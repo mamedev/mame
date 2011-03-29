@@ -55,28 +55,28 @@ f80b      ????
 static WRITE8_HANDLER( tecmo_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank1", &RAM[bankaddress]);
 }
 
 static WRITE8_HANDLER( tecmo_sound_command_w )
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "soundcpu",INPUT_LINE_NMI,PULSE_LINE);
+	cputag_set_input_line(space->machine(), "soundcpu",INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( tecmo_adpcm_start_w )
 {
-	tecmo_state *state = device->machine->driver_data<tecmo_state>();
+	tecmo_state *state = device->machine().driver_data<tecmo_state>();
 	state->adpcm_pos = data << 8;
 	msm5205_reset_w(device, 0);
 }
 static WRITE8_HANDLER( tecmo_adpcm_end_w )
 {
-	tecmo_state *state = space->machine->driver_data<tecmo_state>();
+	tecmo_state *state = space->machine().driver_data<tecmo_state>();
 	state->adpcm_end = (data + 1) << 8;
 }
 static WRITE8_DEVICE_HANDLER( tecmo_adpcm_vol_w )
@@ -85,9 +85,9 @@ static WRITE8_DEVICE_HANDLER( tecmo_adpcm_vol_w )
 }
 static void tecmo_adpcm_int(device_t *device)
 {
-	tecmo_state *state = device->machine->driver_data<tecmo_state>();
+	tecmo_state *state = device->machine().driver_data<tecmo_state>();
 	if (state->adpcm_pos >= state->adpcm_end ||
-				state->adpcm_pos >= device->machine->region("adpcm")->bytes())
+				state->adpcm_pos >= device->machine().region("adpcm")->bytes())
 		msm5205_reset_w(device,1);
 	else if (state->adpcm_data != -1)
 	{
@@ -96,7 +96,7 @@ static void tecmo_adpcm_int(device_t *device)
 	}
 	else
 	{
-		UINT8 *ROM = device->machine->region("adpcm")->base();
+		UINT8 *ROM = device->machine().region("adpcm")->base();
 
 		state->adpcm_data = ROM[state->adpcm_pos++];
 		msm5205_data_w(device,state->adpcm_data >> 4);
@@ -106,28 +106,28 @@ static void tecmo_adpcm_int(device_t *device)
 /* the 8-bit dipswitches are split across addresses */
 static READ8_HANDLER( tecmo_dswa_l_r )
 {
-	UINT8 port = input_port_read(space->machine, "DSWA");
+	UINT8 port = input_port_read(space->machine(), "DSWA");
 	port &= 0x0f;
 	return port;
 }
 
 static READ8_HANDLER( tecmo_dswa_h_r )
 {
-	UINT8 port = input_port_read(space->machine, "DSWA");
+	UINT8 port = input_port_read(space->machine(), "DSWA");
 	port &= 0xf0;
 	return port>>4;
 }
 
 static READ8_HANDLER( tecmo_dswb_l_r )
 {
-	UINT8 port = input_port_read(space->machine, "DSWB");
+	UINT8 port = input_port_read(space->machine(), "DSWB");
 	port &= 0x0f;
 	return port;
 }
 
 static READ8_HANDLER( tecmo_dswb_h_r )
 {
-	UINT8 port = input_port_read(space->machine, "DSWB");
+	UINT8 port = input_port_read(space->machine(), "DSWB");
 	port &= 0xf0;
 	return port>>4;
 }
@@ -640,7 +640,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "soundcpu", 0, linestate);
+	cputag_set_input_line(device->machine(), "soundcpu", 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -657,7 +657,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_RESET( rygar )
 {
-	tecmo_state *state = machine->driver_data<tecmo_state>();
+	tecmo_state *state = machine.driver_data<tecmo_state>();
 	state->adpcm_pos = 0;
 	state->adpcm_end = 0;
 	state->adpcm_data = -1;
@@ -1156,31 +1156,31 @@ ROM_END
 */
 static DRIVER_INIT( rygar )
 {
-	tecmo_state *state = machine->driver_data<tecmo_state>();
+	tecmo_state *state = machine.driver_data<tecmo_state>();
 	state->video_type = 0;
 }
 
 static DRIVER_INIT( silkworm )
 {
-	tecmo_state *state = machine->driver_data<tecmo_state>();
+	tecmo_state *state = machine.driver_data<tecmo_state>();
 	state->video_type = 1;
 }
 
 static DRIVER_INIT( gemini )
 {
-	tecmo_state *state = machine->driver_data<tecmo_state>();
+	tecmo_state *state = machine.driver_data<tecmo_state>();
 	state->video_type = 2;
 }
 
 static DRIVER_INIT( backfirt )
 {
-	tecmo_state *state = machine->driver_data<tecmo_state>();
+	tecmo_state *state = machine.driver_data<tecmo_state>();
 	state->video_type = 2;
 
 	/* no MSM */
-	machine->device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xc000, 0xc000);
-	machine->device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xd000, 0xd000);
-	machine->device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xe000, 0xe000);
+	machine.device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xc000, 0xc000);
+	machine.device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xd000, 0xd000);
+	machine.device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xe000, 0xe000);
 }
 
 

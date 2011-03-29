@@ -23,15 +23,15 @@ static const pen_t pens_from_color_prom[] =
 
 WRITE8_HANDLER( vicdual_palette_bank_w )
 {
-	vicdual_state *state = space->machine->driver_data<vicdual_state>();
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+	vicdual_state *state = space->machine().driver_data<vicdual_state>();
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 	state->palette_bank = data & 3;
 }
 
 
 SCREEN_UPDATE( vicdual_bw )
 {
-	vicdual_state *state = screen->machine->driver_data<vicdual_state>();
+	vicdual_state *state = screen->machine().driver_data<vicdual_state>();
 	UINT8 x = 0;
 	UINT8 y = cliprect->min_y;
 	UINT8 video_data = 0;
@@ -82,8 +82,8 @@ SCREEN_UPDATE( vicdual_bw )
 
 SCREEN_UPDATE( vicdual_color )
 {
-	vicdual_state *state = screen->machine->driver_data<vicdual_state>();
-	UINT8 *color_prom = (UINT8 *)screen->machine->region("proms")->base();
+	vicdual_state *state = screen->machine().driver_data<vicdual_state>();
+	UINT8 *color_prom = (UINT8 *)screen->machine().region("proms")->base();
 	UINT8 x = 0;
 	UINT8 y = cliprect->min_y;
 	UINT8 video_data = 0;
@@ -141,7 +141,7 @@ SCREEN_UPDATE( vicdual_color )
 
 SCREEN_UPDATE( vicdual_bw_or_color )
 {
-	if (vicdual_is_cabinet_color(screen->machine))
+	if (vicdual_is_cabinet_color(screen->machine()))
 		SCREEN_UPDATE_CALL(vicdual_color);
 	else
 		SCREEN_UPDATE_CALL(vicdual_bw);

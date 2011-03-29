@@ -9,7 +9,7 @@
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *base = machine->region("gfx5")->base() + 2 * tile_index;
+	UINT8 *base = machine.region("gfx5")->base() + 2 * tile_index;
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000 + 1] << 8) | base[1];
@@ -22,7 +22,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	UINT8 *base = machine->region("gfx5")->base() + 0x20000 + 2 * tile_index;
+	UINT8 *base = machine.region("gfx5")->base() + 0x20000 + 2 * tile_index;
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000 + 1] << 8) | base[1];
@@ -35,7 +35,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	sf_state *state = machine->driver_data<sf_state>();
+	sf_state *state = machine.driver_data<sf_state>();
 	int code = state->videoram[tile_index];
 	SET_TILE_INFO(
 			3,
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( sf )
 {
-	sf_state *state = machine->driver_data<sf_state>();
+	sf_state *state = machine.driver_data<sf_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 2048, 16);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 16, 16, 2048, 16);
@@ -74,21 +74,21 @@ VIDEO_START( sf )
 
 WRITE16_HANDLER( sf_videoram_w )
 {
-	sf_state *state = space->machine->driver_data<sf_state>();
+	sf_state *state = space->machine().driver_data<sf_state>();
 	COMBINE_DATA(&state->videoram[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
 }
 
 WRITE16_HANDLER( sf_bg_scroll_w )
 {
-	sf_state *state = space->machine->driver_data<sf_state>();
+	sf_state *state = space->machine().driver_data<sf_state>();
 	COMBINE_DATA(&state->bgscroll);
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->bgscroll);
 }
 
 WRITE16_HANDLER( sf_fg_scroll_w )
 {
-	sf_state *state = space->machine->driver_data<sf_state>();
+	sf_state *state = space->machine().driver_data<sf_state>();
 	COMBINE_DATA(&state->fgscroll);
 	tilemap_set_scrollx(state->fg_tilemap, 0, state->fgscroll);
 }
@@ -104,11 +104,11 @@ WRITE16_HANDLER( sf_gfxctrl_w )
 	/* b6 = active middle plane */
 	/* b7 = active sprites */
 
-	sf_state *state = space->machine->driver_data<sf_state>();
+	sf_state *state = space->machine().driver_data<sf_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->sf_active = data & 0xff;
-		flip_screen_set(space->machine, data & 0x04);
+		flip_screen_set(space->machine(), data & 0x04);
 		tilemap_set_enable(state->tx_tilemap, data & 0x08);
 		tilemap_set_enable(state->bg_tilemap, data & 0x20);
 		tilemap_set_enable(state->fg_tilemap, data & 0x40);
@@ -129,9 +129,9 @@ INLINE int sf_invert( int nb )
 	return nb ^ delta[(nb >> 3) & 3];
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	sf_state *state = machine->driver_data<sf_state>();
+	sf_state *state = machine.driver_data<sf_state>();
 	int offs;
 
 	for (offs = 0x1000 - 0x20; offs >= 0; offs -= 0x20)
@@ -173,25 +173,25 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 			}
 
 			drawgfx_transpen(bitmap,
-					cliprect, machine->gfx[2],
+					cliprect, machine.gfx[2],
 					sf_invert(c1),
 					color,
 					flipx,flipy,
 					sx,sy, 15);
 			drawgfx_transpen(bitmap,
-					cliprect, machine->gfx[2],
+					cliprect, machine.gfx[2],
 					sf_invert(c2),
 					color,
 					flipx,flipy,
 					sx+16,sy, 15);
 			drawgfx_transpen(bitmap,
-					cliprect, machine->gfx[2],
+					cliprect, machine.gfx[2],
 					sf_invert(c3),
 					color,
 					flipx,flipy,
 					sx,sy+16, 15);
 			drawgfx_transpen(bitmap,
-					cliprect, machine->gfx[2],
+					cliprect, machine.gfx[2],
 					sf_invert(c4),
 					color,
 					flipx,flipy,
@@ -208,7 +208,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 			}
 
 			drawgfx_transpen(bitmap,
-					cliprect, machine->gfx[2],
+					cliprect, machine.gfx[2],
 					sf_invert(c),
 					color,
 					flipx,flipy,
@@ -220,7 +220,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 
 SCREEN_UPDATE( sf )
 {
-	sf_state *state = screen->machine->driver_data<sf_state>();
+	sf_state *state = screen->machine().driver_data<sf_state>();
 
 	if (state->sf_active & 0x20)
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -230,7 +230,7 @@ SCREEN_UPDATE( sf )
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 
 	if (state->sf_active & 0x80)
-		draw_sprites(screen->machine, bitmap, cliprect);
+		draw_sprites(screen->machine(), bitmap, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 	return 0;

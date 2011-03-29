@@ -17,7 +17,7 @@
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	offtwall_state *state = machine->driver_data<offtwall_state>();
+	offtwall_state *state = machine.driver_data<offtwall_state>();
 	UINT16 data1 = state->playfield[tile_index];
 	UINT16 data2 = state->playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x7fff;
@@ -71,7 +71,7 @@ VIDEO_START( offtwall )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	offtwall_state *state = machine->driver_data<offtwall_state>();
+	offtwall_state *state = machine.driver_data<offtwall_state>();
 
 	/* initialize the playfield */
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
@@ -90,7 +90,7 @@ VIDEO_START( offtwall )
 
 SCREEN_UPDATE( offtwall )
 {
-	offtwall_state *state = screen->machine->driver_data<offtwall_state>();
+	offtwall_state *state = screen->machine().driver_data<offtwall_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

@@ -761,8 +761,8 @@ private:
 	void container_free(render_container *container);
 
 	// config callbacks
-	static void config_load_static(running_machine *machine, int config_type, xml_data_node *parentnode);
-	static void config_save_static(running_machine *machine, int config_type, xml_data_node *parentnode);
+	static void config_load_static(running_machine &machine, int config_type, xml_data_node *parentnode);
+	static void config_save_static(running_machine &machine, int config_type, xml_data_node *parentnode);
 	void config_load(int config_type, xml_data_node *parentnode);
 	void config_save(int config_type, xml_data_node *parentnode);
 

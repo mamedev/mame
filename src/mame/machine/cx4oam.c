@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 //Build OAM
-static void CX4_op00_00(running_machine *machine)
+static void CX4_op00_00(running_machine &machine)
 {
 	INT32 i;
 
@@ -44,7 +44,7 @@ static void CX4_op00_00(running_machine *machine)
 	offset = (cx4.ram[0x626] & 3) * 2;
 	srcptr = 0x220;
 
-	address_space *space = machine->device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	address_space *space = machine.device<cpu_device>("maincpu")->space(AS_PROGRAM);
 	for(i = cx4.ram[0x620]; i > 0 && sprcount > 0; i--, srcptr += 16)
 	{
 		UINT32 spraddr = CX4_readl(srcptr + 7);
@@ -133,7 +133,7 @@ static void CX4_op00_03(void)
 }
 
 //Transform Lines
-static void CX4_op00_05(running_machine *machine)
+static void CX4_op00_05(running_machine &machine)
 {
 	INT32 i;
 	UINT32 ptr = 0, ptr2 = 0;
@@ -185,13 +185,13 @@ static void CX4_op00_07(void)
 }
 
 //Draw Wireframe
-static void CX4_op00_08(running_machine *machine)
+static void CX4_op00_08(running_machine &machine)
 {
 	CX4_C4DrawWireFrame(machine);
 }
 
 //Disintegrate
-static void CX4_op00_0b(running_machine *machine)
+static void CX4_op00_0b(running_machine &machine)
 {
 	UINT8  width, height;
 	UINT32 startx, starty;
@@ -241,7 +241,7 @@ static void CX4_op00_0b(running_machine *machine)
 }
 
 //Bitplane Wave
-static void CX4_op00_0c(running_machine *machine)
+static void CX4_op00_0c(running_machine &machine)
 {
 	int i, j;
 	UINT32 destptr = 0;

@@ -222,10 +222,10 @@ READ64_DEVICE_HANDLER(pci_64be_r) { return read64be_with_32le_device_handler(pci
 WRITE64_DEVICE_HANDLER(pci_64be_w) { write64be_with_32le_device_handler(pci_32le_w, device, offset, data, mem_mask); }
 
 
-int pci_add_sibling( running_machine *machine, char *pcitag, char *sibling )
+int pci_add_sibling( running_machine &machine, char *pcitag, char *sibling )
 {
-	device_t *device1 = machine->device(pcitag);
-	device_t *device2 = machine->device(sibling);
+	device_t *device1 = machine.device(pcitag);
+	device_t *device2 = machine.device(sibling);
 	pci_bus_state *pcibus1 = get_safe_token(device1);
 	pci_bus_state *pcibus2 = get_safe_token(device2);
 	pci_bus_config *config2;
@@ -271,7 +271,6 @@ static DEVICE_START( pci_bus )
 	assert(device != NULL);
 	assert(device->baseconfig().static_config() == NULL);
 	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
-	assert(device->machine != NULL);
 
 	/* store a pointer back to the device */
 	pcibus->config = (const pci_bus_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
@@ -281,17 +280,17 @@ static DEVICE_START( pci_bus )
 	/* find all our devices */
 	for (devicenum = 0; devicenum < ARRAY_LENGTH(pcibus->device); devicenum++)
 		if (pcibus->config->device[devicenum].devtag != NULL)
-			pcibus->device[devicenum] = device->machine->device(pcibus->config->device[devicenum].devtag);
+			pcibus->device[devicenum] = device->machine().device(pcibus->config->device[devicenum].devtag);
 
 	if (pcibus->config->father != NULL)
-		pci_add_sibling(device->machine, (char *)pcibus->config->father, (char *)device->tag());
+		pci_add_sibling(device->machine(), (char *)pcibus->config->father, (char *)device->tag());
 
 	/* register pci states */
 	device->save_item(NAME(pcibus->address));
 	device->save_item(NAME(pcibus->devicenum));
 	device->save_item(NAME(pcibus->busnum));
 
-	device->machine->state().register_postload(pci_bus_postload, pcibus);
+	device->machine().state().register_postload(pci_bus_postload, pcibus);
 }
 
 

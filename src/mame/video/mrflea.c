@@ -10,7 +10,7 @@ Mr. F. Lea
 
 WRITE8_HANDLER( mrflea_gfx_bank_w )
 {
-	mrflea_state *state = space->machine->driver_data<mrflea_state>();
+	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 	state->gfx_bank = data;
 
 	if (data & ~0x14)
@@ -19,7 +19,7 @@ WRITE8_HANDLER( mrflea_gfx_bank_w )
 
 WRITE8_HANDLER( mrflea_videoram_w )
 {
-	mrflea_state *state = space->machine->driver_data<mrflea_state>();
+	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 	int bank = offset / 0x400;
 
 	offset &= 0x3ff;
@@ -31,7 +31,7 @@ WRITE8_HANDLER( mrflea_videoram_w )
 
 WRITE8_HANDLER( mrflea_spriteram_w )
 {
-	mrflea_state *state = space->machine->driver_data<mrflea_state>();
+	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 
 	if (offset & 2)
 	{
@@ -43,13 +43,13 @@ WRITE8_HANDLER( mrflea_spriteram_w )
 	state->spriteram[offset] = data;
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	mrflea_state *state = machine->driver_data<mrflea_state>();
-	const gfx_element *gfx = machine->gfx[0];
+	mrflea_state *state = machine.driver_data<mrflea_state>();
+	const gfx_element *gfx = machine.gfx[0];
 	const UINT8 *source = state->spriteram;
 	const UINT8 *finish = source + 0x100;
-	rectangle clip = machine->primary_screen->visible_area();
+	rectangle clip = machine.primary_screen->visible_area();
 
 	clip.max_x -= 24;
 	clip.min_x += 16;
@@ -74,11 +74,11 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static void draw_background( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	mrflea_state *state = machine->driver_data<mrflea_state>();
+	mrflea_state *state = machine.driver_data<mrflea_state>();
 	const UINT8 *source = state->videoram;
-	const gfx_element *gfx = machine->gfx[1];
+	const gfx_element *gfx = machine.gfx[1];
 	int sx, sy;
 	int base = 0;
 
@@ -106,7 +106,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 
 SCREEN_UPDATE( mrflea )
 {
-	draw_background(screen->machine, bitmap, cliprect);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_background(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

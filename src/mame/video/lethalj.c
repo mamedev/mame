@@ -20,10 +20,10 @@
  *
  *************************************/
 
-INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *y)
+INLINE void get_crosshair_xy(running_machine &machine, int player, int *x, int *y)
 {
 	static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 	int width = visarea.max_x + 1 - visarea.min_x;
 	int height = visarea.max_y + 1 - visarea.min_y;
 
@@ -41,7 +41,7 @@ INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *
 
 READ16_HANDLER( lethalj_gun_r )
 {
-	lethalj_state *state = space->machine->driver_data<lethalj_state>();
+	lethalj_state *state = space->machine().driver_data<lethalj_state>();
 	UINT16 result = 0;
 	int beamx, beamy;
 
@@ -50,7 +50,7 @@ READ16_HANDLER( lethalj_gun_r )
 		case 4:
 		case 5:
 			/* latch the crosshair position */
-			get_crosshair_xy(space->machine, offset - 4, &beamx, &beamy);
+			get_crosshair_xy(space->machine(), offset - 4, &beamx, &beamy);
 			state->gunx = beamx;
 			state->guny = beamy;
 			state->blank_palette = 1;
@@ -78,13 +78,13 @@ READ16_HANDLER( lethalj_gun_r )
 
 VIDEO_START( lethalj )
 {
-	lethalj_state *state = machine->driver_data<lethalj_state>();
+	lethalj_state *state = machine.driver_data<lethalj_state>();
 	/* allocate video RAM for screen */
 	state->screenram = auto_alloc_array(machine, UINT16, BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
 
 	/* predetermine blitter info */
-	state->blitter_base = (UINT16 *)machine->region("gfx1")->base();
-	state->blitter_rows = machine->region("gfx1")->bytes() / (2*BLITTER_SOURCE_WIDTH);
+	state->blitter_base = (UINT16 *)machine.region("gfx1")->base();
+	state->blitter_rows = machine.region("gfx1")->bytes() / (2*BLITTER_SOURCE_WIDTH);
 }
 
 
@@ -143,7 +143,7 @@ static void do_blit(lethalj_state *state)
 
 WRITE16_HANDLER( lethalj_blitter_w )
 {
-	lethalj_state *state = space->machine->driver_data<lethalj_state>();
+	lethalj_state *state = space->machine().driver_data<lethalj_state>();
 	/* combine the data */
 	COMBINE_DATA(&state->blitter_data[offset]);
 
@@ -155,12 +155,12 @@ WRITE16_HANDLER( lethalj_blitter_w )
 		else
 			do_blit(state);
 
-		space->machine->scheduler().timer_set(attotime::from_hz(XTAL_32MHz) * ((state->blitter_data[5] + 1) * (state->blitter_data[7] + 1)), FUNC(gen_ext1_int));
+		space->machine().scheduler().timer_set(attotime::from_hz(XTAL_32MHz) * ((state->blitter_data[5] + 1) * (state->blitter_data[7] + 1)), FUNC(gen_ext1_int));
 	}
 
 	/* clear the IRQ on offset 0 */
 	else if (offset == 0)
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -173,7 +173,7 @@ WRITE16_HANDLER( lethalj_blitter_w )
 
 void lethalj_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	lethalj_state *state = screen.machine->driver_data<lethalj_state>();
+	lethalj_state *state = screen.machine().driver_data<lethalj_state>();
 	UINT16 *src = &state->screenram[(state->vispage << 17) | ((params->rowaddr << 9) & 0x3fe00)];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
 	int coladdr = params->coladdr << 1;

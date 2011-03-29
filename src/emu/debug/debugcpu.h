@@ -370,51 +370,51 @@ private:
 /* ----- initialization and cleanup ----- */
 
 /* initialize the CPU tracking for the debugger */
-void debug_cpu_init(running_machine *machine);
+void debug_cpu_init(running_machine &machine);
 void debug_cpu_configure_memory(running_machine &machine, symbol_table &table);
 
 /* flushes all traces; this is useful if a trace is going on when we fatalerror */
-void debug_cpu_flush_traces(running_machine *machine);
+void debug_cpu_flush_traces(running_machine &machine);
 
 
 
 /* ----- debugging status & information ----- */
 
 /* return the visible CPU device (the one that commands should apply to) */
-device_t *debug_cpu_get_visible_cpu(running_machine *machine);
+device_t *debug_cpu_get_visible_cpu(running_machine &machine);
 
 /* TRUE if the debugger is currently stopped within an instruction hook callback */
-int debug_cpu_within_instruction_hook(running_machine *machine);
+int debug_cpu_within_instruction_hook(running_machine &machine);
 
 /* return TRUE if the current execution state is stopped */
-int	debug_cpu_is_stopped(running_machine *machine);
+int	debug_cpu_is_stopped(running_machine &machine);
 
 
 
 /* ----- symbol table interfaces ----- */
 
 /* return the global symbol table */
-symbol_table *debug_cpu_get_global_symtable(running_machine *machine);
+symbol_table *debug_cpu_get_global_symtable(running_machine &machine);
 
 /* return the locally-visible symbol table */
-symbol_table *debug_cpu_get_visible_symtable(running_machine *machine);
+symbol_table *debug_cpu_get_visible_symtable(running_machine &machine);
 
 
 
 /* ----- misc debugger functions ----- */
 
 /* specifies a debug command script to execute */
-void debug_cpu_source_script(running_machine *machine, const char *file);
+void debug_cpu_source_script(running_machine &machine, const char *file);
 
 
 
 /* ----- debugger comment helpers ----- */
 
 // save all comments for a given machine
-bool debug_comment_save(running_machine *machine);
+bool debug_comment_save(running_machine &machine);
 
 // load all comments for a given machine
-bool debug_comment_load(running_machine *machine);
+bool debug_comment_load(running_machine &machine);
 
 
 

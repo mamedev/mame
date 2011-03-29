@@ -5,7 +5,7 @@
 ****************************************************************************/
 
 
-void atarijsa_init(running_machine *machine, const char *testport, int testmask);
+void atarijsa_init(running_machine &machine, const char *testport, int testmask);
 void atarijsa_reset(void);
 
 

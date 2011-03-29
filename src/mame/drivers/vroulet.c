@@ -65,35 +65,35 @@ static WRITE8_HANDLER(vroulet_paletteram_w)
     */
 
 	int i,j,a,b;
-	space->machine->generic.paletteram.u8[offset]=data;
+	space->machine().generic.paletteram.u8[offset]=data;
 	for(i=0;i<32;i++)
 	{
 		for(j=0;j<16;j++)
 		{
-			a=space->machine->generic.paletteram.u8[((i*8+j)*2)&0xff ];
-			b=space->machine->generic.paletteram.u8[((i*8+j)*2+1)&0xff ];
-			palette_set_color_rgb(space->machine,i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
+			a=space->machine().generic.paletteram.u8[((i*8+j)*2)&0xff ];
+			b=space->machine().generic.paletteram.u8[((i*8+j)*2+1)&0xff ];
+			palette_set_color_rgb(space->machine(),i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
 		}
 	}
 }
 
 static WRITE8_HANDLER( vroulet_videoram_w )
 {
-	vroulet_state *state = space->machine->driver_data<vroulet_state>();
+	vroulet_state *state = space->machine().driver_data<vroulet_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( vroulet_colorram_w )
 {
-	vroulet_state *state = space->machine->driver_data<vroulet_state>();
+	vroulet_state *state = space->machine().driver_data<vroulet_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	vroulet_state *state = machine->driver_data<vroulet_state>();
+	vroulet_state *state = machine.driver_data<vroulet_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x1f;
@@ -103,16 +103,16 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START(vroulet)
 {
-	vroulet_state *state = machine->driver_data<vroulet_state>();
+	vroulet_state *state = machine.driver_data<vroulet_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE(vroulet)
 {
-	vroulet_state *state = screen->machine->driver_data<vroulet_state>();
+	vroulet_state *state = screen->machine().driver_data<vroulet_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], 0x320, 1, 0, 0,
+	drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], 0x320, 1, 0, 0,
 		state->ball[1], state->ball[0] - 12, 0);
 	return 0;
 }

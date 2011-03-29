@@ -103,7 +103,7 @@ device_config *crt9021_device_config::static_alloc_device_config(const machine_c
 
 device_t *crt9021_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, crt9021_device(machine, *this));
+	return auto_alloc(machine, crt9021_device(machine, *this));
 }
 
 
@@ -166,7 +166,7 @@ void crt9021_device::device_start()
 	devcb_resolve_read_line(&m_in_atten_func, &m_config.in_atten_func, this);
 
 	// get the screen device
-	m_screen = machine->device<screen_device>(m_config.screen_tag);
+	m_screen = m_machine.device<screen_device>(m_config.screen_tag);
 	assert(m_screen != NULL);
 
 	// register for state saving

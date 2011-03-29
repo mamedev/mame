@@ -75,7 +75,7 @@ public:
 
 static MACHINE_START(merit)
 {
-	merit_state *state = machine->driver_data<merit_state>();
+	merit_state *state = machine.driver_data<merit_state>();
 	state->question_address = 0;
 	state->ram_palette = auto_alloc_array(machine, UINT8, RAM_PALETTE_SIZE);
 
@@ -89,8 +89,8 @@ static MACHINE_START(merit)
 
 static READ8_HANDLER( questions_r )
 {
-	merit_state *state = space->machine->driver_data<merit_state>();
-	UINT8 *questions = space->machine->region("user1")->base();
+	merit_state *state = space->machine().driver_data<merit_state>();
+	UINT8 *questions = space->machine().region("user1")->base();
 	int address;
 
 	switch(state->question_address >> 16)
@@ -142,7 +142,7 @@ static READ8_HANDLER( questions_r )
 
 static WRITE8_HANDLER( low_offset_w )
 {
-	merit_state *state = space->machine->driver_data<merit_state>();
+	merit_state *state = space->machine().driver_data<merit_state>();
 	offset = (offset & 0xf0) | ((offset - state->decryption_key) & 0x0f);
 	offset = BITSWAP8(offset,7,6,5,4,0,1,2,3);
 	state->question_address = (state->question_address & 0xffff00) | offset;
@@ -150,7 +150,7 @@ static WRITE8_HANDLER( low_offset_w )
 
 static WRITE8_HANDLER( med_offset_w )
 {
-	merit_state *state = space->machine->driver_data<merit_state>();
+	merit_state *state = space->machine().driver_data<merit_state>();
 	offset = (offset & 0xf0) | ((offset - state->decryption_key) & 0x0f);
 	offset = BITSWAP8(offset,7,6,5,4,0,1,2,3);
 	state->question_address = (state->question_address & 0xff00ff) | (offset << 8);
@@ -158,14 +158,14 @@ static WRITE8_HANDLER( med_offset_w )
 
 static WRITE8_HANDLER( high_offset_w )
 {
-	merit_state *state = space->machine->driver_data<merit_state>();
+	merit_state *state = space->machine().driver_data<merit_state>();
 	offset = BITSWAP8(offset,7,6,5,4,0,1,2,3);
 	state->question_address = (state->question_address & 0x00ffff) | (offset << 16);
 }
 
 static READ8_HANDLER( palette_r )
 {
-	merit_state *state = space->machine->driver_data<merit_state>();
+	merit_state *state = space->machine().driver_data<merit_state>();
 	int co;
 
 	co = ((state->ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
@@ -174,10 +174,10 @@ static READ8_HANDLER( palette_r )
 
 static WRITE8_HANDLER( palette_w )
 {
-	merit_state *state = space->machine->driver_data<merit_state>();
+	merit_state *state = space->machine().driver_data<merit_state>();
 	int co;
 
-	space->machine->primary_screen->update_now();
+	space->machine().primary_screen->update_now();
 	data &= 0x0f;
 
 	co = ((state->ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
@@ -188,7 +188,7 @@ static WRITE8_HANDLER( palette_w )
 
 static MC6845_BEGIN_UPDATE( begin_update )
 {
-	merit_state *state = device->machine->driver_data<merit_state>();
+	merit_state *state = device->machine().driver_data<merit_state>();
 	int i;
 	int dim, bit0, bit1, bit2;
 
@@ -207,7 +207,7 @@ static MC6845_BEGIN_UPDATE( begin_update )
 
 static MC6845_UPDATE_ROW( update_row )
 {
-	merit_state *state = device->machine->driver_data<merit_state>();
+	merit_state *state = device->machine().driver_data<merit_state>();
 	UINT8 cx;
 
 	pen_t *pens = (pen_t *)param;
@@ -215,9 +215,9 @@ static MC6845_UPDATE_ROW( update_row )
 	UINT16 x = 0;
 	int rlen;
 
-	gfx[0] = device->machine->region("gfx1")->base();
-	gfx[1] = device->machine->region("gfx2")->base();
-	rlen = device->machine->region("gfx2")->bytes();
+	gfx[0] = device->machine().region("gfx1")->base();
+	gfx[1] = device->machine().region("gfx2")->base();
+	rlen = device->machine().region("gfx2")->bytes();
 
 	//ma = ma ^ 0x7ff;
 	for (cx = 0; cx < x_count; cx++)
@@ -258,12 +258,12 @@ static MC6845_UPDATE_ROW( update_row )
 static WRITE_LINE_DEVICE_HANDLER(hsync_changed)
 {
 	/* update any video up to the current scanline */
-	device->machine->primary_screen->update_now();
+	device->machine().primary_screen->update_now();
 }
 
 static WRITE_LINE_DEVICE_HANDLER(vsync_changed)
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =
@@ -283,30 +283,30 @@ static const mc6845_interface mc6845_intf =
 static WRITE8_DEVICE_HANDLER( led1_w )
 {
 	/* 5 button lamps player 1 */
-	set_led_status(device->machine, 0,~data & 0x01);
-	set_led_status(device->machine, 1,~data & 0x02);
-	set_led_status(device->machine, 2,~data & 0x04);
-	set_led_status(device->machine, 3,~data & 0x08);
-	set_led_status(device->machine, 4,~data & 0x10);
+	set_led_status(device->machine(), 0,~data & 0x01);
+	set_led_status(device->machine(), 1,~data & 0x02);
+	set_led_status(device->machine(), 2,~data & 0x04);
+	set_led_status(device->machine(), 3,~data & 0x08);
+	set_led_status(device->machine(), 4,~data & 0x10);
 }
 
 static WRITE8_DEVICE_HANDLER( led2_w )
 {
 	/* 5 button lamps player 2 */
-	set_led_status(device->machine, 5,~data & 0x01);
-	set_led_status(device->machine, 6,~data & 0x02);
-	set_led_status(device->machine, 7,~data & 0x04);
-	set_led_status(device->machine, 8,~data & 0x08);
-	set_led_status(device->machine, 9,~data & 0x10);
+	set_led_status(device->machine(), 5,~data & 0x01);
+	set_led_status(device->machine(), 6,~data & 0x02);
+	set_led_status(device->machine(), 7,~data & 0x04);
+	set_led_status(device->machine(), 8,~data & 0x08);
+	set_led_status(device->machine(), 9,~data & 0x10);
 
 	/* coin counter */
-	coin_counter_w(device->machine,0,0x80-(data & 0x80));
+	coin_counter_w(device->machine(),0,0x80-(data & 0x80));
 }
 
 static WRITE8_DEVICE_HANDLER( misc_w )
 {
-	merit_state *state = device->machine->driver_data<merit_state>();
-	flip_screen_set(device->machine, ~data & 0x10);
+	merit_state *state = device->machine().driver_data<merit_state>();
+	flip_screen_set(device->machine(), ~data & 0x10);
 	state->extra_video_bank_bit = (data & 2) << 8;
 	state->lscnblk = (data >> 3) & 1;
 
@@ -315,8 +315,8 @@ static WRITE8_DEVICE_HANDLER( misc_w )
 
 static WRITE8_DEVICE_HANDLER( misc_couple_w )
 {
-	merit_state *state = device->machine->driver_data<merit_state>();
-	flip_screen_set(device->machine, ~data & 0x10);
+	merit_state *state = device->machine().driver_data<merit_state>();
+	flip_screen_set(device->machine(), ~data & 0x10);
 	state->extra_video_bank_bit = (data & 2) << 8;
 	state->lscnblk = (data >> 3) & 1;
 
@@ -330,13 +330,13 @@ static WRITE8_HANDLER(casino5_bank_w)
 {
 	if ( data == 0 )
 	{
-		memory_set_bank(space->machine, "bank1", 1);
-		memory_set_bank(space->machine, "bank2", 1);
+		memory_set_bank(space->machine(), "bank1", 1);
+		memory_set_bank(space->machine(), "bank2", 1);
 	}
 	else if ( data == 0xff )
 	{
-		memory_set_bank(space->machine, "bank1", 0);
-		memory_set_bank(space->machine, "bank2", 0);
+		memory_set_bank(space->machine(), "bank1", 0);
+		memory_set_bank(space->machine(), "bank2", 0);
 	}
 	else
 	{
@@ -346,7 +346,7 @@ static WRITE8_HANDLER(casino5_bank_w)
 
 static CUSTOM_INPUT(rndbit_r)
 {
-	return field->port->machine->rand();
+	return field->port->machine().rand();
 }
 
 static ADDRESS_MAP_START( pitboss_map, AS_PROGRAM, 8 )
@@ -1155,7 +1155,7 @@ INPUT_PORTS_END
 
 static SCREEN_UPDATE( merit )
 {
-	device_t *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine().device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
@@ -1218,8 +1218,8 @@ void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
 static MACHINE_START(casino5)
 {
 	MACHINE_START_CALL(merit);
-	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x2000, 0x2000);
-	memory_configure_bank(machine, "bank2", 0, 2, machine->region("maincpu")->base() + 0x6000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0x2000, 0x2000);
+	memory_configure_bank(machine, "bank2", 0, 2, machine.region("maincpu")->base() + 0x6000, 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 	memory_set_bank(machine, "bank2", 0);
 }
@@ -1995,37 +1995,37 @@ ROM_END
 
 static DRIVER_INIT( key_0 )
 {
-	merit_state *state = machine->driver_data<merit_state>();
+	merit_state *state = machine.driver_data<merit_state>();
 	state->decryption_key = 0;
 }
 
 static DRIVER_INIT( key_2 )
 {
-	merit_state *state = machine->driver_data<merit_state>();
+	merit_state *state = machine.driver_data<merit_state>();
 	state->decryption_key = 2;
 }
 
 static DRIVER_INIT( key_4 )
 {
-	merit_state *state = machine->driver_data<merit_state>();
+	merit_state *state = machine.driver_data<merit_state>();
 	state->decryption_key = 4;
 }
 
 static DRIVER_INIT( key_5 )
 {
-	merit_state *state = machine->driver_data<merit_state>();
+	merit_state *state = machine.driver_data<merit_state>();
 	state->decryption_key = 5;
 }
 
 static DRIVER_INIT( key_7 )
 {
-	merit_state *state = machine->driver_data<merit_state>();
+	merit_state *state = machine.driver_data<merit_state>();
 	state->decryption_key = 7;
 }
 
 static DRIVER_INIT( couple )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	#if 0 //quick rom compare test
 	{
@@ -2050,9 +2050,9 @@ static DRIVER_INIT( couple )
 
 static DRIVER_INIT( dtrvwz5 )
 {
-	merit_state *state = machine->driver_data<merit_state>();
+	merit_state *state = machine.driver_data<merit_state>();
 	int i;
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	/* fill b000 - b0ff with ret 0xc9 */
 	for ( i = 0xb000; i < 0xb100; i++ )
 		ROM[i] = 0xc9;

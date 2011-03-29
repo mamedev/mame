@@ -17,7 +17,7 @@
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	foodf_state *state = machine->driver_data<foodf_state>();
+	foodf_state *state = machine.driver_data<foodf_state>();
 	UINT16 data = state->playfield[tile_index];
 	int code = (data & 0xff) | ((data >> 7) & 0x100);
 	int color = (data >> 8) & 0x3f;
@@ -35,7 +35,7 @@ static TILE_GET_INFO( get_playfield_tile_info )
 VIDEO_START( foodf )
 {
 	static const int resistances[3] = { 1000, 470, 220 };
-	foodf_state *state = machine->driver_data<foodf_state>();
+	foodf_state *state = machine.driver_data<foodf_state>();
 
 	/* initialize the playfield */
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 32,32);
@@ -79,11 +79,11 @@ void foodf_set_flip(foodf_state *state, int flip)
 
 WRITE16_HANDLER( foodf_paletteram_w )
 {
-	foodf_state *state = space->machine->driver_data<foodf_state>();
+	foodf_state *state = space->machine().driver_data<foodf_state>();
 	int newword, r, g, b, bit0, bit1, bit2;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	newword = space->machine->generic.paletteram.u16[offset];
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	newword = space->machine().generic.paletteram.u16[offset];
 
 	/* only the bottom 8 bits are used */
 	/* red component */
@@ -103,7 +103,7 @@ WRITE16_HANDLER( foodf_paletteram_w )
 	bit1 = (newword >> 7) & 0x01;
 	b = combine_2_weights(state->bweights, bit0, bit1);
 
-	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
 }
 
 
@@ -116,10 +116,10 @@ WRITE16_HANDLER( foodf_paletteram_w )
 
 SCREEN_UPDATE( foodf )
 {
-	foodf_state *state = screen->machine->driver_data<foodf_state>();
+	foodf_state *state = screen->machine().driver_data<foodf_state>();
 	int offs;
-	const gfx_element *gfx = screen->machine->gfx[1];
-	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
+	const gfx_element *gfx = screen->machine().gfx[1];
+	bitmap_t *priority_bitmap = screen->machine().priority_bitmap;
 	UINT16 *spriteram16 = state->spriteram;
 
 	/* first draw the playfield opaquely */

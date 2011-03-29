@@ -6,7 +6,7 @@
 
 /* Sprites */
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	/*- SPR RAM Format -**
 
@@ -16,8 +16,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
         ( rest unused )
     **- End of Comments -*/
 
-	bigstrkb_state *state = machine->driver_data<bigstrkb_state>();
-	const gfx_element *gfx = machine->gfx[2];
+	bigstrkb_state *state = machine.driver_data<bigstrkb_state>();
+	const gfx_element *gfx = machine.gfx[2];
 	UINT16 *source = state->spriteram;
 	UINT16 *finish = source + 0x800/2;
 
@@ -61,7 +61,7 @@ static TILEMAP_MAPPER( bsb_bg_scan )
 
 static TILE_GET_INFO( get_bsb_tile_info )
 {
-	bigstrkb_state *state = machine->driver_data<bigstrkb_state>();
+	bigstrkb_state *state = machine.driver_data<bigstrkb_state>();
 	int tileno,col;
 
 	tileno = state->videoram[tile_index] & 0x0fff;
@@ -72,14 +72,14 @@ static TILE_GET_INFO( get_bsb_tile_info )
 
 WRITE16_HANDLER( bsb_videoram_w )
 {
-	bigstrkb_state *state = space->machine->driver_data<bigstrkb_state>();
+	bigstrkb_state *state = space->machine().driver_data<bigstrkb_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap,offset);
 }
 
 static TILE_GET_INFO( get_bsb_tile2_info )
 {
-	bigstrkb_state *state = machine->driver_data<bigstrkb_state>();
+	bigstrkb_state *state = machine.driver_data<bigstrkb_state>();
 	int tileno,col;
 
 	tileno = state->videoram2[tile_index] & 0x0fff;
@@ -90,7 +90,7 @@ static TILE_GET_INFO( get_bsb_tile2_info )
 
 WRITE16_HANDLER( bsb_videoram2_w )
 {
-	bigstrkb_state *state = space->machine->driver_data<bigstrkb_state>();
+	bigstrkb_state *state = space->machine().driver_data<bigstrkb_state>();
 	state->videoram2[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap2,offset);
 }
@@ -98,7 +98,7 @@ WRITE16_HANDLER( bsb_videoram2_w )
 
 static TILE_GET_INFO( get_bsb_tile3_info )
 {
-	bigstrkb_state *state = machine->driver_data<bigstrkb_state>();
+	bigstrkb_state *state = machine.driver_data<bigstrkb_state>();
 	int tileno,col;
 
 	tileno = state->videoram3[tile_index] & 0x0fff;
@@ -109,7 +109,7 @@ static TILE_GET_INFO( get_bsb_tile3_info )
 
 WRITE16_HANDLER( bsb_videoram3_w )
 {
-	bigstrkb_state *state = space->machine->driver_data<bigstrkb_state>();
+	bigstrkb_state *state = space->machine().driver_data<bigstrkb_state>();
 	state->videoram3[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap3,offset);
 }
@@ -118,7 +118,7 @@ WRITE16_HANDLER( bsb_videoram3_w )
 
 VIDEO_START(bigstrkb)
 {
-	bigstrkb_state *state = machine->driver_data<bigstrkb_state>();
+	bigstrkb_state *state = machine.driver_data<bigstrkb_state>();
 	state->tilemap = tilemap_create(machine, get_bsb_tile_info,tilemap_scan_cols, 8, 8,64,32);
 	state->tilemap2 = tilemap_create(machine, get_bsb_tile2_info,bsb_bg_scan, 16, 16,128,64);
 	state->tilemap3 = tilemap_create(machine, get_bsb_tile3_info,bsb_bg_scan, 16, 16,128,64);
@@ -130,9 +130,9 @@ VIDEO_START(bigstrkb)
 
 SCREEN_UPDATE(bigstrkb)
 {
-	bigstrkb_state *state = screen->machine->driver_data<bigstrkb_state>();
+	bigstrkb_state *state = screen->machine().driver_data<bigstrkb_state>();
 
-//  bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+//  bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
 	tilemap_set_scrollx(state->tilemap2,0, state->vidreg1[0]+(256-14));
 	tilemap_set_scrolly(state->tilemap2,0, state->vidreg2[0]);
@@ -143,7 +143,7 @@ SCREEN_UPDATE(bigstrkb)
 	tilemap_draw(bitmap,cliprect,state->tilemap2,0,0);
 	tilemap_draw(bitmap,cliprect,state->tilemap3,0,0);
 
-	draw_sprites(screen->machine,bitmap,cliprect);
+	draw_sprites(screen->machine(),bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->tilemap,0,0);
 
 //  popmessage ("Regs %08x %08x %08x %08x",bsb_vidreg2[0],bsb_vidreg2[1],bsb_vidreg2[2],bsb_vidreg2[3]);

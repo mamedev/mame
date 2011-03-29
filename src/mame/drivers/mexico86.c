@@ -421,15 +421,15 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( mexico86 )
 {
-	mexico86_state *state = machine->driver_data<mexico86_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	mexico86_state *state = machine.driver_data<mexico86_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->subcpu = machine->device("sub");
-	state->mcu = machine->device("mcu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->subcpu = machine.device("sub");
+	state->mcu = machine.device("mcu");
 
 	state->save_item(NAME(state->port_a_in));
 	state->save_item(NAME(state->port_a_out));
@@ -449,10 +449,10 @@ static MACHINE_START( mexico86 )
 
 static MACHINE_RESET( mexico86 )
 {
-	mexico86_state *state = machine->driver_data<mexico86_state>();
+	mexico86_state *state = machine.driver_data<mexico86_state>();
 
 	/*TODO: check the PCB and see how the halt / reset lines are connected. */
-	if (machine->device("sub") != NULL)
+	if (machine.device("sub") != NULL)
 		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (input_port_read(machine, "DSW1") & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
 	state->port_a_in = 0;

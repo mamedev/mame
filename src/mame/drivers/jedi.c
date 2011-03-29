@@ -125,7 +125,7 @@
 
 static TIMER_CALLBACK( generate_interrupt )
 {
-	jedi_state *state = machine->driver_data<jedi_state>();
+	jedi_state *state = machine.driver_data<jedi_state>();
 	int scanline = param;
 
 	/* IRQ is set by /32V */
@@ -136,13 +136,13 @@ static TIMER_CALLBACK( generate_interrupt )
 	scanline += 32;
 	if (scanline > 256)
 		scanline = 32;
-	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
+	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
 
 static WRITE8_HANDLER( main_irq_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -155,14 +155,14 @@ static WRITE8_HANDLER( main_irq_ack_w )
 
 static MACHINE_START( jedi )
 {
-	jedi_state *state = machine->driver_data<jedi_state>();
+	jedi_state *state = machine.driver_data<jedi_state>();
 
 	/* set a timer to run the interrupts */
-	state->interrupt_timer = machine->scheduler().timer_alloc(FUNC(generate_interrupt));
-	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(32), 32);
+	state->interrupt_timer = machine.scheduler().timer_alloc(FUNC(generate_interrupt));
+	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(32), 32);
 
 	/* configure the banks */
-	memory_configure_bank(machine, "bank1", 0, 3, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 3, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* set up save state */
 	state->save_item(NAME(state->nvram_enabled));
@@ -178,7 +178,7 @@ static MACHINE_START( jedi )
 
 static MACHINE_RESET( jedi )
 {
-	jedi_state *state = machine->driver_data<jedi_state>();
+	jedi_state *state = machine.driver_data<jedi_state>();
 
 	/* init globals */
 	state->a2d_select = 0;
@@ -195,9 +195,9 @@ static MACHINE_RESET( jedi )
 
 static WRITE8_HANDLER( rom_banksel_w )
 {
-	if (data & 0x01) memory_set_bank(space->machine, "bank1", 0);
-	if (data & 0x02) memory_set_bank(space->machine, "bank1", 1);
-	if (data & 0x04) memory_set_bank(space->machine, "bank1", 2);
+	if (data & 0x01) memory_set_bank(space->machine(), "bank1", 0);
+	if (data & 0x02) memory_set_bank(space->machine(), "bank1", 1);
+	if (data & 0x04) memory_set_bank(space->machine(), "bank1", 2);
 }
 
 
@@ -210,13 +210,13 @@ static WRITE8_HANDLER( rom_banksel_w )
 
 static READ8_HANDLER( a2d_data_r )
 {
-	jedi_state *state = space->machine->driver_data<jedi_state>();
+	jedi_state *state = space->machine().driver_data<jedi_state>();
 	UINT8 ret = 0;
 
 	switch (state->a2d_select)
 	{
-		case 0: ret = input_port_read(space->machine, "STICKY"); break;
-		case 2: ret = input_port_read(space->machine, "STICKX"); break;
+		case 0: ret = input_port_read(space->machine(), "STICKY"); break;
+		case 2: ret = input_port_read(space->machine(), "STICKX"); break;
 	}
 
 	return ret;
@@ -225,7 +225,7 @@ static READ8_HANDLER( a2d_data_r )
 
 static WRITE8_HANDLER( a2d_select_w )
 {
-	jedi_state *state = space->machine->driver_data<jedi_state>();
+	jedi_state *state = space->machine().driver_data<jedi_state>();
 
 	state->a2d_select = offset;
 }
@@ -233,7 +233,7 @@ static WRITE8_HANDLER( a2d_select_w )
 
 static WRITE8_HANDLER( jedi_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset, data);
+	coin_counter_w(space->machine(), offset, data);
 }
 
 
@@ -246,7 +246,7 @@ static WRITE8_HANDLER( jedi_coin_counter_w )
 
 static WRITE8_HANDLER( nvram_data_w )
 {
-	jedi_state *state = space->machine->driver_data<jedi_state>();
+	jedi_state *state = space->machine().driver_data<jedi_state>();
 
 	if (state->nvram_enabled)
 		state->m_nvram[offset] = data;
@@ -255,7 +255,7 @@ static WRITE8_HANDLER( nvram_data_w )
 
 static WRITE8_HANDLER( nvram_enable_w )
 {
-	jedi_state *state = space->machine->driver_data<jedi_state>();
+	jedi_state *state = space->machine().driver_data<jedi_state>();
 
 	state->nvram_enabled = ~offset & 1;
 }

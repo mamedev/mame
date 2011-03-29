@@ -103,19 +103,19 @@ INLINE int vysnc_chain_counter_to_vpos( UINT16 counter )
 
 static TIMER_CALLBACK( interrupt_clear_callback )
 {
-	enigma2_state *state = machine->driver_data<enigma2_state>();
+	enigma2_state *state = machine.driver_data<enigma2_state>();
 	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( interrupt_assert_callback )
 {
-	enigma2_state *state = machine->driver_data<enigma2_state>();
+	enigma2_state *state = machine.driver_data<enigma2_state>();
 	UINT16 next_counter;
 	int next_vpos;
 
 	/* compute vector and set the interrupt line */
-	int vpos = machine->primary_screen->vpos();
+	int vpos = machine.primary_screen->vpos();
 	UINT16 counter = vpos_to_vysnc_chain_counter(vpos);
 	UINT8 vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
 	device_set_input_line_and_vector(state->maincpu, 0, ASSERT_LINE, vector);
@@ -127,35 +127,35 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 		next_counter = INT_TRIGGER_COUNT_1;
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter);
-	state->interrupt_assert_timer->adjust(machine->primary_screen->time_until_pos(next_vpos));
-	state->interrupt_clear_timer->adjust(machine->primary_screen->time_until_pos(vpos + 1));
+	state->interrupt_assert_timer->adjust(machine.primary_screen->time_until_pos(next_vpos));
+	state->interrupt_clear_timer->adjust(machine.primary_screen->time_until_pos(vpos + 1));
 }
 
 
-static void create_interrupt_timers( running_machine *machine )
+static void create_interrupt_timers( running_machine &machine )
 {
-	enigma2_state *state = machine->driver_data<enigma2_state>();
-	state->interrupt_clear_timer = machine->scheduler().timer_alloc(FUNC(interrupt_clear_callback));
-	state->interrupt_assert_timer = machine->scheduler().timer_alloc(FUNC(interrupt_assert_callback));
+	enigma2_state *state = machine.driver_data<enigma2_state>();
+	state->interrupt_clear_timer = machine.scheduler().timer_alloc(FUNC(interrupt_clear_callback));
+	state->interrupt_assert_timer = machine.scheduler().timer_alloc(FUNC(interrupt_assert_callback));
 }
 
 
-static void start_interrupt_timers( running_machine *machine )
+static void start_interrupt_timers( running_machine &machine )
 {
-	enigma2_state *state = machine->driver_data<enigma2_state>();
+	enigma2_state *state = machine.driver_data<enigma2_state>();
 	int vpos = vysnc_chain_counter_to_vpos(INT_TRIGGER_COUNT_1);
-	state->interrupt_assert_timer->adjust(machine->primary_screen->time_until_pos(vpos));
+	state->interrupt_assert_timer->adjust(machine.primary_screen->time_until_pos(vpos));
 }
 
 
 
 static MACHINE_START( enigma2 )
 {
-	enigma2_state *state = machine->driver_data<enigma2_state>();
+	enigma2_state *state = machine.driver_data<enigma2_state>();
 	create_interrupt_timers(machine);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->blink_count));
 	state->save_item(NAME(state->sound_latch));
@@ -167,7 +167,7 @@ static MACHINE_START( enigma2 )
 
 static MACHINE_RESET( enigma2 )
 {
-	enigma2_state *state = machine->driver_data<enigma2_state>();
+	enigma2_state *state = machine.driver_data<enigma2_state>();
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 
 	state->last_sound_data = 0;
@@ -199,11 +199,11 @@ static void get_pens(pen_t *pens)
 
 static SCREEN_UPDATE( enigma2 )
 {
-	enigma2_state *state = screen->machine->driver_data<enigma2_state>();
+	enigma2_state *state = screen->machine().driver_data<enigma2_state>();
 	pen_t pens[NUM_PENS];
 
 	const rectangle &visarea = screen->visible_area();
-	UINT8 *prom = screen->machine->region("proms")->base();
+	UINT8 *prom = screen->machine().region("proms")->base();
 	UINT8 *color_map_base = state->flip_screen ? &prom[0x0400] : &prom[0x0000];
 	UINT8 *star_map_base = (state->blink_count & 0x08) ? &prom[0x0c00] : &prom[0x0800];
 
@@ -227,7 +227,7 @@ static SCREEN_UPDATE( enigma2 )
 			offs_t color_map_address = (y >> 3 << 5) | (x >> 3);
 			/* the schematics shows it like this, but it doesn't work as this would
                produce no stars, due to the contents of the PROM -- maybe there is
-               a star disabled bit somewhere that's connected here instead of flip_screen_get(screen->machine) */
+               a star disabled bit somewhere that's connected here instead of flip_screen_get(screen->machine()) */
 			/* star_map_address = (y >> 4 << 6) | (engima2_flip_screen_get() << 5) | (x >> 3); */
 			offs_t star_map_address = (y >> 4 << 6) | 0x20 | (x >> 3);
 
@@ -287,7 +287,7 @@ static SCREEN_UPDATE( enigma2 )
 
 static SCREEN_UPDATE( enigma2a )
 {
-	enigma2_state *state = screen->machine->driver_data<enigma2_state>();
+	enigma2_state *state = screen->machine().driver_data<enigma2_state>();
 	UINT8 x = 0;
 	const rectangle &visarea = screen->visible_area();
 	UINT16 bitmap_y = visarea.min_y;
@@ -349,7 +349,7 @@ static SCREEN_UPDATE( enigma2a )
 
 static READ8_HANDLER( dip_switch_r )
 {
-	enigma2_state *state = space->machine->driver_data<enigma2_state>();
+	enigma2_state *state = space->machine().driver_data<enigma2_state>();
 	UINT8 ret = 0x00;
 
 	if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, cpu_get_pc(space->cpu), state->protection_data);
@@ -361,7 +361,7 @@ static READ8_HANDLER( dip_switch_r )
 		if (state->protection_data != 0xff)
 			ret = state->protection_data ^ 0x88;
 		else
-			ret = input_port_read(space->machine, "DSW");
+			ret = input_port_read(space->machine(), "DSW");
 		break;
 
 	case 0x02:
@@ -382,7 +382,7 @@ static READ8_HANDLER( dip_switch_r )
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	enigma2_state *state = space->machine->driver_data<enigma2_state>();
+	enigma2_state *state = space->machine().driver_data<enigma2_state>();
 	/* clock sound latch shift register on rising edge of D2 */
 	if (!(data & 0x04) && (state->last_sound_data & 0x04))
 		state->sound_latch = (state->sound_latch << 1) | (~data & 0x01);
@@ -395,39 +395,39 @@ static WRITE8_HANDLER( sound_data_w )
 
 static READ8_DEVICE_HANDLER( sound_latch_r )
 {
-	enigma2_state *state = device->machine->driver_data<enigma2_state>();
+	enigma2_state *state = device->machine().driver_data<enigma2_state>();
 	return BITSWAP8(state->sound_latch,0,1,2,3,4,5,6,7);
 }
 
 
 static WRITE8_DEVICE_HANDLER( protection_data_w )
 {
-	enigma2_state *state = device->machine->driver_data<enigma2_state>();
-	if (LOG_PROT) logerror("%s: Protection Data Write: %x\n", device->machine->describe_context(), data);
+	enigma2_state *state = device->machine().driver_data<enigma2_state>();
+	if (LOG_PROT) logerror("%s: Protection Data Write: %x\n", device->machine().describe_context(), data);
 	state->protection_data = data;
 }
 
 
 static WRITE8_HANDLER( enigma2_flip_screen_w )
 {
-	enigma2_state *state = space->machine->driver_data<enigma2_state>();
-	state->flip_screen = ((data >> 5) & 0x01) && ((input_port_read(space->machine, "DSW") & 0x20) == 0x20);
+	enigma2_state *state = space->machine().driver_data<enigma2_state>();
+	state->flip_screen = ((data >> 5) & 0x01) && ((input_port_read(space->machine(), "DSW") & 0x20) == 0x20);
 }
 
 
 static CUSTOM_INPUT( p1_controls_r )
 {
-	return input_port_read(field->port->machine, "P1CONTROLS");
+	return input_port_read(field->port->machine(), "P1CONTROLS");
 }
 
 
 static CUSTOM_INPUT( p2_controls_r )
 {
-	enigma2_state *state = field->port->machine->driver_data<enigma2_state>();
+	enigma2_state *state = field->port->machine().driver_data<enigma2_state>();
 	if (state->flip_screen)
-		return input_port_read(field->port->machine, "P2CONTROLS");
+		return input_port_read(field->port->machine(), "P2CONTROLS");
 	else
-		return input_port_read(field->port->machine, "P1CONTROLS");
+		return input_port_read(field->port->machine(), "P1CONTROLS");
 }
 
 
@@ -708,7 +708,7 @@ ROM_END
 static DRIVER_INIT(enigma2)
 {
 	offs_t i;
-	UINT8 *rom = machine->region("audiocpu")->base();
+	UINT8 *rom = machine.region("audiocpu")->base();
 
 	for(i = 0; i < 0x2000; i++)
 	{

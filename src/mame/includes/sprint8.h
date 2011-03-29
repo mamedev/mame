@@ -25,7 +25,7 @@ public:
 
 /*----------- defined in drivers/sprint8.c -----------*/
 
-void sprint8_set_collision(running_machine *machine, int n);
+void sprint8_set_collision(running_machine &machine, int n);
 
 
 /*----------- defined in video/sprint8.c -----------*/

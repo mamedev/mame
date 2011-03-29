@@ -30,7 +30,7 @@ PALETTE_INIT( sprtmtch )
 {
 	int i;
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		int x = (color_prom[i] << 8) + color_prom[0x200 + i];
 		/* The bits are in reverse order! */
@@ -57,13 +57,13 @@ PALETTE_INIT( sprtmtch )
 
 WRITE8_HANDLER( dynax_extra_scrollx_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->extra_scroll_x = data;
 }
 
 WRITE8_HANDLER( dynax_extra_scrolly_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->extra_scroll_y = data;
 }
 
@@ -71,14 +71,14 @@ WRITE8_HANDLER( dynax_extra_scrolly_w )
 /* Destination Pen */
 WRITE8_HANDLER( dynax_blit_pen_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->blit_pen = data;
 	LOG(("P=%02X ", data));
 }
 
 WRITE8_HANDLER( dynax_blit2_pen_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->blit2_pen = data;
 	LOG(("P'=%02X ", data));
 }
@@ -87,7 +87,7 @@ WRITE8_HANDLER( dynax_blit2_pen_w )
 /* Destination Layers */
 WRITE8_HANDLER( dynax_blit_dest_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->blit_dest = data;
 	if (state->layer_layout == LAYOUT_HNORIDUR)
 		state->blit_dest = BITSWAP8(state->blit_dest ^ 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
@@ -97,7 +97,7 @@ WRITE8_HANDLER( dynax_blit_dest_w )
 
 WRITE8_HANDLER( dynax_blit2_dest_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->blit2_dest = data;
 	LOG(("D'=%02X ", data));
 }
@@ -111,7 +111,7 @@ WRITE8_HANDLER( tenkai_blit_dest_w )
 /* Background Color */
 WRITE8_HANDLER( dynax_blit_backpen_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->blit_backpen = data;
 	LOG(("B=%02X ", data));
 }
@@ -120,7 +120,7 @@ WRITE8_HANDLER( dynax_blit_backpen_w )
 /* Layers 0&1 Palettes (Low Bits) */
 WRITE8_HANDLER( dynax_blit_palette01_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	if (state->layer_layout == LAYOUT_HNORIDUR)
 		state->blit_palettes = (state->blit_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
 	else
@@ -130,7 +130,7 @@ WRITE8_HANDLER( dynax_blit_palette01_w )
 
 WRITE8_HANDLER( tenkai_blit_palette01_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->blit_palettes = (state->blit_palettes & 0xff00) | data;
 	LOG(("P01=%02X ", data));
 }
@@ -139,7 +139,7 @@ WRITE8_HANDLER( tenkai_blit_palette01_w )
 /* Layers 4&5 Palettes (Low Bits) */
 WRITE8_HANDLER( dynax_blit_palette45_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	if (state->layer_layout == LAYOUT_HNORIDUR)
 		state->blit2_palettes = (state->blit2_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
@@ -152,7 +152,7 @@ WRITE8_HANDLER( dynax_blit_palette45_w )
 /* Layer 2&3 Palettes (Low Bits) */
 WRITE8_HANDLER( dynax_blit_palette23_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	if (state->layer_layout == LAYOUT_HNORIDUR)
 		state->blit_palettes = (state->blit_palettes & 0xff00) | ((data & 0x0f) << 4) | ((data & 0xf0) >> 4);
@@ -163,7 +163,7 @@ WRITE8_HANDLER( dynax_blit_palette23_w )
 
 WRITE8_HANDLER( tenkai_blit_palette23_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->blit_palettes = (state->blit_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
 	LOG(("P23=%02X ", data));
 }
@@ -172,7 +172,7 @@ WRITE8_HANDLER( tenkai_blit_palette23_w )
 /* Layer 6&7 Palettes (Low Bits) */
 WRITE8_HANDLER( dynax_blit_palette67_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	if (state->layer_layout == LAYOUT_HNORIDUR)
 		state->blit2_palettes = (state->blit2_palettes & 0xff00) | ((data & 0x0f) << 4) | ((data & 0xf0) >> 4);
@@ -185,14 +185,14 @@ WRITE8_HANDLER( dynax_blit_palette67_w )
 /* Layers Palettes (High Bits) */
 WRITE8_HANDLER( dynax_blit_palbank_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->blit_palbank = data;
 	LOG(("PB=%02X ", data));
 }
 
 WRITE8_HANDLER( dynax_blit2_palbank_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->blit2_palbank = data;
 	LOG(("PB'=%02X ", data));
 }
@@ -201,7 +201,7 @@ WRITE8_HANDLER( dynax_blit2_palbank_w )
 /* Which half of the layers to write two (interleaved games only) */
 WRITE8_HANDLER( hanamai_layer_half_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->hanamai_layer_half = (~data) & 1;
 	LOG(("H=%02X ", data));
 }
@@ -210,14 +210,14 @@ WRITE8_HANDLER( hanamai_layer_half_w )
 /* Write to both halves of the layers (interleaved games only) */
 WRITE8_HANDLER( hnoridur_layer_half2_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->hnoridur_layer_half2 = (~data) & 1;
 	LOG(("H2=%02X ", data));
 }
 
 WRITE8_HANDLER( mjdialq2_blit_dest_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	int mask = (2 >> offset);	/* 1 or 2 */
 
 	state->blit_dest &= ~mask;
@@ -230,14 +230,14 @@ WRITE8_HANDLER( mjdialq2_blit_dest_w )
 /* Layers Enable */
 WRITE8_HANDLER( dynax_layer_enable_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->layer_enable = data;
 	LOG(("E=%02X ", data));
 }
 
 WRITE8_HANDLER( jantouki_layer_enable_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	int mask = 1 << (7 - offset);
 	state->layer_enable = (state->layer_enable & ~mask) | ((data & 1) ? mask : 0);
 	state->layer_enable |= 1;
@@ -245,7 +245,7 @@ WRITE8_HANDLER( jantouki_layer_enable_w )
 
 WRITE8_HANDLER( mjdialq2_layer_enable_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	int mask = (2 >> offset);	/* 1 or 2 */
 
 	state->layer_enable &= ~mask;
@@ -256,7 +256,7 @@ WRITE8_HANDLER( mjdialq2_layer_enable_w )
 
 WRITE8_HANDLER( dynax_flipscreen_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->flipscreen = data & 1;
 	if (data & ~1)
 		logerror("CPU#0 PC %06X: Warning, flip screen <- %02X\n", cpu_get_pc(space->cpu), data);
@@ -268,7 +268,7 @@ static const char *const gfxregions[] = { "gfx1", "gfx2", "gfx3", "gfx4", "gfx5"
 
 WRITE8_HANDLER( dynax_blit_romregion_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	if (data < ARRAY_LENGTH(gfxregions))
 		state->blit_romregion = data;
 	LOG(("GFX%X ", data + 1));
@@ -276,7 +276,7 @@ WRITE8_HANDLER( dynax_blit_romregion_w )
 
 WRITE8_HANDLER( dynax_blit2_romregion_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	if (data + 1 < ARRAY_LENGTH(gfxregions))
 		state->blit2_romregion = data + 1;
 	LOG(("GFX%X' ", data + 2));
@@ -310,9 +310,9 @@ WRITE8_HANDLER( dynax_blit2_romregion_w )
 
 
 /* Plot a pixel (in the pixmaps specified by dynax_blit_dest) */
-INLINE void blitter_plot_pixel( running_machine *machine, int layer, int mask, int x, int y, int pen, int wrap, int flags )
+INLINE void blitter_plot_pixel( running_machine &machine, int layer, int mask, int x, int y, int pen, int wrap, int flags )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 	int addr;
 
 	if ((y > 0xff) && (!(wrap & 2))) return;	// fixes mjdialq2 & mjangels title screens
@@ -375,12 +375,12 @@ INLINE void blitter_plot_pixel( running_machine *machine, int layer, int mask, i
 }
 
 
-static int blitter_drawgfx( running_machine *machine, int layer, int mask, const char *gfx, int src, int pen, int x, int y, int wrap, int flags )
+static int blitter_drawgfx( running_machine &machine, int layer, int mask, const char *gfx, int src, int pen, int x, int y, int wrap, int flags )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 	UINT8 cmd;
-	UINT8 *ROM = machine->region(gfx)->base();
-	size_t ROM_size = machine->region(gfx)->bytes();
+	UINT8 *ROM = machine.region(gfx)->base();
+	size_t ROM_size = machine.region(gfx)->bytes();
 
 	int sx;
 
@@ -529,9 +529,9 @@ static int blitter_drawgfx( running_machine *machine, int layer, int mask, const
 
 
 
-static void dynax_blitter_start( running_machine *machine, int flags )
+static void dynax_blitter_start( running_machine &machine, int flags )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 	int blit_newsrc;
 
 	LOG(("XY=%X,%X SRC=%X BLIT=%X\n", state->blit_x, state->blit_y, state->blit_src, flags));
@@ -558,9 +558,9 @@ static void dynax_blitter_start( running_machine *machine, int flags )
 	}
 }
 
-static void jantouki_blitter_start( running_machine *machine, int flags )
+static void jantouki_blitter_start( running_machine &machine, int flags )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 	int blit_newsrc;
 
 	LOG(("XY=%X,%X SRC=%X BLIT=%X\n", state->blit_x, state->blit_y, state->blit_src, flags));
@@ -587,9 +587,9 @@ static void jantouki_blitter_start( running_machine *machine, int flags )
 	}
 }
 
-static void jantouki_blitter2_start( running_machine *machine, int flags )
+static void jantouki_blitter2_start( running_machine &machine, int flags )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 	int blit2_newsrc;
 
 	LOG(("XY'=%X,%X SRC'=%X BLIT'=%02X\n", state->blit2_x, state->blit2_y, state->blit2_src, flags));
@@ -620,7 +620,7 @@ static void jantouki_blitter2_start( running_machine *machine, int flags )
 
 static WRITE8_HANDLER( dynax_blit_scroll_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (state->blit_src & 0xc00000)
 	{
@@ -640,7 +640,7 @@ static WRITE8_HANDLER( dynax_blit_scroll_w )
 // inverted scroll values
 static WRITE8_HANDLER( tenkai_blit_scroll_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (state->blit_src & 0xc00000)
 	{
@@ -659,7 +659,7 @@ static WRITE8_HANDLER( tenkai_blit_scroll_w )
 
 static WRITE8_HANDLER( dynax_blit2_scroll_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (state->blit2_src & 0xc00000)
 	{
@@ -678,11 +678,11 @@ static WRITE8_HANDLER( dynax_blit2_scroll_w )
 
 WRITE8_HANDLER( dynax_blitter_rev2_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (offset)
 	{
-		case 0: dynax_blitter_start(space->machine, data); break;
+		case 0: dynax_blitter_start(space->machine(), data); break;
 		case 1: state->blit_x = data; break;
 		case 2: state->blit_y = data; break;
 		case 3: state->blit_src = (state->blit_src & 0xffff00) | (data <<  0); break;
@@ -695,11 +695,11 @@ WRITE8_HANDLER( dynax_blitter_rev2_w )
 // different scroll_w
 WRITE8_HANDLER( tenkai_blitter_rev2_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (offset)
 	{
-		case 0: dynax_blitter_start(space->machine, data); break;
+		case 0: dynax_blitter_start(space->machine(), data); break;
 		case 1: state->blit_x = data; break;
 		case 2: state->blit_y = data; break;
 		case 3: state->blit_src = (state->blit_src & 0xffff00) | (data <<  0); break;
@@ -712,11 +712,11 @@ WRITE8_HANDLER( tenkai_blitter_rev2_w )
 
 WRITE8_HANDLER( jantouki_blitter_rev2_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (offset)
 	{
-		case 0: jantouki_blitter_start(space->machine, data); break;
+		case 0: jantouki_blitter_start(space->machine(), data); break;
 		case 1: state->blit_x = data; break;
 		case 2: state->blit_y = data; break;
 		case 3: state->blit_src = (state->blit_src & 0xffff00) | (data <<  0); break;
@@ -728,11 +728,11 @@ WRITE8_HANDLER( jantouki_blitter_rev2_w )
 
 WRITE8_HANDLER( jantouki_blitter2_rev2_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (offset)
 	{
-		case 0: jantouki_blitter2_start(space->machine,data); break;
+		case 0: jantouki_blitter2_start(space->machine(),data); break;
 		case 1: state->blit2_x = data; break;
 		case 2: state->blit2_y = data; break;
 		case 3: state->blit2_src = (state->blit2_src & 0xffff00) | (data <<  0); break;
@@ -757,9 +757,9 @@ static const int priority_mcnpshnt[8] = { 0x3210, 0x2103, 0x3102, 0x2031, 0x3021
 static const int priority_mjelctrn[8] = { 0x0231, 0x0321, 0x2031, 0x2301, 0x3021, 0x3201 ,0x0000, 0x0000 };	// this game doesn't use (hasn't?) layer 1
 
 
-static void dynax_common_reset( running_machine *machine )
+static void dynax_common_reset( running_machine &machine )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 
 	state->blit_romregion = 0;
 	state->blit2_romregion = 0;
@@ -832,7 +832,7 @@ static void dynax_common_reset( running_machine *machine )
 
 VIDEO_START( hanamai )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 
 	state->pixmap[0][0] = auto_alloc_array(machine, UINT8, 256 * 256);
 	state->pixmap[0][1] = auto_alloc_array(machine, UINT8, 256 * 256);
@@ -858,7 +858,7 @@ VIDEO_START( hanamai )
 
 VIDEO_START( hnoridur )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 
 	state->pixmap[0][0] = auto_alloc_array(machine, UINT8, 256 * 256);
 	state->pixmap[0][1] = auto_alloc_array(machine, UINT8, 256 * 256);
@@ -886,7 +886,7 @@ VIDEO_START( hnoridur )
 
 VIDEO_START( mcnpshnt )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 
 	VIDEO_START_CALL(hnoridur);
 	state->priority_table = priority_mcnpshnt;
@@ -894,7 +894,7 @@ VIDEO_START( mcnpshnt )
 
 VIDEO_START( sprtmtch )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 
 	state->pixmap[0][0] = auto_alloc_array(machine, UINT8, 256 * 256);
 	state->pixmap[0][1] = auto_alloc_array(machine, UINT8, 256 * 256);
@@ -916,7 +916,7 @@ VIDEO_START( sprtmtch )
 
 VIDEO_START( jantouki )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 
 	state->pixmap[0][0] = auto_alloc_array(machine, UINT8, 256 * 256);
 	state->pixmap[0][1] = auto_alloc_array(machine, UINT8, 256 * 256);
@@ -959,7 +959,7 @@ VIDEO_START( jantouki )
 
 VIDEO_START( mjdialq2 )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 
 	state->pixmap[0][0] = auto_alloc_array(machine, UINT8, 256 * 256);
 	state->pixmap[1][0] = auto_alloc_array(machine, UINT8, 256 * 256);
@@ -974,7 +974,7 @@ VIDEO_START( mjdialq2 )
 
 VIDEO_START( mjelctrn )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 
 	VIDEO_START_CALL(hnoridur);
 
@@ -984,7 +984,7 @@ VIDEO_START( mjelctrn )
 
 VIDEO_START( neruton )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 
 	VIDEO_START_CALL(hnoridur);
 
@@ -1000,9 +1000,9 @@ VIDEO_START( neruton )
 
 ***************************************************************************/
 
-static void hanamai_copylayer( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int i )
+static void hanamai_copylayer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int i )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 	int color;
 	int scrollx, scrolly;
 
@@ -1064,9 +1064,9 @@ static void hanamai_copylayer( running_machine *machine, bitmap_t *bitmap, const
 }
 
 
-static void jantouki_copylayer( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int i, int y )
+static void jantouki_copylayer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int i, int y )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 	int color, scrollx, scrolly, palettes, palbank;
 
 	if (i < 4)
@@ -1139,9 +1139,9 @@ static void jantouki_copylayer( running_machine *machine, bitmap_t *bitmap, cons
 }
 
 
-static void mjdialq2_copylayer( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int i )
+static void mjdialq2_copylayer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int i )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 	int color;
 	int scrollx, scrolly;
 
@@ -1191,17 +1191,17 @@ static void mjdialq2_copylayer( running_machine *machine, bitmap_t *bitmap, cons
 
 WRITE8_HANDLER( hanamai_priority_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->hanamai_priority = data;
 }
 
 WRITE8_HANDLER( tenkai_priority_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->hanamai_priority = BITSWAP8(data, 3, 2, 1, 0, 4, 7, 5, 6);
 }
 
-static int debug_mask( running_machine *machine )
+static int debug_mask( running_machine &machine )
 {
 #ifdef MAME_DEBUG
 	int msk = 0;
@@ -1227,7 +1227,7 @@ static int debug_mask( running_machine *machine )
     I,O        -  Change palette (-,+)
     J,K & N,M  -  Change "tile"  (-,+, slow & fast)
     R          -  move "tile" to the next 1/8th of the gfx  */
-static int debug_viewer( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static int debug_viewer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 
 #ifdef MAME_DEBUG
@@ -1235,9 +1235,9 @@ static int debug_viewer( running_machine *machine, bitmap_t *bitmap, const recta
 	if (input_code_pressed_once(machine, KEYCODE_T))	toggle = 1 - toggle;
 	if (toggle)
 	{
-		dynax_state *state = machine->driver_data<dynax_state>();
-		UINT8 *RAM = machine->region( "gfx1" )->base();
-		size_t size = machine->region( "gfx1" )->bytes();
+		dynax_state *state = machine.driver_data<dynax_state>();
+		UINT8 *RAM = machine.region( "gfx1" )->base();
+		size_t size = machine.region( "gfx1" )->bytes();
 		static int i = 0, c = 0, r = 0;
 
 		if (input_code_pressed_once(machine, KEYCODE_I))	c = (c - 1) & 0x1f;
@@ -1280,14 +1280,14 @@ static int debug_viewer( running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( hanamai )
 {
-	dynax_state *state = screen->machine->driver_data<dynax_state>();
+	dynax_state *state = screen->machine().driver_data<dynax_state>();
 	int layers_ctrl = ~state->layer_enable;
 	int lay[4];
 
-	if (debug_viewer(screen->machine, bitmap, cliprect))
+	if (debug_viewer(screen->machine(), bitmap, cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen->machine);
+	layers_ctrl &= debug_mask(screen->machine());
 
 	bitmap_fill(bitmap, cliprect, (state->blit_backpen & 0xff) + (state->blit_palbank & 1) * 256);
 
@@ -1306,25 +1306,25 @@ SCREEN_UPDATE( hanamai )
 		case 0x15:	lay[0] = 0; lay[1] = 2; lay[2] = 3; lay[3] = 1; break;
 	}
 
-	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(screen->machine, bitmap, cliprect, lay[0]);
-	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(screen->machine, bitmap, cliprect, lay[1]);
-	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(screen->machine, bitmap, cliprect, lay[2]);
-	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(screen->machine, bitmap, cliprect, lay[3]);
+	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[0]);
+	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[1]);
+	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[2]);
+	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[3]);
 	return 0;
 }
 
 
 SCREEN_UPDATE( hnoridur )
 {
-	dynax_state *state = screen->machine->driver_data<dynax_state>();
+	dynax_state *state = screen->machine().driver_data<dynax_state>();
 	int layers_ctrl = ~BITSWAP8(state->hanamai_priority, 7, 6, 5, 4, 0, 1, 2, 3);
 	int lay[4];
 	int pri;
 
-	if (debug_viewer(screen->machine, bitmap, cliprect))
+	if (debug_viewer(screen->machine(), bitmap, cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen->machine);
+	layers_ctrl &= debug_mask(screen->machine());
 
 	bitmap_fill(bitmap, cliprect, (state->blit_backpen & 0xff) + (state->blit_palbank & 0x0f) * 256);
 
@@ -1342,10 +1342,10 @@ SCREEN_UPDATE( hnoridur )
 	lay[2] = (pri >>  4) & 3;
 	lay[3] = (pri >>  0) & 3;
 
-	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(screen->machine, bitmap, cliprect, lay[0]);
-	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(screen->machine, bitmap, cliprect, lay[1]);
-	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(screen->machine, bitmap, cliprect, lay[2]);
-	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(screen->machine, bitmap, cliprect, lay[3]);
+	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[0]);
+	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[1]);
+	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[2]);
+	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[3]);
 
 	return 0;
 }
@@ -1353,48 +1353,48 @@ SCREEN_UPDATE( hnoridur )
 
 SCREEN_UPDATE( sprtmtch )
 {
-	dynax_state *state = screen->machine->driver_data<dynax_state>();
+	dynax_state *state = screen->machine().driver_data<dynax_state>();
 	int layers_ctrl = ~state->layer_enable;
 
-	if (debug_viewer(screen->machine,bitmap,cliprect))
+	if (debug_viewer(screen->machine(),bitmap,cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen->machine);
+	layers_ctrl &= debug_mask(screen->machine());
 
 	bitmap_fill(bitmap, cliprect, (state->blit_backpen & 0xff) + (state->blit_palbank & 1) * 256);
 
-	if (BIT(layers_ctrl, 0))   hanamai_copylayer(screen->machine, bitmap, cliprect, 0);
-	if (BIT(layers_ctrl, 1))   hanamai_copylayer(screen->machine, bitmap, cliprect, 1);
-	if (BIT(layers_ctrl, 2))   hanamai_copylayer(screen->machine, bitmap, cliprect, 2);
+	if (BIT(layers_ctrl, 0))   hanamai_copylayer(screen->machine(), bitmap, cliprect, 0);
+	if (BIT(layers_ctrl, 1))   hanamai_copylayer(screen->machine(), bitmap, cliprect, 1);
+	if (BIT(layers_ctrl, 2))   hanamai_copylayer(screen->machine(), bitmap, cliprect, 2);
 	return 0;
 }
 
 SCREEN_UPDATE( jantouki )
 {
-	dynax_state *state = screen->machine->driver_data<dynax_state>();
+	dynax_state *state = screen->machine().driver_data<dynax_state>();
 	int layers_ctrl = state->layer_enable;
 
-	if (debug_viewer(screen->machine, bitmap, cliprect))
+	if (debug_viewer(screen->machine(), bitmap, cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen->machine);
+	layers_ctrl &= debug_mask(screen->machine());
 
 	bitmap_fill(bitmap, cliprect, (state->blit_backpen & 0xff) + (state->blit_palbank & 1) * 256);
 
 	if (screen == state->top_scr)
 	{
-	//  if (BIT(layers_ctrl, 0))   jantouki_copylayer(screen->machine, bitmap, cliprect, 3, 0);
-		if (BIT(layers_ctrl, 1))   jantouki_copylayer(screen->machine, bitmap, cliprect, 2, 0);
-		if (BIT(layers_ctrl, 2))   jantouki_copylayer(screen->machine, bitmap, cliprect, 1, 0);
-		if (BIT(layers_ctrl, 3))   jantouki_copylayer(screen->machine, bitmap, cliprect, 0, 0);
+	//  if (BIT(layers_ctrl, 0))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 3, 0);
+		if (BIT(layers_ctrl, 1))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 2, 0);
+		if (BIT(layers_ctrl, 2))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 1, 0);
+		if (BIT(layers_ctrl, 3))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 0, 0);
 	}
 	else if (screen == state->bot_scr)
 	{
-		if (BIT(layers_ctrl, 0))   jantouki_copylayer(screen->machine, bitmap, cliprect, 3, 0);
-		if (BIT(layers_ctrl, 4))   jantouki_copylayer(screen->machine, bitmap, cliprect, 7, 0);
-		if (BIT(layers_ctrl, 5))   jantouki_copylayer(screen->machine, bitmap, cliprect, 6, 0);
-		if (BIT(layers_ctrl, 6))   jantouki_copylayer(screen->machine, bitmap, cliprect, 5, 0);
-		if (BIT(layers_ctrl, 7))   jantouki_copylayer(screen->machine, bitmap, cliprect, 4, 0);
+		if (BIT(layers_ctrl, 0))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 3, 0);
+		if (BIT(layers_ctrl, 4))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 7, 0);
+		if (BIT(layers_ctrl, 5))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 6, 0);
+		if (BIT(layers_ctrl, 6))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 5, 0);
+		if (BIT(layers_ctrl, 7))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 4, 0);
 	}
 	return 0;
 }
@@ -1402,18 +1402,18 @@ SCREEN_UPDATE( jantouki )
 
 SCREEN_UPDATE( mjdialq2 )
 {
-	dynax_state *state = screen->machine->driver_data<dynax_state>();
+	dynax_state *state = screen->machine().driver_data<dynax_state>();
 	int layers_ctrl = ~state->layer_enable;
 
-	if (debug_viewer(screen->machine, bitmap, cliprect))
+	if (debug_viewer(screen->machine(), bitmap, cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen->machine);
+	layers_ctrl &= debug_mask(screen->machine());
 
 	bitmap_fill(bitmap, cliprect, (state->blit_backpen & 0xff) + (state->blit_palbank & 1) * 256);
 
-	if (BIT(layers_ctrl, 0))   mjdialq2_copylayer(screen->machine, bitmap, cliprect, 0);
-	if (BIT(layers_ctrl, 1))   mjdialq2_copylayer(screen->machine, bitmap, cliprect, 1);
+	if (BIT(layers_ctrl, 0))   mjdialq2_copylayer(screen->machine(), bitmap, cliprect, 0);
+	if (BIT(layers_ctrl, 1))   mjdialq2_copylayer(screen->machine(), bitmap, cliprect, 1);
 	return 0;
 }
 
@@ -1427,7 +1427,7 @@ VIDEO_START(htengoku)
 
 SCREEN_UPDATE(htengoku)
 {
-	dynax_state *state = screen->machine->driver_data<dynax_state>();
+	dynax_state *state = screen->machine().driver_data<dynax_state>();
 	int layer, x, y;
 
 	// render the layers, one by one, "dynax.c" style. Then convert the pixmaps to "ddenlovr.c"
@@ -1435,7 +1435,7 @@ SCREEN_UPDATE(htengoku)
 	for (layer = 0; layer < 4; layer++)
 	{
 		bitmap_fill(bitmap, cliprect, 0);
-		hanamai_copylayer(screen->machine, bitmap, cliprect, layer);
+		hanamai_copylayer(screen->machine(), bitmap, cliprect, layer);
 
 		for (y = 0; y < 256; y++)
 			for (x = 0; x < 512; x++)

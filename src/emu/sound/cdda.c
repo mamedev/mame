@@ -54,11 +54,11 @@ static DEVICE_START( cdda )
 	cdda_info *info = get_safe_token(device);
 
 	/* allocate an audio cache */
-	info->audio_cache = auto_alloc_array( device->machine, UINT8, CD_MAX_SECTOR_DATA * MAX_SECTORS );
+	info->audio_cache = auto_alloc_array( device->machine(), UINT8, CD_MAX_SECTOR_DATA * MAX_SECTORS );
 
 	//intf = (const struct CDDAinterface *)device->baseconfig().static_config();
 
-	info->stream = device->machine->sound().stream_alloc(*device, 0, 2, 44100, info, cdda_update);
+	info->stream = device->machine().sound().stream_alloc(*device, 0, 2, 44100, info, cdda_update);
 
 	device->save_item( NAME(info->audio_playing) );
 	device->save_item( NAME(info->audio_pause) );
@@ -88,11 +88,11 @@ void cdda_set_cdrom(device_t *device, void *file)
     that references the given CD-ROM file
 -------------------------------------------------*/
 
-device_t *cdda_from_cdrom(running_machine *machine, void *file)
+device_t *cdda_from_cdrom(running_machine &machine, void *file)
 {
 	device_sound_interface *sound = NULL;
 
-	for (bool gotone = machine->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
+	for (bool gotone = machine.m_devicelist.first(sound); gotone; gotone = sound->next(sound))
 		if (sound->device().type() == CDDA)
 		{
 			cdda_info *info = get_safe_token(*sound);

@@ -10,92 +10,92 @@ Taito Super Speed Race video emulation
 
 WRITE8_HANDLER( sspeedr_driver_horz_w )
 {
-	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	state->driver_horz = (state->driver_horz & 0x100) | data;
 }
 
 
 WRITE8_HANDLER( sspeedr_driver_horz_2_w )
 {
-	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	state->driver_horz = (state->driver_horz & 0xff) | ((data & 1) << 8);
 }
 
 
 WRITE8_HANDLER( sspeedr_driver_vert_w )
 {
-	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	state->driver_vert = data;
 }
 
 
 WRITE8_HANDLER( sspeedr_driver_pic_w )
 {
-	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	state->driver_pic = data & 0x1f;
 }
 
 
 WRITE8_HANDLER( sspeedr_drones_horz_w )
 {
-	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	state->drones_horz = (state->drones_horz & 0x100) | data;
 }
 
 
 WRITE8_HANDLER( sspeedr_drones_horz_2_w )
 {
-	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	state->drones_horz = (state->drones_horz & 0xff) | ((data & 1) << 8);
 }
 
 
 WRITE8_HANDLER( sspeedr_drones_mask_w )
 {
-	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	state->drones_mask = data & 0x3f;
 }
 
 
 WRITE8_HANDLER( sspeedr_drones_vert_w )
 {
-	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	state->drones_vert[offset] = data;
 }
 
 
 WRITE8_HANDLER( sspeedr_track_horz_w )
 {
-	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	state->track_horz = (state->track_horz & 0x100) | data;
 }
 
 
 WRITE8_HANDLER( sspeedr_track_horz_2_w )
 {
-	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	state->track_horz = (state->track_horz & 0xff) | ((data & 1) << 8);
 }
 
 
 WRITE8_HANDLER( sspeedr_track_vert_w )
 {
-	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	state->track_vert[offset] = data & 0x7f;
 }
 
 
 WRITE8_HANDLER( sspeedr_track_ice_w )
 {
-	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	state->track_ice = data & 0x07;
 }
 
 
-static void draw_track(running_machine *machine, bitmap_t* bitmap)
+static void draw_track(running_machine &machine, bitmap_t* bitmap)
 {
-	sspeedr_state *state = machine->driver_data<sspeedr_state>();
-	const UINT8* p = machine->region("gfx3")->base();
+	sspeedr_state *state = machine.driver_data<sspeedr_state>();
+	const UINT8* p = machine.region("gfx3")->base();
 
 	int x;
 	int y;
@@ -181,9 +181,9 @@ static void draw_track(running_machine *machine, bitmap_t* bitmap)
 }
 
 
-static void draw_drones(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
+static void draw_drones(running_machine &machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
-	sspeedr_state *state = machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = machine.driver_data<sspeedr_state>();
 	static const UINT8 code[6] =
 	{
 		0xf, 0x4, 0x3, 0x9, 0x7, 0xc
@@ -211,7 +211,7 @@ static void draw_drones(running_machine *machine, bitmap_t* bitmap, const rectan
 		y = 0xf0 - state->drones_vert[i >> 1];
 
 		drawgfx_transpen(bitmap, cliprect,
-			machine->gfx[1],
+			machine.gfx[1],
 			code[i] ^ state->toggle,
 			0,
 			0, 0,
@@ -221,9 +221,9 @@ static void draw_drones(running_machine *machine, bitmap_t* bitmap, const rectan
 }
 
 
-static void draw_driver(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
+static void draw_driver(running_machine &machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
-	sspeedr_state *state = machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = machine.driver_data<sspeedr_state>();
 	int x;
 	int y;
 
@@ -242,7 +242,7 @@ static void draw_driver(running_machine *machine, bitmap_t* bitmap, const rectan
 	y = 0xf0 - state->driver_vert;
 
 	drawgfx_transpen(bitmap, cliprect,
-		machine->gfx[0],
+		machine.gfx[0],
 		state->driver_pic,
 		0,
 		0, 0,
@@ -253,22 +253,22 @@ static void draw_driver(running_machine *machine, bitmap_t* bitmap, const rectan
 
 VIDEO_START( sspeedr )
 {
-	sspeedr_state *state = machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = machine.driver_data<sspeedr_state>();
 	state->toggle = 0;
 }
 
 
 SCREEN_UPDATE( sspeedr )
 {
-	draw_track(screen->machine, bitmap);
-	draw_drones(screen->machine, bitmap, cliprect);
-	draw_driver(screen->machine, bitmap, cliprect);
+	draw_track(screen->machine(), bitmap);
+	draw_drones(screen->machine(), bitmap, cliprect);
+	draw_driver(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
 
 SCREEN_EOF( sspeedr )
 {
-	sspeedr_state *state = machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = machine.driver_data<sspeedr_state>();
 	state->toggle ^= 1;
 }

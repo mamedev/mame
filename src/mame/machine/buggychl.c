@@ -191,7 +191,7 @@ static DEVICE_START( buggychl_mcu )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
 
-	state->mcu = device->machine->device("mcu");
+	state->mcu = device->machine().device("mcu");
 
 	device->save_item(NAME(state->from_main));
 	device->save_item(NAME(state->from_mcu));

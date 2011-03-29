@@ -27,29 +27,29 @@ $208 strikes count
 
 static WRITE8_HANDLER( tryout_nmi_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE );
+	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE );
 }
 
 static WRITE8_HANDLER( tryout_sound_w )
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 /*this is actually irq/nmi mask, polls only four values at start up (81->01->81->01) and then
   stays on this state.*/
 static WRITE8_HANDLER( tryout_sound_irq_ack_w )
 {
-//  cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
+//  cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( tryout_bankswitch_w )
 {
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x2000;
-	memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank1", &RAM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8 )
@@ -84,7 +84,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( coin_inserted )
 {
 	if(newval != oldval)
-		cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( tryout )

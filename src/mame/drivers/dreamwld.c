@@ -113,13 +113,13 @@ public:
 
 
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	dreamwld_state *state = machine->driver_data<dreamwld_state>();
-	const gfx_element *gfx = machine->gfx[0];
+	dreamwld_state *state = machine.driver_data<dreamwld_state>();
+	const gfx_element *gfx = machine.gfx[0];
 	UINT32 *source = state->spriteram;
 	UINT32 *finish = state->spriteram + 0x1000 / 4;
-	UINT16 *redirect = (UINT16 *)machine->region("gfx3")->base();
+	UINT16 *redirect = (UINT16 *)machine.region("gfx3")->base();
 
 	while (source < finish)
 	{
@@ -171,7 +171,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static WRITE32_HANDLER( dreamwld_bg_videoram_w )
 {
-	dreamwld_state *state = space->machine->driver_data<dreamwld_state>();
+	dreamwld_state *state = space->machine().driver_data<dreamwld_state>();
 	COMBINE_DATA(&state->bg_videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset * 2);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset * 2 + 1);
@@ -179,7 +179,7 @@ static WRITE32_HANDLER( dreamwld_bg_videoram_w )
 
 static TILE_GET_INFO( get_dreamwld_bg_tile_info )
 {
-	dreamwld_state *state = machine->driver_data<dreamwld_state>();
+	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 	int tileno, colour;
 	tileno = (tile_index & 1) ? (state->bg_videoram[tile_index >> 1] & 0xffff) : ((state->bg_videoram[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
@@ -190,7 +190,7 @@ static TILE_GET_INFO( get_dreamwld_bg_tile_info )
 
 static WRITE32_HANDLER( dreamwld_bg2_videoram_w )
 {
-	dreamwld_state *state = space->machine->driver_data<dreamwld_state>();
+	dreamwld_state *state = space->machine().driver_data<dreamwld_state>();
 	COMBINE_DATA(&state->bg2_videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg2_tilemap, offset * 2);
 	tilemap_mark_tile_dirty(state->bg2_tilemap, offset * 2 + 1);
@@ -198,7 +198,7 @@ static WRITE32_HANDLER( dreamwld_bg2_videoram_w )
 
 static TILE_GET_INFO( get_dreamwld_bg2_tile_info )
 {
-	dreamwld_state *state = machine->driver_data<dreamwld_state>();
+	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 	UINT16 tileno, colour;
 	tileno = (tile_index & 1) ? (state->bg2_videoram[tile_index >> 1] & 0xffff) : ((state->bg2_videoram[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
@@ -208,7 +208,7 @@ static TILE_GET_INFO( get_dreamwld_bg2_tile_info )
 
 static VIDEO_START( dreamwld )
 {
-	dreamwld_state *state = machine->driver_data<dreamwld_state>();
+	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_dreamwld_bg_tile_info,tilemap_scan_rows, 16, 16, 64,32);
 	state->bg2_tilemap = tilemap_create(machine, get_dreamwld_bg2_tile_info,tilemap_scan_rows, 16, 16, 64,32);
@@ -217,7 +217,7 @@ static VIDEO_START( dreamwld )
 
 static SCREEN_UPDATE( dreamwld )
 {
-	dreamwld_state *state = screen->machine->driver_data<dreamwld_state>();
+	dreamwld_state *state = screen->machine().driver_data<dreamwld_state>();
 
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->bg_scroll[(0x400 / 4)] + 32);
 	tilemap_set_scrolly(state->bg2_tilemap, 0, state->bg_scroll[(0x400 / 4) + 2] + 32);
@@ -242,7 +242,7 @@ static SCREEN_UPDATE( dreamwld )
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->bg2_tilemap, 0, 0);
 
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 
 	return 0;
 }
@@ -250,10 +250,10 @@ static SCREEN_UPDATE( dreamwld )
 
 static READ32_HANDLER( dreamwld_protdata_r )
 {
-	dreamwld_state *state = space->machine->driver_data<dreamwld_state>();
+	dreamwld_state *state = space->machine().driver_data<dreamwld_state>();
 
-	UINT8 *protdata = space->machine->region("user1")->base();
-	size_t protsize = space->machine->region("user1")->bytes();
+	UINT8 *protdata = space->machine().region("user1")->base();
+	size_t protsize = space->machine().region("user1")->bytes();
 	UINT8 dat = protdata[(state->protindex++) % protsize];
 	return dat << 24;
 }
@@ -261,7 +261,7 @@ static READ32_HANDLER( dreamwld_protdata_r )
 
 static WRITE32_HANDLER( dreamwld_palette_w )
 {
-	dreamwld_state *state = space->machine->driver_data<dreamwld_state>();
+	dreamwld_state *state = space->machine().driver_data<dreamwld_state>();
 	UINT16 dat;
 	int color;
 
@@ -269,17 +269,17 @@ static WRITE32_HANDLER( dreamwld_palette_w )
 	color = offset * 2;
 
 	dat = state->paletteram[offset] & 0x7fff;
-	palette_set_color_rgb(space->machine, color + 1, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
+	palette_set_color_rgb(space->machine(), color + 1, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 
 	dat = (state->paletteram[offset] >> 16) & 0x7fff;
-	palette_set_color_rgb(space->machine, color, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
+	palette_set_color_rgb(space->machine(), color, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 }
 
-static void dreamwld_oki_setbank( running_machine *machine, UINT8 chip, UINT8 bank )
+static void dreamwld_oki_setbank( running_machine &machine, UINT8 chip, UINT8 bank )
 {
 	/* 0x30000-0x3ffff is banked.
         banks are at 0x30000,0x40000,0x50000 and 0x60000 in rom */
-	UINT8 *sound = machine->region(chip ? "oki1" : "oki2")->base();
+	UINT8 *sound = machine.region(chip ? "oki1" : "oki2")->base();
 	logerror("OKI%d: set bank %02x\n", chip, bank);
 	memcpy(sound + 0x30000, sound + 0xb0000 + 0x10000 * bank, 0x10000);
 }
@@ -288,7 +288,7 @@ static void dreamwld_oki_setbank( running_machine *machine, UINT8 chip, UINT8 ba
 static WRITE32_HANDLER( dreamwld_6295_0_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
-		dreamwld_oki_setbank(space->machine, 0, data & 0x3);
+		dreamwld_oki_setbank(space->machine(), 0, data & 0x3);
 	else
 		logerror("OKI0: unk bank write %x mem_mask %8x\n", data, mem_mask);
 }
@@ -296,7 +296,7 @@ static WRITE32_HANDLER( dreamwld_6295_0_bank_w )
 static WRITE32_HANDLER( dreamwld_6295_1_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
-		dreamwld_oki_setbank(space->machine, 1, data & 0x3);
+		dreamwld_oki_setbank(space->machine(), 1, data & 0x3);
 	else
 		logerror("OKI1: unk bank write %x mem_mask %8x\n", data, mem_mask);
 }
@@ -402,7 +402,7 @@ GFXDECODE_END
 
 static MACHINE_START( dreamwld )
 {
-	dreamwld_state *state = machine->driver_data<dreamwld_state>();
+	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 
 	state->save_item(NAME(state->protindex));
 	state->save_item(NAME(state->tilebank));
@@ -411,7 +411,7 @@ static MACHINE_START( dreamwld )
 
 static MACHINE_RESET( dreamwld )
 {
-	dreamwld_state *state = machine->driver_data<dreamwld_state>();
+	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 
 	state->tilebankold[0] = state->tilebankold[1] = -1;
 	state->tilebank[0] = state->tilebank[1] = 0;

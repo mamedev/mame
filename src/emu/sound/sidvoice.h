@@ -106,7 +106,7 @@ void sidEmuSet2(sidOperator* pVoice);
 INT8 sidWaveCalcNormal(sidOperator* pVoice);
 
 void sidInitWaveformTables(SIDTYPE type);
-void sidInitMixerEngine(running_machine *machine);
+void sidInitMixerEngine(running_machine &machine);
 
 #if 0
 extern ptr2sidVoidFunc sid6581ModeNormalTable[16];

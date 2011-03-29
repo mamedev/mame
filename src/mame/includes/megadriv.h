@@ -40,10 +40,10 @@ extern UINT16* megadriv_backupram;
 extern int megadriv_backupram_length;
 extern UINT16* megadrive_ram;
 
-extern UINT8 megatech_bios_port_cc_dc_r(running_machine *machine, int offset, int ctrl);
+extern UINT8 megatech_bios_port_cc_dc_r(running_machine &machine, int offset, int ctrl);
 extern void megadriv_stop_scanline_timer(void);
 
-void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine, const char* tag);
+void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const char* tag);
 
 extern READ16_HANDLER( megadriv_vdp_r );
 extern WRITE16_HANDLER( megadriv_vdp_w );
@@ -58,8 +58,8 @@ extern WRITE8_DEVICE_HANDLER( megadriv_68k_YM2612_write);
 
 /* These are needed to create external input handlers (see e.g. MESS) */
 /* Regs are also used by Megaplay! */
-extern UINT8 (*megadrive_io_read_data_port_ptr)(running_machine *machine, int offset);
-extern void (*megadrive_io_write_data_port_ptr)(running_machine *machine, int offset, UINT16 data);
+extern UINT8 (*megadrive_io_read_data_port_ptr)(running_machine &machine, int offset);
+extern void (*megadrive_io_write_data_port_ptr)(running_machine &machine, int offset, UINT16 data);
 extern UINT8 megadrive_io_data_regs[3];
 extern UINT8 megadrive_io_ctrl_regs[3];
 

@@ -222,9 +222,9 @@ GFXDECODE_END
 
 static MACHINE_START( dday )
 {
-	dday_state *state = machine->driver_data<dday_state>();
+	dday_state *state = machine.driver_data<dday_state>();
 
-	state->ay1 = machine->device("ay1");
+	state->ay1 = machine.device("ay1");
 
 	state->save_item(NAME(state->control));
 	state->save_item(NAME(state->sl_enable));
@@ -234,7 +234,7 @@ static MACHINE_START( dday )
 
 static MACHINE_RESET( dday )
 {
-	dday_state *state = machine->driver_data<dday_state>();
+	dday_state *state = machine.driver_data<dday_state>();
 
 	state->control = 0;
 	state->sl_enable = 0;

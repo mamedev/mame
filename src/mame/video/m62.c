@@ -182,7 +182,7 @@ static const res_net_decode_info spelunk2_sprite_decode_info =
 
 PALETTE_INIT( m62 )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine, color_prom, &m62_tile_decode_info, &m62_tile_net_info);
@@ -193,7 +193,7 @@ PALETTE_INIT( m62 )
 	palette_set_colors(machine, 0x100, rgb, 0x100);
 	auto_free(machine, rgb);
 
-	palette_normalize_range(machine->palette, 0x000, 0x1ff, 0x00, 0xff);
+	palette_normalize_range(machine.palette, 0x000, 0x1ff, 0x00, 0xff);
 
 	/* we'll need this at run time */
 	state->sprite_height_prom = color_prom + 0x600;
@@ -202,7 +202,7 @@ PALETTE_INIT( m62 )
 
 PALETTE_INIT( lotlot )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine, color_prom, &lotlot_tile_decode_info, &m62_tile_net_info);
@@ -213,7 +213,7 @@ PALETTE_INIT( lotlot )
 	palette_set_colors(machine, 0x180, rgb, 0x180);
 	auto_free(machine, rgb);
 
-	palette_normalize_range(machine->palette, 0x000, 0x2ff, 0x00, 0xff);
+	palette_normalize_range(machine.palette, 0x000, 0x2ff, 0x00, 0xff);
 
 	/* we'll need this at run time */
 	state->sprite_height_prom = color_prom + 0x900;
@@ -222,7 +222,7 @@ PALETTE_INIT( lotlot )
 
 PALETTE_INIT( battroad )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine, color_prom, &m62_tile_decode_info, &m62_tile_net_info);
@@ -237,7 +237,7 @@ PALETTE_INIT( battroad )
 	palette_set_colors(machine, 0x200, rgb, 0x020);
 	auto_free(machine, rgb);
 
-	palette_normalize_range(machine->palette, 0x000, 0x21f, 0x00, 0xff);
+	palette_normalize_range(machine.palette, 0x000, 0x21f, 0x00, 0xff);
 
 	state->sprite_height_prom = color_prom + 0x620;	/* we'll need this at run time */
 }
@@ -245,7 +245,7 @@ PALETTE_INIT( battroad )
 
 PALETTE_INIT( spelunk2 )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine, color_prom, &spelunk2_tile_decode_info, &m62_tile_net_info);
@@ -256,16 +256,16 @@ PALETTE_INIT( spelunk2 )
 	palette_set_colors(machine, 0x200, rgb, 0x100);
 	auto_free(machine, rgb);
 
-	palette_normalize_range(machine->palette, 0x000, 0x2ff, 0x00, 0xff);
+	palette_normalize_range(machine.palette, 0x000, 0x2ff, 0x00, 0xff);
 
 	/* we'll need this at run time */
 	state->sprite_height_prom = color_prom + 0x700;
 }
 
 
-static void register_savestate( running_machine *machine )
+static void register_savestate( running_machine &machine )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 
 	state->save_item(NAME(state->flipscreen));
 	state->save_item(NAME(state->m62_background_hscroll));
@@ -280,62 +280,62 @@ static void register_savestate( running_machine *machine )
 
 WRITE8_HANDLER( m62_flipscreen_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	/* screen flip is handled both by software and hardware */
-	data ^= ~input_port_read(space->machine, "DSW2") & 1;
+	data ^= ~input_port_read(space->machine(), "DSW2") & 1;
 
 	state->flipscreen = data & 0x01;
 	if (state->flipscreen)
-		tilemap_set_flip_all(space->machine, TILEMAP_FLIPX | TILEMAP_FLIPY);
+		tilemap_set_flip_all(space->machine(), TILEMAP_FLIPX | TILEMAP_FLIPY);
 	else
-		tilemap_set_flip_all(space->machine, 0);
+		tilemap_set_flip_all(space->machine(), 0);
 
-	coin_counter_w(space->machine, 0, data & 2);
-	coin_counter_w(space->machine, 1, data & 4);
+	coin_counter_w(space->machine(), 0, data & 2);
+	coin_counter_w(space->machine(), 1, data & 4);
 }
 
 WRITE8_HANDLER( m62_hscroll_low_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	state->m62_background_hscroll = (state->m62_background_hscroll & 0xff00) | data;
 }
 
 WRITE8_HANDLER( m62_hscroll_high_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	state->m62_background_hscroll = (state->m62_background_hscroll & 0xff) | (data << 8);
 }
 
 WRITE8_HANDLER( m62_vscroll_low_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	state->m62_background_vscroll = (state->m62_background_vscroll & 0xff00) | data;
 }
 
 WRITE8_HANDLER( m62_vscroll_high_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	state->m62_background_vscroll = (state->m62_background_vscroll & 0xff) | (data << 8);
 }
 
 WRITE8_HANDLER( m62_tileram_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	state->m62_tileram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset >> 1);
 }
 
 WRITE8_HANDLER( m62_textram_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	state->m62_textram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset >> 1);
 }
 
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int colormask, int prioritymask, int priority )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int colormask, int prioritymask, int priority )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 8)
@@ -381,7 +381,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 			do
 			{
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 						code + i * incr,col,
 						flipx,flipy,
 						sx,sy + 16 * i,0);
@@ -392,9 +392,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static void m62_start( running_machine *machine, tile_get_info_func tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
+static void m62_start( running_machine &machine, tile_get_info_func tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	state->bg_tilemap = tilemap_create(machine, tile_get_info, tilemap_scan_rows,  x1, y1, x2, y2);
 
 	register_savestate(machine);
@@ -406,9 +406,9 @@ static void m62_start( running_machine *machine, tile_get_info_func tile_get_inf
 		tilemap_set_scroll_cols(state->bg_tilemap, cols);
 }
 
-static void m62_textlayer( running_machine *machine, tile_get_info_func tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
+static void m62_textlayer( running_machine &machine, tile_get_info_func tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	state->fg_tilemap = tilemap_create(machine, tile_get_info, tilemap_scan_rows,  x1, y1, x2, y2);
 
 	if (rows != 0)
@@ -420,14 +420,14 @@ static void m62_textlayer( running_machine *machine, tile_get_info_func tile_get
 
 WRITE8_HANDLER( kungfum_tileram_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	state->m62_tileram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset & 0x7ff);
 }
 
 static TILE_GET_INFO( get_kungfum_bg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int code;
 	int color;
 	int flags;
@@ -454,7 +454,7 @@ VIDEO_START( kungfum )
 
 SCREEN_UPDATE( kungfum )
 {
-	m62_state *state = screen->machine->driver_data<m62_state>();
+	m62_state *state = screen->machine().driver_data<m62_state>();
 	int i;
 	for (i = 0; i < 6; i++)
 	{
@@ -465,7 +465,7 @@ SCREEN_UPDATE( kungfum )
 		tilemap_set_scrollx(state->bg_tilemap, i, state->m62_background_hscroll);
 	}
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 1, 0);
 	return 0;
 }
@@ -473,7 +473,7 @@ SCREEN_UPDATE( kungfum )
 
 static TILE_GET_INFO( get_ldrun_bg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 
 	int code;
 	int color;
@@ -494,7 +494,7 @@ static TILE_GET_INFO( get_ldrun_bg_tile_info )
 
 VIDEO_START( ldrun )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 
 	m62_start(machine, get_ldrun_bg_tile_info, 1, 1, 8, 8, 64, 32);
 	tilemap_set_transmask(state->bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
@@ -503,20 +503,20 @@ VIDEO_START( ldrun )
 
 SCREEN_UPDATE( ldrun )
 {
-	m62_state *state = screen->machine->driver_data<m62_state>();
+	m62_state *state = screen->machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->m62_background_vscroll);
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0x0f, 0x10, 0x00);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0x0f, 0x10, 0x00);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0x0f, 0x10, 0x10);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0x0f, 0x10, 0x10);
 	return 0;
 }
 
 static TILE_GET_INFO( get_ldrun2_bg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int code;
 	int color;
 	int flags;
@@ -536,7 +536,7 @@ static TILE_GET_INFO( get_ldrun2_bg_tile_info )
 
 VIDEO_START( ldrun2 )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	m62_start(machine, get_ldrun2_bg_tile_info, 1, 1, 8, 8, 64, 32);
 	tilemap_set_transmask(state->bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(state->bg_tilemap, 1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
@@ -545,13 +545,13 @@ VIDEO_START( ldrun2 )
 
 WRITE8_HANDLER( ldrun3_topbottom_mask_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	state->ldrun3_topbottom_mask = data & 1;
 }
 
 SCREEN_UPDATE( ldrun3 )
 {
-	m62_state *state = screen->machine->driver_data<m62_state>();
+	m62_state *state = screen->machine().driver_data<m62_state>();
 	SCREEN_UPDATE_CALL(ldrun);
 
 	if (state->ldrun3_topbottom_mask)
@@ -560,11 +560,11 @@ SCREEN_UPDATE( ldrun3 )
 
 		my_cliprect.min_y = 0 * 8;
 		my_cliprect.max_y = 1 * 8 - 1;
-		bitmap_fill(bitmap, &my_cliprect, get_black_pen(screen->machine));
+		bitmap_fill(bitmap, &my_cliprect, get_black_pen(screen->machine()));
 
 		my_cliprect.min_y = 31 * 8;
 		my_cliprect.max_y = 32 * 8 - 1;
-		bitmap_fill(bitmap, &my_cliprect, get_black_pen(screen->machine));
+		bitmap_fill(bitmap, &my_cliprect, get_black_pen(screen->machine()));
 	}
 
 	return 0;
@@ -573,7 +573,7 @@ SCREEN_UPDATE( ldrun3 )
 
 static TILE_GET_INFO( get_battroad_bg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int code;
 	int color;
 	int flags;
@@ -593,7 +593,7 @@ static TILE_GET_INFO( get_battroad_bg_tile_info )
 
 static TILE_GET_INFO( get_battroad_fg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_textram[tile_index << 1];
@@ -603,7 +603,7 @@ static TILE_GET_INFO( get_battroad_fg_tile_info )
 
 VIDEO_START( battroad )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	m62_start(machine, get_battroad_bg_tile_info, 1, 1, 8, 8, 64, 32);
 	m62_textlayer(machine, get_battroad_fg_tile_info, 1, 1, 8, 8, 32, 32);
 	tilemap_set_transmask(state->bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
@@ -612,7 +612,7 @@ VIDEO_START( battroad )
 
 SCREEN_UPDATE( battroad )
 {
-	m62_state *state = screen->machine->driver_data<m62_state>();
+	m62_state *state = screen->machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->m62_background_vscroll);
 	tilemap_set_scrollx(state->fg_tilemap, 0, 128);
@@ -620,9 +620,9 @@ SCREEN_UPDATE( battroad )
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0x0f, 0x10, 0x00);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0x0f, 0x10, 0x00);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0x0f, 0x10, 0x10);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0x0f, 0x10, 0x10);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
 }
@@ -632,7 +632,7 @@ SCREEN_UPDATE( battroad )
 /* no char x flip, and more sprites */
 static TILE_GET_INFO( get_ldrun4_bg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_tileram[tile_index << 1];
@@ -647,18 +647,18 @@ VIDEO_START( ldrun4 )
 
 SCREEN_UPDATE( ldrun4 )
 {
-	m62_state *state = screen->machine->driver_data<m62_state>();
+	m62_state *state = screen->machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll - 2);
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	return 0;
 }
 
 
 static TILE_GET_INFO( get_lotlot_bg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int code;
 	int color;
 	int flags;
@@ -674,7 +674,7 @@ static TILE_GET_INFO( get_lotlot_bg_tile_info )
 
 static TILE_GET_INFO( get_lotlot_fg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_textram[tile_index << 1];
@@ -690,7 +690,7 @@ VIDEO_START( lotlot )
 
 SCREEN_UPDATE( lotlot )
 {
-	m62_state *state = screen->machine->driver_data<m62_state>();
+	m62_state *state = screen->machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll - 64);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->m62_background_vscroll + 32);
 	tilemap_set_scrollx(state->fg_tilemap, 0, -64);
@@ -699,26 +699,26 @@ SCREEN_UPDATE( lotlot )
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	return 0;
 }
 
 
 WRITE8_HANDLER( kidniki_text_vscroll_low_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	state->kidniki_text_vscroll = (state->kidniki_text_vscroll & 0xff00) | data;
 }
 
 WRITE8_HANDLER( kidniki_text_vscroll_high_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	state->kidniki_text_vscroll = (state->kidniki_text_vscroll & 0xff) | (data << 8);
 }
 
 WRITE8_HANDLER( kidniki_background_bank_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	if (state->kidniki_background_bank != (data & 1))
 	{
 		state->kidniki_background_bank = data & 1;
@@ -728,7 +728,7 @@ WRITE8_HANDLER( kidniki_background_bank_w )
 
 static TILE_GET_INFO( get_kidniki_bg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_tileram[tile_index << 1];
@@ -739,7 +739,7 @@ static TILE_GET_INFO( get_kidniki_bg_tile_info )
 
 static TILE_GET_INFO( get_kidniki_fg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_textram[tile_index << 1];
@@ -749,7 +749,7 @@ static TILE_GET_INFO( get_kidniki_fg_tile_info )
 
 VIDEO_START( kidniki )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_kidniki_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 	tilemap_set_transmask(state->bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
@@ -762,14 +762,14 @@ VIDEO_START( kidniki )
 
 SCREEN_UPDATE( kidniki )
 {
-	m62_state *state = screen->machine->driver_data<m62_state>();
+	m62_state *state = screen->machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll);
 	tilemap_set_scrollx(state->fg_tilemap, 0, -64);
 	tilemap_set_scrolly(state->fg_tilemap, 0, state->kidniki_text_vscroll + 128);
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
@@ -778,7 +778,7 @@ SCREEN_UPDATE( kidniki )
 
 WRITE8_HANDLER( spelunkr_palbank_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	if (state->spelunkr_palbank != (data & 0x01))
 	{
 		state->spelunkr_palbank = data & 0x01;
@@ -789,7 +789,7 @@ WRITE8_HANDLER( spelunkr_palbank_w )
 
 static TILE_GET_INFO( get_spelunkr_bg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_tileram[tile_index << 1];
@@ -799,7 +799,7 @@ static TILE_GET_INFO( get_spelunkr_bg_tile_info )
 
 static TILE_GET_INFO( get_spelunkr_fg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_textram[tile_index << 1];
@@ -816,7 +816,7 @@ VIDEO_START( spelunkr )
 
 SCREEN_UPDATE( spelunkr )
 {
-	m62_state *state = screen->machine->driver_data<m62_state>();
+	m62_state *state = screen->machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->m62_background_vscroll + 128);
 	tilemap_set_scrollx(state->fg_tilemap, 0, -64);
@@ -824,7 +824,7 @@ SCREEN_UPDATE( spelunkr )
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
 }
@@ -832,7 +832,7 @@ SCREEN_UPDATE( spelunkr )
 
 WRITE8_HANDLER( spelunk2_gfxport_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	m62_hscroll_high_w(space, 0, (data & 2) >> 1);
 	m62_vscroll_high_w(space, 0, (data & 1));
 	if (state->spelunkr_palbank != ((data & 0x0c) >> 2))
@@ -845,7 +845,7 @@ WRITE8_HANDLER( spelunk2_gfxport_w )
 
 static TILE_GET_INFO( get_spelunk2_bg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_tileram[tile_index << 1];
@@ -861,7 +861,7 @@ VIDEO_START( spelunk2 )
 
 SCREEN_UPDATE( spelunk2 )
 {
-	m62_state *state = screen->machine->driver_data<m62_state>();
+	m62_state *state = screen->machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll - 1);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->m62_background_vscroll + 128);
 	tilemap_set_scrollx(state->fg_tilemap, 0, -65);
@@ -869,7 +869,7 @@ SCREEN_UPDATE( spelunk2 )
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
 }
@@ -877,7 +877,7 @@ SCREEN_UPDATE( spelunk2 )
 
 static TILE_GET_INFO( get_youjyudn_bg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_tileram[tile_index << 1];
@@ -891,7 +891,7 @@ static TILE_GET_INFO( get_youjyudn_bg_tile_info )
 
 static TILE_GET_INFO( get_youjyudn_fg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_textram[tile_index << 1];
@@ -901,7 +901,7 @@ static TILE_GET_INFO( get_youjyudn_fg_tile_info )
 
 VIDEO_START( youjyudn )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	m62_start(machine, get_youjyudn_bg_tile_info, 1, 0, 8, 16, 64, 16);
 	m62_textlayer(machine, get_youjyudn_fg_tile_info, 1, 1, 12, 8, 32, 32);
 	tilemap_set_transmask(state->bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
@@ -910,14 +910,14 @@ VIDEO_START( youjyudn )
 
 SCREEN_UPDATE( youjyudn )
 {
-	m62_state *state = screen->machine->driver_data<m62_state>();
+	m62_state *state = screen->machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll);
 	tilemap_set_scrollx(state->fg_tilemap, 0, -64);
 	tilemap_set_scrolly(state->fg_tilemap, 0, 0);
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
@@ -926,13 +926,13 @@ SCREEN_UPDATE( youjyudn )
 
 WRITE8_HANDLER( horizon_scrollram_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	state->scrollram[offset] = data;
 }
 
 static TILE_GET_INFO( get_horizon_bg_tile_info )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_tileram[tile_index << 1];
@@ -947,7 +947,7 @@ static TILE_GET_INFO( get_horizon_bg_tile_info )
 
 VIDEO_START( horizon )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 	m62_start(machine, get_horizon_bg_tile_info, 32, 0, 8, 8, 64, 32);
 	tilemap_set_transmask(state->bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(state->bg_tilemap, 1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
@@ -955,14 +955,14 @@ VIDEO_START( horizon )
 
 SCREEN_UPDATE( horizon )
 {
-	m62_state *state = screen->machine->driver_data<m62_state>();
+	m62_state *state = screen->machine().driver_data<m62_state>();
 	int i;
 	for (i = 0; i < 32; i++)
 	{
 		tilemap_set_scrollx(state->bg_tilemap, i, state->scrollram[i << 1] | (state->scrollram[(i << 1) | 1] << 8));
 	}
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

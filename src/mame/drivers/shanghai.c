@@ -42,7 +42,7 @@ static PALETTE_INIT( shanghai )
 	int i;
 
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -73,7 +73,7 @@ static VIDEO_START( shanghai )
 
 static SCREEN_UPDATE( shanghai )
 {
-	device_t *hd63484 = screen->machine->device("hd63484");
+	device_t *hd63484 = screen->machine().device("hd63484");
 	int x, y, b, src;
 
 	b = ((hd63484_regs_r(hd63484, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, 0xce/2, 0xffff);
@@ -127,8 +127,8 @@ static WRITE16_HANDLER( shanghai_coin_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0,data & 1);
-		coin_counter_w(space->machine, 1,data & 2);
+		coin_counter_w(space->machine(), 0,data & 1);
+		coin_counter_w(space->machine(), 1,data & 2);
 	}
 }
 

@@ -101,7 +101,7 @@ void st010_write_ram(snes_state *state, UINT16 addr, UINT8 data)
 
 static TIMER_CALLBACK( snes_nmi_tick )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 
 	// pull NMI
 	device_set_input_line(state->maincpu, G65816_LINE_NMI, ASSERT_LINE);
@@ -110,9 +110,9 @@ static TIMER_CALLBACK( snes_nmi_tick )
 	state->nmi_timer->adjust(attotime::never);
 }
 
-static void snes_hirq_tick( running_machine *machine )
+static void snes_hirq_tick( running_machine &machine )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 
 	// latch the counters and pull IRQ
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
@@ -131,7 +131,7 @@ static TIMER_CALLBACK( snes_hirq_tick_callback )
 
 static TIMER_CALLBACK( snes_reset_oam_address )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	// make sure we're in the 65816's context since we're messing with the OAM and stuff
 	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 
@@ -145,16 +145,16 @@ static TIMER_CALLBACK( snes_reset_oam_address )
 
 static TIMER_CALLBACK( snes_reset_hdma )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	address_space *cpu0space = state->maincpu->memory().space(AS_PROGRAM);
 	snes_hdma_init(cpu0space);
 }
 
 static TIMER_CALLBACK( snes_update_io )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	address_space *cpu0space = state->maincpu->memory().space(AS_PROGRAM);
-	state->io_read(cpu0space->machine);
+	state->io_read(cpu0space->machine());
 	snes_ram[HVBJOY] &= 0xfe;		/* Clear busy bit */
 
 	state->io_timer->adjust(attotime::never);
@@ -162,10 +162,10 @@ static TIMER_CALLBACK( snes_update_io )
 
 static TIMER_CALLBACK( snes_scanline_tick )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 
 	/* Increase current line - we want to latch on this line during it, not after it */
-	snes_ppu.beam.current_vert = machine->primary_screen->vpos();
+	snes_ppu.beam.current_vert = machine.primary_screen->vpos();
 
 	// not in hblank
 	snes_ram[HVBJOY] &= ~0x40;
@@ -205,7 +205,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 			}
 			else
 			{
-				state->hirq_timer->adjust(machine->primary_screen->time_until_pos(snes_ppu.beam.current_vert, pixel * state->htmult));
+				state->hirq_timer->adjust(machine.primary_screen->time_until_pos(snes_ppu.beam.current_vert, pixel * state->htmult));
 			}
 		}
 	}
@@ -213,7 +213,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	/* Start of VBlank */
 	if (snes_ppu.beam.current_vert == snes_ppu.beam.last_visible_line)
 	{
-		machine->scheduler().timer_set(machine->primary_screen->time_until_pos(snes_ppu.beam.current_vert, 10), FUNC(snes_reset_oam_address));
+		machine.scheduler().timer_set(machine.primary_screen->time_until_pos(snes_ppu.beam.current_vert, 10), FUNC(snes_reset_oam_address));
 
 		snes_ram[HVBJOY] |= 0x81;		/* Set vblank bit to on & indicate controllers being read */
 		snes_ram[RDNMI] |= 0x80;		/* Set NMI occured bit */
@@ -225,7 +225,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		}
 
 		/* three lines after start of vblank we update the controllers (value from snes9x) */
-		state->io_timer->adjust(machine->primary_screen->time_until_pos(snes_ppu.beam.current_vert + 2, state->hblank_offset * state->htmult));
+		state->io_timer->adjust(machine.primary_screen->time_until_pos(snes_ppu.beam.current_vert + 2, state->hblank_offset * state->htmult));
 	}
 
 	// hdma reset happens at scanline 0, H=~6
@@ -246,7 +246,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	}
 
 	state->scanline_timer->adjust(attotime::never);
-	state->hblank_timer->adjust(machine->primary_screen->time_until_pos(snes_ppu.beam.current_vert, state->hblank_offset * state->htmult));
+	state->hblank_timer->adjust(machine.primary_screen->time_until_pos(snes_ppu.beam.current_vert, state->hblank_offset * state->htmult));
 
 //  printf("%02x %d\n",snes_ram[HVBJOY],snes_ppu.beam.current_vert);
 }
@@ -254,11 +254,11 @@ static TIMER_CALLBACK( snes_scanline_tick )
 /* This is called at the start of hblank *before* the scanline indicated in current_vert! */
 static TIMER_CALLBACK( snes_hblank_tick )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	address_space *cpu0space = state->maincpu->memory().space(AS_PROGRAM);
 	int nextscan;
 
-	snes_ppu.beam.current_vert = machine->primary_screen->vpos();
+	snes_ppu.beam.current_vert = machine.primary_screen->vpos();
 
 	/* make sure we halt */
 	state->hblank_timer->adjust(attotime::never);
@@ -266,13 +266,13 @@ static TIMER_CALLBACK( snes_hblank_tick )
 	/* draw a scanline */
 	if (snes_ppu.beam.current_vert <= snes_ppu.beam.last_visible_line)
 	{
-		if (machine->primary_screen->vpos() > 0)
+		if (machine.primary_screen->vpos() > 0)
 		{
 			/* Do HDMA */
 			if (snes_ram[HDMAEN])
 				snes_hdma(cpu0space);
 
-			machine->primary_screen->update_partial((snes_ppu.interlace == 2) ? (snes_ppu.beam.current_vert * snes_ppu.interlace) : snes_ppu.beam.current_vert - 1);
+			machine.primary_screen->update_partial((snes_ppu.interlace == 2) ? (snes_ppu.beam.current_vert * snes_ppu.interlace) : snes_ppu.beam.current_vert - 1);
 		}
 	}
 
@@ -286,7 +286,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 		nextscan = 0;
 	}
 
-	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(nextscan));
+	state->scanline_timer->adjust(machine.primary_screen->time_until_pos(nextscan));
 }
 
 /* FIXME: multiplication should take 8 CPU cycles & division 16 CPU cycles, but
@@ -348,7 +348,7 @@ READ8_HANDLER( snes_open_bus_r )
 /* read & write to DMA addresses are defined separately, to be called by snessdd1 handlers */
 static READ8_HANDLER( snes_io_dma_r )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 
 	switch (offset)
 	{
@@ -396,7 +396,7 @@ static READ8_HANDLER( snes_io_dma_r )
 
 static WRITE8_HANDLER( snes_io_dma_w )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 
 	switch (offset)
 	{
@@ -462,7 +462,7 @@ static WRITE8_HANDLER( snes_io_dma_w )
  */
 READ8_HANDLER( snes_r_io )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	UINT8 value = 0;
 
 	// PPU accesses are from 2100 to 213f
@@ -527,14 +527,14 @@ READ8_HANDLER( snes_r_io )
 			if (snes_ram[offset] & 0x1)
 				return 0 | (snes_open_bus_r(space, 0) & 0xfc); //correct?
 
-			value = state->oldjoy1_read(space->machine);
+			value = state->oldjoy1_read(space->machine());
 
 			return (value & 0x03) | (snes_open_bus_r(space, 0) & 0xfc); //correct?
 		case OLDJOY2:	/* Data for old NES controllers (JOYSER2) */
 			if (snes_ram[OLDJOY1] & 0x1)
 				return 0 | 0x1c | (snes_open_bus_r(space, 0) & 0xe0); //correct?
 
-			value = state->oldjoy2_read(space->machine);
+			value = state->oldjoy2_read(space->machine());
 
 			return value | 0x1c | (snes_open_bus_r(space, 0) & 0xe0); //correct?
 		case RDNMI:			/* NMI flag by v-blank and version number */
@@ -548,7 +548,7 @@ READ8_HANDLER( snes_r_io )
 			return value;
 		case HVBJOY:		/* H/V blank and joypad controller enable */
 			// electronics test says hcounter 272 is start of hblank, which is beampos 363
-//          if (space->machine->primary_screen->hpos() >= 363) snes_ram[offset] |= 0x40;
+//          if (space->machine().primary_screen->hpos() >= 363) snes_ram[offset] |= 0x40;
 //              else snes_ram[offset] &= ~0x40;
 			return (snes_ram[offset] & 0xc1) | (snes_open_bus_r(space, 0) & 0x3e);
 		case RDIO:			/* Programmable I/O port - echos back what's written to WRIO */
@@ -577,7 +577,7 @@ READ8_HANDLER( snes_r_io )
 
 #ifndef MESS
 		case 0x4100:		/* NSS Dip-Switches */
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 //      case 0x4101: //PC: a104 - a10e - a12a   //only nss_actr
 //      case 0x420c: //PC: 9c7d - 8fab          //only nss_ssoc
 
@@ -602,7 +602,7 @@ READ8_HANDLER( snes_r_io )
  */
 WRITE8_HANDLER( snes_w_io )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 
 	// PPU accesses are from 2100 to 213f
 	if (offset >= INIDISP && offset < APU00)
@@ -616,7 +616,7 @@ WRITE8_HANDLER( snes_w_io )
 	{
 //      printf("816: %02x to APU @ %d (PC=%06x)\n", data, offset & 3,cpu_get_pc(space->cpu));
 		spc_port_in(state->spc700, offset & 0x3, data);
-		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 		return;
 	}
 
@@ -632,7 +632,7 @@ WRITE8_HANDLER( snes_w_io )
 	{
 		if (offset == 0x2800 || offset == 0x2801)
 		{
-			srtc_write(space->machine, offset, data);
+			srtc_write(space->machine(), offset, data);
 			return;
 		}
 	}
@@ -654,7 +654,7 @@ WRITE8_HANDLER( snes_w_io )
 		UINT16 limit = (state->has_addon_chip == HAS_SPC7110_RTC) ? 0x4842 : 0x483f;
 		if (offset >= 0x4800 && offset <= limit)
 		{
-			spc7110_mmio_write(space->machine, (UINT32)offset, data);
+			spc7110_mmio_write(space->machine(), (UINT32)offset, data);
 			return;
 		}
 	}
@@ -704,7 +704,7 @@ WRITE8_HANDLER( snes_w_io )
 			if (!(snes_ram[WRIO] & 0x80) && (data & 0x80))
 			{
 				// external latch
-				snes_latch_counters(space->machine);
+				snes_latch_counters(space->machine());
 			}
 			break;
 		case WRMPYA:	/* Multiplier A */
@@ -766,7 +766,7 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case HDMAEN:	/* HDMA channel designation */
 			if (data) //if a HDMA is enabled, data is inited at the next scanline
-				space->machine->scheduler().timer_set(space->machine->primary_screen->time_until_pos(snes_ppu.beam.current_vert + 1), FUNC(snes_reset_hdma));
+				space->machine().scheduler().timer_set(space->machine().primary_screen->time_until_pos(snes_ppu.beam.current_vert + 1), FUNC(snes_reset_hdma));
 			break;
 		case MEMSEL:	/* Access cycle designation in memory (2) area */
 			/* FIXME: Need to adjust the speed only during access of banks 0x80+
@@ -809,7 +809,7 @@ WRITE8_HANDLER( snes_w_io )
 
 WRITE_LINE_DEVICE_HANDLER( snes_extern_irq_w )
 {
-	snes_state *driver_state = device->machine->driver_data<snes_state>();
+	snes_state *driver_state = device->machine().driver_data<snes_state>();
 	device_set_input_line(driver_state->maincpu, G65816_LINE_IRQ, state);
 }
 
@@ -890,7 +890,7 @@ address               |         |          |       |     |         |        |   
 
 #if USE_CYCLE_STEAL
 /*FIXME: missing work RAM access steal / we need to do this less "aggressive" otherwise we lose too much CPU horsepower, why? */
-static int snes_bank_0x00_0x3f_cycles(running_machine *machine,UINT32 offset)
+static int snes_bank_0x00_0x3f_cycles(running_machine &machine,UINT32 offset)
 {
 /*
  $00-$3F | $0000-$1FFF | Slow  | Address Bus A + /WRAM (mirror $7E:0000-$1FFF)
@@ -918,7 +918,7 @@ static int snes_bank_0x00_0x3f_cycles(running_machine *machine,UINT32 offset)
 	return 0; //TODO: 6
 }
 
-static int snes_bank_0x80_0xbf_cycles(running_machine *machine,UINT32 offset)
+static int snes_bank_0x80_0xbf_cycles(running_machine &machine,UINT32 offset)
 {
 /*
  $80-$BF | $0000-$1FFF | Slow  | Address Bus A + /WRAM (mirror $7E:0000-$1FFF)
@@ -955,7 +955,7 @@ static int snes_bank_0x80_0xbf_cycles(running_machine *machine,UINT32 offset)
 /* 0x000000 - 0x2fffff */
 READ8_HANDLER( snes_r_bank1 )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	UINT8 value = 0xff;
 	UINT16 address = offset & 0xffff;
 
@@ -1005,7 +1005,7 @@ READ8_HANDLER( snes_r_bank1 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
 	#endif
 
 	return value;
@@ -1014,7 +1014,7 @@ READ8_HANDLER( snes_r_bank1 )
 /* 0x300000 - 0x3fffff */
 READ8_HANDLER( snes_r_bank2 )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	UINT8 value = 0xff;
 	UINT16 address = offset & 0xffff;
 
@@ -1071,7 +1071,7 @@ READ8_HANDLER( snes_r_bank2 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
 	#endif
 
 	return value;
@@ -1080,7 +1080,7 @@ READ8_HANDLER( snes_r_bank2 )
 /* 0x400000 - 0x5fffff */
 READ8_HANDLER( snes_r_bank3 )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	UINT8 value = 0xff;
 	UINT16 address = offset & 0xffff;
 
@@ -1123,7 +1123,7 @@ READ8_HANDLER( snes_r_bank3 )
 /* 0x600000 - 0x6fffff */
 READ8_HANDLER( snes_r_bank4 )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	UINT8 value = 0xff;
 	UINT16 address = offset & 0xffff;
 
@@ -1172,7 +1172,7 @@ READ8_HANDLER( snes_r_bank4 )
 /* 0x700000 - 0x7dffff */
 READ8_HANDLER( snes_r_bank5 )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	UINT8 value;
 	UINT16 address = offset & 0xffff;
 
@@ -1210,7 +1210,7 @@ READ8_HANDLER( snes_r_bank5 )
 /* 0x800000 - 0xbfffff */
 READ8_HANDLER( snes_r_bank6 )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	UINT8 value = 0;
 	UINT16 address = offset & 0xffff;
 
@@ -1251,7 +1251,7 @@ READ8_HANDLER( snes_r_bank6 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
+		device_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine(), offset));
 	#endif
 
 	return value;
@@ -1260,7 +1260,7 @@ READ8_HANDLER( snes_r_bank6 )
 /* 0xc00000 - 0xffffff */
 READ8_HANDLER( snes_r_bank7 )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	UINT8 value = 0;
 	UINT16 address = offset & 0xffff;
 
@@ -1291,7 +1291,7 @@ READ8_HANDLER( snes_r_bank7 )
 	else if ((state->has_addon_chip == HAS_SPC7110 || state->has_addon_chip == HAS_SPC7110_RTC) && offset >= 0x100000)
 		value = spc7110_bank7_read(space, offset);
 	else if (state->has_addon_chip == HAS_SDD1)
-		value = sdd1_read(space->machine, offset);
+		value = sdd1_read(space->machine(), offset);
 	else if (state->has_addon_chip == HAS_ST010 || state->has_addon_chip == HAS_ST011)
 	{
 		if (offset >= 0x280000 && offset < 0x300000 && address < 0x1000)
@@ -1325,7 +1325,7 @@ READ8_HANDLER( snes_r_bank7 )
 /* 0x000000 - 0x2fffff */
 WRITE8_HANDLER( snes_w_bank1 )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	UINT16 address = offset & 0xffff;
 
 	if (address < 0x2000)							/* Mirror of Low RAM */
@@ -1346,7 +1346,7 @@ WRITE8_HANDLER( snes_w_bank1 )
 		else if ((state->cart[0].mode == SNES_MODE_21) && (state->has_addon_chip == HAS_DSP1) && (offset < 0x100000))
 			dsp_set_dr(data);
 		else if (state->has_addon_chip == HAS_CX4)
-			CX4_write(space->machine, address - 0x6000, data);
+			CX4_write(space->machine(), address - 0x6000, data);
 		else if (state->has_addon_chip == HAS_SPC7110 || state->has_addon_chip == HAS_SPC7110_RTC)
 		{
 			if (offset < 0x10000)
@@ -1374,14 +1374,14 @@ WRITE8_HANDLER( snes_w_bank1 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
 	#endif
 }
 
 /* 0x300000 - 0x3fffff */
 WRITE8_HANDLER( snes_w_bank2 )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	UINT16 address = offset & 0xffff;
 
 	if (address < 0x2000)							/* Mirror of Low RAM */
@@ -1400,7 +1400,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 		else if (state->has_addon_chip == HAS_OBC1)
 			obc1_write(space, offset, data);
 		else if (state->has_addon_chip == HAS_CX4)
-			CX4_write(space->machine, address - 0x6000, data);
+			CX4_write(space->machine(), address - 0x6000, data);
 		else if (state->has_addon_chip == HAS_SPC7110 || state->has_addon_chip == HAS_SPC7110_RTC)
 		{
 			if (offset < 0x10000)
@@ -1435,14 +1435,14 @@ WRITE8_HANDLER( snes_w_bank2 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
 	#endif
 }
 
 /* 0x600000 - 0x6fffff */
 WRITE8_HANDLER( snes_w_bank4 )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	UINT16 address = offset & 0xffff;
 
 	if (state->has_addon_chip == HAS_SUPERFX)
@@ -1483,7 +1483,7 @@ WRITE8_HANDLER( snes_w_bank4 )
 /* 0x700000 - 0x7dffff */
 WRITE8_HANDLER( snes_w_bank5 )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	UINT16 address = offset & 0xffff;
 
 	if (state->has_addon_chip == HAS_SUPERFX)
@@ -1511,7 +1511,7 @@ WRITE8_HANDLER( snes_w_bank5 )
 /* 0x800000 - 0xbfffff */
 WRITE8_HANDLER( snes_w_bank6 )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	UINT16 address = offset & 0xffff;
 
 	if (state->has_addon_chip == HAS_SUPERFX)
@@ -1519,7 +1519,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 	else if (address < 0x8000)
 	{
 		if ((state->has_addon_chip == HAS_CX4) && (address >= 0x6000))
-			CX4_write(space->machine, address - 0x6000, data);
+			CX4_write(space->machine(), address - 0x6000, data);
 		else if (state->cart[0].mode != SNES_MODE_25)
 			space->write_byte(offset, data);
 		else	/* Mode 25 has SRAM not mirrored from lower banks */
@@ -1559,7 +1559,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
+		device_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine(), offset));
 	#endif
 }
 
@@ -1567,7 +1567,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 /* 0xc00000 - 0xffffff */
 WRITE8_HANDLER( snes_w_bank7 )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	UINT16 address = offset & 0xffff;
 
 	if (state->has_addon_chip == HAS_SUPERFX)
@@ -1625,9 +1625,9 @@ WRITE8_HANDLER( snes_w_bank7 )
 
 *************************************/
 
-static void nss_io_read( running_machine *machine )
+static void nss_io_read( running_machine &machine )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	static const char *const portnames[2][4] =
 			{
 				{ "SERIAL1_DATA1_L", "SERIAL1_DATA1_H", "SERIAL1_DATA2_L", "SERIAL1_DATA2_H" },
@@ -1671,9 +1671,9 @@ static void nss_io_read( running_machine *machine )
 
 }
 
-static UINT8 nss_oldjoy1_read( running_machine *machine )
+static UINT8 nss_oldjoy1_read( running_machine &machine )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	UINT8 res;
 
 	if (state->read_idx[0] >= 16)
@@ -1684,9 +1684,9 @@ static UINT8 nss_oldjoy1_read( running_machine *machine )
 	return res;
 }
 
-static UINT8 nss_oldjoy2_read( running_machine *machine )
+static UINT8 nss_oldjoy2_read( running_machine &machine )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	UINT8 res;
 
 	if (state->read_idx[1] >= 16)
@@ -1703,36 +1703,36 @@ static UINT8 nss_oldjoy2_read( running_machine *machine )
 
 *************************************/
 
-static void snes_init_timers( running_machine *machine )
+static void snes_init_timers( running_machine &machine )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 
 	/* init timers and stop them */
-	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(snes_scanline_tick));
+	state->scanline_timer = machine.scheduler().timer_alloc(FUNC(snes_scanline_tick));
 	state->scanline_timer->adjust(attotime::never);
-	state->hblank_timer = machine->scheduler().timer_alloc(FUNC(snes_hblank_tick));
+	state->hblank_timer = machine.scheduler().timer_alloc(FUNC(snes_hblank_tick));
 	state->hblank_timer->adjust(attotime::never);
-	state->nmi_timer = machine->scheduler().timer_alloc(FUNC(snes_nmi_tick));
+	state->nmi_timer = machine.scheduler().timer_alloc(FUNC(snes_nmi_tick));
 	state->nmi_timer->adjust(attotime::never);
-	state->hirq_timer = machine->scheduler().timer_alloc(FUNC(snes_hirq_tick_callback));
+	state->hirq_timer = machine.scheduler().timer_alloc(FUNC(snes_hirq_tick_callback));
 	state->hirq_timer->adjust(attotime::never);
-	state->div_timer = machine->scheduler().timer_alloc(FUNC(snes_div_callback));
+	state->div_timer = machine.scheduler().timer_alloc(FUNC(snes_div_callback));
 	state->div_timer->adjust(attotime::never);
-	state->mult_timer = machine->scheduler().timer_alloc(FUNC(snes_mult_callback));
+	state->mult_timer = machine.scheduler().timer_alloc(FUNC(snes_mult_callback));
 	state->mult_timer->adjust(attotime::never);
-	state->io_timer = machine->scheduler().timer_alloc(FUNC(snes_update_io));
+	state->io_timer = machine.scheduler().timer_alloc(FUNC(snes_update_io));
 	state->io_timer->adjust(attotime::never);
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.
 	state->hblank_offset = 274;
-	state->hblank_timer->adjust(machine->primary_screen->time_until_pos(((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC - 1 : SNES_VTOTAL_PAL - 1, state->hblank_offset));
+	state->hblank_timer->adjust(machine.primary_screen->time_until_pos(((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC - 1 : SNES_VTOTAL_PAL - 1, state->hblank_offset));
 }
 
-static void snes_init_ram( running_machine *machine )
+static void snes_init_ram( running_machine &machine )
 {
-	snes_state *state = machine->driver_data<snes_state>();
-	address_space *cpu0space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	snes_state *state = machine.driver_data<snes_state>();
+	address_space *cpu0space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Init work RAM - 0x55 isn't exactly right but it's close */
@@ -1760,7 +1760,7 @@ static void snes_init_ram( running_machine *machine )
 	snes_ram[VMAIN] = 0x80;
 
 	// see if there's a uPD7725 DSP in the machine config
-	state->upd7725 = machine->device<upd7725_device>("dsp");
+	state->upd7725 = machine.device<upd7725_device>("dsp");
 
 	// if we have a DSP, halt it for the moment
 	if (state->upd7725)
@@ -1769,7 +1769,7 @@ static void snes_init_ram( running_machine *machine )
 	}
 
 	// ditto for a uPD96050 (Seta ST-010 or ST-011)
-	state->upd96050 = machine->device<upd96050_device>("setadsp");
+	state->upd96050 = machine.device<upd96050_device>("setadsp");
 	if (state->upd96050)
 	{
 		cputag_set_input_line(machine, "setadsp", INPUT_LINE_RESET, ASSERT_LINE);
@@ -1824,7 +1824,7 @@ static void snes_init_ram( running_machine *machine )
 	}
 
 	// init frame counter so first line is 0
-	if (ATTOSECONDS_TO_HZ(machine->primary_screen->frame_period().attoseconds) >= 59)
+	if (ATTOSECONDS_TO_HZ(machine.primary_screen->frame_period().attoseconds) >= 59)
 		snes_ppu.beam.current_vert = SNES_VTOTAL_NTSC;
 	else
 		snes_ppu.beam.current_vert = SNES_VTOTAL_PAL;
@@ -1845,16 +1845,16 @@ DIRECT_UPDATE_HANDLER( snes_direct )
 
 MACHINE_START( snes )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	int i;
 
-	state->maincpu = machine->device<_5a22_device>("maincpu");
-	state->soundcpu = machine->device<spc700_device>("soundcpu");
-	state->spc700 = machine->device<snes_sound_device>("spc700");
-	state->superfx = machine->device<cpu_device>("superfx");
+	state->maincpu = machine.device<_5a22_device>("maincpu");
+	state->soundcpu = machine.device<spc700_device>("soundcpu");
+	state->spc700 = machine.device<snes_sound_device>("spc700");
+	state->superfx = machine.device<cpu_device>("superfx");
 
-	state->maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(snes_direct, *machine));
-	state->soundcpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(snes_spc_direct, *machine));
+	state->maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(snes_direct, machine));
+	state->soundcpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(snes_spc_direct, machine));
 
 	// power-on sets these registers like this
 	snes_ram[WRIO] = 0xff;
@@ -1947,7 +1947,7 @@ MACHINE_START( snes )
 
 MACHINE_RESET( snes )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	int i;
 
 	snes_init_ram(machine);
@@ -1967,9 +1967,9 @@ MACHINE_RESET( snes )
 	}
 
 	/* Set STAT78 to NTSC or PAL */
-	if (ATTOSECONDS_TO_HZ(machine->primary_screen->frame_period().attoseconds) >= 59.0f)
+	if (ATTOSECONDS_TO_HZ(machine.primary_screen->frame_period().attoseconds) >= 59.0f)
 		snes_ram[STAT78] = SNES_NTSC;
-	else /* if (ATTOSECONDS_TO_HZ(machine->primary_screen->frame_period().attoseconds) == 50.0f) */
+	else /* if (ATTOSECONDS_TO_HZ(machine.primary_screen->frame_period().attoseconds) == 50.0f) */
 		snes_ram[STAT78] = SNES_PAL;
 
 	// reset does this to these registers
@@ -1986,12 +1986,12 @@ MACHINE_RESET( snes )
 /* for mame we use an init, maybe we will need more for the different games */
 DRIVER_INIT( snes )
 {
-	snes_state *state = machine->driver_data<snes_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	snes_state *state = machine.driver_data<snes_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8 *rom;
 
-	rom = machine->region("user3")->base();
+	rom = machine.region("user3")->base();
 	snes_ram = auto_alloc_array_clear(machine, UINT8, 0x1400000);
 
 	/* all NSS games seem to use MODE 20 */
@@ -2000,7 +2000,7 @@ DRIVER_INIT( snes )
 	state->has_addon_chip = HAS_NONE;
 
 	/* Find the number of blocks in this ROM */
-	total_blocks = (machine->region("user3")->bytes() / 0x8000);
+	total_blocks = (machine.region("user3")->bytes() / 0x8000);
 	read_blocks = 0;
 
 	/* Loading all the data blocks from cart, we only partially cover banks 0x00 to 0x7f. Therefore, we
@@ -2052,12 +2052,12 @@ DRIVER_INIT( snes )
 
 DRIVER_INIT( snes_hirom )
 {
-	snes_state *state = machine->driver_data<snes_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	snes_state *state = machine.driver_data<snes_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8  *rom;
 
-	rom = machine->region("user3")->base();
+	rom = machine.region("user3")->base();
 	snes_ram = auto_alloc_array(machine, UINT8, 0x1400000);
 	memset(snes_ram, 0, 0x1400000);
 
@@ -2066,7 +2066,7 @@ DRIVER_INIT( snes_hirom )
 	state->has_addon_chip = HAS_NONE;
 
 	/* Find the number of blocks in this ROM */
-	total_blocks = (machine->region("user3")->bytes() / 0x10000);
+	total_blocks = (machine.region("user3")->bytes() / 0x10000);
 	read_blocks = 0;
 
 	/* See above for details about the way we fill banks 0x00 to 0x7f */
@@ -2137,7 +2137,7 @@ INLINE UINT8 snes_abus_read( address_space *space, UINT32 abus )
 
 INLINE void snes_dma_transfer( address_space *space, UINT8 dma, UINT32 abus, UINT16 bbus )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 
 	#if USE_CYCLE_STEAL
 	/* every byte transfer takes 8 master cycles */
@@ -2181,21 +2181,21 @@ INLINE void snes_dma_transfer( address_space *space, UINT8 dma, UINT32 abus, UIN
 
 /* WIP: These have the advantage to automatically update the address, but then we would need to
 check again if the transfer is direct/indirect at each step... is it worth? */
-INLINE UINT32 snes_get_hdma_addr( running_machine *machine, int dma )
+INLINE UINT32 snes_get_hdma_addr( running_machine &machine, int dma )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	return (state->dma_channel[dma].bank << 16) | (state->dma_channel[dma].hdma_addr++);
 }
 
-INLINE UINT32 snes_get_hdma_iaddr( running_machine *machine, int dma )
+INLINE UINT32 snes_get_hdma_iaddr( running_machine &machine, int dma )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	return (state->dma_channel[dma].ibank << 16) | (state->dma_channel[dma].trans_size++);
 }
 
-INLINE int is_last_active_channel( running_machine *machine, int dma )
+INLINE int is_last_active_channel( running_machine &machine, int dma )
 {
-	snes_state *state = machine->driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	int i;
 
 	for (i = dma + 1; i < 8; i++)
@@ -2210,8 +2210,8 @@ INLINE int is_last_active_channel( running_machine *machine, int dma )
 
 static void snes_hdma_update( address_space *space, int dma )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
-	UINT32 abus = snes_get_hdma_addr(space->machine, dma);
+	snes_state *state = space->machine().driver_data<snes_state>();
+	UINT32 abus = snes_get_hdma_addr(space->machine(), dma);
 
 	state->dma_channel[dma].hdma_line_counter = snes_abus_read(space, abus);
 
@@ -2221,13 +2221,13 @@ static void snes_hdma_update( address_space *space, int dma )
         one byte for Address, and use the $00 for the low byte. So Address ends up incremented one less than
         otherwise expected */
 
-		abus = snes_get_hdma_addr(space->machine, dma);
+		abus = snes_get_hdma_addr(space->machine(), dma);
 		state->dma_channel[dma].trans_size = snes_abus_read(space, abus) << 8;
 
-		if (state->dma_channel[dma].hdma_line_counter || !is_last_active_channel(space->machine, dma))
+		if (state->dma_channel[dma].hdma_line_counter || !is_last_active_channel(space->machine(), dma))
 		{
 			// we enter here if we have more transfers to be done or if there are other active channels after this one
-			abus = snes_get_hdma_addr(space->machine, dma);
+			abus = snes_get_hdma_addr(space->machine(), dma);
 			state->dma_channel[dma].trans_size >>= 8;
 			state->dma_channel[dma].trans_size |= snes_abus_read(space, abus) << 8;
 		}
@@ -2241,7 +2241,7 @@ static void snes_hdma_update( address_space *space, int dma )
 
 static void snes_hdma_init( address_space *space )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	int i;
 
 	state->hdmaen = snes_ram[HDMAEN];
@@ -2257,7 +2257,7 @@ static void snes_hdma_init( address_space *space )
 
 static void snes_hdma( address_space *space )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	UINT16 bbus;
 	UINT32 abus;
 	int i;
@@ -2341,7 +2341,7 @@ static void snes_hdma( address_space *space )
 
 static void snes_dma( address_space *space, UINT8 channels )
 {
-	snes_state *state = space->machine->driver_data<snes_state>();
+	snes_state *state = space->machine().driver_data<snes_state>();
 	int i;
 	INT8 increment;
 	UINT16 bbus;

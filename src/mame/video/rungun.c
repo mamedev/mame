@@ -16,7 +16,7 @@
 /* TTL text plane stuff */
 static TILE_GET_INFO( ttl_get_tile_info )
 {
-	rungun_state *state = machine->driver_data<rungun_state>();
+	rungun_state *state = machine.driver_data<rungun_state>();
 	UINT8 *lvram = (UINT8 *)state->ttl_vram;
 	int attr, code;
 
@@ -26,35 +26,35 @@ static TILE_GET_INFO( ttl_get_tile_info )
 	SET_TILE_INFO(state->ttl_gfx_index, code, attr, 0);
 }
 
-void rng_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
+void rng_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
 {
-	rungun_state *state = machine->driver_data<rungun_state>();
+	rungun_state *state = machine.driver_data<rungun_state>();
 	*color = state->sprite_colorbase | (*color & 0x001f);
 }
 
 READ16_HANDLER( rng_ttl_ram_r )
 {
-	rungun_state *state = space->machine->driver_data<rungun_state>();
+	rungun_state *state = space->machine().driver_data<rungun_state>();
 	return state->ttl_vram[offset];
 }
 
 WRITE16_HANDLER( rng_ttl_ram_w )
 {
-	rungun_state *state = space->machine->driver_data<rungun_state>();
+	rungun_state *state = space->machine().driver_data<rungun_state>();
 	COMBINE_DATA(&state->ttl_vram[offset]);
 }
 
 /* 53936 (PSAC2) rotation/zoom plane */
 WRITE16_HANDLER(rng_936_videoram_w)
 {
-	rungun_state *state = space->machine->driver_data<rungun_state>();
+	rungun_state *state = space->machine().driver_data<rungun_state>();
 	COMBINE_DATA(&state->_936_videoram[offset]);
 	tilemap_mark_tile_dirty(state->_936_tilemap, offset / 2);
 }
 
 static TILE_GET_INFO( get_rng_936_tile_info )
 {
-	rungun_state *state = machine->driver_data<rungun_state>();
+	rungun_state *state = machine.driver_data<rungun_state>();
 	int tileno, colour, flipx;
 
 	tileno = state->_936_videoram[tile_index * 2 + 1] & 0x3fff;
@@ -78,7 +78,7 @@ VIDEO_START( rng )
 		8*8*4
 	};
 
-	rungun_state *state = machine->driver_data<rungun_state>();
+	rungun_state *state = machine.driver_data<rungun_state>();
 	int gfx_index;
 
 	state->_936_tilemap = tilemap_create(machine, get_rng_936_tile_info, tilemap_scan_rows, 16, 16, 128, 128);
@@ -86,13 +86,13 @@ VIDEO_START( rng )
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
+		if (machine.gfx[gfx_index] == 0)
 			break;
 
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	// decode the ttl layer's gfx
-	machine->gfx[gfx_index] = gfx_element_alloc(machine, &charlayout, machine->region("gfx3")->base(), machine->total_colors() / 16, 0);
+	machine.gfx[gfx_index] = gfx_element_alloc(machine, &charlayout, machine.region("gfx3")->base(), machine.total_colors() / 16, 0);
 	state->ttl_gfx_index = gfx_index;
 
 	// create the tilemap
@@ -105,10 +105,10 @@ VIDEO_START( rng )
 
 SCREEN_UPDATE(rng)
 {
-	rungun_state *state = screen->machine->driver_data<rungun_state>();
+	rungun_state *state = screen->machine().driver_data<rungun_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	k053936_zoom_draw(state->k053936, bitmap, cliprect, state->_936_tilemap, 0, 0, 1);
 

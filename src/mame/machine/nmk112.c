@@ -122,8 +122,8 @@ static DEVICE_START( nmk112 )
 	}
 	else
 	{
-		nmk112->rom0 = device->machine->region(intf->rgn0)->base();
-		nmk112->size0 = device->machine->region(intf->rgn0)->bytes() - 0x40000;
+		nmk112->rom0 = device->machine().region(intf->rgn0)->base();
+		nmk112->size0 = device->machine().region(intf->rgn0)->bytes() - 0x40000;
 	}
 
 	if (intf->rgn1 == NULL)
@@ -133,14 +133,14 @@ static DEVICE_START( nmk112 )
 	}
 	else
 	{
-		nmk112->rom1 = device->machine->region(intf->rgn1)->base();
-		nmk112->size1 = device->machine->region(intf->rgn1)->bytes() - 0x40000;
+		nmk112->rom1 = device->machine().region(intf->rgn1)->base();
+		nmk112->size1 = device->machine().region(intf->rgn1)->bytes() - 0x40000;
 	}
 
 	nmk112->page_mask = ~intf->disable_page_mask;
 
 	device->save_item(NAME(nmk112->current_bank));
-	device->machine->state().register_postload(nmk112_postload_bankswitch, nmk112);
+	device->machine().state().register_postload(nmk112_postload_bankswitch, nmk112);
 }
 
 static DEVICE_RESET( nmk112 )

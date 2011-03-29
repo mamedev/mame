@@ -137,21 +137,21 @@
 
 static READ8_HANDLER( hsync_chain_r )
 {
-	UINT8 val = space->machine->primary_screen->hpos();
+	UINT8 val = space->machine().primary_screen->hpos();
 	return BITSWAP8(val,0,1,2,3,4,5,6,7);
 }
 
 
 static READ8_HANDLER( vsync_chain_hi_r )
 {
-	UINT8 val = space->machine->primary_screen->vpos();
+	UINT8 val = space->machine().primary_screen->vpos();
 	return ((val >> 1) & 0x08) | ((val >> 3) & 0x04) | ((val >> 5) & 0x02) | (val >> 7);
 }
 
 
 static READ8_HANDLER( vsync_chain_lo_r )
 {
-	UINT8 val = space->machine->primary_screen->vpos();
+	UINT8 val = space->machine().primary_screen->vpos();
 	return val & 0x0f;
 }
 
@@ -165,7 +165,7 @@ static READ8_HANDLER( vsync_chain_lo_r )
 
 static WRITE8_HANDLER( meadows_audio_w )
 {
-	meadows_state *state = space->machine->driver_data<meadows_state>();
+	meadows_state *state = space->machine().driver_data<meadows_state>();
 	switch (offset)
 	{
 		case 0:
@@ -199,7 +199,7 @@ static WRITE8_HANDLER( meadows_audio_w )
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cputag_set_input_line_and_vector(field->port->machine, "maincpu", 0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82);
+	cputag_set_input_line_and_vector(field->port->machine(), "maincpu", 0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82);
 }
 
 
@@ -212,7 +212,7 @@ static INPUT_CHANGED( coin_inserted )
 
 static INTERRUPT_GEN( meadows_interrupt )
 {
-	meadows_state *state = device->machine->driver_data<meadows_state>();
+	meadows_state *state = device->machine().driver_data<meadows_state>();
     /* fake something toggling the sense input line of the S2650 */
 	state->main_sense_state ^= 1;
 	device_set_input_line(device, 1, state->main_sense_state ? ASSERT_LINE : CLEAR_LINE);
@@ -228,7 +228,7 @@ static INTERRUPT_GEN( meadows_interrupt )
 
 static INTERRUPT_GEN( minferno_interrupt )
 {
-	meadows_state *state = device->machine->driver_data<meadows_state>();
+	meadows_state *state = device->machine().driver_data<meadows_state>();
 	state->main_sense_state++;
 	device_set_input_line(device, 1, (state->main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE );
 }
@@ -243,11 +243,11 @@ static INTERRUPT_GEN( minferno_interrupt )
 
 static WRITE8_HANDLER( audio_hardware_w )
 {
-	meadows_state *state = space->machine->driver_data<meadows_state>();
+	meadows_state *state = space->machine().driver_data<meadows_state>();
 	switch (offset & 3)
 	{
 		case 0: /* DAC */
-			meadows_sh_dac_w(space->machine, data ^ 0xff);
+			meadows_sh_dac_w(space->machine(), data ^ 0xff);
             break;
 
 		case 1: /* counter clk 5 MHz / 256 */
@@ -255,7 +255,7 @@ static WRITE8_HANDLER( audio_hardware_w )
 				break;
 			logerror("audio_w ctr1 preset $%x amp %d\n", data & 15, data >> 4);
 			state->_0c01 = data;
-			meadows_sh_update(space->machine);
+			meadows_sh_update(space->machine());
 			break;
 
 		case 2: /* counter clk 5 MHz / 32 (/ 2 or / 4) */
@@ -263,7 +263,7 @@ static WRITE8_HANDLER( audio_hardware_w )
                 break;
 			logerror("audio_w ctr2 preset $%02x\n", data);
 			state->_0c02 = data;
-			meadows_sh_update(space->machine);
+			meadows_sh_update(space->machine());
             break;
 
 		case 3: /* audio enable */
@@ -271,7 +271,7 @@ static WRITE8_HANDLER( audio_hardware_w )
                 break;
 			logerror("audio_w enable ctr2/2:%d ctr2:%d dac:%d ctr1:%d\n", data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1);
 			state->_0c03 = data;
-			meadows_sh_update(space->machine);
+			meadows_sh_update(space->machine());
             break;
 	}
 }
@@ -286,7 +286,7 @@ static WRITE8_HANDLER( audio_hardware_w )
 
 static READ8_HANDLER( audio_hardware_r )
 {
-	meadows_state *state = space->machine->driver_data<meadows_state>();
+	meadows_state *state = space->machine().driver_data<meadows_state>();
 	int data = 0;
 
 	switch (offset)
@@ -312,7 +312,7 @@ static READ8_HANDLER( audio_hardware_r )
 
 static INTERRUPT_GEN( audio_interrupt )
 {
-	meadows_state *state = device->machine->driver_data<meadows_state>();
+	meadows_state *state = device->machine().driver_data<meadows_state>();
     /* fake something toggling the sense input line of the S2650 */
 	state->audio_sense_state ^= 1;
 	device_set_input_line(device, 1, state->audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
@@ -881,12 +881,12 @@ static DRIVER_INIT( gypsyjug )
 		0x01,0x80, 0x03,0xc0, 0x03,0xc0, 0x01,0x80
 	};
 	int i;
-	UINT8 *gfx2 = machine->region("gfx2")->base();
-	UINT8 *gfx3 = machine->region("gfx3")->base();
-	UINT8 *gfx4 = machine->region("gfx4")->base();
-	UINT8 *gfx5 = machine->region("gfx5")->base();
-	int len3 = machine->region("gfx3")->bytes();
-	int len4 = machine->region("gfx4")->bytes();
+	UINT8 *gfx2 = machine.region("gfx2")->base();
+	UINT8 *gfx3 = machine.region("gfx3")->base();
+	UINT8 *gfx4 = machine.region("gfx4")->base();
+	UINT8 *gfx5 = machine.region("gfx5")->base();
+	int len3 = machine.region("gfx3")->bytes();
+	int len4 = machine.region("gfx4")->bytes();
 
 	memcpy(gfx3,gfx2,len3);
 
@@ -905,8 +905,8 @@ static DRIVER_INIT( minferno )
 	UINT8 *mem;
 
 	/* create an inverted copy of the graphics data */
-	mem = machine->region("gfx1")->base();
-	length = machine->region("gfx1")->bytes();
+	mem = machine.region("gfx1")->base();
+	length = machine.region("gfx1")->bytes();
 	for (i = 0; i < length/2; i++)
 		mem[i] = ~mem[i + length/2];
 }

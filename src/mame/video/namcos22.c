@@ -383,7 +383,7 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 	}
 } /* renderscanline_uvi_full */
 
-static void poly3d_DrawQuad(running_machine *machine, bitmap_t *bitmap, int textureBank, int color, Poly3dVertex pv[4], UINT16 flags, int direct, int cmode )
+static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int textureBank, int color, Poly3dVertex pv[4], UINT16 flags, int direct, int cmode )
 {
 	poly_extra_data *extra;
 	poly_vertex v[4], clipv[6];
@@ -436,8 +436,8 @@ static void poly3d_DrawQuad(running_machine *machine, bitmap_t *bitmap, int text
 
 	extra = (poly_extra_data *)poly_get_extra_data(poly);
 
-	extra->pens = &machine->pens[(color&0x7f)<<8];
-	extra->priority_bitmap = machine->priority_bitmap;
+	extra->pens = &machine.pens[(color&0x7f)<<8];
+	extra->priority_bitmap = machine.priority_bitmap;
 	extra->bn = textureBank;
 	extra->flags = flags;
 	extra->cmode = cmode;
@@ -596,8 +596,8 @@ mydrawgfxzoom(
 		extra->alpha = alpha;
 		extra->prioverchar = prioverchar;
 		extra->line_modulo = gfx->line_modulo;
-		extra->pens = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-		extra->priority_bitmap = gfx->machine->priority_bitmap;
+		extra->pens = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		extra->priority_bitmap = gfx->machine().priority_bitmap;
 		extra->source = gfx_element_get_data(gfx, code % gfx->total_elements);
 #ifdef RENDER_AS_QUADS
 		poly_render_quad_fan(poly, dest_bmp, clip, renderscanline_sprite, 2, 4, &vert[0]);
@@ -608,7 +608,7 @@ mydrawgfxzoom(
 } /* mydrawgfxzoom */
 
 static void
-ApplyGamma( running_machine *machine, bitmap_t *bitmap )
+ApplyGamma( running_machine &machine, bitmap_t *bitmap )
 {
 	int x,y;
 	if( mbSuperSystem22 )
@@ -632,7 +632,7 @@ ApplyGamma( running_machine *machine, bitmap_t *bitmap )
 	}
 	else
 	{ /* system 22 */
-		const UINT8 *rlut = 0x000+(const UINT8 *)machine->region("user1")->base();
+		const UINT8 *rlut = 0x000+(const UINT8 *)machine.region("user1")->base();
 		const UINT8 *glut = 0x100+rlut;
 		const UINT8 *blut = 0x200+rlut;
 		for( y=0; y<bitmap->height; y++ )
@@ -827,7 +827,7 @@ FreeSceneNode( struct SceneNode *node )
 } /* FreeSceneNode */
 
 static struct SceneNode *
-MallocSceneNode( running_machine *machine )
+MallocSceneNode( running_machine &machine )
 {
    struct SceneNode *node = mpFreeSceneNode;
    if( node )
@@ -843,7 +843,7 @@ MallocSceneNode( running_machine *machine )
 } /* MallocSceneNode */
 
 static struct SceneNode *
-NewSceneNode( running_machine *machine, UINT32 zsortvalue24, SceneNodeType type )
+NewSceneNode( running_machine &machine, UINT32 zsortvalue24, SceneNodeType type )
 {
    struct SceneNode *node = &mSceneRoot;
    int i;
@@ -887,9 +887,9 @@ NewSceneNode( running_machine *machine, UINT32 zsortvalue24, SceneNodeType type 
 } /* NewSceneNode */
 
 
-static void RenderSprite(running_machine *machine, bitmap_t *bitmap, struct SceneNode *node )
+static void RenderSprite(running_machine &machine, bitmap_t *bitmap, struct SceneNode *node )
 {
-	namcos22_state *state = machine->driver_data<namcos22_state>();
+	namcos22_state *state = machine.driver_data<namcos22_state>();
    int tile = node->data.sprite.tile;
    int col,row;
 	int i = 0;
@@ -908,7 +908,7 @@ static void RenderSprite(running_machine *machine, bitmap_t *bitmap, struct Scen
          }
          poly3d_Draw3dSprite(
                bitmap,
-               machine->gfx[GFX_SPRITE],
+               machine.gfx[GFX_SPRITE],
                code,
                node->data.sprite.color,
                node->data.sprite.xpos+col*node->data.sprite.sizex,
@@ -923,7 +923,7 @@ static void RenderSprite(running_machine *machine, bitmap_t *bitmap, struct Scen
    } /* next row */
 } /* RenderSprite */
 
-static void RenderSceneHelper(running_machine *machine, bitmap_t *bitmap, struct SceneNode *node )
+static void RenderSceneHelper(running_machine &machine, bitmap_t *bitmap, struct SceneNode *node )
 {
    if( node )
    {
@@ -976,7 +976,7 @@ static void RenderSceneHelper(running_machine *machine, bitmap_t *bitmap, struct
    }
 } /* RenderSceneHelper */
 
-static void RenderScene(running_machine *machine, bitmap_t *bitmap )
+static void RenderScene(running_machine &machine, bitmap_t *bitmap )
 {
    struct SceneNode *node = &mSceneRoot;
    int i;
@@ -1118,7 +1118,7 @@ PatchTexture( void )
 } /* PatchTexture */
 
 void
-namcos22_draw_direct_poly( running_machine *machine, const UINT16 *pSource )
+namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 {
    /**
     * word#0:
@@ -1209,7 +1209,7 @@ namcos22_draw_direct_poly( running_machine *machine, const UINT16 *pSource )
 } /* namcos22_draw_direct_poly */
 
 static void
-Prepare3dTexture( running_machine *machine, void *pTilemapROM, void *pTextureROM )
+Prepare3dTexture( running_machine &machine, void *pTilemapROM, void *pTextureROM )
 {
     int i;
     assert( pTilemapROM && pTextureROM );
@@ -1234,7 +1234,7 @@ Prepare3dTexture( running_machine *machine, void *pTilemapROM, void *pTextureROM
 
 static void
 DrawSpritesHelper(
-	running_machine *machine,
+	running_machine &machine,
 	bitmap_t *bitmap,
 	const rectangle *cliprect,
 	const UINT32 *pSource,
@@ -1336,9 +1336,9 @@ DrawSpritesHelper(
 } /* DrawSpritesHelper */
 
 static void
-DrawSprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	namcos22_state *state = machine->driver_data<namcos22_state>();
+	namcos22_state *state = machine.driver_data<namcos22_state>();
 /*
 // time crisis:
 00980000: 00060000 000b0053 03000200 03000000
@@ -1466,7 +1466,7 @@ DrawSprites( running_machine *machine, bitmap_t *bitmap, const rectangle *clipre
 	}
 } /* DrawSprites */
 
-static void UpdatePaletteS(running_machine *machine) /* for Super System22 - apply gamma correction and preliminary fader support */
+static void UpdatePaletteS(running_machine &machine) /* for Super System22 - apply gamma correction and preliminary fader support */
 {
 	int i;
 	for( i=0; i<NAMCOS22_PALETTE_SIZE/4; i++ )
@@ -1477,9 +1477,9 @@ static void UpdatePaletteS(running_machine *machine) /* for Super System22 - app
 			for( j=0; j<4; j++ )
 			{
 				int which = i*4+j;
-				int r = nthbyte(machine->generic.paletteram.u32,which+0x00000);
-				int g = nthbyte(machine->generic.paletteram.u32,which+0x08000);
-				int b = nthbyte(machine->generic.paletteram.u32,which+0x10000);
+				int r = nthbyte(machine.generic.paletteram.u32,which+0x00000);
+				int g = nthbyte(machine.generic.paletteram.u32,which+0x08000);
+				int b = nthbyte(machine.generic.paletteram.u32,which+0x10000);
 				palette_set_color( machine,which,MAKE_RGB(r,g,b) );
 			}
 			dirtypal[i] = 0;
@@ -1487,7 +1487,7 @@ static void UpdatePaletteS(running_machine *machine) /* for Super System22 - app
 	}
 } /* UpdatePaletteS */
 
-static void UpdatePalette(running_machine *machine) /* for System22 - ignore gamma/fader effects for now */
+static void UpdatePalette(running_machine &machine) /* for System22 - ignore gamma/fader effects for now */
 {
 	int i,j;
 	for( i=0; i<NAMCOS22_PALETTE_SIZE/4; i++ )
@@ -1497,9 +1497,9 @@ static void UpdatePalette(running_machine *machine) /* for System22 - ignore gam
 			for( j=0; j<4; j++ )
 			{
 				int which = i*4+j;
-				int r = nthbyte(machine->generic.paletteram.u32,which+0x00000);
-				int g = nthbyte(machine->generic.paletteram.u32,which+0x08000);
-				int b = nthbyte(machine->generic.paletteram.u32,which+0x10000);
+				int r = nthbyte(machine.generic.paletteram.u32,which+0x00000);
+				int g = nthbyte(machine.generic.paletteram.u32,which+0x08000);
+				int b = nthbyte(machine.generic.paletteram.u32,which+0x10000);
 				palette_set_color( machine,which,MAKE_RGB(r,g,b) );
 			}
 			dirtypal[i] = 0;
@@ -1544,7 +1544,7 @@ DrawTranslucentCharacters( bitmap_t *bitmap, const rectangle *cliprect )
 	tilemap_draw( bitmap, cliprect, bgtilemap, TILEMAP_DRAW_ALPHA(alpha)|1, 0 );
 }
 
-static void DrawCharacterLayer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void DrawCharacterLayer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	INT32 dx = namcos22_tilemapattr[0]>>16;
 	INT32 dy = namcos22_tilemapattr[0]&0xffff;
@@ -1553,7 +1553,7 @@ static void DrawCharacterLayer(running_machine *machine, bitmap_t *bitmap, const
     * namcos22_tilemapattr[0x8/4] == 0x01ff0000
     * namcos22_tilemapattr[0xe/4] == ?
     */
-	bitmap_fill(machine->priority_bitmap,cliprect,0);
+	bitmap_fill(machine.priority_bitmap,cliprect,0);
 	tilemap_set_scrollx( bgtilemap,0, (dx-0x35c)&0x3ff );
 	tilemap_set_scrolly( bgtilemap,0, dy&0x3ff );
 	tilemap_set_palette_offset( bgtilemap, mixer.palBase*256 );
@@ -1622,7 +1622,7 @@ Signed18( UINT32 value )
  */
 static void
 BlitQuadHelper(
-		running_machine *machine,
+		running_machine &machine,
 		bitmap_t *bitmap,
 		unsigned color,
 		unsigned addr,
@@ -1789,7 +1789,7 @@ RegisterNormals( INT32 addr, float m[4][4] )
 } /* RegisterNormals */
 
 static void
-BlitQuads( running_machine *machine, bitmap_t *bitmap, INT32 addr, float m[4][4], INT32 base )
+BlitQuads( running_machine &machine, bitmap_t *bitmap, INT32 addr, float m[4][4], INT32 base )
 {
 	int numAdditionalNormals = 0;
 	int chunkLength = GetPolyData(addr++);
@@ -1894,7 +1894,7 @@ BlitQuads( running_machine *machine, bitmap_t *bitmap, INT32 addr, float m[4][4]
 } /* BlitQuads */
 
 static void
-BlitPolyObject( running_machine *machine, bitmap_t *bitmap, int code, float M[4][4] )
+BlitPolyObject( running_machine &machine, bitmap_t *bitmap, int code, float M[4][4] )
 {
 	unsigned addr1 = GetPolyData(code);
 	mLitSurfaceCount = 0;
@@ -2012,7 +2012,7 @@ HandleBB0003( const INT32 *pSource )
 } /* HandleBB0003 */
 
 static void
-Handle200002( running_machine *machine, bitmap_t *bitmap, const INT32 *pSource )
+Handle200002( running_machine &machine, bitmap_t *bitmap, const INT32 *pSource )
 {
 	if( mPrimitiveID>=0x45 )
 	{
@@ -2078,7 +2078,7 @@ Handle233002( const INT32 *pSource )
 } /* Handle233002 */
 
 static void
-SimulateSlaveDSP( running_machine *machine, bitmap_t *bitmap )
+SimulateSlaveDSP( running_machine &machine, bitmap_t *bitmap )
 {
 	const INT32 *pSource = 0x300 + (INT32 *)namcos22_polygonram;
 	INT16 len;
@@ -2143,7 +2143,7 @@ SimulateSlaveDSP( running_machine *machine, bitmap_t *bitmap )
 } /* SimulateSlaveDSP */
 
 static void
-DrawPolygons( running_machine *machine, bitmap_t *bitmap )
+DrawPolygons( running_machine &machine, bitmap_t *bitmap )
 {
 	if( mbDSPisActive )
 	{
@@ -2168,7 +2168,7 @@ READ32_HANDLER( namcos22_cgram_r )
 WRITE32_HANDLER( namcos22_cgram_w )
 {
 	COMBINE_DATA( &namcos22_cgram[offset] );
-	gfx_element_mark_dirty(space->machine->gfx[GFX_CHAR],offset/32);
+	gfx_element_mark_dirty(space->machine().gfx[GFX_CHAR],offset/32);
 }
 
 READ32_HANDLER( namcos22_gamma_r )
@@ -2183,12 +2183,12 @@ WRITE32_HANDLER( namcos22_gamma_w )
 
 READ32_HANDLER( namcos22_paletteram_r )
 {
-	return space->machine->generic.paletteram.u32[offset];
+	return space->machine().generic.paletteram.u32[offset];
 }
 
 WRITE32_HANDLER( namcos22_paletteram_w )
 {
-	COMBINE_DATA( &space->machine->generic.paletteram.u32[offset] );
+	COMBINE_DATA( &space->machine().generic.paletteram.u32[offset] );
 	dirtypal[offset&(0x7fff/4)] = 1;
 }
 
@@ -2213,12 +2213,12 @@ static VIDEO_START( common )
 	mbDSPisActive = 0;
 	memset( namcos22_polygonram, 0xcc, 0x20000 );
 
-	for (code = 0; code < machine->gfx[GFX_TEXTURE_TILE]->total_elements; code++)
-		gfx_element_decode(machine->gfx[GFX_TEXTURE_TILE], code);
-	Prepare3dTexture(machine, machine->region("textilemap")->base(), machine->gfx[GFX_TEXTURE_TILE]->gfxdata );
+	for (code = 0; code < machine.gfx[GFX_TEXTURE_TILE]->total_elements; code++)
+		gfx_element_decode(machine.gfx[GFX_TEXTURE_TILE], code);
+	Prepare3dTexture(machine, machine.region("textilemap")->base(), machine.gfx[GFX_TEXTURE_TILE]->gfxdata );
 	dirtypal = auto_alloc_array(machine, UINT8, NAMCOS22_PALETTE_SIZE/4);
-	mPtRomSize = machine->region("pointrom")->bytes()/3;
-	mpPolyL = machine->region("pointrom")->base();
+	mPtRomSize = machine.region("pointrom")->bytes()/3;
+	mpPolyL = machine.region("pointrom")->base();
 	mpPolyM = mpPolyL + mPtRomSize;
 	mpPolyH = mpPolyM + mPtRomSize;
 
@@ -2227,10 +2227,10 @@ static VIDEO_START( common )
 #else
 	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
 #endif
-	machine->add_notifier(MACHINE_NOTIFY_RESET, namcos22_reset);
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, namcos22_exit);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, namcos22_reset);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, namcos22_exit);
 
-	gfx_element_set_source(machine->gfx[GFX_CHAR], (UINT8 *)namcos22_cgram);
+	gfx_element_set_source(machine.gfx[GFX_CHAR], (UINT8 *)namcos22_cgram);
 }
 
 VIDEO_START( namcos22 )
@@ -2261,21 +2261,21 @@ SCREEN_UPDATE( namcos22s )
 	UpdateVideoMixer();
 	bgColor = (mixer.rBackColor<<16)|(mixer.gBackColor<<8)|mixer.bBackColor;
 	bitmap_fill( bitmap, cliprect , bgColor);
-	UpdatePaletteS(screen->machine);
-	DrawCharacterLayer(screen->machine, bitmap, cliprect );
-	DrawPolygons( screen->machine, bitmap );
-	DrawSprites( screen->machine, bitmap, cliprect );
-	RenderScene(screen->machine, bitmap );
+	UpdatePaletteS(screen->machine());
+	DrawCharacterLayer(screen->machine(), bitmap, cliprect );
+	DrawPolygons( screen->machine(), bitmap );
+	DrawSprites( screen->machine(), bitmap, cliprect );
+	RenderScene(screen->machine(), bitmap );
 	DrawTranslucentCharacters( bitmap, cliprect );
-	ApplyGamma( screen->machine, bitmap );
+	ApplyGamma( screen->machine(), bitmap );
 
 #ifdef MAME_DEBUG
-   if( input_code_pressed(screen->machine, KEYCODE_D) )
+   if( input_code_pressed(screen->machine(), KEYCODE_D) )
    {
       FILE *f = fopen( "dump.txt", "wb" );
       if( f )
       {
-         address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
+         address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
          {
             int i,bank;
@@ -2302,7 +2302,7 @@ SCREEN_UPDATE( namcos22s )
          Dump(space, f,0xc00000, 0xc1ffff, "polygonram");
          fclose( f );
       }
-      while( input_code_pressed(screen->machine, KEYCODE_D) ){}
+      while( input_code_pressed(screen->machine(), KEYCODE_D) ){}
    }
 #endif
 	return 0;
@@ -2311,21 +2311,21 @@ SCREEN_UPDATE( namcos22s )
 SCREEN_UPDATE( namcos22 )
 {
 	UpdateVideoMixer();
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
-	UpdatePalette(screen->machine);
-	DrawCharacterLayer(screen->machine, bitmap, cliprect );
-	DrawPolygons( screen->machine, bitmap );
-	RenderScene(screen->machine, bitmap);
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine()));
+	UpdatePalette(screen->machine());
+	DrawCharacterLayer(screen->machine(), bitmap, cliprect );
+	DrawPolygons( screen->machine(), bitmap );
+	RenderScene(screen->machine(), bitmap);
 	DrawTranslucentCharacters( bitmap, cliprect );
-	ApplyGamma( screen->machine, bitmap );
+	ApplyGamma( screen->machine(), bitmap );
 
 #ifdef MAME_DEBUG
-   if( input_code_pressed(screen->machine, KEYCODE_D) )
+   if( input_code_pressed(screen->machine(), KEYCODE_D) )
    {
       FILE *f = fopen( "dump.txt", "wb" );
       if( f )
       {
-         address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
+         address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 //         Dump(space, f,0x90000000, 0x90000003, "led?" );
 //         Dump(space, f,0x90010000, 0x90017fff, "cz_ram");
@@ -2334,7 +2334,7 @@ SCREEN_UPDATE( namcos22 )
 //         Dump(space, f,0x70000000, 0x7001ffff, "polygonram");
          fclose( f );
       }
-      while( input_code_pressed(screen->machine, KEYCODE_D) ){}
+      while( input_code_pressed(screen->machine(), KEYCODE_D) ){}
    }
 #endif
 	return 0;

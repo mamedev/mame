@@ -34,7 +34,7 @@ static const float PSCALE[8]={0.0f,7.0f,13.5f,27.0f,55.0f,112.0f,230.0f,494.0f};
 static int PSCALES[8][256];
 static int ASCALES[8][256];
 
-static void AICALFO_Init(running_machine *machine)
+static void AICALFO_Init(running_machine &machine)
 {
     int i,s;
     for(i=0;i<256;++i)
@@ -82,7 +82,7 @@ static void AICALFO_Init(running_machine *machine)
 
 		//noise
 		//a=lfo_noise[i];
-		a=machine->rand()&0xff;
+		a=machine.rand()&0xff;
 		p=128-a;
 		ALFO_NOI[i]=a;
 		PLFO_NOI[i]=p;

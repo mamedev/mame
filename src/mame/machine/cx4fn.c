@@ -92,7 +92,7 @@ static void CX4_C4TransfWireFrame2(void)
 	cx4.C4WFYVal = (INT16)(cx4.c4y * cx4.C4WFScale / 0x100);
 }
 
-static void CX4_C4DrawWireFrame(running_machine *machine)
+static void CX4_C4DrawWireFrame(running_machine &machine)
 {
 	UINT32 line = CX4_readl(0x1f80);
 	UINT32 point1, point2;
@@ -101,7 +101,7 @@ static void CX4_C4DrawWireFrame(running_machine *machine)
 	UINT8 Color;
 	INT32 i;
 
-	address_space *space = machine->device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	address_space *space = machine.device<cpu_device>("maincpu")->space(AS_PROGRAM);
 	for(i = cx4.ram[0x0295]; i > 0; i--, line += 5)
 	{
 		if(space->read_byte(line) == 0xff &&

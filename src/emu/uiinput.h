@@ -55,7 +55,7 @@ struct _ui_event
 /* ----- core system management ----- */
 
 /* initialization */
-void ui_input_init(running_machine *machine);
+void ui_input_init(running_machine &machine);
 
 
 
@@ -64,27 +64,27 @@ void ui_input_init(running_machine *machine);
 void ui_input_frame_update(running_machine &machine);
 
 /* pushes a single event onto the queue */
-int ui_input_push_event(running_machine *machine, ui_event event);
+int ui_input_push_event(running_machine &machine, ui_event event);
 
 /* pops an event off of the queue */
-int ui_input_pop_event(running_machine *machine, ui_event *event);
+int ui_input_pop_event(running_machine &machine, ui_event *event);
 
 /* clears all outstanding events */
-void ui_input_reset(running_machine *machine);
+void ui_input_reset(running_machine &machine);
 
 /* retrieves the current location of the mouse */
-render_target *ui_input_find_mouse(running_machine *machine, INT32 *x, INT32 *y, int *button);
+render_target *ui_input_find_mouse(running_machine &machine, INT32 *x, INT32 *y, int *button);
 
 
 
 /* ----- user interface sequence reading ----- */
 
 /* return TRUE if a key down for the given user interface sequence is detected */
-int ui_input_pressed(running_machine *machine, int code);
+int ui_input_pressed(running_machine &machine, int code);
 
 /* return TRUE if a key down for the given user interface sequence is detected, or if
    autorepeat at the given speed is triggered */
-int ui_input_pressed_repeat(running_machine *machine, int code, int speed);
+int ui_input_pressed_repeat(running_machine &machine, int code, int speed);
 
 
 
@@ -97,7 +97,7 @@ int ui_input_pressed_repeat(running_machine *machine, int code, int speed);
     move event to the specified render_target
 -------------------------------------------------*/
 
-INLINE void ui_input_push_mouse_move_event(running_machine *machine, render_target *target, INT32 x, INT32 y)
+INLINE void ui_input_push_mouse_move_event(running_machine &machine, render_target *target, INT32 x, INT32 y)
 {
 	ui_event event = { UI_EVENT_NONE };
 	event.event_type = UI_EVENT_MOUSE_MOVE;
@@ -113,7 +113,7 @@ INLINE void ui_input_push_mouse_move_event(running_machine *machine, render_targ
     mouse leave event to the specified render_target
 -------------------------------------------------*/
 
-INLINE void ui_input_push_mouse_leave_event(running_machine *machine, render_target *target)
+INLINE void ui_input_push_mouse_leave_event(running_machine &machine, render_target *target)
 {
 	ui_event event = { UI_EVENT_NONE };
 	event.event_type = UI_EVENT_MOUSE_LEAVE;
@@ -127,7 +127,7 @@ INLINE void ui_input_push_mouse_leave_event(running_machine *machine, render_tar
     down event to the specified render_target
 -------------------------------------------------*/
 
-INLINE void ui_input_push_mouse_down_event(running_machine *machine, render_target *target, INT32 x, INT32 y)
+INLINE void ui_input_push_mouse_down_event(running_machine &machine, render_target *target, INT32 x, INT32 y)
 {
 	ui_event event = { UI_EVENT_NONE };
 	event.event_type = UI_EVENT_MOUSE_DOWN;
@@ -143,7 +143,7 @@ INLINE void ui_input_push_mouse_down_event(running_machine *machine, render_targ
     down event to the specified render_target
 -------------------------------------------------*/
 
-INLINE void ui_input_push_mouse_up_event(running_machine *machine, render_target *target, INT32 x, INT32 y)
+INLINE void ui_input_push_mouse_up_event(running_machine &machine, render_target *target, INT32 x, INT32 y)
 {
 	ui_event event = { UI_EVENT_NONE };
 	event.event_type = UI_EVENT_MOUSE_UP;
@@ -160,7 +160,7 @@ INLINE void ui_input_push_mouse_up_event(running_machine *machine, render_target
     render_target
 -------------------------------------------------*/
 
-INLINE void ui_input_push_mouse_double_click_event(running_machine *machine, render_target *target, INT32 x, INT32 y)
+INLINE void ui_input_push_mouse_double_click_event(running_machine &machine, render_target *target, INT32 x, INT32 y)
 {
 	ui_event event = { UI_EVENT_NONE };
 	event.event_type = UI_EVENT_MOUSE_DOUBLE_CLICK;
@@ -176,7 +176,7 @@ INLINE void ui_input_push_mouse_double_click_event(running_machine *machine, ren
     to the specified render_target
 -------------------------------------------------*/
 
-INLINE void ui_input_push_char_event(running_machine *machine, render_target *target, unicode_char ch)
+INLINE void ui_input_push_char_event(running_machine &machine, render_target *target, unicode_char ch)
 {
 	ui_event event = { UI_EVENT_NONE };
 	event.event_type = UI_EVENT_CHAR;

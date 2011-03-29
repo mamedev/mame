@@ -95,20 +95,20 @@ static const UINT8 led_map[16] =
 
 static void dleuro_interrupt(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, state);
+	cputag_set_input_line(device->machine(), "maincpu", 0, state);
 }
 
 
 static WRITE8_DEVICE_HANDLER( serial_transmit )
 {
-	dlair_state *state = device->machine->driver_data<dlair_state>();
+	dlair_state *state = device->machine().driver_data<dlair_state>();
 	laserdisc_data_w(state->laserdisc, data);
 }
 
 
 static int serial_receive(device_t *device, int channel)
 {
-	dlair_state *state = device->machine->driver_data<dlair_state>();
+	dlair_state *state = device->machine().driver_data<dlair_state>();
 	/* if we still have data to send, do it now */
 	if (channel == 0 && laserdisc_line_r(state->laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 		return laserdisc_data_r(state->laserdisc);
@@ -174,7 +174,7 @@ static PALETTE_INIT( dleuro )
 
 static SCREEN_UPDATE( dleuro )
 {
-	dlair_state *state = screen->machine->driver_data<dlair_state>();
+	dlair_state *state = screen->machine().driver_data<dlair_state>();
 	UINT8 *videoram = state->videoram;
 	int x, y;
 
@@ -183,7 +183,7 @@ static SCREEN_UPDATE( dleuro )
 		for (x = 0; x < 32; x++)
 		{
 			UINT8 *base = &videoram[y * 64 + x * 2 + 1];
-			drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], base[0], base[1], 0, 0, 10 * x, 16 * y);
+			drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[0], base[0], base[1], 0, 0, 10 * x, 16 * y);
 		}
 
 	return 0;
@@ -199,14 +199,14 @@ static SCREEN_UPDATE( dleuro )
 
 static MACHINE_START( dlair )
 {
-	dlair_state *state = machine->driver_data<dlair_state>();
-	state->laserdisc = machine->device<laserdisc_device>("laserdisc");
+	dlair_state *state = machine.driver_data<dlair_state>();
+	state->laserdisc = machine.device<laserdisc_device>("laserdisc");
 }
 
 
 static MACHINE_RESET( dlair )
 {
-	dlair_state *state = machine->driver_data<dlair_state>();
+	dlair_state *state = machine.driver_data<dlair_state>();
 	/* determine the laserdisc player from the DIP switches */
 	if (state->laserdisc_type == LASERDISC_TYPE_VARIABLE)
 	{
@@ -226,10 +226,10 @@ static MACHINE_RESET( dlair )
 static INTERRUPT_GEN( vblank_callback )
 {
 	/* also update the speaker on the European version */
-	beep_device *beep = device->machine->device<beep_device>("beep");
+	beep_device *beep = device->machine().device<beep_device>("beep");
 	if (beep != NULL)
 	{
-		z80ctc_device *ctc = device->machine->device<z80ctc_device>("ctc");
+		z80ctc_device *ctc = device->machine().device<z80ctc_device>("ctc");
 		beep_set_state(beep, 1);
 		beep_set_frequency(beep, ATTOSECONDS_TO_HZ(ctc->period(0).attoseconds));
 	}
@@ -245,7 +245,7 @@ static INTERRUPT_GEN( vblank_callback )
 
 static WRITE8_HANDLER( misc_w )
 {
-	dlair_state *state = space->machine->driver_data<dlair_state>();
+	dlair_state *state = space->machine().driver_data<dlair_state>();
 	/*
         D0-D3 = B0-B3
            D4 = coin counter
@@ -256,7 +256,7 @@ static WRITE8_HANDLER( misc_w )
 	UINT8 diff = data ^ state->last_misc;
 	state->last_misc = data;
 
-	coin_counter_w(space->machine, 0, (~data >> 4) & 1);
+	coin_counter_w(space->machine(), 0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
@@ -269,7 +269,7 @@ static WRITE8_HANDLER( misc_w )
 
 static WRITE8_HANDLER( dleuro_misc_w )
 {
-	dlair_state *state = space->machine->driver_data<dlair_state>();
+	dlair_state *state = space->machine().driver_data<dlair_state>();
 	/*
            D0 = CHAR GEN ON+
            D1 = KILL VIDEO+
@@ -283,8 +283,8 @@ static WRITE8_HANDLER( dleuro_misc_w )
 	UINT8 diff = data ^ state->last_misc;
 	state->last_misc = data;
 
-	coin_counter_w(space->machine, 1, (~data >> 3) & 1);
-	coin_counter_w(space->machine, 0, (~data >> 4) & 1);
+	coin_counter_w(space->machine(), 1, (~data >> 3) & 1);
+	coin_counter_w(space->machine(), 0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
@@ -316,7 +316,7 @@ static WRITE8_HANDLER( led_den2_w )
 
 static CUSTOM_INPUT( laserdisc_status_r )
 {
-	dlair_state *state = field->port->machine->driver_data<dlair_state>();
+	dlair_state *state = field->port->machine().driver_data<dlair_state>();
 	switch (laserdisc_get_type(state->laserdisc))
 	{
 		case LASERDISC_TYPE_PIONEER_PR7820:
@@ -334,7 +334,7 @@ static CUSTOM_INPUT( laserdisc_status_r )
 
 static CUSTOM_INPUT( laserdisc_command_r )
 {
-	dlair_state *state = field->port->machine->driver_data<dlair_state>();
+	dlair_state *state = field->port->machine().driver_data<dlair_state>();
 	switch (laserdisc_get_type(state->laserdisc))
 	{
 		case LASERDISC_TYPE_PIONEER_PR7820:
@@ -352,7 +352,7 @@ static CUSTOM_INPUT( laserdisc_command_r )
 
 static READ8_HANDLER( laserdisc_r )
 {
-	dlair_state *state = space->machine->driver_data<dlair_state>();
+	dlair_state *state = space->machine().driver_data<dlair_state>();
 	UINT8 result = laserdisc_data_r(state->laserdisc);
 	mame_printf_debug("laserdisc_r = %02X\n", result);
 	return result;
@@ -361,7 +361,7 @@ static READ8_HANDLER( laserdisc_r )
 
 static WRITE8_HANDLER( laserdisc_w )
 {
-	dlair_state *state = space->machine->driver_data<dlair_state>();
+	dlair_state *state = space->machine().driver_data<dlair_state>();
 	state->laserdisc_data = data;
 }
 
@@ -949,14 +949,14 @@ ROM_END
 
 static DRIVER_INIT( fixed )
 {
-	dlair_state *state = machine->driver_data<dlair_state>();
+	dlair_state *state = machine.driver_data<dlair_state>();
 	state->laserdisc_type = LASERDISC_TYPE_FIXED;
 }
 
 
 static DRIVER_INIT( variable )
 {
-	dlair_state *state = machine->driver_data<dlair_state>();
+	dlair_state *state = machine.driver_data<dlair_state>();
 	state->laserdisc_type = LASERDISC_TYPE_VARIABLE;
 }
 

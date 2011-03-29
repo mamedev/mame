@@ -10,7 +10,7 @@
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	tbowl_state *state = machine->driver_data<tbowl_state>();
+	tbowl_state *state = machine.driver_data<tbowl_state>();
 	int tileno;
 	int col;
 
@@ -22,7 +22,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 WRITE8_HANDLER( tbowl_txvideoram_w )
 {
-	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->txvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tx_tilemap,offset & 0x7ff);
 }
@@ -31,7 +31,7 @@ WRITE8_HANDLER( tbowl_txvideoram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	tbowl_state *state = machine->driver_data<tbowl_state>();
+	tbowl_state *state = machine.driver_data<tbowl_state>();
 	int tileno;
 	int col;
 
@@ -43,32 +43,32 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 WRITE8_HANDLER( tbowl_bg2videoram_w )
 {
-	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->bg2videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg2_tilemap,offset & 0xfff);
 }
 
 WRITE8_HANDLER (tbowl_bgxscroll_lo)
 {
-	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->xscroll = (state->xscroll & 0xff00) | data;
 }
 
 WRITE8_HANDLER (tbowl_bgxscroll_hi)
 {
-	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->xscroll = (state->xscroll & 0x00ff) | (data << 8);
 }
 
 WRITE8_HANDLER (tbowl_bgyscroll_lo)
 {
-	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->yscroll = (state->yscroll & 0xff00) | data;
 }
 
 WRITE8_HANDLER (tbowl_bgyscroll_hi)
 {
-	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->yscroll = (state->yscroll & 0x00ff) | (data << 8);
 }
 
@@ -76,7 +76,7 @@ WRITE8_HANDLER (tbowl_bgyscroll_hi)
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	tbowl_state *state = machine->driver_data<tbowl_state>();
+	tbowl_state *state = machine.driver_data<tbowl_state>();
 	int tileno;
 	int col;
 
@@ -89,38 +89,38 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 WRITE8_HANDLER( tbowl_bgvideoram_w )
 {
-	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->bgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0xfff);
 }
 
 WRITE8_HANDLER (tbowl_bg2xscroll_lo)
 {
-	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->bg2xscroll = (state->bg2xscroll & 0xff00) | data;
 }
 
 WRITE8_HANDLER (tbowl_bg2xscroll_hi)
 {
-	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->bg2xscroll = (state->bg2xscroll & 0x00ff) | (data << 8);
 }
 
 WRITE8_HANDLER (tbowl_bg2yscroll_lo)
 {
-	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->bg2yscroll = (state->bg2yscroll & 0xff00) | data;
 }
 
 WRITE8_HANDLER (tbowl_bg2yscroll_hi)
 {
-	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->bg2yscroll = (state->bg2yscroll & 0x00ff) | (data << 8);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int xscroll)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect, int xscroll)
 {
-	tbowl_state *state = machine->driver_data<tbowl_state>();
+	tbowl_state *state = machine.driver_data<tbowl_state>();
 	int offs;
 	static const UINT8 layout[8][8] =
 	{
@@ -162,28 +162,28 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 					sx -= xscroll;
 
-					drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
+					drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx,sy,0 );
 
 					/* wraparound */
-					drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
+					drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx,sy-0x200,0 );
 
 					/* wraparound */
-					drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
+					drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx-0x400,sy,0 );
 
 					/* wraparound */
-					drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
+					drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
@@ -203,7 +203,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_START( tbowl )
 {
-	tbowl_state *state = machine->driver_data<tbowl_state>();
+	tbowl_state *state = machine.driver_data<tbowl_state>();
 	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows, 8, 8,64,32);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows, 16, 16,128,32);
 	state->bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,tilemap_scan_rows, 16, 16,128,32);
@@ -216,9 +216,9 @@ VIDEO_START( tbowl )
 
 SCREEN_UPDATE( tbowl )
 {
-	tbowl_state *state = screen->machine->driver_data<tbowl_state>();
-	device_t *left_screen  = screen->machine->device("lscreen");
-	device_t *right_screen = screen->machine->device("rscreen");
+	tbowl_state *state = screen->machine().driver_data<tbowl_state>();
+	device_t *left_screen  = screen->machine().device("lscreen");
+	device_t *right_screen = screen->machine().device("rscreen");
 
 	if (screen == left_screen)
 	{
@@ -231,7 +231,7 @@ SCREEN_UPDATE( tbowl )
 
 		bitmap_fill(bitmap,cliprect,0x100); /* is there a register controling the colour? looks odd when screen is blank */
 		tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-		draw_sprites(screen->machine, bitmap,cliprect, 0);
+		draw_sprites(screen->machine(), bitmap,cliprect, 0);
 		tilemap_draw(bitmap,cliprect,state->bg2_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
 	}
@@ -246,7 +246,7 @@ SCREEN_UPDATE( tbowl )
 
 		bitmap_fill(bitmap,cliprect,0x100); /* is there a register controling the colour? looks odd when screen is blank */
 		tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-		draw_sprites(screen->machine, bitmap,cliprect, 32*8);
+		draw_sprites(screen->machine(), bitmap,cliprect, 32*8);
 		tilemap_draw(bitmap,cliprect,state->bg2_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
 	}

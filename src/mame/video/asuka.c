@@ -8,7 +8,7 @@
 
 WRITE16_HANDLER( asuka_spritectrl_w )
 {
-	asuka_state *state = space->machine->driver_data<asuka_state>();
+	asuka_state *state = space->machine().driver_data<asuka_state>();
 
 	/* Bits 2-5 are color bank; in asuka games bit 0 is global priority */
 	pc090oj_set_sprite_ctrl(state->pc090oj, ((data & 0x3c) >> 2) | ((data & 0x1) << 15));
@@ -21,7 +21,7 @@ WRITE16_HANDLER( asuka_spritectrl_w )
 
 SCREEN_UPDATE( asuka )
 {
-	asuka_state *state = screen->machine->driver_data<asuka_state>();
+	asuka_state *state = screen->machine().driver_data<asuka_state>();
 	UINT8 layer[3];
 
 	tc0100scn_tilemap_update(state->tc0100scn);
@@ -30,7 +30,7 @@ SCREEN_UPDATE( asuka )
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -47,7 +47,7 @@ SCREEN_UPDATE( asuka )
 
 SCREEN_UPDATE( bonzeadv )
 {
-	asuka_state *state = screen->machine->driver_data<asuka_state>();
+	asuka_state *state = screen->machine().driver_data<asuka_state>();
 	UINT8 layer[3];
 
 	tc0100scn_tilemap_update(state->tc0100scn);
@@ -56,7 +56,7 @@ SCREEN_UPDATE( bonzeadv )
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);

@@ -338,7 +338,7 @@ static void blit(halleys_state *state, int offset)
 
 #if HALLEYS_DEBUG
 if (0) {
-	logerror("%s:[%04x]", machine->describe_context(), offset);
+	logerror("%s:[%04x]", machine.describe_context(), offset);
 	for (ecx=0; ecx<16; ecx++) logerror(" %02x", param[ecx]);
 	logerror("\n");
 }
@@ -975,7 +975,7 @@ COMMAND_MODE:
 // draws Ben Bero Beh's color backdrop(verification required)
 static WRITE8_HANDLER( bgtile_w )
 {
-	halleys_state *state = space->machine->driver_data<halleys_state>();
+	halleys_state *state = space->machine().driver_data<halleys_state>();
 	int yskip, xskip, ecx;
 	UINT16 *edi;
 	UINT16 ax;
@@ -1001,7 +1001,7 @@ static WRITE8_HANDLER( bgtile_w )
 
 static READ8_HANDLER( blitter_status_r )
 {
-	halleys_state *state = space->machine->driver_data<halleys_state>();
+	halleys_state *state = space->machine().driver_data<halleys_state>();
 	if (state->game_id==GAME_HALLEYS && cpu_get_pc(space->cpu)==0x8017) return(0x55); // HACK: trick SRAM test on startup
 
 	return(0);
@@ -1010,7 +1010,7 @@ static READ8_HANDLER( blitter_status_r )
 
 static READ8_HANDLER( blitter_r )
 {
-	halleys_state *state = space->machine->driver_data<halleys_state>();
+	halleys_state *state = space->machine().driver_data<halleys_state>();
 	int i = offset & 0xf;
 
 	if (i==0 || i==4) return(1);
@@ -1021,14 +1021,14 @@ static READ8_HANDLER( blitter_r )
 
 static TIMER_CALLBACK( blitter_reset )
 {
-	halleys_state *state = machine->driver_data<halleys_state>();
+	halleys_state *state = machine.driver_data<halleys_state>();
 	state->blitter_busy = 0;
 }
 
 
 static WRITE8_HANDLER( blitter_w )
 {
-	halleys_state *state = space->machine->driver_data<halleys_state>();
+	halleys_state *state = space->machine().driver_data<halleys_state>();
 	int i = offset & 0xf;
 
 	state->blitter_ram[offset] = data;
@@ -1040,7 +1040,7 @@ static WRITE8_HANDLER( blitter_w )
 		if (i==0 || (i==4 && !data))
 		{
 			state->blitter_busy = 0;
-			if (state->firq_level) cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE); // make up delayed FIRQ's
+			if (state->firq_level) cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, ASSERT_LINE); // make up delayed FIRQ's
 		}
 		else
 		{
@@ -1053,7 +1053,7 @@ static WRITE8_HANDLER( blitter_w )
 
 static READ8_HANDLER( collision_id_r )
 {
-	halleys_state *state = space->machine->driver_data<halleys_state>();
+	halleys_state *state = space->machine().driver_data<halleys_state>();
 /*
     Collision detection abstract:
 
@@ -1092,7 +1092,7 @@ static READ8_HANDLER( collision_id_r )
 
 static PALETTE_INIT( halleys )
 {
-	halleys_state *state = machine->driver_data<halleys_state>();
+	halleys_state *state = machine.driver_data<halleys_state>();
 	UINT32 d, r, g, b, i, j, count;
 	UINT32 *pal_ptr = state->internal_palette;
 
@@ -1139,7 +1139,7 @@ static PALETTE_INIT( halleys )
 	}
 }
 
-static void halleys_decode_rgb(running_machine *machine, UINT32 *r, UINT32 *g, UINT32 *b, int addr, int data)
+static void halleys_decode_rgb(running_machine &machine, UINT32 *r, UINT32 *g, UINT32 *b, int addr, int data)
 {
 /*
     proms contain:
@@ -1153,10 +1153,10 @@ static void halleys_decode_rgb(running_machine *machine, UINT32 *r, UINT32 *g, U
 	int bit0, bit1, bit2, bit3, bit4;
 
 	// the four 16x4-bit SN74S189 SRAM chips are assumed be the game's 32-byte palette RAM
-	sram_189 = machine->generic.paletteram.u8;
+	sram_189 = machine.generic.paletteram.u8;
 
 	// each of the three 32-byte 6330 PROM is wired to an RGB component output
-	prom_6330 = machine->region("proms")->base();
+	prom_6330 = machine.region("proms")->base();
 
 	// latch1 holds 8 bits from the selected palette RAM address
 	latch1_273 = sram_189[addr];
@@ -1186,11 +1186,11 @@ static void halleys_decode_rgb(running_machine *machine, UINT32 *r, UINT32 *g, U
 
 static WRITE8_HANDLER( halleys_paletteram_IIRRGGBB_w )
 {
-	halleys_state *state = space->machine->driver_data<halleys_state>();
+	halleys_state *state = space->machine().driver_data<halleys_state>();
 	UINT32 d, r, g, b, i, j;
 	UINT32 *pal_ptr = state->internal_palette;
 
-	space->machine->generic.paletteram.u8[offset] = data;
+	space->machine().generic.paletteram.u8[offset] = data;
 	d = (UINT32)data;
 	j = d | BG_RGB;
 	pal_ptr[offset] = j;
@@ -1204,19 +1204,19 @@ static WRITE8_HANDLER( halleys_paletteram_IIRRGGBB_w )
 	g = d    & 0x0c; g |= i;  g = g<<4 | g;
 	b = d<<2 & 0x0c; b |= i;  b = b<<4 | b;
 
-	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
-	palette_set_color(space->machine, offset+SP_2BACK, MAKE_RGB(r, g, b));
-	palette_set_color(space->machine, offset+SP_ALPHA, MAKE_RGB(r, g, b));
-	palette_set_color(space->machine, offset+SP_COLLD, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset+SP_2BACK, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset+SP_ALPHA, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset+SP_COLLD, MAKE_RGB(r, g, b));
 
-	halleys_decode_rgb(space->machine, &r, &g, &b, offset, 0);
-	palette_set_color(space->machine, offset+0x20, MAKE_RGB(r, g, b));
+	halleys_decode_rgb(space->machine(), &r, &g, &b, offset, 0);
+	palette_set_color(space->machine(), offset+0x20, MAKE_RGB(r, g, b));
 }
 
 
 static VIDEO_START( halleys )
 {
-	halleys_state *state = machine->driver_data<halleys_state>();
+	halleys_state *state = machine.driver_data<halleys_state>();
 #define HALLEYS_Y0  0x8e
 #define HALLEYS_X0  0x9a
 #define HALLEYS_Y1  0xa2
@@ -1423,9 +1423,9 @@ static void copy_fixed_2b(bitmap_t *bitmap, UINT16 *source)
 }
 
 
-static void filter_bitmap(running_machine *machine, bitmap_t *bitmap, int mask)
+static void filter_bitmap(running_machine &machine, bitmap_t *bitmap, int mask)
 {
-	halleys_state *state = machine->driver_data<halleys_state>();
+	halleys_state *state = machine.driver_data<halleys_state>();
 	int dst_pitch;
 
 	UINT32 *pal_ptr, *edi;
@@ -1466,7 +1466,7 @@ static void filter_bitmap(running_machine *machine, bitmap_t *bitmap, int mask)
 
 static SCREEN_UPDATE( halleys )
 {
-	halleys_state *state = screen->machine->driver_data<halleys_state>();
+	halleys_state *state = screen->machine().driver_data<halleys_state>();
 	int i, j;
 
 	if (state->stars_enabled)
@@ -1478,7 +1478,7 @@ static SCREEN_UPDATE( halleys )
 		bitmap_fill(bitmap, cliprect, state->bgcolor);
 
 #ifdef MAME_DEBUG
-	if (input_port_read(screen->machine, "DEBUG")) copy_scroll_xp(bitmap, state->render_layer[3], *state->scrollx0, *state->scrolly0); // not used???
+	if (input_port_read(screen->machine(), "DEBUG")) copy_scroll_xp(bitmap, state->render_layer[3], *state->scrollx0, *state->scrolly0); // not used???
 #endif
 
 	copy_scroll_xp(bitmap, state->render_layer[2], *state->scrollx1, *state->scrolly1);
@@ -1488,14 +1488,14 @@ static SCREEN_UPDATE( halleys )
 	// HALF-HACK: apply RGB filter when the following conditions are met
 	i = state->io_ram[0xa0];
 	j = state->io_ram[0xa1];
-	if (state->io_ram[0x2b] && (i>0xc6 && i<0xfe) && (j==0xc0 || j==0xed)) filter_bitmap(screen->machine, bitmap, i);
+	if (state->io_ram[0x2b] && (i>0xc6 && i<0xfe) && (j==0xc0 || j==0xed)) filter_bitmap(screen->machine(), bitmap, i);
 	return 0;
 }
 
 
 static SCREEN_UPDATE( benberob )
 {
-	halleys_state *state = screen->machine->driver_data<halleys_state>();
+	halleys_state *state = screen->machine().driver_data<halleys_state>();
 	if (state->io_ram[0xa0] & 0x80)
 		copy_scroll_op(bitmap, state->render_layer[2], *state->scrollx1, *state->scrolly1);
 	else
@@ -1516,7 +1516,7 @@ static READ8_HANDLER( zero_r ) { return(0); }
 
 static READ8_HANDLER( debug_r )
 {
-	halleys_state *state = space->machine->driver_data<halleys_state>();
+	halleys_state *state = space->machine().driver_data<halleys_state>();
 	return(state->io_ram[offset]);
 }
 
@@ -1528,7 +1528,7 @@ static READ8_HANDLER( debug_r )
 
 static INTERRUPT_GEN( halleys_interrupt )
 {
-	halleys_state *state = device->machine->driver_data<halleys_state>();
+	halleys_state *state = device->machine().driver_data<halleys_state>();
 	UINT8 latch_data;
 
 	switch (cpu_getiloops(device))
@@ -1555,7 +1555,7 @@ static INTERRUPT_GEN( halleys_interrupt )
 				state->fftail = (state->fftail + 1) & (MAX_SOUNDS - 1);
 				state->latch_delay = (latch_data) ? 0 : 4;
 				soundlatch_w( device->memory().space(AS_PROGRAM), 0, latch_data);
-				cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+				cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
 
 			// clear collision list of this frame unconditionally
@@ -1581,7 +1581,7 @@ static INTERRUPT_GEN( halleys_interrupt )
 
 static INTERRUPT_GEN( benberob_interrupt )
 {
-	halleys_state *state = device->machine->driver_data<halleys_state>();
+	halleys_state *state = device->machine().driver_data<halleys_state>();
 	UINT8 latch_data;
 
 	switch (cpu_getiloops(device))
@@ -1595,7 +1595,7 @@ static INTERRUPT_GEN( benberob_interrupt )
 				state->fftail = (state->fftail + 1) & (MAX_SOUNDS - 1);
 				state->latch_delay = (latch_data) ? 0 : 4;
 				soundlatch_w(device->memory().space(AS_PROGRAM), 0, latch_data);
-				cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+				cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
 		break;
 
@@ -1614,31 +1614,31 @@ static INTERRUPT_GEN( benberob_interrupt )
 
 static READ8_HANDLER( vector_r )
 {
-	halleys_state *state = space->machine->driver_data<halleys_state>();
+	halleys_state *state = space->machine().driver_data<halleys_state>();
 	return(state->cpu1_base[0xffe0 + (offset^(state->mVectorType<<4))]);
 }
 
 
 static WRITE8_HANDLER( firq_ack_w )
 {
-	halleys_state *state = space->machine->driver_data<halleys_state>();
+	halleys_state *state = space->machine().driver_data<halleys_state>();
 	state->io_ram[0x9c] = data;
 
 	if (state->firq_level) state->firq_level--;
-	cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
 static WRITE8_DEVICE_HANDLER( sndnmi_msk_w )
 {
-	halleys_state *state = device->machine->driver_data<halleys_state>();
+	halleys_state *state = device->machine().driver_data<halleys_state>();
 	state->sndnmi_mask = data & 1;
 }
 
 
 static WRITE8_HANDLER( soundcommand_w )
 {
-	halleys_state *state = space->machine->driver_data<halleys_state>();
+	halleys_state *state = space->machine().driver_data<halleys_state>();
 	if (state->ffcount < MAX_SOUNDS)
 	{
 		state->ffcount++;
@@ -1655,8 +1655,8 @@ static READ8_HANDLER( coin_lockout_r )
 	//   0x8599 : 'benberob'
 	//   0x83e2 : 'halleys', 'halleysc', 'halleycj'
 	//   0x83df : 'halley87'
-	int inp = input_port_read(space->machine, "IN0");
-	int result = ((input_port_read(space->machine, "DSW4")) & 0x20) >> 5;
+	int inp = input_port_read(space->machine(), "IN0");
+	int result = ((input_port_read(space->machine(), "DSW4")) & 0x20) >> 5;
 
 	if (inp & 0x80) result |= 0x02;
 	if (inp & 0x40) result |= 0x04;
@@ -1669,7 +1669,7 @@ static READ8_HANDLER( io_mirror_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
-	return input_port_read(space->machine, portnames[offset]);
+	return input_port_read(space->machine(), portnames[offset]);
 }
 
 
@@ -1955,7 +1955,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( halleys )
 {
-	halleys_state *state = machine->driver_data<halleys_state>();
+	halleys_state *state = machine.driver_data<halleys_state>();
 	state->mVectorType     = 0;
 	state->firq_level      = 0;
 	state->blitter_busy    = 0;
@@ -2178,9 +2178,9 @@ ROM_END
 //**************************************************************************
 // Driver Initializations
 
-static void init_common(running_machine *machine)
+static void init_common(running_machine &machine)
 {
-	halleys_state *state = machine->driver_data<halleys_state>();
+	halleys_state *state = machine.driver_data<halleys_state>();
 	UINT8 *buf, *rom;
 	int addr, i;
 	UINT8 al, ah, dl, dh;
@@ -2214,7 +2214,7 @@ static void init_common(running_machine *machine)
 
 
 	// decrypt main program ROM
-	rom = state->cpu1_base = machine->region("maincpu")->base();
+	rom = state->cpu1_base = machine.region("maincpu")->base();
 	buf = state->gfx1_base;
 
 	for (i=0; i<0x10000; i++)
@@ -2227,7 +2227,7 @@ static void init_common(running_machine *machine)
 
 
 	// swap graphics ROM addresses and unpack each pixel
-	rom = machine->region("gfx1")->base();
+	rom = machine.region("gfx1")->base();
 	buf = state->gfx_plane02;
 
 	for (i=0xffff; i>=0; i--)
@@ -2261,18 +2261,18 @@ static void init_common(running_machine *machine)
 
 static DRIVER_INIT( benberob )
 {
-	halleys_state *state = machine->driver_data<halleys_state>();
+	halleys_state *state = machine.driver_data<halleys_state>();
 	state->game_id = GAME_BENBEROB;
 
 	init_common(machine);
 
-	state->blitter_reset_timer = machine->scheduler().timer_alloc(FUNC(blitter_reset));
+	state->blitter_reset_timer = machine.scheduler().timer_alloc(FUNC(blitter_reset));
 }
 
 
 static DRIVER_INIT( halleys )
 {
-	halleys_state *state = machine->driver_data<halleys_state>();
+	halleys_state *state = machine.driver_data<halleys_state>();
 	state->game_id = GAME_HALLEYS;
 	state->collision_detection = 0xb114;
 
@@ -2281,7 +2281,7 @@ static DRIVER_INIT( halleys )
 
 static DRIVER_INIT( halley87 )
 {
-	halleys_state *state = machine->driver_data<halleys_state>();
+	halleys_state *state = machine.driver_data<halleys_state>();
 	state->game_id = GAME_HALLEYS;
 	state->collision_detection = 0xb10d;
 

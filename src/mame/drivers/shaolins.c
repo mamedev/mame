@@ -16,7 +16,7 @@ driver by Allard Van Der Bas
 
 static INTERRUPT_GEN( shaolins_interrupt )
 {
-	shaolins_state *state = device->machine->driver_data<shaolins_state>();
+	shaolins_state *state = device->machine().driver_data<shaolins_state>();
 
 	if (cpu_getiloops(device) == 0) device_set_input_line(device, 0, HOLD_LINE);
 	else if (cpu_getiloops(device) % 2)

@@ -19,7 +19,7 @@ PALETTE_INIT( mermaid )
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x41);
+	machine.colortable = colortable_alloc(machine, 0x41);
 
 	for (i = 0; i < 0x40; i++)
 	{
@@ -27,21 +27,21 @@ PALETTE_INIT( mermaid )
 		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
 		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* blue background */
-	colortable_palette_set_color(machine->colortable, 0x40, MAKE_RGB(0, 0, 0xff));
+	colortable_palette_set_color(machine.colortable, 0x40, MAKE_RGB(0, 0, 0xff));
 
 	/* char/sprite palette */
 	for (i = 0; i < 0x40; i++)
-		colortable_entry_set_value(machine->colortable, i, i);
+		colortable_entry_set_value(machine.colortable, i, i);
 
 	/* background palette */
-	colortable_entry_set_value(machine->colortable, 0x40, 0x20);
-	colortable_entry_set_value(machine->colortable, 0x41, 0x21);
-	colortable_entry_set_value(machine->colortable, 0x42, 0x40);
-	colortable_entry_set_value(machine->colortable, 0x43, 0x21);
+	colortable_entry_set_value(machine.colortable, 0x40, 0x20);
+	colortable_entry_set_value(machine.colortable, 0x41, 0x21);
+	colortable_entry_set_value(machine.colortable, 0x42, 0x40);
+	colortable_entry_set_value(machine.colortable, 0x43, 0x21);
 }
 
 PALETTE_INIT( rougien )
@@ -49,7 +49,7 @@ PALETTE_INIT( rougien )
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x41);
+	machine.colortable = colortable_alloc(machine, 0x41);
 
 	for (i = 0; i < 0x40; i++)
 	{
@@ -57,78 +57,78 @@ PALETTE_INIT( rougien )
 		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
 		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* blue background */
-	colortable_palette_set_color(machine->colortable, 0x40, MAKE_RGB(0, 0, 0));
+	colortable_palette_set_color(machine.colortable, 0x40, MAKE_RGB(0, 0, 0));
 
 	/* char/sprite palette */
 	for (i = 0; i < 0x40; i++)
-		colortable_entry_set_value(machine->colortable, i, i);
+		colortable_entry_set_value(machine.colortable, i, i);
 
 	/* background palette */
-	colortable_entry_set_value(machine->colortable, 0x40, 0x40);
-	colortable_entry_set_value(machine->colortable, 0x41, 0x00);
-	colortable_entry_set_value(machine->colortable, 0x42, 0x00);
-	colortable_entry_set_value(machine->colortable, 0x43, 0x02);
+	colortable_entry_set_value(machine.colortable, 0x40, 0x40);
+	colortable_entry_set_value(machine.colortable, 0x41, 0x00);
+	colortable_entry_set_value(machine.colortable, 0x42, 0x00);
+	colortable_entry_set_value(machine.colortable, 0x43, 0x02);
 }
 
 
 WRITE8_HANDLER( mermaid_videoram2_w )
 {
-	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	state->videoram2[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( mermaid_videoram_w )
 {
-	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( mermaid_colorram_w )
 {
-	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( mermaid_flip_screen_x_w )
 {
-	flip_screen_x_set(space->machine, data & 0x01);
+	flip_screen_x_set(space->machine(), data & 0x01);
 }
 
 WRITE8_HANDLER( mermaid_flip_screen_y_w )
 {
-	flip_screen_y_set(space->machine, data & 0x01);
+	flip_screen_y_set(space->machine(), data & 0x01);
 }
 
 WRITE8_HANDLER( mermaid_bg_scroll_w )
 {
-	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	state->bg_scrollram[offset] = data;
 	tilemap_set_scrolly(state->bg_tilemap, offset, data);
 }
 
 WRITE8_HANDLER( mermaid_fg_scroll_w )
 {
-	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	state->fg_scrollram[offset] = data;
 	tilemap_set_scrolly(state->fg_tilemap, offset, data);
 }
 
 WRITE8_HANDLER( rougien_gfxbankswitch1_w )
 {
-	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	state->rougien_gfxbank1 = data & 0x01;
 }
 
 WRITE8_HANDLER( rougien_gfxbankswitch2_w )
 {
-	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	state->rougien_gfxbank2 = data & 0x01;
 }
 
@@ -149,7 +149,7 @@ READ8_HANDLER( mermaid_collision_r )
         Bit 7
     */
 
-	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	int collision = 0xff;
 
 	if (state->coll_bit0) collision ^= 0x01;
@@ -163,7 +163,7 @@ READ8_HANDLER( mermaid_collision_r )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	mermaid_state *state = machine->driver_data<mermaid_state>();
+	mermaid_state *state = machine.driver_data<mermaid_state>();
 	int code = state->videoram2[tile_index];
 	int sx = tile_index % 32;
 	int color = (sx >= 26) ? 0 : 1;
@@ -173,7 +173,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	mermaid_state *state = machine->driver_data<mermaid_state>();
+	mermaid_state *state = machine.driver_data<mermaid_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + ((attr & 0x30) << 4);
 	int color = attr & 0x0f;
@@ -187,7 +187,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( mermaid )
 {
-	mermaid_state *state = machine->driver_data<mermaid_state>();
+	mermaid_state *state = machine.driver_data<mermaid_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_cols(state->bg_tilemap, 32);
@@ -196,13 +196,13 @@ VIDEO_START( mermaid )
 	tilemap_set_scroll_cols(state->fg_tilemap, 32);
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
-	state->helper = machine->primary_screen->alloc_compatible_bitmap();
-	state->helper2 = machine->primary_screen->alloc_compatible_bitmap();
+	state->helper = machine.primary_screen->alloc_compatible_bitmap();
+	state->helper2 = machine.primary_screen->alloc_compatible_bitmap();
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	mermaid_state *state = machine->driver_data<mermaid_state>();
+	mermaid_state *state = machine.driver_data<mermaid_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -235,23 +235,23 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		}
 
 		drawgfx_transpen(bitmap, (flip_screen_x_get(machine) ? &flip_spritevisiblearea : &spritevisiblearea),
-			machine->gfx[1], code, color, flipx, flipy, sx, sy, 0);
+			machine.gfx[1], code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
 SCREEN_UPDATE( mermaid )
 {
-	mermaid_state *state = screen->machine->driver_data<mermaid_state>();
+	mermaid_state *state = screen->machine().driver_data<mermaid_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
-static UINT8 collision_check( running_machine *machine, rectangle* rect )
+static UINT8 collision_check( running_machine &machine, rectangle* rect )
 {
-	mermaid_state *state = machine->driver_data<mermaid_state>();
+	mermaid_state *state = machine.driver_data<mermaid_state>();
 	UINT8 data = 0;
 
 	int x;
@@ -260,8 +260,8 @@ static UINT8 collision_check( running_machine *machine, rectangle* rect )
 	for (y = rect->min_y; y <= rect->max_y; y++)
 		for (x = rect->min_x; x <= rect->max_x; x++)
 		{
-			UINT16 a = colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(state->helper, y, x)) & 0x3f;
-			UINT16 b = colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(state->helper2, y, x)) & 0x3f;
+			UINT16 a = colortable_entry_get_value(machine.colortable, *BITMAP_ADDR16(state->helper, y, x)) & 0x3f;
+			UINT16 b = colortable_entry_get_value(machine.colortable, *BITMAP_ADDR16(state->helper2, y, x)) & 0x3f;
 
 			if (b)
 				if (a)
@@ -273,8 +273,8 @@ static UINT8 collision_check( running_machine *machine, rectangle* rect )
 
 SCREEN_EOF( mermaid )
 {
-	mermaid_state *state = machine->driver_data<mermaid_state>();
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	mermaid_state *state = machine.driver_data<mermaid_state>();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 	UINT8 *spriteram = state->spriteram;
 
 	int offs, offs2;
@@ -319,8 +319,8 @@ SCREEN_EOF( mermaid )
 
 		rect.min_x = sx;
 		rect.min_y = sy;
-		rect.max_x = sx + machine->gfx[1]->width - 1;
-		rect.max_y = sy + machine->gfx[1]->height - 1;
+		rect.max_x = sx + machine.gfx[1]->width - 1;
+		rect.max_y = sy + machine.gfx[1]->height - 1;
 
 		if (rect.min_x < visarea.min_x)
 			rect.min_x = visarea.min_x;
@@ -338,7 +338,7 @@ SCREEN_EOF( mermaid )
 
 		tilemap_draw(state->helper, &rect, state->bg_tilemap, 0, 0);
 
-		drawgfx_transpen(state->helper2, &rect, machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(state->helper2, &rect, machine.gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
 		state->coll_bit2 |= collision_check(machine, &rect);
 
@@ -349,7 +349,7 @@ SCREEN_EOF( mermaid )
 
 		tilemap_draw(state->helper, &rect, state->fg_tilemap, 0, 0);
 
-		drawgfx_transpen(state->helper2, &rect, machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(state->helper2, &rect, machine.gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
 		state->coll_bit1 |= collision_check(machine, &rect);
 
@@ -387,10 +387,10 @@ SCREEN_EOF( mermaid )
 					sy2 = 240 - sy2;
 				}
 
-				drawgfx_transpen(state->helper, &rect, machine->gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+				drawgfx_transpen(state->helper, &rect, machine.gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
 			}
 
-		drawgfx_transpen(state->helper2, &rect, machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(state->helper2, &rect, machine.gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
 		state->coll_bit0 |= collision_check(machine, &rect);
 	}
@@ -429,8 +429,8 @@ SCREEN_EOF( mermaid )
 
 		rect.min_x = sx;
 		rect.min_y = sy;
-		rect.max_x = sx + machine->gfx[1]->width - 1;
-		rect.max_y = sy + machine->gfx[1]->height - 1;
+		rect.max_x = sx + machine.gfx[1]->width - 1;
+		rect.max_y = sy + machine.gfx[1]->height - 1;
 
 		if (rect.min_x < visarea.min_x)
 			rect.min_x = visarea.min_x;
@@ -475,10 +475,10 @@ SCREEN_EOF( mermaid )
 					sy2 = 240 - sy2;
 				}
 
-				drawgfx_transpen(state->helper, &rect, machine->gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+				drawgfx_transpen(state->helper, &rect, machine.gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
 			}
 
-		drawgfx_transpen(state->helper2, &rect, machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(state->helper2, &rect, machine.gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
 		state->coll_bit3 |= collision_check(machine, &rect);
 	}
@@ -517,8 +517,8 @@ SCREEN_EOF( mermaid )
 
 		rect.min_x = sx;
 		rect.min_y = sy;
-		rect.max_x = sx + machine->gfx[1]->width - 1;
-		rect.max_y = sy + machine->gfx[1]->height - 1;
+		rect.max_x = sx + machine.gfx[1]->width - 1;
+		rect.max_y = sy + machine.gfx[1]->height - 1;
 
 		if (rect.min_x < visarea.min_x)
 			rect.min_x = visarea.min_x;
@@ -563,10 +563,10 @@ SCREEN_EOF( mermaid )
 					sy2 = 240 - sy2;
 				}
 
-				drawgfx_transpen(state->helper, &rect, machine->gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+				drawgfx_transpen(state->helper, &rect, machine.gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
 			}
 
-		drawgfx_transpen(state->helper2, &rect, machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(state->helper2, &rect, machine.gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
 		state->coll_bit6 |= collision_check(machine, &rect);
 	}

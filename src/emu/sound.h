@@ -244,8 +244,8 @@ private:
 	static void reset(running_machine &machine);
 	static void pause(running_machine &machine);
 	static void resume(running_machine &machine);
-	static void config_load(running_machine *machine, int config_type, xml_data_node *parentnode);
-	static void config_save(running_machine *machine, int config_type, xml_data_node *parentnode);
+	static void config_load(running_machine &machine, int config_type, xml_data_node *parentnode);
+	static void config_save(running_machine &machine, int config_type, xml_data_node *parentnode);
 
 	static TIMER_CALLBACK( update_static ) { reinterpret_cast<sound_manager *>(ptr)->update(); }
 	void update();

@@ -177,7 +177,7 @@ static PALETTE_INIT(murogem)
 
 static SCREEN_UPDATE(murogem)
 {
-	murogem_state *state = screen->machine->driver_data<murogem_state>();
+	murogem_state *state = screen->machine().driver_data<murogem_state>();
 	int xx,yy,count;
 	count = 0x000;
 
@@ -190,7 +190,7 @@ static SCREEN_UPDATE(murogem)
 			int tileno = state->videoram[count]&0x3f;
 			int attr = state->videoram[count+0x400]&0x0f;
 
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tileno,attr,0,0,xx*8,yy*8,0);
+			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],tileno,attr,0,0,xx*8,yy*8,0);
 
 			count++;
 

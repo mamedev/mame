@@ -222,14 +222,14 @@
 
 static MACHINE_START( bzone )
 {
-	bzone_state *state = machine->driver_data<bzone_state>();
+	bzone_state *state = machine.driver_data<bzone_state>();
 	state_save_register_global(machine, state->analog_data);
 }
 
 
 static MACHINE_START( redbaron )
 {
-	bzone_state *state = machine->driver_data<bzone_state>();
+	bzone_state *state = machine.driver_data<bzone_state>();
 	state_save_register_global(machine, state->analog_data);
 	state_save_register_global(machine, state->rb_input_select);
 }
@@ -244,7 +244,7 @@ static MACHINE_START( redbaron )
 
 static INTERRUPT_GEN( bzone_interrupt )
 {
-	if (input_port_read(device->machine, "IN0") & 0x10)
+	if (input_port_read(device->machine(), "IN0") & 0x10)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -258,13 +258,13 @@ static INTERRUPT_GEN( bzone_interrupt )
 
 static CUSTOM_INPUT( clock_r )
 {
-	return (field->port->machine->device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
+	return (field->port->machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
 }
 
 
 static WRITE8_HANDLER( bzone_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset,data);
+	coin_counter_w(space->machine(), offset,data);
 }
 
 
@@ -277,13 +277,13 @@ static WRITE8_HANDLER( bzone_coin_counter_w )
 
 static READ8_DEVICE_HANDLER( redbaron_joy_r )
 {
-	bzone_state *state = device->machine->driver_data<bzone_state>();
-	return input_port_read(device->machine, state->rb_input_select ? "FAKE1" : "FAKE2");
+	bzone_state *state = device->machine().driver_data<bzone_state>();
+	return input_port_read(device->machine(), state->rb_input_select ? "FAKE1" : "FAKE2");
 }
 
 static WRITE8_DEVICE_HANDLER( redbaron_joysound_w )
 {
-	bzone_state *state = device->machine->driver_data<bzone_state>();
+	bzone_state *state = device->machine().driver_data<bzone_state>();
 	state->rb_input_select = data & 1;
 	redbaron_sounds_w(device, offset, data);
 }
@@ -780,24 +780,24 @@ ROM_END
 
 static READ8_HANDLER( analog_data_r )
 {
-	bzone_state *state = space->machine->driver_data<bzone_state>();
+	bzone_state *state = space->machine().driver_data<bzone_state>();
 	return state->analog_data;
 }
 
 
 static WRITE8_HANDLER( analog_select_w )
 {
-	bzone_state *state = space->machine->driver_data<bzone_state>();
+	bzone_state *state = space->machine().driver_data<bzone_state>();
 	static const char *const analog_port[] = { "AN0", "AN1", "AN2" };
 
 	if (offset <= 2)
-		state->analog_data = input_port_read(space->machine, analog_port[offset]);
+		state->analog_data = input_port_read(space->machine(), analog_port[offset]);
 }
 
 
 static DRIVER_INIT( bradley )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	space->install_ram(0x400, 0x7ff);
 	space->install_read_port(0x1808, 0x1808, "1808");
 	space->install_read_port(0x1809, 0x1809, "1809");

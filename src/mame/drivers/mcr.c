@@ -321,9 +321,9 @@ static READ8_HANDLER( solarfox_ip0_r )
 	/* game in cocktail mode, they don't work at all. So we fake-mux   */
 	/* the controls through player 1's ports */
 	if (mcr_cocktail_flip)
-		return input_port_read(space->machine, "SSIO.IP0") | 0x08;
+		return input_port_read(space->machine(), "SSIO.IP0") | 0x08;
 	else
-		return ((input_port_read(space->machine, "SSIO.IP0") & ~0x14) | 0x08) | ((input_port_read(space->machine, "SSIO.IP0") & 0x08) >> 1) | ((input_port_read(space->machine, "SSIO.IP2") & 0x01) << 4);
+		return ((input_port_read(space->machine(), "SSIO.IP0") & ~0x14) | 0x08) | ((input_port_read(space->machine(), "SSIO.IP0") & 0x08) >> 1) | ((input_port_read(space->machine(), "SSIO.IP2") & 0x01) << 4);
 }
 
 
@@ -331,9 +331,9 @@ static READ8_HANDLER( solarfox_ip1_r )
 {
 	/*  same deal as above */
 	if (mcr_cocktail_flip)
-		return input_port_read(space->machine, "SSIO.IP1") | 0xf0;
+		return input_port_read(space->machine(), "SSIO.IP1") | 0xf0;
 	else
-		return (input_port_read(space->machine, "SSIO.IP1") >> 4) | 0xf0;
+		return (input_port_read(space->machine(), "SSIO.IP1") >> 4) | 0xf0;
 }
 
 
@@ -346,7 +346,7 @@ static READ8_HANDLER( solarfox_ip1_r )
 
 static READ8_HANDLER( kick_ip1_r )
 {
-	return (input_port_read(space->machine, "DIAL2") << 4) & 0xf0;
+	return (input_port_read(space->machine(), "DIAL2") << 4) & 0xf0;
 }
 
 
@@ -366,18 +366,18 @@ static WRITE8_HANDLER( wacko_op4_w )
 static READ8_HANDLER( wacko_ip1_r )
 {
 	if (!input_mux)
-		return input_port_read(space->machine, "SSIO.IP1");
+		return input_port_read(space->machine(), "SSIO.IP1");
 	else
-		return input_port_read(space->machine, "SSIO.IP1.ALT");
+		return input_port_read(space->machine(), "SSIO.IP1.ALT");
 }
 
 
 static READ8_HANDLER( wacko_ip2_r )
 {
 	if (!input_mux)
-		return input_port_read(space->machine, "SSIO.IP2");
+		return input_port_read(space->machine(), "SSIO.IP2");
 	else
-		return input_port_read(space->machine, "SSIO.IP2.ALT");
+		return input_port_read(space->machine(), "SSIO.IP2.ALT");
 }
 
 
@@ -390,7 +390,7 @@ static READ8_HANDLER( wacko_ip2_r )
 
 static READ8_HANDLER( kroozr_ip1_r )
 {
-	int dial = input_port_read(space->machine, "DIAL");
+	int dial = input_port_read(space->machine(), "DIAL");
 	return ((dial & 0x80) >> 1) | ((dial & 0x70) >> 4);
 }
 
@@ -414,7 +414,7 @@ static WRITE8_HANDLER( kroozr_op4_w )
 
 static WRITE8_HANDLER( journey_op4_w )
 {
-	device_t *samples = space->machine->device("samples");
+	device_t *samples = space->machine().device("samples");
 
 	/* if we're not playing the sample yet, start it */
 	if (!sample_playing(samples, 0))
@@ -535,7 +535,7 @@ static READ8_HANDLER( nflfoot_ip2_r )
 
 static WRITE8_HANDLER( nflfoot_op4_w )
 {
-	device_t *sio = space->machine->device("ipu_sio");
+	device_t *sio = space->machine().device("ipu_sio");
 
 	/* bit 7 = J3-7 on IPU board = /RXDA on SIO */
 	logerror("%04X:op4_w(%d%d%d)\n", cpu_get_pc(space->cpu), (data >> 7) & 1, (data >> 6) & 1, (data >> 5) & 1);
@@ -587,15 +587,15 @@ static WRITE8_HANDLER( nflfoot_op4_w )
 
 static READ8_HANDLER( demoderb_ip1_r )
 {
-	return input_port_read(space->machine, "SSIO.IP1") |
-		(input_port_read(space->machine, input_mux ? "SSIO.IP1.ALT2" : "SSIO.IP1.ALT1") << 2);
+	return input_port_read(space->machine(), "SSIO.IP1") |
+		(input_port_read(space->machine(), input_mux ? "SSIO.IP1.ALT2" : "SSIO.IP1.ALT1") << 2);
 }
 
 
 static READ8_HANDLER( demoderb_ip2_r )
 {
-	return input_port_read(space->machine, "SSIO.IP2") |
-		(input_port_read(space->machine, input_mux ? "SSIO.IP2.ALT2" : "SSIO.IP2.ALT1") << 2);
+	return input_port_read(space->machine(), "SSIO.IP2") |
+		(input_port_read(space->machine(), input_mux ? "SSIO.IP2.ALT2" : "SSIO.IP2.ALT1") << 2);
 }
 
 
@@ -2521,7 +2521,7 @@ ROM_END
  *
  *************************************/
 
-static void mcr_init(running_machine *machine, int cpuboard, int vidboard, int ssioboard)
+static void mcr_init(running_machine &machine, int cpuboard, int vidboard, int ssioboard)
 {
 	mcr_cpu_board = cpuboard;
 	mcr_sprite_board = vidboard;
@@ -2580,7 +2580,7 @@ static DRIVER_INIT( twotiger )
 	mcr_init(machine, 90010, 91399, 90913);
 	mcr_sound_init(machine, MCR_SSIO);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe800, 0xefff, 0, 0x1000, FUNC(twotiger_videoram_r), FUNC(twotiger_videoram_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe800, 0xefff, 0, 0x1000, FUNC(twotiger_videoram_r), FUNC(twotiger_videoram_w));
 }
 
 
@@ -2649,7 +2649,7 @@ static DRIVER_INIT( demoderb )
 	ssio_set_custom_output(4, 0xff, demoderb_op4_w);
 
 	/* the SSIO Z80 doesn't have any program to execute */
-	machine->device<cpu_device>("tcscpu")->suspend(SUSPEND_REASON_DISABLE, 1);
+	machine.device<cpu_device>("tcscpu")->suspend(SUSPEND_REASON_DISABLE, 1);
 }
 
 

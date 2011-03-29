@@ -93,7 +93,7 @@ device_config *asc_device_config::static_alloc_device_config(const machine_confi
 
 device_t *asc_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, asc_device(machine, *this));
+	return auto_alloc(machine, asc_device(machine, *this));
 }
 
 //**************************************************************************
@@ -133,7 +133,7 @@ void asc_device::device_start()
 
 	memset(m_regs, 0, sizeof(m_regs));
 
-	m_sync_timer = this->machine->scheduler().timer_alloc(FUNC(sync_timer_cb), this);
+	m_sync_timer = this->machine().scheduler().timer_alloc(FUNC(sync_timer_cb), this);
 
 	save_item(NAME(m_fifo_a_rdptr));
 	save_item(NAME(m_fifo_b_rdptr));

@@ -124,7 +124,7 @@ static WRITE8_HANDLER( tubep_LS259_w )
                     port b0: bit0 - coin 1 counter
                     port b1  bit0 - coin 2 counter
                 */
-				coin_counter_w(space->machine, offset,data&1);
+				coin_counter_w(space->machine(), offset,data&1);
 				break;
 		case 2:
 				//something...
@@ -155,8 +155,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( main_cpu_irq_line_clear_w )
 {
-	tubep_state *state = space->machine->driver_data<tubep_state>();
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	tubep_state *state = space->machine().driver_data<tubep_state>();
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 	logerror("CPU#0 VBLANK int clear at scanline=%3i\n", state->curr_scanline);
 	return;
 }
@@ -164,7 +164,7 @@ static WRITE8_HANDLER( main_cpu_irq_line_clear_w )
 
 static WRITE8_HANDLER( tubep_soundlatch_w )
 {
-	tubep_state *state = space->machine->driver_data<tubep_state>();
+	tubep_state *state = space->machine().driver_data<tubep_state>();
 	state->sound_latch = (data&0x7f) | 0x80;
 }
 
@@ -193,8 +193,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( second_cpu_irq_line_clear_w )
 {
-	tubep_state *state = space->machine->driver_data<tubep_state>();
-	cputag_set_input_line(space->machine, "slave", 0, CLEAR_LINE);
+	tubep_state *state = space->machine().driver_data<tubep_state>();
+	cputag_set_input_line(space->machine(), "slave", 0, CLEAR_LINE);
 	logerror("CPU#1 VBLANK int clear at scanline=%3i\n", state->curr_scanline);
 	return;
 }
@@ -219,7 +219,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( tubep_soundlatch_r )
 {
-	tubep_state *state = space->machine->driver_data<tubep_state>();
+	tubep_state *state = space->machine().driver_data<tubep_state>();
 	int res;
 
 	res = state->sound_latch;
@@ -230,7 +230,7 @@ static READ8_HANDLER( tubep_soundlatch_r )
 
 static READ8_HANDLER( tubep_sound_irq_ack )
 {
-	cputag_set_input_line(space->machine, "soundcpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "soundcpu", 0, CLEAR_LINE);
 	return 0;
 }
 
@@ -260,7 +260,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( tubep_scanline_callback )
 {
-	tubep_state *state = machine->driver_data<tubep_state>();
+	tubep_state *state = machine.driver_data<tubep_state>();
 	int scanline = param;
 
 	state->curr_scanline = scanline;//for debugging
@@ -308,16 +308,16 @@ static TIMER_CALLBACK( tubep_scanline_callback )
 	}
 
 
-	machine->primary_screen->update_partial(machine->primary_screen->vpos());
+	machine.primary_screen->update_partial(machine.primary_screen->vpos());
 
 	//debug
-	logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,machine->primary_screen->vpos());
+	logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,machine.primary_screen->vpos());
 
 	scanline++;
 	if (scanline >= 264)
 		scanline = 0;
 
-	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
+	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -328,9 +328,9 @@ static TIMER_CALLBACK( tubep_scanline_callback )
  *
  *************************************/
 
-static void tubep_setup_save_state(running_machine *machine)
+static void tubep_setup_save_state(running_machine &machine)
 {
-	tubep_state *state = machine->driver_data<tubep_state>();
+	tubep_state *state = machine.driver_data<tubep_state>();
 	/* Set up save state */
 	state_save_register_global(machine, state->sound_latch);
 	state_save_register_global(machine, state->ls74);
@@ -341,9 +341,9 @@ static void tubep_setup_save_state(running_machine *machine)
 
 static MACHINE_START( tubep )
 {
-	tubep_state *state = machine->driver_data<tubep_state>();
+	tubep_state *state = machine.driver_data<tubep_state>();
 	/* Create interrupt timer */
-	state->interrupt_timer = machine->scheduler().timer_alloc(FUNC(tubep_scanline_callback));
+	state->interrupt_timer = machine.scheduler().timer_alloc(FUNC(tubep_scanline_callback));
 
 	tubep_setup_save_state(machine);
 }
@@ -351,8 +351,8 @@ static MACHINE_START( tubep )
 
 static MACHINE_RESET( tubep )
 {
-	tubep_state *state = machine->driver_data<tubep_state>();
-	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(0));
+	tubep_state *state = machine.driver_data<tubep_state>();
+	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(0));
 }
 
 
@@ -386,7 +386,7 @@ static WRITE8_HANDLER( rjammer_LS259_w )
 	{
 		case 0:
 		case 1:
-				coin_counter_w(space->machine, offset,data&1);	/* bit 0 = coin counter */
+				coin_counter_w(space->machine(), offset,data&1);	/* bit 0 = coin counter */
 				break;
 		case 5:
 				//screen_flip_w(offset,data&1); /* bit 0 = screen flip, active high */
@@ -399,9 +399,9 @@ static WRITE8_HANDLER( rjammer_LS259_w )
 
 static WRITE8_HANDLER( rjammer_soundlatch_w )
 {
-	tubep_state *state = space->machine->driver_data<tubep_state>();
+	tubep_state *state = space->machine().driver_data<tubep_state>();
 	state->sound_latch = data;
-	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -446,7 +446,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( rjammer_scanline_callback )
 {
-	tubep_state *state = machine->driver_data<tubep_state>();
+	tubep_state *state = machine.driver_data<tubep_state>();
 	int scanline = param;
 
 	state->curr_scanline = scanline;//for debugging
@@ -494,31 +494,31 @@ static TIMER_CALLBACK( rjammer_scanline_callback )
 	}
 
 
-	machine->primary_screen->update_partial(machine->primary_screen->vpos());
+	machine.primary_screen->update_partial(machine.primary_screen->vpos());
 
-	logerror("scanline=%3i scrgetvpos(0)=%3i\n", scanline, machine->primary_screen->vpos());
+	logerror("scanline=%3i scrgetvpos(0)=%3i\n", scanline, machine.primary_screen->vpos());
 
 	scanline++;
 	if (scanline >= 264)
 		scanline = 0;
 
-	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
+	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
 
 static MACHINE_START( rjammer )
 {
-	tubep_state *state = machine->driver_data<tubep_state>();
+	tubep_state *state = machine.driver_data<tubep_state>();
 	/* Create interrupt timer */
-	state->interrupt_timer = machine->scheduler().timer_alloc(FUNC(rjammer_scanline_callback));
+	state->interrupt_timer = machine.scheduler().timer_alloc(FUNC(rjammer_scanline_callback));
 
 	tubep_setup_save_state(machine);
 }
 
 static MACHINE_RESET( rjammer )
 {
-	tubep_state *state = machine->driver_data<tubep_state>();
-	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(0));
+	tubep_state *state = machine.driver_data<tubep_state>();
+	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(0));
 }
 
 
@@ -531,7 +531,7 @@ static MACHINE_RESET( rjammer )
 
 static READ8_HANDLER( rjammer_soundlatch_r )
 {
-	tubep_state *state = space->machine->driver_data<tubep_state>();
+	tubep_state *state = space->machine().driver_data<tubep_state>();
 	int res = state->sound_latch;
 	return res;
 }
@@ -562,13 +562,13 @@ static WRITE8_DEVICE_HANDLER( rjammer_voice_frequency_select_w )
 
 static void rjammer_adpcm_vck (device_t *device)
 {
-	tubep_state *state = device->machine->driver_data<tubep_state>();
+	tubep_state *state = device->machine().driver_data<tubep_state>();
 	state->ls74 = (state->ls74 + 1) & 1;
 
 	if (state->ls74 == 1)
 	{
 		msm5205_data_w(device, (state->ls377 >> 0) & 15 );
-		cputag_set_input_line(device->machine, "soundcpu", 0, ASSERT_LINE );
+		cputag_set_input_line(device->machine(), "soundcpu", 0, ASSERT_LINE );
 	}
 	else
 	{
@@ -580,7 +580,7 @@ static void rjammer_adpcm_vck (device_t *device)
 
 static WRITE8_HANDLER( rjammer_voice_input_w )
 {
-	tubep_state *state = space->machine->driver_data<tubep_state>();
+	tubep_state *state = space->machine().driver_data<tubep_state>();
 	/* 8 bits of adpcm data for MSM5205 */
 	/* need to buffer the data, and switch two nibbles on two following interrupts*/
 
@@ -591,7 +591,7 @@ static WRITE8_HANDLER( rjammer_voice_input_w )
             I do it here because this port (0x80) is first one accessed
             in the interrupt routine.
     */
-	cputag_set_input_line(space->machine, "soundcpu", 0, CLEAR_LINE );
+	cputag_set_input_line(space->machine(), "soundcpu", 0, CLEAR_LINE );
 	return;
 }
 

@@ -138,19 +138,19 @@ static READ16_HANDLER( dassault_control_r )
 	switch (offset << 1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(space->machine, "P1_P2");
+			return input_port_read(space->machine(), "P1_P2");
 
 		case 2: /* Player 3 & Player 4 joysticks & fire buttons */
-			return input_port_read(space->machine, "P3_P4");
+			return input_port_read(space->machine(), "P3_P4");
 
 		case 4: /* Dip 1 (stored at 0x3f8035) */
-			return input_port_read(space->machine, "DSW1");
+			return input_port_read(space->machine(), "DSW1");
 
 		case 6: /* Dip 2 (stored at 0x3f8034) */
-			return input_port_read(space->machine, "DSW2");
+			return input_port_read(space->machine(), "DSW2");
 
 		case 8: /* VBL, Credits */
-			return input_port_read(space->machine, "SYSTEM");
+			return input_port_read(space->machine(), "SYSTEM");
 	}
 
 	return 0xffff;
@@ -158,19 +158,19 @@ static READ16_HANDLER( dassault_control_r )
 
 static WRITE16_HANDLER( dassault_control_w )
 {
-	coin_counter_w(space->machine, 0, data & 1);
+	coin_counter_w(space->machine(), 0, data & 1);
 	if (data & 0xfffe)
 		logerror("Coin cointrol %04x\n", data);
 }
 
 static READ16_HANDLER( dassault_sub_control_r )
 {
-	return input_port_read(space->machine, "VBLANK1");
+	return input_port_read(space->machine(), "VBLANK1");
 }
 
 static WRITE16_HANDLER( dassault_sound_w )
 {
-	dassault_state *state = space->machine->driver_data<dassault_state>();
+	dassault_state *state = space->machine().driver_data<dassault_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE); /* IRQ1 */
 }
@@ -178,7 +178,7 @@ static WRITE16_HANDLER( dassault_sound_w )
 /* The CPU-CPU irq controller is overlaid onto the end of the shared memory */
 static READ16_HANDLER( dassault_irq_r )
 {
-	dassault_state *state = space->machine->driver_data<dassault_state>();
+	dassault_state *state = space->machine().driver_data<dassault_state>();
 	switch (offset)
 	{
 	case 0: device_set_input_line(state->maincpu, 5, CLEAR_LINE); break;
@@ -189,7 +189,7 @@ static READ16_HANDLER( dassault_irq_r )
 
 static WRITE16_HANDLER( dassault_irq_w )
 {
-	dassault_state *state = space->machine->driver_data<dassault_state>();
+	dassault_state *state = space->machine().driver_data<dassault_state>();
 	switch (offset)
 	{
 	case 0: device_set_input_line(state->maincpu, 5, ASSERT_LINE); break;
@@ -201,13 +201,13 @@ static WRITE16_HANDLER( dassault_irq_w )
 
 static WRITE16_HANDLER( shared_ram_w )
 {
-	dassault_state *state = space->machine->driver_data<dassault_state>();
+	dassault_state *state = space->machine().driver_data<dassault_state>();
 	COMBINE_DATA(&state->shared_ram[offset]);
 }
 
 static READ16_HANDLER( shared_ram_r )
 {
-	dassault_state *state = space->machine->driver_data<dassault_state>();
+	dassault_state *state = space->machine().driver_data<dassault_state>();
 	return state->shared_ram[offset];
 }
 
@@ -513,13 +513,13 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int state)
 {
-	dassault_state *driver_state = device->machine->driver_data<dassault_state>();
+	dassault_state *driver_state = device->machine().driver_data<dassault_state>();
 	device_set_input_line(driver_state->audiocpu, 1, state);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	dassault_state *state = device->machine->driver_data<dassault_state>();
+	dassault_state *state = device->machine().driver_data<dassault_state>();
 
 	/* the second OKIM6295 ROM is bank switched */
 	state->oki2->set_bank_base((data & 1) * 0x40000);
@@ -828,7 +828,7 @@ ROM_END
 
 static READ16_HANDLER( dassault_main_skip )
 {
-	dassault_state *state = space->machine->driver_data<dassault_state>();
+	dassault_state *state = space->machine().driver_data<dassault_state>();
 	int ret = state->ram[0];
 
 	if (cpu_get_previouspc(space->cpu) == 0x1170 && ret & 0x8000)
@@ -839,7 +839,7 @@ static READ16_HANDLER( dassault_main_skip )
 
 static READ16_HANDLER( thndzone_main_skip )
 {
-	dassault_state *state = space->machine->driver_data<dassault_state>();
+	dassault_state *state = space->machine().driver_data<dassault_state>();
 	int ret = state->ram[0];
 
 	if (cpu_get_pc(space->cpu) == 0x114c && ret & 0x8000)
@@ -850,8 +850,8 @@ static READ16_HANDLER( thndzone_main_skip )
 
 static DRIVER_INIT( dassault )
 {
-	const UINT8 *src = machine->region("gfx1")->base();
-	UINT8 *dst = machine->region("gfx2")->base();
+	const UINT8 *src = machine.region("gfx1")->base();
+	UINT8 *dst = machine.region("gfx2")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
@@ -865,13 +865,13 @@ static DRIVER_INIT( dassault )
 	auto_free(machine, tmp);
 
 	/* Save time waiting on vblank bit */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3f8000, 0x3f8001, FUNC(dassault_main_skip));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3f8000, 0x3f8001, FUNC(dassault_main_skip));
 }
 
 static DRIVER_INIT( thndzone )
 {
-	const UINT8 *src = machine->region("gfx1")->base();
-	UINT8 *dst = machine->region("gfx2")->base();
+	const UINT8 *src = machine.region("gfx1")->base();
+	UINT8 *dst = machine.region("gfx2")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
@@ -885,7 +885,7 @@ static DRIVER_INIT( thndzone )
 	auto_free(machine, tmp);
 
 	/* Save time waiting on vblank bit */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3f8000, 0x3f8001, FUNC(thndzone_main_skip));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3f8000, 0x3f8001, FUNC(thndzone_main_skip));
 }
 
 /**********************************************************************************/

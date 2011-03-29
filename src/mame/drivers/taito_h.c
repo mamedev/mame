@@ -158,7 +158,7 @@ some kind of zoom table?
 /* Handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler( device_t *device, int irq )
 {
-	taitoh_state *state = device->machine->driver_data<taitoh_state>();
+	taitoh_state *state = device->machine().driver_data<taitoh_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -183,43 +183,43 @@ static READ8_HANDLER( syvalion_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	taitoh_state *state = space->machine->driver_data<taitoh_state>();
+	taitoh_state *state = space->machine().driver_data<taitoh_state>();
 	UINT8	port = tc0220ioc_port_r(state->tc0220ioc, 0);	/* read port number */
 
 	switch( port )
 	{
 		case 0x08:				/* trackball y coords bottom 8 bits for 2nd player */
-			return input_port_read(space->machine, P2TRACKY_PORT_TAG);
+			return input_port_read(space->machine(), P2TRACKY_PORT_TAG);
 
 		case 0x09:				/* trackball y coords top 8 bits for 2nd player */
-			if (input_port_read(space->machine, P2TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
+			if (input_port_read(space->machine(), P2TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
 				return 0xff;
 			else												/* y+ direction (positive value) */
 				return 0x00;
 
 		case 0x0a:				/* trackball x coords bottom 8 bits for 2nd player */
-			return input_port_read(space->machine, P2TRACKX_PORT_TAG);
+			return input_port_read(space->machine(), P2TRACKX_PORT_TAG);
 
 		case 0x0b:				/* trackball x coords top 8 bits for 2nd player */
-			if (input_port_read(space->machine, P2TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
+			if (input_port_read(space->machine(), P2TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
 				return 0xff;
 			else												/* x+ direction (positive value) */
 				return 0x00;
 
 		case 0x0c:				/* trackball y coords bottom 8 bits for 1st player */
-			return input_port_read(space->machine, P1TRACKY_PORT_TAG);
+			return input_port_read(space->machine(), P1TRACKY_PORT_TAG);
 
 		case 0x0d:				/* trackball y coords top 8 bits for 1st player */
-			if (input_port_read(space->machine, P1TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
+			if (input_port_read(space->machine(), P1TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
 				return 0xff;
 			else												/* y+ direction (positive value) */
 				return 0x00;
 
 		case 0x0e:				/* trackball x coords bottom 8 bits for 1st player */
-			return input_port_read(space->machine, P1TRACKX_PORT_TAG);
+			return input_port_read(space->machine(), P1TRACKX_PORT_TAG);
 
 		case 0x0f:				/* trackball x coords top 8 bits for 1st player */
-			if (input_port_read(space->machine, P1TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
+			if (input_port_read(space->machine(), P1TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
 				return 0xff;
 			else												/* x+ direction (positive value) */
 				return 0x00;
@@ -229,17 +229,17 @@ static READ8_HANDLER( syvalion_input_bypass_r )
 	}
 }
 
-static void reset_sound_region(running_machine *machine)
+static void reset_sound_region(running_machine &machine)
 {
-	taitoh_state *state = machine->driver_data<taitoh_state>();
+	taitoh_state *state = machine.driver_data<taitoh_state>();
 	memory_set_bank(machine, "bank1", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	taitoh_state *state = space->machine->driver_data<taitoh_state>();
+	taitoh_state *state = space->machine().driver_data<taitoh_state>();
 	state->banknum = data & 3;
-	reset_sound_region(space->machine);
+	reset_sound_region(space->machine());
 }
 
 
@@ -518,23 +518,23 @@ static STATE_POSTLOAD( taitoh_postload )
 
 static MACHINE_RESET( taitoh )
 {
-	taitoh_state *state = machine->driver_data<taitoh_state>();
+	taitoh_state *state = machine.driver_data<taitoh_state>();
 	state->banknum = 0;
 }
 
 static MACHINE_START( taitoh )
 {
-	taitoh_state *state = machine->driver_data<taitoh_state>();
-	UINT8 *ROM = machine->region("audiocpu")->base();
+	taitoh_state *state = machine.driver_data<taitoh_state>();
+	UINT8 *ROM = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);
 
-	state->audiocpu = machine->device("audiocpu");
-	state->tc0220ioc = machine->device("tc0220ioc");
-	state->tc0080vco = machine->device("tc0080vco");
+	state->audiocpu = machine.device("audiocpu");
+	state->tc0220ioc = machine.device("tc0220ioc");
+	state->tc0080vco = machine.device("tc0080vco");
 
 	state->save_item(NAME(state->banknum));
-	machine->state().register_postload(taitoh_postload, NULL);
+	machine.state().register_postload(taitoh_postload, NULL);
 }
 
 

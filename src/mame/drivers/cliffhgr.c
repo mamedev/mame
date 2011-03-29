@@ -95,7 +95,7 @@ static emu_timer *irq_timer;
 
 static WRITE8_HANDLER( cliff_test_led_w )
 {
-	set_led_status(space->machine, 0, offset ^ 1);
+	set_led_status(space->machine(), 0, offset ^ 1);
 }
 
 static WRITE8_HANDLER( cliff_port_bank_w )
@@ -112,7 +112,7 @@ static READ8_HANDLER( cliff_port_r )
 	static const char *const banknames[] = { "BANK0", "BANK1", "BANK2", "BANK3", "BANK4", "BANK5", "BANK6" };
 
 	if (port_bank < 7)
-		return input_port_read(space->machine,  banknames[port_bank]);
+		return input_port_read(space->machine(),  banknames[port_bank]);
 
 	/* output is pulled up for non-mapped ports */
 	return 0xff;
@@ -133,13 +133,13 @@ static WRITE8_HANDLER( cliff_phillips_clear_w )
 
 static WRITE8_HANDLER( cliff_coin_counter_w )
 {
-	coin_counter_w(space->machine, 0, (data & 0x40) ? 1 : 0 );
+	coin_counter_w(space->machine(), 0, (data & 0x40) ? 1 : 0 );
 }
 
 static READ8_HANDLER( cliff_irq_ack_r )
 {
 	/* deassert IRQ on the CPU */
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 
 	return 0x00;
 }
@@ -152,13 +152,13 @@ static WRITE8_DEVICE_HANDLER( cliff_sound_overlay_w )
 	/* configure pen 0 and 1 as transparent in the renderer and use it as the compositing color */
 	if (overlay)
 	{
-		palette_set_color(device->machine, 0, palette_get_color(device->machine, 0) & MAKE_ARGB(0,255,255,255));
-		palette_set_color(device->machine, 1, palette_get_color(device->machine, 1) & MAKE_ARGB(0,255,255,255));
+		palette_set_color(device->machine(), 0, palette_get_color(device->machine(), 0) & MAKE_ARGB(0,255,255,255));
+		palette_set_color(device->machine(), 1, palette_get_color(device->machine(), 1) & MAKE_ARGB(0,255,255,255));
 	}
 	else
 	{
-		palette_set_color(device->machine, 0, palette_get_color(device->machine, 0) | MAKE_ARGB(255,0,0,0));
-		palette_set_color(device->machine, 1, palette_get_color(device->machine, 1) | MAKE_ARGB(255,0,0,0));
+		palette_set_color(device->machine(), 0, palette_get_color(device->machine(), 0) | MAKE_ARGB(255,0,0,0));
+		palette_set_color(device->machine(), 1, palette_get_color(device->machine(), 1) | MAKE_ARGB(255,0,0,0));
 	}
 
 	/* audio */
@@ -177,7 +177,7 @@ static WRITE8_HANDLER( cliff_ldwire_w )
 static INTERRUPT_GEN( cliff_vsync )
 {
 	/* clock the video chip every 60Hz */
-	TMS9928A_interrupt(device->machine);
+	TMS9928A_interrupt(device->machine());
 }
 
 static TIMER_CALLBACK( cliff_irq_callback )
@@ -204,10 +204,10 @@ static TIMER_CALLBACK( cliff_irq_callback )
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 	}
 
-	irq_timer->adjust(machine->primary_screen->time_until_pos(param * 2), param);
+	irq_timer->adjust(machine.primary_screen->time_until_pos(param * 2), param);
 }
 
-static void vdp_interrupt(running_machine *machine, int state)
+static void vdp_interrupt(running_machine &machine, int state)
 {
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -216,15 +216,15 @@ static void vdp_interrupt(running_machine *machine, int state)
 
 static MACHINE_START( cliffhgr )
 {
-	laserdisc = machine->device("laserdisc");
-	irq_timer = machine->scheduler().timer_alloc(FUNC(cliff_irq_callback));
+	laserdisc = machine.device("laserdisc");
+	irq_timer = machine.scheduler().timer_alloc(FUNC(cliff_irq_callback));
 }
 
 static MACHINE_RESET( cliffhgr )
 {
 	port_bank = 0;
 	phillips_code = 0;
-	irq_timer->adjust(machine->primary_screen->time_until_pos(17), 17);
+	irq_timer->adjust(machine.primary_screen->time_until_pos(17), 17);
 }
 
 /********************************************************/

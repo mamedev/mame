@@ -17,7 +17,7 @@
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	badlands_state *state = machine->driver_data<badlands_state>();
+	badlands_state *state = machine.driver_data<badlands_state>();
 	UINT16 data = state->playfield[tile_index];
 	int code = (data & 0x1fff) + ((data & 0x1000) ? (state->playfield_tile_bank << 12) : 0);
 	int color = (data >> 13) & 0x07;
@@ -70,7 +70,7 @@ VIDEO_START( badlands )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	badlands_state *state = machine->driver_data<badlands_state>();
+	badlands_state *state = machine.driver_data<badlands_state>();
 
 	/* initialize the playfield */
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 64,32);
@@ -92,11 +92,11 @@ VIDEO_START( badlands )
 
 WRITE16_HANDLER( badlands_pf_bank_w )
 {
-	badlands_state *state = space->machine->driver_data<badlands_state>();
+	badlands_state *state = space->machine().driver_data<badlands_state>();
 	if (ACCESSING_BITS_0_7)
 		if (state->playfield_tile_bank != (data & 1))
 		{
-			space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+			space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 			state->playfield_tile_bank = data & 1;
 			tilemap_mark_all_tiles_dirty(state->playfield_tilemap);
 		}
@@ -112,7 +112,7 @@ WRITE16_HANDLER( badlands_pf_bank_w )
 
 SCREEN_UPDATE( badlands )
 {
-	badlands_state *state = screen->machine->driver_data<badlands_state>();
+	badlands_state *state = screen->machine().driver_data<badlands_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

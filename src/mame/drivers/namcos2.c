@@ -5035,7 +5035,7 @@ static DRIVER_INIT( assaultp_hack ){
 	//
 	// This is used in conjunction with the interleave increase in the
 	// MACHINE_DRIVER
-	machine->device("mcu")->set_clock_scale(4.0f);
+	machine.device("mcu")->set_clock_scale(4.0f);
 
 	DRIVER_INIT_CALL( assaultp );
 }
@@ -5096,7 +5096,7 @@ static DRIVER_INIT( metlhawk )
 {
 	/* unscramble sprites */
 	int i, j, k, l;
-	UINT8 *data = machine->region("gfx1")->base();
+	UINT8 *data = machine.region("gfx1")->base();
 	for(i=0; i<0x200000; i+=32*32)
 	{
 		for(j=0; j<32*32; j+=32*4)
@@ -5213,7 +5213,7 @@ static DRIVER_INIT( bubbletr ){
 
 
 static DRIVER_INIT( luckywld ){
-	UINT8 *pData = (UINT8 *)machine->region( "gfx5" )->base();
+	UINT8 *pData = (UINT8 *)machine.region( "gfx5" )->base();
 	int i;
 	for( i=0; i<32*0x4000; i++ )
 	{ /* unscramble gfx mask */

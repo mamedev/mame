@@ -238,23 +238,23 @@ static WRITE8_HANDLER( laserdisc_command_w );
 
 static MACHINE_START( gottlieb )
 {
-	gottlieb_state *state = machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	/* register for save states */
 	state_save_register_global(machine, state->joystick_select);
 	state_save_register_global_array(machine, state->track);
 
 	/* see if we have a laserdisc */
-	state->laserdisc = machine->m_devicelist.first(LASERDISC);
+	state->laserdisc = machine.m_devicelist.first(LASERDISC);
 	if (state->laserdisc != NULL)
 	{
 		/* attach to the I/O ports */
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x05805, 0x05807, 0, 0x07f8, FUNC(laserdisc_status_r));
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x05805, 0x05805, 0, 0x07f8, FUNC(laserdisc_command_w));	/* command for the player */
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x05806, 0x05806, 0, 0x07f8, FUNC(laserdisc_select_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x05805, 0x05807, 0, 0x07f8, FUNC(laserdisc_status_r));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x05805, 0x05805, 0, 0x07f8, FUNC(laserdisc_command_w));	/* command for the player */
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x05806, 0x05806, 0, 0x07f8, FUNC(laserdisc_select_w));
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
-		state->laserdisc_bit_timer = machine->scheduler().timer_alloc(FUNC(laserdisc_bit_callback));
-		state->laserdisc_philips_timer = machine->scheduler().timer_alloc(FUNC(laserdisc_philips_callback));
+		state->laserdisc_bit_timer = machine.scheduler().timer_alloc(FUNC(laserdisc_bit_callback));
+		state->laserdisc_philips_timer = machine.scheduler().timer_alloc(FUNC(laserdisc_philips_callback));
 
 		/* create some audio RAM */
 		state->laserdisc_audio_buffer = auto_alloc_array(machine, UINT8, AUDIORAM_SIZE);
@@ -279,10 +279,10 @@ static MACHINE_START( gottlieb )
 
 static MACHINE_RESET( gottlieb )
 {
-	gottlieb_state *state = machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	/* if we have a laserdisc, reset our philips code callback for the next line 17 */
 	if (state->laserdisc != NULL)
-		state->laserdisc_philips_timer->adjust(machine->primary_screen->time_until_pos(17), 17);
+		state->laserdisc_philips_timer->adjust(machine.primary_screen->time_until_pos(17), 17);
 }
 
 
@@ -295,28 +295,28 @@ static MACHINE_RESET( gottlieb )
 
 static CUSTOM_INPUT( analog_delta_r )
 {
-	gottlieb_state *state = field->port->machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = field->port->machine().driver_data<gottlieb_state>();
 	const char *string = (const char *)param;
 	int which = string[0] - '0';
 
-	return input_port_read(field->port->machine, &string[1]) - state->track[which];
+	return input_port_read(field->port->machine(), &string[1]) - state->track[which];
 }
 
 
 static WRITE8_HANDLER( gottlieb_analog_reset_w )
 {
-	gottlieb_state *state = space->machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	/* reset the trackball counters */
-	state->track[0] = input_port_read_safe(space->machine, "TRACKX", 0);
-	state->track[1] = input_port_read_safe(space->machine, "TRACKY", 0);
+	state->track[0] = input_port_read_safe(space->machine(), "TRACKX", 0);
+	state->track[1] = input_port_read_safe(space->machine(), "TRACKY", 0);
 }
 
 
 static CUSTOM_INPUT( stooges_joystick_r )
 {
-	gottlieb_state *state = field->port->machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = field->port->machine().driver_data<gottlieb_state>();
 	static const char *const joyport[] = { "P2JOY", "P3JOY", "P1JOY", NULL };
-	return (joyport[state->joystick_select & 3] != NULL) ? input_port_read(field->port->machine, joyport[state->joystick_select & 3]) : 0xff;
+	return (joyport[state->joystick_select & 3] != NULL) ? input_port_read(field->port->machine(), joyport[state->joystick_select & 3]) : 0xff;
 }
 
 
@@ -329,7 +329,7 @@ static CUSTOM_INPUT( stooges_joystick_r )
 
 static WRITE8_HANDLER( general_output_w )
 {
-	gottlieb_state *state = space->machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	/* bits 0-3 control video features, and are different for laserdisc games */
 	if (state->laserdisc == NULL)
 		gottlieb_video_control_w(space, offset, data);
@@ -337,7 +337,7 @@ static WRITE8_HANDLER( general_output_w )
 		gottlieb_laserdisc_video_control_w(space, offset, data);
 
 	/* bit 4 controls the coin meter */
-	coin_counter_w(space->machine, 0, data & 0x10);
+	coin_counter_w(space->machine(), 0, data & 0x10);
 
 	/* bit 5 controls the knocker */
 	output_set_value("knocker0", (data >> 5) & 1);
@@ -351,15 +351,15 @@ static WRITE8_HANDLER( general_output_w )
 static WRITE8_HANDLER( reactor_output_w )
 {
 	general_output_w(space, offset, data & ~0xe0);
-	set_led_status(space->machine, 0, data & 0x20);
-	set_led_status(space->machine, 1, data & 0x40);
-	set_led_status(space->machine, 2, data & 0x80);
+	set_led_status(space->machine(), 0, data & 0x20);
+	set_led_status(space->machine(), 1, data & 0x40);
+	set_led_status(space->machine(), 2, data & 0x80);
 }
 
 
 static WRITE8_HANDLER( stooges_output_w )
 {
-	gottlieb_state *state = space->machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	general_output_w(space, offset, data & ~0x60);
 	state->joystick_select = (data >> 5) & 0x03;
 }
@@ -374,7 +374,7 @@ static WRITE8_HANDLER( stooges_output_w )
 
 static READ8_HANDLER( laserdisc_status_r )
 {
-	gottlieb_state *state = space->machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	/* IP5 reads low 8 bits of philips code */
 	if (offset == 0)
 		return state->laserdisc_philips_code;
@@ -406,7 +406,7 @@ static READ8_HANDLER( laserdisc_status_r )
 
 static WRITE8_HANDLER( laserdisc_select_w )
 {
-	gottlieb_state *state = space->machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	/* selects between reading audio data and reading status */
 	state->laserdisc_select = data & 1;
 }
@@ -414,7 +414,7 @@ static WRITE8_HANDLER( laserdisc_select_w )
 
 static WRITE8_HANDLER( laserdisc_command_w )
 {
-	gottlieb_state *state = space->machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	/* a write here latches data into a 8-bit register and starts
        a sequence of events that sends serial data to the player */
 
@@ -435,7 +435,7 @@ static WRITE8_HANDLER( laserdisc_command_w )
 
 static TIMER_CALLBACK( laserdisc_philips_callback )
 {
-	gottlieb_state *state = machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	int newcode = laserdisc_get_field_code(state->laserdisc, (param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, TRUE);
 
 	/* the PR8210 sends line 17/18 data on each frame; the laserdisc interface
@@ -450,13 +450,13 @@ static TIMER_CALLBACK( laserdisc_philips_callback )
 
 	/* toggle to the next one */
 	param = (param == 17) ? 18 : 17;
-	state->laserdisc_philips_timer->adjust(machine->primary_screen->time_until_pos(param * 2), param);
+	state->laserdisc_philips_timer->adjust(machine.primary_screen->time_until_pos(param * 2), param);
 }
 
 
 static TIMER_CALLBACK( laserdisc_bit_off_callback )
 {
-	gottlieb_state *state = machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	/* deassert the control line */
 	laserdisc_line_w(state->laserdisc, LASERDISC_LINE_CONTROL, CLEAR_LINE);
 }
@@ -464,14 +464,14 @@ static TIMER_CALLBACK( laserdisc_bit_off_callback )
 
 static TIMER_CALLBACK( laserdisc_bit_callback )
 {
-	gottlieb_state *state = machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	UINT8 bitsleft = param >> 16;
 	UINT8 data = param;
 	attotime duration;
 
 	/* assert the line and set a timer for deassertion */
 	laserdisc_line_w(state->laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
-	machine->scheduler().timer_set(LASERDISC_CLOCK * 10, FUNC(laserdisc_bit_off_callback));
+	machine.scheduler().timer_set(LASERDISC_CLOCK * 10, FUNC(laserdisc_bit_off_callback));
 
 	/* determine how long for the next command; there is a 555 timer with a
        variable resistor controlling the timing of the pulses. Nominally, the
@@ -598,8 +598,8 @@ static void audio_handle_zero_crossing(gottlieb_state *state, attotime zerotime,
 
 static void laserdisc_audio_process(device_t *device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1)
 {
-	gottlieb_state *state = device->machine->driver_data<gottlieb_state>();
-	int logit = LOG_AUDIO_DECODE && input_code_pressed(device->machine, KEYCODE_L);
+	gottlieb_state *state = device->machine().driver_data<gottlieb_state>();
+	int logit = LOG_AUDIO_DECODE && input_code_pressed(device->machine(), KEYCODE_L);
 	attotime time_per_sample = attotime::from_hz(samplerate);
 	attotime curtime = state->laserdisc_last_time;
 	int cursamp;
@@ -672,10 +672,10 @@ static TIMER_CALLBACK( nmi_clear )
 
 static INTERRUPT_GEN( gottlieb_interrupt )
 {
-	gottlieb_state *state = device->machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = device->machine().driver_data<gottlieb_state>();
 	/* assert the NMI and set a timer to clear it at the first visible line */
 	device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
-	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_pos(0), FUNC(nmi_clear));
+	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(0), FUNC(nmi_clear));
 
 	/* if we have a laserdisc, update it */
 	if (state->laserdisc != NULL)
@@ -2598,14 +2598,14 @@ ROM_END
 
 static DRIVER_INIT( ramtiles )
 {
-	gottlieb_state *state = machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	state->gfxcharlo = state->gfxcharhi = 0;
 }
 
 
 static DRIVER_INIT( romtiles )
 {
-	gottlieb_state *state = machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	state->gfxcharlo = state->gfxcharhi = 1;
 }
 
@@ -2613,13 +2613,13 @@ static DRIVER_INIT( romtiles )
 static DRIVER_INIT( stooges )
 {
 	DRIVER_INIT_CALL(ramtiles);
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x05803, 0x05803, 0, 0x07f8, FUNC(stooges_output_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x05803, 0x05803, 0, 0x07f8, FUNC(stooges_output_w));
 }
 
 
 static DRIVER_INIT( screwloo )
 {
-	gottlieb_state *state = machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	state->gfxcharlo = 0;
 	state->gfxcharhi = 1;
 }
@@ -2627,7 +2627,7 @@ static DRIVER_INIT( screwloo )
 
 static DRIVER_INIT( vidvince )
 {
-	gottlieb_state *state = machine->driver_data<gottlieb_state>();
+	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	state->gfxcharlo = 1;
 	state->gfxcharhi = 0;
 }

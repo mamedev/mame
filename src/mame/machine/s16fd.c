@@ -31,7 +31,7 @@ static int fd1094_selected_state;
 
 static char fd1094_cputag[64];
 
-static void (*fd1094_set_decrypted)(running_machine *, UINT8 *);
+static void (*fd1094_set_decrypted)(running_machine &, UINT8 *);
 
 void *fd1094_get_decrypted_base(void)
 {
@@ -40,19 +40,19 @@ void *fd1094_get_decrypted_base(void)
 	return fd1094_userregion;
 }
 
-static void set_decrypted_region(running_machine *machine)
+static void set_decrypted_region(running_machine &machine)
 {
 	if (fd1094_set_decrypted != NULL)
 		(*fd1094_set_decrypted)(machine, (UINT8 *)fd1094_userregion);
 	else
-		machine->device<cpu_device>(fd1094_cputag)->space(AS_PROGRAM)->set_decrypted_region(0, fd1094_cpuregionsize - 1, fd1094_userregion);
+		machine.device<cpu_device>(fd1094_cputag)->space(AS_PROGRAM)->set_decrypted_region(0, fd1094_cpuregionsize - 1, fd1094_userregion);
 }
 
 /* this function checks the cache to see if the current state is cached,
    if it is then it copies the cached data to the user region where code is
    executed from, if its not cached then it gets decrypted to the current
    cache position using the functions in fd1094.c */
-static void fd1094_setstate_and_decrypt(running_machine *machine, int state)
+static void fd1094_setstate_and_decrypt(running_machine &machine, int state)
 {
 	int i;
 	UINT32 addr;
@@ -67,7 +67,7 @@ static void fd1094_setstate_and_decrypt(running_machine *machine, int state)
 
 	fd1094_state = state;
 
-	cpu_set_reg(machine->device(fd1094_cputag), M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
+	cpu_set_reg(machine.device(fd1094_cputag), M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
 
 	/* set the FD1094 state ready to decrypt.. */
 	state = fd1094_set_state(fd1094_key, state) & 0xff;
@@ -80,7 +80,7 @@ static void fd1094_setstate_and_decrypt(running_machine *machine, int state)
 			/* copy cached state */
 			fd1094_userregion = fd1094_cacheregion[i];
 			set_decrypted_region(machine);
-			m68k_set_encrypted_opcode_range(machine->device(fd1094_cputag), 0, fd1094_cpuregionsize);
+			m68k_set_encrypted_opcode_range(machine.device(fd1094_cputag), 0, fd1094_cpuregionsize);
 
 			return;
 		}
@@ -99,7 +99,7 @@ static void fd1094_setstate_and_decrypt(running_machine *machine, int state)
 	/* copy newly decrypted data to user region */
 	fd1094_userregion = fd1094_cacheregion[fd1094_current_cacheposition];
 	set_decrypted_region(machine);
-	m68k_set_encrypted_opcode_range(machine->device(fd1094_cputag), 0, fd1094_cpuregionsize);
+	m68k_set_encrypted_opcode_range(machine.device(fd1094_cputag), 0, fd1094_cpuregionsize);
 
 	fd1094_current_cacheposition++;
 
@@ -115,20 +115,20 @@ static void fd1094_cmp_callback(device_t *device, UINT32 val, UINT8 reg)
 {
 	if (reg == 0 && (val & 0x0000ffff) == 0x0000ffff) // ?
 	{
-		fd1094_setstate_and_decrypt(device->machine, (val & 0xffff0000) >> 16);
+		fd1094_setstate_and_decrypt(device->machine(), (val & 0xffff0000) >> 16);
 	}
 }
 
 /* Callback when the FD1094 enters interrupt code */
 static IRQ_CALLBACK(fd1094_int_callback)
 {
-	fd1094_setstate_and_decrypt(device->machine, FD1094_STATE_IRQ);
+	fd1094_setstate_and_decrypt(device->machine(), FD1094_STATE_IRQ);
 	return (0x60+irqline*4)/4; // vector address
 }
 
 static void fd1094_rte_callback (device_t *device)
 {
-	fd1094_setstate_and_decrypt(device->machine, FD1094_STATE_RTE);
+	fd1094_setstate_and_decrypt(device->machine(), FD1094_STATE_RTE);
 }
 
 
@@ -149,7 +149,7 @@ void fd1094_machine_init(device_t *device)
 	if (!fd1094_key)
 		return;
 
-	fd1094_setstate_and_decrypt(device->machine, FD1094_STATE_RESET);
+	fd1094_setstate_and_decrypt(device->machine(), FD1094_STATE_RESET);
 	fd1094_kludge_reset_values();
 
 	m68k_set_cmpild_callback(device, fd1094_cmp_callback);
@@ -166,7 +166,7 @@ static STATE_POSTLOAD( fd1094_postload )
 		int selected_state = fd1094_selected_state;
 		int state = fd1094_state;
 
-		fd1094_machine_init(machine->device(fd1094_cputag));
+		fd1094_machine_init(machine.device(fd1094_cputag));
 
 		fd1094_setstate_and_decrypt(machine, selected_state);
 		fd1094_setstate_and_decrypt(machine, state);
@@ -174,7 +174,7 @@ static STATE_POSTLOAD( fd1094_postload )
 }
 
 
-static void key_changed(running_machine *machine)
+static void key_changed(running_machine &machine)
 {
 	int addr;
 
@@ -192,20 +192,20 @@ static void key_changed(running_machine *machine)
 	fd1094_current_cacheposition = 1;
 
 	/* flush the prefetch queue */
-	cpu_set_reg(machine->device(fd1094_cputag), M68K_PREF_ADDR, 0x0010);
+	cpu_set_reg(machine.device(fd1094_cputag), M68K_PREF_ADDR, 0x0010);
 }
 
 
 /* startup function, to be called from DRIVER_INIT (once on startup) */
-void fd1094_driver_init(running_machine *machine, const char* tag, void (*set_decrypted)(running_machine *, UINT8 *))
+void fd1094_driver_init(running_machine &machine, const char* tag, void (*set_decrypted)(running_machine &, UINT8 *))
 {
 	int i;
 
 	strcpy(fd1094_cputag, tag);
 
-	fd1094_cpuregion = (UINT16*)machine->region(fd1094_cputag)->base();
-	fd1094_cpuregionsize = machine->region(fd1094_cputag)->bytes();
-	fd1094_key = machine->region("user1")->base();
+	fd1094_cpuregion = (UINT16*)machine.region(fd1094_cputag)->base();
+	fd1094_cpuregionsize = machine.region(fd1094_cputag)->bytes();
+	fd1094_key = machine.region("user1")->base();
 	fd1094_set_decrypted = set_decrypted;
 
 	/* punt if no key; this allows us to be called even for non-FD1094 games */
@@ -221,12 +221,12 @@ void fd1094_driver_init(running_machine *machine, const char* tag, void (*set_de
 	fd1094_state = -1;
 
 	/* key debugging */
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0 && machine->region("user2")->base() != NULL)
+	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) != 0 && machine.region("user2")->base() != NULL)
 	{
 		fd1094_init_debugging(machine, fd1094_cputag, "user1", "user2", key_changed);
 	}
 
 	state_save_register_global(machine, fd1094_selected_state);
 	state_save_register_global(machine, fd1094_state);
-	machine->state().register_postload(fd1094_postload, NULL);
+	machine.state().register_postload(fd1094_postload, NULL);
 }

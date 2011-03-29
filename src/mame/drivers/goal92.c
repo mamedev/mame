@@ -17,7 +17,7 @@
 
 static WRITE16_HANDLER( goal92_sound_command_w )
 {
-	goal92_state *state = space->machine->driver_data<goal92_state>();
+	goal92_state *state = space->machine().driver_data<goal92_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, 0, (data >> 8) & 0xff);
@@ -30,15 +30,15 @@ static READ16_HANDLER( goal92_inputs_r )
 	switch(offset)
 	{
 		case 0:
-			return input_port_read(space->machine, "DSW1");
+			return input_port_read(space->machine(), "DSW1");
 		case 1:
-			return input_port_read(space->machine, "IN1");
+			return input_port_read(space->machine(), "IN1");
 		case 2:
-			return input_port_read(space->machine, "IN2");
+			return input_port_read(space->machine(), "IN2");
 		case 3:
-			return input_port_read(space->machine, "IN3");
+			return input_port_read(space->machine(), "IN3");
 		case 7:
-			return input_port_read(space->machine, "DSW2");
+			return input_port_read(space->machine(), "DSW2");
 
 		default:
 			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n", offset, mem_mask,cpu_get_pc(space->cpu));
@@ -70,14 +70,14 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 {
-	memory_set_bank(device->machine, "bank1", data & 0x01);
+	memory_set_bank(device->machine(), "bank1", data & 0x01);
 
 	msm5205_reset_w(device, data & 0x08);
 }
 
 static WRITE8_HANDLER( adpcm_data_w )
 {
-	goal92_state *state = space->machine->driver_data<goal92_state>();
+	goal92_state *state = space->machine().driver_data<goal92_state>();
 	state->msm5205next = data;
 }
 
@@ -213,7 +213,7 @@ INPUT_PORTS_END
 static void irqhandler( device_t *device, int irq )
 {
 	/* NMI writes to MSM ports *only*! -AS */
-	//goal92_state *state = device->machine->driver_data<goal92_state>();
+	//goal92_state *state = device->machine().driver_data<goal92_state>();
 	//device_set_input_line(state->audiocpu, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -229,7 +229,7 @@ static const ym2203_interface ym2203_config =
 
 static void goal92_adpcm_int( device_t *device )
 {
-	goal92_state *state = device->machine->driver_data<goal92_state>();
+	goal92_state *state = device->machine().driver_data<goal92_state>();
 	msm5205_data_w(device, state->msm5205next);
 	state->msm5205next >>= 4;
 	state->adpcm_toggle^= 1;
@@ -292,12 +292,12 @@ GFXDECODE_END
 
 static MACHINE_START( goal92 )
 {
-	goal92_state *state = machine->driver_data<goal92_state>();
-	UINT8 *ROM = machine->region("audiocpu")->base();
+	goal92_state *state = machine.driver_data<goal92_state>();
+	UINT8 *ROM = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->fg_bank));
 	state->save_item(NAME(state->msm5205next));
@@ -306,7 +306,7 @@ static MACHINE_START( goal92 )
 
 static MACHINE_RESET( goal92 )
 {
-	goal92_state *state = machine->driver_data<goal92_state>();
+	goal92_state *state = machine.driver_data<goal92_state>();
 
 	state->fg_bank = 0;
 	state->msm5205next = 0;

@@ -25,20 +25,20 @@ DIP Locations verified for:
 
 static READ8_HANDLER( bking_sndnmi_disable_r )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->sound_nmi_enable = 0;
 	return 0;
 }
 
 static WRITE8_HANDLER( bking_sndnmi_enable_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->sound_nmi_enable = 1;
 }
 
 static WRITE8_HANDLER( bking_soundlatch_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	int i, code = 0;
 
 	for (i = 0;i < 8;i++)
@@ -52,20 +52,20 @@ static WRITE8_HANDLER( bking_soundlatch_w )
 
 static WRITE8_HANDLER( bking3_addr_l_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->addr_l = data;
 }
 
 static WRITE8_HANDLER( bking3_addr_h_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->addr_h = data;
 }
 
 static READ8_HANDLER( bking3_extrarom_r )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
-	UINT8 *rom = space->machine->region("user2")->base();
+	bking_state *state = space->machine().driver_data<bking_state>();
+	UINT8 *rom = space->machine().region("user2")->base();
 	return rom[state->addr_h * 256 + state->addr_l];
 }
 
@@ -147,40 +147,40 @@ ADDRESS_MAP_END
 #if 0
 static READ8_HANDLER( bking3_68705_port_a_r )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	//printf("port_a_r = %02X\n",(state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a));
 	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
 }
 
 static WRITE8_HANDLER( bking3_68705_port_a_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->port_a_out = data;
 //  printf("port_a_out = %02X\n",data);
 }
 
 static WRITE8_HANDLER( bking3_68705_ddr_a_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->ddr_a = data;
 }
 
 static READ8_HANDLER( bking3_68705_port_b_r )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	return (state->port_b_out & state->ddr_b) | (state->port_b_in & ~state->ddr_b);
 }
 
 static WRITE8_HANDLER( bking3_68705_port_b_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 //  if(data != 0xff)
 //      printf("port_b_out = %02X\n",data);
 
 	if (~data & 0x02)
 	{
 		state->port_a_in = from_main;
-		if (main_sent) cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
+		if (main_sent) cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
 		main_sent = 0;
 	}
 
@@ -199,7 +199,7 @@ static WRITE8_HANDLER( bking3_68705_port_b_w )
 
 static WRITE8_HANDLER( bking3_68705_ddr_b_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->ddr_b = data;
 }
 
@@ -402,9 +402,9 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( bking )
 {
-	bking_state *state = machine->driver_data<bking_state>();
+	bking_state *state = machine.driver_data<bking_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	/* video */
 	state->save_item(NAME(state->pc3259_output));
@@ -428,7 +428,7 @@ static MACHINE_START( bking )
 
 static MACHINE_START( bking3 )
 {
-	bking_state *state = machine->driver_data<bking_state>();
+	bking_state *state = machine.driver_data<bking_state>();
 
 	MACHINE_START_CALL(bking);
 
@@ -440,7 +440,7 @@ static MACHINE_START( bking3 )
 
 static MACHINE_RESET( bking )
 {
-	bking_state *state = machine->driver_data<bking_state>();
+	bking_state *state = machine.driver_data<bking_state>();
 
 	/* video */
 	state->pc3259_output[0] = 0;
@@ -467,7 +467,7 @@ static MACHINE_RESET( bking )
 
 static MACHINE_RESET( bking3 )
 {
-	bking_state *state = machine->driver_data<bking_state>();
+	bking_state *state = machine.driver_data<bking_state>();
 
 	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
 

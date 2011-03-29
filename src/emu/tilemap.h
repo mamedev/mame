@@ -173,7 +173,7 @@
 
             // set the common info for the tile
             SET_TILE_INFO(
-                1,              // use machine->gfx[1] for tile graphics
+                1,              // use machine.gfx[1] for tile graphics
                 code,           // the index of the graphics for this tile
                 color,          // the color to use for this tile
                 (flipx ? TILE_FLIPX : 0) |  // flags for this tile; also
@@ -354,7 +354,7 @@
 ***************************************************************************/
 
 /* function definition for a get info callback */
-#define TILE_GET_INFO(_name)			void _name(running_machine *machine, tile_data *tileinfo, tilemap_memory_index tile_index, void *param)
+#define TILE_GET_INFO(_name)			void _name(running_machine &machine, tile_data *tileinfo, tilemap_memory_index tile_index, void *param)
 #define TILE_GET_INFO_DEVICE(_name)		void _name(device_t *device, tile_data *tileinfo, tilemap_memory_index tile_index, void *param)
 
 /* function definition for a logical-to-memory mapper */
@@ -362,7 +362,7 @@
 
 /* useful macro inside of a TILE_GET_INFO callback to set tile information  */
 #define SET_TILE_INFO(GFX,CODE,COLOR,FLAGS)         tileinfo_set(machine, tileinfo, GFX, CODE, COLOR, FLAGS)
-#define SET_TILE_INFO_DEVICE(GFX,CODE,COLOR,FLAGS)  tileinfo_set(device->machine, tileinfo, GFX, CODE, COLOR, FLAGS)
+#define SET_TILE_INFO_DEVICE(GFX,CODE,COLOR,FLAGS)  tileinfo_set(device->machine(), tileinfo, GFX, CODE, COLOR, FLAGS)
 
 /* Macros for setting tile attributes in the TILE_GET_INFO callback: */
 /*   TILE_FLIP_YX assumes that flipy is in bit 1 and flipx is in bit 0 */
@@ -394,12 +394,12 @@ struct _tile_data
 	UINT8			group;			/* defaults to 0; range from 0..TILEMAP_NUM_GROUPS */
 	UINT8			flags;			/* defaults to 0; one or more of TILE_* flags above */
 	UINT8			pen_mask;		/* defaults to 0xff; mask to apply to pen_data while rendering the tile */
-	UINT8			gfxnum;			/* defaults to 0xff; specify index of machine->gfx for auto-invalidation on dirty */
+	UINT8			gfxnum;			/* defaults to 0xff; specify index of machine.gfx for auto-invalidation on dirty */
 };
 
 
 /* callback function to get info about a tile */
-typedef void (*tile_get_info_func)(running_machine *machine, tile_data *tileinfo, tilemap_memory_index tile_index, void *param);
+typedef void (*tile_get_info_func)(running_machine &machine, tile_data *tileinfo, tilemap_memory_index tile_index, void *param);
 typedef void (*tile_get_info_device_func)(device_t *device, tile_data *tileinfo, tilemap_memory_index tile_index, void *param);
 
 /* callback function to map a column,row pair to a memory index */
@@ -415,14 +415,14 @@ typedef tilemap_memory_index (*tilemap_mapper_func)(UINT32 col, UINT32 row, UINT
 /* ----- system-wide management ----- */
 
 /* initialize the tilemap system -- not for use by drivers */
-void tilemap_init(running_machine *machine);
+void tilemap_init(running_machine &machine);
 
 
 
 /* ----- tilemap creation and configuration ----- */
 
 /* create a new tilemap; note that tilemaps are tracked by the core so there is no dispose */
-tilemap_t *tilemap_create(running_machine *machine, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
+tilemap_t *tilemap_create(running_machine &machine, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
 
 /* create a new tilemap that is owned by a device */
 tilemap_t *tilemap_create_device(device_t *device, tile_get_info_device_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
@@ -446,7 +446,7 @@ int tilemap_get_enable(tilemap_t *tmap);
 void tilemap_set_flip(tilemap_t *tmap, UINT32 attributes);
 
 /* set a global flip for all tilemaps */
-void tilemap_set_flip_all(running_machine *machine, UINT32 attributes);
+void tilemap_set_flip_all(running_machine &machine, UINT32 attributes);
 
 
 
@@ -459,7 +459,7 @@ void tilemap_mark_tile_dirty(tilemap_t *tmap, tilemap_memory_index memory_index)
 void tilemap_mark_all_tiles_dirty(tilemap_t *tmap);
 
 /* mark all the tiles dirty in all tilemaps */
-void tilemap_mark_all_tiles_dirty_all(running_machine *machine);
+void tilemap_mark_all_tiles_dirty_all(running_machine &machine);
 
 
 
@@ -531,13 +531,13 @@ void tilemap_draw_roz_primask(bitmap_t *dest, const rectangle *cliprect, tilemap
 /* ----- indexed tilemap handling ----- */
 
 /* return the number of tilemaps */
-int tilemap_count(running_machine *machine);
+int tilemap_count(running_machine &machine);
 
 /* return the size of an indexed tilemap */
-void tilemap_size_by_index(running_machine *machine, int number, UINT32 *width, UINT32 *height);
+void tilemap_size_by_index(running_machine &machine, int number, UINT32 *width, UINT32 *height);
 
 /* render an indexed tilemap with fixed characteristics (no priority) */
-void tilemap_draw_by_index(running_machine *machine, bitmap_t *dest, int number, UINT32 scrollx, UINT32 scrolly);
+void tilemap_draw_by_index(running_machine &machine, bitmap_t *dest, int number, UINT32 scrollx, UINT32 scrolly);
 
 
 
@@ -566,9 +566,9 @@ TILEMAP_MAPPER( tilemap_scan_cols_flip_xy );
     structure
 -------------------------------------------------*/
 
-INLINE void tileinfo_set(running_machine *machine, tile_data *tileinfo, int gfxnum, int rawcode, int rawcolor, int flags)
+INLINE void tileinfo_set(running_machine &machine, tile_data *tileinfo, int gfxnum, int rawcode, int rawcolor, int flags)
 {
-	const gfx_element *gfx = machine->gfx[gfxnum];
+	const gfx_element *gfx = machine.gfx[gfxnum];
 	int code = rawcode % gfx->total_elements;
 	tileinfo->pen_data = gfx_element_get_data(gfx, code);
 	tileinfo->palette_base = gfx->color_base + gfx->color_granularity * rawcolor;

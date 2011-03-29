@@ -616,7 +616,7 @@ static void mpu4_stepper_reset(mpu4_state *state)
 
 static MACHINE_RESET( mpu4 )
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	ROC10937_reset(0);	/* reset display1 */
 
 	mpu4_stepper_reset(state);
@@ -636,12 +636,12 @@ static MACHINE_RESET( mpu4 )
 
 /* init rom bank, some games don't set this */
 	{
-		UINT8 *rom = machine->region("maincpu")->base();
+		UINT8 *rom = machine.region("maincpu")->base();
 
 		memory_configure_bank(machine, "bank1", 0, 8, &rom[0x01000], 0x10000);
 
 		memory_set_bank(machine, "bank1",0);
-		machine->device("maincpu")->reset();
+		machine.device("maincpu")->reset();
 	}
 
 }
@@ -650,14 +650,14 @@ static MACHINE_RESET( mpu4 )
 /* 6809 IRQ handler */
 static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
-	device_t *pia3 = device->machine->device("pia_ic3");
-	device_t *pia4 = device->machine->device("pia_ic4");
-	device_t *pia5 = device->machine->device("pia_ic5");
-	device_t *pia6 = device->machine->device("pia_ic6");
-	device_t *pia7 = device->machine->device("pia_ic7");
-	device_t *pia8 = device->machine->device("pia_ic8");
-	device_t *ptm2 = device->machine->device("ptm_ic2");
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
+	device_t *pia3 = device->machine().device("pia_ic3");
+	device_t *pia4 = device->machine().device("pia_ic4");
+	device_t *pia5 = device->machine().device("pia_ic5");
+	device_t *pia6 = device->machine().device("pia_ic6");
+	device_t *pia7 = device->machine().device("pia_ic7");
+	device_t *pia8 = device->machine().device("pia_ic8");
+	device_t *ptm2 = device->machine().device("ptm_ic2");
 
 	/* The PIA and PTM IRQ lines are all connected to a common PCB track, leading directly to the 6809 IRQ line. */
 	int combined_state = pia6821_get_irq_a(pia3) | pia6821_get_irq_b(pia3) |
@@ -670,12 +670,12 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 
 	if (!drvstate->link7a_connected) //7B = IRQ, 7A = FIRQ, both = NMI
 	{
-		cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6809 int%d \n", combined_state));
 	}
 	else
 	{
-		cputag_set_input_line(device->machine, "maincpu", M6809_FIRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", M6809_FIRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6809 fint%d \n", combined_state));
 	}
 }
@@ -683,13 +683,13 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 /* Bankswitching */
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1",data & 0x07);
+	memory_set_bank(space->machine(), "bank1",data & 0x07);
 }
 
 
 static READ8_HANDLER( bankswitch_r )
 {
-	return memory_get_bank(space->machine, "bank1");
+	return memory_get_bank(space->machine(), "bank1");
 }
 
 
@@ -706,7 +706,7 @@ static WRITE8_DEVICE_HANDLER( ic2_o1_callback )
 
 static WRITE8_DEVICE_HANDLER( ic2_o2_callback )
 {
-	device_t *pia = device->machine->device("pia_ic3");
+	device_t *pia = device->machine().device("pia_ic3");
 	pia6821_ca1_w(pia, data); /* copy output value to IC3 ca1 */
 	/* the output from timer2 is the input clock for timer3 */
 	/* miscellaneous interrupts generated here */
@@ -738,9 +738,9 @@ static const ptm6840_interface ptm_ic2_intf =
 /* IC3, lamp data lines + alpha numeric display */
 static WRITE8_DEVICE_HANDLER( pia_ic3_porta_w )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	int i;
-	LOG_IC3(("%s: IC3 PIA Port A Set to %2x (lamp strobes 1 - 9)\n", device->machine->describe_context(),data));
+	LOG_IC3(("%s: IC3 PIA Port A Set to %2x (lamp strobes 1 - 9)\n", device->machine().describe_context(),data));
 
 	if(state->ic23_active)
 	{
@@ -761,9 +761,9 @@ static WRITE8_DEVICE_HANDLER( pia_ic3_porta_w )
 
 static WRITE8_DEVICE_HANDLER( pia_ic3_portb_w )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	int i;
-	LOG_IC3(("%s: IC3 PIA Port B Set to %2x  (lamp strobes 10 - 17)\n", device->machine->describe_context(),data));
+	LOG_IC3(("%s: IC3 PIA Port B Set to %2x  (lamp strobes 10 - 17)\n", device->machine().describe_context(),data));
 
 	if(state->ic23_active)
 	{
@@ -799,8 +799,8 @@ static WRITE8_DEVICE_HANDLER( pia_ic3_portb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic3_ca2_w )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
-	LOG_IC3(("%s: IC3 PIA Write CA2 (alpha data), %02X\n", device->machine->describe_context(),state));
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
+	LOG_IC3(("%s: IC3 PIA Write CA2 (alpha data), %02X\n", device->machine().describe_context(),state));
 
 	drvstate->alpha_data_line = state;
 	ROC10937_draw_16seg(0);
@@ -809,7 +809,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic3_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic3_cb2_w )
 {
-	LOG_IC3(("%s: IC3 PIA Write CB (alpha reset), %02X\n",device->machine->describe_context(),state));
+	LOG_IC3(("%s: IC3 PIA Write CB (alpha reset), %02X\n",device->machine().describe_context(),state));
 
 	if ( state ) ROC10937_reset(0);
 	ROC10937_draw_16seg(0);
@@ -898,7 +898,7 @@ static void ic24_setup(mpu4_state *state)
 
 static TIMER_CALLBACK( ic24_timeout )
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->ic23_active=0;
 	ic24_output(state, 1);
 }
@@ -907,7 +907,7 @@ static TIMER_CALLBACK( ic24_timeout )
 /* IC4, 7 seg leds, 50Hz timer reel sensors, current sensors */
 static WRITE8_DEVICE_HANDLER( pia_ic4_porta_w )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	if(state->ic23_active)
 	{
 		if (((state->lamp_extender == NO_EXTENDER)||(state->lamp_extender == SMALL_CARD)||(state->lamp_extender == LARGE_CARD_C))&& (state->led_extender == NO_EXTENDER))
@@ -923,7 +923,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic4_porta_w )
 
 static WRITE8_DEVICE_HANDLER( pia_ic4_portb_w )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	if (state->reel_mux)
 	{
 		/* A write here connects one reel (and only one)
@@ -940,7 +940,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic4_portb_w )
 
 static READ8_DEVICE_HANDLER( pia_ic4_portb_r )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	if ( state->serial_data )
 	{
 		state->ic4_input_b |=  0x80;
@@ -993,15 +993,15 @@ static READ8_DEVICE_HANDLER( pia_ic4_portb_r )
 	if ( lamp_undercurrent ) state->ic4_input_b |= 0x01;
 	#endif
 
-	LOG_IC3(("%s: IC4 PIA Read of Port B %x\n",device->machine->describe_context(),state->ic4_input_b));
+	LOG_IC3(("%s: IC4 PIA Read of Port B %x\n",device->machine().describe_context(),state->ic4_input_b));
 	return state->ic4_input_b;
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic4_ca2_w )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
-	LOG_IC3(("%s: IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", device->machine->describe_context(),state));
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
+	LOG_IC3(("%s: IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", device->machine().describe_context(),state));
 
 	drvstate->IC23GB = state;
 	ic23_update(drvstate);
@@ -1009,8 +1009,8 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic4_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic4_cb2_w )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
-	LOG_IC3(("%s: IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", device->machine->describe_context(),state));
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
+	LOG_IC3(("%s: IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", device->machine().describe_context(),state));
 	drvstate->reel_flag=state;
 }
 static const pia6821_interface pia_ic4_intf =
@@ -1032,7 +1032,7 @@ static const pia6821_interface pia_ic4_intf =
 /* IC5, AUX ports, coin lockouts and AY sound chip select (MODs below 4 only) */
 static READ8_DEVICE_HANDLER( pia_ic5_porta_r )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	if (state->lamp_extender == LARGE_CARD_A)
 	{
 		if (state->lamp_sense && state->ic23_active)
@@ -1055,15 +1055,15 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_r )
             state->aux1_input &= ~0x04;
         }*/
 	}
-	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",device->machine->describe_context()));
+	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",device->machine().describe_context()));
 
-	return input_port_read(device->machine, "AUX1")|state->aux1_input;
+	return input_port_read(device->machine(), "AUX1")|state->aux1_input;
 }
 
 static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
-	device_t *pia_ic4 = device->machine->device("pia_ic4");
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
+	device_t *pia_ic4 = device->machine().device("pia_ic4");
 	if (state->hopper == HOPPER_NONDUART_A)
 	{
 		//hopper1_drive_sensor(data&0x10);
@@ -1116,7 +1116,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 		awp_draw_reel(2);
 	}
 
-		if (mame_stricmp(device->machine->system().name, "m_gmball") == 0)
+		if (mame_stricmp(device->machine().system().name, "m_gmball") == 0)
 	{
 		/* The 'Gamball' device is a unique piece of mechanical equipment, designed to
         provide a truly fair hi-lo gamble for an AWP machine. Functionally, it consists of
@@ -1130,7 +1130,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
         the physics of a bouncing ball ;)*/
 		if (data & 0x0f)
 		{
-			switch (device->machine->rand() & 0xf)
+			switch (device->machine().rand() & 0xf)
 			{
 			case 0x00:
 			default:
@@ -1190,7 +1190,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 
 static WRITE8_DEVICE_HANDLER( pia_ic5_portb_w )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	if (state->hopper == HOPPER_NONDUART_B)
 	{
 		//hopper1_drive_motor(data &0x01)
@@ -1204,8 +1204,8 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_portb_w )
 }
 static READ8_DEVICE_HANDLER( pia_ic5_portb_r )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
-	device_t *pia_ic5 = device->machine->device("pia_ic5");
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
+	device_t *pia_ic5 = device->machine().device("pia_ic5");
 	if (state->hopper == HOPPER_NONDUART_B)
 	{/*
         if (hopper1_active)
@@ -1218,19 +1218,19 @@ static READ8_DEVICE_HANDLER( pia_ic5_portb_r )
         }*/
 	}
 
-	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",device->machine->describe_context()));
-	coin_lockout_w(device->machine, 0, (pia6821_get_output_b(pia_ic5) & 0x01) );
-	coin_lockout_w(device->machine, 1, (pia6821_get_output_b(pia_ic5) & 0x02) );
-	coin_lockout_w(device->machine, 2, (pia6821_get_output_b(pia_ic5) & 0x04) );
-	coin_lockout_w(device->machine, 3, (pia6821_get_output_b(pia_ic5) & 0x08) );
-	return input_port_read(device->machine, "AUX2") | state->aux2_input;
+	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",device->machine().describe_context()));
+	coin_lockout_w(device->machine(), 0, (pia6821_get_output_b(pia_ic5) & 0x01) );
+	coin_lockout_w(device->machine(), 1, (pia6821_get_output_b(pia_ic5) & 0x02) );
+	coin_lockout_w(device->machine(), 2, (pia6821_get_output_b(pia_ic5) & 0x04) );
+	coin_lockout_w(device->machine(), 3, (pia6821_get_output_b(pia_ic5) & 0x08) );
+	return input_port_read(device->machine(), "AUX2") | state->aux2_input;
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic5_ca2_w )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
-	LOG(("%s: IC5 PIA Write CA2 (Serial Tx) %2x\n",device->machine->describe_context(),state));
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
+	LOG(("%s: IC5 PIA Write CA2 (Serial Tx) %2x\n",device->machine().describe_context(),state));
 	drvstate->serial_data = state;
 }
 
@@ -1260,7 +1260,7 @@ BDIR BC1       |
 /* PSG function selected */
 static void update_ay(device_t *device)
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	if (!pia6821_get_output_cb2(device))
 	{
 		switch (state->ay8913_address)
@@ -1272,14 +1272,14 @@ static void update_ay(device_t *device)
 			}
 			case 0x01:
 			{	/* CA2 = 1 CB2 = 0? : Read from selected PSG register and make the register data available to Port A */
-				device_t *pia_ic6 = device->machine->device("pia_ic6");
+				device_t *pia_ic6 = device->machine().device("pia_ic6");
 				LOG(("AY8913 address = %d \n",pia6821_get_output_a(pia_ic6)&0x0f));
 				break;
 			}
 			case 0x02:
 			{/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
-				device_t *pia_ic6 = device->machine->device("pia_ic6");
-				device_t *ay = device->machine->device("ay8913");
+				device_t *pia_ic6 = device->machine().device("pia_ic6");
+				device_t *ay = device->machine().device("ay8913");
 				ay8910_data_w(ay, 0, pia6821_get_output_a(pia_ic6));
 				LOG(("AY Chip Write \n"));
 				break;
@@ -1287,8 +1287,8 @@ static void update_ay(device_t *device)
 			case 0x03:
 			{/* CA2 = 1 CB2 = 1? : The register will now be selected and the user can read from or write to it.
              The register will remain selected until another is chosen.*/
-				device_t *pia_ic6 = device->machine->device("pia_ic6");
-				device_t *ay = device->machine->device("ay8913");
+				device_t *pia_ic6 = device->machine().device("pia_ic6");
+				device_t *ay = device->machine().device("ay8913");
 				ay8910_address_w(ay, 0, pia6821_get_output_a(pia_ic6));
 				LOG(("AY Chip Select \n"));
 				break;
@@ -1328,8 +1328,8 @@ static const pia6821_interface pia_ic5_intf =
 /* IC6, Reel A and B and AY registers (MODs below 4 only) */
 static WRITE8_DEVICE_HANDLER( pia_ic6_portb_w )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
-	LOG(("%s: IC6 PIA Port B Set to %2x (Reel A and B)\n", device->machine->describe_context(),data));
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
+	LOG(("%s: IC6 PIA Port B Set to %2x (Reel A and B)\n", device->machine().describe_context(),data));
 
 	if (state->reel_mux == SEVEN_REEL)
 	{
@@ -1359,8 +1359,8 @@ static WRITE8_DEVICE_HANDLER( pia_ic6_portb_w )
 
 static WRITE8_DEVICE_HANDLER( pia_ic6_porta_w )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
-	LOG(("%s: IC6 PIA Write A %2x\n", device->machine->describe_context(),data));
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
+	LOG(("%s: IC6 PIA Write A %2x\n", device->machine().describe_context(),data));
 	if (state->mod_number <4)
 	{
 		state->ay_data = data;
@@ -1371,8 +1371,8 @@ static WRITE8_DEVICE_HANDLER( pia_ic6_porta_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic6_ca2_w )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
-	LOG(("%s: IC6 PIA write CA2 %2x (AY8913 BC1)\n", device->machine->describe_context(),state));
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
+	LOG(("%s: IC6 PIA write CA2 %2x (AY8913 BC1)\n", device->machine().describe_context(),state));
 	if (drvstate->mod_number <4)
 	{
 		if ( state ) drvstate->ay8913_address |=  0x01;
@@ -1384,8 +1384,8 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic6_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic6_cb2_w )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
-	LOG(("%s: IC6 PIA write CB2 %2x (AY8913 BCDIR)\n", device->machine->describe_context(),state));
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
+	LOG(("%s: IC6 PIA write CB2 %2x (AY8913 BCDIR)\n", device->machine().describe_context(),state));
 	if (drvstate->mod_number <4)
 	{
 		if ( state ) drvstate->ay8913_address |=  0x02;
@@ -1415,8 +1415,8 @@ static const pia6821_interface pia_ic6_intf =
 /* IC7 Reel C and D, mechanical meters/Reel E and F, input strobe bit A */
 static WRITE8_DEVICE_HANDLER( pia_ic7_porta_w )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
-	LOG(("%s: IC7 PIA Port A Set to %2x (Reel C and D)\n", device->machine->describe_context(),data));
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
+	LOG(("%s: IC7 PIA Port A Set to %2x (Reel C and D)\n", device->machine().describe_context(),data));
 	if (state->reel_mux == SEVEN_REEL)
 	{
 		stepper_update(5, data&0x0F);
@@ -1443,7 +1443,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic7_porta_w )
 
 static WRITE8_DEVICE_HANDLER( pia_ic7_portb_w )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	if (state->hopper == HOPPER_DUART_A)
 	{
 		//duart write data
@@ -1493,8 +1493,8 @@ all eight meters are driven from this port, giving the 8 line driver chip
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic7_ca2_w )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
-	LOG(("%s: IC7 PIA write CA2 %2x (input strobe bit 0 / LED A)\n", device->machine->describe_context(),state));
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
+	LOG(("%s: IC7 PIA write CA2 %2x (input strobe bit 0 / LED A)\n", device->machine().describe_context(),state));
 
 	drvstate->IC23GA = state;
 	ic24_setup(drvstate);
@@ -1503,7 +1503,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic7_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic7_cb2_w )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
 	drvstate->remote_meter = state?0x80:0x00;
 }
 
@@ -1527,22 +1527,22 @@ static const pia6821_interface pia_ic7_intf =
 /* IC8, Inputs, TRIACS, alpha clock */
 static READ8_DEVICE_HANDLER( pia_ic8_porta_r )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	static const char *const portnames[] = { "ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2" };
-	device_t *pia_ic5 = device->machine->device("pia_ic5");
+	device_t *pia_ic5 = device->machine().device("pia_ic5");
 
-	LOG_IC8(("%s: IC8 PIA Read of Port A (MUX input data)\n", device->machine->describe_context()));
+	LOG_IC8(("%s: IC8 PIA Read of Port A (MUX input data)\n", device->machine().describe_context()));
 /* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
    This is achieved via connecting every input line to an AND gate, thus allowing two strobes
    to represent each orange input bank (strobes are active low). */
-	pia6821_cb1_w(pia_ic5, (input_port_read(device->machine, "AUX2") & 0x80));
-	return input_port_read(device->machine, portnames[state->input_strobe]);
+	pia6821_cb1_w(pia_ic5, (input_port_read(device->machine(), "AUX2") & 0x80));
+	return input_port_read(device->machine(), portnames[state->input_strobe]);
 }
 
 
 static WRITE8_DEVICE_HANDLER( pia_ic8_portb_w )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	if (state->hopper == HOPPER_DUART_B)
 	{
 //      duart.drive_sensor(data & 0x04, data & 0x01, 0, 0);
@@ -1552,7 +1552,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic8_portb_w )
 //      duart.drive_sensor(data & 0x04, data & 0x01, data & 0x04, data & 0x02);
 	}
 	int i;
-	LOG_IC8(("%s: IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", device->machine->describe_context(),data));
+	LOG_IC8(("%s: IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", device->machine().describe_context(),data));
 	for (i = 0; i < 8; i++)
 	{
 		output_set_indexed_value("triac", i, data & (1 << i));
@@ -1561,8 +1561,8 @@ static WRITE8_DEVICE_HANDLER( pia_ic8_portb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic8_ca2_w )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
-	LOG_IC8(("%s: IC8 PIA write CA2 (input_strobe bit 2 / LED C) %02X\n", device->machine->describe_context(), state & 0xFF));
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
+	LOG_IC8(("%s: IC8 PIA write CA2 (input_strobe bit 2 / LED C) %02X\n", device->machine().describe_context(), state & 0xFF));
 
 	drvstate->IC23GC = state;
 	ic23_update(drvstate);
@@ -1571,8 +1571,8 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic8_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic8_cb2_w )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
-	LOG_IC8(("%s: IC8 PIA write CB2 (alpha clock) %02X\n", device->machine->describe_context(), state & 0xFF));
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
+	LOG_IC8(("%s: IC8 PIA write CB2 (alpha clock) %02X\n", device->machine().describe_context(), state & 0xFF));
 
 	if ( !drvstate->alpha_clock && (state) )
 	{
@@ -1603,17 +1603,17 @@ static const pia6821_interface pia_ic8_intf =
 // Sampled sound card, using a PIA and PTM for timing and data handling
 static WRITE8_DEVICE_HANDLER( pia_gb_porta_w )
 {
-	device_t *msm6376 = device->machine->device("msm6376");
-	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", device->machine->describe_context(),data));
+	device_t *msm6376 = device->machine().device("msm6376");
+	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", device->machine().describe_context(),data));
 	okim6376_w(msm6376, 0, data);
 }
 
 static WRITE8_DEVICE_HANDLER( pia_gb_portb_w )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	int changed = state->expansion_latch^data;
 
-	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", device->machine->describe_context(),data));
+	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", device->machine().describe_context(),data));
 
 	state->expansion_latch = data;
 
@@ -1639,8 +1639,8 @@ static WRITE8_DEVICE_HANDLER( pia_gb_portb_w )
 }
 static READ8_DEVICE_HANDLER( pia_gb_portb_r )
 {
-	device_t *msm6376 = device->machine->device("msm6376");
-	LOG_SS(("%s: GAMEBOARD: PIA Read of Port B\n",device->machine->describe_context()));
+	device_t *msm6376 = device->machine().device("msm6376");
+	LOG_SS(("%s: GAMEBOARD: PIA Read of Port B\n",device->machine().describe_context()));
 	//
 	// b7, 1 = OKI ready, 0 = OKI busy
 	// b5, vol clock
@@ -1652,18 +1652,18 @@ static READ8_DEVICE_HANDLER( pia_gb_portb_r )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_gb_ca2_w )
 {
-	LOG_SS(("%s: GAMEBOARD: OKI RESET data = %02X\n", device->machine->describe_context(), state));
+	LOG_SS(("%s: GAMEBOARD: OKI RESET data = %02X\n", device->machine().describe_context(), state));
 
 //  reset line
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pia_gb_cb2_w )
 {
-	mpu4_state *mstate = device->machine->driver_data<mpu4_state>();
+	mpu4_state *mstate = device->machine().driver_data<mpu4_state>();
 	//Some BWB games use this to drive the bankswitching
 	if (mstate->bwb_bank)
 	{
-		memory_set_bank(device->machine, "bank1",state);
+		memory_set_bank(device->machine(), "bank1",state);
 	}
 }
 
@@ -2105,13 +2105,13 @@ static const stepper_interface bwb_opto1_interface =
 };
 
 /* Common configurations */
-static void mpu4_config_common(running_machine *machine)
+static void mpu4_config_common(running_machine &machine)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
-	state->ic24_timer = machine->scheduler().timer_alloc(FUNC(ic24_timeout));
+	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->ic24_timer = machine.scheduler().timer_alloc(FUNC(ic24_timeout));
 }
 
-static void mpu4_config_common_reels(running_machine *machine,int reels)
+static void mpu4_config_common_reels(running_machine &machine,int reels)
 {
 	int n;
 	/* setup n default 96 half step reels, using the standard optic flag */
@@ -2124,7 +2124,7 @@ static void mpu4_config_common_reels(running_machine *machine,int reels)
 
 static MACHINE_START( mpu4mod2 )
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	mpu4_config_common(machine);
 
 	state->link7a_connected=0;
@@ -2139,7 +2139,7 @@ static MACHINE_START( mpu4mod2 )
 
 static MACHINE_START( mpu4dutch )
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	mpu4_config_common(machine);
 
 	state->link7a_connected=0;
@@ -2153,7 +2153,7 @@ static MACHINE_START( mpu4dutch )
 
 static MACHINE_START( mpu4mod4 )
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	mpu4_config_common(machine);
 
 	state->link7a_connected=0;
@@ -2192,7 +2192,7 @@ there are again fixed call values.
 
 static WRITE8_HANDLER( characteriser_w )
 {
-	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	int x;
 	int call=data;
 	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(space->cpu),offset,data));
@@ -2258,7 +2258,7 @@ static WRITE8_HANDLER( characteriser_w )
 
 static READ8_HANDLER( characteriser_r )
 {
-	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	if (!state->current_chr_table)
 		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
 
@@ -2290,7 +2290,7 @@ us) prone to similar weaknesses that allow a per game solution.
 
 static WRITE8_HANDLER( bwb_characteriser_w )
 {
-	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	int x;
 	int call=data;
 	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", cpu_get_previouspc(space->cpu),offset,data));
@@ -2335,7 +2335,7 @@ static WRITE8_HANDLER( bwb_characteriser_w )
 
 static READ8_HANDLER( bwb_characteriser_r )
 {
-	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	if (!state->current_chr_table)
 		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
 
@@ -2426,7 +2426,7 @@ static const mpu4_chr_table blsbys_data[72] = {
 
 static DRIVER_INIT (m_oldtmr)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->reel_mux=SIX_REEL_1TO8;
 
 	stepper_config(machine, 0, &barcrest_opto1_interface);
@@ -2442,7 +2442,7 @@ static DRIVER_INIT (m_oldtmr)
 
 static DRIVER_INIT (m_ccelbr)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->reel_mux=STANDARD_REEL;
 	// setup 4 default 96 half step reels ///////////////////////////////////
 	mpu4_config_common_reels(machine,4);
@@ -2452,7 +2452,7 @@ static DRIVER_INIT (m_ccelbr)
 
 static DRIVER_INIT (m_gmball)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->reel_mux=STANDARD_REEL;
 	// setup 4 default 96 half step reels ///////////////////////////////////
 	mpu4_config_common_reels(machine,4);
@@ -2462,7 +2462,7 @@ static DRIVER_INIT (m_gmball)
 
 static DRIVER_INIT (m_grtecp)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->reel_mux=FIVE_REEL_5TO8;
 	state->lamp_extender=SMALL_CARD;
 	// setup 5 default 96 half step reels with the mux board
@@ -2472,7 +2472,7 @@ static DRIVER_INIT (m_grtecp)
 
 static DRIVER_INIT (m_blsbys)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->bwb_bank=1;
 	state->reel_mux=FIVE_REEL_5TO8;
 
@@ -2486,7 +2486,7 @@ static DRIVER_INIT (m_blsbys)
 
 static DRIVER_INIT (mpu4tst2)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->reel_mux=STANDARD_REEL;
 	// setup 5 default 96 half step reels with the mux board
 	mpu4_config_common_reels(machine,4);
@@ -2495,7 +2495,7 @@ static DRIVER_INIT (mpu4tst2)
 
 static DRIVER_INIT (mpu4utst)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->reel_mux=STANDARD_REEL;
 	// setup 4 default 96 half step reels ///////////////////////////////////
 	mpu4_config_common_reels(machine,4);
@@ -2503,19 +2503,19 @@ static DRIVER_INIT (mpu4utst)
 
 static DRIVER_INIT (connect4)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->led_lamp=1;
 }
 
 /* generate a 50 Hz signal (based on an RC time) */
 static TIMER_DEVICE_CALLBACK( gen_50hz )
 {
-	mpu4_state *state = timer.machine->driver_data<mpu4_state>();
+	mpu4_state *state = timer.machine().driver_data<mpu4_state>();
 	/* Although reported as a '50Hz' signal, the fact that both rising and
     falling edges of the pulse are used means the timer actually gives a 100Hz
     oscillating signal.*/
 	state->signal_50hz = state->signal_50hz?0:1;
-	pia6821_ca1_w(timer.machine->device("pia_ic4"), state->signal_50hz);	/* signal is connected to IC4 CA1 */
+	pia6821_ca1_w(timer.machine().device("pia_ic4"), state->signal_50hz);	/* signal is connected to IC4 CA1 */
 
 	if (state->signal_50hz)
 	{

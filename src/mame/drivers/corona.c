@@ -380,13 +380,13 @@ static WRITE8_HANDLER( blitter_aux_w )
 static READ8_HANDLER( blitter_status_r )
 {
 /* code checks bit 6 and/or bit 7 */
-	//return space->machine->rand() & 0xc0;
+	//return space->machine().rand() & 0xc0;
 	/*
         x--- ---- blitter busy
         -x-- ---- vblank
     */
 
-	return 0x80 | ((space->machine->primary_screen->vblank() & 1) << 6);
+	return 0x80 | ((space->machine().primary_screen->vblank() & 1) << 6);
 }
 
 static void blitter_execute(int x, int y, int color, int width, int flag)
@@ -463,12 +463,12 @@ static SCREEN_UPDATE(luckyrlt)
 static WRITE8_HANDLER( sound_latch_w )
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "soundcpu", 0, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "soundcpu", 0, ASSERT_LINE);
 }
 
 static READ8_HANDLER( sound_latch_r )
 {
-	cputag_set_input_line(space->machine, "soundcpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "soundcpu", 0, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
 
@@ -491,12 +491,12 @@ static READ8_HANDLER( mux_port_r )
 {
 	switch( input_selector )
 	{
-		case 0x01: return input_port_read(space->machine, "IN0-1");
-		case 0x02: return input_port_read(space->machine, "IN0-2");
-		case 0x04: return input_port_read(space->machine, "IN0-3");
-		case 0x08: return input_port_read(space->machine, "IN0-4");
-		case 0x10: return input_port_read(space->machine, "IN0-5");
-		case 0x20: return input_port_read(space->machine, "IN0-6");
+		case 0x01: return input_port_read(space->machine(), "IN0-1");
+		case 0x02: return input_port_read(space->machine(), "IN0-2");
+		case 0x04: return input_port_read(space->machine(), "IN0-3");
+		case 0x08: return input_port_read(space->machine(), "IN0-4");
+		case 0x10: return input_port_read(space->machine(), "IN0-5");
+		case 0x20: return input_port_read(space->machine(), "IN0-6");
 	}
 
 	return 0xff;
@@ -515,8 +515,8 @@ static WRITE8_HANDLER( mux_port_w )
 */
 	input_selector = (data ^ 0xff) & 0x3f;	/* Input Selector,  */
 
-	coin_counter_w(space->machine, 0, (data ^ 0xff) & 0x40);	/* Credits In (mechanical meters) */
-	coin_counter_w(space->machine, 1, (data ^ 0xff) & 0x80);	/* Credits Out (mechanical meters) */
+	coin_counter_w(space->machine(), 0, (data ^ 0xff) & 0x40);	/* Credits In (mechanical meters) */
+	coin_counter_w(space->machine(), 1, (data ^ 0xff) & 0x80);	/* Credits Out (mechanical meters) */
 
 //  logerror("muxsel: %02x \n", input_selector);
 }
@@ -534,9 +534,9 @@ static WRITE8_HANDLER( wc_meters_w )
    Data is written inverted.
 
 */
-	coin_counter_w(space->machine, 0, (data ^ 0xff) & 0x01);	/* Credits In */
-	coin_counter_w(space->machine, 1, (data ^ 0xff) & 0x02);	/* Credits In (through Coin 3) */
-	coin_counter_w(space->machine, 2, (data ^ 0xff) & 0x04);	/* Credits Out */
+	coin_counter_w(space->machine(), 0, (data ^ 0xff) & 0x01);	/* Credits In */
+	coin_counter_w(space->machine(), 1, (data ^ 0xff) & 0x02);	/* Credits In (through Coin 3) */
+	coin_counter_w(space->machine(), 2, (data ^ 0xff) & 0x04);	/* Credits Out */
 
 //  popmessage("meters: %02x", (data ^ 0xff));
 }

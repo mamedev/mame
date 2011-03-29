@@ -503,7 +503,7 @@ static DEVICE_START( multipcm )
 	ptChip->ROM=*device->region();
 	ptChip->Rate=(float) device->clock() / MULTIPCM_CLOCKDIV;
 
-	ptChip->stream = device->machine->sound().stream_alloc(*device, 0, 2, ptChip->Rate, ptChip, MultiPCM_update);
+	ptChip->stream = device->machine().sound().stream_alloc(*device, 0, 2, ptChip->Rate, ptChip, MultiPCM_update);
 
 	//Volume+pan table
 	for(i=0;i<0x800;++i)

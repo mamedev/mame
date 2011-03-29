@@ -99,14 +99,14 @@ static DEVICE_START( ym3526 )
 	info->chip = ym3526_init(device,device->clock(),rate);
 	assert_always(info->chip != NULL, "Error creating YM3526 chip");
 
-	info->stream = device->machine->sound().stream_alloc(*device,0,1,rate,info,ym3526_stream_update);
+	info->stream = device->machine().sound().stream_alloc(*device,0,1,rate,info,ym3526_stream_update);
 	/* YM3526 setup */
 	ym3526_set_timer_handler (info->chip, TimerHandler, info);
 	ym3526_set_irq_handler   (info->chip, IRQHandler, info);
 	ym3526_set_update_handler(info->chip, _stream_update, info);
 
-	info->timer[0] = device->machine->scheduler().timer_alloc(FUNC(timer_callback_0), info);
-	info->timer[1] = device->machine->scheduler().timer_alloc(FUNC(timer_callback_1), info);
+	info->timer[0] = device->machine().scheduler().timer_alloc(FUNC(timer_callback_0), info);
+	info->timer[1] = device->machine().scheduler().timer_alloc(FUNC(timer_callback_1), info);
 }
 
 static DEVICE_STOP( ym3526 )

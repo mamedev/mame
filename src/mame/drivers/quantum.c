@@ -72,19 +72,19 @@ public:
 
 static READ16_HANDLER( trackball_r )
 {
-	return (input_port_read(space->machine, "TRACKY") << 4) | input_port_read(space->machine, "TRACKX");
+	return (input_port_read(space->machine(), "TRACKY") << 4) | input_port_read(space->machine(), "TRACKX");
 }
 
 
 static READ8_DEVICE_HANDLER( input_1_r )
 {
-	return (input_port_read(device->machine, "DSW0") << (7 - (offset - POT0_C))) & 0x80;
+	return (input_port_read(device->machine(), "DSW0") << (7 - (offset - POT0_C))) & 0x80;
 }
 
 
 static READ8_DEVICE_HANDLER( input_2_r )
 {
-	return (input_port_read(device->machine, "DSW1") << (7 - (offset - POT0_C))) & 0x80;
+	return (input_port_read(device->machine(), "DSW1") << (7 - (offset - POT0_C))) & 0x80;
 }
 
 
@@ -100,14 +100,14 @@ static WRITE16_HANDLER( led_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bits 0 and 1 are coin counters */
-		coin_counter_w(space->machine, 0, data & 2);
-		coin_counter_w(space->machine, 1, data & 1);
+		coin_counter_w(space->machine(), 0, data & 2);
+		coin_counter_w(space->machine(), 1, data & 1);
 
 		/* bit 3 = select second trackball for cocktail mode? */
 
 		/* bits 4 and 5 are LED controls */
-		set_led_status(space->machine, 0, data & 0x10);
-		set_led_status(space->machine, 1, data & 0x20);
+		set_led_status(space->machine(), 0, data & 0x10);
+		set_led_status(space->machine(), 1, data & 0x20);
 
 		/* bits 6 and 7 flip screen */
 		avg_set_flip_x (data & 0x40);

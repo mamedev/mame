@@ -220,7 +220,7 @@ static PALETTE_INIT( spaceg )
 
 static WRITE8_HANDLER( zvideoram_w )
 {
-	spaceg_state *state = space->machine->driver_data<spaceg_state>();
+	spaceg_state *state = space->machine().driver_data<spaceg_state>();
 	int col = state->colorram[0x400];
 	int xoff = *state->io9400 >> 5 & 7;
 	UINT16 offset2 = (offset + 0x100) & 0x1fff;
@@ -262,7 +262,7 @@ static WRITE8_HANDLER( zvideoram_w )
 
 static READ8_HANDLER(spaceg_colorram_r)
 {
-	spaceg_state *state = space->machine->driver_data<spaceg_state>();
+	spaceg_state *state = space->machine().driver_data<spaceg_state>();
 	int rgbcolor;
 
 	if (offset < 0x400)
@@ -273,13 +273,13 @@ static READ8_HANDLER(spaceg_colorram_r)
 		{
 			/* palette 1 */
 			int col_ind = offset & 0x1f;
-			palette_set_color_rgb(space->machine, 0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
+			palette_set_color_rgb(space->machine(), 0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
 		}
 		else if ((offset >= 0x300) && (offset < 0x320)) /* 0xa300- 0xa31f */
 		{
 			/* palette 2 */
 			int col_ind = offset & 0x1f;
-			palette_set_color_rgb(space->machine, 0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
+			palette_set_color_rgb(space->machine(), 0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
 		}
 		else
 			logerror("palette? read from colorram offset = %04x\n",offset);
@@ -294,7 +294,7 @@ static READ8_HANDLER(spaceg_colorram_r)
 
 static SCREEN_UPDATE( spaceg )
 {
-	spaceg_state *state = screen->machine->driver_data<spaceg_state>();
+	spaceg_state *state = screen->machine().driver_data<spaceg_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x2000; offs++)

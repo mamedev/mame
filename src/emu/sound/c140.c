@@ -470,7 +470,7 @@ static DEVICE_START( c140 )
 
 	info->banking_type = intf->banking_type;
 
-	info->stream = device->machine->sound().stream_alloc(*device,0,2,info->sample_rate,info,update_stereo);
+	info->stream = device->machine().sound().stream_alloc(*device,0,2,info->sample_rate,info,update_stereo);
 
 	info->pRom=*device->region();
 
@@ -492,7 +492,7 @@ static DEVICE_START( c140 )
 	}
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	info->mixer_buffer_left = auto_alloc_array(device->machine, INT16, 2 * info->sample_rate);
+	info->mixer_buffer_left = auto_alloc_array(device->machine(), INT16, 2 * info->sample_rate);
 	info->mixer_buffer_right = info->mixer_buffer_left + info->sample_rate;
 }
 

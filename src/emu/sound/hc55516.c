@@ -76,7 +76,7 @@ static void start_common(device_t *device, UINT8 _shiftreg_mask, int _active_clo
 	chip->last_clock_state = 0;
 
 	/* create the stream */
-	chip->channel = device->machine->sound().stream_alloc(*device, 0, 1, SAMPLE_RATE, chip, hc55516_update);
+	chip->channel = device->machine().sound().stream_alloc(*device, 0, 1, SAMPLE_RATE, chip, hc55516_update);
 
 	device->save_item(NAME(chip->last_clock_state));
 	device->save_item(NAME(chip->digit));

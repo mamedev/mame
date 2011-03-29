@@ -35,9 +35,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	cyberbal_state *state = machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 	cputag_set_input_line(machine, "maincpu", 1, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "extra", 1, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -45,7 +45,7 @@ static void update_interrupts(running_machine *machine)
 
 static MACHINE_START( cyberbal )
 {
-	cyberbal_state *state = machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 	atarigen_init(machine);
 
 	state->save_item(NAME(state->fast_68k_int));
@@ -59,13 +59,13 @@ static MACHINE_START( cyberbal )
 
 static MACHINE_RESET( cyberbal )
 {
-	cyberbal_state *state = machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_slapstic_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine->primary_screen, cyberbal_scanline_update, 8);
-	atarigen_sound_io_reset(machine->device("audiocpu"));
+	atarigen_scanline_timer_reset(*machine.primary_screen, cyberbal_scanline_update, 8);
+	atarigen_sound_io_reset(machine.device("audiocpu"));
 
 	cyberbal_sound_reset(machine);
 
@@ -74,9 +74,9 @@ static MACHINE_RESET( cyberbal )
 }
 
 
-static void cyberbal2p_update_interrupts(running_machine *machine)
+static void cyberbal2p_update_interrupts(running_machine &machine)
 {
-	cyberbal_state *state = machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 	cputag_set_input_line(machine, "maincpu", 1, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 3, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -84,11 +84,11 @@ static void cyberbal2p_update_interrupts(running_machine *machine)
 
 static MACHINE_RESET( cyberbal2p )
 {
-	cyberbal_state *state = machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, cyberbal2p_update_interrupts);
-	atarigen_scanline_timer_reset(*machine->primary_screen, cyberbal_scanline_update, 8);
+	atarigen_scanline_timer_reset(*machine.primary_screen, cyberbal_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -102,8 +102,8 @@ static MACHINE_RESET( cyberbal2p )
 
 static READ16_HANDLER( special_port0_r )
 {
-	cyberbal_state *state = space->machine->driver_data<cyberbal_state>();
-	int temp = input_port_read(space->machine, "IN0");
+	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
+	int temp = input_port_read(space->machine(), "IN0");
 	if (state->cpu_to_sound_ready) temp ^= 0x0080;
 	return temp;
 }
@@ -111,8 +111,8 @@ static READ16_HANDLER( special_port0_r )
 
 static READ16_HANDLER( special_port2_r )
 {
-	cyberbal_state *state = space->machine->driver_data<cyberbal_state>();
-	int temp = input_port_read(space->machine, "IN2");
+	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
+	int temp = input_port_read(space->machine(), "IN2");
 	if (state->cpu_to_sound_ready) temp ^= 0x2000;
 	return temp;
 }
@@ -120,7 +120,7 @@ static READ16_HANDLER( special_port2_r )
 
 static READ16_HANDLER( sound_state_r )
 {
-	cyberbal_state *state = space->machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
 	int temp = 0xffff;
 	if (state->cpu_to_sound_ready) temp ^= 0xffff;
 	return temp;
@@ -136,7 +136,7 @@ static READ16_HANDLER( sound_state_r )
 
 static WRITE16_HANDLER( p2_reset_w )
 {
-	cputag_set_input_line(space->machine, "extra", INPUT_LINE_RESET, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "extra", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 
@@ -1009,13 +1009,13 @@ ROM_END
 
 static DRIVER_INIT( cyberbal )
 {
-	atarigen_slapstic_init(machine->device("maincpu"), 0x018000, 0, 0);
+	atarigen_slapstic_init(machine.device("maincpu"), 0x018000, 0, 0);
 }
 
 
 static DRIVER_INIT( cyberbalt )
 {
-	atarigen_slapstic_init(machine->device("maincpu"), 0x018000, 0, 116);
+	atarigen_slapstic_init(machine.device("maincpu"), 0x018000, 0, 116);
 }
 
 

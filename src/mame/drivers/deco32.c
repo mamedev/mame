@@ -279,24 +279,24 @@ static const deco16ic_interface fghthist_deco16ic_tilegen2_intf =
 #if 0
 static WRITE32_HANDLER( deco32_pf12_control_w )
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	COMBINE_DATA(&state->pf12_control[offset]);
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 }
 
 
 static WRITE32_HANDLER( deco32_pf34_control_w )
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	COMBINE_DATA(&state->pf34_control[offset]);
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 }
 #endif
 
 
 static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
-	cputag_set_input_line(timer.machine, "maincpu", ARM_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(timer.machine(), "maincpu", ARM_IRQ_LINE, HOLD_LINE);
 }
 
 static READ32_HANDLER( deco32_irq_controller_r )
@@ -306,7 +306,7 @@ static READ32_HANDLER( deco32_irq_controller_r )
 	switch (offset)
 	{
 	case 2: /* Raster IRQ ACK - value read is not used */
-		cputag_set_input_line(space->machine, "maincpu", ARM_IRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", ARM_IRQ_LINE, CLEAR_LINE);
 		return 0;
 
 	case 3: /* Irq controller
@@ -323,7 +323,7 @@ static READ32_HANDLER( deco32_irq_controller_r )
 
         /* ZV03082007 - video_screen_get_vblank() doesn't work for Captain America, as it expects
            that this bit is NOT set in rows 0-7. */
-        vblank = space->machine->primary_screen->vpos() > space->machine->primary_screen->visible_area().max_y;
+        vblank = space->machine().primary_screen->vpos() > space->machine().primary_screen->visible_area().max_y;
 		if (vblank)
 			return 0xffffff80 | 0x1 | 0x10; /* Assume VBL takes priority over possible raster/lightgun irq */
 
@@ -337,7 +337,7 @@ static READ32_HANDLER( deco32_irq_controller_r )
 
 static WRITE32_HANDLER( deco32_irq_controller_w )
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	int scanline;
 
 	switch (offset) {
@@ -351,7 +351,7 @@ static WRITE32_HANDLER( deco32_irq_controller_w )
 		if (state->raster_enable && scanline>0 && scanline<240)
 		{
 			// needs +16 for the raster to align on captaven intro? (might just be our screen size / visible area / layer offsets need adjusting instead)
-			state->raster_irq_timer->adjust(space->machine->primary_screen->time_until_pos(scanline+16, 320));
+			state->raster_irq_timer->adjust(space->machine().primary_screen->time_until_pos(scanline+16, 320));
 		}
 		else
 			state->raster_irq_timer->reset();
@@ -364,7 +364,7 @@ static WRITE32_HANDLER( deco32_irq_controller_w )
 static WRITE32_HANDLER( deco32_sound_w )
 {
 	soundlatch_w(space,0,data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 static READ32_HANDLER( deco32_71_r )
@@ -378,9 +378,9 @@ static READ32_HANDLER( captaven_prot_r )
 {
 	/* Protection/IO chip 75, same as Lemmings & Robocop 2 */
 	switch (offset<<2) {
-	case 0x0a0: return input_port_read(space->machine, "IN0"); /* Player 1 & 2 controls */
-	case 0x158: return input_port_read(space->machine, "IN1"); /* Player 3 & 4 controls */
-	case 0xed4: return input_port_read(space->machine, "IN2"); /* Misc */
+	case 0x0a0: return input_port_read(space->machine(), "IN0"); /* Player 1 & 2 controls */
+	case 0x158: return input_port_read(space->machine(), "IN1"); /* Player 3 & 4 controls */
+	case 0xed4: return input_port_read(space->machine(), "IN2"); /* Misc */
 	}
 
 	logerror("%08x: Unmapped protection read %04x\n",cpu_get_pc(space->cpu),offset<<2);
@@ -390,15 +390,15 @@ static READ32_HANDLER( captaven_prot_r )
 static READ32_HANDLER( captaven_soundcpu_r )
 {
 	/* Top byte - top bit low == sound cpu busy, bottom word is dips */
-	return 0xffff0000 | input_port_read(space->machine, "DSW");
+	return 0xffff0000 | input_port_read(space->machine(), "DSW");
 }
 
 static READ32_HANDLER( fghthist_control_r )
 {
 	switch (offset) {
-	case 0: return 0xffff0000 | input_port_read(space->machine, "IN0");
-	case 1: return 0xffff0000 | input_port_read(space->machine, "IN1"); //check top bits??
-	case 2: return 0xfffffffe | eeprom_read_bit(space->machine->device("eeprom"));
+	case 0: return 0xffff0000 | input_port_read(space->machine(), "IN0");
+	case 1: return 0xffff0000 | input_port_read(space->machine(), "IN1"); //check top bits??
+	case 2: return 0xfffffffe | eeprom_read_bit(space->machine().device("eeprom"));
 	}
 
 	return 0xffffffff;
@@ -407,7 +407,7 @@ static READ32_HANDLER( fghthist_control_r )
 static WRITE32_HANDLER( fghthist_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7) {
-		eeprom_device *device = space->machine->device<eeprom_device>("eeprom");
+		eeprom_device *device = space->machine().device<eeprom_device>("eeprom");
 		eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom_write_bit(device, data & 0x10);
 		eeprom_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
@@ -425,21 +425,21 @@ static WRITE32_HANDLER( fghthist_eeprom_w )
 static READ32_HANDLER( dragngun_service_r )
 {
 //  logerror("%08x:Read service\n",cpu_get_pc(space->cpu));
-	return input_port_read(space->machine, "IN2");
+	return input_port_read(space->machine(), "IN2");
 }
 
 static READ32_HANDLER( lockload_gun_mirror_r )
 {
 //logerror("%08x:Read gun %d\n",cpu_get_pc(space->cpu),offset);
-//return ((space->machine->rand()%0xffff)<<16) | space->machine->rand()%0xffff;
+//return ((space->machine().rand()%0xffff)<<16) | space->machine().rand()%0xffff;
 	if (offset) /* Mirror of player 1 and player 2 fire buttons */
-		return input_port_read(space->machine, "IN4") | ((space->machine->rand()%0xff)<<16);
-	return input_port_read(space->machine, "IN3") | input_port_read(space->machine, "LIGHT0_X") | (input_port_read(space->machine, "LIGHT0_X")<<16) | (input_port_read(space->machine, "LIGHT0_X")<<24); //((space->machine->rand()%0xff)<<16);
+		return input_port_read(space->machine(), "IN4") | ((space->machine().rand()%0xff)<<16);
+	return input_port_read(space->machine(), "IN3") | input_port_read(space->machine(), "LIGHT0_X") | (input_port_read(space->machine(), "LIGHT0_X")<<16) | (input_port_read(space->machine(), "LIGHT0_X")<<24); //((space->machine().rand()%0xff)<<16);
 }
 
 static READ32_HANDLER( dragngun_prot_r )
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 //  logerror("%08x:Read prot %08x (%08x)\n",cpu_get_pc(space->cpu),offset<<1,mem_mask);
 
 	if (!state->strobe) state->strobe=8;
@@ -448,9 +448,9 @@ static READ32_HANDLER( dragngun_prot_r )
 //definitely vblank in locked load
 
 	switch (offset<<1) {
-	case 0x140/2: return 0xffff0000 | input_port_read(space->machine, "IN0"); /* IN0 */
-	case 0xadc/2: return 0xffff0000 | input_port_read(space->machine, "IN1") | state->strobe; /* IN1 */
-	case 0x6a0/2: return 0xffff0000 | input_port_read(space->machine, "DSW"); /* IN2 (Dip switch) */
+	case 0x140/2: return 0xffff0000 | input_port_read(space->machine(), "IN0"); /* IN0 */
+	case 0xadc/2: return 0xffff0000 | input_port_read(space->machine(), "IN1") | state->strobe; /* IN1 */
+	case 0x6a0/2: return 0xffff0000 | input_port_read(space->machine(), "DSW"); /* IN2 (Dip switch) */
 	}
 	return 0xffffffff;
 }
@@ -458,13 +458,13 @@ static READ32_HANDLER( dragngun_prot_r )
 
 static READ32_HANDLER( dragngun_lightgun_r )
 {
-	dragngun_state *state = space->machine->driver_data<dragngun_state>();
+	dragngun_state *state = space->machine().driver_data<dragngun_state>();
 	/* Ports 0-3 are read, but seem unused */
 	switch (state->dragngun_lightgun_port) {
-	case 4: return input_port_read(space->machine, "LIGHT0_X");
-	case 5: return input_port_read(space->machine, "LIGHT1_X");
-	case 6: return input_port_read(space->machine, "LIGHT0_Y");
-	case 7: return input_port_read(space->machine, "LIGHT1_Y");
+	case 4: return input_port_read(space->machine(), "LIGHT0_X");
+	case 5: return input_port_read(space->machine(), "LIGHT1_X");
+	case 6: return input_port_read(space->machine(), "LIGHT0_Y");
+	case 7: return input_port_read(space->machine(), "LIGHT1_Y");
 	}
 
 //  logerror("Illegal lightgun port %d read \n",state->dragngun_lightgun_port);
@@ -473,7 +473,7 @@ static READ32_HANDLER( dragngun_lightgun_r )
 
 static WRITE32_HANDLER( dragngun_lightgun_w )
 {
-	dragngun_state *state = space->machine->driver_data<dragngun_state>();
+	dragngun_state *state = space->machine().driver_data<dragngun_state>();
 //  logerror("Lightgun port %d\n",state->dragngun_lightgun_port);
 	state->dragngun_lightgun_port=offset;
 }
@@ -491,7 +491,7 @@ static WRITE32_DEVICE_HANDLER( dragngun_eeprom_w )
 		eeprom_set_cs_line(device, (data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 		return;
 	}
-	logerror("%s:Write control 1 %08x %08x\n",device->machine->describe_context(),offset,data);
+	logerror("%s:Write control 1 %08x %08x\n",device->machine().describe_context(),offset,data);
 }
 
 /**********************************************************************************/
@@ -499,10 +499,10 @@ static WRITE32_DEVICE_HANDLER( dragngun_eeprom_w )
 
 static READ32_HANDLER( tattass_prot_r )
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	switch (offset<<1) {
-	case 0x280: return input_port_read(space->machine, "IN0") << 16;
-	case 0x4c4: return input_port_read(space->machine, "IN1") << 16;
+	case 0x280: return input_port_read(space->machine(), "IN0") << 16;
+	case 0x4c4: return input_port_read(space->machine(), "IN1") << 16;
 	case 0x35a: return state->tattass_eprom_bit << 16;
 	}
 
@@ -524,8 +524,8 @@ static WRITE32_HANDLER( tattass_prot_w )
 
 static WRITE32_HANDLER( tattass_control_w )
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
-	eeprom_device *eeprom = space->machine->device<eeprom_device>("eeprom");
+	deco32_state *state = space->machine().driver_data<deco32_state>();
+	eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
 	address_space *eeprom_space = eeprom->space();
 
 	/* Eprom in low byte */
@@ -644,9 +644,9 @@ static WRITE32_HANDLER( tattass_control_w )
 
 	/* Sound board reset control */
 	if (data&0x80)
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* bit 0x4 fade cancel? */
 	/* bit 0x8 ?? */
@@ -660,9 +660,9 @@ static READ32_HANDLER( nslasher_prot_r )
 {
 
 	switch (offset<<1) {
-	case 0x280: return input_port_read(space->machine, "IN0") << 16| 0xffff; /* IN0 */
-	case 0x4c4: return input_port_read(space->machine, "IN1") << 16| 0xffff; /* IN1 */
-	case 0x35a: return (eeprom_read_bit(space->machine->device("eeprom"))<< 16) | 0xffff; // Debug switch in low word??
+	case 0x280: return input_port_read(space->machine(), "IN0") << 16| 0xffff; /* IN0 */
+	case 0x4c4: return input_port_read(space->machine(), "IN1") << 16| 0xffff; /* IN1 */
+	case 0x35a: return (eeprom_read_bit(space->machine().device("eeprom"))<< 16) | 0xffff; // Debug switch in low word??
 	}
 
 	//logerror("%08x: Read unmapped prot %08x (%08x)\n",cpu_get_pc(space->cpu),offset<<1,mem_mask);
@@ -674,7 +674,7 @@ static WRITE32_HANDLER( nslasher_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_device *device = space->machine->device<eeprom_device>("eeprom");
+		eeprom_device *device = space->machine().device<eeprom_device>("eeprom");
 		eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom_write_bit(device, data & 0x10);
 		eeprom_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
@@ -686,7 +686,7 @@ static WRITE32_HANDLER( nslasher_eeprom_w )
 
 static WRITE32_HANDLER( nslasher_prot_w )
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	//logerror("%08x:write prot %08x (%08x) %08x\n",cpu_get_pc(space->cpu),offset<<1,mem_mask,data);
 
 	/* Only sound port of chip is used - no protection */
@@ -695,7 +695,7 @@ static WRITE32_HANDLER( nslasher_prot_w )
 		/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 		soundlatch_w(space,0,(data>>16)&0xff);
 		state->nslasher_sound_irq |= 0x02;
-		cputag_set_input_line(space->machine, "audiocpu", 0, (state->nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", 0, (state->nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -703,13 +703,13 @@ static WRITE32_HANDLER( nslasher_prot_w )
 
 static READ32_HANDLER( deco32_spriteram_r )
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	return state->spriteram16[offset] ^ 0xffff0000;
 }
 
 static WRITE32_HANDLER( deco32_spriteram_w )
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 	COMBINE_DATA(&state->spriteram16[offset]);
@@ -717,19 +717,19 @@ static WRITE32_HANDLER( deco32_spriteram_w )
 
 static WRITE32_HANDLER( deco32_buffer_spriteram_w )
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	memcpy(state->spriteram16_buffered, state->spriteram16, 0x1000);
 }	
 
 static READ32_HANDLER( deco32_spriteram2_r )
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	return state->spriteram16_2[offset] ^ 0xffff0000;
 }
 
 static WRITE32_HANDLER( deco32_spriteram2_w )
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 	COMBINE_DATA(&state->spriteram16_2[offset]);
@@ -737,16 +737,16 @@ static WRITE32_HANDLER( deco32_spriteram2_w )
 
 static WRITE32_HANDLER( deco32_buffer_spriteram2_w )
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	memcpy(state->spriteram16_2_buffered, state->spriteram16_2, 0x1000);
 }	
 
 
 // tattass tests these as 32-bit ram, even if only 16-bits are hooked up to the tilemap chip - does it mirror parts of the dword?
-static WRITE32_HANDLER( deco32_pf1_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); COMBINE_DATA(&state->pf1_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf1_rowscroll[offset]); }
-static WRITE32_HANDLER( deco32_pf2_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); COMBINE_DATA(&state->pf2_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf2_rowscroll[offset]); }
-static WRITE32_HANDLER( deco32_pf3_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); COMBINE_DATA(&state->pf3_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf3_rowscroll[offset]); }
-static WRITE32_HANDLER( deco32_pf4_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); COMBINE_DATA(&state->pf4_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf4_rowscroll[offset]); }
+static WRITE32_HANDLER( deco32_pf1_rowscroll_w ) { deco32_state *state = space->machine().driver_data<deco32_state>(); COMBINE_DATA(&state->pf1_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf1_rowscroll[offset]); }
+static WRITE32_HANDLER( deco32_pf2_rowscroll_w ) { deco32_state *state = space->machine().driver_data<deco32_state>(); COMBINE_DATA(&state->pf2_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf2_rowscroll[offset]); }
+static WRITE32_HANDLER( deco32_pf3_rowscroll_w ) { deco32_state *state = space->machine().driver_data<deco32_state>(); COMBINE_DATA(&state->pf3_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf3_rowscroll[offset]); }
+static WRITE32_HANDLER( deco32_pf4_rowscroll_w ) { deco32_state *state = space->machine().driver_data<deco32_state>(); COMBINE_DATA(&state->pf4_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf4_rowscroll[offset]); }
 
 
 static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32 )
@@ -1032,36 +1032,36 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(deco32_bsmt_reset_w)
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	UINT8 diff = data ^ state->bsmt_reset;
 	state->bsmt_reset = data;
 	if ((diff & 0x80) && !(data & 0x80))
-		devtag_reset(space->machine, "bsmt");
+		devtag_reset(space->machine(), "bsmt");
 }
 
 static WRITE8_HANDLER(deco32_bsmt0_w)
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	state->bsmt_latch = data;
 }
 
 static void bsmt_ready_callback(bsmt2000_device &device)
 {
-	cputag_set_input_line(device.machine, "audiocpu", M6809_IRQ_LINE, ASSERT_LINE); /* BSMT is ready */
+	cputag_set_input_line(device.machine(), "audiocpu", M6809_IRQ_LINE, ASSERT_LINE); /* BSMT is ready */
 }
 
 static WRITE8_HANDLER(deco32_bsmt1_w)
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
-	bsmt2000_device *bsmt = space->machine->device<bsmt2000_device>("bsmt");
+	deco32_state *state = space->machine().driver_data<deco32_state>();
+	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
 	bsmt->write_reg(offset ^ 0xff);
 	bsmt->write_data((state->bsmt_latch << 8) | data);
-	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, CLEAR_LINE); /* BSMT is not ready */
+	cputag_set_input_line(space->machine(), "audiocpu", M6809_IRQ_LINE, CLEAR_LINE); /* BSMT is not ready */
 }
 
 static READ8_HANDLER(deco32_bsmt_status_r)
 {
-	bsmt2000_device *bsmt = space->machine->device<bsmt2000_device>("bsmt");
+	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
 	return bsmt->read_status() << 7;
 }
 
@@ -1088,10 +1088,10 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(latch_r)
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 	state->nslasher_sound_irq &= ~0x02;
-	cputag_set_input_line(space->machine, "audiocpu", 0, (state->nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, (state->nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 	return soundlatch_r(space,0);
 }
 
@@ -1689,24 +1689,24 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
+	cputag_set_input_line(device->machine(), "audiocpu", 1, state); /* IRQ 2 */
 }
 
 static void sound_irq_nslasher(device_t *device, int state)
 {
-	deco32_state *drvstate = device->machine->driver_data<deco32_state>();
+	deco32_state *drvstate = device->machine().driver_data<deco32_state>();
 	/* bit 0 of nslasher_sound_irq specifies IRQ from sound chip */
 	if (state)
 		drvstate->nslasher_sound_irq |= 0x01;
 	else
 		drvstate->nslasher_sound_irq &= ~0x01;
-	cputag_set_input_line(device->machine, "audiocpu", 0, (drvstate->nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, (drvstate->nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	okim6295_device *oki1 = device->machine->device<okim6295_device>("oki1");
-	okim6295_device *oki2 = device->machine->device<okim6295_device>("oki2");
+	okim6295_device *oki1 = device->machine().device<okim6295_device>("oki1");
+	okim6295_device *oki2 = device->machine().device<okim6295_device>("oki2");
 	oki1->set_bank_base(((data >> 0)& 1) * 0x40000);
 	oki2->set_bank_base(((data >> 1)& 1) * 0x40000);
 }
@@ -1733,8 +1733,8 @@ static const eeprom_interface eeprom_interface_tattass =
 
 static MACHINE_RESET( deco32 )
 {
-	deco32_state *state = machine->driver_data<deco32_state>();
-	state->raster_irq_timer = machine->device<timer_device>("int_timer");
+	deco32_state *state = machine.driver_data<deco32_state>();
+	state->raster_irq_timer = machine.device<timer_device>("int_timer");
 }
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )
@@ -3251,9 +3251,9 @@ static DRIVER_INIT( captaven )
 
 static DRIVER_INIT( dragngun )
 {
-	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
-	const UINT8 *SRC_RAM = machine->region("gfx1")->base();
-	UINT8 *DST_RAM = machine->region("gfx2")->base();
+	UINT32 *ROM = (UINT32 *)machine.region("maincpu")->base();
+	const UINT8 *SRC_RAM = machine.region("gfx1")->base();
+	UINT8 *DST_RAM = machine.region("gfx2")->base();
 
 	deco74_decrypt_gfx(machine, "gfx1");
 	deco74_decrypt_gfx(machine, "gfx2");
@@ -3275,8 +3275,8 @@ static DRIVER_INIT( fghthist )
 
 static DRIVER_INIT( lockload )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
-//  UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
+//  UINT32 *ROM = (UINT32 *)machine.region("maincpu")->base();
 
 	deco74_decrypt_gfx(machine, "gfx1");
 	deco74_decrypt_gfx(machine, "gfx2");
@@ -3292,7 +3292,7 @@ static DRIVER_INIT( lockload )
 
 static DRIVER_INIT( tattass )
 {
-	UINT8 *RAM = machine->region("gfx1")->base();
+	UINT8 *RAM = machine.region("gfx1")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
@@ -3300,7 +3300,7 @@ static DRIVER_INIT( tattass )
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
-	RAM = machine->region("gfx2")->base();
+	RAM = machine.region("gfx2")->base();
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
@@ -3313,7 +3313,7 @@ static DRIVER_INIT( tattass )
 
 static DRIVER_INIT( nslasher )
 {
-	UINT8 *RAM = machine->region("gfx1")->base();
+	UINT8 *RAM = machine.region("gfx1")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
@@ -3321,7 +3321,7 @@ static DRIVER_INIT( nslasher )
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
-	RAM = machine->region("gfx2")->base();
+	RAM = machine.region("gfx2")->base();
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);

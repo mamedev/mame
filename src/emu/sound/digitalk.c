@@ -648,8 +648,8 @@ static DEVICE_START(digitalker)
 {
 	digitalker *dg = get_safe_token(device);
 	dg->device = device;
-	dg->rom = device->machine->region(device->tag())->base();
-	dg->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock()/4, dg, digitalker_update);
+	dg->rom = device->machine().region(device->tag())->base();
+	dg->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock()/4, dg, digitalker_update);
 	dg->dac_index = 128;
 	dg->data = 0xff;
 	dg->cs = dg->cms = dg->wr = 1;

@@ -26,10 +26,10 @@ struct _segaic16_memory_map_entry
 	const char *	name;				/* friendly name for debugging */
 };
 
-void segaic16_memory_mapper_init(device_t *cpu, const segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(running_machine *, UINT8), UINT8 (*sound_r_callback)(running_machine *));
-void segaic16_memory_mapper_reset(running_machine *machine);
-void segaic16_memory_mapper_config(running_machine *machine, const UINT8 *map_data);
-void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decrypted);
+void segaic16_memory_mapper_init(device_t *cpu, const segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(running_machine &, UINT8), UINT8 (*sound_r_callback)(running_machine &));
+void segaic16_memory_mapper_reset(running_machine &machine);
+void segaic16_memory_mapper_config(running_machine &machine, const UINT8 *map_data);
+void segaic16_memory_mapper_set_decrypted(running_machine &machine, UINT8 *decrypted);
 READ8_HANDLER( segaic16_memory_mapper_r );
 WRITE8_HANDLER( segaic16_memory_mapper_w );
 READ16_HANDLER( segaic16_memory_mapper_lsb_r );
@@ -43,8 +43,8 @@ WRITE16_HANDLER( segaic16_memory_mapper_lsb_w );
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*_315_5250_sound_callback)(running_machine *, UINT8);
-typedef void (*_315_5250_timer_ack_callback)(running_machine *);
+typedef void (*_315_5250_sound_callback)(running_machine &, UINT8);
+typedef void (*_315_5250_timer_ack_callback)(running_machine &);
 
 typedef struct _ic_315_5250_interface ic_315_5250_interface;
 struct _ic_315_5250_interface

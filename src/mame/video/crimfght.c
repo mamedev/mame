@@ -9,9 +9,9 @@
 
 ***************************************************************************/
 
-void crimfght_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+void crimfght_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	crimfght_state *state = machine->driver_data<crimfght_state>();
+	crimfght_state *state = machine.driver_data<crimfght_state>();
 
 	*flags = (*color & 0x20) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x1f) << 8) | (bank << 13);
@@ -24,13 +24,13 @@ void crimfght_tile_callback( running_machine *machine, int layer, int bank, int 
 
 ***************************************************************************/
 
-void crimfght_sprite_callback( running_machine *machine, int *code, int *color, int *priority, int *shadow )
+void crimfght_sprite_callback( running_machine &machine, int *code, int *color, int *priority, int *shadow )
 {
 	/* Weird priority scheme. Why use three bits when two would suffice? */
 	/* The PROM allows for mixed priorities, where sprites would have */
 	/* priority over text but not on one or both of the other two planes. */
 	/* Luckily, this isn't used by the game. */
-	crimfght_state *state = machine->driver_data<crimfght_state>();
+	crimfght_state *state = machine.driver_data<crimfght_state>();
 
 	switch (*color & 0x70)
 	{
@@ -57,16 +57,16 @@ void crimfght_sprite_callback( running_machine *machine, int *code, int *color, 
 
 VIDEO_START( crimfght )
 {
-	crimfght_state *state = machine->driver_data<crimfght_state>();
+	crimfght_state *state = machine.driver_data<crimfght_state>();
 
-	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x400);
+	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x400);
 
 	state->layer_colorbase[0] = 0;
 	state->layer_colorbase[1] = 4;
 	state->layer_colorbase[2] = 8;
 	state->sprite_colorbase = 16;
 
-	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x400);
+	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x400);
 }
 
 
@@ -79,7 +79,7 @@ VIDEO_START( crimfght )
 
 SCREEN_UPDATE( crimfght )
 {
-	crimfght_state *state = screen->machine->driver_data<crimfght_state>();
+	crimfght_state *state = screen->machine().driver_data<crimfght_state>();
 
 	k052109_tilemap_update(state->k052109);
 

@@ -31,11 +31,11 @@
 
 #define VERBOSE_DBG 0       /* general debug messages */
 #define DBG_LOG(N,M,A) \
-	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",pc_keyb.machine->time().as_double(),(char*)M ); logerror A; }
+	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",pc_keyb.machine().time().as_double(),(char*)M ); logerror A; }
 
 #define VERBOSE_JOY 0		/* JOY (joystick port) */
 #define JOY_LOG(N,M,A) \
-	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",pc_keyb.machine->time().as_double(),(char*)M ); logerror A; }
+	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",pc_keyb.machine().time().as_double(),(char*)M ); logerror A; }
 
 
 static TIMER_CALLBACK( pc_keyb_timer );
@@ -47,8 +47,10 @@ static TIMER_CALLBACK( pc_keyb_timer );
 */
 
 static struct {
-	running_machine *machine;
-	void (*int_cb)(running_machine *, int);
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
+	running_machine *m_machine;
+	void (*int_cb)(running_machine &, int);
 	emu_timer *timer;
 	UINT8 data;
 	int on;
@@ -57,7 +59,7 @@ static struct {
 
 
 
-void init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(running_machine *, int))
+void init_pc_common(running_machine &machine, UINT32 flags, void (*set_keyb_int_func)(running_machine &, int))
 {
 	/* PC-XT keyboard */
 	if (flags & PCCOMMON_KEYBOARD_AT)
@@ -67,9 +69,9 @@ void init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb_int_
 	at_keyboard_set_scan_code_set(1);
 
 	memset(&pc_keyb, 0, sizeof(pc_keyb));
-	pc_keyb.machine = machine;
+	pc_keyb.m_machine = &machine;
 	pc_keyb.int_cb = set_keyb_int_func;
-	pc_keyb.timer = machine->scheduler().timer_alloc(FUNC(pc_keyb_timer));
+	pc_keyb.timer = machine.scheduler().timer_alloc(FUNC(pc_keyb_timer));
 }
 
 UINT8 pc_keyb_read(void)
@@ -119,7 +121,7 @@ void pc_keyb_clear(void)
 {
 	pc_keyb.data = 0;
 	if ( pc_keyb.int_cb ) {
-		pc_keyb.int_cb(pc_keyb.machine, 0);
+		pc_keyb.int_cb(pc_keyb.machine(), 0);
 	}
 }
 
@@ -135,7 +137,7 @@ void pc_keyboard(void)
 			pc_keyb.data = data;
 			DBG_LOG(1,"KB_scancode",("$%02x\n", pc_keyb.data));
 			if ( pc_keyb.int_cb ) {
-				pc_keyb.int_cb(pc_keyb.machine, 1);
+				pc_keyb.int_cb(pc_keyb.machine(), 1);
 			}
 			pc_keyb.self_test = 0;
 		}
@@ -152,7 +154,7 @@ static UINT8 at_pages[0x10];
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( device, state );
@@ -259,7 +261,7 @@ static I8237_INTERFACE( dma8237_2_config )
 
 static WRITE_LINE_DEVICE_HANDLER( pic8259_1_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface pic8259_1_config =
@@ -275,19 +277,19 @@ static const struct pic8259_interface pic8259_2_config =
 IRQ_CALLBACK(pcat_irq_callback)
 {
 	int r = 0;
-	r = pic8259_acknowledge(device->machine->device("pic8259_2"));
+	r = pic8259_acknowledge(device->machine().device("pic8259_2"));
 	if (r==0)
 	{
-		r = pic8259_acknowledge(device->machine->device("pic8259_1"));
+		r = pic8259_acknowledge(device->machine().device("pic8259_1"));
 	}
 	return r;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out0_changed )
 {
-	if ( device->machine->device("pic8259_1") )
+	if ( device->machine().device("pic8259_1") )
 	{
-		pic8259_ir0_w(device->machine->device("pic8259_1"), state);
+		pic8259_ir0_w(device->machine().device("pic8259_1"), state);
 	}
 }
 

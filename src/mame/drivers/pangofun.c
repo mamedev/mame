@@ -157,9 +157,9 @@ static INPUT_PORTS_START( pangofun )
 	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
 
-static void pangofun_set_keyb_int(running_machine *machine, int state)
+static void pangofun_set_keyb_int(running_machine &machine, int state)
 {
-	pic8259_ir1_w(machine->device("pic8259_1"), state);
+	pic8259_ir1_w(machine.device("pic8259_1"), state);
 }
 
 static const struct pc_vga_interface vga_interface ={
@@ -170,18 +170,18 @@ static const struct pc_vga_interface vga_interface ={
 	0x0000
 };
 
-static void set_gate_a20(running_machine *machine, int a20)
+static void set_gate_a20(running_machine &machine, int a20)
 {
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, a20);
 }
 
-static void keyboard_interrupt(running_machine *machine, int state)
+static void keyboard_interrupt(running_machine &machine, int state)
 {
-	pic8259_ir1_w(machine->device("pic8259_1"), state);
+	pic8259_ir1_w(machine.device("pic8259_1"), state);
 }
 
-static int pcat_dyn_get_out2(running_machine *machine) {
-	return pit8253_get_output(machine->device("pit8254"), 2 );
+static int pcat_dyn_get_out2(running_machine &machine) {
+	return pit8253_get_output(machine.device("pit8254"), 2 );
 }
 
 
@@ -192,7 +192,7 @@ static const struct kbdc8042_interface at8042 =
 
 static MACHINE_START( pangofun )
 {
-	device_set_irq_callback(machine->device("maincpu"), pcat_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), pcat_irq_callback);
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, pangofun_set_keyb_int);
 	kbdc8042_init(machine, &at8042);
 }

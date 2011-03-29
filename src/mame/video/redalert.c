@@ -24,7 +24,7 @@
 
 WRITE8_HANDLER( redalert_bitmap_videoram_w )
 {
-	redalert_state *state = space->machine->driver_data<redalert_state>();
+	redalert_state *state = space->machine().driver_data<redalert_state>();
 	state->bitmap_videoram[offset     ] = data;
 	state->bitmap_colorram[offset >> 3] = *state->bitmap_color & 0x07;
 }
@@ -37,7 +37,7 @@ WRITE8_HANDLER( redalert_bitmap_videoram_w )
  *
  *************************************/
 
-static void get_pens(running_machine *machine, pen_t *pens)
+static void get_pens(running_machine &machine, pen_t *pens)
 {
 	static const int resistances_bitmap[]     = { 100 };
 	static const int resistances_charmap_rg[] = { 390, 220, 180 };
@@ -52,7 +52,7 @@ static void get_pens(running_machine *machine, pen_t *pens)
 	double charmap_b_weights[2];
 	double back_r_weight[1];
 	double back_gb_weight[1];
-	const UINT8 *prom = machine->region("proms")->base();
+	const UINT8 *prom = machine.region("proms")->base();
 
 	scaler = compute_resistor_weights(0, 0xff, -1,
 									  1, resistances_bitmap,     bitmap_weight,      470, 0,
@@ -102,7 +102,7 @@ static void get_pens(running_machine *machine, pen_t *pens)
 
 /* this uses the same color hook-up between bitmap and chars. */
 /* TODO: clean me up */
-static void get_panther_pens(running_machine *machine, pen_t *pens)
+static void get_panther_pens(running_machine &machine, pen_t *pens)
 {
 	static const int resistances_bitmap[]     = { 100 };
 	static const int resistances_charmap_rg[] = { 390, 220, 180 };
@@ -117,7 +117,7 @@ static void get_panther_pens(running_machine *machine, pen_t *pens)
 	double charmap_b_weights[2];
 	double back_r_weight[1];
 	double back_gb_weight[1];
-	const UINT8 *prom = machine->region("proms")->base();
+	const UINT8 *prom = machine.region("proms")->base();
 
 	scaler = compute_resistor_weights(0, 0xff, -1,
 									  1, resistances_bitmap,     bitmap_weight,      470, 0,
@@ -163,7 +163,7 @@ static void get_panther_pens(running_machine *machine, pen_t *pens)
 
 static VIDEO_START( redalert )
 {
-	redalert_state *state = machine->driver_data<redalert_state>();
+	redalert_state *state = machine.driver_data<redalert_state>();
 	state->bitmap_colorram = auto_alloc_array(machine, UINT8, 0x0400);
 
 	state->save_pointer(NAME(state->bitmap_colorram), 0x0400);
@@ -173,7 +173,7 @@ static VIDEO_START( redalert )
 
 static VIDEO_START( ww3 )
 {
-	redalert_state *state = machine->driver_data<redalert_state>();
+	redalert_state *state = machine.driver_data<redalert_state>();
 	VIDEO_START_CALL( redalert );
 
 	state->control_xor = 0x04;
@@ -188,11 +188,11 @@ static VIDEO_START( ww3 )
 
 static SCREEN_UPDATE( redalert )
 {
-	redalert_state *state = screen->machine->driver_data<redalert_state>();
+	redalert_state *state = screen->machine().driver_data<redalert_state>();
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_pens(screen->machine, pens);
+	get_pens(screen->machine(), pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
@@ -261,11 +261,11 @@ static SCREEN_UPDATE( redalert )
 
 static SCREEN_UPDATE( demoneye )
 {
-	redalert_state *state = screen->machine->driver_data<redalert_state>();
+	redalert_state *state = screen->machine().driver_data<redalert_state>();
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_pens(screen->machine, pens);
+	get_pens(screen->machine(), pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
@@ -336,11 +336,11 @@ static SCREEN_UPDATE( demoneye )
 
 static SCREEN_UPDATE( panther )
 {
-	redalert_state *state = screen->machine->driver_data<redalert_state>();
+	redalert_state *state = screen->machine().driver_data<redalert_state>();
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_panther_pens(screen->machine, pens);
+	get_panther_pens(screen->machine(), pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{

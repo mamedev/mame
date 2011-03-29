@@ -19,25 +19,25 @@ To Do:
 
 static DRIVER_INIT( triplhnt )
 {
-	triplhnt_state *state = machine->driver_data<triplhnt_state>();
-	machine->device<nvram_device>("nvram")->set_base(state->cmos, sizeof(state->cmos));
+	triplhnt_state *state = machine.driver_data<triplhnt_state>();
+	machine.device<nvram_device>("nvram")->set_base(state->cmos, sizeof(state->cmos));
 }
 
 
-void triplhnt_set_collision(running_machine *machine, int code)
+void triplhnt_set_collision(running_machine &machine, int code)
 {
-	triplhnt_state *state = machine->driver_data<triplhnt_state>();
+	triplhnt_state *state = machine.driver_data<triplhnt_state>();
 	state->hit_code = code;
 
 	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 }
 
 
-static void triplhnt_update_misc(running_machine *machine, int offset)
+static void triplhnt_update_misc(running_machine &machine, int offset)
 {
-	triplhnt_state *state = machine->driver_data<triplhnt_state>();
-	device_t *samples = machine->device("samples");
-	device_t *discrete = machine->device("discrete");
+	triplhnt_state *state = machine.driver_data<triplhnt_state>();
+	device_t *samples = machine.device("samples");
+	device_t *discrete = machine.device("discrete");
 	UINT8 is_witch_hunt;
 	UINT8 bit = offset >> 1;
 
@@ -93,13 +93,13 @@ static void triplhnt_update_misc(running_machine *machine, int offset)
 
 static WRITE8_HANDLER( triplhnt_misc_w )
 {
-	triplhnt_update_misc(space->machine, offset);
+	triplhnt_update_misc(space->machine(), offset);
 }
 
 
 static READ8_HANDLER( triplhnt_cmos_r )
 {
-	triplhnt_state *state = space->machine->driver_data<triplhnt_state>();
+	triplhnt_state *state = space->machine().driver_data<triplhnt_state>();
 	state->cmos_latch = offset;
 
 	return state->cmos[state->cmos_latch] ^ 15;
@@ -109,23 +109,23 @@ static READ8_HANDLER( triplhnt_cmos_r )
 static READ8_HANDLER( triplhnt_input_port_4_r )
 {
 	watchdog_reset_w(space, 0, 0);
-	return input_port_read(space->machine, "0C0B");
+	return input_port_read(space->machine(), "0C0B");
 }
 
 
 static READ8_HANDLER( triplhnt_misc_r )
 {
-	triplhnt_state *state = space->machine->driver_data<triplhnt_state>();
-	triplhnt_update_misc(space->machine, offset);
-	return input_port_read(space->machine, "VBLANK") | state->hit_code;
+	triplhnt_state *state = space->machine().driver_data<triplhnt_state>();
+	triplhnt_update_misc(space->machine(), offset);
+	return input_port_read(space->machine(), "VBLANK") | state->hit_code;
 }
 
 
 static READ8_HANDLER( triplhnt_da_latch_r )
 {
-	triplhnt_state *state = space->machine->driver_data<triplhnt_state>();
-	int cross_x = input_port_read(space->machine, "STICKX");
-	int cross_y = input_port_read(space->machine, "STICKY");
+	triplhnt_state *state = space->machine().driver_data<triplhnt_state>();
+	int cross_x = input_port_read(space->machine(), "STICKX");
+	int cross_y = input_port_read(space->machine(), "STICKY");
 
 	state->da_latch = offset;
 

@@ -17,16 +17,16 @@
 
 WRITE8_HANDLER( spacefb_port_0_w )
 {
-	spacefb_state *state = space->machine->driver_data<spacefb_state>();
-	space->machine->primary_screen->update_now();
+	spacefb_state *state = space->machine().driver_data<spacefb_state>();
+	space->machine().primary_screen->update_now();
 	state->port_0 = data;
 }
 
 
 WRITE8_HANDLER( spacefb_port_2_w )
 {
-	spacefb_state *state = space->machine->driver_data<spacefb_state>();
-	space->machine->primary_screen->update_now();
+	spacefb_state *state = space->machine().driver_data<spacefb_state>();
+	space->machine().primary_screen->update_now();
 	state->port_2 = data;
 }
 
@@ -69,7 +69,7 @@ WRITE8_HANDLER( spacefb_port_2_w )
 
 VIDEO_START( spacefb )
 {
-	spacefb_state *state = machine->driver_data<spacefb_state>();
+	spacefb_state *state = machine.driver_data<spacefb_state>();
 	int width, height;
 
 	/* compute the color gun weights */
@@ -81,8 +81,8 @@ VIDEO_START( spacefb )
 							 2, resistances_b,  state->color_weights_b,  470, 0,
 							 0, 0, 0, 0, 0);
 
-	width = machine->primary_screen->width();
-	height = machine->primary_screen->height();
+	width = machine.primary_screen->width();
+	height = machine.primary_screen->height();
 	state->object_present_map = auto_alloc_array(machine, UINT8, width * height);
 
 	/* this start value positions the stars to match the flyer screen shot,
@@ -140,7 +140,7 @@ static void get_starfield_pens(spacefb_state *state, pen_t *pens)
 
 static void draw_starfield(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	spacefb_state *state = screen.machine->driver_data<spacefb_state>();
+	spacefb_state *state = screen.machine().driver_data<spacefb_state>();
 	int y;
 	pen_t pens[NUM_STARFIELD_PENS];
 
@@ -207,11 +207,11 @@ static void draw_starfield(screen_device &screen, bitmap_t *bitmap, const rectan
 #define NUM_SPRITE_PENS	(0x40)
 
 
-static void get_sprite_pens(running_machine *machine, pen_t *pens)
+static void get_sprite_pens(running_machine &machine, pen_t *pens)
 {
-	spacefb_state *state = machine->driver_data<spacefb_state>();
+	spacefb_state *state = machine.driver_data<spacefb_state>();
 	static const double fade_weights[] = { 1.0, 1.5, 2.5, 4.0 };
-	const UINT8 *prom = machine->region("proms")->base();
+	const UINT8 *prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < NUM_SPRITE_PENS; i++)
@@ -248,12 +248,12 @@ static void get_sprite_pens(running_machine *machine, pen_t *pens)
 }
 
 
-static void draw_bullet(running_machine *machine, offs_t offs, pen_t pen, bitmap_t *bitmap, const rectangle *cliprect, int flip)
+static void draw_bullet(running_machine &machine, offs_t offs, pen_t pen, bitmap_t *bitmap, const rectangle *cliprect, int flip)
 {
-	spacefb_state *state = machine->driver_data<spacefb_state>();
+	spacefb_state *state = machine.driver_data<spacefb_state>();
 	UINT8 sy;
 
-	UINT8 *gfx = machine->region("gfx2")->base();
+	UINT8 *gfx = machine.region("gfx2")->base();
 
 	UINT8 code = state->videoram[offs + 0x0200] & 0x3f;
 	UINT8 y = ~state->videoram[offs + 0x0100] - 2;
@@ -300,12 +300,12 @@ static void draw_bullet(running_machine *machine, offs_t offs, pen_t pen, bitmap
 }
 
 
-static void draw_sprite(running_machine *machine, offs_t offs, pen_t *pens, bitmap_t *bitmap, const rectangle *cliprect, int flip)
+static void draw_sprite(running_machine &machine, offs_t offs, pen_t *pens, bitmap_t *bitmap, const rectangle *cliprect, int flip)
 {
-	spacefb_state *state = machine->driver_data<spacefb_state>();
+	spacefb_state *state = machine.driver_data<spacefb_state>();
 	UINT8 sy;
 
-	UINT8 *gfx = machine->region("gfx1")->base();
+	UINT8 *gfx = machine.region("gfx1")->base();
 
 	UINT8 code = ~state->videoram[offs + 0x0200];
 	UINT8 color_base = (~state->videoram[offs + 0x0300] & 0x0f) << 2;
@@ -358,9 +358,9 @@ static void draw_sprite(running_machine *machine, offs_t offs, pen_t *pens, bitm
 }
 
 
-static void draw_objects(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_objects(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	spacefb_state *state = machine->driver_data<spacefb_state>();
+	spacefb_state *state = machine.driver_data<spacefb_state>();
 	pen_t sprite_pens[NUM_SPRITE_PENS];
 
 	offs_t offs = (state->port_0 & 0x20) ? 0x80 : 0x00;
@@ -399,7 +399,7 @@ static void draw_objects(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( spacefb )
 {
-	draw_objects(screen->machine, bitmap, cliprect);
+	draw_objects(screen->machine(), bitmap, cliprect);
 	draw_starfield(*screen, bitmap, cliprect);
 
 	return 0;

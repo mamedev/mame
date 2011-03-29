@@ -11,15 +11,15 @@
 
 INTERRUPT_GEN( esripsys_vblank_irq )
 {
-	esripsys_state *state = device->machine->driver_data<esripsys_state>();
-	cputag_set_input_line(device->machine, "game_cpu", M6809_IRQ_LINE, ASSERT_LINE);
+	esripsys_state *state = device->machine().driver_data<esripsys_state>();
+	cputag_set_input_line(device->machine(), "game_cpu", M6809_IRQ_LINE, ASSERT_LINE);
 	state->frame_vbl = 0;
 }
 
 static TIMER_CALLBACK( hblank_start_callback )
 {
-	esripsys_state *state = machine->driver_data<esripsys_state>();
-	int v = machine->primary_screen->vpos();
+	esripsys_state *state = machine.driver_data<esripsys_state>();
+	int v = machine.primary_screen->vpos();
 
 	if (state->video_firq)
 	{
@@ -39,27 +39,27 @@ static TIMER_CALLBACK( hblank_start_callback )
 		v = 0;
 
 	/* Set end of HBLANK timer */
-	state->hblank_end_timer->adjust(machine->primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_END), v);
+	state->hblank_end_timer->adjust(machine.primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_END), v);
 	state->hblank = 0;
 }
 
 static TIMER_CALLBACK( hblank_end_callback )
 {
-	esripsys_state *state = machine->driver_data<esripsys_state>();
-	int v = machine->primary_screen->vpos();
+	esripsys_state *state = machine.driver_data<esripsys_state>();
+	int v = machine.primary_screen->vpos();
 
 	if (v > 0)
-		machine->primary_screen->update_partial(v - 1);
+		machine.primary_screen->update_partial(v - 1);
 
 	state->_12sel ^= 1;
-	state->hblank_start_timer->adjust(machine->primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_START));
+	state->hblank_start_timer->adjust(machine.primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_START));
 
 	state->hblank = 1;
 }
 
 VIDEO_START( esripsys )
 {
-	esripsys_state *state = machine->driver_data<esripsys_state>();
+	esripsys_state *state = machine.driver_data<esripsys_state>();
 	struct line_buffer_t *line_buffer = state->line_buffer;
 	int i;
 
@@ -73,9 +73,9 @@ VIDEO_START( esripsys )
 	line_buffer[1].priority_buf = auto_alloc_array(machine, UINT8, 512);
 
 	/* Create and initialise the HBLANK timers */
-	state->hblank_start_timer = machine->scheduler().timer_alloc(FUNC(hblank_start_callback));
-	state->hblank_end_timer = machine->scheduler().timer_alloc(FUNC(hblank_end_callback));
-	state->hblank_start_timer->adjust(machine->primary_screen->time_until_pos(0, ESRIPSYS_HBLANK_START));
+	state->hblank_start_timer = machine.scheduler().timer_alloc(FUNC(hblank_start_callback));
+	state->hblank_end_timer = machine.scheduler().timer_alloc(FUNC(hblank_end_callback));
+	state->hblank_start_timer->adjust(machine.primary_screen->time_until_pos(0, ESRIPSYS_HBLANK_START));
 
 	/* Create the sprite scaling table */
 	state->scale_table = auto_alloc_array(machine, UINT8, 64 * 64);
@@ -153,7 +153,7 @@ VIDEO_START( esripsys )
 
 SCREEN_UPDATE( esripsys )
 {
-	esripsys_state *state = screen->machine->driver_data<esripsys_state>();
+	esripsys_state *state = screen->machine().driver_data<esripsys_state>();
 	struct line_buffer_t *line_buffer = state->line_buffer;
 	int x, y;
 
@@ -187,14 +187,14 @@ SCREEN_UPDATE( esripsys )
 
 WRITE8_HANDLER( esripsys_bg_intensity_w )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
 	state->bg_intensity = data & 0xf;
 }
 
 /* Draw graphics to a line buffer */
-int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank)
+int esripsys_draw(running_machine &machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank)
 {
-	esripsys_state *state = machine->driver_data<esripsys_state>();
+	esripsys_state *state = machine.driver_data<esripsys_state>();
 	struct line_buffer_t *line_buffer = state->line_buffer;
 	UINT8 *colour_buf = line_buffer[state->_12sel ? 1 : 0].colour_buf;
 	UINT8 *intensity_buf = line_buffer[state->_12sel ? 1 : 0].intensity_buf;
@@ -226,13 +226,13 @@ int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int
 
 		if (x_flip)
 		{
-			rom_l = machine->region("8bpp_r")->base();
-			rom_r = machine->region("8bpp_l")->base();
+			rom_l = machine.region("8bpp_r")->base();
+			rom_r = machine.region("8bpp_l")->base();
 		}
 		else
 		{
-			rom_l = machine->region("8bpp_l")->base();
-			rom_r = machine->region("8bpp_r")->base();
+			rom_l = machine.region("8bpp_l")->base();
+			rom_r = machine.region("8bpp_r")->base();
 		}
 
 		for (cnt = 0; cnt <= fig; cnt++)
@@ -295,7 +295,7 @@ int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int
 	/* 4bpp case */
 	else
 	{
-		const UINT8* const rom = machine->region("4bpp")->base();
+		const UINT8* const rom = machine.region("4bpp")->base();
 		int ptr = 0;
 		int cnt;
 		UINT32 lpos = l;

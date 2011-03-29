@@ -148,13 +148,13 @@ Region byte at offset 0x031:
 
 static READ16_HANDLER( color_ram_word_r )
 {
-	slapshot_state *state = space->machine->driver_data<slapshot_state>();
+	slapshot_state *state = space->machine().driver_data<slapshot_state>();
 	return state->color_ram[offset];
 }
 
 static WRITE16_HANDLER( color_ram_word_w )
 {
-	slapshot_state *state = space->machine->driver_data<slapshot_state>();
+	slapshot_state *state = space->machine().driver_data<slapshot_state>();
 	int r,g,b;
 	COMBINE_DATA(&state->color_ram[offset]);
 
@@ -164,7 +164,7 @@ static WRITE16_HANDLER( color_ram_word_w )
 		g = (state->color_ram[offset] & 0xff00) >> 8;
 		b = (state->color_ram[offset] & 0xff);
 
-		palette_set_color(space->machine, offset / 2, MAKE_RGB(r,g,b));
+		palette_set_color(space->machine(), offset / 2, MAKE_RGB(r,g,b));
 	}
 }
 
@@ -175,14 +175,14 @@ static WRITE16_HANDLER( color_ram_word_w )
 
 static TIMER_CALLBACK( slapshot_interrupt6 )
 {
-	slapshot_state *state = machine->driver_data<slapshot_state>();
+	slapshot_state *state = machine.driver_data<slapshot_state>();
 	device_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
 
 static INTERRUPT_GEN( slapshot_interrupt )
 {
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(slapshot_interrupt6));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(slapshot_interrupt6));
 	device_set_input_line(device, 5, HOLD_LINE);
 }
 
@@ -193,12 +193,12 @@ static INTERRUPT_GEN( slapshot_interrupt )
 
 static READ16_HANDLER( slapshot_service_input_r )
 {
-	slapshot_state *state = space->machine->driver_data<slapshot_state>();
+	slapshot_state *state = space->machine().driver_data<slapshot_state>();
 	switch (offset)
 	{
 		case 0x03:
-			return ((input_port_read(space->machine, "SYSTEM") & 0xef) |
-				  (input_port_read(space->machine, "SERVICE") & 0x10))  << 8;	/* IN3 + service switch */
+			return ((input_port_read(space->machine(), "SYSTEM") & 0xef) |
+				  (input_port_read(space->machine(), "SERVICE") & 0x10))  << 8;	/* IN3 + service switch */
 
 		default:
 			return tc0640fio_r(state->tc0640fio, offset) << 8;
@@ -210,7 +210,7 @@ static READ16_HANDLER( opwolf3_adc_r )
 {
 	static const char *const adcnames[] = { "GUN1X", "GUN1Y", "GUN2X", "GUN2Y" };
 
-	return input_port_read(space->machine, adcnames[offset]) << 8;
+	return input_port_read(space->machine(), adcnames[offset]) << 8;
 }
 
 static WRITE16_HANDLER( opwolf3_adc_req_w )
@@ -233,7 +233,7 @@ static WRITE16_HANDLER( opwolf3_adc_req_w )
 		output_set_value("Player2_Gun_Recoil",0);
 	break;
 	}
-	slapshot_state *state = space->machine->driver_data<slapshot_state>();
+	slapshot_state *state = space->machine().driver_data<slapshot_state>();
 
 	/* 4 writes a frame - one for each analogue port */
 	device_set_input_line(state->maincpu, 3, HOLD_LINE);
@@ -243,17 +243,17 @@ static WRITE16_HANDLER( opwolf3_adc_req_w )
                 SOUND
 *****************************************************/
 
-static void reset_sound_region( running_machine *machine )
+static void reset_sound_region( running_machine &machine )
 {
-	slapshot_state *state = machine->driver_data<slapshot_state>();
+	slapshot_state *state = machine.driver_data<slapshot_state>();
 	memory_set_bank(machine, "bank10", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	slapshot_state *state = space->machine->driver_data<slapshot_state>();
+	slapshot_state *state = space->machine().driver_data<slapshot_state>();
 	state->banknum = data & 7;
-	reset_sound_region(space->machine);
+	reset_sound_region(space->machine());
 }
 
 
@@ -263,7 +263,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static WRITE16_HANDLER( slapshot_msb_sound_w )
 {
-	slapshot_state *state = space->machine->driver_data<slapshot_state>();
+	slapshot_state *state = space->machine().driver_data<slapshot_state>();
 	if (offset == 0)
 		tc0140syt_port_w(state->tc0140syt, 0, (data >> 8) & 0xff);
 	else if (offset == 1)
@@ -277,7 +277,7 @@ static WRITE16_HANDLER( slapshot_msb_sound_w )
 
 static READ16_HANDLER( slapshot_msb_sound_r )
 {
-	slapshot_state *state = space->machine->driver_data<slapshot_state>();
+	slapshot_state *state = space->machine().driver_data<slapshot_state>();
 	if (offset == 1)
 		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff) << 8);
 	else
@@ -492,7 +492,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler( device_t *device, int irq )
 {
-	slapshot_state *state = device->machine->driver_data<slapshot_state>();
+	slapshot_state *state = device->machine().driver_data<slapshot_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -534,20 +534,20 @@ static STATE_POSTLOAD( slapshot_postload )
 
 static MACHINE_START( slapshot )
 {
-	slapshot_state *state = machine->driver_data<slapshot_state>();
+	slapshot_state *state = machine.driver_data<slapshot_state>();
 
-	memory_configure_bank(machine, "bank10", 0, 4, machine->region("audiocpu")->base() + 0xc000, 0x4000);
+	memory_configure_bank(machine, "bank10", 0, 4, machine.region("audiocpu")->base() + 0xc000, 0x4000);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->tc0140syt = machine->device("tc0140syt");
-	state->tc0480scp = machine->device("tc0480scp");
-	state->tc0360pri = machine->device("tc0360pri");
-	state->tc0640fio = machine->device("tc0640fio");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->tc0140syt = machine.device("tc0140syt");
+	state->tc0480scp = machine.device("tc0480scp");
+	state->tc0360pri = machine.device("tc0360pri");
+	state->tc0640fio = machine.device("tc0640fio");
 
 	state->banknum = 0;
 	state->save_item(NAME(state->banknum));
-	machine->state().register_postload(slapshot_postload, NULL);
+	machine.state().register_postload(slapshot_postload, NULL);
 }
 
 
@@ -744,8 +744,8 @@ ROM_END
 static DRIVER_INIT( slapshot )
 {
 	UINT32 offset,i;
-	UINT8 *gfx = machine->region("gfx2")->base();
-	int size = machine->region("gfx2")->bytes();
+	UINT8 *gfx = machine.region("gfx2")->base();
+	int size = machine.region("gfx2")->bytes();
 	int data;
 
 	offset = size / 2;

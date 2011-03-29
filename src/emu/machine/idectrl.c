@@ -258,9 +258,9 @@ INLINE void signal_delayed_interrupt(ide_state *ide, attotime time, int buffer_r
 
 	/* set a timer */
 	if (buffer_ready)
-		ide->device->machine->scheduler().timer_set(time, FUNC(delayed_interrupt_buffer_ready), 0, ide);
+		ide->device->machine().scheduler().timer_set(time, FUNC(delayed_interrupt_buffer_ready), 0, ide);
 	else
-		ide->device->machine->scheduler().timer_set(time, FUNC(delayed_interrupt), 0, ide);
+		ide->device->machine().scheduler().timer_set(time, FUNC(delayed_interrupt), 0, ide);
 }
 
 
@@ -625,7 +625,7 @@ static void security_error(ide_state *ide)
 	ide->status &= ~IDE_STATUS_DRIVE_READY;
 
 	/* just set a timer and mark ourselves error */
-	ide->device->machine->scheduler().timer_set(TIME_SECURITY_ERROR, FUNC(security_error_done), 0, ide);
+	ide->device->machine().scheduler().timer_set(TIME_SECURITY_ERROR, FUNC(security_error_done), 0, ide);
 }
 
 
@@ -806,10 +806,10 @@ static void read_first_sector(ide_state *ide)
 			seek_time = TIME_SEEK_MULTISECTOR;
 
 		ide->cur_lba = new_lba;
-		ide->device->machine->scheduler().timer_set(seek_time, FUNC(read_sector_done_callback), 0, ide);
+		ide->device->machine().scheduler().timer_set(seek_time, FUNC(read_sector_done_callback), 0, ide);
 	}
 	else
-		ide->device->machine->scheduler().timer_set(TIME_PER_SECTOR, FUNC(read_sector_done_callback), 0, ide);
+		ide->device->machine().scheduler().timer_set(TIME_PER_SECTOR, FUNC(read_sector_done_callback), 0, ide);
 }
 
 
@@ -825,11 +825,11 @@ static void read_next_sector(ide_state *ide)
 			read_sector_done(ide);
 		else
 			/* just set a timer */
-			ide->device->machine->scheduler().timer_set(attotime::from_usec(1), FUNC(read_sector_done_callback), 0, ide);
+			ide->device->machine().scheduler().timer_set(attotime::from_usec(1), FUNC(read_sector_done_callback), 0, ide);
 	}
 	else
 		/* just set a timer */
-		ide->device->machine->scheduler().timer_set(TIME_PER_SECTOR, FUNC(read_sector_done_callback), 0, ide);
+		ide->device->machine().scheduler().timer_set(TIME_PER_SECTOR, FUNC(read_sector_done_callback), 0, ide);
 }
 
 
@@ -862,13 +862,13 @@ static void continue_write(ide_state *ide)
 		else
 		{
 			/* set a timer to do the write */
-			ide->device->machine->scheduler().timer_set(TIME_PER_SECTOR, FUNC(write_sector_done_callback), 0, ide);
+			ide->device->machine().scheduler().timer_set(TIME_PER_SECTOR, FUNC(write_sector_done_callback), 0, ide);
 		}
 	}
 	else
 	{
 		/* set a timer to do the write */
-		ide->device->machine->scheduler().timer_set(TIME_PER_SECTOR, FUNC(write_sector_done_callback), 0, ide);
+		ide->device->machine().scheduler().timer_set(TIME_PER_SECTOR, FUNC(write_sector_done_callback), 0, ide);
 	}
 }
 
@@ -1224,7 +1224,7 @@ static void handle_command(ide_state *ide, UINT8 command)
 
 		default:
 			LOGPRINT(("IDE unknown command (%02X)\n", command));
-			debugger_break(ide->device->machine);
+			debugger_break(ide->device->machine());
 			break;
 	}
 }
@@ -1244,7 +1244,7 @@ static UINT32 ide_controller_read(device_t *device, int bank, offs_t offset, int
 
 	/* logit */
 //  if (BANK(bank, offset) != IDE_BANK0_DATA && BANK(bank, offset) != IDE_BANK0_STATUS_COMMAND && BANK(bank, offset) != IDE_BANK1_STATUS_CONTROL)
-		LOG(("%s:IDE read at %d:%X, size=%d\n", device->machine->describe_context(), bank, offset, size));
+		LOG(("%s:IDE read at %d:%X, size=%d\n", device->machine().describe_context(), bank, offset, size));
 
 	switch (BANK(bank, offset))
 	{
@@ -1279,7 +1279,7 @@ static UINT32 ide_controller_read(device_t *device, int bank, offs_t offset, int
 				/* if we're at the end of the buffer, handle it */
 				if (ide->buffer_offset >= IDE_DISK_SECTOR_SIZE)
 				{
-					LOG(("%s:IDE completed PIO read\n", device->machine->describe_context()));
+					LOG(("%s:IDE completed PIO read\n", device->machine().describe_context()));
 					continue_read(ide);
 				}
 			}
@@ -1330,7 +1330,7 @@ static UINT32 ide_controller_read(device_t *device, int bank, offs_t offset, int
 
 		/* log anything else */
 		default:
-			logerror("%s:unknown IDE read at %03X, size=%d\n", device->machine->describe_context(), offset, size);
+			logerror("%s:unknown IDE read at %03X, size=%d\n", device->machine().describe_context(), offset, size);
 			break;
 	}
 
@@ -1352,7 +1352,7 @@ static void ide_controller_write(device_t *device, int bank, offs_t offset, int 
 
 	/* logit */
 	if (BANK(bank, offset) != IDE_BANK0_DATA)
-		LOG(("%s:IDE write to %d:%X = %08X, size=%d\n", device->machine->describe_context(), bank, offset, data, size));
+		LOG(("%s:IDE write to %d:%X = %08X, size=%d\n", device->machine().describe_context(), bank, offset, data, size));
 	//  fprintf(stderr, "ide write %03x %02x size=%d\n", offset, data, size);
 	switch (BANK(bank, offset))
 	{
@@ -1389,7 +1389,7 @@ static void ide_controller_write(device_t *device, int bank, offs_t offset, int 
 				/* if we're at the end of the buffer, handle it */
 				if (ide->buffer_offset >= IDE_DISK_SECTOR_SIZE)
 				{
-					LOG(("%s:IDE completed PIO write\n", device->machine->describe_context()));
+					LOG(("%s:IDE completed PIO write\n", device->machine().describe_context()));
 					if (ide->command == IDE_COMMAND_SECURITY_UNLOCK)
 					{
 						if (ide->user_password_enable && memcmp(ide->buffer, ide->user_password, 2 + 32) == 0)
@@ -1518,7 +1518,7 @@ static UINT32 ide_bus_master_read(device_t *device, offs_t offset, int size)
 {
 	ide_state *ide = get_safe_token(device);
 
-	LOG(("%s:ide_bus_master_read(%d, %d)\n", device->machine->describe_context(), offset, size));
+	LOG(("%s:ide_bus_master_read(%d, %d)\n", device->machine().describe_context(), offset, size));
 
 	/* command register */
 	if (offset == 0)
@@ -1547,7 +1547,7 @@ static void ide_bus_master_write(device_t *device, offs_t offset, int size, UINT
 {
 	ide_state *ide = get_safe_token(device);
 
-	LOG(("%s:ide_bus_master_write(%d, %d, %08X)\n", device->machine->describe_context(), offset, size, data));
+	LOG(("%s:ide_bus_master_write(%d, %d, %08X)\n", device->machine().describe_context(), offset, size, data));
 
 	/* command register */
 	if (offset == 0)
@@ -1792,21 +1792,20 @@ static DEVICE_START( ide_controller )
 	assert(device != NULL);
 	assert(device->baseconfig().static_config() == NULL);
 	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
-	assert(device->machine != NULL);
 
 	/* store a pointer back to the device */
 	ide->device = device;
 
 	/* set MAME harddisk handle */
 	config = (const ide_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
-	ide->handle = get_disk_handle(device->machine, (config->master != NULL) ? config->master : device->tag());
+	ide->handle = get_disk_handle(device->machine(), (config->master != NULL) ? config->master : device->tag());
 	ide->disk = hard_disk_open(ide->handle);
 	assert_always(config->slave == NULL, "IDE controller does not yet support slave drives\n");
 
 	/* find the bus master space */
 	if (config->bmcpu != NULL)
 	{
-		device_t *bmtarget = device->machine->device(config->bmcpu);
+		device_t *bmtarget = device->machine().device(config->bmcpu);
 		if (bmtarget == NULL)
 			throw emu_fatalerror("IDE controller '%s' bus master target '%s' doesn't exist!", device->tag(), config->bmcpu);
 		device_memory_interface *memory;
@@ -1835,8 +1834,8 @@ static DEVICE_START( ide_controller )
 	}
 
 	/* create a timer for timing status */
-	ide->last_status_timer = device->machine->scheduler().timer_alloc(FUNC(NULL));
-	ide->reset_timer = device->machine->scheduler().timer_alloc(FUNC(reset_callback), (void *)device);
+	ide->last_status_timer = device->machine().scheduler().timer_alloc(FUNC(NULL));
+	ide->reset_timer = device->machine().scheduler().timer_alloc(FUNC(reset_callback), (void *)device);
 
 	/* register ide states */
 	device->save_item(NAME(ide->adapter_control));
@@ -1910,14 +1909,14 @@ static DEVICE_RESET( ide_controller )
 
 	LOG(("IDE controller reset performed\n"));
 
-	if (device->machine->device( "harddisk" )) {
+	if (device->machine().device( "harddisk" )) {
 		if (!ide->disk)
 		{
-			ide->handle = hd_get_chd_file( device->machine->device( "harddisk" ) );	// should be config->master
+			ide->handle = hd_get_chd_file( device->machine().device( "harddisk" ) );	// should be config->master
 
 			if (ide->handle)
 			{
-				ide->disk = hd_get_hard_disk_file( device->machine->device( "harddisk" ) );	// should be config->master
+				ide->disk = hd_get_hard_disk_file( device->machine().device( "harddisk" ) );	// should be config->master
 
 				if (ide->disk != NULL)
 				{

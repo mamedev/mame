@@ -164,8 +164,8 @@ static DEVICE_START( renegade_adpcm )
 {
 	renegade_adpcm_state *state = get_safe_token(device);
 	state->playing = 0;
-	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock(), state, renegade_adpcm_callback);
-	state->base = device->machine->region("adpcm")->base();
+	state->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), state, renegade_adpcm_callback);
+	state->base = device->machine().region("adpcm")->base();
 	state->adpcm.reset();
 }
 
@@ -215,7 +215,7 @@ static WRITE8_DEVICE_HANDLER( adpcm_play_w )
 static WRITE8_HANDLER( sound_w )
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /********************************************************************************************/
@@ -237,10 +237,10 @@ static const UINT8 kuniokun_xor_table[0x2a] =
 	0x68, 0x60
 };
 
-static void setbank(running_machine *machine)
+static void setbank(running_machine &machine)
 {
-	renegade_state *state = machine->driver_data<renegade_state>();
-	UINT8 *RAM = machine->region("maincpu")->base();
+	renegade_state *state = machine.driver_data<renegade_state>();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1", &RAM[state->bank ? 0x10000 : 0x4000]);
 }
 
@@ -251,36 +251,36 @@ static STATE_POSTLOAD( renegade_postload )
 
 static MACHINE_START( renegade )
 {
-	renegade_state *state = machine->driver_data<renegade_state>();
+	renegade_state *state = machine.driver_data<renegade_state>();
 	state_save_register_global_array(machine, state->mcu_buffer);
 	state_save_register_global(machine, state->mcu_input_size);
 	state_save_register_global(machine, state->mcu_output_byte);
 	state_save_register_global(machine, state->mcu_key);
 
 	state_save_register_global(machine, state->bank);
-	machine->state().register_postload(renegade_postload, NULL);
+	machine.state().register_postload(renegade_postload, NULL);
 }
 
 static DRIVER_INIT( renegade )
 {
-	renegade_state *state = machine->driver_data<renegade_state>();
+	renegade_state *state = machine.driver_data<renegade_state>();
 	state->mcu_sim = FALSE;
 }
 
 static DRIVER_INIT( kuniokun )
 {
-	renegade_state *state = machine->driver_data<renegade_state>();
+	renegade_state *state = machine.driver_data<renegade_state>();
 	state->mcu_sim = TRUE;
 	state->mcu_checksum = 0x85;
 	state->mcu_encrypt_table = kuniokun_xor_table;
 	state->mcu_encrypt_table_len = 0x2a;
 
-	machine->device<cpu_device>("mcu")->suspend(SUSPEND_REASON_DISABLE, 1);
+	machine.device<cpu_device>("mcu")->suspend(SUSPEND_REASON_DISABLE, 1);
 }
 
 static DRIVER_INIT( kuniokunb )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Remove the MCU handlers */
 	space->unmap_readwrite(0x3804, 0x3804);
@@ -296,37 +296,37 @@ static DRIVER_INIT( kuniokunb )
 
 READ8_HANDLER( renegade_68705_port_a_r )
 {
-	renegade_state *state = space->machine->driver_data<renegade_state>();
+	renegade_state *state = space->machine().driver_data<renegade_state>();
 	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
 }
 
 WRITE8_HANDLER( renegade_68705_port_a_w )
 {
-	renegade_state *state = space->machine->driver_data<renegade_state>();
+	renegade_state *state = space->machine().driver_data<renegade_state>();
 	state->port_a_out = data;
 }
 
 WRITE8_HANDLER( renegade_68705_ddr_a_w )
 {
-	renegade_state *state = space->machine->driver_data<renegade_state>();
+	renegade_state *state = space->machine().driver_data<renegade_state>();
 	state->ddr_a = data;
 }
 
 READ8_HANDLER( renegade_68705_port_b_r )
 {
-	renegade_state *state = space->machine->driver_data<renegade_state>();
+	renegade_state *state = space->machine().driver_data<renegade_state>();
 	return (state->port_b_out & state->ddr_b) | (state->port_b_in & ~state->ddr_b);
 }
 
 WRITE8_HANDLER( renegade_68705_port_b_w )
 {
-	renegade_state *state = space->machine->driver_data<renegade_state>();
+	renegade_state *state = space->machine().driver_data<renegade_state>();
 	if ((state->ddr_b & 0x02) && (~data & 0x02) && (state->port_b_out & 0x02))
 	{
 		state->port_a_in = state->from_main;
 
 		if (state->main_sent)
-			cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
 
 		state->main_sent = 0;
 	}
@@ -341,14 +341,14 @@ WRITE8_HANDLER( renegade_68705_port_b_w )
 
 WRITE8_HANDLER( renegade_68705_ddr_b_w )
 {
-	renegade_state *state = space->machine->driver_data<renegade_state>();
+	renegade_state *state = space->machine().driver_data<renegade_state>();
 	state->ddr_b = data;
 }
 
 
 READ8_HANDLER( renegade_68705_port_c_r )
 {
-	renegade_state *state = space->machine->driver_data<renegade_state>();
+	renegade_state *state = space->machine().driver_data<renegade_state>();
 	state->port_c_in = 0;
 	if (state->main_sent)
 		state->port_c_in |= 0x01;
@@ -360,13 +360,13 @@ READ8_HANDLER( renegade_68705_port_c_r )
 
 WRITE8_HANDLER( renegade_68705_port_c_w )
 {
-	renegade_state *state = space->machine->driver_data<renegade_state>();
+	renegade_state *state = space->machine().driver_data<renegade_state>();
 	state->port_c_out = data;
 }
 
 WRITE8_HANDLER( renegade_68705_ddr_c_w )
 {
-	renegade_state *state = space->machine->driver_data<renegade_state>();
+	renegade_state *state = space->machine().driver_data<renegade_state>();
 	state->ddr_c = data;
 }
 
@@ -379,7 +379,7 @@ WRITE8_HANDLER( renegade_68705_ddr_c_w )
 
 static READ8_HANDLER( mcu_reset_r )
 {
-	renegade_state *state = space->machine->driver_data<renegade_state>();
+	renegade_state *state = space->machine().driver_data<renegade_state>();
 	if (state->mcu_sim == TRUE)
 	{
 		state->mcu_key = -1;
@@ -388,14 +388,14 @@ static READ8_HANDLER( mcu_reset_r )
 	}
 	else
 	{
-		cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 	return 0;
 }
 
 static WRITE8_HANDLER( mcu_w )
 {
-	renegade_state *state = space->machine->driver_data<renegade_state>();
+	renegade_state *state = space->machine().driver_data<renegade_state>();
 	if (state->mcu_sim == TRUE)
 	{
 		state->mcu_output_byte = 0;
@@ -419,7 +419,7 @@ static WRITE8_HANDLER( mcu_w )
 	{
 		state->from_main = data;
 		state->main_sent = 1;
-		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "mcu", 0, ASSERT_LINE);
 	}
 }
 
@@ -590,7 +590,7 @@ static void mcu_process_command(renegade_state *state)
 
 static READ8_HANDLER( mcu_r )
 {
-	renegade_state *state = space->machine->driver_data<renegade_state>();
+	renegade_state *state = space->machine().driver_data<renegade_state>();
 	if (state->mcu_sim == TRUE)
 	{
 		int result = 1;
@@ -612,7 +612,7 @@ static READ8_HANDLER( mcu_r )
 
 static CUSTOM_INPUT( mcu_status_r )
 {
-	renegade_state *state = field->port->machine->driver_data<renegade_state>();
+	renegade_state *state = field->port->machine().driver_data<renegade_state>();
 	UINT8 res = 0;
 
 	if (state->mcu_sim == TRUE)
@@ -634,11 +634,11 @@ static CUSTOM_INPUT( mcu_status_r )
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	renegade_state *state = space->machine->driver_data<renegade_state>();
+	renegade_state *state = space->machine().driver_data<renegade_state>();
 	if ((data & 1) != state->bank)
 	{
 		state->bank = data & 1;
-		setbank(space->machine);
+		setbank(space->machine());
 	}
 }
 
@@ -909,7 +909,7 @@ GFXDECODE_END
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
 static void irqhandler(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "audiocpu", M6809_FIRQ_LINE, linestate);
+	cputag_set_input_line(device->machine(), "audiocpu", M6809_FIRQ_LINE, linestate);
 }
 
 static const ym3526_interface ym3526_config =
@@ -920,7 +920,7 @@ static const ym3526_interface ym3526_config =
 
 static MACHINE_RESET( renegade )
 {
-	renegade_state *state = machine->driver_data<renegade_state>();
+	renegade_state *state = machine.driver_data<renegade_state>();
 	state->bank = 0;
 	setbank(machine);
 }

@@ -175,28 +175,28 @@ INLINE int scanline_to_vcount(int scanline)
 
 static TIMER_DEVICE_CALLBACK( xain_scanline )
 {
-	xain_state *state = timer.machine->driver_data<xain_state>();
+	xain_state *state = timer.machine().driver_data<xain_state>();
 	int scanline = param;
-	int screen_height = timer.machine->primary_screen->height();
+	int screen_height = timer.machine().primary_screen->height();
 	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
 	int vcount = scanline_to_vcount(scanline);
 
 	/* update to the current point */
 	if (scanline > 0)
 	{
-		timer.machine->primary_screen->update_partial(scanline - 1);
+		timer.machine().primary_screen->update_partial(scanline - 1);
 	}
 
 	/* FIRQ (IMS) fires every on every 8th scanline (except 0) */
 	if (!(vcount_old & 8) && (vcount & 8))
 	{
-		cputag_set_input_line(timer.machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(timer.machine(), "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 	}
 
 	/* NMI fires on scanline 248 (VBL) and is latched */
 	if (vcount == 0xf8)
 	{
-		cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 
 	/* VBLANK input bit is held high from scanlines 248-255 */
@@ -212,20 +212,20 @@ static TIMER_DEVICE_CALLBACK( xain_scanline )
 
 static WRITE8_HANDLER( xainCPUA_bankswitch_w )
 {
-	xain_state *state = space->machine->driver_data<xain_state>();
+	xain_state *state = space->machine().driver_data<xain_state>();
 	state->pri = data & 0x7;
-	memory_set_bank(space->machine, "bank1", (data >> 3) & 1);
+	memory_set_bank(space->machine(), "bank1", (data >> 3) & 1);
 }
 
 static WRITE8_HANDLER( xainCPUB_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank2", data & 1);
+	memory_set_bank(space->machine(), "bank2", data & 1);
 }
 
 static WRITE8_HANDLER( xain_sound_command_w )
 {
 	soundlatch_w(space,offset,data);
-	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( xain_main_irq_w )
@@ -233,50 +233,50 @@ static WRITE8_HANDLER( xain_main_irq_w )
 	switch (offset)
 	{
 	case 0: /* 0x3a09 - NMI clear */
-		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 		break;
 	case 1: /* 0x3a0a - FIRQ clear */
-		cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
 		break;
 	case 2: /* 0x3a0b - IRQ clear */
-		cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 		break;
 	case 3: /* 0x3a0c - IRQB assert */
-		cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "sub", M6809_IRQ_LINE, ASSERT_LINE);
 		break;
 	}
 }
 
 static WRITE8_HANDLER( xain_irqA_assert_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( xain_irqB_clear_w )
 {
-	cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "sub", M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static READ8_HANDLER( xain_68705_r )
 {
-	xain_state *state = space->machine->driver_data<xain_state>();
+	xain_state *state = space->machine().driver_data<xain_state>();
 	state->_mcu_ready = 1;
 	return state->from_mcu;
 }
 
 static WRITE8_HANDLER( xain_68705_w )
 {
-	xain_state *state = space->machine->driver_data<xain_state>();
+	xain_state *state = space->machine().driver_data<xain_state>();
 	state->from_main = data;
 	state->_mcu_accept = 0;
 
-	if (space->machine->device("mcu") != NULL)
-		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
+	if (space->machine().device("mcu") != NULL)
+		cputag_set_input_line(space->machine(), "mcu", 0, ASSERT_LINE);
 }
 
 static CUSTOM_INPUT( xain_vblank_r )
 {
-	xain_state *state = field->port->machine->driver_data<xain_state>();
+	xain_state *state = field->port->machine().driver_data<xain_state>();
 	return state->vblank;
 }
 
@@ -289,31 +289,31 @@ static CUSTOM_INPUT( xain_vblank_r )
 
 READ8_HANDLER( xain_68705_port_a_r )
 {
-	xain_state *state = space->machine->driver_data<xain_state>();
+	xain_state *state = space->machine().driver_data<xain_state>();
 	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
 }
 
 WRITE8_HANDLER( xain_68705_port_a_w )
 {
-	xain_state *state = space->machine->driver_data<xain_state>();
+	xain_state *state = space->machine().driver_data<xain_state>();
 	state->port_a_out = data;
 }
 
 WRITE8_HANDLER( xain_68705_ddr_a_w )
 {
-	xain_state *state = space->machine->driver_data<xain_state>();
+	xain_state *state = space->machine().driver_data<xain_state>();
 	state->ddr_a = data;
 }
 
 READ8_HANDLER( xain_68705_port_b_r )
 {
-	xain_state *state = space->machine->driver_data<xain_state>();
+	xain_state *state = space->machine().driver_data<xain_state>();
 	return (state->port_b_out & state->ddr_b) | (state->port_b_in & ~state->ddr_b);
 }
 
 WRITE8_HANDLER( xain_68705_port_b_w )
 {
-	xain_state *state = space->machine->driver_data<xain_state>();
+	xain_state *state = space->machine().driver_data<xain_state>();
 	if ((state->ddr_b & 0x02) && (~data & 0x02))
 	{
 		state->port_a_in = state->from_main;
@@ -322,7 +322,7 @@ WRITE8_HANDLER( xain_68705_port_b_w )
 	else if ((state->ddr_b & 0x02) && (~state->port_b_out & 0x02) && (data & 0x02))
 	{
 		state->_mcu_accept = 1;
-		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
 	}
 
 	/* Rising edge of PB2 */
@@ -337,13 +337,13 @@ WRITE8_HANDLER( xain_68705_port_b_w )
 
 WRITE8_HANDLER( xain_68705_ddr_b_w )
 {
-	xain_state *state = space->machine->driver_data<xain_state>();
+	xain_state *state = space->machine().driver_data<xain_state>();
 	state->ddr_b = data;
 }
 
 READ8_HANDLER( xain_68705_port_c_r )
 {
-	xain_state *state = space->machine->driver_data<xain_state>();
+	xain_state *state = space->machine().driver_data<xain_state>();
 	state->port_c_in = 0;
 
 	if (!state->_mcu_accept)
@@ -356,22 +356,22 @@ READ8_HANDLER( xain_68705_port_c_r )
 
 WRITE8_HANDLER( xain_68705_port_c_w )
 {
-	xain_state *state = space->machine->driver_data<xain_state>();
+	xain_state *state = space->machine().driver_data<xain_state>();
 	state->port_c_out = data;
 }
 
 WRITE8_HANDLER( xain_68705_ddr_c_w )
 {
-	xain_state *state = space->machine->driver_data<xain_state>();
+	xain_state *state = space->machine().driver_data<xain_state>();
 	state->ddr_c = data;
 }
 
 static CUSTOM_INPUT( mcu_status_r )
 {
-	xain_state *state = field->port->machine->driver_data<xain_state>();
+	xain_state *state = field->port->machine().driver_data<xain_state>();
 	UINT8 res = 0;
 
-	if (field->port->machine->device("mcu") != NULL)
+	if (field->port->machine().device("mcu") != NULL)
 	{
 		if (state->_mcu_ready == 1)
 			res |= 0x01;
@@ -388,12 +388,12 @@ static CUSTOM_INPUT( mcu_status_r )
 
 READ8_HANDLER( mcu_comm_reset_r )
 {
-	xain_state *state = space->machine->driver_data<xain_state>();
+	xain_state *state = space->machine().driver_data<xain_state>();
 	state->_mcu_ready = 1;
 	state->_mcu_accept = 1;
 
-	if (space->machine->device("mcu") != NULL)
-		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
+	if (space->machine().device("mcu") != NULL)
+		cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
 
 	return 0xff;
 }
@@ -568,7 +568,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -583,8 +583,8 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( xsleena )
 {
-	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x4000, 0xc000);
-	memory_configure_bank(machine, "bank2", 0, 2, machine->region("sub")->base()  + 0x4000, 0xc000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0x4000, 0xc000);
+	memory_configure_bank(machine, "bank2", 0, 2, machine.region("sub")->base()  + 0x4000, 0xc000);
 	memory_set_bank(machine, "bank1", 0);
 	memory_set_bank(machine, "bank2", 0);
 }

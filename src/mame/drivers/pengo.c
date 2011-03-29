@@ -107,7 +107,7 @@ public:
 
 static WRITE8_HANDLER( pengo_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset, data & 1);
+	coin_counter_w(space->machine(), offset, data & 1);
 }
 
 
@@ -674,9 +674,9 @@ static DRIVER_INIT( penta )
 		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 },	/* ...1...1...0.... */
 		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 }		/* ...1...1...1.... */
 	};
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	int A;
 
 	space->set_decrypted_region(0x0000, 0x7fff, decrypt);

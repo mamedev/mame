@@ -127,7 +127,7 @@ The current set of Super Model is an example of type C
 
 static SCREEN_EOF( galpanic )
 {
-	device_t *pandora = machine->device("pandora");
+	device_t *pandora = machine.device("pandora");
 	pandora_eof(pandora);
 }
 
@@ -153,11 +153,11 @@ static INTERRUPT_GEN( galhustl_interrupt )
 
 static WRITE16_HANDLER( galpanic_6295_bankswitch_w )
 {
-	device_t *pandora = space->machine->device("pandora");
+	device_t *pandora = space->machine().device("pandora");
 
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = space->machine->region("oki")->base();
+		UINT8 *rom = space->machine().region("oki")->base();
 
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 
@@ -170,7 +170,7 @@ static WRITE16_HANDLER( galpanica_6295_bankswitch_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = space->machine->region("oki")->base();
+		UINT8 *rom = space->machine().region("oki")->base();
 
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 	}
@@ -179,7 +179,7 @@ static WRITE16_HANDLER( galpanica_6295_bankswitch_w )
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( galpanica_misc_w )
 {
-	device_t *pandora = machine->device("pandora");
+	device_t *pandora = machine.device("pandora");
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -194,11 +194,11 @@ static WRITE16_HANDLER( galpanic_coin_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine, 0, data & 0x100);
-		coin_counter_w(space->machine, 1, data & 0x200);
+		coin_counter_w(space->machine(), 0, data & 0x100);
+		coin_counter_w(space->machine(), 1, data & 0x200);
 
-		coin_lockout_w(space->machine, 0, ~data & 0x400);
-		coin_lockout_w(space->machine, 1, ~data & 0x800);
+		coin_lockout_w(space->machine(), 0, ~data & 0x400);
+		coin_lockout_w(space->machine(), 1, ~data & 0x800);
 	}
 }
 
@@ -233,7 +233,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( kludge )
 {
-	return space->machine->rand() & 0x0700;
+	return space->machine().rand() & 0x0700;
 }
 
 /* a kludge! */
@@ -242,7 +242,7 @@ static READ8_DEVICE_HANDLER( comad_okim6295_r )
 	UINT16 retvalue;
 
 //  retvalue = okim6295_r(offset,mem_mask) << 8; // doesn't work, causes lockups when girls change..
-	retvalue = device->machine->rand();
+	retvalue = device->machine().rand();
 
 	return retvalue;
 }
@@ -306,7 +306,7 @@ ADDRESS_MAP_END
 #ifdef UNUSED_FUNCTION
 READ16_HANDLER( zipzap_random_read )
 {
-    return space->machine->rand();
+    return space->machine().rand();
 }
 #endif
 

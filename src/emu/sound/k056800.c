@@ -61,7 +61,7 @@ static void k056800_host_reg_w( device_t *device, int reg, UINT8 data )
 	k056800->sound_reg[reg] = data;
 
 	if (reg == 7)
-		k056800->irq_cb(device->machine, 1);
+		k056800->irq_cb(device->machine(), 1);
 }
 
 static UINT8 k056800_sound_reg_r( device_t *device, int reg )
@@ -146,7 +146,7 @@ static DEVICE_START( k056800 )
 
 	k056800->irq_cb = intf->irq_cb;
 
-	k056800->sound_cpu_timer = device->machine->scheduler().timer_alloc(FUNC(k056800_sound_cpu_timer_tick), k056800);
+	k056800->sound_cpu_timer = device->machine().scheduler().timer_alloc(FUNC(k056800_sound_cpu_timer_tick), k056800);
 	k056800->sound_cpu_timer->adjust(timer_period, 0, timer_period);
 
 	device->save_item(NAME(k056800->host_reg));

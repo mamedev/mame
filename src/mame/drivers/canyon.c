@@ -67,10 +67,10 @@ static READ8_HANDLER( canyon_switches_r )
 {
 	UINT8 val = 0;
 
-	if ((input_port_read(space->machine, "IN2") >> (offset & 7)) & 1)
+	if ((input_port_read(space->machine(), "IN2") >> (offset & 7)) & 1)
 		val |= 0x80;
 
-	if ((input_port_read(space->machine, "IN1") >> (offset & 3)) & 1)
+	if ((input_port_read(space->machine(), "IN1") >> (offset & 3)) & 1)
 		val |= 0x01;
 
 	return val;
@@ -79,7 +79,7 @@ static READ8_HANDLER( canyon_switches_r )
 
 static READ8_HANDLER( canyon_options_r )
 {
-	return (input_port_read(space->machine, "DSW") >> (2 * (~offset & 3))) & 3;
+	return (input_port_read(space->machine(), "DSW") >> (2 * (~offset & 3))) & 3;
 }
 
 
@@ -93,7 +93,7 @@ static READ8_HANDLER( canyon_options_r )
 
 static WRITE8_HANDLER( canyon_led_w )
 {
-	set_led_status(space->machine, offset & 0x01, offset & 0x02);
+	set_led_status(space->machine(), offset & 0x01, offset & 0x02);
 }
 
 

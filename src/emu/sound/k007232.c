@@ -328,7 +328,7 @@ static DEVICE_START( k007232 )
 
 	for( i = 0; i < 0x10; i++ )  info->wreg[i] = 0;
 
-	info->stream = device->machine->sound().stream_alloc(*device,0,2,device->clock()/128,info,KDAC_A_update);
+	info->stream = device->machine().sound().stream_alloc(*device,0,2,device->clock()/128,info,KDAC_A_update);
 
 	KDAC_A_make_fncode(info);
 }

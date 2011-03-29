@@ -113,11 +113,11 @@ static DEVICE_START( votrax )
 	votrax_state *votrax = get_safe_token(device);
 
 	votrax->device = device;
-	votrax->samples = readsamples(device->machine,VotraxTable,"votrax");
+	votrax->samples = readsamples(device->machine(),VotraxTable,"votrax");
 	votrax->frequency = 8000;
 	votrax->volume = 230;
 
-	votrax->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), votrax, votrax_update_sound);
+	votrax->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), votrax, votrax_update_sound);
 
 	votrax->sample = NULL;
 	votrax->step = 0;
@@ -144,7 +144,7 @@ WRITE8_DEVICE_HANDLER( votrax_w )
 		info->sample = &info->samples->sample[Phoneme];
 		info->pos = 0;
 		info->frac = 0;
-		info->step = ((INT64)(info->sample->frequency + (256*Intonation)) << FRAC_BITS) / info->device->machine->sample_rate();
+		info->step = ((INT64)(info->sample->frequency + (256*Intonation)) << FRAC_BITS) / info->device->machine().sample_rate();
 		info->channel->set_output_gain(0, (info->volume + (8*Intonation)*100/255) / 100.0);
 	}
 }

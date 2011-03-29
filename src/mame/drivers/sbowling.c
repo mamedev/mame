@@ -64,8 +64,8 @@ public:
 
 static TILE_GET_INFO( get_sb_tile_info )
 {
-	sbowling_state *state = machine->driver_data<sbowling_state>();
-	UINT8 *rom = machine->region("user1")->base();
+	sbowling_state *state = machine.driver_data<sbowling_state>();
+	UINT8 *rom = machine.region("user1")->base();
 	int tileno = rom[tile_index + state->bgmap * 1024];
 
 	SET_TILE_INFO(0, tileno, 0, 0);
@@ -83,8 +83,8 @@ static void plot_pixel_sbw(bitmap_t *tmpbitmap, int x, int y, int col, int flip)
 
 static WRITE8_HANDLER( sbw_videoram_w )
 {
-	sbowling_state *state = space->machine->driver_data<sbowling_state>();
-	int flip = flip_screen_get(space->machine);
+	sbowling_state *state = space->machine().driver_data<sbowling_state>();
+	int flip = flip_screen_get(space->machine());
 	int x,y,i,v1,v2;
 
 	state->videoram[offset] = data;
@@ -107,7 +107,7 @@ static WRITE8_HANDLER( sbw_videoram_w )
 
 static SCREEN_UPDATE(sbowling)
 {
-	sbowling_state *state = screen->machine->driver_data<sbowling_state>();
+	sbowling_state *state = screen->machine().driver_data<sbowling_state>();
 
 	bitmap_fill(bitmap, cliprect, 0x18);
 	tilemap_draw(bitmap, cliprect,state->sb_tilemap, 0, 0);
@@ -117,28 +117,28 @@ static SCREEN_UPDATE(sbowling)
 
 static VIDEO_START(sbowling)
 {
-	sbowling_state *state = machine->driver_data<sbowling_state>();
+	sbowling_state *state = machine.driver_data<sbowling_state>();
 
-	state->tmpbitmap = auto_bitmap_alloc(machine,32*8,32*8,machine->primary_screen->format());
+	state->tmpbitmap = auto_bitmap_alloc(machine,32*8,32*8,machine.primary_screen->format());
 	state->sb_tilemap = tilemap_create(machine, get_sb_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static WRITE8_HANDLER( pix_shift_w )
 {
-	sbowling_state *state = space->machine->driver_data<sbowling_state>();
+	sbowling_state *state = space->machine().driver_data<sbowling_state>();
 
 	state->pix_sh = data;
 }
 static WRITE8_HANDLER( pix_data_w )
 {
-	sbowling_state *state = space->machine->driver_data<sbowling_state>();
+	sbowling_state *state = space->machine().driver_data<sbowling_state>();
 
 	state->pix[0] = state->pix[1];
 	state->pix[1] = data;
 }
 static READ8_HANDLER( pix_data_r )
 {
-	sbowling_state *state = space->machine->driver_data<sbowling_state>();
+	sbowling_state *state = space->machine().driver_data<sbowling_state>();
 	UINT32 p1, p0;
 	int res;
 	int sh = state->pix_sh & 7;
@@ -155,7 +155,7 @@ static READ8_HANDLER( pix_data_r )
 
 static INTERRUPT_GEN( sbw_interrupt )
 {
-	int vector = device->machine->primary_screen->vblank() ? 0xcf : 0xd7;	/* RST 08h/10h */
+	int vector = device->machine().primary_screen->vblank() ? 0xcf : 0xd7;	/* RST 08h/10h */
 
 	device_set_input_line_and_vector(device, 0, HOLD_LINE, vector);
 }
@@ -169,9 +169,9 @@ static WRITE8_HANDLER (system_w)
         -----x-- 1 ?
         ----x--- flip screen/controls
     */
-	sbowling_state *state = space->machine->driver_data<sbowling_state>();
+	sbowling_state *state = space->machine().driver_data<sbowling_state>();
 
-	flip_screen_set(space->machine, data&1);
+	flip_screen_set(space->machine(), data&1);
 
 	if ((state->sbw_system^data)&1)
 	{
@@ -192,7 +192,7 @@ static WRITE8_HANDLER(graph_control_w)
         xx------ color PROM address lines A4,A3
     */
 
-	sbowling_state *state = space->machine->driver_data<sbowling_state>();
+	sbowling_state *state = space->machine().driver_data<sbowling_state>();
 
 	state->color_prom_address = ((data&0x07)<<7) | ((data&0xc0)>>3);
 
@@ -202,12 +202,12 @@ static WRITE8_HANDLER(graph_control_w)
 
 static READ8_HANDLER (controls_r)
 {
-	sbowling_state *state = space->machine->driver_data<sbowling_state>();
+	sbowling_state *state = space->machine().driver_data<sbowling_state>();
 
 	if (state->sbw_system & 2)
-		return input_port_read(space->machine, "TRACKY");
+		return input_port_read(space->machine(), "TRACKY");
 	else
-		return input_port_read(space->machine, "TRACKX");
+		return input_port_read(space->machine(), "TRACKX");
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
@@ -343,7 +343,7 @@ static PALETTE_INIT( sbowling )
 		3,	resistances_rg, outputs_g,	0,	100,
 		2,	resistances_b,  outputs_b,	0,	100);
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 

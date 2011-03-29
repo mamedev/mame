@@ -31,10 +31,10 @@ public:
 };
 
 
-static void pk8000_set_bank(running_machine *machine,UINT8 data)
+static void pk8000_set_bank(running_machine &machine,UINT8 data)
 {
-	UINT8 *rom = machine->region("maincpu")->base();
-	UINT8 *ram = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *ram = machine.region("maincpu")->base();
 	UINT8 block1 = data & 3;
 	UINT8 block2 = (data >> 2) & 3;
 	UINT8 block3 = (data >> 4) & 3;
@@ -92,7 +92,7 @@ static void pk8000_set_bank(running_machine *machine,UINT8 data)
 }
 static WRITE8_DEVICE_HANDLER(pk8000_80_porta_w)
 {
-	pk8000_set_bank(device->machine,data);
+	pk8000_set_bank(device->machine(),data);
 }
 
 static READ8_DEVICE_HANDLER(pk8000_80_portb_r)
@@ -102,7 +102,7 @@ static READ8_DEVICE_HANDLER(pk8000_80_portb_r)
 
 static WRITE8_DEVICE_HANDLER(pk8000_80_portc_w)
 {
-	speaker_level_w(device->machine->device("speaker"), BIT(data,7));
+	speaker_level_w(device->machine().device("speaker"), BIT(data,7));
 }
 
 static I8255A_INTERFACE( pk8000_ppi8255_interface_1 )
@@ -190,7 +190,7 @@ static IRQ_CALLBACK(pk8000_irq_callback)
 static MACHINE_RESET(pk8000)
 {
 	pk8000_set_bank(machine,0);
-	device_set_irq_callback(machine->device("maincpu"), pk8000_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), pk8000_irq_callback);
 }
 
 static VIDEO_START( photon )
@@ -199,7 +199,7 @@ static VIDEO_START( photon )
 
 static SCREEN_UPDATE( photon )
 {
-	return pk8000_video_update(screen, bitmap, cliprect, screen->machine->region("maincpu")->base());
+	return pk8000_video_update(screen, bitmap, cliprect, screen->machine().region("maincpu")->base());
 }
 
 static MACHINE_CONFIG_START( photon, photon_state )

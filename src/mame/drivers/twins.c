@@ -78,7 +78,7 @@ static WRITE16_HANDLER( twins_port4_w )
 
 static WRITE16_HANDLER( port6_pal0_w )
 {
-	twins_state *state = space->machine->driver_data<twins_state>();
+	twins_state *state = space->machine().driver_data<twins_state>();
 	COMBINE_DATA(&state->pal[state->paloff]);
 	state->paloff = (state->paloff + 1) & 0xff;
 }
@@ -86,7 +86,7 @@ static WRITE16_HANDLER( port6_pal0_w )
 /* ??? weird ..*/
 static WRITE16_HANDLER( porte_paloff0_w )
 {
-	twins_state *state = space->machine->driver_data<twins_state>();
+	twins_state *state = space->machine().driver_data<twins_state>();
 	state->paloff = 0;
 }
 
@@ -106,18 +106,18 @@ ADDRESS_MAP_END
 
 static VIDEO_START(twins)
 {
-	twins_state *state = machine->driver_data<twins_state>();
+	twins_state *state = machine.driver_data<twins_state>();
 	state->pal = auto_alloc_array(machine, UINT16, 0x100);
 }
 
 static SCREEN_UPDATE(twins)
 {
-	twins_state *state = screen->machine->driver_data<twins_state>();
+	twins_state *state = screen->machine().driver_data<twins_state>();
 	int y,x,count;
 	int i;
 	static const int xxx=320,yyy=204;
 
-	bitmap_fill(bitmap, 0, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, 0, get_black_pen(screen->machine()));
 
 	for (i=0;i<0x100;i++)
 	{
@@ -133,7 +133,7 @@ static SCREEN_UPDATE(twins)
 		b = (dat>>10) & 0x1f;
 		b = BITSWAP8(b,7,6,5,0,1,2,3,4);
 
-		palette_set_color_rgb(screen->machine,i, pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(screen->machine(),i, pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 
 	count=0;
@@ -213,18 +213,18 @@ MACHINE_CONFIG_END
 
 static VIDEO_START(twinsa)
 {
-	twins_state *state = machine->driver_data<twins_state>();
+	twins_state *state = machine.driver_data<twins_state>();
 	state->pal = auto_alloc_array(machine, UINT16, 0x1000);
 }
 
 static SCREEN_UPDATE(twinsa)
 {
-	twins_state *state = screen->machine->driver_data<twins_state>();
+	twins_state *state = screen->machine().driver_data<twins_state>();
 	int y,x,count;
 	int i;
 	static const int xxx=320,yyy=204;
 
-	bitmap_fill(bitmap, 0, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, 0, get_black_pen(screen->machine()));
 
 	for (i=0;i<0x1000-3;i+=3)
 	{
@@ -233,7 +233,7 @@ static SCREEN_UPDATE(twinsa)
 		g = state->pal[i+1];
 		b = state->pal[i+2];
 
-		palette_set_color_rgb(screen->machine,i/3, pal6bit(r), pal6bit(g), pal6bit(b));
+		palette_set_color_rgb(screen->machine(),i/3, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 
 	count=0;
@@ -250,7 +250,7 @@ static SCREEN_UPDATE(twinsa)
 
 static WRITE16_HANDLER( twinsa_port4_w )
 {
-	twins_state *state = space->machine->driver_data<twins_state>();
+	twins_state *state = space->machine().driver_data<twins_state>();
 	state->pal[state->paloff&0xfff] = data;
 	state->paloff++;
 //  printf("paloff %04x\n",state->paloff);

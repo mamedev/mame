@@ -309,13 +309,13 @@ Notes & Todo:
 
 static WRITE8_HANDLER( up8w_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	state->up_8w = data & 1;
 }
 
 static READ8_HANDLER( ram_8w_r )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	if ( offset >= 0x400 && state->up_8w )
 		return state->ram_8w[offset];
 
@@ -324,7 +324,7 @@ static READ8_HANDLER( ram_8w_r )
 
 static WRITE8_HANDLER( ram_8w_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	if ( offset >= 0x400 && state->up_8w )
 		state->ram_8w[offset] = data;
 	else
@@ -334,14 +334,14 @@ static WRITE8_HANDLER( ram_8w_w )
 static WRITE8_HANDLER( sprite_dma_w )
 {
 	int source = ( data & 7 );
-	ppu2c0x_spriteram_dma( space, space->machine->device("ppu"), source );
+	ppu2c0x_spriteram_dma( space, space->machine().device("ppu"), source );
 }
 
 /* Only used in single monitor bios */
 
 static WRITE8_HANDLER( time_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	if(data == 0xf)
 		data = 0;
 
@@ -657,7 +657,7 @@ static GFXDECODE_START( playch10 )
 GFXDECODE_END
 
 static INTERRUPT_GEN( playch10_interrupt ) {
-	playch10_state *state = device->machine->driver_data<playch10_state>();
+	playch10_state *state = device->machine().driver_data<playch10_state>();
 
 	/* LS161A, Sheet 1 - bottom left of Z80 */
 	if ( !state->pc10_dog_di && !state->pc10_nmi_enable ) {

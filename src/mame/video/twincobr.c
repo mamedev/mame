@@ -42,7 +42,7 @@ const mc6845_interface twincobr_mc6845_intf =
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	twincobr_state *state = machine->driver_data<twincobr_state>();
+	twincobr_state *state = machine.driver_data<twincobr_state>();
 	int code, tile_number, color;
 
 	code = state->bgvideoram16[tile_index+state->bg_ram_bank];
@@ -57,7 +57,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	twincobr_state *state = machine->driver_data<twincobr_state>();
+	twincobr_state *state = machine.driver_data<twincobr_state>();
 	int code, tile_number, color;
 
 	code = state->fgvideoram16[tile_index];
@@ -72,7 +72,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	twincobr_state *state = machine->driver_data<twincobr_state>();
+	twincobr_state *state = machine.driver_data<twincobr_state>();
 	int code, tile_number, color;
 
 	code = state->txvideoram16[tile_index];
@@ -89,9 +89,9 @@ static TILE_GET_INFO( get_tx_tile_info )
     Start the video hardware emulation.
 ***************************************************************************/
 
-static void twincobr_create_tilemaps(running_machine *machine)
+static void twincobr_create_tilemaps(running_machine &machine)
 {
-	twincobr_state *state = machine->driver_data<twincobr_state>();
+	twincobr_state *state = machine.driver_data<twincobr_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
@@ -103,7 +103,7 @@ static void twincobr_create_tilemaps(running_machine *machine)
 
 VIDEO_START( toaplan0 )
 {
-	twincobr_state *state = machine->driver_data<twincobr_state>();
+	twincobr_state *state = machine.driver_data<twincobr_state>();
 
 	/* the video RAM is accessed via ports, it's not memory mapped */
 	state->txvideoram_size = 0x0800;
@@ -138,12 +138,12 @@ VIDEO_START( toaplan0 )
 	state_save_register_global(machine, state->bg_ram_bank);
 	state_save_register_global(machine, state->flip_screen);
 	state_save_register_global(machine, state->wardner_sprite_hack);
-	machine->state().register_postload(twincobr_restore_screen, NULL);
+	machine.state().register_postload(twincobr_restore_screen, NULL);
 }
 
 static STATE_POSTLOAD( twincobr_restore_screen )
 {
-	twincobr_state *state = machine->driver_data<twincobr_state>();
+	twincobr_state *state = machine.driver_data<twincobr_state>();
 
 	twincobr_display(machine, state->display_on);
 	twincobr_flipscreen(machine, state->flip_screen);
@@ -154,9 +154,9 @@ static STATE_POSTLOAD( twincobr_restore_screen )
     Video I/O interface
 ***************************************************************************/
 
-void twincobr_display(running_machine *machine, int enable)
+void twincobr_display(running_machine &machine, int enable)
 {
-	twincobr_state *state = machine->driver_data<twincobr_state>();
+	twincobr_state *state = machine.driver_data<twincobr_state>();
 
 	state->display_on = enable;
 	tilemap_set_enable(state->bg_tilemap, enable);
@@ -164,9 +164,9 @@ void twincobr_display(running_machine *machine, int enable)
 	tilemap_set_enable(state->tx_tilemap, enable);
 }
 
-void twincobr_flipscreen(running_machine *machine, int flip)
+void twincobr_flipscreen(running_machine &machine, int flip)
 {
-	twincobr_state *state = machine->driver_data<twincobr_state>();
+	twincobr_state *state = machine.driver_data<twincobr_state>();
 
 	tilemap_set_flip_all(machine, (flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
 	state->flip_screen = flip;
@@ -183,20 +183,20 @@ void twincobr_flipscreen(running_machine *machine, int flip)
 
 WRITE16_HANDLER( twincobr_txoffs_w )
 {
-	twincobr_state *state = space->machine->driver_data<twincobr_state>();
+	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
 	COMBINE_DATA(&state->txoffs);
 	state->txoffs %= state->txvideoram_size;
 }
 READ16_HANDLER( twincobr_txram_r )
 {
-	twincobr_state *state = space->machine->driver_data<twincobr_state>();
+	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
 	return state->txvideoram16[state->txoffs];
 }
 WRITE16_HANDLER( twincobr_txram_w )
 {
-	twincobr_state *state = space->machine->driver_data<twincobr_state>();
+	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
 	COMBINE_DATA(&state->txvideoram16[state->txoffs]);
 	tilemap_mark_tile_dirty(state->tx_tilemap,state->txoffs);
@@ -204,20 +204,20 @@ WRITE16_HANDLER( twincobr_txram_w )
 
 WRITE16_HANDLER( twincobr_bgoffs_w )
 {
-	twincobr_state *state = space->machine->driver_data<twincobr_state>();
+	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
 	COMBINE_DATA(&state->bgoffs);
 	state->bgoffs %= (state->bgvideoram_size >> 1);
 }
 READ16_HANDLER( twincobr_bgram_r )
 {
-	twincobr_state *state = space->machine->driver_data<twincobr_state>();
+	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
 	return state->bgvideoram16[state->bgoffs+state->bg_ram_bank];
 }
 WRITE16_HANDLER( twincobr_bgram_w )
 {
-	twincobr_state *state = space->machine->driver_data<twincobr_state>();
+	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
 	COMBINE_DATA(&state->bgvideoram16[state->bgoffs+state->bg_ram_bank]);
 	tilemap_mark_tile_dirty(state->bg_tilemap,(state->bgoffs+state->bg_ram_bank));
@@ -225,20 +225,20 @@ WRITE16_HANDLER( twincobr_bgram_w )
 
 WRITE16_HANDLER( twincobr_fgoffs_w )
 {
-	twincobr_state *state = space->machine->driver_data<twincobr_state>();
+	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
 	COMBINE_DATA(&state->fgoffs);
 	state->fgoffs %= state->fgvideoram_size;
 }
 READ16_HANDLER( twincobr_fgram_r )
 {
-	twincobr_state *state = space->machine->driver_data<twincobr_state>();
+	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
 	return state->fgvideoram16[state->fgoffs];
 }
 WRITE16_HANDLER( twincobr_fgram_w )
 {
-	twincobr_state *state = space->machine->driver_data<twincobr_state>();
+	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
 	COMBINE_DATA(&state->fgvideoram16[state->fgoffs]);
 	tilemap_mark_tile_dirty(state->fg_tilemap,state->fgoffs);
@@ -247,7 +247,7 @@ WRITE16_HANDLER( twincobr_fgram_w )
 
 WRITE16_HANDLER( twincobr_txscroll_w )
 {
-	twincobr_state *state = space->machine->driver_data<twincobr_state>();
+	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
 	if (offset == 0) {
 		COMBINE_DATA(&state->txscrollx);
@@ -261,7 +261,7 @@ WRITE16_HANDLER( twincobr_txscroll_w )
 
 WRITE16_HANDLER( twincobr_bgscroll_w )
 {
-	twincobr_state *state = space->machine->driver_data<twincobr_state>();
+	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
 	if (offset == 0) {
 		COMBINE_DATA(&state->bgscrollx);
@@ -275,7 +275,7 @@ WRITE16_HANDLER( twincobr_bgscroll_w )
 
 WRITE16_HANDLER( twincobr_fgscroll_w )
 {
-	twincobr_state *state = space->machine->driver_data<twincobr_state>();
+	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
 	if (offset == 0) {
 		COMBINE_DATA(&state->fgscrollx);
@@ -365,12 +365,12 @@ WRITE8_HANDLER( wardner_videoram_w )
 READ8_HANDLER( wardner_sprite_r )
 {
 	int shift = (offset & 1) * 8;
-	return space->machine->generic.spriteram.u16[offset/2] >> shift;
+	return space->machine().generic.spriteram.u16[offset/2] >> shift;
 }
 
 WRITE8_HANDLER( wardner_sprite_w )
 {
-	UINT16 *spriteram16 = space->machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = space->machine().generic.spriteram.u16;
 	if (offset & 1)
 		spriteram16[offset/2] = (spriteram16[offset/2] & 0x00ff) | (data << 8);
 	else
@@ -383,12 +383,12 @@ WRITE8_HANDLER( wardner_sprite_w )
     Ugly sprite hack for Wardner when hero is in shop
 ***************************************************************************/
 
-static void wardner_sprite_priority_hack(running_machine *machine)
+static void wardner_sprite_priority_hack(running_machine &machine)
 {
-	twincobr_state *state = machine->driver_data<twincobr_state>();
+	twincobr_state *state = machine.driver_data<twincobr_state>();
 
 	if (state->fgscrollx != state->bgscrollx) {
-		UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
+		UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
 		if ((state->fgscrollx==0x1c9) || (state->flip_screen && (state->fgscrollx==0x17a))) {	/* in the shop ? */
 			int wardner_hack = buffered_spriteram16[0x0b04/2];
 		/* sprite position 0x6300 to 0x8700 -- hero on shop keeper (normal) */
@@ -413,10 +413,10 @@ static void wardner_sprite_priority_hack(running_machine *machine)
 
 
 
-static void twincobr_log_vram(running_machine *machine)
+static void twincobr_log_vram(running_machine &machine)
 {
 #ifdef MAME_DEBUG
-	twincobr_state *state = machine->driver_data<twincobr_state>();
+	twincobr_state *state = machine.driver_data<twincobr_state>();
 
 	if ( input_code_pressed(machine, KEYCODE_M) )
 	{
@@ -458,15 +458,15 @@ static void twincobr_log_vram(running_machine *machine)
     Sprite Handlers
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	twincobr_state *state = machine->driver_data<twincobr_state>();
+	twincobr_state *state = machine.driver_data<twincobr_state>();
 	int offs;
 
 	if (state->display_on)
 	{
-		UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
-		for (offs = 0;offs < machine->generic.spriteram_size/2;offs += 4)
+		UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
+		for (offs = 0;offs < machine.generic.spriteram_size/2;offs += 4)
 		{
 			int attribute,sx,sy,flipx,flipy;
 			int sprite, color;
@@ -481,7 +481,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					flipx = attribute & 0x100;
 					if (flipx) sx -= 14;		/* should really be 15 */
 					flipy = attribute & 0x200;
-					drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
+					drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 						sprite,
 						color,
 						flipx,flipy,
@@ -499,26 +499,26 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( toaplan0 )
 {
-	twincobr_state *state = screen->machine->driver_data<twincobr_state>();
-	twincobr_log_vram(screen->machine);
+	twincobr_state *state = screen->machine().driver_data<twincobr_state>();
+	twincobr_log_vram(screen->machine());
 
-	if (state->wardner_sprite_hack) wardner_sprite_priority_hack(screen->machine);
+	if (state->wardner_sprite_hack) wardner_sprite_priority_hack(screen->machine());
 
 	bitmap_fill(bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
-	draw_sprites(screen->machine, bitmap,cliprect,0x0400);
+	draw_sprites(screen->machine(), bitmap,cliprect,0x0400);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect,0x0800);
+	draw_sprites(screen->machine(), bitmap,cliprect,0x0800);
 	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect,0x0c00);
+	draw_sprites(screen->machine(), bitmap,cliprect,0x0c00);
 	return 0;
 }
 
 
 SCREEN_EOF( toaplan0 )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Spriteram is always 1 frame ahead, suggesting spriteram buffering.
         There are no CPU output registers that control this so we

@@ -116,7 +116,7 @@ public:
 
 static WRITE8_HANDLER( jokrwild_videoram_w )
 {
-	jokrwild_state *state = space->machine->driver_data<jokrwild_state>();
+	jokrwild_state *state = space->machine().driver_data<jokrwild_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -124,7 +124,7 @@ static WRITE8_HANDLER( jokrwild_videoram_w )
 
 static WRITE8_HANDLER( jokrwild_colorram_w )
 {
-	jokrwild_state *state = space->machine->driver_data<jokrwild_state>();
+	jokrwild_state *state = space->machine().driver_data<jokrwild_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -132,7 +132,7 @@ static WRITE8_HANDLER( jokrwild_colorram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	jokrwild_state *state = machine->driver_data<jokrwild_state>();
+	jokrwild_state *state = machine.driver_data<jokrwild_state>();
 /*  - bits -
     7654 3210
     xx-- ----   bank select.
@@ -148,14 +148,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( jokrwild )
 {
-	jokrwild_state *state = machine->driver_data<jokrwild_state>();
+	jokrwild_state *state = machine.driver_data<jokrwild_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 24, 26);
 }
 
 
 static SCREEN_UPDATE( jokrwild )
 {
-	jokrwild_state *state = screen->machine->driver_data<jokrwild_state>();
+	jokrwild_state *state = screen->machine().driver_data<jokrwild_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
@@ -184,7 +184,7 @@ static READ8_HANDLER( rng_r )
 	if(cpu_get_pc(space->cpu) == 0xab3a)
 		return (offset == 2) ? 0x49 : 0x92;
 
-	return space->machine->rand() & 0xff;
+	return space->machine().rand() & 0xff;
 }
 
 /*************************
@@ -551,7 +551,7 @@ static DRIVER_INIT( jokrwild )
 *****************************************************************************/
 {
 	int i, offs;
-	UINT8 *srcp = machine->region( "maincpu" )->base();
+	UINT8 *srcp = machine.region( "maincpu" )->base();
 
 	for (i = 0x8000; i < 0x10000; i++)
 	{

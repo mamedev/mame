@@ -50,14 +50,14 @@ static CUSTOM_INPUT( f3_analog_r )
 	const char *tag = (const char *)param;
 	UINT32 ipt = 0;
 
-	ipt = ((input_port_read(field->port->machine, tag) & 0xf)<<12) | ((input_port_read(field->port->machine, tag) & 0xff0)>>4);
+	ipt = ((input_port_read(field->port->machine(), tag) & 0xf)<<12) | ((input_port_read(field->port->machine(), tag) & 0xff0)>>4);
 
 	return ipt;
 }
 
 static CUSTOM_INPUT( f3_coin_r )
 {
-	taito_f3_state *state = field->port->machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = field->port->machine().driver_data<taito_f3_state>();
 	int num = (FPTR)param;
 	return state->coin_word[num];
 }
@@ -67,7 +67,7 @@ static READ32_HANDLER( f3_control_r )
 	static const char *const iptnames[] = { "IN0", "IN1", "AN0", "AN1", "IN2", "IN3" };
 
 	if (offset < 6)
-		return input_port_read(space->machine, iptnames[offset]);
+		return input_port_read(space->machine(), iptnames[offset]);
 
 	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", cpu_get_pc(space->cpu), offset);
 	return 0xffffffff;
@@ -75,20 +75,20 @@ static READ32_HANDLER( f3_control_r )
 
 static WRITE32_HANDLER( f3_control_w )
 {
-	taito_f3_state *state = space->machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	switch (offset)
 	{
 		case 0x00: /* Watchdog */
-			watchdog_reset(space->machine);
+			watchdog_reset(space->machine());
 			return;
 
 		case 0x01: /* Coin counters & lockouts */
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(space->machine, 0,~data & 0x01000000);
-				coin_lockout_w(space->machine, 1,~data & 0x02000000);
-				coin_counter_w(space->machine, 0, data & 0x04000000);
-				coin_counter_w(space->machine, 1, data & 0x08000000);
+				coin_lockout_w(space->machine(), 0,~data & 0x01000000);
+				coin_lockout_w(space->machine(), 1,~data & 0x02000000);
+				coin_counter_w(space->machine(), 0, data & 0x04000000);
+				coin_counter_w(space->machine(), 1, data & 0x08000000);
 				state->coin_word[0]=(data>>16)&0xffff;
 			}
 			return;
@@ -96,17 +96,17 @@ static WRITE32_HANDLER( f3_control_w )
 		case 0x04: /* Eeprom */
 			if (ACCESSING_BITS_0_7)
 			{
-				input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+				input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 			}
 			return;
 
 		case 0x05:	/* Player 3 & 4 coin counters */
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(space->machine, 2,~data & 0x01000000);
-				coin_lockout_w(space->machine, 3,~data & 0x02000000);
-				coin_counter_w(space->machine, 2, data & 0x04000000);
-				coin_counter_w(space->machine, 3, data & 0x08000000);
+				coin_lockout_w(space->machine(), 2,~data & 0x01000000);
+				coin_lockout_w(space->machine(), 3,~data & 0x02000000);
+				coin_counter_w(space->machine(), 2, data & 0x04000000);
+				coin_counter_w(space->machine(), 3, data & 0x08000000);
 				state->coin_word[1]=(data>>16)&0xffff;
 			}
 			return;
@@ -116,19 +116,19 @@ static WRITE32_HANDLER( f3_control_w )
 
 static WRITE32_HANDLER( f3_sound_reset_0_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE32_HANDLER( f3_sound_reset_1_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static WRITE32_HANDLER( f3_sound_bankswitch_w )
 {
-	taito_f3_state *state = space->machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	if (state->f3_game==KIRAMEKI) {
-		UINT16 *rom = (UINT16 *)space->machine->region("audiocpu")->base();
+		UINT16 *rom = (UINT16 *)space->machine().region("audiocpu")->base();
 		UINT32 idx;
 
 		idx = (offset << 1) & 0x1e;
@@ -140,7 +140,7 @@ static WRITE32_HANDLER( f3_sound_bankswitch_w )
 
 		/* Banks are 0x20000 bytes each, divide by two to get data16
         pointer rather than byte pointer */
-		memory_set_bankptr(space->machine, "bank2", &rom[(idx*0x20000)/2 + 0x80000]);
+		memory_set_bankptr(space->machine(), "bank2", &rom[(idx*0x20000)/2 + 0x80000]);
 
 	} else {
 		logerror("Sound bankswitch in unsupported game\n");
@@ -362,7 +362,7 @@ static TIMER_CALLBACK( f3_interrupt3 )
 static INTERRUPT_GEN( f3_interrupt2 )
 {
 	device_set_input_line(device, 2, HOLD_LINE);	// vblank
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(10000), FUNC(f3_interrupt3));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(10000), FUNC(f3_interrupt3));
 }
 
 static SOUND_RESET( f3 )
@@ -385,7 +385,7 @@ static const UINT16 recalh_eeprom[64] =	{
 
 static MACHINE_START(f3)
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state_save_register_global_array(machine, state->coin_word);
 }
 
@@ -3494,12 +3494,12 @@ ROM_END
 
 /******************************************************************************/
 
-static void tile_decode(running_machine *machine)
+static void tile_decode(running_machine &machine)
 {
 	UINT8 lsb,msb;
 	UINT32 offset,i;
-	UINT8 *gfx = machine->region("gfx2")->base();
-	int size=machine->region("gfx2")->bytes();
+	UINT8 *gfx = machine.region("gfx2")->base();
+	int size=machine.region("gfx2")->bytes();
 	int data;
 
 	/* Setup ROM formats:
@@ -3531,8 +3531,8 @@ static void tile_decode(running_machine *machine)
 		offset+=4;
 	}
 
-	gfx = machine->region("gfx1")->base();
-	size=machine->region("gfx1")->bytes();
+	gfx = machine.region("gfx1")->base();
+	size=machine.region("gfx1")->bytes();
 
 	offset = size/2;
 	for (i = size/2+size/4; i<size; i++)
@@ -3556,64 +3556,64 @@ static void tile_decode(running_machine *machine)
 
 static DRIVER_INIT( ringrage )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=RINGRAGE;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( arabianm )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=ARABIANM;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( ridingf )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=RIDINGF;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( gseeker )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=GSEEKER;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( gunlock )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=GUNLOCK;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( elvactr )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=EACTION2;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( cupfinal )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=SCFINALS;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( trstaroj )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=TRSTAR;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( scfinals )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
-	UINT32 *RAM = (UINT32 *)machine->region("maincpu")->base();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
+	UINT32 *RAM = (UINT32 *)machine.region("maincpu")->base();
 
 	/* Doesn't boot without this - eprom related? */
     RAM[0x5af0/4]=0x4e710000|(RAM[0x5af0/4]&0xffff);
@@ -3627,63 +3627,63 @@ static DRIVER_INIT( scfinals )
 
 static DRIVER_INIT( lightbr )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=LIGHTBR;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( kaiserkn )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=KAISERKN;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( dariusg )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=DARIUSG;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( spcinvdj )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=SPCINVDX;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( qtheater )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=QTHEATER;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( spcinv95 )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=SPCINV95;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( gekirido )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=GEKIRIDO;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( ktiger2 )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=KTIGER2;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( bubsymph )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=BUBSYMPH;
 	tile_decode(machine);
 }
@@ -3691,16 +3691,16 @@ static DRIVER_INIT( bubsymph )
 
 static READ32_HANDLER( bubsympb_oki_r )
 {
-	return space->machine->device<okim6295_device>("oki")->read(*space,0);
+	return space->machine().device<okim6295_device>("oki")->read(*space,0);
 }
 static WRITE32_HANDLER( bubsympb_oki_w )
 {
 	//printf("write %08x %08x\n",data,mem_mask);
-	if (ACCESSING_BITS_0_7) space->machine->device<okim6295_device>("oki")->write(*space, 0,data&0xff);
+	if (ACCESSING_BITS_0_7) space->machine().device<okim6295_device>("oki")->write(*space, 0,data&0xff);
 	//if (mem_mask==0x000000ff) downcast<okim6295_device *>(device)->write(0,data&0xff);
 	if (ACCESSING_BITS_16_23)
 	{
-		UINT8 *snd = space->machine->region("oki")->base();
+		UINT8 *snd = space->machine().region("oki")->base();
 		int bank = (data & 0x000f0000) >> 16;
 		// almost certainly wrong
 		memcpy(snd+0x30000, snd+0x80000+0x30000+bank*0x10000, 0x10000);
@@ -3714,14 +3714,14 @@ static WRITE32_HANDLER( bubsympb_oki_w )
 
 static DRIVER_INIT( bubsympb )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=BUBSYMPH;
 	//tile_decode(machine);
 
 	/* expand gfx rom */
 	{
 		int i;
-		UINT8 *gfx = machine->region("gfx2")->base();
+		UINT8 *gfx = machine.region("gfx2")->base();
 
 		for (i=0x200000;i<0x400000; i+=4)
 		{
@@ -3737,43 +3737,43 @@ static DRIVER_INIT( bubsympb )
 		}
 	}
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4a001c, 0x4a001f, FUNC(bubsympb_oki_r) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4a001c, 0x4a001f, FUNC(bubsympb_oki_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4a001c, 0x4a001f, FUNC(bubsympb_oki_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4a001c, 0x4a001f, FUNC(bubsympb_oki_w) );
 }
 
 
 static DRIVER_INIT( bubblem )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=BUBBLEM;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( cleopatr )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=CLEOPATR;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( popnpop )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=POPNPOP;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( landmakr )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=LANDMAKR;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( landmkrp )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
-	UINT32 *RAM = (UINT32 *)machine->region("maincpu")->base();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
+	UINT32 *RAM = (UINT32 *)machine.region("maincpu")->base();
 
 	/* For some reason the least significant byte in the last 2 long words of
     ROM is swapped.  As the roms have been verified ok, I assume this is some
@@ -3788,40 +3788,40 @@ static DRIVER_INIT( landmkrp )
 
 static DRIVER_INIT( pbobble3 )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=PBOBBLE3;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( pbobble4 )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=PBOBBLE4;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( quizhuhu )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=QUIZHUHU;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( pbobble2 )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=PBOBBLE2;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( pbobbl2p )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	// has 040092: beq     $30000; (2+)
 	// which eventually causes the game to crash
 	//  -- protection check?? or some kind of checksum fail?
 
-	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
+	UINT32 *ROM = (UINT32 *)machine.region("maincpu")->base();
 
 	/* protection? */
     ROM[0x40090/4]=0x00004e71|(ROM[0x40090/4]&0xffff0000);
@@ -3835,63 +3835,63 @@ static DRIVER_INIT( pbobbl2p )
 
 static DRIVER_INIT( pbobbl2x )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=PBOBBLE2;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( hthero95 )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=HTHERO95;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( kirameki )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=KIRAMEKI;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( puchicar )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=PUCHICAR;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( twinqix )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=TWINQIX;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( arkretrn )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=ARKRETRN;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( intcup94 )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=SCFINALS;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( recalh )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=RECALH;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( commandw )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	state->f3_game=COMMANDW;
 	tile_decode(machine);
 }

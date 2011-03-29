@@ -33,7 +33,7 @@ PALETTE_INIT(usgames)
 
 static TILE_GET_INFO( get_usgames_tile_info )
 {
-	usgames_state *state = machine->driver_data<usgames_state>();
+	usgames_state *state = machine.driver_data<usgames_state>();
 	int tileno, colour;
 
 	tileno = state->videoram[tile_index*2];
@@ -44,30 +44,30 @@ static TILE_GET_INFO( get_usgames_tile_info )
 
 VIDEO_START(usgames)
 {
-	usgames_state *state = machine->driver_data<usgames_state>();
+	usgames_state *state = machine.driver_data<usgames_state>();
 	state->tilemap = tilemap_create(machine, get_usgames_tile_info,tilemap_scan_rows, 8, 8,64,32);
-	gfx_element_set_source(machine->gfx[0], state->charram);
+	gfx_element_set_source(machine.gfx[0], state->charram);
 }
 
 
 WRITE8_HANDLER( usgames_videoram_w )
 {
-	usgames_state *state = space->machine->driver_data<usgames_state>();
+	usgames_state *state = space->machine().driver_data<usgames_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap,offset/2);
 }
 
 WRITE8_HANDLER( usgames_charram_w )
 {
-	usgames_state *state = space->machine->driver_data<usgames_state>();
+	usgames_state *state = space->machine().driver_data<usgames_state>();
 	state->charram[offset] = data;
-	gfx_element_mark_dirty(space->machine->gfx[0], offset/8);
+	gfx_element_mark_dirty(space->machine().gfx[0], offset/8);
 }
 
 
 SCREEN_UPDATE(usgames)
 {
-	usgames_state *state = screen->machine->driver_data<usgames_state>();
+	usgames_state *state = screen->machine().driver_data<usgames_state>();
 	tilemap_draw(bitmap,cliprect,state->tilemap,0,0);
 	return 0;
 }

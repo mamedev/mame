@@ -130,7 +130,7 @@ PALETTE_INIT( battles );
 
 /*----------- defined in machine/xevious.c -----------*/
 
-void battles_customio_init(running_machine *machine);
+void battles_customio_init(running_machine &machine);
 TIMER_DEVICE_CALLBACK( battles_nmi_generate );
 
 READ8_HANDLER( battles_customio0_r );

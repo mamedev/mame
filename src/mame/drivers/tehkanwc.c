@@ -98,46 +98,46 @@ TO DO :
 static WRITE8_HANDLER( sub_cpu_halt_w )
 {
 	if (data)
-		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
 static READ8_HANDLER( tehkanwc_track_0_r )
 {
-	tehkanwc_state *state = space->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
 	int joy;
 
-	joy = input_port_read(space->machine, "FAKE") >> (2 * offset);
+	joy = input_port_read(space->machine(), "FAKE") >> (2 * offset);
 	if (joy & 1) return -63;
 	if (joy & 2) return 63;
-	return input_port_read(space->machine, offset ? "P1Y" : "P1X") - state->track0[offset];
+	return input_port_read(space->machine(), offset ? "P1Y" : "P1X") - state->track0[offset];
 }
 
 static READ8_HANDLER( tehkanwc_track_1_r )
 {
-	tehkanwc_state *state = space->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
 	int joy;
 
-	joy = input_port_read(space->machine, "FAKE") >> (4 + 2 * offset);
+	joy = input_port_read(space->machine(), "FAKE") >> (4 + 2 * offset);
 	if (joy & 1) return -63;
 	if (joy & 2) return 63;
-	return input_port_read(space->machine, offset ? "P2Y" : "P2X") - state->track1[offset];
+	return input_port_read(space->machine(), offset ? "P2Y" : "P2X") - state->track1[offset];
 }
 
 static WRITE8_HANDLER( tehkanwc_track_0_reset_w )
 {
-	tehkanwc_state *state = space->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
 	/* reset the trackball counters */
-	state->track0[offset] = input_port_read(space->machine, offset ? "P1Y" : "P1X") + data;
+	state->track0[offset] = input_port_read(space->machine(), offset ? "P1Y" : "P1X") + data;
 }
 
 static WRITE8_HANDLER( tehkanwc_track_1_reset_w )
 {
-	tehkanwc_state *state = space->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
 	/* reset the trackball counters */
-	state->track1[offset] = input_port_read(space->machine, offset ? "P2Y" : "P2X") + data;
+	state->track1[offset] = input_port_read(space->machine(), offset ? "P2Y" : "P2X") + data;
 }
 
 
@@ -145,7 +145,7 @@ static WRITE8_HANDLER( tehkanwc_track_1_reset_w )
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static TIMER_CALLBACK( reset_callback )
@@ -159,7 +159,7 @@ static WRITE8_HANDLER( sound_answer_w )
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */
-	if (cpu_get_pc(space->cpu) == 0x08bc) space->machine->scheduler().timer_set(attotime::from_seconds(1), FUNC(reset_callback));
+	if (cpu_get_pc(space->cpu) == 0x08bc) space->machine().scheduler().timer_set(attotime::from_seconds(1), FUNC(reset_callback));
 }
 
 
@@ -168,25 +168,25 @@ static WRITE8_HANDLER( sound_answer_w )
 
 static READ8_DEVICE_HANDLER( tehkanwc_portA_r )
 {
-	tehkanwc_state *state = device->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = device->machine().driver_data<tehkanwc_state>();
 	return state->msm_data_offs & 0xff;
 }
 
 static READ8_DEVICE_HANDLER( tehkanwc_portB_r )
 {
-	tehkanwc_state *state = device->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = device->machine().driver_data<tehkanwc_state>();
 	return (state->msm_data_offs >> 8) & 0xff;
 }
 
 static WRITE8_DEVICE_HANDLER( tehkanwc_portA_w )
 {
-	tehkanwc_state *state = device->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = device->machine().driver_data<tehkanwc_state>();
 	state->msm_data_offs = (state->msm_data_offs & 0xff00) | data;
 }
 
 static WRITE8_DEVICE_HANDLER( tehkanwc_portB_w )
 {
-	tehkanwc_state *state = device->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = device->machine().driver_data<tehkanwc_state>();
 	state->msm_data_offs = (state->msm_data_offs & 0x00ff) | (data << 8);
 }
 
@@ -197,9 +197,9 @@ static WRITE8_DEVICE_HANDLER( msm_reset_w )
 
 static void tehkanwc_adpcm_int(device_t *device)
 {
-	tehkanwc_state *state = device->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = device->machine().driver_data<tehkanwc_state>();
 
-	UINT8 *SAMPLES = device->machine->region("adpcm")->base();
+	UINT8 *SAMPLES = device->machine().region("adpcm")->base();
 	int msm_data = SAMPLES[state->msm_data_offs & 0x7fff];
 
 	if (state->toggle == 0)
@@ -712,7 +712,7 @@ static DRIVER_INIT( teedoff )
         023A: 00          nop
     */
 
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	ROM[0x0238] = 0x00;
 	ROM[0x0239] = 0x00;

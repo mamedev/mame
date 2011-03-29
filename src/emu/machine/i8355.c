@@ -83,7 +83,7 @@ device_config *i8355_device_config::static_alloc_device_config(const machine_con
 
 device_t *i8355_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, i8355_device(machine, *this));
+	return auto_alloc(machine, i8355_device(machine, *this));
 }
 
 

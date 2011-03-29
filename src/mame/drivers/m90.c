@@ -38,10 +38,10 @@ Notes:
 
 /***************************************************************************/
 
-static void set_m90_bank(running_machine *machine)
+static void set_m90_bank(running_machine &machine)
 {
-	m90_state *state = machine->driver_data<m90_state>();
-	UINT8 *rom = machine->region("user1")->base();
+	m90_state *state = machine.driver_data<m90_state>();
+	UINT8 *rom = machine.region("user1")->base();
 
 	if (!rom)
 		popmessage("bankswitch with no banked ROM!");
@@ -55,8 +55,8 @@ static WRITE16_HANDLER( m90_coincounter_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0,data & 0x01);
-		coin_counter_w(space->machine, 1,data & 0x02);
+		coin_counter_w(space->machine(), 0,data & 0x01);
+		coin_counter_w(space->machine(), 1,data & 0x02);
 
 		if (data&0xfe) logerror("Coin counter %02x\n",data);
 	}
@@ -64,11 +64,11 @@ static WRITE16_HANDLER( m90_coincounter_w )
 
 static WRITE16_HANDLER( quizf1_bankswitch_w )
 {
-	m90_state *state = space->machine->driver_data<m90_state>();
+	m90_state *state = space->machine().driver_data<m90_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->bankaddress = 0x10000 * (data & 0x0f);
-		set_m90_bank(space->machine);
+		set_m90_bank(space->machine());
 	}
 }
 
@@ -1145,19 +1145,19 @@ static STATE_POSTLOAD( quizf1_postload )
 
 static DRIVER_INIT( quizf1 )
 {
-	m90_state *state = machine->driver_data<m90_state>();
+	m90_state *state = machine.driver_data<m90_state>();
 	state->bankaddress = 0;
 	set_m90_bank(machine);
 
 	state_save_register_global(machine, state->bankaddress);
-	machine->state().register_postload(quizf1_postload, NULL);
+	machine.state().register_postload(quizf1_postload, NULL);
 }
 
 
 
 static DRIVER_INIT( bomblord )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 
 	int i;
 	for (i=0; i<0x100000; i+=8)

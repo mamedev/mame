@@ -113,8 +113,8 @@ MACHINE_CONFIG_END
 
 WRITE8_DEVICE_HANDLER( zaxxon_sound_a_w )
 {
-	zaxxon_state *state = device->machine->driver_data<zaxxon_state>();
-	device_t *samples = device->machine->device("samples");
+	zaxxon_state *state = device->machine().driver_data<zaxxon_state>();
+	device_t *samples = device->machine().device("samples");
 	UINT8 diff = data ^ state->sound_state[0];
 	state->sound_state[0] = data;
 
@@ -149,8 +149,8 @@ WRITE8_DEVICE_HANDLER( zaxxon_sound_a_w )
 
 WRITE8_DEVICE_HANDLER( zaxxon_sound_b_w )
 {
-	zaxxon_state *state = device->machine->driver_data<zaxxon_state>();
-	device_t *samples = device->machine->device("samples");
+	zaxxon_state *state = device->machine().driver_data<zaxxon_state>();
+	device_t *samples = device->machine().device("samples");
 	UINT8 diff = data ^ state->sound_state[1];
 	state->sound_state[1] = data;
 
@@ -167,8 +167,8 @@ WRITE8_DEVICE_HANDLER( zaxxon_sound_b_w )
 
 WRITE8_DEVICE_HANDLER( zaxxon_sound_c_w )
 {
-	zaxxon_state *state = device->machine->driver_data<zaxxon_state>();
-	device_t *samples = device->machine->device("samples");
+	zaxxon_state *state = device->machine().driver_data<zaxxon_state>();
+	device_t *samples = device->machine().device("samples");
 	UINT8 diff = data ^ state->sound_state[2];
 	state->sound_state[2] = data;
 
@@ -225,8 +225,8 @@ MACHINE_CONFIG_END
 
 WRITE8_DEVICE_HANDLER( congo_sound_b_w )
 {
-	zaxxon_state *state = device->machine->driver_data<zaxxon_state>();
-	device_t *samples = device->machine->device("samples");
+	zaxxon_state *state = device->machine().driver_data<zaxxon_state>();
+	device_t *samples = device->machine().device("samples");
 	UINT8 diff = data ^ state->sound_state[1];
 	state->sound_state[1] = data;
 
@@ -239,8 +239,8 @@ WRITE8_DEVICE_HANDLER( congo_sound_b_w )
 
 WRITE8_DEVICE_HANDLER( congo_sound_c_w )
 {
-	zaxxon_state *state = device->machine->driver_data<zaxxon_state>();
-	device_t *samples = device->machine->device("samples");
+	zaxxon_state *state = device->machine().driver_data<zaxxon_state>();
+	device_t *samples = device->machine().device("samples");
 	UINT8 diff = data ^ state->sound_state[2];
 	state->sound_state[2] = data;
 

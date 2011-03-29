@@ -62,7 +62,7 @@
 
 #define TIMEKPR_DEVCFG_DERIVED_DEV_ALLOC(devtype) \
 	device_t *devtype##_device_config::alloc_device(running_machine &machine) const \
-	{ return auto_alloc(&machine, devtype##_device(machine, *this)); }
+	{ return auto_alloc(machine, devtype##_device(machine, *this)); }
 
 #define TIMEKPR_DERIVE(devtype, name, shortname) \
 	TIMEKPR_DEV_DERIVED_CTOR(devtype) \
@@ -104,7 +104,7 @@ device_config *timekeeper_device_config::static_alloc_device_config(const machin
 
 device_t *timekeeper_device_config::alloc_device(running_machine &machine) const
 {
-    return auto_alloc(&machine, timekeeper_device(machine, *this));
+    return auto_alloc(machine, timekeeper_device(machine, *this));
 }
 
 /***************************************************************************
@@ -211,7 +211,7 @@ void timekeeper_device::device_start()
 	m_month = make_bcd( systime.local_time.month + 1 );
 	m_year = make_bcd( systime.local_time.year % 100 );
 	m_century = make_bcd( systime.local_time.year / 100 );
-	m_data = auto_alloc_array( &m_machine, UINT8, m_size );
+	m_data = auto_alloc_array( m_machine, UINT8, m_size );
 
 	m_default_data = *region();
 	if (m_default_data)

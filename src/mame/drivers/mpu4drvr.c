@@ -225,9 +225,9 @@ static WRITE16_HANDLER( bwb_characteriser16_w );
 */
 
 
-static void update_mpu68_interrupts(running_machine *machine)
+static void update_mpu68_interrupts(running_machine &machine)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	cputag_set_input_line(machine, "video", 1, state->m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "video", 2, state->m6850_irq_state ? CLEAR_LINE : ASSERT_LINE);
 	cputag_set_input_line(machine, "video", 3, state->scn2674_irq_state ? ASSERT_LINE : CLEAR_LINE);
@@ -237,39 +237,39 @@ static void update_mpu68_interrupts(running_machine *machine)
 
 static READ_LINE_DEVICE_HANDLER( m6809_acia_rx_r )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	return state->m68k_m6809_line;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m6809_acia_tx_w )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
 	drvstate->m6809_m68k_line = state;
 }
 
 static READ_LINE_DEVICE_HANDLER( m6809_acia_cts_r )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	return state->m6809_acia_cts;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m6809_acia_rts_w )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
 	drvstate->m6809_acia_rts = state;
 }
 
 static READ_LINE_DEVICE_HANDLER( m6809_acia_dcd_r )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	return state->m6809_acia_dcd;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m6809_acia_irq )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
 	drvstate->m68k_acia_cts = !state;
-	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static ACIA6850_INTERFACE( m6809_acia_if )
@@ -286,40 +286,40 @@ static ACIA6850_INTERFACE( m6809_acia_if )
 
 static READ_LINE_DEVICE_HANDLER( m68k_acia_rx_r )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	return state->m6809_m68k_line;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m68k_acia_tx_w )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
 	drvstate->m68k_m6809_line = state;
 }
 
 static READ_LINE_DEVICE_HANDLER( m68k_acia_cts_r )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	return state->m68k_acia_cts;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m68k_acia_rts_w )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
 	drvstate->m6809_acia_dcd = state;
 }
 
 static READ_LINE_DEVICE_HANDLER( m68k_acia_dcd_r )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	return state->m6809_acia_rts;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m68k_acia_irq )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
 	drvstate->m6809_acia_cts = !state;
 	drvstate->m6850_irq_state = state;
-	update_mpu68_interrupts(device->machine);
+	update_mpu68_interrupts(device->machine());
 }
 
 static ACIA6850_INTERFACE( m68k_acia_if )
@@ -337,9 +337,9 @@ static ACIA6850_INTERFACE( m68k_acia_if )
 
 static WRITE_LINE_DEVICE_HANDLER( cpu1_ptm_irq )
 {
-	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
 	drvstate->m6840_irq_state = state;
-	update_mpu68_interrupts(device->machine);
+	update_mpu68_interrupts(device->machine());
 }
 
 
@@ -349,8 +349,8 @@ static WRITE8_DEVICE_HANDLER( vid_o1_callback )
 
 	if (data)
 	{
-		device_t *acia_0 = device->machine->device("acia6850_0");
-		device_t *acia_1 = device->machine->device("acia6850_1");
+		device_t *acia_0 = device->machine().device("acia6850_0");
+		device_t *acia_1 = device->machine().device("acia6850_1");
 		acia6850_tx_clock_in(acia_0);
 		acia6850_rx_clock_in(acia_0);
 		acia6850_tx_clock_in(acia_1);
@@ -446,7 +446,7 @@ static const gfx_layout mpu4_vid_char_16x16_layout =
 
 static SCREEN_UPDATE( mpu4_vid )
 {
-	mpu4_state *state = screen->machine->driver_data<mpu4_state>();
+	mpu4_state *state = screen->machine().driver_data<mpu4_state>();
 	int x, y/*, count = 0*/;
 
 	bitmap_fill(bitmap,cliprect,0);
@@ -476,7 +476,7 @@ static SCREEN_UPDATE( mpu4_vid )
 			attr = tiledat >>12;
 
 			if (attr)
-				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfxregion],tiledat,0,0,0,x*8,y*8);
+				drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[gfxregion],tiledat,0,0,0,x*8,y*8);
 
 			//count++;
 		}
@@ -491,20 +491,20 @@ static SCREEN_UPDATE( mpu4_vid )
 
 static READ16_HANDLER( mpu4_vid_vidram_r )
 {
-	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	return state->vid_vidram[offset];
 }
 
 
 static WRITE16_HANDLER( mpu4_vid_vidram_w )
 {
-	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	COMBINE_DATA(&state->vid_vidram[offset]);
 	offset <<= 1;
-	gfx_element_mark_dirty(space->machine->gfx[state->gfx_index+0], offset/0x20);
-	gfx_element_mark_dirty(space->machine->gfx[state->gfx_index+1], offset/0x20);
-	gfx_element_mark_dirty(space->machine->gfx[state->gfx_index+2], offset/0x20);
-	gfx_element_mark_dirty(space->machine->gfx[state->gfx_index+3], offset/0x20);
+	gfx_element_mark_dirty(space->machine().gfx[state->gfx_index+0], offset/0x20);
+	gfx_element_mark_dirty(space->machine().gfx[state->gfx_index+1], offset/0x20);
+	gfx_element_mark_dirty(space->machine().gfx[state->gfx_index+2], offset/0x20);
+	gfx_element_mark_dirty(space->machine().gfx[state->gfx_index+3], offset/0x20);
 }
 
 
@@ -650,9 +650,9 @@ static void scn2674_write_init_regs(mpu4_state *state, UINT8 data)
 	if (state->scn2675_IR_pointer>14)state->scn2675_IR_pointer=14;
 }
 
-static void scn2674_write_command(running_machine *machine, UINT8 data)
+static void scn2674_write_command(running_machine &machine, UINT8 data)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	UINT8 oprand;
 	int i;
 
@@ -874,7 +874,7 @@ static void scn2674_write_command(running_machine *machine, UINT8 data)
 
 static READ16_HANDLER( mpu4_vid_scn2674_r )
 {
-	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	/*
     Offset:  Purpose
      0       Interrupt Register
@@ -925,7 +925,7 @@ static READ16_HANDLER( mpu4_vid_scn2674_r )
 
 static WRITE16_HANDLER( mpu4_vid_scn2674_w )
 {
-	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	/*
     Offset:  Purpose
      0       Initialization Registers
@@ -947,7 +947,7 @@ static WRITE16_HANDLER( mpu4_vid_scn2674_w )
 			break;
 
 		case 1:
-			scn2674_write_command(space->machine, data);
+			scn2674_write_command(space->machine(), data);
 			break;
 
 		case 2: state->scn2674_screen1_l = data; break;
@@ -962,7 +962,7 @@ static WRITE16_HANDLER( mpu4_vid_scn2674_w )
 
 static VIDEO_START( mpu4_vid )
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	/* if anything uses tile sizes other than 8x8 we can't really do it this way.. we'll have to draw tiles by hand.
       maybe we will anyway, but for now we don't need to */
 
@@ -972,16 +972,16 @@ static VIDEO_START( mpu4_vid )
 
 	/* find first empty slot to decode gfx */
 	for (state->gfx_index = 0; state->gfx_index < MAX_GFX_ELEMENTS; state->gfx_index++)
-		if (machine->gfx[state->gfx_index] == 0)
+		if (machine.gfx[state->gfx_index] == 0)
 			break;
 
 	assert(state->gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[state->gfx_index+0] = gfx_element_alloc(machine, &mpu4_vid_char_8x8_layout, (UINT8 *)state->vid_vidram, machine->total_colors() / 16, 0);
-	machine->gfx[state->gfx_index+1] = gfx_element_alloc(machine, &mpu4_vid_char_8x16_layout, (UINT8 *)state->vid_vidram, machine->total_colors() / 16, 0);
-	machine->gfx[state->gfx_index+2] = gfx_element_alloc(machine, &mpu4_vid_char_16x8_layout, (UINT8 *)state->vid_vidram, machine->total_colors() / 16, 0);
-	machine->gfx[state->gfx_index+3] = gfx_element_alloc(machine, &mpu4_vid_char_16x16_layout, (UINT8 *)state->vid_vidram, machine->total_colors() / 16, 0);
+	machine.gfx[state->gfx_index+0] = gfx_element_alloc(machine, &mpu4_vid_char_8x8_layout, (UINT8 *)state->vid_vidram, machine.total_colors() / 16, 0);
+	machine.gfx[state->gfx_index+1] = gfx_element_alloc(machine, &mpu4_vid_char_8x16_layout, (UINT8 *)state->vid_vidram, machine.total_colors() / 16, 0);
+	machine.gfx[state->gfx_index+2] = gfx_element_alloc(machine, &mpu4_vid_char_16x8_layout, (UINT8 *)state->vid_vidram, machine.total_colors() / 16, 0);
+	machine.gfx[state->gfx_index+3] = gfx_element_alloc(machine, &mpu4_vid_char_16x16_layout, (UINT8 *)state->vid_vidram, machine.total_colors() / 16, 0);
 
 	state->scn2675_IR_pointer = 0;
 }
@@ -998,7 +998,7 @@ static VIDEO_START( mpu4_vid )
 
 static WRITE16_HANDLER( ef9369_w )
 {
-	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	struct ef9369_t &pal = state->pal;
 	data &= 0x00ff;
 
@@ -1028,7 +1028,7 @@ static WRITE16_HANDLER( ef9369_w )
 			col = pal.clut[entry] & 0xfff;
 
 			/* Update the MAME palette */
-			palette_set_color_rgb(space->machine, entry, pal4bit(col >> 8), pal4bit(col >> 4), pal4bit(col >> 0));
+			palette_set_color_rgb(space->machine(), entry, pal4bit(col >> 8), pal4bit(col >> 4), pal4bit(col >> 0));
 		}
 
 			/* Address register auto-increment */
@@ -1040,7 +1040,7 @@ static WRITE16_HANDLER( ef9369_w )
 
 static READ16_HANDLER( ef9369_r )
 {
-	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	struct ef9369_t &pal = state->pal;
 	if ((offset & 1) == 0)
 	{
@@ -1077,7 +1077,7 @@ static READ16_HANDLER( ef9369_r )
 
 WRITE16_HANDLER( bt471_w )
 {
-	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	struct bt471_t &bt471 = state->bt471;
 	UINT8 val = data & 0xff;
 		{
@@ -1101,7 +1101,7 @@ WRITE16_HANDLER( bt471_w )
 
 			if (++*addr_cnt == 3)
 			{
-				palette_set_color(space->machine, bt471.address, MAKE_RGB(color[0], color[1], color[2]));
+				palette_set_color(space->machine(), bt471.address, MAKE_RGB(color[0], color[1], color[2]));
 				*addr_cnt = 0;
 
 				/* Address register increments */
@@ -1137,7 +1137,7 @@ READ16_HANDLER( bt471_r )
 
 static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
 {
-	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	/* The SWP trackball interface connects a standard trackball to the AUX1 port on the MPU4
     mainboard. As per usual, they've taken the cheap route here, reading and processing the
     raw quadrature signal from the encoder wheels for a 4 bit interface, rather than use any
@@ -1147,13 +1147,13 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
     We invert the X and Y data at source due to the use of Schmitt triggers in the interface, which
     clean up the pulses and flip the active phase.*/
 
-	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",device->machine->describe_context()));
+	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",device->machine().describe_context()));
 
 
-	UINT8 data = input_port_read(device->machine, "AUX1");
+	UINT8 data = input_port_read(device->machine(), "AUX1");
 
-	INT8 dx = input_port_read(device->machine, "TRACKX");
-	INT8 dy = input_port_read(device->machine, "TRACKY");
+	INT8 dx = input_port_read(device->machine(), "TRACKX");
+	INT8 dy = input_port_read(device->machine(), "TRACKY");
 
 	state->cur[0] = dy + dx;
 	state->cur[1] = dy - dx;
@@ -1902,7 +1902,7 @@ INPUT_PORTS_END
 /* OKI M6376 (for Mating Game) FIXME */
 static READ16_DEVICE_HANDLER( oki_r )
 {
-	return device->machine->rand();
+	return device->machine().rand();
 }
 
 static WRITE16_DEVICE_HANDLER( oki_w )
@@ -1913,14 +1913,14 @@ static WRITE16_DEVICE_HANDLER( oki_w )
 
 static void video_reset(device_t *device)
 {
-	device->machine->device("6840ptm_68k")->reset();
-	device->machine->device("acia6850_1")->reset();
+	device->machine().device("6840ptm_68k")->reset();
+	device->machine().device("acia6850_1")->reset();
 }
 
 /* machine start (called only once) */
 static MACHINE_START( mpu4_vid )
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	mpu4_config_common(machine);
 
 	state->mod_number=4; //No AY chip
@@ -1934,12 +1934,12 @@ static MACHINE_START( mpu4_vid )
 	ROC10937_init(0, MSC1937, 0);
 
 	/* Hook the reset line */
-	m68k_set_reset_callback(machine->device("video"), video_reset);
+	m68k_set_reset_callback(machine.device("video"), video_reset);
 }
 
 static MACHINE_RESET( mpu4_vid )
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	ROC10937_reset(0);
 
 	mpu4_stepper_reset(state);
@@ -2119,7 +2119,7 @@ static PALETTE_INIT( dealem )
 			3,	resistances_rg,	weights_g,	1000,	0,
 			2,	resistances_b,	weights_b,	1000,	0);
 
-	len = machine->region("proms")->bytes();
+	len = machine.region("proms")->bytes();
 	for (i = 0; i < len; i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -2147,7 +2147,7 @@ static PALETTE_INIT( dealem )
 
 static SCREEN_UPDATE(dealem)
 {
-	mpu4_state *state = screen->machine->driver_data<mpu4_state>();
+	mpu4_state *state = screen->machine().driver_data<mpu4_state>();
 	int x,y;
 	int count = 0;
 
@@ -2157,7 +2157,7 @@ static SCREEN_UPDATE(dealem)
 		{
 			int tile = state->dealem_videoram[count + 0x1000] | (state->dealem_videoram[count] << 8);
 			count++;
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,0,0,0,x * 8,y * 8);
+			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tile,0,0,0,x * 8,y * 8);
 		}
 	}
 
@@ -2167,7 +2167,7 @@ static SCREEN_UPDATE(dealem)
 
 static WRITE_LINE_DEVICE_HANDLER( dealem_vsync_changed )
 {
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, state);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, state);
 }
 
 
@@ -2217,9 +2217,9 @@ ADDRESS_MAP_END
 
 static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 {
-	mpu4_state *state = timer.machine->driver_data<mpu4_state>();
+	mpu4_state *state = timer.machine().driver_data<mpu4_state>();
 	int current_scanline=param;
-	timer.machine->scheduler().synchronize();
+	timer.machine().scheduler().synchronize();
 
 
 	if (current_scanline==0)
@@ -2237,7 +2237,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 			LOGSTUFF(("SCN2674 Ready\n"));
 			state->scn2674_irq_state = 1;
 			state->scn2674_irq_register |= 0x02;
-			update_mpu68_interrupts(timer.machine);
+			update_mpu68_interrupts(timer.machine());
 		}
 	}
 
@@ -2250,7 +2250,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 			LOGSTUFF(("SCN2674 Line Zero\n"));
 			state->scn2674_irq_state = 1;
 			state->scn2674_irq_register |= 0x08;
-			update_mpu68_interrupts(timer.machine);
+			update_mpu68_interrupts(timer.machine());
 		}
 	}
 
@@ -2267,8 +2267,8 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 		{
 			LOGSTUFF(("SCN2674 Split Screen 1\n"));
 			state->scn2674_irq_state = 1;
-			update_mpu68_interrupts(timer.machine);
-			timer.machine->primary_screen->update_partial(timer.machine->primary_screen->vpos());
+			update_mpu68_interrupts(timer.machine());
+			timer.machine().primary_screen->update_partial(timer.machine().primary_screen->vpos());
 
 			state->scn2674_irq_register |= 0x04;
 		}
@@ -2288,8 +2288,8 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 			LOGSTUFF(("SCN2674 Split Screen 2 irq\n"));
 			state->scn2674_irq_state = 1;
 			state->scn2674_irq_register |= 0x01;
-			update_mpu68_interrupts(timer.machine);
-			timer.machine->primary_screen->update_partial(timer.machine->primary_screen->vpos());
+			update_mpu68_interrupts(timer.machine());
+			timer.machine().primary_screen->update_partial(timer.machine().primary_screen->vpos());
 
 		}
 	}
@@ -2305,7 +2305,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 				LOGSTUFF(("vblank irq\n"));
 				state->scn2674_irq_state = 1;
 				state->scn2674_irq_register |= 0x10;
-				update_mpu68_interrupts(timer.machine);
+				update_mpu68_interrupts(timer.machine());
 			}
 		}
 	}
@@ -2504,7 +2504,7 @@ Characteriser (CHR)
 
 static WRITE16_HANDLER( characteriser16_w )
 {
-	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	int x;
 	int call=data;
 	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(space->cpu),offset,data));
@@ -2533,7 +2533,7 @@ static WRITE16_HANDLER( characteriser16_w )
 
 static READ16_HANDLER( characteriser16_r )
 {
-	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", cpu_get_previouspc(space->cpu),offset,state->current_chr_table[state->prot_col].response));
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	LOG_CHR(("Characteriser read data %02X \n",state->current_chr_table[state->prot_col].response));
@@ -2566,7 +2566,7 @@ us) prone to similar weaknesses that allow a per game solution.
 
 static WRITE16_HANDLER( bwb_characteriser16_w )
 {
-	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	int x;
 	int call=data &0xff;
 	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", cpu_get_previouspc(space->cpu),offset,data));
@@ -2611,7 +2611,7 @@ static WRITE16_HANDLER( bwb_characteriser16_w )
 
 static READ16_HANDLER( bwb_characteriser16_r )
 {
-	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	if (!state->current_chr_table)
 		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
 
@@ -2789,47 +2789,47 @@ static const mpu4_chr_table prizeinv_data[72] = {
 
 static DRIVER_INIT (adders)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->current_chr_table = adders_data;
 }
 
 static DRIVER_INIT (crmaze)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->current_chr_table = crmaze_data;
 }
 
 static DRIVER_INIT (crmazea)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->current_chr_table = crmazea_data;
 }
 
 static DRIVER_INIT (crmaze2)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->current_chr_table = crmaze2_data;
 }
 
 static DRIVER_INIT (crmaze3)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->reel_mux = FLUTTERBOX;
 	state->current_chr_table = crmaze3_data;
 }
 
 static DRIVER_INIT (crmaze3a)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->reel_mux = FLUTTERBOX;
 	state->current_chr_table = crmaze3a_data;
 }
 
 static DRIVER_INIT (mating)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
-	address_space *space = machine->device("video")->memory().space(AS_PROGRAM);
-	device_t *device = machine->device("oki");
+	mpu4_state *state = machine.driver_data<mpu4_state>();
+	address_space *space = machine.device("video")->memory().space(AS_PROGRAM);
+	device_t *device = machine.device("oki");
 
 	/* The Mating Game has an extra 256kB RAM on the program card */
 	space->install_ram(0x600000, 0x63ffff);
@@ -2842,43 +2842,43 @@ static DRIVER_INIT (mating)
 
 static DRIVER_INIT (skiltrek)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->current_chr_table = skiltrek_data;
 }
 
 static DRIVER_INIT (timemchn)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->current_chr_table = timemchn_data;
 }
 
 static DRIVER_INIT (strikeit)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->current_chr_table = strikeit_data;
 }
 
 static DRIVER_INIT (turnover)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->current_chr_table = turnover_data;
 }
 
 static DRIVER_INIT (eyesdown)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->current_chr_table = eyesdown_data;
 }
 
 static DRIVER_INIT (quidgrid)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->current_chr_table = quidgrid_data;
 }
 
 static DRIVER_INIT (prizeinv)
 {
-	mpu4_state *state = machine->driver_data<mpu4_state>();
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->current_chr_table = prizeinv_data;
 }
 

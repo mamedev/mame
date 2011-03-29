@@ -5,7 +5,7 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
-	void (*videomode_custom)(running_machine *machine, UINT8 data, UINT8 prevdata);
+	void (*videomode_custom)(running_machine &machine, UINT8 data, UINT8 prevdata);
 	UINT8 mute_xor;
 	UINT8 *ram;
 	UINT8 dakkochn_mux_data;

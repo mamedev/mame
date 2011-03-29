@@ -217,60 +217,60 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 static WRITE8_HANDLER( swimmer_sh_soundlatch_w )
 {
 	soundlatch_w(space,offset,data);
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
+	cputag_set_input_line_and_vector(space->machine(), "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 
 static WRITE8_HANDLER( yamato_p0_w )
 {
-	cclimber_state *state = space->machine->driver_data<cclimber_state>();
+	cclimber_state *state = space->machine().driver_data<cclimber_state>();
 	state->yamato_p0 = data;
 }
 
 static WRITE8_HANDLER( yamato_p1_w )
 {
-	cclimber_state *state = space->machine->driver_data<cclimber_state>();
+	cclimber_state *state = space->machine().driver_data<cclimber_state>();
 	state->yamato_p1 = data;
 }
 
 static READ8_HANDLER( yamato_p0_r )
 {
-	cclimber_state *state = space->machine->driver_data<cclimber_state>();
+	cclimber_state *state = space->machine().driver_data<cclimber_state>();
 	return state->yamato_p0;
 }
 
 static READ8_HANDLER( yamato_p1_r )
 {
-	cclimber_state *state = space->machine->driver_data<cclimber_state>();
+	cclimber_state *state = space->machine().driver_data<cclimber_state>();
 	return state->yamato_p1;
 }
 
 
 static WRITE8_HANDLER(toprollr_rombank_w)
 {
-	cclimber_state *state = space->machine->driver_data<cclimber_state>();
+	cclimber_state *state = space->machine().driver_data<cclimber_state>();
 	state->toprollr_rombank &= ~(1 << offset);
 	state->toprollr_rombank |= (data & 1) << offset;
 
 	if (state->toprollr_rombank < 3)
-		memory_set_bank(space->machine, "bank1", state->toprollr_rombank);
+		memory_set_bank(space->machine(), "bank1", state->toprollr_rombank);
 }
 
 
 static TIMER_CALLBACK( disable_interrupts )
 {
-	cpu_interrupt_enable(machine->device("maincpu"), 0);
+	cpu_interrupt_enable(machine.device("maincpu"), 0);
 }
 
 
 static MACHINE_RESET( cclimber )
 {
-	cclimber_state *state = machine->driver_data<cclimber_state>();
+	cclimber_state *state = machine.driver_data<cclimber_state>();
 	/* Disable interrupts, River Patrol / Silver Land needs this */
 
 	/* we must do this on a timer in order to have it take effect */
 	/* otherwise, the reset process will override our changes */
-	machine->scheduler().synchronize(FUNC(disable_interrupts));
+	machine.scheduler().synchronize(FUNC(disable_interrupts));
 
 	state->toprollr_rombank = 0;
 }

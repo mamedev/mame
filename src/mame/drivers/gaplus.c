@@ -160,52 +160,52 @@ TODO:
 
 static READ8_HANDLER( gaplus_spriteram_r )
 {
-	gaplus_state *state = space->machine->driver_data<gaplus_state>();
+	gaplus_state *state = space->machine().driver_data<gaplus_state>();
 	return state->spriteram[offset];
 }
 
 static WRITE8_HANDLER( gaplus_spriteram_w )
 {
-	gaplus_state *state = space->machine->driver_data<gaplus_state>();
+	gaplus_state *state = space->machine().driver_data<gaplus_state>();
 	state->spriteram[offset] = data;
 }
 
 static WRITE8_HANDLER( gaplus_irq_1_ctrl_w )
 {
 	int bit = !BIT(offset, 11);
-	cpu_interrupt_enable(space->machine->device("maincpu"), bit);
+	cpu_interrupt_enable(space->machine().device("maincpu"), bit);
 	if (!bit)
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( gaplus_irq_3_ctrl_w )
 {
 	int bit = !BIT(offset, 13);
-	cpu_interrupt_enable(space->machine->device("sub2"), bit);
+	cpu_interrupt_enable(space->machine().device("sub2"), bit);
 	if (!bit)
-		cputag_set_input_line(space->machine, "sub2", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "sub2", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( gaplus_irq_2_ctrl_w )
 {
 	int bit = offset & 1;
-	cpu_interrupt_enable(space->machine->device("sub"), bit);
+	cpu_interrupt_enable(space->machine().device("sub"), bit);
 	if (!bit)
-		cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "sub", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( gaplus_sreset_w )
 {
 	int bit = !BIT(offset, 11);
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(space->machine, "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-	mappy_sound_enable(space->machine->device("namco"), bit);
+	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+	mappy_sound_enable(space->machine().device("namco"), bit);
 }
 
 static WRITE8_HANDLER( gaplus_freset_w )
 {
-	device_t *io58xx = space->machine->device("58xx");
-	device_t *io56xx = space->machine->device("56xx");
+	device_t *io58xx = space->machine().device("58xx");
+	device_t *io56xx = space->machine().device("56xx");
 	int bit = !BIT(offset, 11);
 
 	logerror("%04x: freset %d\n",cpu_get_pc(space->cpu), bit);
@@ -232,14 +232,14 @@ static const namco_62xx_interface namco_62xx_intf =
 static MACHINE_RESET( gaplus )
 {
 	/* on reset, VINTON is reset, while the other flags don't seem to be affected */
-	cpu_interrupt_enable(machine->device("sub"), 0);
+	cpu_interrupt_enable(machine.device("sub"), 0);
 	cputag_set_input_line(machine, "sub", 0, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( namcoio_run )
 {
-	device_t *io58xx = machine->device("58xx");
-	device_t *io56xx = machine->device("56xx");
+	device_t *io58xx = machine.device("58xx");
+	device_t *io56xx = machine.device("56xx");
 
 	switch (param)
 	{
@@ -254,17 +254,17 @@ static TIMER_CALLBACK( namcoio_run )
 
 static INTERRUPT_GEN( gaplus_interrupt_1 )
 {
-	device_t *io58xx = device->machine->device("58xx");
-	device_t *io56xx = device->machine->device("56xx");
+	device_t *io58xx = device->machine().device("58xx");
+	device_t *io56xx = device->machine().device("56xx");
 
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
 								// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(io58xx))		/* give the cpu a tiny bit of time to write the command before processing it */
-		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run));
+		device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run));
 
 	if (!namcoio_read_reset_line(io56xx))		/* give the cpu a tiny bit of time to write the command before processing it */
-		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run), 1);
+		device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run), 1);
 
 }
 
@@ -503,15 +503,15 @@ static const samples_interface gaplus_samples_interface =
 
 static WRITE8_DEVICE_HANDLER( out_lamps0 )
 {
-	set_led_status(device->machine, 0, data & 1);
-	set_led_status(device->machine, 1, data & 2);
-	coin_lockout_global_w(device->machine, data & 4);
-	coin_counter_w(device->machine, 0, ~data & 8);
+	set_led_status(device->machine(), 0, data & 1);
+	set_led_status(device->machine(), 1, data & 2);
+	coin_lockout_global_w(device->machine(), data & 4);
+	coin_counter_w(device->machine(), 0, ~data & 8);
 }
 
 static WRITE8_DEVICE_HANDLER( out_lamps1 )
 {
-	coin_counter_w(device->machine, 1, ~data & 1);
+	coin_counter_w(device->machine(), 1, ~data & 1);
 }
 
 /* chip #0: player inputs, buttons, coins */
@@ -858,11 +858,11 @@ static DRIVER_INIT( gaplus )
 	UINT8 *rom;
 	int i;
 
-	rom = machine->region("gfx1")->base();
+	rom = machine.region("gfx1")->base();
 	for (i = 0;i < 0x2000;i++)
 		rom[i + 0x2000] = rom[i] >> 4;
 
-	rom = machine->region("gfx2")->base() + 0x6000;
+	rom = machine.region("gfx2")->base() + 0x6000;
 	for (i = 0;i < 0x2000;i++)
 		rom[i + 0x2000] = rom[i] << 4;
 }

@@ -17,24 +17,24 @@
 
 VIDEO_START( battlera )
 {
-	battlera_state *state = machine->driver_data<battlera_state>();
+	battlera_state *state = machine.driver_data<battlera_state>();
 	state->HuC6270_vram=auto_alloc_array(machine, UINT8, 0x20000);
 	state->vram_dirty=auto_alloc_array(machine, UINT8, 0x1000);
 
 	memset(state->HuC6270_vram,0,0x20000);
 	memset(state->vram_dirty,1,0x1000);
 
-	state->tile_bitmap=auto_bitmap_alloc(machine,512,512,machine->primary_screen->format());
-	state->front_bitmap=auto_bitmap_alloc(machine,512,512,machine->primary_screen->format());
+	state->tile_bitmap=auto_bitmap_alloc(machine,512,512,machine.primary_screen->format());
+	state->front_bitmap=auto_bitmap_alloc(machine,512,512,machine.primary_screen->format());
 
 	state->vram_ptr=0;
 	state->inc_value=1;
 	state->current_scanline=0;
 	state->irq_enable=state->rcr_enable=state->sb_enable=state->bb_enable=0;
 
-	gfx_element_set_source(machine->gfx[0], state->HuC6270_vram);
-	gfx_element_set_source(machine->gfx[1], state->HuC6270_vram);
-	gfx_element_set_source(machine->gfx[2], state->blank_tile);
+	gfx_element_set_source(machine.gfx[0], state->HuC6270_vram);
+	gfx_element_set_source(machine.gfx[1], state->HuC6270_vram);
+	gfx_element_set_source(machine.gfx[2], state->blank_tile);
 }
 
 /******************************************************************************/
@@ -43,29 +43,29 @@ WRITE8_HANDLER( battlera_palette_w )
 {
 	int pal_word;
 
-	space->machine->generic.paletteram.u8[offset]=data;
+	space->machine().generic.paletteram.u8[offset]=data;
 	if (offset%2) offset-=1;
 
-	pal_word=space->machine->generic.paletteram.u8[offset] | (space->machine->generic.paletteram.u8[offset+1]<<8);
-	palette_set_color_rgb(space->machine, offset/2, pal3bit(pal_word >> 3), pal3bit(pal_word >> 6), pal3bit(pal_word >> 0));
+	pal_word=space->machine().generic.paletteram.u8[offset] | (space->machine().generic.paletteram.u8[offset+1]<<8);
+	palette_set_color_rgb(space->machine(), offset/2, pal3bit(pal_word >> 3), pal3bit(pal_word >> 6), pal3bit(pal_word >> 0));
 }
 
 /******************************************************************************/
 
 READ8_HANDLER( HuC6270_debug_r )
 {
-	battlera_state *state = space->machine->driver_data<battlera_state>();
+	battlera_state *state = space->machine().driver_data<battlera_state>();
 	return state->HuC6270_vram[offset];
 }
 
 WRITE8_HANDLER( HuC6270_debug_w )
 {
-	battlera_state *state = space->machine->driver_data<battlera_state>();
+	battlera_state *state = space->machine().driver_data<battlera_state>();
 	state->HuC6270_vram[offset]=data;
 }
 READ8_HANDLER( HuC6270_register_r )
 {
-	battlera_state *state = space->machine->driver_data<battlera_state>();
+	battlera_state *state = space->machine().driver_data<battlera_state>();
 	int rr;
 
 	if ((state->current_scanline+56)==state->HuC6270_registers[6]) rr=1; else rr=0;
@@ -82,7 +82,7 @@ READ8_HANDLER( HuC6270_register_r )
 
 WRITE8_HANDLER( HuC6270_register_w )
 {
-	battlera_state *state = space->machine->driver_data<battlera_state>();
+	battlera_state *state = space->machine().driver_data<battlera_state>();
 	switch (offset) {
 	case 0: /* Select data region */
 		state->VDC_register=data;
@@ -97,7 +97,7 @@ WRITE8_HANDLER( HuC6270_register_w )
 #ifdef UNUSED_FUNCTION
 READ8_HANDLER( HuC6270_data_r )
 {
-	battlera_state *state = space->machine->driver_data<battlera_state>();
+	battlera_state *state = space->machine().driver_data<battlera_state>();
 	int result;
 
 	switch (offset) {
@@ -116,7 +116,7 @@ READ8_HANDLER( HuC6270_data_r )
 
 WRITE8_HANDLER( HuC6270_data_w )
 {
-	battlera_state *state = space->machine->driver_data<battlera_state>();
+	battlera_state *state = space->machine().driver_data<battlera_state>();
 	switch (offset) {
 		case 0: /* LSB */
 			switch (state->VDC_register) {
@@ -132,8 +132,8 @@ WRITE8_HANDLER( HuC6270_data_w )
 			case 2: /* VRAM */
 				if (state->HuC6270_vram[(state->HuC6270_registers[0]<<1)|1]!=data) {
 					state->HuC6270_vram[(state->HuC6270_registers[0]<<1)|1]=data;
-					gfx_element_mark_dirty(space->machine->gfx[0], state->HuC6270_registers[0]>>4);
-					gfx_element_mark_dirty(space->machine->gfx[1], state->HuC6270_registers[0]>>6);
+					gfx_element_mark_dirty(space->machine().gfx[0], state->HuC6270_registers[0]>>4);
+					gfx_element_mark_dirty(space->machine().gfx[1], state->HuC6270_registers[0]>>6);
 				}
 				if (state->HuC6270_registers[0]<0x1000) state->vram_dirty[state->HuC6270_registers[0]]=1;
 				return;
@@ -192,8 +192,8 @@ WRITE8_HANDLER( HuC6270_data_w )
 			case 2: /* VWR - VRAM */
 				if (state->HuC6270_vram[(state->HuC6270_registers[0]<<1)|0]!=data) {
 					state->HuC6270_vram[(state->HuC6270_registers[0]<<1)|0]=data;
-					gfx_element_mark_dirty(space->machine->gfx[0], state->HuC6270_registers[0]>>4);
-					gfx_element_mark_dirty(space->machine->gfx[1], state->HuC6270_registers[0]>>6);
+					gfx_element_mark_dirty(space->machine().gfx[0], state->HuC6270_registers[0]>>4);
+					gfx_element_mark_dirty(space->machine().gfx[1], state->HuC6270_registers[0]>>6);
 					if (state->HuC6270_registers[0]<0x1000) state->vram_dirty[state->HuC6270_registers[0]]=1;
 				}
 				state->HuC6270_registers[0]+=state->inc_value;
@@ -242,9 +242,9 @@ WRITE8_HANDLER( HuC6270_data_w )
 
 /******************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *clip,int pri)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *clip,int pri)
 {
-	battlera_state *state = machine->driver_data<battlera_state>();
+	battlera_state *state = machine.driver_data<battlera_state>();
 	int offs,my,mx,code,code2,fx,fy,cgy=0,cgx,colour,i,yinc;
 
 	/* Draw sprites, starting at SATB, draw in _reverse_ order */
@@ -283,14 +283,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		if (fy) { my += 16*(cgy-1); yinc = -16; } /* Swap tile order on Y flips */
 
 		for (i=0; i<cgy; i++) {
-			drawgfx_transpen(bitmap,clip,machine->gfx[1],
+			drawgfx_transpen(bitmap,clip,machine.gfx[1],
 				code,
 				colour,
 				fx,fy,
 				mx,my,0);
 
 			if (cgx)
-				drawgfx_transpen(bitmap,clip,machine->gfx[1],
+				drawgfx_transpen(bitmap,clip,machine.gfx[1],
 						code2,
 						colour,
 						fx,fy,
@@ -309,13 +309,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( battlera )
 {
-	battlera_state *state = screen->machine->driver_data<battlera_state>();
+	battlera_state *state = screen->machine().driver_data<battlera_state>();
 	int offs,code,scrollx,scrolly,mx,my;
 
 	/* if any tiles changed, redraw the VRAM */
-	if (screen->machine->gfx[0]->dirtyseq != state->tile_dirtyseq)
+	if (screen->machine().gfx[0]->dirtyseq != state->tile_dirtyseq)
 	{
-		state->tile_dirtyseq = screen->machine->gfx[0]->dirtyseq;
+		state->tile_dirtyseq = screen->machine().gfx[0]->dirtyseq;
 		memset(state->vram_dirty, 1, 0x1000);
 	}
 
@@ -330,17 +330,17 @@ SCREEN_UPDATE( battlera )
 		/* If this tile was changed OR tilemap was changed, redraw */
 		if (state->vram_dirty[offs/2]) {
 			state->vram_dirty[offs/2]=0;
-			drawgfx_opaque(state->tile_bitmap,0,screen->machine->gfx[0],
+			drawgfx_opaque(state->tile_bitmap,0,screen->machine().gfx[0],
 					code,
 					state->HuC6270_vram[offs] >> 4,
 					0,0,
 					8*mx,8*my);
-			drawgfx_opaque(state->front_bitmap,0,screen->machine->gfx[2],
+			drawgfx_opaque(state->front_bitmap,0,screen->machine().gfx[2],
 					0,
 					0,	/* fill the spot with pen 256 */
 					0,0,
 					8*mx,8*my);
-			drawgfx_transmask(state->front_bitmap,0,screen->machine->gfx[0],
+			drawgfx_transmask(state->front_bitmap,0,screen->machine().gfx[0],
 					code,
 					state->HuC6270_vram[offs] >> 4,
 					0,0,
@@ -357,13 +357,13 @@ SCREEN_UPDATE( battlera )
 	/* Todo:  Background enable (not used anyway) */
 
 	/* Render low priority sprites, if enabled */
-	if (state->sb_enable) draw_sprites(screen->machine,bitmap,cliprect,0);
+	if (state->sb_enable) draw_sprites(screen->machine(),bitmap,cliprect,0);
 
 	/* Render background over sprites */
 	copyscrollbitmap_trans(bitmap,state->front_bitmap,1,&scrollx,1,&scrolly,cliprect,256);
 
 	/* Render high priority sprites, if enabled */
-	if (state->sb_enable) draw_sprites(screen->machine,bitmap,cliprect,1);
+	if (state->sb_enable) draw_sprites(screen->machine(),bitmap,cliprect,1);
 
 	return 0;
 }
@@ -372,19 +372,19 @@ SCREEN_UPDATE( battlera )
 
 INTERRUPT_GEN( battlera_interrupt )
 {
-	battlera_state *state = device->machine->driver_data<battlera_state>();
+	battlera_state *state = device->machine().driver_data<battlera_state>();
 	state->current_scanline=255-cpu_getiloops(device); /* 8 lines clipped at top */
 
 	/* If raster interrupt occurs, refresh screen _up_ to this point */
 	if (state->rcr_enable && (state->current_scanline+56)==state->HuC6270_registers[6]) {
-		device->machine->primary_screen->update_partial(state->current_scanline);
+		device->machine().primary_screen->update_partial(state->current_scanline);
 		device_set_input_line(device, 0, HOLD_LINE); /* RCR interrupt */
 	}
 
 	/* Start of vblank */
 	else if (state->current_scanline==240) {
 		state->bldwolf_vblank=1;
-		device->machine->primary_screen->update_partial(240);
+		device->machine().primary_screen->update_partial(240);
 		if (state->irq_enable)
 			device_set_input_line(device, 0, HOLD_LINE); /* VBL */
 	}

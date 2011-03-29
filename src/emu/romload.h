@@ -266,13 +266,13 @@ struct rom_entry
 /* ----- ROM processing ----- */
 
 /* load the ROMs and open the disk images associated with the given machine */
-void rom_init(running_machine *machine);
+void rom_init(running_machine &machine);
 
 /* return the number of warnings we generated */
-int rom_load_warnings(running_machine *machine);
+int rom_load_warnings(running_machine &machine);
 
 /* return the number of BAD_DUMP/NO_DUMP warnings we generated */
-int rom_load_knownbad(running_machine *machine);
+int rom_load_knownbad(running_machine &machine);
 
 
 /* ----- Helpers ----- */
@@ -318,7 +318,7 @@ astring &rom_region_name(astring &result, const game_driver *drv, const rom_sour
 chd_error open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_entry *romp, emu_file **image_file, chd_file **image_chd,const char *locationtag);
 
 /* return a pointer to the CHD file associated with the given region */
-chd_file *get_disk_handle(running_machine *machine, const char *region);
+chd_file *get_disk_handle(running_machine &machine, const char *region);
 
 /* set a pointer to the CHD file associated with the given region */
 void set_disk_handle(running_machine &machine, const char *region, emu_file &file, chd_file &chdfile);

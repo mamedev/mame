@@ -50,16 +50,16 @@ INLINE timeplt_audio_state *get_safe_token( device_t *device )
 
 static DEVICE_START( timeplt_audio )
 {
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	timeplt_audio_state *state = get_safe_token(device);
 
-	state->soundcpu = machine->device<cpu_device>("tpsound");
-	state->filter_0_0 = machine->device("filter.0.0");
-	state->filter_0_1 = machine->device("filter.0.1");
-	state->filter_0_2 = machine->device("filter.0.2");
-	state->filter_1_0 = machine->device("filter.1.0");
-	state->filter_1_1 = machine->device("filter.1.1");
-	state->filter_1_2 = machine->device("filter.1.2");
+	state->soundcpu = machine.device<cpu_device>("tpsound");
+	state->filter_0_0 = machine.device("filter.0.0");
+	state->filter_0_1 = machine.device("filter.0.1");
+	state->filter_0_2 = machine.device("filter.0.2");
+	state->filter_1_0 = machine.device("filter.1.0");
+	state->filter_1_1 = machine.device("filter.1.1");
+	state->filter_1_2 = machine.device("filter.1.2");
 
 	state->last_irq_state = 0;
 	device->save_item(NAME(state->last_irq_state));
@@ -145,7 +145,7 @@ static WRITE8_DEVICE_HANDLER( timeplt_filter_w )
 
 WRITE8_HANDLER( timeplt_sh_irqtrigger_w )
 {
-	device_t *audio = space->machine->device("timeplt_audio");
+	device_t *audio = space->machine().device("timeplt_audio");
 	timeplt_audio_state *state = get_safe_token(audio);
 
 	if (state->last_irq_state == 0 && data)

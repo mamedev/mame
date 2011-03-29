@@ -125,7 +125,7 @@ static void dai3wksi_get_pens(pen_t *pens)
 
 static SCREEN_UPDATE( dai3wksi )
 {
-	dai3wksi_state *state = screen->machine->driver_data<dai3wksi_state>();
+	dai3wksi_state *state = screen->machine().driver_data<dai3wksi_state>();
 	offs_t offs;
 	pen_t pens[8];
 
@@ -147,7 +147,7 @@ static SCREEN_UPDATE( dai3wksi )
 		}
 		else
 		{
-			if (input_port_read(screen->machine, "IN2") & 0x03)
+			if (input_port_read(screen->machine(), "IN2") & 0x03)
 				color = vr_prom2[value];
 			else
 				color = vr_prom1[value];
@@ -196,8 +196,8 @@ static SCREEN_UPDATE( dai3wksi )
 #if (USE_SAMPLES)
 static WRITE8_HANDLER( dai3wksi_audio_1_w )
 {
-	dai3wksi_state *state = space->machine->driver_data<dai3wksi_state>();
-	device_t *samples = space->machine->device("samples");
+	dai3wksi_state *state = space->machine().driver_data<dai3wksi_state>();
+	device_t *samples = space->machine().device("samples");
 	UINT8 rising_bits = data & ~state->port_last1;
 
 	state->enabled_sound = data & 0x80;
@@ -217,8 +217,8 @@ static WRITE8_HANDLER( dai3wksi_audio_1_w )
 
 static WRITE8_HANDLER( dai3wksi_audio_2_w )
 {
-	dai3wksi_state *state = space->machine->driver_data<dai3wksi_state>();
-	device_t *samples = space->machine->device("samples");
+	dai3wksi_state *state = space->machine().driver_data<dai3wksi_state>();
+	device_t *samples = space->machine().device("samples");
 	UINT8 rising_bits = data & ~state->port_last2;
 
 	state->dai3wksi_flipscreen = data & 0x10;
@@ -246,8 +246,8 @@ static WRITE8_HANDLER( dai3wksi_audio_2_w )
 
 static WRITE8_HANDLER( dai3wksi_audio_3_w )
 {
-	dai3wksi_state *state = space->machine->driver_data<dai3wksi_state>();
-	device_t *samples = space->machine->device("samples");
+	dai3wksi_state *state = space->machine().driver_data<dai3wksi_state>();
+	device_t *samples = space->machine().device("samples");
 
 	if (state->enabled_sound)
 	{
@@ -284,9 +284,9 @@ static const samples_interface dai3wksi_samples_interface =
 
 static WRITE8_HANDLER( dai3wksi_audio_1_w )
 {
-	device_t *ic79 = space->machine->device("ic79");
+	device_t *ic79 = space->machine().device("ic79");
 
-	space->machine->sound().system_enable(data & 0x80);
+	space->machine().sound().system_enable(data & 0x80);
 
 	sn76477_enable_w(ic79, (~data >> 5) & 0x01);		/* invader movement enable */
 	sn76477_envelope_1_w(ic79, (~data >> 2) & 0x01);	/* invader movement envelope control*/
@@ -295,10 +295,10 @@ static WRITE8_HANDLER( dai3wksi_audio_1_w )
 static WRITE8_HANDLER( dai3wksi_audio_2_w )
 {
 
-	dai3wksi_state *state = space->machine->driver_data<dai3wksi_state>();
-	device_t *ic77 = space->machine->device("ic77");
-	device_t *ic78 = space->machine->device("ic78");
-	device_t *ic80 = space->machine->device("ic80");
+	dai3wksi_state *state = space->machine().driver_data<dai3wksi_state>();
+	device_t *ic77 = space->machine().device("ic77");
+	device_t *ic78 = space->machine().device("ic78");
+	device_t *ic80 = space->machine().device("ic80");
 
 	state->dai3wksi_flipscreen =  data & 0x10;
 	state->dai3wksi_redscreen  = ~data & 0x20;
@@ -312,7 +312,7 @@ static WRITE8_HANDLER( dai3wksi_audio_2_w )
 
 static WRITE8_HANDLER( dai3wksi_audio_3_w )
 {
-	device_t *ic81 = space->machine->device("ic81");
+	device_t *ic81 = space->machine().device("ic81");
 
 	sn76477_enable_w(ic81, (~data >> 2) & 0x01);	/* player shoot enable */
 	sn76477_vco_w(ic81, (~data >> 3) & 0x01);		/* player shoot vco control */
@@ -564,7 +564,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( dai3wksi )
 {
-	dai3wksi_state *state = machine->driver_data<dai3wksi_state>();
+	dai3wksi_state *state = machine.driver_data<dai3wksi_state>();
 
 	/* Set up save state */
 	state->save_item(NAME(state->dai3wksi_flipscreen));
@@ -578,7 +578,7 @@ static MACHINE_START( dai3wksi )
 
 static MACHINE_RESET( dai3wksi )
 {
-	dai3wksi_state *state = machine->driver_data<dai3wksi_state>();
+	dai3wksi_state *state = machine.driver_data<dai3wksi_state>();
 
 	state->port_last1 = 0;
 	state->port_last2 = 0;

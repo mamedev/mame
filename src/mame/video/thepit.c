@@ -109,7 +109,7 @@ PALETTE_INIT( suprmous )
 
 static TILE_GET_INFO( solid_get_tile_info )
 {
-	thepit_state *state = machine->driver_data<thepit_state>();
+	thepit_state *state = machine.driver_data<thepit_state>();
 	UINT8 back_color = (state->colorram[tile_index] & 0x70) >> 4;
 	int priority = (back_color != 0) && ((state->colorram[tile_index] & 0x80) == 0);
 	tileinfo->pen_data = state->dummy_tile;
@@ -120,8 +120,8 @@ static TILE_GET_INFO( solid_get_tile_info )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	thepit_state *state = machine->driver_data<thepit_state>();
-	UINT8 fore_color = state->colorram[tile_index] % machine->gfx[0]->total_colors;
+	thepit_state *state = machine.driver_data<thepit_state>();
+	UINT8 fore_color = state->colorram[tile_index] % machine.gfx[0]->total_colors;
 	UINT8 code = state->videoram[tile_index];
 	SET_TILE_INFO(2 * state->graphics_bank, code, fore_color, 0);
 }
@@ -136,7 +136,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( thepit )
 {
-	thepit_state *state = machine->driver_data<thepit_state>();
+	thepit_state *state = machine.driver_data<thepit_state>();
 	state->solid_tilemap = tilemap_create(machine, solid_get_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	state->tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
@@ -160,7 +160,7 @@ VIDEO_START( thepit )
 
 WRITE8_HANDLER( thepit_videoram_w )
 {
-	thepit_state *state = space->machine->driver_data<thepit_state>();
+	thepit_state *state = space->machine().driver_data<thepit_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap, offset);
 }
@@ -168,7 +168,7 @@ WRITE8_HANDLER( thepit_videoram_w )
 
 WRITE8_HANDLER( thepit_colorram_w )
 {
-	thepit_state *state = space->machine->driver_data<thepit_state>();
+	thepit_state *state = space->machine().driver_data<thepit_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap, offset);
 	tilemap_mark_tile_dirty(state->solid_tilemap, offset);
@@ -177,7 +177,7 @@ WRITE8_HANDLER( thepit_colorram_w )
 
 WRITE8_HANDLER( thepit_flip_screen_x_w )
 {
-	thepit_state *state = space->machine->driver_data<thepit_state>();
+	thepit_state *state = space->machine().driver_data<thepit_state>();
 	int flip;
 
 	state->flip_screen_x = data & 0x01;
@@ -194,7 +194,7 @@ WRITE8_HANDLER( thepit_flip_screen_x_w )
 
 WRITE8_HANDLER( thepit_flip_screen_y_w )
 {
-	thepit_state *state = space->machine->driver_data<thepit_state>();
+	thepit_state *state = space->machine().driver_data<thepit_state>();
 	int flip;
 
 	state->flip_screen_y = data & 0x01;
@@ -211,7 +211,7 @@ WRITE8_HANDLER( thepit_flip_screen_y_w )
 
 WRITE8_HANDLER( intrepid_graphics_bank_w )
 {
-	thepit_state *state = space->machine->driver_data<thepit_state>();
+	thepit_state *state = space->machine().driver_data<thepit_state>();
 	if (state->graphics_bank != (data & 0x01))
 	{
 		state->graphics_bank = data & 0x01;
@@ -223,16 +223,16 @@ WRITE8_HANDLER( intrepid_graphics_bank_w )
 
 READ8_HANDLER( thepit_input_port_0_r )
 {
-	thepit_state *state = space->machine->driver_data<thepit_state>();
+	thepit_state *state = space->machine().driver_data<thepit_state>();
 	/* Read either the real or the fake input ports depending on the
        horizontal flip switch. (This is how the real PCB does it) */
 	if (state->flip_screen_x)
 	{
-		return input_port_read(space->machine, "IN2");
+		return input_port_read(space->machine(), "IN2");
 	}
 	else
 	{
-		return input_port_read(space->machine, "IN0");
+		return input_port_read(space->machine(), "IN0");
 	}
 }
 
@@ -244,12 +244,12 @@ READ8_HANDLER( thepit_input_port_0_r )
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine,
+static void draw_sprites(running_machine &machine,
 						 bitmap_t *bitmap,
 						 const rectangle *cliprect,
 						 int priority_to_draw)
 {
-	thepit_state *state = machine->driver_data<thepit_state>();
+	thepit_state *state = machine.driver_data<thepit_state>();
 	int offs;
 
 	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
@@ -285,7 +285,7 @@ static void draw_sprites(running_machine *machine,
 			if (offs < 16) y++;
 
 			drawgfx_transpen(bitmap, state->flip_screen_x ? &spritevisibleareaflipx : &spritevisiblearea,
-					machine->gfx[2 * state->graphics_bank + 1],
+					machine.gfx[2 * state->graphics_bank + 1],
 					state->spriteram[offs + 1] & 0x3f,
 					state->spriteram[offs + 2],
 					flipx, flipy, x, y, 0);
@@ -296,7 +296,7 @@ static void draw_sprites(running_machine *machine,
 
 SCREEN_UPDATE( thepit )
 {
-	thepit_state *state = screen->machine->driver_data<thepit_state>();
+	thepit_state *state = screen->machine().driver_data<thepit_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 32; offs++)
@@ -316,13 +316,13 @@ SCREEN_UPDATE( thepit )
 	tilemap_draw(bitmap, cliprect, state->tilemap, 0, 0);
 
 	/* low priority sprites */
-	draw_sprites(screen->machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0);
 
 	/* high priority tiles */
 	tilemap_draw(bitmap, cliprect, state->solid_tilemap, 1, 1);
 
 	/* high priority sprites */
-	draw_sprites(screen->machine, bitmap, cliprect, 1);
+	draw_sprites(screen->machine(), bitmap, cliprect, 1);
 
 	return 0;
 }

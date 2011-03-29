@@ -76,19 +76,19 @@ Sound Board 1b11107
 
 static WRITE8_HANDLER( video_page_select_w )
 {
-	quasar_state *state = space->machine->driver_data<quasar_state>();
+	quasar_state *state = space->machine().driver_data<quasar_state>();
 	state->page = offset & 0x03;
 }
 
 static WRITE8_HANDLER( io_page_select_w )
 {
-	quasar_state *state = space->machine->driver_data<quasar_state>();
+	quasar_state *state = space->machine().driver_data<quasar_state>();
 	state->io_page = offset & 0x03;
 }
 
 static WRITE8_HANDLER( quasar_video_w )
 {
-	quasar_state *state = space->machine->driver_data<quasar_state>();
+	quasar_state *state = space->machine().driver_data<quasar_state>();
 
 	switch (state->page)
 	{
@@ -101,15 +101,15 @@ static WRITE8_HANDLER( quasar_video_w )
 
 static READ8_HANDLER( quasar_IO_r )
 {
-	quasar_state *state = space->machine->driver_data<quasar_state>();
+	quasar_state *state = space->machine().driver_data<quasar_state>();
 	UINT8 ans = 0;
 
 	switch (state->io_page)
 	{
-	case 0:  ans = input_port_read(space->machine, "IN0"); break;
-	case 1:  ans = input_port_read(space->machine, "IN1"); break;
-	case 2:  ans = input_port_read(space->machine, "DSW0"); break;
-	case 3:  ans = input_port_read(space->machine, "DSW1"); break;
+	case 0:  ans = input_port_read(space->machine(), "IN0"); break;
+	case 1:  ans = input_port_read(space->machine(), "IN1"); break;
+	case 2:  ans = input_port_read(space->machine(), "DSW0"); break;
+	case 3:  ans = input_port_read(space->machine(), "DSW1"); break;
 	}
 
 	return ans;
@@ -117,7 +117,7 @@ static READ8_HANDLER( quasar_IO_r )
 
 static WRITE8_HANDLER( quasar_bullet_w )
 {
-	quasar_state *state = space->machine->driver_data<quasar_state>();
+	quasar_state *state = space->machine().driver_data<quasar_state>();
 	state->bullet_ram[offset] = (data ^ 0xff);
 }
 
@@ -134,7 +134,7 @@ static WRITE8_HANDLER( quasar_sh_command_w )
 
 static READ8_HANDLER( quasar_sh_command_r )
 {
-	return soundlatch_r(space, 0) + (input_port_read(space->machine, "DSW2") & 0x30);
+	return soundlatch_r(space, 0) + (input_port_read(space->machine(), "DSW2") & 0x30);
 }
 
 static READ8_HANDLER( audio_t1_r )
@@ -338,7 +338,7 @@ static const s2636_interface s2636_2_config =
 
 static MACHINE_START( quasar )
 {
-	quasar_state *state = machine->driver_data<quasar_state>();
+	quasar_state *state = machine.driver_data<quasar_state>();
 
 	MACHINE_START_CALL(cvs);
 
@@ -350,7 +350,7 @@ static MACHINE_START( quasar )
 
 static MACHINE_RESET( quasar )
 {
-	quasar_state *state = machine->driver_data<quasar_state>();
+	quasar_state *state = machine.driver_data<quasar_state>();
 
 	MACHINE_RESET_CALL(cvs);
 

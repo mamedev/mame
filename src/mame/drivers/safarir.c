@@ -77,7 +77,7 @@ public:
 
 static WRITE8_HANDLER( ram_w )
 {
-	safarir_state *state = space->machine->driver_data<safarir_state>();
+	safarir_state *state = space->machine().driver_data<safarir_state>();
 
 	if (state->ram_bank)
 		state->ram_2[offset] = data;
@@ -90,7 +90,7 @@ static WRITE8_HANDLER( ram_w )
 
 static READ8_HANDLER( ram_r )
 {
-	safarir_state *state = space->machine->driver_data<safarir_state>();
+	safarir_state *state = space->machine().driver_data<safarir_state>();
 
 	return state->ram_bank ? state->ram_2[offset] : state->ram_1[offset];
 }
@@ -98,11 +98,11 @@ static READ8_HANDLER( ram_r )
 
 static WRITE8_HANDLER( ram_bank_w )
 {
-	safarir_state *state = space->machine->driver_data<safarir_state>();
+	safarir_state *state = space->machine().driver_data<safarir_state>();
 
 	state->ram_bank = data & 0x01;
 
-	tilemap_mark_all_tiles_dirty_all(space->machine);
+	tilemap_mark_all_tiles_dirty_all(space->machine());
 }
 
 
@@ -135,7 +135,7 @@ static PALETTE_INIT( safarir )
 {
 	int i;
 
-	for (i = 0; i < machine->total_colors() / 2; i++)
+	for (i = 0; i < machine.total_colors() / 2; i++)
 	{
 		palette_set_color(machine, (i * 2) + 0, RGB_BLACK);
 		palette_set_color(machine, (i * 2) + 1, MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
@@ -145,7 +145,7 @@ static PALETTE_INIT( safarir )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int color;
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 code = ram_r(space,tile_index | 0x400);
 
 	if (code & 0x80)
@@ -167,7 +167,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int color, flags;
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	UINT8 code = ram_r(space,tile_index);
 
@@ -184,7 +184,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static VIDEO_START( safarir )
 {
-	safarir_state *state = machine->driver_data<safarir_state>();
+	safarir_state *state = machine.driver_data<safarir_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -195,7 +195,7 @@ static VIDEO_START( safarir )
 
 static SCREEN_UPDATE( safarir )
 {
-	safarir_state *state = screen->machine->driver_data<safarir_state>();
+	safarir_state *state = screen->machine().driver_data<safarir_state>();
 
 	tilemap_set_scrollx(state->bg_tilemap, 0, *state->bg_scroll);
 
@@ -233,7 +233,7 @@ static SCREEN_UPDATE( safarir )
 
 static WRITE8_HANDLER( safarir_audio_w )
 {
-	safarir_state *state = space->machine->driver_data<safarir_state>();
+	safarir_state *state = space->machine().driver_data<safarir_state>();
 	device_t *samples = state->samples;
 	UINT8 rising_bits = data & ~state->port_last;
 
@@ -312,13 +312,13 @@ MACHINE_CONFIG_END
 
 static MACHINE_START( safarir )
 {
-	safarir_state *state = machine->driver_data<safarir_state>();
+	safarir_state *state = machine.driver_data<safarir_state>();
 
 	state->ram_1 = auto_alloc_array(machine, UINT8, state->ram_size);
 	state->ram_2 = auto_alloc_array(machine, UINT8, state->ram_size);
 	state->port_last = 0;
 	state->port_last2 = 0;
-	state->samples = machine->device("samples");
+	state->samples = machine.device("samples");
 
 	/* setup for save states */
 	state->save_pointer(NAME(state->ram_1), state->ram_size);

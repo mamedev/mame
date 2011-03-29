@@ -360,7 +360,7 @@ static int SN76496_init(device_t *device, sn76496_state *R, int stereo)
 	int sample_rate = device->clock()/2;
 	int i;
 
-	R->Channel = device->machine->sound().stream_alloc(*device,0,(stereo?2:1),sample_rate,R,SN76496Update);
+	R->Channel = device->machine().sound().stream_alloc(*device,0,(stereo?2:1),sample_rate,R,SN76496Update);
 
 	for (i = 0;i < 4;i++) R->Volume[i] = 0;
 

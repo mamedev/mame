@@ -106,13 +106,13 @@ static DEVICE_START( dmadac )
 	dmadac_state *info = get_safe_token(device);
 
 	/* allocate a clear a buffer */
-	info->buffer = auto_alloc_array_clear(device->machine, INT16, BUFFER_SIZE);
+	info->buffer = auto_alloc_array_clear(device->machine(), INT16, BUFFER_SIZE);
 
 	/* reset the state */
 	info->volume = 0x100;
 
 	/* allocate a stream channel */
-	info->channel = device->machine->sound().stream_alloc(*device, 0, 1, DEFAULT_SAMPLE_RATE, info, dmadac_update);
+	info->channel = device->machine().sound().stream_alloc(*device, 0, 1, DEFAULT_SAMPLE_RATE, info, dmadac_update);
 
 	/* register with the save state system */
 	device->save_item(NAME(info->bufin));

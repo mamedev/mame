@@ -236,7 +236,7 @@ legacy_cpu_device::legacy_cpu_device(running_machine &machine, const legacy_cpu_
 		throw emu_fatalerror("Device %s specifies a 0 context size!\n", tag());
 
 	// allocate memory for the token
-	m_token = auto_alloc_array_clear(&machine, UINT8, tokenbytes);
+	m_token = auto_alloc_array_clear(machine, UINT8, tokenbytes);
 }
 
 

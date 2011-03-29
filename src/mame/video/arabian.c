@@ -153,8 +153,8 @@ PALETTE_INIT( arabian )
 
 VIDEO_START( arabian )
 {
-	arabian_state *state = machine->driver_data<arabian_state>();
-	UINT8 *gfxbase = machine->region("gfx1")->base();
+	arabian_state *state = machine.driver_data<arabian_state>();
+	UINT8 *gfxbase = machine.region("gfx1")->base();
 	int offs;
 
 	/* allocate a common bitmap to use for both planes */
@@ -220,9 +220,9 @@ VIDEO_START( arabian )
  *
  *************************************/
 
-static void blit_area( running_machine *machine, UINT8 plane, UINT16 src, UINT8 x, UINT8 y, UINT8 sx, UINT8 sy )
+static void blit_area( running_machine &machine, UINT8 plane, UINT16 src, UINT8 x, UINT8 y, UINT8 sx, UINT8 sy )
 {
-	arabian_state *state = machine->driver_data<arabian_state>();
+	arabian_state *state = machine.driver_data<arabian_state>();
 	UINT8 *srcdata = &state->converted_gfx[src * 4];
 	int i,j;
 
@@ -269,7 +269,7 @@ static void blit_area( running_machine *machine, UINT8 plane, UINT16 src, UINT8 
 
 WRITE8_HANDLER( arabian_blitter_w )
 {
-	arabian_state *state = space->machine->driver_data<arabian_state>();
+	arabian_state *state = space->machine().driver_data<arabian_state>();
 
 	/* write the data */
 	state->blitter[offset] = data;
@@ -286,7 +286,7 @@ WRITE8_HANDLER( arabian_blitter_w )
 		int sy    = state->blitter[5];
 
 		/* blit it */
-		blit_area(space->machine, plane, src, x, y, sx, sy);
+		blit_area(space->machine(), plane, src, x, y, sx, sy);
 	}
 }
 
@@ -300,7 +300,7 @@ WRITE8_HANDLER( arabian_blitter_w )
 
 WRITE8_HANDLER( arabian_videoram_w )
 {
-	arabian_state *state = space->machine->driver_data<arabian_state>();
+	arabian_state *state = space->machine().driver_data<arabian_state>();
 	UINT8 *base;
 	UINT8 x, y;
 
@@ -370,8 +370,8 @@ WRITE8_HANDLER( arabian_videoram_w )
 
 SCREEN_UPDATE( arabian )
 {
-	arabian_state *state = screen->machine->driver_data<arabian_state>();
-	const pen_t *pens = &screen->machine->pens[(state->video_control >> 3) << 8];
+	arabian_state *state = screen->machine().driver_data<arabian_state>();
+	const pen_t *pens = &screen->machine().pens[(state->video_control >> 3) << 8];
 	int y;
 
 	/* render the screen from the bitmap */

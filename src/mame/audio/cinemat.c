@@ -53,7 +53,7 @@
 
 WRITE8_HANDLER( cinemat_sound_control_w )
 {
-	cinemat_state *state = space->machine->driver_data<cinemat_state>();
+	cinemat_state *state = space->machine().driver_data<cinemat_state>();
 	UINT8 oldval = state->sound_control;
 
 	/* form an 8-bit value with the new bit */
@@ -61,7 +61,7 @@ WRITE8_HANDLER( cinemat_sound_control_w )
 
 	/* if something changed, call the sound subroutine */
 	if ((state->sound_control != oldval) && state->sound_handler)
-		(*state->sound_handler)(space->machine, state->sound_control, state->sound_control ^ oldval);
+		(*state->sound_handler)(space->machine(), state->sound_control, state->sound_control ^ oldval);
 }
 
 
@@ -74,7 +74,7 @@ WRITE8_HANDLER( cinemat_sound_control_w )
 
 static MACHINE_START( generic )
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
+	cinemat_state *state = machine.driver_data<cinemat_state>();
     /* register for save states */
     state_save_register_global(machine, state->sound_control);
     state_save_register_global(machine, state->current_shift);
@@ -89,9 +89,9 @@ static MACHINE_START( generic )
 }
 
 
-static void generic_init(running_machine *machine, void (*callback)(running_machine *,UINT8, UINT8))
+static void generic_init(running_machine &machine, void (*callback)(running_machine &,UINT8, UINT8))
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
+	cinemat_state *state = machine.driver_data<cinemat_state>();
 	/* call the standard init */
 	MACHINE_RESET_CALL(cinemat);
 
@@ -141,17 +141,17 @@ static const samples_interface spacewar_samples_interface =
 	spacewar_sample_names
 };
 
-static void spacewar_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
+static void spacewar_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	device_t *samples = machine->device("samples");
+	device_t *samples = machine.device("samples");
 
 	/* Explosion - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x01))
-		sample_start(samples, 0, (machine->rand() & 1) ? 0 : 6, 0);
+		sample_start(samples, 0, (machine.rand() & 1) ? 0 : 6, 0);
 
 	/* Fire sound - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x02))
-		sample_start(samples, 1, (machine->rand() & 1) ? 1 : 7, 0);
+		sample_start(samples, 1, (machine.rand() & 1) ? 1 : 7, 0);
 
 	/* Player 1 thrust - 0=on, 1=off */
 	if (SOUNDVAL_FALLING_EDGE(0x04))
@@ -221,9 +221,9 @@ static const samples_interface barrier_samples_interface =
 	barrier_sample_names
 };
 
-static void barrier_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
+static void barrier_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	device_t *samples = machine->device("samples");
+	device_t *samples = machine.device("samples");
 
 	/* Player die - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x01))
@@ -275,10 +275,10 @@ static const samples_interface speedfrk_samples_interface =
 	speedfrk_sample_names
 };
 
-static void speedfrk_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
+static void speedfrk_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
-	device_t *samples = machine->device("samples");
+	cinemat_state *state = machine.driver_data<cinemat_state>();
+	device_t *samples = machine.device("samples");
 
 	/* on the falling edge of bit 0x08, clock the inverse of bit 0x04 into the top of the shiftreg */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
@@ -342,9 +342,9 @@ static const samples_interface starhawk_samples_interface =
 	starhawk_sample_names
 };
 
-static void starhawk_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
+static void starhawk_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	device_t *samples = machine->device("samples");
+	device_t *samples = machine.device("samples");
 
 	/* explosion - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
@@ -419,9 +419,9 @@ static const samples_interface sundance_samples_interface =
 	sundance_sample_names
 };
 
-static void sundance_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
+static void sundance_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	device_t *samples = machine->device("samples");
+	device_t *samples = machine.device("samples");
 
 	/* bong - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
@@ -490,13 +490,13 @@ static const samples_interface tailg_samples_interface =
 	tailg_sample_names
 };
 
-static void tailg_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
+static void tailg_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
+	cinemat_state *state = machine.driver_data<cinemat_state>();
 	/* the falling edge of bit 0x10 clocks bit 0x08 into the mux selected by bits 0x07 */
 	if (SOUNDVAL_FALLING_EDGE(0x10))
 	{
-		device_t *samples = machine->device("samples");
+		device_t *samples = machine.device("samples");
 
 		/* update the shift register (actually just a simple mux) */
 		state->current_shift = (state->current_shift & ~(1 << (sound_val & 7))) | (((sound_val >> 3) & 1) << (sound_val & 7));
@@ -580,9 +580,9 @@ static const samples_interface warrior_samples_interface =
 	warrior_sample_names
 };
 
-static void warrior_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
+static void warrior_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	device_t *samples = machine->device("samples");
+	device_t *samples = machine.device("samples");
 
 	/* normal level - 0=on, 1=off */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
@@ -652,10 +652,10 @@ static const samples_interface armora_samples_interface =
 	armora_sample_names
 };
 
-static void armora_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
+static void armora_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
-	device_t *samples = machine->device("samples");
+	cinemat_state *state = machine.driver_data<cinemat_state>();
+	device_t *samples = machine.device("samples");
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -755,10 +755,10 @@ static const samples_interface ripoff_samples_interface =
 	ripoff_sample_names
 };
 
-static void ripoff_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
+static void ripoff_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
-	device_t *samples = machine->device("samples");
+	cinemat_state *state = machine.driver_data<cinemat_state>();
+	device_t *samples = machine.device("samples");
 
 	/* on the rising edge of bit 0x02, clock bit 0x01 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x02))
@@ -844,10 +844,10 @@ static const samples_interface starcas_samples_interface =
 	starcas_sample_names
 };
 
-static void starcas_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
+static void starcas_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
-	device_t *samples = machine->device("samples");
+	cinemat_state *state = machine.driver_data<cinemat_state>();
+	device_t *samples = machine.device("samples");
 	UINT32 target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
@@ -888,14 +888,14 @@ static void starcas_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bit
         target_pitch = 0x5800 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (machine->primary_screen->frame_number() > state->last_frame)
+        if (machine.primary_screen->frame_number() > state->last_frame)
         {
             if (state->current_pitch > target_pitch)
                 state->current_pitch -= 225;
             if (state->current_pitch < target_pitch)
                 state->current_pitch += 150;
             sample_set_freq(samples, 4, state->current_pitch);
-            state->last_frame = machine->primary_screen->frame_number();
+            state->last_frame = machine.primary_screen->frame_number();
         }
 
 		/* remember the previous value */
@@ -959,10 +959,10 @@ static const samples_interface solarq_samples_interface =
 	solarq_sample_names
 };
 
-static void solarq_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
+static void solarq_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
-	device_t *samples = machine->device("samples");
+	cinemat_state *state = machine.driver_data<cinemat_state>();
+	device_t *samples = machine.device("samples");
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -993,7 +993,7 @@ static void solarq_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits
 			state->target_volume = 0;
 
 		/* ramp the thrust volume */
-        if (sample_playing(samples, 2) && machine->primary_screen->frame_number() > state->last_frame)
+        if (sample_playing(samples, 2) && machine.primary_screen->frame_number() > state->last_frame)
         {
             if (state->current_volume > state->target_volume)
                 state->current_volume -= 0.078f;
@@ -1003,7 +1003,7 @@ static void solarq_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits
                 sample_set_volume(samples, 2, state->current_volume);
             else
                 sample_stop(samples, 2);
-            state->last_frame = machine->primary_screen->frame_number();
+            state->last_frame = machine.primary_screen->frame_number();
         }
 
 		/* fire - falling edge */
@@ -1100,10 +1100,10 @@ static const samples_interface boxingb_samples_interface =
 	boxingb_sample_names
 };
 
-static void boxingb_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
+static void boxingb_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
-	device_t *samples = machine->device("samples");
+	cinemat_state *state = machine.driver_data<cinemat_state>();
+	device_t *samples = machine.device("samples");
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -1233,10 +1233,10 @@ static const samples_interface wotw_samples_interface =
 	wotw_sample_names
 };
 
-static void wotw_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
+static void wotw_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
-	device_t *samples = machine->device("samples");
+	cinemat_state *state = machine.driver_data<cinemat_state>();
+	device_t *samples = machine.device("samples");
 	UINT32 target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
@@ -1277,14 +1277,14 @@ static void wotw_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_c
         target_pitch = 0x10000 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (machine->primary_screen->frame_number() > state->last_frame)
+        if (machine.primary_screen->frame_number() > state->last_frame)
         {
             if (state->current_pitch > target_pitch)
                 state->current_pitch -= 300;
             if (state->current_pitch < target_pitch)
                 state->current_pitch += 200;
             sample_set_freq(samples, 4, state->current_pitch);
-            state->last_frame = machine->primary_screen->frame_number();
+            state->last_frame = machine.primary_screen->frame_number();
         }
 
 		/* remember the previous value */
@@ -1348,10 +1348,10 @@ static const samples_interface wotwc_samples_interface =
 	wotwc_sample_names
 };
 
-static void wotwc_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
+static void wotwc_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
-	device_t *samples = machine->device("samples");
+	cinemat_state *state = machine.driver_data<cinemat_state>();
+	device_t *samples = machine.device("samples");
 	UINT32 target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
@@ -1392,14 +1392,14 @@ static void wotwc_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_
         target_pitch = 0x10000 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (machine->primary_screen->frame_number() > state->last_frame)
+        if (machine.primary_screen->frame_number() > state->last_frame)
         {
             if (state->current_pitch > target_pitch)
                 state->current_pitch -= 300;
             if (state->current_pitch < target_pitch)
                 state->current_pitch += 200;
             sample_set_freq(samples, 4, state->current_pitch);
-            state->last_frame = machine->primary_screen->frame_number();
+            state->last_frame = machine.primary_screen->frame_number();
         }
 
 		/* remember the previous value */
@@ -1445,26 +1445,26 @@ MACHINE_CONFIG_END
 
 static TIMER_CALLBACK( synced_sound_w )
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
+	cinemat_state *state = machine.driver_data<cinemat_state>();
 	state->sound_fifo[state->sound_fifo_in] = param;
 	state->sound_fifo_in = (state->sound_fifo_in + 1) % 16;
 }
 
 
-static void demon_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
+static void demon_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
 {
 	/* all inputs are inverted */
 	sound_val = ~sound_val;
 
 	/* watch for a 0->1 edge on bit 4 ("shift in") to clock in the new data */
 	if ((bits_changed & 0x10) && (sound_val & 0x10))
-		machine->scheduler().synchronize(FUNC(synced_sound_w), sound_val & 0x0f);
+		machine.scheduler().synchronize(FUNC(synced_sound_w), sound_val & 0x0f);
 }
 
 
 static READ8_DEVICE_HANDLER( sound_porta_r )
 {
-	cinemat_state *state = device->machine->driver_data<cinemat_state>();
+	cinemat_state *state = device->machine().driver_data<cinemat_state>();
 	/* bits 0-3 are the sound data; bit 4 is the data ready */
 	return state->sound_fifo[state->sound_fifo_out] | ((state->sound_fifo_in != state->sound_fifo_out) << 4);
 }
@@ -1472,14 +1472,14 @@ static READ8_DEVICE_HANDLER( sound_porta_r )
 
 static READ8_DEVICE_HANDLER( sound_portb_r )
 {
-	cinemat_state *state = device->machine->driver_data<cinemat_state>();
+	cinemat_state *state = device->machine().driver_data<cinemat_state>();
 	return state->last_portb_write;
 }
 
 
 static WRITE8_DEVICE_HANDLER( sound_portb_w )
 {
-	cinemat_state *state = device->machine->driver_data<cinemat_state>();
+	cinemat_state *state = device->machine().driver_data<cinemat_state>();
 	/* watch for a 0->1 edge on bit 0 ("shift out") to advance the data pointer */
 	if ((data & 1) != (state->last_portb_write & 1) && (data & 1) != 0)
 		state->sound_fifo_out = (state->sound_fifo_out + 1) % 16;
@@ -1490,7 +1490,7 @@ static WRITE8_DEVICE_HANDLER( sound_portb_w )
 
 	/* bit 2 controls the global mute */
 	if ((data & 4) != (state->last_portb_write & 4))
-		device->machine->sound().system_mute(data & 4);
+		device->machine().sound().system_mute(data & 4);
 
 	/* remember the last value written */
 	state->last_portb_write = data;
@@ -1536,7 +1536,7 @@ static Z80CTC_INTERFACE( demon_z80ctc_interface )
 
 static MACHINE_RESET( demon_sound )
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
+	cinemat_state *state = machine.driver_data<cinemat_state>();
 	/* generic init */
 	generic_init(machine, demon_sound_w);
 
@@ -1545,7 +1545,7 @@ static MACHINE_RESET( demon_sound )
 	state->last_portb_write = 0xff;
 
 	/* turn off channel A on AY8910 #0 because it is used as a low-pass filter */
-	ay8910_set_volume(machine->device("ay1"), 0, 0);
+	ay8910_set_volume(machine.device("ay1"), 0, 0);
 }
 
 
@@ -1614,19 +1614,19 @@ MACHINE_CONFIG_END
 
 static WRITE8_HANDLER( qb3_sound_w )
 {
-	UINT16 rega = cpu_get_reg(space->machine->device("maincpu"), CCPU_A);
-	demon_sound_w(space->machine, 0x00 | (~rega & 0x0f), 0x10);
+	UINT16 rega = cpu_get_reg(space->machine().device("maincpu"), CCPU_A);
+	demon_sound_w(space->machine(), 0x00 | (~rega & 0x0f), 0x10);
 }
 
 
 static MACHINE_RESET( qb3_sound )
 {
 	MACHINE_RESET_CALL(demon_sound);
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x04, 0x04, FUNC(qb3_sound_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x04, 0x04, FUNC(qb3_sound_w));
 
 	/* this patch prevents the sound ROM from eating itself when command $0A is sent */
 	/* on a cube rotate */
-	machine->region("audiocpu")->base()[0x11dc] = 0x09;
+	machine.region("audiocpu")->base()[0x11dc] = 0x09;
 }
 
 

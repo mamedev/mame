@@ -126,10 +126,10 @@ static UINT16 *rle_table[8];
     STATIC FUNCTION DECLARATIONS
 ***************************************************************************/
 
-static void build_rle_tables(running_machine *machine);
+static void build_rle_tables(running_machine &machine);
 static int count_objects(const UINT16 *base, int length);
 static void prescan_rle(const atarirle_data *mo, int which);
-static void sort_and_render(running_machine *machine, atarirle_data *mo);
+static void sort_and_render(running_machine &machine, atarirle_data *mo);
 static void compute_checksum(atarirle_data *mo);
 static void draw_rle(atarirle_data *mo, bitmap_t *bitmap, int code, int color, int hflip, int vflip,
 		int x, int y, int xscale, int yscale, const rectangle *clip);
@@ -271,9 +271,9 @@ INLINE int convert_mask(const atarirle_entry *input, atarirle_mask *result)
 static DEVICE_START( atarirle )
 {
 	atarirle_data *mo = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	const atarirle_desc *desc = (const atarirle_desc *)device->baseconfig().static_config();
-	const UINT16 *base = (const UINT16 *)machine->region(desc->region)->base();
+	const UINT16 *base = (const UINT16 *)machine.region(desc->region)->base();
 	int i, width, height;
 
 	/* build and allocate the generic tables */
@@ -303,10 +303,10 @@ static DEVICE_START( atarirle )
 	mo->maxcolors     = desc->maxcolors / 16;
 
 	mo->rombase       = base;
-	mo->romlength     = machine->region(desc->region)->bytes();
+	mo->romlength     = machine.region(desc->region)->bytes();
 	mo->objectcount   = count_objects(base, mo->romlength);
 
-	mo->cliprect      = machine->primary_screen->visible_area();
+	mo->cliprect      = machine.primary_screen->visible_area();
 	if (desc->rightclip)
 	{
 		mo->cliprect.min_x = desc->leftclip;
@@ -335,8 +335,8 @@ static DEVICE_START( atarirle )
 	mo->spriteram = auto_alloc_array_clear(machine, atarirle_entry, mo->spriteramsize);
 
 	/* allocate bitmaps */
-	width = machine->primary_screen->width();
-	height = machine->primary_screen->height();
+	width = machine.primary_screen->width();
+	height = machine.primary_screen->height();
 
 	mo->vram[0][0] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 	mo->vram[0][1] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
@@ -399,7 +399,7 @@ DEFINE_LEGACY_DEVICE(ATARIRLE, atarirle);
 void atarirle_control_w(device_t *device, UINT8 bits)
 {
 	atarirle_data *mo = get_safe_token(device);
-	int scanline = device->machine->primary_screen->vpos();
+	int scanline = device->machine().primary_screen->vpos();
 	int oldbits = mo->control_bits;
 
 //logerror("atarirle_control_w(%d)\n", bits);
@@ -409,7 +409,7 @@ void atarirle_control_w(device_t *device, UINT8 bits)
 		return;
 
 	/* force a partial update first */
-	device->machine->primary_screen->update_partial(scanline);
+	device->machine().primary_screen->update_partial(scanline);
 
 	/* if the erase flag was set, erase the front map */
 	if (oldbits & ATARIRLE_CONTROL_ERASE)
@@ -437,7 +437,7 @@ void atarirle_control_w(device_t *device, UINT8 bits)
 	if (!(oldbits & ATARIRLE_CONTROL_MOGO) && (bits & ATARIRLE_CONTROL_MOGO))
 	{
 		if (mo->command == ATARIRLE_COMMAND_DRAW)
-			sort_and_render(device->machine, mo);
+			sort_and_render(device->machine(), mo);
 		else if (mo->command == ATARIRLE_COMMAND_CHECKSUM)
 			compute_checksum(mo);
 	}
@@ -579,7 +579,7 @@ bitmap_t *atarirle_get_vram(device_t *device, int idx)
     build_rle_tables: Builds internal table for RLE mapping.
 ---------------------------------------------------------------*/
 
-static void build_rle_tables(running_machine *machine)
+static void build_rle_tables(running_machine &machine)
 {
 	UINT16 *base;
 	int i;
@@ -773,7 +773,7 @@ static void compute_checksum(atarirle_data *mo)
     sort_and_render: Render all motion objects in order.
 ---------------------------------------------------------------*/
 
-static void sort_and_render(running_machine *machine, atarirle_data *mo)
+static void sort_and_render(running_machine &machine, atarirle_data *mo)
 {
 	bitmap_t *bitmap1 = mo->vram[0][(~mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2];
 	bitmap_t *bitmap2 = mo->vram[1][(~mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2];
@@ -882,7 +882,7 @@ if (hilite)
 
 		do
 		{
-			const rectangle &visarea = machine->primary_screen->visible_area();
+			const rectangle &visarea = machine.primary_screen->visible_area();
 			int scaled_width = (scale * info->width + 0x7fff) >> 12;
 			int scaled_height = (scale * info->height + 0x7fff) >> 12;
 			int ex, ey, sx = x, sy = y, tx, ty;
@@ -921,13 +921,13 @@ if (hilite)
 
 			for (ty = sy; ty <= ey; ty++)
 			{
-				*BITMAP_ADDR16(bitmap1, ty, sx) = machine->rand() & 0xff;
-				*BITMAP_ADDR16(bitmap1, ty, ex) = machine->rand() & 0xff;
+				*BITMAP_ADDR16(bitmap1, ty, sx) = machine.rand() & 0xff;
+				*BITMAP_ADDR16(bitmap1, ty, ex) = machine.rand() & 0xff;
 			}
 			for (tx = sx; tx <= ex; tx++)
 			{
-				*BITMAP_ADDR16(bitmap1, sy, tx) = machine->rand() & 0xff;
-				*BITMAP_ADDR16(bitmap1, ey, tx) = machine->rand() & 0xff;
+				*BITMAP_ADDR16(bitmap1, sy, tx) = machine.rand() & 0xff;
+				*BITMAP_ADDR16(bitmap1, ey, tx) = machine.rand() & 0xff;
 			}
 		} while (0);
 fprintf(stderr, "   Sprite: c=%04X l=%04X h=%d X=%4d (o=%4d w=%3d) Y=%4d (o=%4d h=%d) s=%04X\n",

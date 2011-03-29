@@ -43,7 +43,7 @@
 
 static WRITE_LINE_DEVICE_HANDLER( ptm_irq )
 {
-	cputag_set_input_line(device->machine, "sound_cpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "sound_cpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface ptm_intf =
@@ -95,32 +95,32 @@ static READ8_HANDLER( uart_r )
 
 static READ8_HANDLER( g_status_r )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
-	int bank4 = BIT(get_rip_status(space->machine->device("video_cpu")), 2);
-	int vblank = space->machine->primary_screen->vblank();
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
+	int bank4 = BIT(get_rip_status(space->machine().device("video_cpu")), 2);
+	int vblank = space->machine().primary_screen->vblank();
 
 	return (!vblank << 7) | (bank4 << 6) | (state->f_status & 0x2f);
 }
 
 static WRITE8_HANDLER( g_status_w )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
 	int bankaddress;
-	UINT8 *rom = space->machine->region("game_cpu")->base();
+	UINT8 *rom = space->machine().region("game_cpu")->base();
 
 	state->g_status = data;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x10000;
-	memory_set_bankptr(space->machine, "bank1", &rom[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank1", &rom[bankaddress]);
 
-	cputag_set_input_line(space->machine, "frame_cpu", M6809_FIRQ_LINE, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(space->machine, "frame_cpu", INPUT_LINE_NMI,  data & 0x80 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "frame_cpu", M6809_FIRQ_LINE, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "frame_cpu", INPUT_LINE_NMI,  data & 0x80 ? CLEAR_LINE : ASSERT_LINE);
 
-	cputag_set_input_line(space->machine, "video_cpu", INPUT_LINE_RESET, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "video_cpu", INPUT_LINE_RESET, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
 
 	/* /VBLANK IRQ acknowledge */
 	if (!(data & 0x20))
-		cputag_set_input_line(space->machine, "game_cpu", M6809_IRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "game_cpu", M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -145,9 +145,9 @@ static WRITE8_HANDLER( g_status_w )
 
 static READ8_HANDLER( f_status_r )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
-	int vblank = space->machine->primary_screen->vblank();
-	UINT8 rip_status = get_rip_status(space->machine->device("video_cpu"));
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
+	int vblank = space->machine().primary_screen->vblank();
+	UINT8 rip_status = get_rip_status(space->machine().device("video_cpu"));
 
 	rip_status = (rip_status & 0x18) | (BIT(rip_status, 6) << 1) |  BIT(rip_status, 7);
 
@@ -156,7 +156,7 @@ static READ8_HANDLER( f_status_r )
 
 static WRITE8_HANDLER( f_status_w )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
 	state->f_status = data;
 }
 
@@ -169,21 +169,21 @@ static WRITE8_HANDLER( f_status_w )
 
 static TIMER_CALLBACK( delayed_bank_swap )
 {
-	esripsys_state *state = machine->driver_data<esripsys_state>();
+	esripsys_state *state = machine.driver_data<esripsys_state>();
 	state->_fasel ^= 1;
 	state->_fbsel ^= 1;
 }
 
 static WRITE8_HANDLER( frame_w )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
-	space->machine->scheduler().synchronize(FUNC(delayed_bank_swap));
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
+	space->machine().scheduler().synchronize(FUNC(delayed_bank_swap));
 	state->frame_vbl = 1;
 }
 
 static READ8_HANDLER( fdt_r )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
 	if (!state->_fasel)
 		return state->fdt_b[offset];
 	else
@@ -192,7 +192,7 @@ static READ8_HANDLER( fdt_r )
 
 static WRITE8_HANDLER( fdt_w )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
 	if (!state->_fasel)
 		state->fdt_b[offset] = data;
 	else
@@ -208,7 +208,7 @@ static WRITE8_HANDLER( fdt_w )
 
 static READ16_DEVICE_HANDLER( fdt_rip_r )
 {
-	esripsys_state *state = device->machine->driver_data<esripsys_state>();
+	esripsys_state *state = device->machine().driver_data<esripsys_state>();
 	offset = (offset & 0x7ff) << 1;
 
 	if (!state->_fasel)
@@ -219,7 +219,7 @@ static READ16_DEVICE_HANDLER( fdt_rip_r )
 
 static WRITE16_DEVICE_HANDLER( fdt_rip_w )
 {
-	esripsys_state *state = device->machine->driver_data<esripsys_state>();
+	esripsys_state *state = device->machine().driver_data<esripsys_state>();
 	offset = (offset & 0x7ff) << 1;
 
 	if (!state->_fasel)
@@ -245,12 +245,12 @@ static WRITE16_DEVICE_HANDLER( fdt_rip_w )
    D7 = /FDONE
 */
 
-static UINT8 rip_status_in(running_machine *machine)
+static UINT8 rip_status_in(running_machine &machine)
 {
-	esripsys_state *state = machine->driver_data<esripsys_state>();
-	int vpos =  machine->primary_screen->vpos();
+	esripsys_state *state = machine.driver_data<esripsys_state>();
+	int vpos =  machine.primary_screen->vpos();
 	UINT8 _vblank = !(vpos >= ESRIPSYS_VBLANK_START);
-//  UINT8 _hblank = !machine->primary_screen->hblank();
+//  UINT8 _hblank = !machine.primary_screen->hblank();
 
 	return	_vblank
 			| (state->hblank << 1)
@@ -268,13 +268,13 @@ static UINT8 rip_status_in(running_machine *machine)
 
 static WRITE8_HANDLER( g_iobus_w )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
 	state->g_iodata = data;
 }
 
 static READ8_HANDLER( g_iobus_r )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
 	switch (state->g_ioaddr & 0x7f)
 	{
 		case 0:
@@ -285,32 +285,32 @@ static READ8_HANDLER( g_iobus_r )
 			return state->cmos_ram[(state->cmos_ram_a10_3 << 3) | (state->cmos_ram_a2_0 & 3)];
 		case 8:
 		{
-			int keypad = input_port_read(space->machine, "KEYPAD_B") | state->keypad_status;
+			int keypad = input_port_read(space->machine(), "KEYPAD_B") | state->keypad_status;
 			state->keypad_status = 0;
 			state->io_firq_status = 0;
 			return keypad;
 		}
 		case 9:
 		{
-			return input_port_read(space->machine, "KEYPAD_A");
+			return input_port_read(space->machine(), "KEYPAD_A");
 		}
 		case 0xa:
 		{
-			int coins =  state->coin_latch | (input_port_read(space->machine, "COINS") & 0x30);
+			int coins =  state->coin_latch | (input_port_read(space->machine(), "COINS") & 0x30);
 			state->coin_latch = 0;
 			state->io_firq_status = 0;
 			return coins;
 		}
 		case 0x10:
-			return input_port_read(space->machine, "IO_1");
+			return input_port_read(space->machine(), "IO_1");
 		case 0x11:
-			return input_port_read(space->machine, "JOYSTICK_X");
+			return input_port_read(space->machine(), "JOYSTICK_X");
 		case 0x12:
-			return input_port_read(space->machine, "JOYSTICK_Y");
+			return input_port_read(space->machine(), "JOYSTICK_Y");
 		case 0x16:
 			return state->io_firq_status;
 		case 0x18:
-			return input_port_read(space->machine, "IO_2");
+			return input_port_read(space->machine(), "IO_2");
 			/* Unused I/O */
 		case 0x19:
 		case 0x1a:
@@ -342,7 +342,7 @@ static READ8_HANDLER( g_iobus_r )
 
 static WRITE8_HANDLER( g_ioadd_w )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
 	state->g_ioaddr = data;
 
 	/* Bit 7 is connected to /OE of LS374 containing I/O data */
@@ -357,7 +357,7 @@ static WRITE8_HANDLER( g_ioadd_w )
 			}
 			case 0x02:
 			{
-				cputag_set_input_line(space->machine, "sound_cpu", INPUT_LINE_NMI, state->g_iodata & 4 ? CLEAR_LINE : ASSERT_LINE);
+				cputag_set_input_line(space->machine(), "sound_cpu", INPUT_LINE_NMI, state->g_iodata & 4 ? CLEAR_LINE : ASSERT_LINE);
 
 				if (!(state->g_to_s_latch2 & 1) && (state->g_iodata & 1))
 				{
@@ -365,7 +365,7 @@ static WRITE8_HANDLER( g_ioadd_w )
 					state->u56a = 1;
 
 					/*...causing a sound CPU /IRQ */
-					cputag_set_input_line(space->machine, "sound_cpu", M6809_IRQ_LINE, ASSERT_LINE);
+					cputag_set_input_line(space->machine(), "sound_cpu", M6809_IRQ_LINE, ASSERT_LINE);
 				}
 
 				if (state->g_iodata & 2)
@@ -414,23 +414,23 @@ static WRITE8_HANDLER( g_ioadd_w )
 
 static INPUT_CHANGED( keypad_interrupt )
 {
-	esripsys_state *state = field->port->machine->driver_data<esripsys_state>();
+	esripsys_state *state = field->port->machine().driver_data<esripsys_state>();
 	if (newval == 0)
 	{
 		state->io_firq_status |= 2;
 		state->keypad_status |= 0x20;
-		cputag_set_input_line(field->port->machine, "game_cpu", M6809_FIRQ_LINE, HOLD_LINE);
+		cputag_set_input_line(field->port->machine(), "game_cpu", M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }
 
 static INPUT_CHANGED( coin_interrupt )
 {
-	esripsys_state *state = field->port->machine->driver_data<esripsys_state>();
+	esripsys_state *state = field->port->machine().driver_data<esripsys_state>();
 	if (newval == 1)
 	{
 		state->io_firq_status |= 2;
-		state->coin_latch = input_port_read(field->port->machine, "COINS") << 2;
-		cputag_set_input_line(field->port->machine, "game_cpu", M6809_FIRQ_LINE, HOLD_LINE);
+		state->coin_latch = input_port_read(field->port->machine(), "COINS") << 2;
+		cputag_set_input_line(field->port->machine(), "game_cpu", M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -493,20 +493,20 @@ INPUT_PORTS_END
 /* Game/Sound CPU communications */
 static READ8_HANDLER( s_200e_r )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
 	return state->g_to_s_latch1;
 }
 
 static WRITE8_HANDLER( s_200e_w )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
 	state->s_to_g_latch1 = data;
 }
 
 static WRITE8_HANDLER( s_200f_w )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
-	UINT8 *rom = space->machine->region("sound_data")->base();
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
+	UINT8 *rom = space->machine().region("sound_data")->base();
 	int rombank = data & 0x20 ? 0x2000 : 0;
 
 	/* Bit 6 -> Reset latch U56A */
@@ -514,23 +514,23 @@ static WRITE8_HANDLER( s_200f_w )
 	if (state->s_to_g_latch2 & 0x40)
 	{
 		state->u56a = 0;
-		cputag_set_input_line(space->machine, "sound_cpu", M6809_IRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "sound_cpu", M6809_IRQ_LINE, CLEAR_LINE);
 	}
 
 	if (!(state->s_to_g_latch2 & 0x80) && (data & 0x80))
 		state->u56b = 1;
 
 	/* Speech data resides in the upper 8kB of the ROMs */
-	memory_set_bankptr(space->machine, "bank2", &rom[0x0000 + rombank]);
-	memory_set_bankptr(space->machine, "bank3", &rom[0x4000 + rombank]);
-	memory_set_bankptr(space->machine, "bank4", &rom[0x8000 + rombank]);
+	memory_set_bankptr(space->machine(), "bank2", &rom[0x0000 + rombank]);
+	memory_set_bankptr(space->machine(), "bank3", &rom[0x4000 + rombank]);
+	memory_set_bankptr(space->machine(), "bank4", &rom[0x8000 + rombank]);
 
 	state->s_to_g_latch2 = data;
 }
 
 static READ8_HANDLER( s_200f_r )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
 	return (state->g_to_s_latch2 & 0xfc) | (state->u56b << 1) | state->u56a;
 }
 
@@ -539,7 +539,7 @@ static READ8_HANDLER( tms5220_r )
 	if (offset == 0)
 	{
 		/* TMS5220 core returns status bits in D7-D6 */
-		device_t *tms = space->machine->device("tms5220nl");
+		device_t *tms = space->machine().device("tms5220nl");
 		UINT8 status = tms5220_status_r(tms, 0);
 
 		status = ((status & 0x80) >> 5) | ((status & 0x40) >> 5) | ((status & 0x20) >> 5);
@@ -552,8 +552,8 @@ static READ8_HANDLER( tms5220_r )
 /* TODO: Implement correctly using the state PROM */
 static WRITE8_HANDLER( tms5220_w )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
-	device_t *tms = space->machine->device("tms5220nl");
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
+	device_t *tms = space->machine().device("tms5220nl");
 	if (offset == 0)
 	{
 		state->tms_data = data;
@@ -577,7 +577,7 @@ static WRITE8_HANDLER( control_w )
 /* 10-bit MC3410CL DAC */
 static WRITE8_DEVICE_HANDLER( esripsys_dac_w )
 {
-	esripsys_state *state = device->machine->driver_data<esripsys_state>();
+	esripsys_state *state = device->machine().driver_data<esripsys_state>();
 	if (offset == 0)
 	{
 		state->dac_msb = data & 3;
@@ -597,7 +597,7 @@ static WRITE8_DEVICE_HANDLER( esripsys_dac_w )
 /* 8-bit MC3408 DAC */
 static WRITE8_HANDLER( volume_dac_w )
 {
-	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	esripsys_state *state = space->machine().driver_data<esripsys_state>();
 	state->dac_vol = data;
 }
 
@@ -662,14 +662,14 @@ ADDRESS_MAP_END
 
 static DRIVER_INIT( esripsys )
 {
-	esripsys_state *state = machine->driver_data<esripsys_state>();
-	UINT8 *rom = machine->region("sound_data")->base();
+	esripsys_state *state = machine.driver_data<esripsys_state>();
+	UINT8 *rom = machine.region("sound_data")->base();
 
 	state->fdt_a = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
 	state->fdt_b = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
 	state->cmos_ram = auto_alloc_array(machine, UINT8, CMOS_RAM_SIZE);
 
-	machine->device<nvram_device>("nvram")->set_base(state->cmos_ram, CMOS_RAM_SIZE);
+	machine.device<nvram_device>("nvram")->set_base(state->cmos_ram, CMOS_RAM_SIZE);
 
 	memory_set_bankptr(machine, "bank2", &rom[0x0000]);
 	memory_set_bankptr(machine, "bank3", &rom[0x4000]);

@@ -37,7 +37,7 @@ static WRITE16_HANDLER( tecmo16_sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0x00, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -363,7 +363,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

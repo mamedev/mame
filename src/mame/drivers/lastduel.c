@@ -176,7 +176,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mg_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x01);
+	memory_set_bank(space->machine(), "bank1", data & 0x01);
 }
 
 static ADDRESS_MAP_START( madgear_sound_map, AS_PROGRAM, 8 )
@@ -442,7 +442,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler( device_t *device, int irq )
 {
-	lastduel_state *state = device->machine->driver_data<lastduel_state>();
+	lastduel_state *state = device->machine().driver_data<lastduel_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -474,9 +474,9 @@ static INTERRUPT_GEN( madgear_interrupt )
 
 static MACHINE_START( lastduel )
 {
-	lastduel_state *state = machine->driver_data<lastduel_state>();
+	lastduel_state *state = machine.driver_data<lastduel_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->tilemap_priority));
 	state->save_item(NAME(state->scroll));
@@ -484,7 +484,7 @@ static MACHINE_START( lastduel )
 
 static MACHINE_START( madgear )
 {
-	UINT8 *ROM = machine->region("audiocpu")->base();
+	UINT8 *ROM = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
 
@@ -493,7 +493,7 @@ static MACHINE_START( madgear )
 
 static MACHINE_RESET( lastduel )
 {
-	lastduel_state *state = machine->driver_data<lastduel_state>();
+	lastduel_state *state = machine.driver_data<lastduel_state>();
 	int i;
 
 	state->tilemap_priority = 0;

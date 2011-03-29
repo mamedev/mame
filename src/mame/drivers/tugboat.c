@@ -50,7 +50,7 @@ static PALETTE_INIT( tugboat )
 	int i;
 
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int r,g,b,brt;
 
@@ -71,13 +71,13 @@ static PALETTE_INIT( tugboat )
    because I need the start_addr register to handle scrolling */
 static WRITE8_HANDLER( tugboat_hd46505_0_w )
 {
-	tugboat_state *state = space->machine->driver_data<tugboat_state>();
+	tugboat_state *state = space->machine().driver_data<tugboat_state>();
 	if (offset == 0) state->reg0 = data & 0x0f;
 	else if (state->reg0 < 18) state->hd46505_0_reg[state->reg0] = data;
 }
 static WRITE8_HANDLER( tugboat_hd46505_1_w )
 {
-	tugboat_state *state = space->machine->driver_data<tugboat_state>();
+	tugboat_state *state = space->machine().driver_data<tugboat_state>();
 	if (offset == 0) state->reg1 = data & 0x0f;
 	else if (state->reg1 < 18) state->hd46505_1_reg[state->reg1] = data;
 }
@@ -85,15 +85,15 @@ static WRITE8_HANDLER( tugboat_hd46505_1_w )
 
 static WRITE8_HANDLER( tugboat_score_w )
 {
-	tugboat_state *state = space->machine->driver_data<tugboat_state>();
+	tugboat_state *state = space->machine().driver_data<tugboat_state>();
       if (offset>=0x8) state->ram[0x291d + 32*offset + 32*(1-8)] = data ^ 0x0f;
       if (offset<0x8 ) state->ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;
 }
 
-static void draw_tilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,
+static void draw_tilemap(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,
 		int addr,int gfx0,int gfx1,int transparency)
 {
-	tugboat_state *state = machine->driver_data<tugboat_state>();
+	tugboat_state *state = machine.driver_data<tugboat_state>();
 	int x,y;
 
 	for (y = 0;y < 32;y++)
@@ -113,7 +113,7 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap,const rectan
 				rgn = gfx1;
 			}
 
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[rgn],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[rgn],
 					code,
 					color,
 					0,0,
@@ -127,13 +127,13 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap,const rectan
 
 static SCREEN_UPDATE( tugboat )
 {
-	tugboat_state *state = screen->machine->driver_data<tugboat_state>();
+	tugboat_state *state = screen->machine().driver_data<tugboat_state>();
 	int startaddr0 = state->hd46505_0_reg[0x0c]*256 + state->hd46505_0_reg[0x0d];
 	int startaddr1 = state->hd46505_1_reg[0x0c]*256 + state->hd46505_1_reg[0x0d];
 
 
-	draw_tilemap(screen->machine, bitmap,cliprect,startaddr0,0,1,FALSE);
-	draw_tilemap(screen->machine, bitmap,cliprect,startaddr1,2,3,TRUE);
+	draw_tilemap(screen->machine(), bitmap,cliprect,startaddr0,0,1,FALSE);
+	draw_tilemap(screen->machine(), bitmap,cliprect,startaddr1,2,3,TRUE);
 	return 0;
 }
 
@@ -141,28 +141,28 @@ static SCREEN_UPDATE( tugboat )
 
 static READ8_DEVICE_HANDLER( tugboat_input_r )
 {
-	tugboat_state *state = device->machine->driver_data<tugboat_state>();
+	tugboat_state *state = device->machine().driver_data<tugboat_state>();
 	if (~state->ctrl & 0x80)
-		return input_port_read(device->machine, "IN0");
+		return input_port_read(device->machine(), "IN0");
 	else if (~state->ctrl & 0x40)
-		return input_port_read(device->machine, "IN1");
+		return input_port_read(device->machine(), "IN1");
 	else if (~state->ctrl & 0x20)
-		return input_port_read(device->machine, "IN2");
+		return input_port_read(device->machine(), "IN2");
 	else if (~state->ctrl & 0x10)
-		return input_port_read(device->machine, "IN3");
+		return input_port_read(device->machine(), "IN3");
 	else
-		return input_port_read(device->machine, "IN4");
+		return input_port_read(device->machine(), "IN4");
 }
 
 static READ8_DEVICE_HANDLER( tugboat_ctrl_r )
 {
-	tugboat_state *state = device->machine->driver_data<tugboat_state>();
+	tugboat_state *state = device->machine().driver_data<tugboat_state>();
 	return state->ctrl;
 }
 
 static WRITE8_DEVICE_HANDLER( tugboat_ctrl_w )
 {
-	tugboat_state *state = device->machine->driver_data<tugboat_state>();
+	tugboat_state *state = device->machine().driver_data<tugboat_state>();
 	state->ctrl = data;
 }
 
@@ -201,12 +201,12 @@ static const pia6821_interface pia1_intf =
 static TIMER_CALLBACK( interrupt_gen )
 {
 	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
-	machine->scheduler().timer_set(machine->primary_screen->frame_period(), FUNC(interrupt_gen));
+	machine.scheduler().timer_set(machine.primary_screen->frame_period(), FUNC(interrupt_gen));
 }
 
 static MACHINE_RESET( tugboat )
 {
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(30*8+4), FUNC(interrupt_gen));
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(30*8+4), FUNC(interrupt_gen));
 }
 
 

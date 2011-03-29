@@ -1055,7 +1055,7 @@ public:
 	int s12_settings[8];
 };
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -1064,29 +1064,29 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", machine->describe_context(), buf );
+		logerror( "%s: %s", machine.describe_context(), buf );
 	}
 }
 
 static WRITE32_HANDLER( sharedram_w )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 
-	verboselog( space->machine, 1, "sharedram_w( %08x, %08x, %08x )\n", ( offset * 4 ), data, mem_mask );
+	verboselog( space->machine(), 1, "sharedram_w( %08x, %08x, %08x )\n", ( offset * 4 ), data, mem_mask );
 	COMBINE_DATA( &state->sharedram[ offset ] );
 }
 
 static READ32_HANDLER( sharedram_r )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 
-	verboselog( space->machine, 1, "sharedram_r( %08x, %08x ) %08x\n", ( offset * 4 ), mem_mask, state->sharedram[ offset ] );
+	verboselog( space->machine(), 1, "sharedram_r( %08x, %08x ) %08x\n", ( offset * 4 ), mem_mask, state->sharedram[ offset ] );
 	return state->sharedram[ offset ];
 }
 
 static WRITE16_HANDLER( sharedram_sub_w )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 
 	UINT16 *shared16 = (UINT16 *)state->sharedram;
 
@@ -1095,7 +1095,7 @@ static WRITE16_HANDLER( sharedram_sub_w )
 
 static READ16_HANDLER( sharedram_sub_r )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 
 	UINT16 *shared16 = (UINT16 *)state->sharedram;
 
@@ -1104,11 +1104,11 @@ static READ16_HANDLER( sharedram_sub_r )
 
 static WRITE32_HANDLER( bankoffset_w )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 
 	// Golgo 13 has different banking (maybe the keycus controls it?)
-	if( strcmp( space->machine->system().name, "golgo13" ) == 0 ||
-		strcmp( space->machine->system().name, "g13knd" ) == 0 )
+	if( strcmp( space->machine().system().name, "golgo13" ) == 0 ||
+		strcmp( space->machine().system().name, "g13knd" ) == 0 )
 	{
 		if( ( data & 8 ) != 0 )
 		{
@@ -1124,14 +1124,14 @@ static WRITE32_HANDLER( bankoffset_w )
 		state->m_n_bankoffset = data;
 	}
 
-	memory_set_bank( space->machine, "bank1", state->m_n_bankoffset );
+	memory_set_bank( space->machine(), "bank1", state->m_n_bankoffset );
 
-	verboselog( space->machine, 1, "bankoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, state->m_n_bankoffset );
+	verboselog( space->machine(), 1, "bankoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, state->m_n_bankoffset );
 }
 
 static WRITE32_HANDLER( dmaoffset_w )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 
 	if( ACCESSING_BITS_0_15 )
 	{
@@ -1141,12 +1141,12 @@ static WRITE32_HANDLER( dmaoffset_w )
 	{
 		state->m_n_dmaoffset = ( ( offset * 4 ) + 2 ) | ( data & 0xffff0000 );
 	}
-	verboselog( space->machine, 1, "dmaoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, state->m_n_dmaoffset );
+	verboselog( space->machine(), 1, "dmaoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, state->m_n_dmaoffset );
 }
 
-static void namcos12_rom_read( running_machine *machine, UINT32 n_address, INT32 n_size )
+static void namcos12_rom_read( running_machine &machine, UINT32 n_address, INT32 n_size )
 {
-	namcos12_state *state = machine->driver_data<namcos12_state>();
+	namcos12_state *state = machine.driver_data<namcos12_state>();
 	const char *n_region;
 	int n_offset;
 
@@ -1175,8 +1175,8 @@ static void namcos12_rom_read( running_machine *machine, UINT32 n_address, INT32
 		verboselog( machine, 1, "namcos12_rom_read( %08x, %08x ) game %08x\n", n_address, n_size, n_offset );
 	}
 
-	source = (UINT16 *) machine->region( n_region )->base();
-	n_romleft = ( machine->region( n_region )->bytes() - n_offset ) / 4;
+	source = (UINT16 *) machine.region( n_region )->base();
+	n_romleft = ( machine.region( n_region )->bytes() - n_offset ) / 4;
 	if( n_size > n_romleft )
 	{
 		verboselog( machine, 1, "namcos12_rom_read dma truncated %d to %d passed end of rom\n", n_size, n_romleft );
@@ -1206,7 +1206,7 @@ static void namcos12_rom_read( running_machine *machine, UINT32 n_address, INT32
 
 static WRITE32_HANDLER( s12_dma_bias_w )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 
 	state->m_n_dmabias = data;
 }
@@ -1261,11 +1261,11 @@ static WRITE32_HANDLER( system11gun_w )
 		output_set_value("P2_Start_lamp", (~data & 0x04)>>2);
 
 
-		verboselog( space->machine, 1, "system11gun_w: outputs (%08x %08x)\n", data, mem_mask );
+		verboselog( space->machine(), 1, "system11gun_w: outputs (%08x %08x)\n", data, mem_mask );
 	}
 	if( ACCESSING_BITS_16_31 )
 	{
-		verboselog( space->machine, 2, "system11gun_w: start reading (%08x %08x)\n", data, mem_mask );
+		verboselog( space->machine(), 2, "system11gun_w: start reading (%08x %08x)\n", data, mem_mask );
 	}
 }
 
@@ -1275,43 +1275,43 @@ static READ32_HANDLER( system11gun_r )
 	switch( offset )
 	{
 	case 0:
-		data = input_port_read(space->machine, "LIGHT0_X");
+		data = input_port_read(space->machine(), "LIGHT0_X");
 		break;
 	case 1:
-		data = ( input_port_read(space->machine, "LIGHT0_Y") ) | ( ( input_port_read(space->machine, "LIGHT0_Y") + 1 ) << 16 );
+		data = ( input_port_read(space->machine(), "LIGHT0_Y") ) | ( ( input_port_read(space->machine(), "LIGHT0_Y") + 1 ) << 16 );
 		break;
 	case 2:
-		data = input_port_read(space->machine, "LIGHT1_X");
+		data = input_port_read(space->machine(), "LIGHT1_X");
 		break;
 	case 3:
-		data = ( input_port_read(space->machine, "LIGHT1_Y") ) | ( ( input_port_read(space->machine, "LIGHT1_Y") + 1 ) << 16 );
+		data = ( input_port_read(space->machine(), "LIGHT1_Y") ) | ( ( input_port_read(space->machine(), "LIGHT1_Y") + 1 ) << 16 );
 		break;
 	}
-	verboselog( space->machine, 2, "system11gun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( space->machine(), 2, "system11gun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
-static void system11gun_install( running_machine *machine )
+static void system11gun_install( running_machine &machine )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f788000, 0x1f788003, FUNC(system11gun_w) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x1f780000, 0x1f78000f, FUNC(system11gun_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f788000, 0x1f788003, FUNC(system11gun_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x1f780000, 0x1f78000f, FUNC(system11gun_r) );
 }
 
 static WRITE32_HANDLER( kcoff_w )
 {
-	memory_set_bankptr( space->machine, "bank2", space->machine->region( "user1" )->base() + 0x20280 );
+	memory_set_bankptr( space->machine(), "bank2", space->machine().region( "user1" )->base() + 0x20280 );
 }
 
 static WRITE32_HANDLER( kcon_w )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 
-	memory_set_bankptr( space->machine, "bank2", state->kcram );
+	memory_set_bankptr( space->machine(), "bank2", state->kcram );
 }
 
 static WRITE32_HANDLER( tektagt_protection_1_w )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 
 	// Second dma offset or protection ref values write
 	state->m_n_tektagdmaoffset = data;
@@ -1327,7 +1327,7 @@ static READ32_HANDLER( tektagt_protection_1_r )
 
 static WRITE32_HANDLER( tektagt_protection_2_w )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 
 	// Writes are 0 or rand(), only used as a "start prot value write" trigger
 	state->ttt_cnt = 0;
@@ -1335,7 +1335,7 @@ static WRITE32_HANDLER( tektagt_protection_2_w )
 
 static READ32_HANDLER( tektagt_protection_2_r )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 	UINT32 *ttt_val = state->ttt_val;
 	UINT32 data = 0;
 
@@ -1365,16 +1365,16 @@ static READ32_HANDLER( tektagt_protection_3_r )
 
 static MACHINE_RESET( namcos12 )
 {
-	namcos12_state *state = machine->driver_data<namcos12_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	namcos12_state *state = machine.driver_data<namcos12_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	psx_machine_init(machine);
 	bankoffset_w(space,0,0,0xffffffff);
 	state->has_tektagt_dma = 0;
 
-	if( strcmp( machine->system().name, "tektagt" ) == 0 ||
-		strcmp( machine->system().name, "tektagta" ) == 0 ||
-		strcmp( machine->system().name, "tektagtb" ) == 0 ||
-		strcmp( machine->system().name, "tektagtc" ) == 0 )
+	if( strcmp( machine.system().name, "tektagt" ) == 0 ||
+		strcmp( machine.system().name, "tektagta" ) == 0 ||
+		strcmp( machine.system().name, "tektagtb" ) == 0 ||
+		strcmp( machine.system().name, "tektagtc" ) == 0 )
 	{
 		state->has_tektagt_dma = 1;
 		space->install_legacy_readwrite_handler(0x1fb00000, 0x1fb00003, FUNC(tektagt_protection_1_r), FUNC(tektagt_protection_1_w) );
@@ -1382,24 +1382,24 @@ static MACHINE_RESET( namcos12 )
 		space->install_legacy_read_handler(0x1f700000, 0x1f700003, FUNC(tektagt_protection_3_r) );
 	}
 
-	if( strcmp( machine->system().name, "tektagt" ) == 0 ||
-		strcmp( machine->system().name, "tektagta" ) == 0 ||
-		strcmp( machine->system().name, "tektagtb" ) == 0 ||
-		strcmp( machine->system().name, "tektagtc" ) == 0 ||
-		strcmp( machine->system().name, "fgtlayer" ) == 0 ||
-		strcmp( machine->system().name, "golgo13" ) == 0 ||
-		strcmp( machine->system().name, "g13knd" ) == 0 ||
-		strcmp( machine->system().name, "mrdrillr" ) == 0 ||
-		strcmp( machine->system().name, "pacapp" ) == 0 ||
-		strcmp( machine->system().name, "pacappsp" ) == 0 ||
-		strcmp( machine->system().name, "pacapp2" ) == 0 ||
-		strcmp( machine->system().name, "tenkomorj" ) == 0 ||
-		strcmp( machine->system().name, "tenkomor" ) == 0 ||
-		strcmp( machine->system().name, "ptblank2" ) == 0 ||
-		strcmp( machine->system().name, "sws2000" ) == 0 ||
-		strcmp( machine->system().name, "sws2001" ) == 0 ||
-		strcmp( machine->system().name, "truckk" ) == 0 ||
-		strcmp( machine->system().name, "ghlpanic" ) == 0 )
+	if( strcmp( machine.system().name, "tektagt" ) == 0 ||
+		strcmp( machine.system().name, "tektagta" ) == 0 ||
+		strcmp( machine.system().name, "tektagtb" ) == 0 ||
+		strcmp( machine.system().name, "tektagtc" ) == 0 ||
+		strcmp( machine.system().name, "fgtlayer" ) == 0 ||
+		strcmp( machine.system().name, "golgo13" ) == 0 ||
+		strcmp( machine.system().name, "g13knd" ) == 0 ||
+		strcmp( machine.system().name, "mrdrillr" ) == 0 ||
+		strcmp( machine.system().name, "pacapp" ) == 0 ||
+		strcmp( machine.system().name, "pacappsp" ) == 0 ||
+		strcmp( machine.system().name, "pacapp2" ) == 0 ||
+		strcmp( machine.system().name, "tenkomorj" ) == 0 ||
+		strcmp( machine.system().name, "tenkomor" ) == 0 ||
+		strcmp( machine.system().name, "ptblank2" ) == 0 ||
+		strcmp( machine.system().name, "sws2000" ) == 0 ||
+		strcmp( machine.system().name, "sws2001" ) == 0 ||
+		strcmp( machine.system().name, "truckk" ) == 0 ||
+		strcmp( machine.system().name, "ghlpanic" ) == 0 )
 	{
 		/* this is based on guesswork, it might not even be keycus. */
 		space->install_read_bank (0x1fc20280, 0x1fc2028b, "bank2" );
@@ -1407,7 +1407,7 @@ static MACHINE_RESET( namcos12 )
 		space->install_legacy_write_handler(0x1f018000, 0x1f018003, FUNC(kcoff_w) );
 
 		memset( state->kcram, 0, sizeof( state->kcram ) );
-		memory_set_bankptr( space->machine, "bank2", state->kcram );
+		memory_set_bankptr( space->machine(), "bank2", state->kcram );
 	}
 }
 
@@ -1433,14 +1433,14 @@ static READ8_HANDLER( s12_mcu_p8_r )
 
 static READ8_HANDLER( s12_mcu_pa_r )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 
 	return state->s12_porta;
 }
 
 static WRITE8_HANDLER( s12_mcu_pa_w )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 
 	// bit 0 = chip enable for the RTC
 	// reset the state on the rising edge of the bit
@@ -1459,12 +1459,12 @@ INLINE UINT8 make_bcd(UINT8 data)
 
 static READ8_HANDLER( s12_mcu_rtc_r )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 	UINT8 ret = 0;
 	system_time systime;
 	static const int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
 
-	space->machine->current_datetime(systime);
+	space->machine().current_datetime(systime);
 
 	switch (state->s12_rtcstate)
 	{
@@ -1501,7 +1501,7 @@ static READ8_HANDLER( s12_mcu_rtc_r )
 
 static READ8_HANDLER( s12_mcu_portB_r )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 
 	// golgo13 won't boot if this doesn't toggle every read
 	state->s12_lastpB ^= 0x80;
@@ -1510,7 +1510,7 @@ static READ8_HANDLER( s12_mcu_portB_r )
 
 static WRITE8_HANDLER( s12_mcu_portB_w )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 
 	// bit 7 = chip enable for the video settings controller
 	if (data & 0x80)
@@ -1523,7 +1523,7 @@ static WRITE8_HANDLER( s12_mcu_portB_w )
 
 static WRITE8_HANDLER( s12_mcu_settings_w )
 {
-	namcos12_state *state = space->machine->driver_data<namcos12_state>();
+	namcos12_state *state = space->machine().driver_data<namcos12_state>();
 	int *s12_settings = state->s12_settings;
 
 	if (state->s12_setstate)
@@ -1557,7 +1557,7 @@ static WRITE8_HANDLER( s12_mcu_settings_w )
 
 static READ8_HANDLER( s12_mcu_gun_h_r )
 {
-	const input_port_config *port = space->machine->port("LIGHT0_X");
+	const input_port_config *port = space->machine().port("LIGHT0_X");
 	if( port != NULL )
 	{
 		int rv = input_port_read_direct( port ) << 6;
@@ -1576,7 +1576,7 @@ static READ8_HANDLER( s12_mcu_gun_h_r )
 
 static READ8_HANDLER( s12_mcu_gun_v_r )
 {
-	const input_port_config *port = space->machine->port("LIGHT0_Y");
+	const input_port_config *port = space->machine().port("LIGHT0_Y");
 	if( port != NULL )
 	{
 		int rv = input_port_read_direct( port ) << 6;
@@ -1607,13 +1607,13 @@ ADDRESS_MAP_END
 
 static DRIVER_INIT( namcos12 )
 {
-	namcos12_state *state = machine->driver_data<namcos12_state>();
+	namcos12_state *state = machine.driver_data<namcos12_state>();
 
 	psx_driver_init(machine);
 
 	psx_dma_install_read_handler( machine, 5, namcos12_rom_read );
 
-	memory_configure_bank(machine, "bank1", 0, machine->region( "user2" )->bytes() / 0x200000, machine->region( "user2" )->base(), 0x200000 );
+	memory_configure_bank(machine, "bank1", 0, machine.region( "user2" )->bytes() / 0x200000, machine.region( "user2" )->base(), 0x200000 );
 
 	state->s12_porta = 0;
 	state->s12_rtcstate = 0;
@@ -1638,7 +1638,7 @@ static DRIVER_INIT( ptblank2 )
 	DRIVER_INIT_CALL(namcos12);
 
 	/* patch out wait for dma 5 to complete */
-	*( (UINT32 *)( machine->region( "user1" )->base() + 0x331c4 ) ) = 0;
+	*( (UINT32 *)( machine.region( "user1" )->base() + 0x331c4 ) ) = 0;
 
 	system11gun_install(machine);
 }

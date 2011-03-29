@@ -344,10 +344,10 @@ static DEVICE_START(bitbanger)
 
 	/* output config */
 	bi->build_count = 0;
-	bi->bitbanger_output_timer = device->machine->scheduler().timer_alloc(FUNC(bitbanger_output_timer), (void *) device);
+	bi->bitbanger_output_timer = device->machine().scheduler().timer_alloc(FUNC(bitbanger_output_timer), (void *) device);
 
 	/* input config */
-	bi->bitbanger_input_timer = device->machine->scheduler().timer_alloc(FUNC(bitbanger_input_timer), (void *) device );
+	bi->bitbanger_input_timer = device->machine().scheduler().timer_alloc(FUNC(bitbanger_input_timer), (void *) device );
 	bi->idle_delay = attotime::from_seconds(1);
 	bi->input_buffer_size = 0;
 	bi->input_buffer_cursor = 0;
@@ -453,7 +453,7 @@ void bitbanger_output(device_t *device, int value)
       bi->bitbanger_output_timer->adjust(one_point_five_baud, 0, bi->current_baud);
    }
 
-   //fprintf(stderr,"%s, %d\n", device->machine->time().as_string(9), value);
+   //fprintf(stderr,"%s, %d\n", device->machine().time().as_string(9), value);
    bi->output_value = value;
 }
 

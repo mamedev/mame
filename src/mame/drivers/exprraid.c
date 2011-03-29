@@ -219,7 +219,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
 
 static READ8_HANDLER( exprraid_protection_r )
 {
-	exprraid_state *state = space->machine->driver_data<exprraid_state>();
+	exprraid_state *state = space->machine().driver_data<exprraid_state>();
 	switch (offset)
 	{
 	case 0:
@@ -233,14 +233,14 @@ static READ8_HANDLER( exprraid_protection_r )
 
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
-	exprraid_state *state = space->machine->driver_data<exprraid_state>();
+	exprraid_state *state = space->machine().driver_data<exprraid_state>();
 	soundlatch_w(space, 0, data);
 	device_set_input_line(state->slave, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( vblank_r )
 {
-	return input_port_read(space->machine, "IN0");
+	return input_port_read(space->machine(), "IN0");
 }
 
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
@@ -280,13 +280,13 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin_inserted_deco16 )
 {
-	exprraid_state *state = field->port->machine->driver_data<exprraid_state>();
+	exprraid_state *state = field->port->machine().driver_data<exprraid_state>();
 	device_set_input_line(state->maincpu, DECO16_IRQ_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted_nmi )
 {
-	exprraid_state *state = field->port->machine->driver_data<exprraid_state>();
+	exprraid_state *state = field->port->machine().driver_data<exprraid_state>();
 	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -441,7 +441,7 @@ GFXDECODE_END
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler( device_t *device, int linestate )
 {
-	exprraid_state *state = device->machine->driver_data<exprraid_state>();
+	exprraid_state *state = device->machine().driver_data<exprraid_state>();
 	device_set_input_line_and_vector(state->slave, 0, linestate, 0xff);
 }
 
@@ -453,9 +453,9 @@ static const ym3526_interface ym3526_config =
 #if 0
 static INTERRUPT_GEN( exprraid_interrupt )
 {
-	exprraid_state *state = device->machine->driver_data<exprraid_state>();
+	exprraid_state *state = device->machine().driver_data<exprraid_state>();
 
-	if ((~input_port_read(device->machine, "IN2")) & 0xc0)
+	if ((~input_port_read(device->machine(), "IN2")) & 0xc0)
 	{
 		if (state->coin == 0)
 		{
@@ -475,17 +475,17 @@ static INTERRUPT_GEN( exprraid_interrupt )
 
 static MACHINE_START( exprraid )
 {
-	exprraid_state *state = machine->driver_data<exprraid_state>();
+	exprraid_state *state = machine.driver_data<exprraid_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->slave = machine->device("slave");
+	state->maincpu = machine.device("maincpu");
+	state->slave = machine.device("slave");
 
 	state->save_item(NAME(state->bg_index));
 }
 
 static MACHINE_RESET( exprraid )
 {
-	exprraid_state *state = machine->driver_data<exprraid_state>();
+	exprraid_state *state = machine.driver_data<exprraid_state>();
 
 	state->bg_index[0] = 0;
 	state->bg_index[1] = 0;
@@ -733,11 +733,11 @@ ROM_START( wexpressb2 )
 ROM_END
 
 
-static void exprraid_gfx_expand(running_machine *machine)
+static void exprraid_gfx_expand(running_machine &machine)
 {
 	/* Expand the background rom so we can use regular decode routines */
 
-	UINT8	*gfx = machine->region("gfx3")->base();
+	UINT8	*gfx = machine.region("gfx3")->base();
 	int offs = 0x10000 - 0x1000;
 	int i;
 
@@ -756,7 +756,7 @@ static void exprraid_gfx_expand(running_machine *machine)
 
 static DRIVER_INIT( wexpress )
 {
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	/* HACK: this set uses M6502 irq vectors but DECO CPU-16 opcodes??? */
 	rom[0xfff7] = rom[0xfffa];
@@ -778,13 +778,13 @@ static DRIVER_INIT( exprraid )
 
 static DRIVER_INIT( wexpressb )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3800, 0x3800, FUNC(vblank_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3800, 0x3800, FUNC(vblank_r));
 	exprraid_gfx_expand(machine);
 }
 
 static DRIVER_INIT( wexpressb2 )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xFFC0, 0xFFC0, FUNC(vblank_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xFFC0, 0xFFC0, FUNC(vblank_r));
 	exprraid_gfx_expand(machine);
 }
 

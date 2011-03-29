@@ -225,7 +225,7 @@ INLINE int noise(phoenix_sound_state *state, int samplerate)
 static STREAM_UPDATE( phoenix_sound_update )
 {
 	phoenix_sound_state *state = get_safe_token(device);
-	int samplerate = device->machine->sample_rate();
+	int samplerate = device->machine().sample_rate();
 	stream_sample_t *buffer = outputs[0];
 
 	while( samples-- > 0 )
@@ -546,10 +546,10 @@ static DEVICE_START( phoenix_sound )
 	memset(&state->c25_state, 0, sizeof(state->c25_state));
 	memset(&state->noise_state, 0, sizeof(state->noise_state));
 
-	state->discrete = device->machine->device("discrete");
-	state->tms = device->machine->device("tms");
+	state->discrete = device->machine().device("discrete");
+	state->tms = device->machine().device("tms");
 
-	state->poly18 = auto_alloc_array(device->machine, UINT32, 1ul << (18-5));
+	state->poly18 = auto_alloc_array(device->machine(), UINT32, 1ul << (18-5));
 
 	shiftreg = 0;
 	for( i = 0; i < (1ul << (18-5)); i++ )
@@ -566,7 +566,7 @@ static DEVICE_START( phoenix_sound )
 		state->poly18[i] = bits;
 	}
 
-	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), 0, phoenix_sound_update);
+	state->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), 0, phoenix_sound_update);
 
 	register_state(device);
 }

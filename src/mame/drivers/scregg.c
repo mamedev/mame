@@ -202,9 +202,9 @@ GFXDECODE_END
 
 static MACHINE_START( scregg )
 {
-	btime_state *state = machine->driver_data<btime_state>();
+	btime_state *state = machine.driver_data<btime_state>();
 
-	state->maincpu = machine->device("maincpu");
+	state->maincpu = machine.device("maincpu");
 	state->audiocpu = NULL;
 
 	state->save_item(NAME(state->btime_palette));
@@ -215,7 +215,7 @@ static MACHINE_START( scregg )
 
 static MACHINE_RESET( scregg )
 {
-	btime_state *state = machine->driver_data<btime_state>();
+	btime_state *state = machine.driver_data<btime_state>();
 
 	state->btime_palette = 0;
 	state->bnj_scroll1 = 0;
@@ -391,7 +391,7 @@ static DRIVER_INIT( rockduck )
 {
 	// rd2.rdh and rd1.rdj are bitswapped, but not rd3.rdg .. are they really from the same board?
 	int x;
-	UINT8 *src = machine->region( "gfx1" )->base();
+	UINT8 *src = machine.region( "gfx1" )->base();
 
 	for (x = 0x2000; x < 0x6000; x++)
 	{

@@ -9,28 +9,28 @@ WRITE16_HANDLER( dynduke_paletteram_w )
 {
 	int color;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	color=space->machine->generic.paletteram.u16[offset];
-	palette_set_color_rgb(space->machine,offset,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	color=space->machine().generic.paletteram.u16[offset];
+	palette_set_color_rgb(space->machine(),offset,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
 }
 
 WRITE16_HANDLER( dynduke_background_w )
 {
-	dynduke_state *state = space->machine->driver_data<dynduke_state>();
+	dynduke_state *state = space->machine().driver_data<dynduke_state>();
 	COMBINE_DATA(&state->back_data[offset]);
 	tilemap_mark_tile_dirty(state->bg_layer,offset);
 }
 
 WRITE16_HANDLER( dynduke_foreground_w )
 {
-	dynduke_state *state = space->machine->driver_data<dynduke_state>();
+	dynduke_state *state = space->machine().driver_data<dynduke_state>();
 	COMBINE_DATA(&state->fore_data[offset]);
 	tilemap_mark_tile_dirty(state->fg_layer,offset);
 }
 
 WRITE16_HANDLER( dynduke_text_w )
 {
-	dynduke_state *state = space->machine->driver_data<dynduke_state>();
+	dynduke_state *state = space->machine().driver_data<dynduke_state>();
 	UINT16 *videoram = state->videoram;
 	COMBINE_DATA(&videoram[offset]);
 	tilemap_mark_tile_dirty(state->tx_layer,offset);
@@ -38,7 +38,7 @@ WRITE16_HANDLER( dynduke_text_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	dynduke_state *state = machine->driver_data<dynduke_state>();
+	dynduke_state *state = machine.driver_data<dynduke_state>();
 	int tile=state->back_data[tile_index];
 	int color=tile >> 12;
 
@@ -53,7 +53,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	dynduke_state *state = machine->driver_data<dynduke_state>();
+	dynduke_state *state = machine.driver_data<dynduke_state>();
 	int tile=state->fore_data[tile_index];
 	int color=tile >> 12;
 
@@ -68,7 +68,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	dynduke_state *state = machine->driver_data<dynduke_state>();
+	dynduke_state *state = machine.driver_data<dynduke_state>();
 	UINT16 *videoram = state->videoram;
 	int tile=videoram[tile_index];
 	int color=(tile >> 8) & 0x0f;
@@ -84,7 +84,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( dynduke )
 {
-	dynduke_state *state = machine->driver_data<dynduke_state>();
+	dynduke_state *state = machine.driver_data<dynduke_state>();
 	state->bg_layer = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,      16,16,32,32);
 	state->fg_layer = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,16,16,32,32);
 	state->tx_layer = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows, 8, 8,32,32);
@@ -95,7 +95,7 @@ VIDEO_START( dynduke )
 
 WRITE16_HANDLER( dynduke_gfxbank_w )
 {
-	dynduke_state *state = space->machine->driver_data<dynduke_state>();
+	dynduke_state *state = space->machine().driver_data<dynduke_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -115,7 +115,7 @@ WRITE16_HANDLER( dynduke_gfxbank_w )
 
 WRITE16_HANDLER( dynduke_control_w )
 {
-	dynduke_state *state = space->machine->driver_data<dynduke_state>();
+	dynduke_state *state = space->machine().driver_data<dynduke_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -133,14 +133,14 @@ WRITE16_HANDLER( dynduke_control_w )
 		if (data&0x4) state->txt_enable = 0; else state->txt_enable = 1;
 		if (data&0x8) state->sprite_enable=0; else state->sprite_enable=1;
 
-		flip_screen_set(space->machine, data & 0x40);
+		flip_screen_set(space->machine(), data & 0x40);
 	}
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
-	dynduke_state *state = machine->driver_data<dynduke_state>();
-	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
+	dynduke_state *state = machine.driver_data<dynduke_state>();
+	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
 	int offs,fx,fy,x,y,color,sprite;
 
 	if (!state->sprite_enable) return;
@@ -169,15 +169,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			if (fy) fy=0; else fy=1;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 				sprite,
 				color,fx,fy,x,y,15);
 	}
 }
 
-static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
-	dynduke_state *state = machine->driver_data<dynduke_state>();
+	dynduke_state *state = machine.driver_data<dynduke_state>();
 	/* The transparency / palette handling on the background layer is very strange */
 	bitmap_t *bm = tilemap_get_pixmap(state->bg_layer);
 	int scrolly, scrollx;
@@ -217,7 +217,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 			if ((srcdat & 0x20) == pri)
 			{
 				if (srcdat & 0x10) srcdat += 0x400;
-				//if (srcdat & 0x10) srcdat += machine->rand()&0x1f;
+				//if (srcdat & 0x10) srcdat += machine.rand()&0x1f;
 
 				srcdat = (srcdat & 0x000f) | ((srcdat & 0xffc0) >> 2);
 				dst[x] = srcdat;
@@ -230,7 +230,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 
 SCREEN_UPDATE( dynduke )
 {
-	dynduke_state *state = screen->machine->driver_data<dynduke_state>();
+	dynduke_state *state = screen->machine().driver_data<dynduke_state>();
 	/* Setup the tilemaps */
 	tilemap_set_scrolly( state->fg_layer,0, ((state->scroll_ram[0x11]&0x30)<<4)+((state->scroll_ram[0x12]&0x7f)<<1)+((state->scroll_ram[0x12]&0x80)>>7) );
 	tilemap_set_scrollx( state->fg_layer,0, ((state->scroll_ram[0x19]&0x30)<<4)+((state->scroll_ram[0x1a]&0x7f)<<1)+((state->scroll_ram[0x1a]&0x80)>>7) );
@@ -238,14 +238,14 @@ SCREEN_UPDATE( dynduke )
 	tilemap_set_enable( state->tx_layer,state->txt_enable);
 
 
-	draw_background(screen->machine, bitmap, cliprect,0x00);
-	draw_sprites(screen->machine,bitmap,cliprect,0); // Untested: does anything use it? Could be behind background
-	draw_sprites(screen->machine,bitmap,cliprect,1);
-	draw_background(screen->machine, bitmap, cliprect,0x20);
+	draw_background(screen->machine(), bitmap, cliprect,0x00);
+	draw_sprites(screen->machine(),bitmap,cliprect,0); // Untested: does anything use it? Could be behind background
+	draw_sprites(screen->machine(),bitmap,cliprect,1);
+	draw_background(screen->machine(), bitmap, cliprect,0x20);
 
-	draw_sprites(screen->machine,bitmap,cliprect,2);
+	draw_sprites(screen->machine(),bitmap,cliprect,2);
 	tilemap_draw(bitmap,cliprect,state->fg_layer,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect,3);
+	draw_sprites(screen->machine(),bitmap,cliprect,3);
 	tilemap_draw(bitmap,cliprect,state->tx_layer,0,0);
 
 	return 0;
@@ -253,7 +253,7 @@ SCREEN_UPDATE( dynduke )
 
 SCREEN_EOF( dynduke )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	buffer_spriteram16_w(space, 0, 0, 0xffff); // Could be a memory location instead
 }

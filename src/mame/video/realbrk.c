@@ -25,13 +25,13 @@
 
 WRITE16_HANDLER( realbrk_flipscreen_w )
 {
-	realbrk_state *state = space->machine->driver_data<realbrk_state>();
+	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0,	data & 0x0001);
-		coin_counter_w(space->machine, 1,	data & 0x0004);
+		coin_counter_w(space->machine(), 0,	data & 0x0001);
+		coin_counter_w(space->machine(), 1,	data & 0x0004);
 
-		flip_screen_set(space->machine, 	data & 0x0080);
+		flip_screen_set(space->machine(), 	data & 0x0080);
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -42,7 +42,7 @@ WRITE16_HANDLER( realbrk_flipscreen_w )
 
 WRITE16_HANDLER( dai2kaku_flipscreen_w )
 {
-	realbrk_state *state = space->machine->driver_data<realbrk_state>();
+	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	state->disable_video = 0;
 }
 
@@ -72,7 +72,7 @@ WRITE16_HANDLER( dai2kaku_flipscreen_w )
 
 static TILE_GET_INFO( get_tile_info_0 )
 {
-	realbrk_state *state = machine->driver_data<realbrk_state>();
+	realbrk_state *state = machine.driver_data<realbrk_state>();
 	UINT16 attr = state->vram_0[tile_index * 2 + 0];
 	UINT16 code = state->vram_0[tile_index * 2 + 1];
 	SET_TILE_INFO(
@@ -84,7 +84,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
-	realbrk_state *state = machine->driver_data<realbrk_state>();
+	realbrk_state *state = machine.driver_data<realbrk_state>();
 	UINT16 attr = state->vram_1[tile_index * 2 + 0];
 	UINT16 code = state->vram_1[tile_index * 2 + 1];
 	SET_TILE_INFO(
@@ -96,14 +96,14 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 WRITE16_HANDLER( realbrk_vram_0_w )
 {
-	realbrk_state *state = space->machine->driver_data<realbrk_state>();
+	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	COMBINE_DATA(&state->vram_0[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_0,offset/2);
 }
 
 WRITE16_HANDLER( realbrk_vram_1_w )
 {
-	realbrk_state *state = space->machine->driver_data<realbrk_state>();
+	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	COMBINE_DATA(&state->vram_1[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_1,offset/2);
 }
@@ -124,7 +124,7 @@ WRITE16_HANDLER( realbrk_vram_1_w )
 
 static TILE_GET_INFO( get_tile_info_2 )
 {
-	realbrk_state *state = machine->driver_data<realbrk_state>();
+	realbrk_state *state = machine.driver_data<realbrk_state>();
 	UINT16 code = state->vram_2[tile_index];
 	SET_TILE_INFO(
 			1,
@@ -135,7 +135,7 @@ static TILE_GET_INFO( get_tile_info_2 )
 
 WRITE16_HANDLER( realbrk_vram_2_w )
 {
-	realbrk_state *state = space->machine->driver_data<realbrk_state>();
+	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	COMBINE_DATA(&state->vram_2[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_2,offset);
 }
@@ -152,7 +152,7 @@ WRITE16_HANDLER( realbrk_vram_2_w )
 
 VIDEO_START(realbrk)
 {
-	realbrk_state *state = machine->driver_data<realbrk_state>();
+	realbrk_state *state = machine.driver_data<realbrk_state>();
 	/* Backgrounds */
 	state->tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 16, 16, 0x40, 0x20);
 	state->tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 16, 16, 0x40, 0x20);
@@ -164,8 +164,8 @@ VIDEO_START(realbrk)
 	tilemap_set_transparent_pen(state->tilemap_1,0);
 	tilemap_set_transparent_pen(state->tilemap_2,0);
 
-	state->tmpbitmap0 = auto_bitmap_alloc(machine,32,32, machine->primary_screen->format());
-	state->tmpbitmap1 = auto_bitmap_alloc(machine,32,32, machine->primary_screen->format());
+	state->tmpbitmap0 = auto_bitmap_alloc(machine,32,32, machine.primary_screen->format());
+	state->tmpbitmap1 = auto_bitmap_alloc(machine,32,32, machine.primary_screen->format());
 }
 
 /***************************************************************************
@@ -213,14 +213,14 @@ VIDEO_START(realbrk)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	realbrk_state *state = machine->driver_data<realbrk_state>();
+	realbrk_state *state = machine.driver_data<realbrk_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
-	int max_x = machine->primary_screen->width();
-	int max_y = machine->primary_screen->height();
+	int max_x = machine.primary_screen->width();
+	int max_y = machine.primary_screen->height();
 
 	rectangle spritetile_clip;
 	spritetile_clip.min_x = 0;
@@ -302,7 +302,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				{
 					bitmap_fill( state->tmpbitmap0, &spritetile_clip , 0);
 					bitmap_fill( state->tmpbitmap1, &spritetile_clip , 0);
-					drawgfxzoom_transpen(	state->tmpbitmap0,&spritetile_clip,machine->gfx[gfx],
+					drawgfxzoom_transpen(	state->tmpbitmap0,&spritetile_clip,machine.gfx[gfx],
 									code++,
 									color,
 									flipx, flipy,
@@ -364,7 +364,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 						break;
 
 					default:
-						drawgfxzoom_transpen(	bitmap,cliprect,machine->gfx[gfx],
+						drawgfxzoom_transpen(	bitmap,cliprect,machine.gfx[gfx],
 										code++,
 										color,
 										flipx, flipy,
@@ -380,14 +380,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 /* DaiDaiKakumei */
 /* layer : 0== bghigh<spr    1== bglow<spr<bghigh     2==spr<bglow    3==boarder */
-static void dai2kaku_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int layer)
+static void dai2kaku_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect, int layer)
 {
-	realbrk_state *state = machine->driver_data<realbrk_state>();
+	realbrk_state *state = machine.driver_data<realbrk_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
-	int max_x = machine->primary_screen->width();
-	int max_y = machine->primary_screen->height();
+	int max_x = machine.primary_screen->width();
+	int max_y = machine.primary_screen->height();
 
 	for ( offs = 0x3000/2; offs < 0x3600/2; offs += 2/2 )
 	{
@@ -446,7 +446,7 @@ static void dai2kaku_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 				int scalex = (sx + (x + 1) * xdim) / 0x10000 - currx;
 				int scaley = (sy + (y + 1) * ydim) / 0x10000 - curry;
 
-				drawgfxzoom_transpen(	bitmap,cliprect,machine->gfx[gfx],
+				drawgfxzoom_transpen(	bitmap,cliprect,machine.gfx[gfx],
 								code++,
 								color,
 								flipx, flipy,
@@ -487,7 +487,7 @@ static void dai2kaku_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 WRITE16_HANDLER( realbrk_vregs_w )
 {
-	realbrk_state *state = space->machine->driver_data<realbrk_state>();
+	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	UINT16 old_data = state->vregs[offset];
 	UINT16 new_data = COMBINE_DATA(&state->vregs[offset]);
 	if (new_data != old_data)
@@ -499,7 +499,7 @@ WRITE16_HANDLER( realbrk_vregs_w )
 
 SCREEN_UPDATE(realbrk)
 {
-	realbrk_state *state = screen->machine->driver_data<realbrk_state>();
+	realbrk_state *state = screen->machine().driver_data<realbrk_state>();
 	int layers_ctrl = -1;
 
 	tilemap_set_scrolly(state->tilemap_0, 0, state->vregs[0x0/2]);
@@ -509,20 +509,20 @@ SCREEN_UPDATE(realbrk)
 	tilemap_set_scrollx(state->tilemap_1, 0, state->vregs[0x6/2]);
 
 #ifdef MAME_DEBUG
-if ( input_code_pressed(screen->machine, KEYCODE_Z) )
+if ( input_code_pressed(screen->machine(), KEYCODE_Z) )
 {
 	int msk = 0;
-	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
-	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
-	if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 4;
-	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 8;
+	if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1;
+	if (input_code_pressed(screen->machine(), KEYCODE_W))	msk |= 2;
+	if (input_code_pressed(screen->machine(), KEYCODE_E))	msk |= 4;
+	if (input_code_pressed(screen->machine(), KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
 	if (state->disable_video)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 		return 0;
 	}
 	else
@@ -531,7 +531,7 @@ if ( input_code_pressed(screen->machine, KEYCODE_Z) )
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,state->tilemap_1,0,0);
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,state->tilemap_0,0,0);
 
-	if (layers_ctrl & 8)	draw_sprites(screen->machine,bitmap,cliprect);
+	if (layers_ctrl & 8)	draw_sprites(screen->machine(),bitmap,cliprect);
 
 	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,state->tilemap_2,0,0);
 
@@ -542,7 +542,7 @@ if ( input_code_pressed(screen->machine, KEYCODE_Z) )
 /* DaiDaiKakumei */
 SCREEN_UPDATE(dai2kaku)
 {
-	realbrk_state *state = screen->machine->driver_data<realbrk_state>();
+	realbrk_state *state = screen->machine().driver_data<realbrk_state>();
 	int layers_ctrl = -1;
 	int offs, bgx0, bgy0, bgx1, bgy1;
 
@@ -580,20 +580,20 @@ SCREEN_UPDATE(dai2kaku)
 	tilemap_set_scrolly( state->tilemap_1, 0, bgy1 );
 
 #ifdef MAME_DEBUG
-if ( input_code_pressed(screen->machine, KEYCODE_Z) )
+if ( input_code_pressed(screen->machine(), KEYCODE_Z) )
 {
 	int msk = 0;
-	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
-	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
-	if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 4;
-	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 8;
+	if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1;
+	if (input_code_pressed(screen->machine(), KEYCODE_W))	msk |= 2;
+	if (input_code_pressed(screen->machine(), KEYCODE_E))	msk |= 4;
+	if (input_code_pressed(screen->machine(), KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
 	if (state->disable_video)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 		return 0;
 	}
 	else
@@ -602,7 +602,7 @@ if ( input_code_pressed(screen->machine, KEYCODE_Z) )
 
 
 	// spr 0
-	if (layers_ctrl & 8)	dai2kaku_draw_sprites(screen->machine,bitmap,cliprect,2);
+	if (layers_ctrl & 8)	dai2kaku_draw_sprites(screen->machine(),bitmap,cliprect,2);
 
 	// bglow
 	if( state->vregs[8/2] & (0x8000)){
@@ -612,7 +612,7 @@ if ( input_code_pressed(screen->machine, KEYCODE_Z) )
 	}
 
 	// spr 1
-	if (layers_ctrl & 8)	dai2kaku_draw_sprites(screen->machine,bitmap,cliprect,1);
+	if (layers_ctrl & 8)	dai2kaku_draw_sprites(screen->machine(),bitmap,cliprect,1);
 
 	// bghigh
 	if( state->vregs[8/2] & (0x8000)){
@@ -622,7 +622,7 @@ if ( input_code_pressed(screen->machine, KEYCODE_Z) )
 	}
 
 	// spr 2
-	if (layers_ctrl & 8)	dai2kaku_draw_sprites(screen->machine,bitmap,cliprect,0);
+	if (layers_ctrl & 8)	dai2kaku_draw_sprites(screen->machine(),bitmap,cliprect,0);
 
 	// fix
 	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,state->tilemap_2,0,0);

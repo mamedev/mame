@@ -80,7 +80,7 @@ device_config *ttl7474_device_config::static_alloc_device_config(const machine_c
 
 device_t *ttl7474_device_config::alloc_device(running_machine &machine) const
 {
-    return auto_alloc(&machine, ttl7474_device(machine, *this));
+    return auto_alloc(machine, ttl7474_device(machine, *this));
 }
 
 

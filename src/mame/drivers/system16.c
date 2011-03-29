@@ -110,7 +110,7 @@ static INTERRUPT_GEN( sys16_interrupt )
 
 static WRITE16_HANDLER( sound_command_nmi_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -149,7 +149,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -160,16 +160,16 @@ static WRITE16_HANDLER( sound_command_w )
 
 static WRITE16_HANDLER( sys16_coinctrl_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		state->coinctrl = data & 0xff;
 		state->refreshenable = state->coinctrl & 0x20;
-		set_led_status(space->machine, 1, state->coinctrl & 0x08);
-		set_led_status(space->machine, 0, state->coinctrl & 0x04);
-		coin_counter_w(space->machine, 1, state->coinctrl & 0x02);
-		coin_counter_w(space->machine, 0, state->coinctrl & 0x01);
+		set_led_status(space->machine(), 1, state->coinctrl & 0x08);
+		set_led_status(space->machine(), 0, state->coinctrl & 0x04);
+		coin_counter_w(space->machine(), 1, state->coinctrl & 0x02);
+		coin_counter_w(space->machine(), 0, state->coinctrl & 0x01);
 		/* bit 6 is also used (1 most of the time; 0 in dduxbl, sdi, wb3;
            tturf has it normally 1 but 0 after coin insertion) */
 		/* eswat sets bit 4 */
@@ -206,57 +206,57 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( passht4b_service_r )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
-	UINT16 val = input_port_read(space->machine, "SERVICE");
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
+	UINT16 val = input_port_read(space->machine(), "SERVICE");
 
-	if(!(input_port_read(space->machine, "P1") & 0x40)) val &= 0xef;
-	if(!(input_port_read(space->machine, "P2") & 0x40)) val &= 0xdf;
-	if(!(input_port_read(space->machine, "P3") & 0x40)) val &= 0xbf;
-	if(!(input_port_read(space->machine, "P4") & 0x40)) val &= 0x7f;
+	if(!(input_port_read(space->machine(), "P1") & 0x40)) val &= 0xef;
+	if(!(input_port_read(space->machine(), "P2") & 0x40)) val &= 0xdf;
+	if(!(input_port_read(space->machine(), "P3") & 0x40)) val &= 0xbf;
+	if(!(input_port_read(space->machine(), "P4") & 0x40)) val &= 0x7f;
 
-	state->passht4b_io3_val = (input_port_read(space->machine, "P1") << 4) | (input_port_read(space->machine, "P3") & 0xf);
-	state->passht4b_io2_val = (input_port_read(space->machine, "P2") << 4) | (input_port_read(space->machine, "P4") & 0xf);
+	state->passht4b_io3_val = (input_port_read(space->machine(), "P1") << 4) | (input_port_read(space->machine(), "P3") & 0xf);
+	state->passht4b_io2_val = (input_port_read(space->machine(), "P2") << 4) | (input_port_read(space->machine(), "P4") & 0xf);
 
 	state->passht4b_io1_val = 0xff;
 
 	// player 1 buttons
-	if(!(input_port_read(space->machine, "P1") & 0x10)) state->passht4b_io1_val &= 0xfe;
-	if(!(input_port_read(space->machine, "P1") & 0x20)) state->passht4b_io1_val &= 0xfd;
-	if(!(input_port_read(space->machine, "P1") & 0x80)) state->passht4b_io1_val &= 0xfc;
+	if(!(input_port_read(space->machine(), "P1") & 0x10)) state->passht4b_io1_val &= 0xfe;
+	if(!(input_port_read(space->machine(), "P1") & 0x20)) state->passht4b_io1_val &= 0xfd;
+	if(!(input_port_read(space->machine(), "P1") & 0x80)) state->passht4b_io1_val &= 0xfc;
 
 	// player 2 buttons
-	if(!(input_port_read(space->machine, "P2") & 0x10)) state->passht4b_io1_val &= 0xfb;
-	if(!(input_port_read(space->machine, "P2") & 0x20)) state->passht4b_io1_val &= 0xf7;
-	if(!(input_port_read(space->machine, "P2") & 0x80)) state->passht4b_io1_val &= 0xf3;
+	if(!(input_port_read(space->machine(), "P2") & 0x10)) state->passht4b_io1_val &= 0xfb;
+	if(!(input_port_read(space->machine(), "P2") & 0x20)) state->passht4b_io1_val &= 0xf7;
+	if(!(input_port_read(space->machine(), "P2") & 0x80)) state->passht4b_io1_val &= 0xf3;
 
 	// player 3 buttons
-	if(!(input_port_read(space->machine, "P3") & 0x10)) state->passht4b_io1_val &= 0xef;
-	if(!(input_port_read(space->machine, "P3") & 0x20)) state->passht4b_io1_val &= 0xdf;
-	if(!(input_port_read(space->machine, "P3") & 0x80)) state->passht4b_io1_val &= 0xcf;
+	if(!(input_port_read(space->machine(), "P3") & 0x10)) state->passht4b_io1_val &= 0xef;
+	if(!(input_port_read(space->machine(), "P3") & 0x20)) state->passht4b_io1_val &= 0xdf;
+	if(!(input_port_read(space->machine(), "P3") & 0x80)) state->passht4b_io1_val &= 0xcf;
 
 	// player 4 buttons
-	if(!(input_port_read(space->machine, "P4") & 0x10)) state->passht4b_io1_val &= 0xbf;
-	if(!(input_port_read(space->machine, "P4") & 0x20)) state->passht4b_io1_val &= 0x7f;
-	if(!(input_port_read(space->machine, "P4") & 0x80)) state->passht4b_io1_val &= 0x3f;
+	if(!(input_port_read(space->machine(), "P4") & 0x10)) state->passht4b_io1_val &= 0xbf;
+	if(!(input_port_read(space->machine(), "P4") & 0x20)) state->passht4b_io1_val &= 0x7f;
+	if(!(input_port_read(space->machine(), "P4") & 0x80)) state->passht4b_io1_val &= 0x3f;
 
 	return val;
 }
 
 static READ16_HANDLER( passht4b_io1_r )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	return state->passht4b_io1_val;
 }
 
 static READ16_HANDLER( passht4b_io2_r )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	return state->passht4b_io2_val;
 }
 
 static READ16_HANDLER( passht4b_io3_r )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	return state->passht4b_io3_val;
 }
 
@@ -293,7 +293,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( sys16_tilebank_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -366,13 +366,13 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tturfbl_msm5205_data_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	state->sample_buffer = data;
 }
 
 static void tturfbl_msm5205_callback( device_t *device )
 {
-	segas1x_bootleg_state *state = device->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = device->machine().driver_data<segas1x_bootleg_state>();
 	msm5205_data_w(device, (state->sample_buffer >> 4) & 0x0f);
 
 	state->sample_buffer <<=  4;
@@ -390,7 +390,7 @@ static const msm5205_interface tturfbl_msm5205_interface  =
 
 static READ8_HANDLER( tturfbl_soundbank_r )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	if (state->soundbank_ptr)
 		return state->soundbank_ptr[offset & 0x3fff];
@@ -399,8 +399,8 @@ static READ8_HANDLER( tturfbl_soundbank_r )
 
 static WRITE8_HANDLER( tturfbl_soundbank_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
-	UINT8 *mem = space->machine->region("soundcpu")->base();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
+	UINT8 *mem = space->machine().region("soundcpu")->base();
 
 	switch(data)
 	{
@@ -471,11 +471,11 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( upd7759_bank_w ) //*
 {
-	int offs, size = device->machine->region("soundcpu")->bytes() - 0x10000;
+	int offs, size = device->machine().region("soundcpu")->bytes() - 0x10000;
 
 	upd7759_reset_w(device, data & 0x40);
 	offs = 0x10000 + (data * 0x4000) % size;
-	memory_set_bankptr(device->machine, "bank1", device->machine->region("soundcpu")->base() + offs);
+	memory_set_bankptr(device->machine(), "bank1", device->machine().region("soundcpu")->base() + offs);
 }
 
 
@@ -490,25 +490,25 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static void set_tile_bank( running_machine *machine, int data )
+static void set_tile_bank( running_machine &machine, int data )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	state->tile_bank0 = (data >> 4) & 0x0f;
 	state->tile_bank1 = data & 0x0f;
 }
 
-static void set_fg_page( running_machine *machine, int data )
+static void set_fg_page( running_machine &machine, int data )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	state->fg_page[0] = data >> 12;
 	state->fg_page[1] = (data >> 8) & 0x0f;
 	state->fg_page[2] = (data >> 4) & 0x0f;
 	state->fg_page[3] = data & 0x0f;
 }
 
-static void set_bg_page( running_machine *machine, int data )
+static void set_bg_page( running_machine &machine, int data )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	state->bg_page[0] = data >> 12;
 	state->bg_page[1] = (data >> 8) & 0x0f;
 	state->bg_page[2] = (data >> 4) & 0x0f;
@@ -551,22 +551,22 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( s16bl_bgpage_w )
 {
-	set_bg_page(space->machine, data);
+	set_bg_page(space->machine(), data);
 }
 
 static WRITE16_HANDLER( s16bl_fgpage_w )
 {
-	set_fg_page(space->machine, data);
+	set_fg_page(space->machine(), data);
 }
 
 static WRITE16_HANDLER( s16bl_fgscrollx_bank_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	int scroll = data & 0x1ff;
 	int bank = (data & 0xc000) >> 14;
 
 	scroll += 0x200;
-	set_tile_bank(space->machine, bank);
+	set_tile_bank(space->machine(), bank);
 
 	scroll += 3; // so that the character portraits in attract mode are properly aligned (alighnment on character select no longer matches original tho?)
 	state->fg_scrollx = -scroll;
@@ -574,7 +574,7 @@ static WRITE16_HANDLER( s16bl_fgscrollx_bank_w )
 
 static WRITE16_HANDLER( s16bl_fgscrollx_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	int scroll = data & 0x1ff;
 
 	scroll += 0x200;
@@ -586,7 +586,7 @@ static WRITE16_HANDLER( s16bl_fgscrollx_w )
 
 static WRITE16_HANDLER( s16bl_fgscrolly_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	int scroll = data & 0xff;
 
 	state->fg_scrolly = scroll;
@@ -594,7 +594,7 @@ static WRITE16_HANDLER( s16bl_fgscrolly_w )
 
 static WRITE16_HANDLER( s16bl_bgscrollx_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	int scroll = data & 0x1ff;
 
 	scroll+= 0x200;
@@ -604,7 +604,7 @@ static WRITE16_HANDLER( s16bl_bgscrollx_w )
 
 static WRITE16_HANDLER( s16bl_bgscrolly_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	int scroll = data & 0xff;
 
 	state->bg_scrolly = scroll;
@@ -656,9 +656,9 @@ static ADDRESS_MAP_START( bayrouteb1_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x902002, 0x902003) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
 
-static void datsu_set_pages( running_machine *machine )
+static void datsu_set_pages( running_machine &machine )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	UINT16 page;
 
 	page = ((state->datsu_page[0] & 0x00f0) >>0) |
@@ -679,34 +679,34 @@ static void datsu_set_pages( running_machine *machine )
 
 static WRITE16_HANDLER( datsu_page0_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	COMBINE_DATA(&state->datsu_page[0]);
-	datsu_set_pages(space->machine);
+	datsu_set_pages(space->machine());
 }
 
 static WRITE16_HANDLER( datsu_page1_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	COMBINE_DATA(&state->datsu_page[1]);
-	datsu_set_pages(space->machine);
+	datsu_set_pages(space->machine());
 }
 
 static WRITE16_HANDLER( datsu_page2_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	COMBINE_DATA(&state->datsu_page[2]);
-	datsu_set_pages(space->machine);
+	datsu_set_pages(space->machine());
 }
 
 static WRITE16_HANDLER( datsu_page3_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	COMBINE_DATA(&state->datsu_page[3]);
-	datsu_set_pages(space->machine);
+	datsu_set_pages(space->machine());
 }
 
 static ADDRESS_MAP_START( bayrouteb2_map, AS_PROGRAM, 16 )
@@ -762,11 +762,11 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( goldnaxeb2_fgscrollx_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	int scroll = data & 0x1ff;
 	int bank = (data & 0xc000) >> 14;
 
-	set_tile_bank(space->machine,  bank);
+	set_tile_bank(space->machine(),  bank);
 	scroll += 0x1f6;
 	scroll &= 0x3ff;
 	state->fg_scrollx = -scroll;
@@ -774,7 +774,7 @@ static WRITE16_HANDLER( goldnaxeb2_fgscrollx_w )
 
 static WRITE16_HANDLER( goldnaxeb2_bgscrollx_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	int scroll = data & 0x1ff;
 
 	scroll += 0x1f4;
@@ -785,7 +785,7 @@ static WRITE16_HANDLER( goldnaxeb2_bgscrollx_w )
 
 static WRITE16_HANDLER( goldnaxeb2_fgscrolly_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	int scroll = data & 0xff;
 
 	scroll += 0x1;
@@ -794,7 +794,7 @@ static WRITE16_HANDLER( goldnaxeb2_fgscrolly_w )
 
 static WRITE16_HANDLER( goldnaxeb2_bgscrolly_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	int scroll = data & 0xff;
 
 	scroll += 0x1;
@@ -803,7 +803,7 @@ static WRITE16_HANDLER( goldnaxeb2_bgscrolly_w )
 
 static WRITE16_HANDLER( goldnaxeb2_fgpage_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	UINT16 page;
 
 	COMBINE_DATA(&state->goldnaxeb2_fgpage[offset]);
@@ -813,13 +813,13 @@ static WRITE16_HANDLER( goldnaxeb2_fgpage_w )
 		   ((state->goldnaxeb2_fgpage[3] & 0xf) << 8) |
 		   ((state->goldnaxeb2_fgpage[2] & 0xf) << 12);
 
-	set_fg_page(space->machine, page ^ 0xffff);
+	set_fg_page(space->machine(), page ^ 0xffff);
 
 }
 
 static WRITE16_HANDLER( goldnaxeb2_bgpage_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	UINT16 page;
 
 	COMBINE_DATA(&state->goldnaxeb2_bgpage[offset]);
@@ -829,7 +829,7 @@ static WRITE16_HANDLER( goldnaxeb2_bgpage_w )
 		   ((state->goldnaxeb2_bgpage[3] & 0xf) << 8) |
 		   ((state->goldnaxeb2_bgpage[2] & 0xf) << 12);
 
-	set_bg_page(space->machine, page ^ 0xffff);
+	set_bg_page(space->machine(), page ^ 0xffff);
 }
 
 static ADDRESS_MAP_START( goldnaxeb2_map, AS_PROGRAM, 16 )
@@ -893,7 +893,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( eswat_tilebank0_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -959,7 +959,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( beautyb_unkx_r )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	state->beautyb_unkx++;
 	state->beautyb_unkx &= 0x7f;
@@ -1029,7 +1029,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( sys18_refreshenable_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1039,7 +1039,7 @@ static WRITE16_HANDLER( sys18_refreshenable_w )
 
 static WRITE16_HANDLER( sys18_tilebank_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1050,7 +1050,7 @@ static WRITE16_HANDLER( sys18_tilebank_w )
 
 static READ8_HANDLER( system18_bank_r )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	if (state->sound_bank != NULL)
 		return state->sound_bank[offset];
@@ -1070,8 +1070,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sys18_soundbank_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
-	UINT8 *mem = space->machine->region("soundcpu")->base();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
+	UINT8 *mem = space->machine().region("soundcpu")->base();
 	int rom = (data >> 6) & 3;
 	int bank = (data & 0x3f);
 	int mask = state->sound_info[rom * 2 + 0];
@@ -1136,7 +1136,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( sound_command_irq_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1206,13 +1206,13 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( shdancbl_msm5205_data_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	state->sample_buffer = data;
 }
 
 static void shdancbl_msm5205_callback(device_t *device)
 {
-	segas1x_bootleg_state *state = device->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = device->machine().driver_data<segas1x_bootleg_state>();
 	msm5205_data_w(device, state->sample_buffer & 0x0f);
 
 	state->sample_buffer >>=  4;
@@ -1229,7 +1229,7 @@ static const msm5205_interface shdancbl_msm5205_interface  =
 
 static READ8_HANDLER( shdancbl_soundbank_r )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	if (state->soundbank_ptr)
 		return state->soundbank_ptr[offset & 0x3fff];
@@ -1238,8 +1238,8 @@ static READ8_HANDLER( shdancbl_soundbank_r )
 
 static WRITE8_HANDLER( shdancbl_bankctrl_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
-	UINT8 *mem = space->machine->region("soundcpu")->base();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
+	UINT8 *mem = space->machine().region("soundcpu")->base();
 
 	switch (data)
 	{
@@ -2081,7 +2081,7 @@ MACHINE_CONFIG_END
 
 static void sound_cause_nmi( device_t *device, int chip )
 {
-	segas1x_bootleg_state *state = device->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = device->machine().driver_data<segas1x_bootleg_state>();
 
 	/* upd7759 callback */
 	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -3327,7 +3327,7 @@ ROM_END
 
 static DRIVER_INIT( common )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	state->bg1_trans = 0;
 	state->splittab_bg_x = 0;
@@ -3347,14 +3347,14 @@ static DRIVER_INIT( common )
 
 	state->beautyb_unkx = 0;
 
-	state->maincpu = machine->device("maincpu");
-	state->soundcpu = machine->device("soundcpu");
+	state->maincpu = machine.device("maincpu");
+	state->soundcpu = machine.device("soundcpu");
 }
 
 /* Sys16A */
 static DRIVER_INIT( shinobl )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	DRIVER_INIT_CALL(common);
 
@@ -3363,7 +3363,7 @@ static DRIVER_INIT( shinobl )
 
 static DRIVER_INIT( passsht )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	DRIVER_INIT_CALL(common);
 
@@ -3373,7 +3373,7 @@ static DRIVER_INIT( passsht )
 
 static DRIVER_INIT( wb3bbl )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	DRIVER_INIT_CALL(common);
 
@@ -3386,11 +3386,11 @@ static DRIVER_INIT( wb3bbl )
 /* Sys16B */
 static DRIVER_INIT( goldnaxeb1 )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	int i;
-	UINT8 *ROM = machine->region("maincpu")->base();
-	UINT8 *KEY = machine->region("decryption")->base();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *KEY = machine.region("decryption")->base();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 data[0x1000];
 
 	// the decryption key is in a rom (part of an MSDOS executable...)
@@ -3425,14 +3425,14 @@ static DRIVER_INIT( bayrouteb1 )
 	//
 	// for now we use the code which is present in the unprotected bootleg set
 	// and modify the rom to use it
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	UINT16 *ROM2;
 	UINT16 *decrypted_region2;
 
 	// decrypt
 	DRIVER_INIT_CALL( goldnaxeb1 );
 
-	ROM2 = (UINT16*)machine->region("maincpu")->base();
+	ROM2 = (UINT16*)machine.region("maincpu")->base();
 	decrypted_region2 = (UINT16*)state->decrypted_region;
 
 	// patch interrupt vector
@@ -3447,7 +3447,7 @@ static DRIVER_INIT( bayrouteb1 )
 
 static DRIVER_INIT( bayrouteb2 )
 {
-	UINT8 *mem = machine->region("soundcpu")->base();
+	UINT8 *mem = machine.region("soundcpu")->base();
 
 	memcpy(mem, mem + 0x10000, 0x8000);
 
@@ -3456,7 +3456,7 @@ static DRIVER_INIT( bayrouteb2 )
 
 static DRIVER_INIT( goldnaxeb2 )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	DRIVER_INIT_CALL(common);
 
@@ -3465,7 +3465,7 @@ static DRIVER_INIT( goldnaxeb2 )
 
 static DRIVER_INIT( tturfbl )
 {
-	UINT8 *mem = machine->region("soundcpu")->base();
+	UINT8 *mem = machine.region("soundcpu")->base();
 
 	memcpy(mem, mem + 0x10000, 0x8000);
 
@@ -3479,7 +3479,7 @@ static DRIVER_INIT( dduxbl )
 
 static DRIVER_INIT( eswatbl )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	DRIVER_INIT_CALL(common);
 	//state->splittab_fg_x = &sys16_textram[0x0f80];
@@ -3489,7 +3489,7 @@ static DRIVER_INIT( eswatbl )
 
 static DRIVER_INIT( fpointbl )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	DRIVER_INIT_CALL(common);
 	//sys16_video_config(fpoint_update_proc, -0xb8, NULL);
@@ -3501,7 +3501,7 @@ static DRIVER_INIT( fpointbl )
 /* Tetris-based */
 static DRIVER_INIT( beautyb )
 {
-	UINT16*rom = (UINT16*)machine->region( "maincpu" )->base();
+	UINT16*rom = (UINT16*)machine.region( "maincpu" )->base();
 	int x;
 
 	for (x = 0; x < 0x8000; x++)
@@ -3519,8 +3519,8 @@ static DRIVER_INIT( beautyb )
 /* Sys18 */
 static DRIVER_INIT( shdancbl )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
-	UINT8 *mem = machine->region("soundcpu")->base();;
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
+	UINT8 *mem = machine.region("soundcpu")->base();;
 
 	/* Copy first 32K of IC45 to Z80 address space */
 	memcpy(mem, mem + 0x10000, 0x8000);
@@ -3534,8 +3534,8 @@ static DRIVER_INIT( shdancbl )
 
 static DRIVER_INIT( mwalkbl )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
-	UINT8 *RAM =  machine->region("soundcpu")->base();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
+	UINT8 *RAM =  machine.region("soundcpu")->base();
 	static const int mwalk_sound_info[]  =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K
@@ -3556,8 +3556,8 @@ static DRIVER_INIT( mwalkbl )
 
 static DRIVER_INIT( astormbl )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
-	UINT8 *RAM =  machine->region("soundcpu")->base();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
+	UINT8 *RAM =  machine.region("soundcpu")->base();
 	static const int astormbl_sound_info[]  =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K

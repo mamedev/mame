@@ -176,22 +176,22 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 static WRITE16_HANDLER( io_w )
 {
-	armedf_state *state = space->machine->driver_data<armedf_state>();
+	armedf_state *state = space->machine().driver_data<armedf_state>();
 
 	COMBINE_DATA(&state->vreg);
 	/* bits 0 and 1 of armedf_vreg are coin counters */
 	/* bit 12 seems to handle screen flipping */
-	flip_screen_set(space->machine, state->vreg & 0x1000);
+	flip_screen_set(space->machine(), state->vreg & 0x1000);
 }
 
 static WRITE16_HANDLER( terraf_io_w )
 {
-	armedf_state *state = space->machine->driver_data<armedf_state>();
+	armedf_state *state = space->machine().driver_data<armedf_state>();
 
 	COMBINE_DATA(&state->vreg);
 	/* bits 0 and 1 of armedf_vreg are coin counters */
 	/* bit 12 seems to handle screen flipping */
-	flip_screen_set(space->machine, state->vreg & 0x1000);
+	flip_screen_set(space->machine(), state->vreg & 0x1000);
 
 	if ((state->vreg & 0x4000) && !(state->vreg & 0x0100))
 	{
@@ -209,12 +209,12 @@ static WRITE16_HANDLER( terraf_io_w )
 
 static WRITE16_HANDLER( kodure_io_w )
 {
-	armedf_state *state = space->machine->driver_data<armedf_state>();
+	armedf_state *state = space->machine().driver_data<armedf_state>();
 
 	COMBINE_DATA(&state->vreg);
 	/* bits 0 and 1 of armedf_vreg are coin counters */
 	/* bit 12 seems to handle screen flipping */
-	flip_screen_set(space->machine, state->vreg & 0x1000);
+	flip_screen_set(space->machine(), state->vreg & 0x1000);
 
 	/* This is a temporary condition specification. */
 	if (!(state->vreg & 0x0080))
@@ -242,7 +242,7 @@ static READ8_HANDLER( soundlatch_clear_r )
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( legion_command_c )
 {
-	armedf_state *state = space->machine->driver_data<armedf_state>();
+	armedf_state *state = space->machine().driver_data<armedf_state>();
 
 	COMBINE_DATA(&state->legion_cmd[offset]);
 	//logerror("Legion CMD %04x=%04x", offset, data);
@@ -761,7 +761,7 @@ GFXDECODE_END
 
 static MACHINE_START( armedf )
 {
-	armedf_state *state = machine->driver_data<armedf_state>();
+	armedf_state *state = machine.driver_data<armedf_state>();
 
 	state->save_item(NAME(state->mcu_mode));
 	state->save_item(NAME(state->old_mcu_mode));
@@ -776,7 +776,7 @@ static MACHINE_START( armedf )
 
 static MACHINE_RESET( armedf )
 {
-	armedf_state *state = machine->driver_data<armedf_state>();
+	armedf_state *state = machine.driver_data<armedf_state>();
 
 	state->mcu_mode = 0;
 	state->old_mcu_mode = 0;
@@ -1508,36 +1508,36 @@ ROM_END
 
 static DRIVER_INIT( terraf )
 {
-	armedf_state *state = machine->driver_data<armedf_state>();
+	armedf_state *state = machine.driver_data<armedf_state>();
 	state->scroll_type = 0;
 }
 
 static DRIVER_INIT( terrafu )
 {
-	armedf_state *state = machine->driver_data<armedf_state>();
+	armedf_state *state = machine.driver_data<armedf_state>();
 	state->scroll_type = 5;
 }
 
 static DRIVER_INIT( armedf )
 {
-	armedf_state *state = machine->driver_data<armedf_state>();
+	armedf_state *state = machine.driver_data<armedf_state>();
 	state->scroll_type = 1;
 }
 
 
 static DRIVER_INIT( kodure )
 {
-	armedf_state *state = machine->driver_data<armedf_state>();
+	armedf_state *state = machine.driver_data<armedf_state>();
 	state->scroll_type = 2;
 }
 
 static DRIVER_INIT( legion )
 {
-	armedf_state *state = machine->driver_data<armedf_state>();
+	armedf_state *state = machine.driver_data<armedf_state>();
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
          of 3 of the "Unused" Dip Switches (see notes above). */
-	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
 	RAM[0x0001d6 / 2] = 0x0001;
 	/* To avoid checksum error */
 	RAM[0x000488 / 2] = 0x4e71;
@@ -1548,11 +1548,11 @@ static DRIVER_INIT( legion )
 
 static DRIVER_INIT( legiono )
 {
-	armedf_state *state = machine->driver_data<armedf_state>();
+	armedf_state *state = machine.driver_data<armedf_state>();
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
          of 3 of the "Unused" Dip Switches (see notes above). */
-	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
 	RAM[0x0001d6/2] = 0x0001;
 	/* No need to patch the checksum routine (see notes) ! */
 #endif
@@ -1562,7 +1562,7 @@ static DRIVER_INIT( legiono )
 
 static DRIVER_INIT( cclimbr2 )
 {
-	armedf_state *state = machine->driver_data<armedf_state>();
+	armedf_state *state = machine.driver_data<armedf_state>();
 	state->scroll_type = 4;
 }
 

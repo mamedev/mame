@@ -19,12 +19,12 @@ typedef enum
 	AT_KEYBOARD_TYPE_MF2
 } AT_KEYBOARD_TYPE;
 
-void at_keyboard_init(running_machine *machine, AT_KEYBOARD_TYPE type);
+void at_keyboard_init(running_machine &machine, AT_KEYBOARD_TYPE type);
 
 void at_keyboard_polling(void);
 int at_keyboard_read(void);
-void at_keyboard_write(running_machine *machine, UINT8 data);
-void at_keyboard_reset(running_machine *machine);
+void at_keyboard_write(running_machine &machine, UINT8 data);
+void at_keyboard_reset(running_machine &machine);
 void at_keyboard_set_scan_code_set(int set);
 
 INPUT_PORTS_EXTERN( pc_keyboard );

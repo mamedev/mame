@@ -6,7 +6,7 @@
 
 WRITE8_HANDLER( playch10_videoram_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	UINT8 *videoram = state->videoram;
 	if (state->pc10_sdcs)
 	{
@@ -59,8 +59,8 @@ PALETTE_INIT( playch10 )
 
 static void ppu_irq( device_t *device, int *ppu_regs )
 {
-	playch10_state *state = device->machine->driver_data<playch10_state>();
-	cputag_set_input_line(device->machine, "cart", INPUT_LINE_NMI, PULSE_LINE );
+	playch10_state *state = device->machine().driver_data<playch10_state>();
+	cputag_set_input_line(device->machine(), "cart", INPUT_LINE_NMI, PULSE_LINE );
 	state->pc10_int_detect = 1;
 }
 
@@ -86,7 +86,7 @@ const ppu2c0x_interface playch10_ppu_interface_hboard =
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
+	playch10_state *state = machine.driver_data<playch10_state>();
 	UINT8 *videoram = state->videoram;
 	int offs = tile_index * 2;
 	int code = videoram[offs] + ((videoram[offs + 1] & 0x07) << 8);
@@ -97,8 +97,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( playch10 )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
-	const UINT8 *bios = machine->region("maincpu")->base();
+	playch10_state *state = machine.driver_data<playch10_state>();
+	const UINT8 *bios = machine.region("maincpu")->base();
 	state->pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
@@ -107,8 +107,8 @@ VIDEO_START( playch10 )
 
 VIDEO_START( playch10_hboard )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
-	const UINT8 *bios = machine->region("maincpu")->base();
+	playch10_state *state = machine.driver_data<playch10_state>();
+	const UINT8 *bios = machine.region("maincpu")->base();
 	state->pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
@@ -123,13 +123,13 @@ VIDEO_START( playch10_hboard )
 
 SCREEN_UPDATE( playch10 )
 {
-	playch10_state *state = screen->machine->driver_data<playch10_state>();
-	device_t *ppu = screen->machine->device("ppu");
+	playch10_state *state = screen->machine().driver_data<playch10_state>();
+	device_t *ppu = screen->machine().device("ppu");
 
 	/* Dual monitor version */
 	if (state->pc10_bios == 1)
 	{
-		device_t *top_screen = screen->machine->device("top");
+		device_t *top_screen = screen->machine().device("top");
 
 		/* On Playchoice 10 single monitor, this bit toggles    */
 		/* between PPU and BIOS display.                        */

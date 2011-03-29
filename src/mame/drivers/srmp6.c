@@ -106,18 +106,18 @@ static const gfx_layout tiles8x8_layout =
 	8*64
 };
 
-static void update_palette(running_machine *machine)
+static void update_palette(running_machine &machine)
 {
-	srmp6_state *state = machine->driver_data<srmp6_state>();
+	srmp6_state *state = machine.driver_data<srmp6_state>();
 	INT8 r, g ,b;
 	int brg = state->brightness - 0x60;
 	int i;
 
 	for(i = 0; i < 0x800; i++)
 	{
-		r = machine->generic.paletteram.u16[i] >>  0 & 0x1F;
-		g = machine->generic.paletteram.u16[i] >>  5 & 0x1F;
-		b = machine->generic.paletteram.u16[i] >> 10 & 0x1F;
+		r = machine.generic.paletteram.u16[i] >>  0 & 0x1F;
+		g = machine.generic.paletteram.u16[i] >>  5 & 0x1F;
+		b = machine.generic.paletteram.u16[i] >> 10 & 0x1F;
 
 		if(brg < 0) {
 			r += (r * brg) >> 5;
@@ -141,15 +141,15 @@ static void update_palette(running_machine *machine)
 
 static VIDEO_START(srmp6)
 {
-	srmp6_state *state = machine->driver_data<srmp6_state>();
+	srmp6_state *state = machine.driver_data<srmp6_state>();
 
 	state->tileram = auto_alloc_array_clear(machine, UINT16, 0x100000*16/2);
 	state->dmaram = auto_alloc_array(machine, UINT16, 0x100/2);
 	state->sprram_old = auto_alloc_array_clear(machine, UINT16, 0x80000/2);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[0] = gfx_element_alloc(machine, &tiles8x8_layout, (UINT8*)state->tileram, machine->total_colors() / 256, 0);
-	machine->gfx[0]->color_granularity=256;
+	machine.gfx[0] = gfx_element_alloc(machine, &tiles8x8_layout, (UINT8*)state->tileram, machine.total_colors() / 256, 0);
+	machine.gfx[0]->color_granularity=256;
 
 	state->brightness = 0x60;
 }
@@ -160,7 +160,7 @@ static int xixi=0;
 
 static SCREEN_UPDATE(srmp6)
 {
-	srmp6_state *state = screen->machine->driver_data<srmp6_state>();
+	srmp6_state *state = screen->machine().driver_data<srmp6_state>();
 	int alpha;
 	int x,y,tileno,height,width,xw,yw,sprite,xb,yb;
 	UINT16 *sprite_list = state->sprram_old;
@@ -176,13 +176,13 @@ static SCREEN_UPDATE(srmp6)
 
 #if 0
 	/* debug */
-	if(input_code_pressed_once(screen->machine, KEYCODE_Q))
+	if(input_code_pressed_once(screen->machine(), KEYCODE_Q))
 	{
 		++xixi;
 		printf("%x\n",xixi);
 	}
 
-	if(input_code_pressed_once(screen->machine, KEYCODE_W))
+	if(input_code_pressed_once(screen->machine(), KEYCODE_W))
 	{
 		--xixi;
 		printf("%x\n",xixi);
@@ -259,7 +259,7 @@ static SCREEN_UPDATE(srmp6)
 						else
 							yb=y+(height-yw-1)*8+global_y;
 
-						drawgfx_alpha(bitmap,cliprect,screen->machine->gfx[0],tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
+						drawgfx_alpha(bitmap,cliprect,screen->machine().gfx[0],tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
 						tileno++;
 					}
 				}
@@ -273,7 +273,7 @@ static SCREEN_UPDATE(srmp6)
 
 	memcpy(state->sprram_old, state->sprram, 0x80000);
 
-	if(input_code_pressed_once(screen->machine, KEYCODE_Q))
+	if(input_code_pressed_once(screen->machine(), KEYCODE_Q))
 	{
 		FILE *p=fopen("tileram.bin","wb");
 		fwrite(state->tileram, 1, 0x100000*16, p);
@@ -290,24 +290,24 @@ static SCREEN_UPDATE(srmp6)
 
 static WRITE16_HANDLER( srmp6_input_select_w )
 {
-	srmp6_state *state = space->machine->driver_data<srmp6_state>();
+	srmp6_state *state = space->machine().driver_data<srmp6_state>();
 
 	state->input_select = data & 0x0f;
 }
 
 static READ16_HANDLER( srmp6_inputs_r )
 {
-	srmp6_state *state = space->machine->driver_data<srmp6_state>();
+	srmp6_state *state = space->machine().driver_data<srmp6_state>();
 
 	if (offset == 0)			// DSW
-		return input_port_read(space->machine, "DSW");
+		return input_port_read(space->machine(), "DSW");
 
 	switch (state->input_select)	// inputs
 	{
-		case 1<<0: return input_port_read(space->machine, "KEY0");
-		case 1<<1: return input_port_read(space->machine, "KEY1");
-		case 1<<2: return input_port_read(space->machine, "KEY2");
-		case 1<<3: return input_port_read(space->machine, "KEY3");
+		case 1<<0: return input_port_read(space->machine(), "KEY0");
+		case 1<<1: return input_port_read(space->machine(), "KEY1");
+		case 1<<2: return input_port_read(space->machine(), "KEY2");
+		case 1<<3: return input_port_read(space->machine(), "KEY3");
 	}
 
 	return 0;
@@ -316,16 +316,16 @@ static READ16_HANDLER( srmp6_inputs_r )
 
 static WRITE16_HANDLER( video_regs_w )
 {
-	srmp6_state *state = space->machine->driver_data<srmp6_state>();
+	srmp6_state *state = space->machine().driver_data<srmp6_state>();
 
 	switch(offset)
 	{
 
 		case 0x5e/2: // bank switch, used by ROM check
 		{
-			const UINT8 *rom = space->machine->region("nile")->base();
+			const UINT8 *rom = space->machine().region("nile")->base();
 			LOG(("%x\n",data));
-			memory_set_bankptr(space->machine, "bank1",(UINT16 *)(rom + (data & 0x0f)*0x200000));
+			memory_set_bankptr(space->machine(), "bank1",(UINT16 *)(rom + (data & 0x0f)*0x200000));
 			break;
 		}
 
@@ -335,7 +335,7 @@ static WRITE16_HANDLER( video_regs_w )
 			data = (!data)?0x60:(data == 0x5e)?0x60:data;
 			if (state->brightness != data) {
 				state->brightness = data;
-				update_palette(space->machine);
+				update_palette(space->machine());
 			}
 			break;
 
@@ -358,7 +358,7 @@ static WRITE16_HANDLER( video_regs_w )
 
 static READ16_HANDLER( video_regs_r )
 {
-	srmp6_state *state = space->machine->driver_data<srmp6_state>();
+	srmp6_state *state = space->machine().driver_data<srmp6_state>();
 
 	logerror("video_regs_r (PC=%06X): %04x\n", cpu_get_previouspc(space->cpu), offset*2);
 	return state->video_regs[offset];
@@ -366,9 +366,9 @@ static READ16_HANDLER( video_regs_r )
 
 
 /* DMA RLE stuff - the same as CPS3 */
-static UINT32 process(running_machine *machine,UINT8 b,UINT32 dst_offset)
+static UINT32 process(running_machine &machine,UINT8 b,UINT32 dst_offset)
 {
-	srmp6_state *state = machine->driver_data<srmp6_state>();
+	srmp6_state *state = machine.driver_data<srmp6_state>();
 	int l=0;
 
 	UINT8 *tram=(UINT8*)state->tileram;
@@ -381,7 +381,7 @@ static UINT32 process(running_machine *machine,UINT8 b,UINT32 dst_offset)
 		for(i=0;i<rle;++i)
 		{
 			tram[dst_offset + state->destl] = state->lastb;
-			gfx_element_mark_dirty(machine->gfx[0], (dst_offset + state->destl)/0x40);
+			gfx_element_mark_dirty(machine.gfx[0], (dst_offset + state->destl)/0x40);
 
 			dst_offset++;
 			++l;
@@ -395,7 +395,7 @@ static UINT32 process(running_machine *machine,UINT8 b,UINT32 dst_offset)
 		state->lastb2 = state->lastb;
 		state->lastb = b;
 		tram[dst_offset + state->destl] = b;
-		gfx_element_mark_dirty(machine->gfx[0], (dst_offset + state->destl)/0x40);
+		gfx_element_mark_dirty(machine.gfx[0], (dst_offset + state->destl)/0x40);
 
 		return 1;
 	}
@@ -404,13 +404,13 @@ static UINT32 process(running_machine *machine,UINT8 b,UINT32 dst_offset)
 
 static WRITE16_HANDLER(srmp6_dma_w)
 {
-	srmp6_state *state = space->machine->driver_data<srmp6_state>();
+	srmp6_state *state = space->machine().driver_data<srmp6_state>();
 	UINT16* dmaram = state->dmaram;
 
 	COMBINE_DATA(&dmaram[offset]);
 	if (offset==13 && dmaram[offset]==0x40)
 	{
-		const UINT8 *rom = space->machine->region("nile")->base();
+		const UINT8 *rom = space->machine().region("nile")->base();
 		UINT32 srctab=2*((((UINT32)dmaram[5])<<16)|dmaram[4]);
 		UINT32 srcdata=2*((((UINT32)dmaram[11])<<16)|dmaram[10]);
 		UINT32 len=4*(((((UINT32)dmaram[7]&3)<<16)|dmaram[6])+1); //??? WRONG!
@@ -452,13 +452,13 @@ static WRITE16_HANDLER(srmp6_dma_w)
 				{
 					UINT8 real_byte;
 					real_byte = rom[srctab+p*2];
-					tempidx+=process(space->machine,real_byte,tempidx);
+					tempidx+=process(space->machine(),real_byte,tempidx);
 					real_byte = rom[srctab+p*2+1];//px[DMA_XOR((current_table_address+p*2+1))];
-					tempidx+=process(space->machine,real_byte,tempidx);
+					tempidx+=process(space->machine(),real_byte,tempidx);
 				}
 				else
 				{
-					tempidx+=process(space->machine,p,tempidx);
+					tempidx+=process(space->machine(),p,tempidx);
 				}
 
 				ctrl<<=1;
@@ -497,7 +497,7 @@ static WRITE16_HANDLER(tileram_w)
 
 static WRITE16_HANDLER(paletteram_w)
 {
-	srmp6_state *state = space->machine->driver_data<srmp6_state>();
+	srmp6_state *state = space->machine().driver_data<srmp6_state>();
 	INT8 r, g, b;
 	int brg = state->brightness - 0x60;
 
@@ -526,7 +526,7 @@ static WRITE16_HANDLER(paletteram_w)
 			if(b > 0x1F) b = 0x1F;
 		}
 
-		palette_set_color(space->machine, offset, MAKE_RGB(r << 3, g << 3, b << 3));
+		palette_set_color(space->machine(), offset, MAKE_RGB(r << 3, g << 3, b << 3));
 	}
 }
 

@@ -116,9 +116,9 @@ public:
 
 
 /* call with tilesize = 0 for 8x8 or 1 for 16x16 */
-INLINE void get_rabbit_tilemap_info(running_machine *machine, tile_data *tileinfo, int tile_index, int whichtilemap, int tilesize)
+INLINE void get_rabbit_tilemap_info(running_machine &machine, tile_data *tileinfo, int tile_index, int whichtilemap, int tilesize)
 {
-	rabbit_state *state = machine->driver_data<rabbit_state>();
+	rabbit_state *state = machine.driver_data<rabbit_state>();
 	int tileno,colour,flipxy, depth;
 	int bank;
 	depth = (state->tilemap_ram[whichtilemap][tile_index]&0x10000000)>>28;
@@ -185,21 +185,21 @@ static TILE_GET_INFO( get_rabbit_tilemap3_tile_info )
 
 static WRITE32_HANDLER( rabbit_tilemap0_w )
 {
-	rabbit_state *state = space->machine->driver_data<rabbit_state>();
+	rabbit_state *state = space->machine().driver_data<rabbit_state>();
 	COMBINE_DATA(&state->tilemap_ram[0][offset]);
 	tilemap_mark_tile_dirty(state->tilemap[0],offset);
 }
 
 static WRITE32_HANDLER( rabbit_tilemap1_w )
 {
-	rabbit_state *state = space->machine->driver_data<rabbit_state>();
+	rabbit_state *state = space->machine().driver_data<rabbit_state>();
 	COMBINE_DATA(&state->tilemap_ram[1][offset]);
 	tilemap_mark_tile_dirty(state->tilemap[1],offset);
 }
 
 static WRITE32_HANDLER( rabbit_tilemap2_w )
 {
-	rabbit_state *state = space->machine->driver_data<rabbit_state>();
+	rabbit_state *state = space->machine().driver_data<rabbit_state>();
 	COMBINE_DATA(&state->tilemap_ram[2][offset]);
 	tilemap_mark_tile_dirty(state->tilemap[2],offset);
 }
@@ -207,7 +207,7 @@ static WRITE32_HANDLER( rabbit_tilemap2_w )
 
 static WRITE32_HANDLER( rabbit_tilemap3_w )
 {
-	rabbit_state *state = space->machine->driver_data<rabbit_state>();
+	rabbit_state *state = space->machine().driver_data<rabbit_state>();
 	COMBINE_DATA(&state->tilemap_ram[3][offset]);
 	tilemap_mark_tile_dirty(state->tilemap[3],offset);
 }
@@ -231,11 +231,11 @@ sprites invisible at the end of a round in rabbit, why?
 
 */
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	rabbit_state *state = machine->driver_data<rabbit_state>();
+	rabbit_state *state = machine.driver_data<rabbit_state>();
 	int xpos,ypos,tileno,xflip,yflip, colr;
-	const gfx_element *gfx = machine->gfx[1];
+	const gfx_element *gfx = machine.gfx[1];
 	int todraw = (state->spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
 
 	UINT32 *source = (state->spriteram+ (todraw*2))-2;
@@ -270,9 +270,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 /* the sprite bitmap can probably be handled better than this ... */
-static void rabbit_clearspritebitmap( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void rabbit_clearspritebitmap( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	rabbit_state *state = machine->driver_data<rabbit_state>();
+	rabbit_state *state = machine.driver_data<rabbit_state>();
 	int startx, starty;
 	int y;
 	int amountx,amounty;
@@ -298,9 +298,9 @@ static void rabbit_clearspritebitmap( running_machine *machine, bitmap_t *bitmap
 }
 
 /* todo: fix zoom, its inaccurate and this code is ugly */
-static void draw_sprite_bitmap( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprite_bitmap( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	rabbit_state *state = machine->driver_data<rabbit_state>();
+	rabbit_state *state = machine.driver_data<rabbit_state>();
 
 	UINT32 x,y;
 	UINT16 *srcline;
@@ -354,7 +354,7 @@ static void draw_sprite_bitmap( running_machine *machine, bitmap_t *bitmap, cons
 }
 static VIDEO_START(rabbit)
 {
-	rabbit_state *state = machine->driver_data<rabbit_state>();
+	rabbit_state *state = machine.driver_data<rabbit_state>();
 	/* the tilemaps are bigger than the regions the cpu can see, need to allocate the ram here */
 	/* or maybe not for this game/hw .... */
 	state->tilemap_ram[0] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
@@ -377,7 +377,7 @@ static VIDEO_START(rabbit)
     tilemap_map_pen_to_layer(state->tilemap[3], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
     tilemap_map_pen_to_layer(state->tilemap[3], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
 
-	state->sprite_bitmap = auto_bitmap_alloc(machine,0x1000,0x1000,machine->primary_screen->format());
+	state->sprite_bitmap = auto_bitmap_alloc(machine,0x1000,0x1000,machine.primary_screen->format());
 	state->sprite_clip.min_x = 0;
 	state->sprite_clip.max_x = 0x1000-1;
 	state->sprite_clip.min_y = 0;
@@ -406,9 +406,9 @@ each line represents the differences on each tilemap for unknown variables
 
 */
 
-static void rabbit_drawtilemap( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int whichtilemap )
+static void rabbit_drawtilemap( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int whichtilemap )
 {
-	rabbit_state *state = machine->driver_data<rabbit_state>();
+	rabbit_state *state = machine.driver_data<rabbit_state>();
 	INT32 startx, starty, incxx, incxy, incyx, incyy, tran;
 
 	startx=((state->tilemap_regs[whichtilemap][1]&0x0000ffff));  // >>4 for nonzoomed pixel scroll value
@@ -432,10 +432,10 @@ static void rabbit_drawtilemap( running_machine *machine, bitmap_t *bitmap, cons
 
 static SCREEN_UPDATE(rabbit)
 {
-	rabbit_state *state = screen->machine->driver_data<rabbit_state>();
+	rabbit_state *state = screen->machine().driver_data<rabbit_state>();
 	int prilevel;
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
 //  popmessage("%08x %08x", state->viewregs0[0], state->viewregs0[1]);
 //  popmessage("%08x %08x %08x %08x %08x %08x", state->tilemap_regs[0][0],state->tilemap_regs[0][1],state->tilemap_regs[0][2],state->tilemap_regs[0][3],state->tilemap_regs[0][4],state->tilemap_regs[0][5]);
@@ -453,16 +453,16 @@ static SCREEN_UPDATE(rabbit)
 	/* prio isnt certain but seems to work.. */
 	for (prilevel = 0xf; prilevel >0; prilevel--)
 	{
-		if (prilevel == ((state->tilemap_regs[3][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen->machine,bitmap,cliprect, 3);
-		if (prilevel == ((state->tilemap_regs[2][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen->machine,bitmap,cliprect, 2);
-		if (prilevel == ((state->tilemap_regs[1][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen->machine,bitmap,cliprect, 1);
-		if (prilevel == ((state->tilemap_regs[0][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen->machine,bitmap,cliprect, 0);
+		if (prilevel == ((state->tilemap_regs[3][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen->machine(),bitmap,cliprect, 3);
+		if (prilevel == ((state->tilemap_regs[2][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen->machine(),bitmap,cliprect, 2);
+		if (prilevel == ((state->tilemap_regs[1][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen->machine(),bitmap,cliprect, 1);
+		if (prilevel == ((state->tilemap_regs[0][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen->machine(),bitmap,cliprect, 0);
 
 		if (prilevel == 0x09) // should it be selectable?
 		{
-			rabbit_clearspritebitmap(screen->machine,bitmap,cliprect);
-			draw_sprites(screen->machine,bitmap,cliprect);  // render to bitmap
-			draw_sprite_bitmap(screen->machine,bitmap,cliprect); // copy bitmap to screen
+			rabbit_clearspritebitmap(screen->machine(),bitmap,cliprect);
+			draw_sprites(screen->machine(),bitmap,cliprect);  // render to bitmap
+			draw_sprite_bitmap(screen->machine(),bitmap,cliprect); // copy bitmap to screen
 		}
 	}
 	return 0;
@@ -472,56 +472,56 @@ static SCREEN_UPDATE(rabbit)
 static WRITE32_HANDLER( rabbit_paletteram_dword_w )
 {
 	int r,g,b;
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
 
-	b = ((space->machine->generic.paletteram.u32[offset] & 0x000000ff) >>0);
-	r = ((space->machine->generic.paletteram.u32[offset] & 0x0000ff00) >>8);
-	g = ((space->machine->generic.paletteram.u32[offset] & 0x00ff0000) >>16);
+	b = ((space->machine().generic.paletteram.u32[offset] & 0x000000ff) >>0);
+	r = ((space->machine().generic.paletteram.u32[offset] & 0x0000ff00) >>8);
+	g = ((space->machine().generic.paletteram.u32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
 }
 
 static READ32_HANDLER( rabbit_tilemap0_r )
 {
-	rabbit_state *state = space->machine->driver_data<rabbit_state>();
+	rabbit_state *state = space->machine().driver_data<rabbit_state>();
 	return state->tilemap_ram[0][offset];
 }
 
 static READ32_HANDLER( rabbit_tilemap1_r )
 {
-	rabbit_state *state = space->machine->driver_data<rabbit_state>();
+	rabbit_state *state = space->machine().driver_data<rabbit_state>();
 	return state->tilemap_ram[1][offset];
 }
 
 static READ32_HANDLER( rabbit_tilemap2_r )
 {
-	rabbit_state *state = space->machine->driver_data<rabbit_state>();
+	rabbit_state *state = space->machine().driver_data<rabbit_state>();
 	return state->tilemap_ram[2][offset];
 }
 
 static READ32_HANDLER( rabbit_tilemap3_r )
 {
-	rabbit_state *state = space->machine->driver_data<rabbit_state>();
+	rabbit_state *state = space->machine().driver_data<rabbit_state>();
 	return state->tilemap_ram[3][offset];
 }
 
 static READ32_HANDLER( randomrabbits )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 /* rom bank is used when testing roms, not currently hooked up */
 static WRITE32_HANDLER ( rabbit_rombank_w )
 {
-	UINT8 *dataroms = space->machine->region("gfx1")->base();
+	UINT8 *dataroms = space->machine().region("gfx1")->base();
 #if 0
 	int bank;
 	printf("rabbit rombank %08x\n",data);
 	bank = data & 0x3ff;
 
-	memory_set_bankptr(space->machine, "bank1",&dataroms[0x40000*(bank&0x3ff)]);
+	memory_set_bankptr(space->machine(), "bank1",&dataroms[0x40000*(bank&0x3ff)]);
 #else
-	memory_set_bankptr(space->machine, "bank1",&dataroms[0]);
+	memory_set_bankptr(space->machine(), "bank1",&dataroms[0]);
 #endif
 
 }
@@ -607,14 +607,14 @@ if (VERBOSE_AUDIO_LOG)
 
 static TIMER_CALLBACK( rabbit_blit_done )
 {
-	rabbit_state *state = machine->driver_data<rabbit_state>();
+	rabbit_state *state = machine.driver_data<rabbit_state>();
 	cputag_set_input_line(machine, "maincpu", state->bltirqlevel, HOLD_LINE);
 }
 
-static void rabbit_do_blit(running_machine *machine)
+static void rabbit_do_blit(running_machine &machine)
 {
-	rabbit_state *state = machine->driver_data<rabbit_state>();
-	UINT8 *blt_data = machine->region("gfx1")->base();
+	rabbit_state *state = machine.driver_data<rabbit_state>();
+	UINT8 *blt_data = machine.region("gfx1")->base();
 	int blt_source = (state->blitterregs[0]&0x000fffff)>>0;
 	int blt_column = (state->blitterregs[1]&0x00ff0000)>>16;
 	int blt_line   = (state->blitterregs[1]&0x000000ff);
@@ -656,7 +656,7 @@ static void rabbit_do_blit(running_machine *machine)
 				if (!blt_amount)
 				{
 					if(BLITLOG) mame_printf_debug("end of blit list\n");
-					machine->scheduler().timer_set(attotime::from_usec(500), FUNC(rabbit_blit_done));
+					machine.scheduler().timer_set(attotime::from_usec(500), FUNC(rabbit_blit_done));
 					return;
 				}
 
@@ -709,12 +709,12 @@ static void rabbit_do_blit(running_machine *machine)
 
 static WRITE32_HANDLER( rabbit_blitter_w )
 {
-	rabbit_state *state = space->machine->driver_data<rabbit_state>();
+	rabbit_state *state = space->machine().driver_data<rabbit_state>();
 	COMBINE_DATA(&state->blitterregs[offset]);
 
 	if (offset == 0x0c/4)
 	{
-		rabbit_do_blit(space->machine);
+		rabbit_do_blit(space->machine());
 	}
 }
 
@@ -943,7 +943,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( rabbit_interrupts )
 {
-	rabbit_state *state = device->machine->driver_data<rabbit_state>();
+	rabbit_state *state = device->machine().driver_data<rabbit_state>();
 	int intlevel = 0;
 
 	int line = 262 - cpu_getiloops(device);
@@ -990,7 +990,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT(rabbit)
 {
-	rabbit_state *state = machine->driver_data<rabbit_state>();
+	rabbit_state *state = machine.driver_data<rabbit_state>();
 	state->banking = 1;
 	state->vblirqlevel = 6;
 	state->bltirqlevel = 4;

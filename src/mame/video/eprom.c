@@ -14,15 +14,15 @@
  *
  *************************************/
 
-static void update_palette(running_machine *machine)
+static void update_palette(running_machine &machine)
 {
-	eprom_state *state = machine->driver_data<eprom_state>();
+	eprom_state *state = machine.driver_data<eprom_state>();
 	int color;
 
 	for (color = 0; color < 0x800; ++color)
 	{
 		int i, r, g, b;
-		UINT16 const data = machine->generic.paletteram.u16[color];
+		UINT16 const data = machine.generic.paletteram.u16[color];
 
 		/* FIXME this is only a very crude approximation of the palette output.
          * The circuit involves a dozen transistors and probably has an output
@@ -52,7 +52,7 @@ static void update_palette(running_machine *machine)
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	eprom_state *state = machine->driver_data<eprom_state>();
+	eprom_state *state = machine.driver_data<eprom_state>();
 	UINT16 data = state->alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
@@ -63,7 +63,7 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	eprom_state *state = machine->driver_data<eprom_state>();
+	eprom_state *state = machine.driver_data<eprom_state>();
 	UINT16 data1 = state->playfield[tile_index];
 	UINT16 data2 = state->playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x7fff;
@@ -74,7 +74,7 @@ static TILE_GET_INFO( get_playfield_tile_info )
 
 static TILE_GET_INFO( guts_get_playfield_tile_info )
 {
-	eprom_state *state = machine->driver_data<eprom_state>();
+	eprom_state *state = machine.driver_data<eprom_state>();
 	UINT16 data1 = state->playfield[tile_index];
 	UINT16 data2 = state->playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x7fff;
@@ -128,7 +128,7 @@ VIDEO_START( eprom )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	eprom_state *state = machine->driver_data<eprom_state>();
+	eprom_state *state = machine.driver_data<eprom_state>();
 
 	/* initialize the playfield */
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
@@ -184,7 +184,7 @@ VIDEO_START( guts )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	eprom_state *state = machine->driver_data<eprom_state>();
+	eprom_state *state = machine.driver_data<eprom_state>();
 
 	/* initialize the playfield */
 	state->playfield_tilemap = tilemap_create(machine, guts_get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
@@ -211,7 +211,7 @@ VIDEO_START( guts )
 
 void eprom_scanline_update(screen_device &screen, int scanline)
 {
-	eprom_state *state = screen.machine->driver_data<eprom_state>();
+	eprom_state *state = screen.machine().driver_data<eprom_state>();
 
 	/* update the playfield */
 	if (scanline == 0)
@@ -235,18 +235,18 @@ void eprom_scanline_update(screen_device &screen, int scanline)
 
 SCREEN_UPDATE( eprom )
 {
-	eprom_state *state = screen->machine->driver_data<eprom_state>();
+	eprom_state *state = screen->machine().driver_data<eprom_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
 	if (state->video_disable)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 		return 0;
 	}
 
-	update_palette(screen->machine);
+	update_palette(screen->machine());
 
 	/* draw the playfield */
 	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 0, 0);
@@ -390,18 +390,18 @@ SCREEN_UPDATE( eprom )
 
 SCREEN_UPDATE( guts )
 {
-	eprom_state *state = screen->machine->driver_data<eprom_state>();
+	eprom_state *state = screen->machine().driver_data<eprom_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
 	if (state->video_disable)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 		return 0;
 	}
 
-	update_palette(screen->machine);
+	update_palette(screen->machine());
 
 	/* draw the playfield */
 	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 0, 0);

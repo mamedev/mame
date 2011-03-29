@@ -35,11 +35,11 @@ struct _generic_audio_private
     register for save states
 -------------------------------------------------*/
 
-int generic_sound_init(running_machine *machine)
+int generic_sound_init(running_machine &machine)
 {
 	generic_audio_private *state;
 
-	state = machine->generic_audio_data = auto_alloc_clear(machine, generic_audio_private);
+	state = machine.generic_audio_data = auto_alloc_clear(machine, generic_audio_private);
 
 	/* register globals with the save state system */
 	state_save_register_global_array(machine, state->latched_value);
@@ -67,7 +67,7 @@ int generic_sound_init(running_machine *machine)
 
 static TIMER_CALLBACK( latch_callback )
 {
-	generic_audio_private *state = machine->generic_audio_data;
+	generic_audio_private *state = machine.generic_audio_data;
 	UINT16 value = param >> 8;
 	int which = param & 0xff;
 
@@ -87,7 +87,7 @@ static TIMER_CALLBACK( latch_callback )
 
 INLINE void latch_w(address_space *space, int which, UINT16 value)
 {
-	space->machine->scheduler().synchronize(FUNC(latch_callback), which | (value << 8));
+	space->machine().scheduler().synchronize(FUNC(latch_callback), which | (value << 8));
 }
 
 
@@ -97,7 +97,7 @@ INLINE void latch_w(address_space *space, int which, UINT16 value)
 
 INLINE UINT16 latch_r(address_space *space, int which)
 {
-	generic_audio_private *state = space->machine->generic_audio_data;
+	generic_audio_private *state = space->machine().generic_audio_data;
 	state->latch_read[which] = 1;
 	return state->latched_value[which];
 }
@@ -109,7 +109,7 @@ INLINE UINT16 latch_r(address_space *space, int which)
 
 INLINE void latch_clear(address_space *space, int which)
 {
-	generic_audio_private *state = space->machine->generic_audio_data;
+	generic_audio_private *state = space->machine().generic_audio_data;
 	state->latched_value[which] = state->latch_clear_value;
 }
 
@@ -160,9 +160,9 @@ WRITE8_HANDLER( soundlatch4_clear_w ) { latch_clear(space, 3); }
     value for all sound latches
 -------------------------------------------------*/
 
-void soundlatch_setclearedvalue(running_machine *machine, int value)
+void soundlatch_setclearedvalue(running_machine &machine, int value)
 {
-	generic_audio_private *state = machine->generic_audio_data;
-	assert_always(machine->phase() == MACHINE_PHASE_INIT, "Can only call soundlatch_setclearedvalue at init time!");
+	generic_audio_private *state = machine.generic_audio_data;
+	assert_always(machine.phase() == MACHINE_PHASE_INIT, "Can only call soundlatch_setclearedvalue at init time!");
 	state->latch_clear_value = value;
 }

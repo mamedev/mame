@@ -29,7 +29,7 @@ TODO:
 
 static WRITE8_HANDLER( laserbat_videoram_w )
 {
-	laserbat_state *state = space->machine->driver_data<laserbat_state>();
+	laserbat_state *state = space->machine().driver_data<laserbat_state>();
 
 	if (state->video_page == 0)
 	{
@@ -45,7 +45,7 @@ static WRITE8_HANDLER( laserbat_videoram_w )
 
 static WRITE8_HANDLER( video_extra_w )
 {
-	laserbat_state *state = space->machine->driver_data<laserbat_state>();
+	laserbat_state *state = space->machine().driver_data<laserbat_state>();
 
 	state->video_page = (data & 0x10) >> 4;
 	state->sprite_enable = (data & 1) ^ 1;
@@ -55,7 +55,7 @@ static WRITE8_HANDLER( video_extra_w )
 
 static WRITE8_HANDLER( sprite_x_y_w )
 {
-	laserbat_state *state = space->machine->driver_data<laserbat_state>();
+	laserbat_state *state = space->machine().driver_data<laserbat_state>();
 
 	if (offset == 0)
 		state->sprite_x = 256 - data;
@@ -65,13 +65,13 @@ static WRITE8_HANDLER( sprite_x_y_w )
 
 static WRITE8_HANDLER( laserbat_input_mux_w )
 {
-	laserbat_state *state = space->machine->driver_data<laserbat_state>();
+	laserbat_state *state = space->machine().driver_data<laserbat_state>();
 
 	state->input_mux = (data & 0x30) >> 4;
 
-	flip_screen_set_no_update(space->machine, data & 0x08);
+	flip_screen_set_no_update(space->machine(), data & 0x08);
 
-	coin_counter_w(space->machine, 0,data & 1);
+	coin_counter_w(space->machine(), 0,data & 1);
 
 	//data & 0x02 ?
 	//data & 0x04 ?
@@ -79,10 +79,10 @@ static WRITE8_HANDLER( laserbat_input_mux_w )
 
 static READ8_HANDLER( laserbat_input_r )
 {
-	laserbat_state *state = space->machine->driver_data<laserbat_state>();
+	laserbat_state *state = space->machine().driver_data<laserbat_state>();
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
-	return input_port_read(space->machine, portnames[state->input_mux]);
+	return input_port_read(space->machine(), portnames[state->input_mux]);
 }
 
 static WRITE8_HANDLER( laserbat_cnteff_w )
@@ -487,7 +487,7 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_tile_info )
 {
-	laserbat_state *state = machine->driver_data<laserbat_state>();
+	laserbat_state *state = machine.driver_data<laserbat_state>();
 
 	// wrong color index!
 	SET_TILE_INFO(0, state->videoram[tile_index], state->colorram[tile_index] & 0x7f, 0);
@@ -495,7 +495,7 @@ static TILE_GET_INFO( get_tile_info )
 
 static VIDEO_START( laserbat )
 {
-	laserbat_state *state = machine->driver_data<laserbat_state>();
+	laserbat_state *state = machine.driver_data<laserbat_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
@@ -505,7 +505,7 @@ static VIDEO_START( laserbat )
 
 static SCREEN_UPDATE( laserbat )
 {
-	laserbat_state *state = screen->machine->driver_data<laserbat_state>();
+	laserbat_state *state = screen->machine().driver_data<laserbat_state>();
 	int y;
 	bitmap_t *s2636_1_bitmap;
 	bitmap_t *s2636_2_bitmap;
@@ -541,7 +541,7 @@ static SCREEN_UPDATE( laserbat )
 	}
 
 	if (state->sprite_enable)
-		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],
 		        state->sprite_code,
 				state->sprite_color,
 				0,0,
@@ -583,32 +583,32 @@ static const sn76477_interface laserbat_sn76477_interface =
 
 static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0a )
 {
-	laserbat_state *laserbat = device->machine->driver_data<laserbat_state>();
+	laserbat_state *laserbat = device->machine().driver_data<laserbat_state>();
 	device_set_input_line(laserbat->audiocpu, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b )
 {
-	laserbat_state *laserbat = device->machine->driver_data<laserbat_state>();
+	laserbat_state *laserbat = device->machine().driver_data<laserbat_state>();
 	device_set_input_line(laserbat->audiocpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( zaccaria_port0a_r )
 {
-	laserbat_state *state = device->machine->driver_data<laserbat_state>();
+	laserbat_state *state = device->machine().driver_data<laserbat_state>();
 	device_t *ay = (state->active_8910 == 0) ? state->ay1 : state->ay2;
 	return ay8910_r(ay, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port0a_w )
 {
-	laserbat_state *state = device->machine->driver_data<laserbat_state>();
+	laserbat_state *state = device->machine().driver_data<laserbat_state>();
 	state->port0a = data;
 }
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 {
-	laserbat_state *state = device->machine->driver_data<laserbat_state>();
+	laserbat_state *state = device->machine().driver_data<laserbat_state>();
 	/* bit 1 goes to 8910 #0 BDIR pin  */
 	if ((state->last_port0b & 0x02) == 0x02 && (data & 0x02) == 0x00)
 	{
@@ -671,7 +671,7 @@ static INTERRUPT_GEN( laserbat_interrupt )
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
-	laserbat_state *state = device->machine->driver_data<laserbat_state>();
+	laserbat_state *state = device->machine().driver_data<laserbat_state>();
 
 	pia6821_cb1_w(state->pia, state->cb1_toggle & 1);
 	state->cb1_toggle ^= 1;
@@ -704,18 +704,18 @@ static const s2636_interface s2636_3_config =
 
 static MACHINE_START( laserbat )
 {
-	laserbat_state *state = machine->driver_data<laserbat_state>();
+	laserbat_state *state = machine.driver_data<laserbat_state>();
 
-	state->audiocpu = machine->device("audiocpu");
-	state->s2636_1 = machine->device("s2636_1");
-	state->s2636_2 = machine->device("s2636_2");
-	state->s2636_3 = machine->device("s2636_3");
-	state->pia = machine->device("pia");
-	state->sn = machine->device("snsnd");
-	state->tms1 = machine->device("tms1");
-	state->tms2 = machine->device("tms2");
-	state->ay1 = machine->device("ay1");
-	state->ay2 = machine->device("ay2");
+	state->audiocpu = machine.device("audiocpu");
+	state->s2636_1 = machine.device("s2636_1");
+	state->s2636_2 = machine.device("s2636_2");
+	state->s2636_3 = machine.device("s2636_3");
+	state->pia = machine.device("pia");
+	state->sn = machine.device("snsnd");
+	state->tms1 = machine.device("tms1");
+	state->tms2 = machine.device("tms2");
+	state->ay1 = machine.device("ay1");
+	state->ay2 = machine.device("ay2");
 
 	state->save_item(NAME(state->video_page));
 	state->save_item(NAME(state->input_mux));
@@ -741,7 +741,7 @@ static MACHINE_START( laserbat )
 
 static MACHINE_RESET( laserbat )
 {
-	laserbat_state *state = machine->driver_data<laserbat_state>();
+	laserbat_state *state = machine.driver_data<laserbat_state>();
 
 	state->video_page = 0;
 	state->input_mux = 0;

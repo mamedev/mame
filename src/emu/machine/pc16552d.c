@@ -54,7 +54,7 @@ typedef struct
 {
 	PC16552D_CHANNEL ch[2];
 	int frequency;
-	void (* irq_handler)(running_machine *machine, int channel, int value);
+	void (* irq_handler)(running_machine &machine, int channel, int value);
 	void (* tx_callback)(int channel, int count, UINT8* data);
 } PC16552D_REGS;
 
@@ -67,7 +67,7 @@ static PC16552D_REGS duart[MAX_PC16552D_CHIPS];
 static const int rx_trigger_level[4] = { 1, 4, 8, 14 };
 
 
-static void check_interrupts(running_machine *machine, int chip, int channel)
+static void check_interrupts(running_machine &machine, int chip, int channel)
 {
 	PC16552D_CHANNEL *ch = &duart[chip].ch[channel];
 	int signal = 0;
@@ -89,7 +89,7 @@ static void check_interrupts(running_machine *machine, int chip, int channel)
 	}
 }
 
-static void duart_push_rx_fifo(running_machine *machine, int chip, int channel, UINT8 data)
+static void duart_push_rx_fifo(running_machine &machine, int chip, int channel, UINT8 data)
 {
 	PC16552D_CHANNEL *ch = &duart[chip].ch[channel];
 
@@ -114,7 +114,7 @@ static void duart_push_rx_fifo(running_machine *machine, int chip, int channel, 
 	}
 }
 
-static UINT8 duart_pop_rx_fifo(running_machine *machine, int chip, int channel)
+static UINT8 duart_pop_rx_fifo(running_machine &machine, int chip, int channel)
 {
 	UINT8 r;
 	PC16552D_CHANNEL *ch = &duart[chip].ch[channel];
@@ -183,7 +183,7 @@ static UINT8 duart_pop_tx_fifo(int chip, int channel, UINT8 data)
 #endif
 
 
-static UINT8 duart_r(running_machine *machine, int chip, int reg)
+static UINT8 duart_r(running_machine &machine, int chip, int reg)
 {
 	int channel = (reg >> 3) & 1;
 	PC16552D_CHANNEL *ch = &duart[chip].ch[channel];
@@ -291,7 +291,7 @@ static UINT8 duart_r(running_machine *machine, int chip, int reg)
 	return ch->reg[reg];
 }
 
-static void duart_w(running_machine *machine, int chip, int reg, UINT8 data)
+static void duart_w(running_machine &machine, int chip, int reg, UINT8 data)
 {
 	int channel = (reg >> 3) & 1;
 	PC16552D_CHANNEL *ch = &duart[chip].ch[channel];
@@ -387,7 +387,7 @@ static void duart_w(running_machine *machine, int chip, int reg, UINT8 data)
 
 /*****************************************************************************/
 
-void pc16552d_init(running_machine *machine, int chip, int frequency, void (* irq_handler)(running_machine *machine, int channel, int value), void (* tx_callback)(int channel, int count, UINT8* data))
+void pc16552d_init(running_machine &machine, int chip, int frequency, void (* irq_handler)(running_machine &machine, int channel, int value), void (* tx_callback)(int channel, int count, UINT8* data))
 {
 	memset(&duart[chip], 0, sizeof(PC16552D_REGS));
 
@@ -400,14 +400,14 @@ void pc16552d_init(running_machine *machine, int chip, int frequency, void (* ir
 	duart[chip].ch[1].pending_interrupt = 0;
 
 	// allocate transmit timers
-	duart[chip].ch[0].tx_fifo_timer = machine->scheduler().timer_alloc(FUNC(tx_fifo_timer_callback));
+	duart[chip].ch[0].tx_fifo_timer = machine.scheduler().timer_alloc(FUNC(tx_fifo_timer_callback));
 	duart[chip].ch[0].tx_fifo_timer->adjust(attotime::never, (chip * 2) + 0);
 
-	duart[chip].ch[1].tx_fifo_timer = machine->scheduler().timer_alloc(FUNC(tx_fifo_timer_callback));
+	duart[chip].ch[1].tx_fifo_timer = machine.scheduler().timer_alloc(FUNC(tx_fifo_timer_callback));
 	duart[chip].ch[1].tx_fifo_timer->adjust(attotime::never, (chip * 2) + 1);
 }
 
-void pc16552d_rx_data(running_machine *machine, int chip, int channel, UINT8 data)
+void pc16552d_rx_data(running_machine &machine, int chip, int channel, UINT8 data)
 {
 	if (duart[chip].ch[channel].reg[REG_FIFO_CTRL] & 0x01)	// RCVR & XMIT FIFO enable
 	{
@@ -420,20 +420,20 @@ void pc16552d_rx_data(running_machine *machine, int chip, int channel, UINT8 dat
 
 READ8_HANDLER(pc16552d_0_r)
 {
-	return duart_r(space->machine, 0, offset);
+	return duart_r(space->machine(), 0, offset);
 }
 
 WRITE8_HANDLER(pc16552d_0_w)
 {
-	duart_w(space->machine, 0, offset, data);
+	duart_w(space->machine(), 0, offset, data);
 }
 
 READ8_HANDLER(pc16552d_1_r)
 {
-	return duart_r(space->machine, 1, offset);
+	return duart_r(space->machine(), 1, offset);
 }
 
 WRITE8_HANDLER(pc16552d_1_w)
 {
-	duart_w(space->machine, 1, offset, data);
+	duart_w(space->machine(), 1, offset, data);
 }

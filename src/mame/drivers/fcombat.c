@@ -36,7 +36,7 @@ inputs + notes by stephh
 
 static INPUT_CHANGED( coin_inserted )
 {
-	fcombat_state *state = field->port->machine->driver_data<fcombat_state>();
+	fcombat_state *state = field->port->machine().driver_data<fcombat_state>();
 
 	/* coin insertion causes an NMI */
 	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
@@ -61,9 +61,9 @@ static READ8_HANDLER( fcombat_protection_r )
 
 static READ8_HANDLER( fcombat_port01_r )
 {
-	fcombat_state *state = space->machine->driver_data<fcombat_state>();
+	fcombat_state *state = space->machine().driver_data<fcombat_state>();
 	/* the cocktail flip bit muxes between ports 0 and 1 */
-	return state->cocktail_flip ? input_port_read(space->machine, "IN1") : input_port_read(space->machine, "IN0");
+	return state->cocktail_flip ? input_port_read(space->machine(), "IN1") : input_port_read(space->machine(), "IN0");
 }
 
 
@@ -71,19 +71,19 @@ static READ8_HANDLER( fcombat_port01_r )
 
 static WRITE8_HANDLER(e900_w)
 {
-	fcombat_state *state = space->machine->driver_data<fcombat_state>();
+	fcombat_state *state = space->machine().driver_data<fcombat_state>();
 	state->fcombat_sh = data;
 }
 
 static WRITE8_HANDLER(ea00_w)
 {
-	fcombat_state *state = space->machine->driver_data<fcombat_state>();
+	fcombat_state *state = space->machine().driver_data<fcombat_state>();
 	state->fcombat_sv = (state->fcombat_sv & 0xff00) | data;
 }
 
 static WRITE8_HANDLER(eb00_w)
 {
-	fcombat_state *state = space->machine->driver_data<fcombat_state>();
+	fcombat_state *state = space->machine().driver_data<fcombat_state>();
 	state->fcombat_sv = (state->fcombat_sv & 0xff) | (data << 8);
 }
 
@@ -92,23 +92,23 @@ static WRITE8_HANDLER(eb00_w)
 
 static WRITE8_HANDLER(ec00_w)
 {
-	fcombat_state *state = space->machine->driver_data<fcombat_state>();
+	fcombat_state *state = space->machine().driver_data<fcombat_state>();
 	state->tx = data;
 }
 
 static WRITE8_HANDLER(ed00_w)
 {
-	fcombat_state *state = space->machine->driver_data<fcombat_state>();
+	fcombat_state *state = space->machine().driver_data<fcombat_state>();
 	state->ty = data;
 }
 
 static READ8_HANDLER(e300_r)
 {
-	fcombat_state *state = space->machine->driver_data<fcombat_state>();
+	fcombat_state *state = space->machine().driver_data<fcombat_state>();
 	int wx = (state->tx + state->fcombat_sh) / 16;
 	int wy = (state->ty * 2 + state->fcombat_sv) / 16;
 
-	return space->machine->region("user2")->base()[wx * 32 * 16 + wy];
+	return space->machine().region("user2")->base()[wx * 32 * 16 + wy];
 }
 
 static WRITE8_HANDLER(ee00_w)
@@ -267,9 +267,9 @@ GFXDECODE_END
 
 static MACHINE_START( fcombat )
 {
-	fcombat_state *state = machine->driver_data<fcombat_state>();
+	fcombat_state *state = machine.driver_data<fcombat_state>();
 
-	state->maincpu = machine->device("maincpu");
+	state->maincpu = machine.device("maincpu");
 
 	state->save_item(NAME(state->cocktail_flip));
 	state->save_item(NAME(state->char_palette));
@@ -283,7 +283,7 @@ static MACHINE_START( fcombat )
 
 static MACHINE_RESET( fcombat )
 {
-	fcombat_state *state = machine->driver_data<fcombat_state>();
+	fcombat_state *state = machine.driver_data<fcombat_state>();
 
 	state->cocktail_flip = 0;
 	state->char_palette = 0;
@@ -348,8 +348,8 @@ static DRIVER_INIT( fcombat )
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = machine->region("gfx1")->base();
-	length = machine->region("gfx1")->bytes();
+	dst = machine.region("gfx1")->base();
+	length = machine.region("gfx1")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -366,8 +366,8 @@ static DRIVER_INIT( fcombat )
 
 	/* make a temporary copy of the sprite data */
 	src = temp;
-	dst = machine->region("gfx2")->base();
-	length = machine->region("gfx2")->bytes();
+	dst = machine.region("gfx2")->base();
+	length = machine.region("gfx2")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the sprites */
@@ -387,8 +387,8 @@ static DRIVER_INIT( fcombat )
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = machine->region("gfx3")->base();
-	length = machine->region("gfx3")->bytes();
+	dst = machine.region("gfx3")->base();
+	length = machine.region("gfx3")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -406,8 +406,8 @@ static DRIVER_INIT( fcombat )
 	}
 
 	src = temp;
-	dst = machine->region("user1")->base();
-	length = machine->region("user1")->bytes();
+	dst = machine.region("user1")->base();
+	length = machine.region("user1")->bytes();
 	memcpy(src, dst, length);
 
 	for (oldaddr = 0; oldaddr < 32; oldaddr++)
@@ -418,8 +418,8 @@ static DRIVER_INIT( fcombat )
 
 
 	src = temp;
-	dst = machine->region("user2")->base();
-	length = machine->region("user2")->bytes();
+	dst = machine.region("user2")->base();
+	length = machine.region("user2")->bytes();
 	memcpy(src, dst, length);
 
 	for (oldaddr = 0; oldaddr < 32; oldaddr++)

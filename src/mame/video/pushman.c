@@ -15,7 +15,7 @@ static TILEMAP_MAPPER( background_scan_rows )
 
 static TILE_GET_INFO( get_back_tile_info )
 {
-	UINT8 *bg_map = machine->region("gfx4")->base();
+	UINT8 *bg_map = machine.region("gfx4")->base();
 	int tile;
 
 	tile = bg_map[tile_index << 1] + (bg_map[(tile_index << 1) + 1] << 8);
@@ -28,7 +28,7 @@ static TILE_GET_INFO( get_back_tile_info )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	pushman_state *state = machine->driver_data<pushman_state>();
+	pushman_state *state = machine.driver_data<pushman_state>();
 
 	int tile = state->videoram[tile_index];
 	SET_TILE_INFO(
@@ -48,7 +48,7 @@ static TILE_GET_INFO( get_text_tile_info )
 
 VIDEO_START( pushman )
 {
-	pushman_state *state = machine->driver_data<pushman_state>();
+	pushman_state *state = machine.driver_data<pushman_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_back_tile_info, background_scan_rows, 32, 32, 128, 64);
 	state->tx_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -66,13 +66,13 @@ VIDEO_START( pushman )
 
 WRITE16_HANDLER( pushman_scroll_w )
 {
-	pushman_state *state = space->machine->driver_data<pushman_state>();
+	pushman_state *state = space->machine().driver_data<pushman_state>();
 	COMBINE_DATA(&state->control[offset]);
 }
 
 WRITE16_HANDLER( pushman_videoram_w )
 {
-	pushman_state *state = space->machine->driver_data<pushman_state>();
+	pushman_state *state = space->machine().driver_data<pushman_state>();
 	COMBINE_DATA(&state->videoram[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
 }
@@ -85,9 +85,9 @@ WRITE16_HANDLER( pushman_videoram_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	pushman_state *state = machine->driver_data<pushman_state>();
+	pushman_state *state = machine.driver_data<pushman_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs, x, y, color, sprite, flipx, flipy;
 
@@ -115,21 +115,21 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[1], sprite,
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[1], sprite,
                 color, flipx, flipy, x, y, 15);
 	}
 }
 
 SCREEN_UPDATE( pushman )
 {
-	pushman_state *state = screen->machine->driver_data<pushman_state>();
+	pushman_state *state = screen->machine().driver_data<pushman_state>();
 
 	/* Setup the tilemaps */
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->control[0]);
 	tilemap_set_scrolly(state->bg_tilemap, 0, 0xf00 - state->control[1]);
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 	return 0;
 }

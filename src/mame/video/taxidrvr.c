@@ -4,7 +4,7 @@
 
 WRITE8_DEVICE_HANDLER( taxidrvr_spritectrl_w )
 {
-	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
 	state->spritectrl[offset] = data;
 }
 
@@ -12,7 +12,7 @@ WRITE8_DEVICE_HANDLER( taxidrvr_spritectrl_w )
 
 SCREEN_UPDATE( taxidrvr )
 {
-	taxidrvr_state *state = screen->machine->driver_data<taxidrvr_state>();
+	taxidrvr_state *state = screen->machine().driver_data<taxidrvr_state>();
 	int offs;
 	int sx,sy;
 
@@ -33,7 +33,7 @@ SCREEN_UPDATE( taxidrvr )
 			sx = offs % 32;
 			sy = offs / 32;
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[3],
+			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[3],
 					state->vram3[offs],
 					0,
 					0,0,
@@ -45,7 +45,7 @@ SCREEN_UPDATE( taxidrvr )
 			sx = offs % 32;
 			sy = offs / 32;
 
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[2],
+			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[2],
 					state->vram2[offs]+256*state->vram2[offs+0x400],
 					0,
 					0,0,
@@ -111,7 +111,7 @@ SCREEN_UPDATE( taxidrvr )
 			sx = offs % 32;
 			sy = offs / 32;
 
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],
 					state->vram1[offs],
 					0,
 					0,0,
@@ -138,7 +138,7 @@ SCREEN_UPDATE( taxidrvr )
 		sx = offs % 32;
 		sy = offs / 32;
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
 				state->vram0[offs],
 				0,
 				0,0,

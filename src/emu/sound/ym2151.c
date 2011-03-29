@@ -824,7 +824,7 @@ static TIMER_CALLBACK( timer_callback_a )
 	if (chip->irq_enable & 0x04)
 	{
 		chip->status |= 1;
-		machine->scheduler().timer_set(attotime::zero, FUNC(irqAon_callback), 0, chip);
+		machine.scheduler().timer_set(attotime::zero, FUNC(irqAon_callback), 0, chip);
 	}
 	if (chip->irq_enable & 0x80)
 		chip->csm_req = 2;		/* request KEY ON / KEY OFF sequence */
@@ -837,7 +837,7 @@ static TIMER_CALLBACK( timer_callback_b )
 	if (chip->irq_enable & 0x08)
 	{
 		chip->status |= 2;
-		machine->scheduler().timer_set(attotime::zero, FUNC(irqBon_callback), 0, chip);
+		machine.scheduler().timer_set(attotime::zero, FUNC(irqBon_callback), 0, chip);
 	}
 }
 #if 0
@@ -1098,7 +1098,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 			{
 #ifdef USE_MAME_TIMERS
 				chip->status &= ~1;
-				chip->device->machine->scheduler().timer_set(attotime::zero, FUNC(irqAoff_callback), 0, chip);
+				chip->device->machine().scheduler().timer_set(attotime::zero, FUNC(irqAoff_callback), 0, chip);
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~1;
@@ -1110,7 +1110,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 			{
 #ifdef USE_MAME_TIMERS
 				chip->status &= ~2;
-				chip->device->machine->scheduler().timer_set(attotime::zero, FUNC(irqBoff_callback), 0, chip);
+				chip->device->machine().scheduler().timer_set(attotime::zero, FUNC(irqBoff_callback), 0, chip);
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~2;
@@ -1485,7 +1485,7 @@ static void ym2151_state_save_register( YM2151 *chip, device_t *device )
 
 	device->save_item(NAME(chip->connect));
 
-	device->machine->state().register_postload(ym2151_postload, chip);
+	device->machine().state().register_postload(ym2151_postload, chip);
 }
 #else
 STATE_POSTLOAD( ym2151_postload )
@@ -1509,7 +1509,7 @@ void * ym2151_init(device_t *device, int clock, int rate)
 {
 	YM2151 *PSG;
 
-	PSG = auto_alloc(device->machine, YM2151);
+	PSG = auto_alloc(device->machine(), YM2151);
 
 	memset(PSG, 0, sizeof(YM2151));
 
@@ -1533,8 +1533,8 @@ void * ym2151_init(device_t *device, int clock, int rate)
 
 #ifdef USE_MAME_TIMERS
 /* this must be done _before_ a call to ym2151_reset_chip() */
-	PSG->timer_A = device->machine->scheduler().timer_alloc(FUNC(timer_callback_a), PSG);
-	PSG->timer_B = device->machine->scheduler().timer_alloc(FUNC(timer_callback_b), PSG);
+	PSG->timer_A = device->machine().scheduler().timer_alloc(FUNC(timer_callback_a), PSG);
+	PSG->timer_B = device->machine().scheduler().timer_alloc(FUNC(timer_callback_b), PSG);
 #else
 	PSG->tim_A      = 0;
 	PSG->tim_B      = 0;
@@ -1546,7 +1546,7 @@ void * ym2151_init(device_t *device, int clock, int rate)
 	{
 		cymfile = fopen("2151_.cym","wb");
 		if (cymfile)
-			device->machine->scheduler().timer_pulse ( attotime::from_hz(110), FUNC(cymfile_callback)); /*110 Hz pulse timer*/
+			device->machine().scheduler().timer_pulse ( attotime::from_hz(110), FUNC(cymfile_callback)); /*110 Hz pulse timer*/
 		else
 			logerror("Could not create file 2151_.cym\n");
 	}
@@ -1560,7 +1560,7 @@ void ym2151_shutdown(void *_chip)
 {
 	YM2151 *chip = (YM2151 *)_chip;
 
-	auto_free (chip->device->machine, chip);
+	auto_free (chip->device->machine(), chip);
 
 	if (cymfile)
 		fclose (cymfile);

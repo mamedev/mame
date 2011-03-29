@@ -146,7 +146,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 static WRITE16_HANDLER( mcat_soundlatch_w )
 {
-	mcatadv_state *state = space->machine->driver_data<mcatadv_state>();
+	mcatadv_state *state = space->machine().driver_data<mcatadv_state>();
 
 	soundlatch_w(space, 0, data);
 	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -157,10 +157,10 @@ static WRITE16_HANDLER( mcat_coin_w )
 {
 	if(ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine, 0, data & 0x1000);
-		coin_counter_w(space->machine, 1, data & 0x2000);
-		coin_lockout_w(space->machine, 0, ~data & 0x4000);
-		coin_lockout_w(space->machine, 1, ~data & 0x8000);
+		coin_counter_w(space->machine(), 0, data & 0x1000);
+		coin_counter_w(space->machine(), 1, data & 0x2000);
+		coin_lockout_w(space->machine(), 0, ~data & 0x4000);
+		coin_lockout_w(space->machine(), 1, ~data & 0x8000);
 	}
 }
 #endif
@@ -207,7 +207,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER ( mcatadv_sound_bw_w )
 {
-	memory_set_bank(space->machine, "bank1", data);
+	memory_set_bank(space->machine(), "bank1", data);
 }
 
 
@@ -416,7 +416,7 @@ GFXDECODE_END
 /* Stolen from Psikyo.c */
 static void sound_irq( device_t *device, int irq )
 {
-	mcatadv_state *state = device->machine->driver_data<mcatadv_state>();
+	mcatadv_state *state = device->machine().driver_data<mcatadv_state>();
 	device_set_input_line(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -428,14 +428,14 @@ static const ym2610_interface mcatadv_ym2610_interface =
 
 static MACHINE_START( mcatadv )
 {
-	mcatadv_state *state = machine->driver_data<mcatadv_state>();
-	UINT8 *ROM = machine->region("soundcpu")->base();
+	mcatadv_state *state = machine.driver_data<mcatadv_state>();
+	UINT8 *ROM = machine.region("soundcpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 	memory_set_bank(machine, "bank1", 1);
 
-	state->maincpu = machine->device("maincpu");
-	state->soundcpu = machine->device("soundcpu");
+	state->maincpu = machine.device("maincpu");
+	state->soundcpu = machine.device("soundcpu");
 
 	state->save_item(NAME(state->palette_bank1));
 	state->save_item(NAME(state->palette_bank2));

@@ -72,7 +72,7 @@ public:
 
 static READ16_HANDLER( gms_read )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 
@@ -83,7 +83,7 @@ static WRITE16_HANDLER( gms_write1 )
 
 static WRITE16_HANDLER( gms_write2 )
 {
-	rbmk_state *state = space->machine->driver_data<rbmk_state>();
+	rbmk_state *state = space->machine().driver_data<rbmk_state>();
 	state->tilebank=data;
 }
 
@@ -129,10 +129,10 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( rbmk_mcu_io_r )
 {
-	rbmk_state *state = space->machine->driver_data<rbmk_state>();
+	rbmk_state *state = space->machine().driver_data<rbmk_state>();
 	if(state->mux_data & 8)
 	{
-		return ym2151_r(space->machine->device("ymsnd"), offset & 1);
+		return ym2151_r(space->machine().device("ymsnd"), offset & 1);
 	}
 	else if(state->mux_data & 4)
 	{
@@ -148,8 +148,8 @@ static READ8_HANDLER( rbmk_mcu_io_r )
 
 static WRITE8_HANDLER( rbmk_mcu_io_w )
 {
-	rbmk_state *state = space->machine->driver_data<rbmk_state>();
-	if(state->mux_data & 8) { ym2151_w(space->machine->device("ymsnd"), offset & 1, data); }
+	rbmk_state *state = space->machine().driver_data<rbmk_state>();
+	if(state->mux_data & 8) { ym2151_w(space->machine().device("ymsnd"), offset & 1, data); }
 	else if(state->mux_data & 4)
 	{
 		//printf("%02x %02x W\n",offset,data);
@@ -161,7 +161,7 @@ static WRITE8_HANDLER( rbmk_mcu_io_w )
 
 static WRITE8_HANDLER( mcu_io_mux_w )
 {
-	rbmk_state *state = space->machine->driver_data<rbmk_state>();
+	rbmk_state *state = space->machine().driver_data<rbmk_state>();
 	state->mux_data = ~data;
 }
 
@@ -492,7 +492,7 @@ static VIDEO_START(rbmk)
 
 static SCREEN_UPDATE(rbmk)
 {
-	rbmk_state *state = screen->machine->driver_data<rbmk_state>();
+	rbmk_state *state = screen->machine().driver_data<rbmk_state>();
 	int x,y;
 	int count = 0;
 
@@ -501,7 +501,7 @@ static SCREEN_UPDATE(rbmk)
 		for (x=0;x<64;x++)
 		{
 			int tile = state->gms_vidram2[count+0x600];
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],(tile&0xfff)+((state->tilebank&0x10)>>4)*0x1000,tile>>12,0,0,x*8,y*32);
+			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],(tile&0xfff)+((state->tilebank&0x10)>>4)*0x1000,tile>>12,0,0,x*8,y*32);
 			count++;
 		}
 	}
@@ -513,7 +513,7 @@ static SCREEN_UPDATE(rbmk)
 		for (x=0;x<64;x++)
 		{
 			int tile = state->gms_vidram[count];
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],(tile&0xfff)+((state->tilebank>>1)&3)*0x1000,tile>>12,0,0,x*8,y*8,0);
+			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],(tile&0xfff)+((state->tilebank>>1)&3)*0x1000,tile>>12,0,0,x*8,y*8,0);
 			count++;
 		}
 	}
@@ -522,7 +522,7 @@ static SCREEN_UPDATE(rbmk)
 
 static INTERRUPT_GEN( mcu_irq )
 {
-	cputag_set_input_line(device->machine, "mcu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(device->machine(), "mcu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( rbmk, rbmk_state )

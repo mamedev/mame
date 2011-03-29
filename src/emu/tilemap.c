@@ -67,8 +67,10 @@ struct _blit_parameters
 /* core tilemap structure */
 struct _tilemap_t
 {
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
 	tilemap_t *					next;				/* pointer to next tilemap */
-	running_machine *			machine;			/* pointer back to the owning machine */
+	running_machine *			m_machine;			/* pointer back to the owning machine */
 
 	/* basic tilemap metrics */
 	UINT32						rows;				/* number of tile rows */
@@ -135,7 +137,7 @@ struct _tilemap_private
 ***************************************************************************/
 
 /* system management helpers */
-static tilemap_t *tilemap_create_common(running_machine *machine, void *get_info_object, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
+static tilemap_t *tilemap_create_common(running_machine &machine, void *get_info_object, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
 static void tilemap_exit(running_machine &machine);
 static STATE_POSTLOAD( tilemap_postload );
 static void tilemap_dispose(tilemap_t *tmap);
@@ -238,12 +240,12 @@ INLINE INT32 effective_colscroll(tilemap_t *tmap, int index, UINT32 screen_heigh
     indexed_tilemap - return a tilemap by index
 -------------------------------------------------*/
 
-INLINE tilemap_t *indexed_tilemap(running_machine *machine, int index)
+INLINE tilemap_t *indexed_tilemap(running_machine &machine, int index)
 {
 	tilemap_t *tmap;
 
 	/* find by the tilemap index */
-	for (tmap = machine->tilemap_data->list; tmap != NULL; tmap = tmap->next)
+	for (tmap = machine.tilemap_data->list; tmap != NULL; tmap = tmap->next)
 		if (index-- == 0)
 			return tmap;
 
@@ -266,9 +268,9 @@ INLINE int gfx_elements_changed(tilemap_t *tmap)
 	/* iterate over all used gfx types and set the dirty flag if any of them have changed */
 	for (gfxnum = 0; usedmask != 0; usedmask >>= 1, gfxnum++)
 		if ((usedmask & 1) != 0)
-			if (tmap->gfx_dirtyseq[gfxnum] != tmap->machine->gfx[gfxnum]->dirtyseq)
+			if (tmap->gfx_dirtyseq[gfxnum] != tmap->machine().gfx[gfxnum]->dirtyseq)
 			{
-				tmap->gfx_dirtyseq[gfxnum] = tmap->machine->gfx[gfxnum]->dirtyseq;
+				tmap->gfx_dirtyseq[gfxnum] = tmap->machine().gfx[gfxnum]->dirtyseq;
 				isdirty = TRUE;
 			}
 
@@ -284,20 +286,20 @@ INLINE int gfx_elements_changed(tilemap_t *tmap)
     tilemap_init - initialize the tilemap system
 -------------------------------------------------*/
 
-void tilemap_init(running_machine *machine)
+void tilemap_init(running_machine &machine)
 {
 	UINT32 screen_width, screen_height;
 
-	if (machine->primary_screen == NULL)
+	if (machine.primary_screen == NULL)
 		return;
 
-	screen_width  = machine->primary_screen->width();
-	screen_height = machine->primary_screen->height();
+	screen_width  = machine.primary_screen->width();
+	screen_height = machine.primary_screen->height();
 
 	if (screen_width != 0 && screen_height != 0)
 	{
-		machine->priority_bitmap = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
-		machine->add_notifier(MACHINE_NOTIFY_EXIT, tilemap_exit);
+		machine.priority_bitmap = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
+		machine.add_notifier(MACHINE_NOTIFY_EXIT, tilemap_exit);
 	}
 }
 
@@ -311,9 +313,9 @@ void tilemap_init(running_machine *machine)
     tilemap_create - create a new tilemap
 -------------------------------------------------*/
 
-tilemap_t *tilemap_create(running_machine *machine, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
+tilemap_t *tilemap_create(running_machine &machine, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
 {
-	return tilemap_create_common(machine, (void *)machine, tile_get_info, mapper, tilewidth, tileheight, cols, rows);
+	return tilemap_create_common(machine, (void *)&machine, tile_get_info, mapper, tilewidth, tileheight, cols, rows);
 }
 
 
@@ -324,7 +326,7 @@ tilemap_t *tilemap_create(running_machine *machine, tile_get_info_func tile_get_
 
 tilemap_t *tilemap_create_device(device_t *device, tile_get_info_device_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
 {
-	return tilemap_create_common(device->machine, (void *)device, (tile_get_info_func)tile_get_info, mapper, tilewidth, tileheight, cols, rows);
+	return tilemap_create_common(device->machine(), (void *)device, (tile_get_info_func)tile_get_info, mapper, tilewidth, tileheight, cols, rows);
 }
 
 
@@ -333,25 +335,25 @@ tilemap_t *tilemap_create_device(device_t *device, tile_get_info_device_func til
     function
 -------------------------------------------------*/
 
-static tilemap_t *tilemap_create_common(running_machine *machine, void *get_info_object, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
+static tilemap_t *tilemap_create_common(running_machine &machine, void *get_info_object, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
 {
 	tilemap_t *tmap;
 	int tilemap_instance;
 	int group;
 
 	/* if no tilemap private data yet, allocate it */
-	if (machine->tilemap_data == NULL)
+	if (machine.tilemap_data == NULL)
 	{
-		machine->tilemap_data = auto_alloc_clear(machine, tilemap_private);
-		machine->tilemap_data->tailptr = &machine->tilemap_data->list;
+		machine.tilemap_data = auto_alloc_clear(machine, tilemap_private);
+		machine.tilemap_data->tailptr = &machine.tilemap_data->list;
 	}
-	tilemap_instance = machine->tilemap_data->instance;
+	tilemap_instance = machine.tilemap_data->instance;
 
 	/* allocate the tilemap itself */
 	tmap = auto_alloc_clear(machine, tilemap_t);
 
 	/* fill in the basic metrics */
-	tmap->machine = machine;
+	tmap->m_machine = &machine;
 	tmap->rows = rows;
 	tmap->cols = cols;
 	tmap->tilewidth = tilewidth;
@@ -392,26 +394,26 @@ static tilemap_t *tilemap_create_common(running_machine *machine, void *get_info
 		tilemap_map_pens_to_layer(tmap, group, 0, 0, TILEMAP_PIXEL_LAYER0);
 
 	/* add us to the end of the list of tilemaps */
-	*machine->tilemap_data->tailptr = tmap;
-	machine->tilemap_data->tailptr = &tmap->next;
+	*machine.tilemap_data->tailptr = tmap;
+	machine.tilemap_data->tailptr = &tmap->next;
 
 	/* save relevant state */
-	machine->state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->enable));
-	machine->state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->attributes));
-	machine->state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->palette_offset));
-	machine->state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->pen_data_offset));
-	machine->state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->scrollrows));
-	machine->state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->scrollcols));
-	machine->state().save_pointer("tilemap", NULL, tilemap_instance, NAME(tmap->rowscroll), rows * tileheight);
-	machine->state().save_pointer("tilemap", NULL, tilemap_instance, NAME(tmap->colscroll), cols * tilewidth);
-	machine->state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dx));
-	machine->state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dx_flipped));
-	machine->state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dy));
-	machine->state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dy_flipped));
-	machine->tilemap_data->instance++;
+	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->enable));
+	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->attributes));
+	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->palette_offset));
+	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->pen_data_offset));
+	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->scrollrows));
+	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->scrollcols));
+	machine.state().save_pointer("tilemap", NULL, tilemap_instance, NAME(tmap->rowscroll), rows * tileheight);
+	machine.state().save_pointer("tilemap", NULL, tilemap_instance, NAME(tmap->colscroll), cols * tilewidth);
+	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dx));
+	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dx_flipped));
+	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dy));
+	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dy_flipped));
+	machine.tilemap_data->instance++;
 
 	/* reset everything after a load */
-	machine->state().register_postload(tilemap_postload, tmap);
+	machine.state().register_postload(tilemap_postload, tmap);
 	return tmap;
 }
 
@@ -482,14 +484,14 @@ void tilemap_set_flip(tilemap_t *tmap, UINT32 attributes)
     the tilemaps
 -------------------------------------------------*/
 
-void tilemap_set_flip_all(running_machine *machine, UINT32 attributes)
+void tilemap_set_flip_all(running_machine &machine, UINT32 attributes)
 {
 	tilemap_t *tmap;
 
-	if (machine->tilemap_data == NULL)
+	if (machine.tilemap_data == NULL)
 		return;
 
-	for (tmap = machine->tilemap_data->list; tmap != NULL; tmap = tmap->next)
+	for (tmap = machine.tilemap_data->list; tmap != NULL; tmap = tmap->next)
 		tilemap_set_flip(tmap, attributes);
 }
 
@@ -539,10 +541,10 @@ void tilemap_mark_all_tiles_dirty(tilemap_t *tmap)
     tiles in all the tilemaps dirty
 -------------------------------------------------*/
 
-void tilemap_mark_all_tiles_dirty_all(running_machine *machine)
+void tilemap_mark_all_tiles_dirty_all(running_machine &machine)
 {
 	tilemap_t *tmap;
-	for (tmap = machine->tilemap_data->list; tmap != NULL; tmap = tmap->next)
+	for (tmap = machine.tilemap_data->list; tmap != NULL; tmap = tmap->next)
 		tilemap_mark_all_tiles_dirty(tmap);
 }
 
@@ -836,8 +838,8 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 		tmap->gfx_used = 0;
 	}
 
-	width  = tmap->machine->primary_screen->width();
-	height = tmap->machine->primary_screen->height();
+	width  = tmap->machine().primary_screen->width();
+	height = tmap->machine().primary_screen->height();
 
 	/* XY scrolling playfield */
 	if (tmap->scrollrows == 1 && tmap->scrollcols == 1)
@@ -984,16 +986,16 @@ g_profiler.stop();
     tilemap_count - return the number of tilemaps
 -------------------------------------------------*/
 
-int tilemap_count(running_machine *machine)
+int tilemap_count(running_machine &machine)
 {
 	tilemap_t *tmap;
 	int count = 0;
 
-	if (machine->tilemap_data == NULL)
+	if (machine.tilemap_data == NULL)
 		return 0;
 
 	/* find by the tilemap index */
-	for (tmap = machine->tilemap_data->list; tmap != NULL; tmap = tmap->next)
+	for (tmap = machine.tilemap_data->list; tmap != NULL; tmap = tmap->next)
 		count++;
 	return count;
 }
@@ -1004,7 +1006,7 @@ int tilemap_count(running_machine *machine)
     indexed tilemap
 -------------------------------------------------*/
 
-void tilemap_size_by_index(running_machine *machine, int number, UINT32 *width, UINT32 *height)
+void tilemap_size_by_index(running_machine &machine, int number, UINT32 *width, UINT32 *height)
 {
 	tilemap_t *tmap = indexed_tilemap(machine, number);
 	*width = tmap->width;
@@ -1018,7 +1020,7 @@ void tilemap_size_by_index(running_machine *machine, int number, UINT32 *width, 
     priority)
 -------------------------------------------------*/
 
-void tilemap_draw_by_index(running_machine *machine, bitmap_t *dest, int number, UINT32 scrollx, UINT32 scrolly)
+void tilemap_draw_by_index(running_machine &machine, bitmap_t *dest, int number, UINT32 scrollx, UINT32 scrolly)
 {
 	tilemap_t *tmap = indexed_tilemap(machine, number);
 	blit_parameters blit;
@@ -1156,7 +1158,7 @@ static void tilemap_dispose(tilemap_t *tmap)
 	tilemap_t **tmapptr;
 
 	/* walk the list of tilemaps; when we find ourself, remove it */
-	for (tmapptr = &tmap->machine->tilemap_data->list; *tmapptr != NULL; tmapptr = &(*tmapptr)->next)
+	for (tmapptr = &tmap->machine().tilemap_data->list; *tmapptr != NULL; tmapptr = &(*tmapptr)->next)
 		if (*tmapptr == tmap)
 		{
 			*tmapptr = tmap->next;
@@ -1164,15 +1166,15 @@ static void tilemap_dispose(tilemap_t *tmap)
 		}
 
 	/* free allocated memory */
-	auto_free(tmap->machine, tmap->pen_to_flags);
-	auto_free(tmap->machine, tmap->tileflags);
-	auto_free(tmap->machine, tmap->flagsmap);
-	auto_free(tmap->machine, tmap->pixmap);
-	auto_free(tmap->machine, tmap->colscroll);
-	auto_free(tmap->machine, tmap->rowscroll);
-	auto_free(tmap->machine, tmap->logical_to_memory);
-	auto_free(tmap->machine, tmap->memory_to_logical);
-	auto_free(tmap->machine, tmap);
+	auto_free(tmap->machine(), tmap->pen_to_flags);
+	auto_free(tmap->machine(), tmap->tileflags);
+	auto_free(tmap->machine(), tmap->flagsmap);
+	auto_free(tmap->machine(), tmap->pixmap);
+	auto_free(tmap->machine(), tmap->colscroll);
+	auto_free(tmap->machine(), tmap->rowscroll);
+	auto_free(tmap->machine(), tmap->logical_to_memory);
+	auto_free(tmap->machine(), tmap->memory_to_logical);
+	auto_free(tmap->machine(), tmap);
 }
 
 
@@ -1204,8 +1206,8 @@ static void mappings_create(tilemap_t *tmap)
 	tmap->max_memory_index++;
 
 	/* allocate the necessary mappings */
-	tmap->memory_to_logical = auto_alloc_array(tmap->machine, tilemap_logical_index, tmap->max_memory_index);
-	tmap->logical_to_memory = auto_alloc_array(tmap->machine, tilemap_memory_index, tmap->max_logical_index);
+	tmap->memory_to_logical = auto_alloc_array(tmap->machine(), tilemap_logical_index, tmap->max_memory_index);
+	tmap->logical_to_memory = auto_alloc_array(tmap->machine(), tilemap_memory_index, tmap->max_logical_index);
 
 	/* update the mappings */
 	mappings_update(tmap);
@@ -1333,7 +1335,7 @@ g_profiler.start(PROFILER_TILEMAP_UPDATE);
 
 	/* call the get info callback for the associated memory index */
 	memindex = tmap->logical_to_memory[logindex];
-	(*tmap->tile_get_info)((running_machine *)tmap->tile_get_info_object, &tmap->tileinfo, memindex, tmap->user_data);
+	(*tmap->tile_get_info)(*(running_machine *)tmap->tile_get_info_object, &tmap->tileinfo, memindex, tmap->user_data);
 
 	/* apply the global tilemap flip to the returned flip flags */
 	flags = tmap->tileinfo.flags ^ (tmap->attributes & 0x03);
@@ -1350,7 +1352,7 @@ g_profiler.start(PROFILER_TILEMAP_UPDATE);
 	if (tmap->tileinfo.gfxnum != 0xff && (tmap->gfx_used & (1 << tmap->tileinfo.gfxnum)) == 0)
 	{
 		tmap->gfx_used |= 1 << tmap->tileinfo.gfxnum;
-		tmap->gfx_dirtyseq[tmap->tileinfo.gfxnum] = tmap->machine->gfx[tmap->tileinfo.gfxnum]->dirtyseq;
+		tmap->gfx_dirtyseq[tmap->tileinfo.gfxnum] = tmap->machine().gfx[tmap->tileinfo.gfxnum]->dirtyseq;
 	}
 
 g_profiler.stop();
@@ -1615,7 +1617,7 @@ static void configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bi
 
 static void tilemap_draw_instance(tilemap_t *tmap, const blit_parameters *blit, int xpos, int ypos)
 {
-	bitmap_t *priority_bitmap = tmap->machine->priority_bitmap;
+	bitmap_t *priority_bitmap = tmap->machine().priority_bitmap;
 	bitmap_t *dest = blit->bitmap;
 	const UINT16 *source_baseaddr;
 	const UINT8 *mask_baseaddr;
@@ -1724,7 +1726,7 @@ static void tilemap_draw_instance(tilemap_t *tmap, const blit_parameters *blit, 
 				{
 					for (cury = y; cury < nexty; cury++)
 					{
-						(*blit->draw_opaque)(dest0, source0, x_end - x_start, tmap->machine->pens, pmap0, blit->tilemap_priority_code, blit->alpha);
+						(*blit->draw_opaque)(dest0, source0, x_end - x_start, tmap->machine().pens, pmap0, blit->tilemap_priority_code, blit->alpha);
 
 						dest0 = (UINT8 *)dest0 + dest_line_pitch_bytes;
 						source0 += tmap->pixmap->rowpixels;
@@ -1738,7 +1740,7 @@ static void tilemap_draw_instance(tilemap_t *tmap, const blit_parameters *blit, 
 					const UINT8 *mask0 = mask_baseaddr + x_start;
 					for (cury = y; cury < nexty; cury++)
 					{
-						(*blit->draw_masked)(dest0, source0, mask0, blit->mask, blit->value, x_end - x_start, tmap->machine->pens, pmap0, blit->tilemap_priority_code, blit->alpha);
+						(*blit->draw_masked)(dest0, source0, mask0, blit->mask, blit->value, x_end - x_start, tmap->machine().pens, pmap0, blit->tilemap_priority_code, blit->alpha);
 
 						dest0 = (UINT8 *)dest0 + dest_line_pitch_bytes;
 						source0 += tmap->pixmap->rowpixels;
@@ -1794,8 +1796,8 @@ do {																		\
 static void tilemap_draw_roz_core(tilemap_t *tmap, const blit_parameters *blit,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound)
 {
-	const pen_t *clut = &tmap->machine->pens[blit->tilemap_priority_code >> 16];
-	bitmap_t *priority_bitmap = tmap->machine->priority_bitmap;
+	const pen_t *clut = &tmap->machine().pens[blit->tilemap_priority_code >> 16];
+	bitmap_t *priority_bitmap = tmap->machine().priority_bitmap;
 	bitmap_t *destbitmap = blit->bitmap;
 	bitmap_t *srcbitmap = tmap->pixmap;
 	bitmap_t *flagsmap = tmap->flagsmap;

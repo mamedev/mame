@@ -59,7 +59,7 @@ public:
 
 static WRITE8_HANDLER( dynadice_videoram_w )
 {
-	dynadice_state *state = space->machine->driver_data<dynadice_state>();
+	dynadice_state *state = space->machine().driver_data<dynadice_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 	tilemap_mark_all_tiles_dirty(state->top_tilemap);
@@ -67,13 +67,13 @@ static WRITE8_HANDLER( dynadice_videoram_w )
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	dynadice_state *state = space->machine->driver_data<dynadice_state>();
+	dynadice_state *state = space->machine().driver_data<dynadice_state>();
 	state->ay_data = data;
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
-	dynadice_state *state = device->machine->driver_data<dynadice_state>();
+	dynadice_state *state = device->machine().driver_data<dynadice_state>();
 /*
     AY 3-8910 :
 
@@ -190,14 +190,14 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_tile_info )
 {
-	dynadice_state *state = machine->driver_data<dynadice_state>();
+	dynadice_state *state = machine.driver_data<dynadice_state>();
 	int code = state->videoram[tile_index];
 	SET_TILE_INFO(1, code, 0, 0);
 }
 
 static VIDEO_START( dynadice )
 {
-	dynadice_state *state = machine->driver_data<dynadice_state>();
+	dynadice_state *state = machine.driver_data<dynadice_state>();
 
 	/* pacman - style videoram layout */
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -207,7 +207,7 @@ static VIDEO_START( dynadice )
 
 static SCREEN_UPDATE( dynadice )
 {
-	dynadice_state *state = screen->machine->driver_data<dynadice_state>();
+	dynadice_state *state = screen->machine().driver_data<dynadice_state>();
 	rectangle myclip = *cliprect;
 	myclip.max_x = 15;
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -224,13 +224,13 @@ static PALETTE_INIT( dynadice )
 
 static MACHINE_START( dynadice )
 {
-	dynadice_state *state = machine->driver_data<dynadice_state>();
+	dynadice_state *state = machine.driver_data<dynadice_state>();
 	state->save_item(NAME(state->ay_data));
 }
 
 static MACHINE_RESET( dynadice )
 {
-	dynadice_state *state = machine->driver_data<dynadice_state>();
+	dynadice_state *state = machine.driver_data<dynadice_state>();
 	state->ay_data = 0;
 }
 
@@ -293,10 +293,10 @@ ROM_END
 static DRIVER_INIT( dynadice )
 {
 	int i, j;
-	UINT8 *usr1 = machine->region("user1")->base();
-	UINT8 *cpu2 = machine->region("audiocpu")->base();
-	UINT8 *gfx1 = machine->region("gfx1")->base();
-	UINT8 *gfx2 = machine->region("gfx2")->base();
+	UINT8 *usr1 = machine.region("user1")->base();
+	UINT8 *cpu2 = machine.region("audiocpu")->base();
+	UINT8 *gfx1 = machine.region("gfx1")->base();
+	UINT8 *gfx2 = machine.region("gfx2")->base();
 
 	cpu2[0x0b] = 0x23;	/* bug in game code  Dec HL -> Inc HL*/
 

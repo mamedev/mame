@@ -39,7 +39,7 @@ static UINT32 *nwk_ram[MAX_CG_BOARDS];
 
 /*****************************************************************************/
 
-void init_konami_cgboard(running_machine *machine, int num_boards, int type)
+void init_konami_cgboard(running_machine &machine, int num_boards, int type)
 {
 	int i;
 	num_cgboards = num_boards;
@@ -114,7 +114,7 @@ int get_cgboard_id(void)
 	}
 }
 
-void set_cgboard_texture_bank(running_machine *machine, int board, const char *bank, UINT8 *rom)
+void set_cgboard_texture_bank(running_machine &machine, int board, const char *bank, UINT8 *rom)
 {
 	texture_bank[board] = bank;
 
@@ -142,8 +142,8 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 {
 	const char *dsptag = (cgboard_id == 0) ? "dsp" : "dsp2";
 	const char *pcitag = (cgboard_id == 0) ? "k033906_1" : "k033906_2";
-	device_t *dsp = space->machine->device(dsptag);
-	device_t *k033906 = space->machine->device(pcitag);
+	device_t *dsp = space->machine().device(dsptag);
+	device_t *k033906 = space->machine().device(pcitag);
 //  mame_printf_debug("dsp_cmd_w: (board %d) %08X, %08X, %08X at %08X\n", cgboard_id, data, offset, mem_mask, cpu_get_pc(space->cpu));
 
 	if (cgboard_id < MAX_CG_BOARDS)
@@ -198,7 +198,7 @@ WRITE32_HANDLER( cgboard_dsp_shared_w_ppc )
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
-		space->machine->scheduler().trigger(10000);		// Remove the timeout (a part of the GTI Club FIFO test workaround)
+		space->machine().scheduler().trigger(10000);		// Remove the timeout (a part of the GTI Club FIFO test workaround)
 		COMBINE_DATA(dsp_shared_ram[cgboard_id] + (offset + (dsp_shared_ram_bank[cgboard_id] * DSP_BANK_SIZE_WORD)));
 	}
 }
@@ -225,12 +225,12 @@ static void dsp_comm_sharc_w(address_space *space, int board, int offset, UINT32
 		case CGBOARD_TYPE_GTICLUB:
 		{
 			//cputag_set_input_line(machine, "dsp", SHARC_INPUT_FLAG0, ASSERT_LINE);
-			sharc_set_flag_input(space->machine->device("dsp"), 0, ASSERT_LINE);
+			sharc_set_flag_input(space->machine().device("dsp"), 0, ASSERT_LINE);
 
 			if (offset == 1)
 			{
 				if (data & 0x03)
-					cputag_set_input_line(space->machine, "dsp", INPUT_LINE_IRQ2, ASSERT_LINE);
+					cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_IRQ2, ASSERT_LINE);
 			}
 			break;
 		}
@@ -239,7 +239,7 @@ static void dsp_comm_sharc_w(address_space *space, int board, int offset, UINT32
 		case CGBOARD_TYPE_HANGPLT:
 		{
 			const char *dsptag = (board == 0) ? "dsp" : "dsp2";
-			device_t *device = space->machine->device(dsptag);
+			device_t *device = space->machine().device(dsptag);
 
 			if (offset == 1)
 			{
@@ -254,7 +254,7 @@ static void dsp_comm_sharc_w(address_space *space, int board, int offset, UINT32
 				{
 					int offset = (data & 0x08) ? 1 : 0;
 
-					memory_set_bank(space->machine, texture_bank[board], offset);
+					memory_set_bank(space->machine(), texture_bank[board], offset);
 				}
 			}
 			break;
@@ -268,14 +268,14 @@ static void dsp_comm_sharc_w(address_space *space, int board, int offset, UINT32
 				{
 					int offset = (data & 0x08) ? 1 : 0;
 
-					memory_set_bank(space->machine, texture_bank[board], offset);
+					memory_set_bank(space->machine(), texture_bank[board], offset);
 				}
 			}
 			break;
 		}
 	}
 
-//  printf("%s:cgboard_dsp_comm_w_sharc: %08X, %08X, %08X\n", space->machine->describe_context(), data, offset, mem_mask);
+//  printf("%s:cgboard_dsp_comm_w_sharc: %08X, %08X, %08X\n", space->machine().describe_context(), data, offset, mem_mask);
 
 	dsp_comm_sharc[board][offset] = data;
 }
@@ -354,7 +354,7 @@ WRITE32_HANDLER( cgboard_1_shared_sharc_w )
 static UINT32 nwk_fifo_r(address_space *space, int board)
 {
 	const char *dsptag = (board == 0) ? "dsp" : "dsp2";
-	device_t *device = space->machine->device(dsptag);
+	device_t *device = space->machine().device(dsptag);
 	UINT32 data;
 
 	if (nwk_fifo_read_ptr[board] < nwk_fifo_half_full_r)
@@ -382,10 +382,10 @@ static UINT32 nwk_fifo_r(address_space *space, int board)
 	return data;
 }
 
-static void nwk_fifo_w(running_machine *machine, int board, UINT32 data)
+static void nwk_fifo_w(running_machine &machine, int board, UINT32 data)
 {
 	const char *dsptag = (board == 0) ? "dsp" : "dsp2";
-	device_t *device = machine->device(dsptag);
+	device_t *device = machine.device(dsptag);
 
 	if (nwk_fifo_write_ptr[board] < nwk_fifo_half_full_w)
 	{
@@ -409,7 +409,7 @@ static void nwk_fifo_w(running_machine *machine, int board, UINT32 data)
 
 READ32_HANDLER( K033906_0_r )
 {
-	device_t *k033906_1 = space->machine->device("k033906_1");
+	device_t *k033906_1 = space->machine().device("k033906_1");
 	if (nwk_device_sel[0] & 0x01)
 		return nwk_fifo_r(space, 0);
 	else
@@ -418,13 +418,13 @@ READ32_HANDLER( K033906_0_r )
 
 WRITE32_HANDLER( K033906_0_w )
 {
-	device_t *k033906_1 = space->machine->device("k033906_1");
+	device_t *k033906_1 = space->machine().device("k033906_1");
 	k033906_w(k033906_1, offset, data, mem_mask);
 }
 
 READ32_HANDLER( K033906_1_r )
 {
-	device_t *k033906_2 = space->machine->device("k033906_2");
+	device_t *k033906_2 = space->machine().device("k033906_2");
 	if (nwk_device_sel[1] & 0x01)
 		return nwk_fifo_r(space, 1);
 	else
@@ -433,7 +433,7 @@ READ32_HANDLER( K033906_1_r )
 
 WRITE32_HANDLER(K033906_1_w)
 {
-	device_t *k033906_2 = space->machine->device("k033906_2");
+	device_t *k033906_2 = space->machine().device("k033906_2");
 	k033906_w(k033906_2, offset, data, mem_mask);
 }
 
@@ -443,7 +443,7 @@ WRITE32_DEVICE_HANDLER(nwk_fifo_0_w)
 {
 	if (nwk_device_sel[0] & 0x01)
 	{
-		nwk_fifo_w(device->machine, 0, data);
+		nwk_fifo_w(device->machine(), 0, data);
 	}
 	else if (nwk_device_sel[0] & 0x02)
 	{
@@ -460,7 +460,7 @@ WRITE32_DEVICE_HANDLER(nwk_fifo_1_w)
 {
 	if (nwk_device_sel[1] & 0x01)
 	{
-		nwk_fifo_w(device->machine, 1, data);
+		nwk_fifo_w(device->machine(), 1, data);
 	}
 	else if (nwk_device_sel[1] & 0x02)
 	{
@@ -501,7 +501,7 @@ WRITE32_DEVICE_HANDLER(nwk_voodoo_0_w)
 {
 	if (nwk_device_sel[0] & 0x01)
 	{
-		nwk_fifo_w(device->machine, 0, data);
+		nwk_fifo_w(device->machine(), 0, data);
 	}
 	else if (nwk_device_sel[0] & 0x02)
 	{
@@ -518,7 +518,7 @@ WRITE32_DEVICE_HANDLER(nwk_voodoo_1_w)
 {
 	if (nwk_device_sel[1] & 0x01)
 	{
-		nwk_fifo_w(device->machine, 1, data);
+		nwk_fifo_w(device->machine(), 1, data);
 	}
 	else if (nwk_device_sel[1] & 0x02)
 	{

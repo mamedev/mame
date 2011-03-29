@@ -624,7 +624,7 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 
 static INTERRUPT_GEN( cps2_interrupt )
 {
-	cps_state *state = device->machine->driver_data<cps_state>();
+	cps_state *state = device->machine().driver_data<cps_state>();
 
 	/* 2 is vblank, 4 is some sort of scanline interrupt, 6 is both at the same time. */
 	if (state->scancount >= 258)
@@ -647,8 +647,8 @@ static INTERRUPT_GEN( cps2_interrupt )
 	{
 		state->cps_b_regs[0x10/2] = 0;
 		device_set_input_line(device, 4, HOLD_LINE);
-		cps2_set_sprite_priorities(device->machine);
-		device->machine->primary_screen->update_partial(16 - 10 + state->scancount);	/* visarea.min_y - [first visible line?] + scancount */
+		cps2_set_sprite_priorities(device->machine());
+		device->machine().primary_screen->update_partial(16 - 10 + state->scancount);	/* visarea.min_y - [first visible line?] + scancount */
 		state->scancalls++;
 //          popmessage("IRQ4 scancounter = %04i", state->scancount);
 	}
@@ -658,8 +658,8 @@ static INTERRUPT_GEN( cps2_interrupt )
 	{
 		state->cps_b_regs[0x12 / 2] = 0;
 		device_set_input_line(device, 4, HOLD_LINE);
-		cps2_set_sprite_priorities(device->machine);
-		device->machine->primary_screen->update_partial(16 - 10 + state->scancount);	/* visarea.min_y - [first visible line?] + scancount */
+		cps2_set_sprite_priorities(device->machine());
+		device->machine().primary_screen->update_partial(16 - 10 + state->scancount);	/* visarea.min_y - [first visible line?] + scancount */
 		state->scancalls++;
 //          popmessage("IRQ4 scancounter = %04i",scancount);
 	}
@@ -671,10 +671,10 @@ static INTERRUPT_GEN( cps2_interrupt )
 		device_set_input_line(device, 2, HOLD_LINE);
 		if(state->scancalls)
 		{
-			cps2_set_sprite_priorities(device->machine);
-			device->machine->primary_screen->update_partial(256);
+			cps2_set_sprite_priorities(device->machine());
+			device->machine().primary_screen->update_partial(256);
 		}
-		cps2_objram_latch(device->machine);
+		cps2_objram_latch(device->machine());
 	}
 	//popmessage("Raster calls = %i", state->scancalls);
 }
@@ -697,7 +697,7 @@ static const eeprom_interface cps2_eeprom_interface =
 
 static WRITE16_HANDLER( cps2_eeprom_port_w )
 {
-	cps_state *state = space->machine->driver_data<cps_state>();
+	cps_state *state = space->machine().driver_data<cps_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -711,7 +711,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 		/* bit 7 - */
 
 		/* EEPROM */
-		input_port_write(space->machine, "EEPROMOUT", data, 0xffff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xffff);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -729,37 +729,37 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 		if (state->audiocpu != NULL)
 			device_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
-		coin_counter_w(space->machine, 0, data & 0x0001);
-		if ((strncmp(space->machine->system().name, "pzloop2", 8) == 0) ||
-		    (strncmp(space->machine->system().name, "pzloop2j", 8) == 0))
+		coin_counter_w(space->machine(), 0, data & 0x0001);
+		if ((strncmp(space->machine().system().name, "pzloop2", 8) == 0) ||
+		    (strncmp(space->machine().system().name, "pzloop2j", 8) == 0))
 		{
 			// Puzz Loop 2 uses coin counter 2 input to switch between stick and paddle controls
 			state->readpaddle = data & 0x0002;
 		}
 		else
 		{
-			coin_counter_w(space->machine, 1, data & 0x0002);
+			coin_counter_w(space->machine(), 1, data & 0x0002);
 		}
 
-		if (strncmp(space->machine->system().name, "mmatrix", 7) == 0)		// Mars Matrix seems to require the coin lockout bit to be reversed
+		if (strncmp(space->machine().system().name, "mmatrix", 7) == 0)		// Mars Matrix seems to require the coin lockout bit to be reversed
 		{
-			coin_lockout_w(space->machine, 0, data & 0x0010);
-			coin_lockout_w(space->machine, 1, data & 0x0020);
-			coin_lockout_w(space->machine, 2, data & 0x0040);
-			coin_lockout_w(space->machine, 3, data & 0x0080);
+			coin_lockout_w(space->machine(), 0, data & 0x0010);
+			coin_lockout_w(space->machine(), 1, data & 0x0020);
+			coin_lockout_w(space->machine(), 2, data & 0x0040);
+			coin_lockout_w(space->machine(), 3, data & 0x0080);
 		}
 		else
 		{
-			coin_lockout_w(space->machine, 0, ~data & 0x0010);
-			coin_lockout_w(space->machine, 1, ~data & 0x0020);
-			coin_lockout_w(space->machine, 2, ~data & 0x0040);
-			coin_lockout_w(space->machine, 3, ~data & 0x0080);
+			coin_lockout_w(space->machine(), 0, ~data & 0x0010);
+			coin_lockout_w(space->machine(), 1, ~data & 0x0020);
+			coin_lockout_w(space->machine(), 2, ~data & 0x0040);
+			coin_lockout_w(space->machine(), 3, ~data & 0x0080);
 		}
 
 		/*
-        set_led_status(space->machine, 0, data & 0x01);
-        set_led_status(space->machine, 1, data & 0x10);
-        set_led_status(space->machine, 2, data & 0x20);
+        set_led_status(space->machine(), 0, data & 0x01);
+        set_led_status(space->machine(), 1, data & 0x10);
+        set_led_status(space->machine(), 2, data & 0x20);
         */
     }
 }
@@ -773,7 +773,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 
 static READ16_HANDLER( cps2_qsound_volume_r )
 {
-	cps_state *state = space->machine->driver_data<cps_state>();
+	cps_state *state = space->machine().driver_data<cps_state>();
 
 	/* Extra adapter memory (0x660000-0x663fff) available when bit 14 = 0 */
 	/* Network adapter (ssf2tb) present when bit 15 = 0 */
@@ -799,12 +799,12 @@ static READ16_HANDLER( kludge_r )
 
 static READ16_HANDLER( joy_or_paddle_r )
 {
-	cps_state *state = space->machine->driver_data<cps_state>();
+	cps_state *state = space->machine().driver_data<cps_state>();
 
 	if (state->readpaddle != 0)
-		return (input_port_read(space->machine, "IN0"));
+		return (input_port_read(space->machine(), "IN0"));
 	else
-		return (input_port_read(space->machine, "PADDLE1") & 0xff) | (input_port_read(space->machine, "PADDLE2") << 8);
+		return (input_port_read(space->machine(), "PADDLE1") & 0xff) | (input_port_read(space->machine(), "PADDLE2") << 8);
 }
 
 
@@ -1201,15 +1201,15 @@ GFXDECODE_END
 
 static MACHINE_START( cps2 )
 {
-	cps_state *state = machine->driver_data<cps_state>();
+	cps_state *state = machine.driver_data<cps_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->scancount));
 
 	if (state->audiocpu != NULL)	// gigamn2 has no audiocpu
-		memory_configure_bank(machine, "bank1", 0, (QSOUND_SIZE - 0x10000) / 0x4000, machine->region("audiocpu")->base() + 0x10000, 0x4000);
+		memory_configure_bank(machine, "bank1", 0, (QSOUND_SIZE - 0x10000) / 0x4000, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -7974,7 +7974,7 @@ ROM_END
 
 static DRIVER_INIT( cps2 )
 {
-	cps_state *state = machine->driver_data<cps_state>();
+	cps_state *state = machine.driver_data<cps_state>();
 
 	/* Decrypt the game - see machine/cps2crpt.c */
 	DRIVER_INIT_CALL(cps2crpt);
@@ -7985,12 +7985,12 @@ static DRIVER_INIT( cps2 )
 	state->scancount = 0;
 	state->cps2networkpresent = 0;
 
-	machine->device("maincpu")->set_clock_scale(0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
+	machine.device("maincpu")->set_clock_scale(0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
 static DRIVER_INIT( ssf2tb )
 {
-	cps_state *state = machine->driver_data<cps_state>();
+	cps_state *state = machine.driver_data<cps_state>();
 
 	DRIVER_INIT_CALL(cps2);
 
@@ -8004,7 +8004,7 @@ static DRIVER_INIT( ssf2tb )
 
 static DRIVER_INIT ( pzloop2 )
 {
-	cps_state *state = machine->driver_data<cps_state>();
+	cps_state *state = machine.driver_data<cps_state>();
 
 	DRIVER_INIT_CALL(cps2);
 
@@ -8012,36 +8012,36 @@ static DRIVER_INIT ( pzloop2 )
 
 	state->save_item(NAME(state->readpaddle));
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x804000, 0x804001, FUNC(joy_or_paddle_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x804000, 0x804001, FUNC(joy_or_paddle_r));
 }
 
 static READ16_HANDLER( gigamn2_dummyqsound_r )
 {
-	cps_state *state = space->machine->driver_data<cps_state>();
+	cps_state *state = space->machine().driver_data<cps_state>();
 	return state->gigamn2_dummyqsound_ram[offset];
 };
 
 static WRITE16_HANDLER( gigamn2_dummyqsound_w )
 {
-	cps_state *state = space->machine->driver_data<cps_state>();
+	cps_state *state = space->machine().driver_data<cps_state>();
 	state->gigamn2_dummyqsound_ram[offset] = data;
 };
 
 static DRIVER_INIT( gigamn2 )
 {
-	cps_state *state = machine->driver_data<cps_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
-	int length = machine->region("maincpu")->bytes();
+	cps_state *state = machine.driver_data<cps_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+	int length = machine.region("maincpu")->bytes();
 
 	DRIVER_INIT_CALL(cps2);
 
 	state->gigamn2_dummyqsound_ram = auto_alloc_array(machine, UINT16, 0x20000 / 2);
 	state->save_pointer(NAME(state->gigamn2_dummyqsound_ram), 0x20000 / 2);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x618000, 0x619fff, FUNC(gigamn2_dummyqsound_r), FUNC(gigamn2_dummyqsound_w)); // no qsound..
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x618000, 0x619fff, FUNC(gigamn2_dummyqsound_r), FUNC(gigamn2_dummyqsound_w)); // no qsound..
 	space->set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);
-	m68k_set_encrypted_opcode_range(machine->device("maincpu"), 0, length);
+	m68k_set_encrypted_opcode_range(machine.device("maincpu"), 0, length);
 }
 
 

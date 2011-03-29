@@ -13,7 +13,7 @@ PALETTE_INIT( speedatk )
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x10);
+	machine.colortable = colortable_alloc(machine, 0x10);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x10; i++)
@@ -39,7 +39,7 @@ PALETTE_INIT( speedatk )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -48,20 +48,20 @@ PALETTE_INIT( speedatk )
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 }
 
 WRITE8_HANDLER( speedatk_videoram_w )
 {
-	speedatk_state *state = space->machine->driver_data<speedatk_state>();
+	speedatk_state *state = space->machine().driver_data<speedatk_state>();
 
 	state->videoram[offset] = data;
 }
 
 WRITE8_HANDLER( speedatk_colorram_w )
 {
-	speedatk_state *state = space->machine->driver_data<speedatk_state>();
+	speedatk_state *state = space->machine().driver_data<speedatk_state>();
 
 	state->colorram[offset] = data;
 }
@@ -73,23 +73,23 @@ VIDEO_START( speedatk )
 
 WRITE8_HANDLER( speedatk_6845_w )
 {
-	speedatk_state *state = space->machine->driver_data<speedatk_state>();
+	speedatk_state *state = space->machine().driver_data<speedatk_state>();
 
 	if(offset == 0)
 	{
 		state->crtc_index = data;
-		mc6845_address_w(space->machine->device("crtc"),0,data);
+		mc6845_address_w(space->machine().device("crtc"),0,data);
 	}
 	else
 	{
 		state->crtc_vreg[state->crtc_index] = data;
-		mc6845_register_w(space->machine->device("crtc"),0,data);
+		mc6845_register_w(space->machine().device("crtc"),0,data);
 	}
 }
 
 SCREEN_UPDATE( speedatk )
 {
-	speedatk_state *state = screen->machine->driver_data<speedatk_state>();
+	speedatk_state *state = screen->machine().driver_data<speedatk_state>();
 	int x,y;
 	int count;
 	UINT16 tile;
@@ -109,7 +109,7 @@ SCREEN_UPDATE( speedatk )
 			color = state->colorram[count] & 0x1f;
 			region = (state->colorram[count] & 0x10) >> 4;
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[region],tile,color,state->flip_scr,state->flip_scr,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[region],tile,color,state->flip_scr,state->flip_scr,x*8,y*8);
 
 			count = (state->flip_scr) ? count-1 : count+1;
 			count&=0x3ff;

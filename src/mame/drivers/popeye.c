@@ -34,7 +34,7 @@ static INTERRUPT_GEN( popeye_interrupt )
 
 static READ8_HANDLER( protection_r )
 {
-	popeye_state *state = space->machine->driver_data<popeye_state>();
+	popeye_state *state = space->machine().driver_data<popeye_state>();
 	if (offset == 0)
 	{
 		return ((state->prot1 << state->prot_shift) | (state->prot0 >> (8-state->prot_shift))) & 0xff;
@@ -48,7 +48,7 @@ static READ8_HANDLER( protection_r )
 
 static WRITE8_HANDLER( protection_w )
 {
-	popeye_state *state = space->machine->driver_data<popeye_state>();
+	popeye_state *state = space->machine().driver_data<popeye_state>();
 	if (offset == 0)
 	{
 		/* this is the same as the level number (1-3) */
@@ -395,9 +395,9 @@ GFXDECODE_END
 
 static WRITE8_DEVICE_HANDLER( popeye_portB_w )
 {
-	popeye_state *state = device->machine->driver_data<popeye_state>();
+	popeye_state *state = device->machine().driver_data<popeye_state>();
 	/* bit 0 flips screen */
-	flip_screen_set(device->machine, data & 1);
+	flip_screen_set(device->machine(), data & 1);
 
 	/* bits 1-3 select DSW1 bit to read */
 	state->dswbit = (data & 0x0e) >> 1;
@@ -405,12 +405,12 @@ static WRITE8_DEVICE_HANDLER( popeye_portB_w )
 
 static READ8_DEVICE_HANDLER( popeye_portA_r )
 {
-	popeye_state *state = device->machine->driver_data<popeye_state>();
+	popeye_state *state = device->machine().driver_data<popeye_state>();
 	int res;
 
 
-	res = input_port_read(device->machine, "DSW0");
-	res |= (input_port_read(device->machine, "DSW1") << (7-state->dswbit)) & 0x80;
+	res = input_port_read(device->machine(), "DSW0");
+	res |= (input_port_read(device->machine(), "DSW1") << (7-state->dswbit)) & 0x80;
 
 	return res;
 }
@@ -621,9 +621,9 @@ ROM_END
 
 static DRIVER_INIT( skyskipr )
 {
-	popeye_state *state = machine->driver_data<popeye_state>();
+	popeye_state *state = machine.driver_data<popeye_state>();
 	UINT8 *buffer;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	int len = 0x10000;
 
 	/* decrypt the program ROMs */
@@ -643,9 +643,9 @@ static DRIVER_INIT( skyskipr )
 
 static DRIVER_INIT( popeye )
 {
-	popeye_state *state = machine->driver_data<popeye_state>();
+	popeye_state *state = machine.driver_data<popeye_state>();
 	UINT8 *buffer;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	int len = 0x10000;
 
 	/* decrypt the program ROMs */

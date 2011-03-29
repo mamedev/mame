@@ -118,15 +118,15 @@ INLINE int scanline_to_vcount( int scanline )
 
 static TIMER_DEVICE_CALLBACK( ddragon_scanline )
 {
-	ddragon_state *state = timer.machine->driver_data<ddragon_state>();
+	ddragon_state *state = timer.machine().driver_data<ddragon_state>();
 	int scanline = param;
-	int screen_height = timer.machine->primary_screen->height();
+	int screen_height = timer.machine().primary_screen->height();
 	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
 	int vcount = scanline_to_vcount(scanline);
 
 	/* update to the current point */
 	if (scanline > 0)
-		timer.machine->primary_screen->update_partial(scanline - 1);
+		timer.machine().primary_screen->update_partial(scanline - 1);
 
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
@@ -147,16 +147,16 @@ static TIMER_DEVICE_CALLBACK( ddragon_scanline )
 
 static MACHINE_START( ddragon )
 {
-	ddragon_state *state = machine->driver_data<ddragon_state>();
+	ddragon_state *state = machine.driver_data<ddragon_state>();
 
 	/* configure banks */
-	memory_configure_bank(machine, "bank1", 0, 8, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
-	state->maincpu = machine->device("maincpu");
-	state->sub_cpu = machine->device("sub");
-	state->snd_cpu = machine->device("soundcpu");
-	state->adpcm_1 = machine->device("adpcm1");
-	state->adpcm_2 = machine->device("adpcm2");
+	state->maincpu = machine.device("maincpu");
+	state->sub_cpu = machine.device("sub");
+	state->snd_cpu = machine.device("soundcpu");
+	state->adpcm_1 = machine.device("adpcm1");
+	state->adpcm_2 = machine.device("adpcm2");
 
 	/* register for save states */
 	state->save_item(NAME(state->dd_sub_cpu_busy));
@@ -171,7 +171,7 @@ static MACHINE_START( ddragon )
 
 static MACHINE_RESET( ddragon )
 {
-	ddragon_state *state = machine->driver_data<ddragon_state>();
+	ddragon_state *state = machine.driver_data<ddragon_state>();
 
 	state->dd_sub_cpu_busy = 1;
 	state->adpcm_pos[0] = state->adpcm_pos[1] = 0;
@@ -192,10 +192,10 @@ static MACHINE_RESET( ddragon )
 
 static WRITE8_HANDLER( ddragon_bankswitch_w )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 	state->scrollx_hi = (data & 0x01);
 	state->scrolly_hi = ((data & 0x02) >> 1);
-	flip_screen_set(space->machine, ~data & 0x04);
+	flip_screen_set(space->machine(), ~data & 0x04);
 
 	/* bit 3 unknown */
 
@@ -204,35 +204,35 @@ static WRITE8_HANDLER( ddragon_bankswitch_w )
 	else if (state->dd_sub_cpu_busy == 0)
 		device_set_input_line(state->sub_cpu, state->sprite_irq, (state->sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
-	memory_set_bank(space->machine, "bank1", (data & 0xe0) >> 5);
+	memory_set_bank(space->machine(), "bank1", (data & 0xe0) >> 5);
 }
 
 
 static WRITE8_HANDLER( toffy_bankswitch_w )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 	state->scrollx_hi = (data & 0x01);
 	state->scrolly_hi = ((data & 0x02) >> 1);
 
-//  flip_screen_set(space->machine, ~data & 0x04);
+//  flip_screen_set(space->machine(), ~data & 0x04);
 
 	/* bit 3 unknown */
 
 	/* I don't know ... */
-	memory_set_bank(space->machine, "bank1", (data & 0x20) >> 5);
+	memory_set_bank(space->machine(), "bank1", (data & 0x20) >> 5);
 }
 
 
 static READ8_HANDLER( darktowr_mcu_bank_r )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 	// logerror("BankRead %05x %08x\n",cpu_get_pc(space->cpu),offset);
 
 	/* Horrible hack - the alternate TStrike set is mismatched against the MCU,
    so just hack around the protection here.  (The hacks are 'right' as I have
    the original source code & notes to this version of TStrike to examine).
    */
-	if (!strcmp(space->machine->system().name, "tstrike"))
+	if (!strcmp(space->machine().system().name, "tstrike"))
 	{
 		/* Static protection checks at boot-up */
 		if (cpu_get_pc(space->cpu) == 0x9ace)
@@ -254,7 +254,7 @@ static READ8_HANDLER( darktowr_mcu_bank_r )
 
 static WRITE8_HANDLER( darktowr_mcu_bank_w )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 	logerror("BankWrite %05x %08x %08x\n", cpu_get_pc(space->cpu), offset, data);
 
 	if (offset == 0x1400 || offset == 0)
@@ -267,14 +267,14 @@ static WRITE8_HANDLER( darktowr_mcu_bank_w )
 
 static WRITE8_HANDLER( darktowr_bankswitch_w )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
-	int oldbank = memory_get_bank(space->machine, "bank1");
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
+	int oldbank = memory_get_bank(space->machine(), "bank1");
 	int newbank = (data & 0xe0) >> 5;
 
 	state->scrollx_hi = (data & 0x01);
 	state->scrolly_hi = ((data & 0x02) >> 1);
 
-//  flip_screen_set(space->machine, ~data & 0x04);
+//  flip_screen_set(space->machine(), ~data & 0x04);
 
 	/* bit 3 unknown */
 
@@ -283,7 +283,7 @@ static WRITE8_HANDLER( darktowr_bankswitch_w )
 	else if (state->dd_sub_cpu_busy == 0)
 		device_set_input_line(state->sub_cpu, state->sprite_irq, (state->sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
-	memory_set_bank(space->machine, "bank1", newbank);
+	memory_set_bank(space->machine(), "bank1", newbank);
 	if (newbank == 4 && oldbank != 4)
 		space->install_legacy_readwrite_handler(0x4000, 0x7fff, FUNC(darktowr_mcu_bank_r), FUNC(darktowr_mcu_bank_w));
 	else if (newbank != 4 && oldbank == 4)
@@ -300,7 +300,7 @@ static WRITE8_HANDLER( darktowr_bankswitch_w )
 
 static WRITE8_HANDLER( ddragon_interrupt_w )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 	switch (offset)
 	{
 		case 0: /* 380b - NMI ack */
@@ -329,21 +329,21 @@ static WRITE8_HANDLER( ddragon_interrupt_w )
 
 static WRITE8_HANDLER( ddragon2_sub_irq_ack_w )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 	device_set_input_line(state->sub_cpu, state->sprite_irq, CLEAR_LINE );
 }
 
 
 static WRITE8_HANDLER( ddragon2_sub_irq_w )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 	device_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
 static void irq_handler( device_t *device, int irq )
 {
-	ddragon_state *state = device->machine->driver_data<ddragon_state>();
+	ddragon_state *state = device->machine().driver_data<ddragon_state>();
 	device_set_input_line(state->snd_cpu, state->ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
@@ -357,14 +357,14 @@ static void irq_handler( device_t *device, int irq )
 
 static CUSTOM_INPUT( sub_cpu_busy )
 {
-	ddragon_state *state = field->port->machine->driver_data<ddragon_state>();
+	ddragon_state *state = field->port->machine().driver_data<ddragon_state>();
 	return state->dd_sub_cpu_busy;
 }
 
 
 static WRITE8_HANDLER( darktowr_mcu_w )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 	logerror("McuWrite %05x %08x %08x\n",cpu_get_pc(space->cpu), offset, data);
 	state->darktowr_mcu_ports[offset] = data;
 }
@@ -379,7 +379,7 @@ static READ8_HANDLER( ddragon_hd63701_internal_registers_r )
 
 static WRITE8_HANDLER( ddragon_hd63701_internal_registers_w )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 
 	/* I don't know why port 0x17 is used..  Doesn't seem to be a standard MCU port */
 	if (offset == 0x17)
@@ -405,7 +405,7 @@ static WRITE8_HANDLER( ddragon_hd63701_internal_registers_w )
 
 static READ8_HANDLER( ddragon_spriteram_r )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 
 	/* Double Dragon crash fix - see notes above */
 	if (offset == 0x49 && cpu_get_pc(space->cpu) == 0x6261 && state->spriteram[offset] == 0x1f)
@@ -417,7 +417,7 @@ static READ8_HANDLER( ddragon_spriteram_r )
 
 static WRITE8_HANDLER( ddragon_spriteram_w )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 
 	if (space->cpu == state->sub_cpu && offset == 0)
 		state->dd_sub_cpu_busy = 1;
@@ -435,7 +435,7 @@ static WRITE8_HANDLER( ddragon_spriteram_w )
 
 static WRITE8_HANDLER( dd_adpcm_w )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 	device_t *adpcm = (offset & 1) ? state->adpcm_2 : state->adpcm_1;
 	int chip = (adpcm == state->adpcm_1) ? 0 : 1;
 
@@ -464,7 +464,7 @@ static WRITE8_HANDLER( dd_adpcm_w )
 
 static void dd_adpcm_int( device_t *device )
 {
-	ddragon_state *state = device->machine->driver_data<ddragon_state>();
+	ddragon_state *state = device->machine().driver_data<ddragon_state>();
 	int chip = (device == state->adpcm_1) ? 0 : 1;
 
 	if (state->adpcm_pos[chip] >= state->adpcm_end[chip] || state->adpcm_pos[chip] >= 0x10000)
@@ -479,7 +479,7 @@ static void dd_adpcm_int( device_t *device )
 	}
 	else
 	{
-		UINT8 *ROM = device->machine->region("adpcm")->base() + 0x10000 * chip;
+		UINT8 *ROM = device->machine().region("adpcm")->base() + 0x10000 * chip;
 
 		state->adpcm_data[chip] = ROM[state->adpcm_pos[chip]++];
 		msm5205_data_w(device, state->adpcm_data[chip] >> 4);
@@ -489,7 +489,7 @@ static void dd_adpcm_int( device_t *device )
 
 static READ8_HANDLER( dd_adpcm_status_r )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 	return state->adpcm_idle[0] + (state->adpcm_idle[1] << 1);
 }
 
@@ -576,7 +576,7 @@ ADDRESS_MAP_END
 /* might not be 100% accurate, check bits written */
 static WRITE8_HANDLER( ddragonba_port_w )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 	device_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 	device_set_input_line(state->sub_cpu, state->sprite_irq, CLEAR_LINE );
 }
@@ -1996,7 +1996,7 @@ ROM_END
 
 static DRIVER_INIT( ddragon )
 {
-	ddragon_state *state = machine->driver_data<ddragon_state>();
+	ddragon_state *state = machine.driver_data<ddragon_state>();
 	state->sprite_irq = INPUT_LINE_NMI;
 	state->sound_irq = M6809_IRQ_LINE;
 	state->ym_irq = M6809_FIRQ_LINE;
@@ -2006,7 +2006,7 @@ static DRIVER_INIT( ddragon )
 
 static DRIVER_INIT( ddragon2 )
 {
-	ddragon_state *state = machine->driver_data<ddragon_state>();
+	ddragon_state *state = machine.driver_data<ddragon_state>();
 	state->sprite_irq = INPUT_LINE_NMI;
 	state->sound_irq = INPUT_LINE_NMI;
 	state->ym_irq = 0;
@@ -2016,47 +2016,47 @@ static DRIVER_INIT( ddragon2 )
 
 static DRIVER_INIT( darktowr )
 {
-	ddragon_state *state = machine->driver_data<ddragon_state>();
+	ddragon_state *state = machine.driver_data<ddragon_state>();
 	state->sprite_irq = INPUT_LINE_NMI;
 	state->sound_irq = M6809_IRQ_LINE;
 	state->ym_irq = M6809_FIRQ_LINE;
 	state->technos_video_hw = 0;
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x3808, 0x3808, FUNC(darktowr_bankswitch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x3808, 0x3808, FUNC(darktowr_bankswitch_w));
 }
 
 
 static DRIVER_INIT( toffy )
 {
-	ddragon_state *state = machine->driver_data<ddragon_state>();
+	ddragon_state *state = machine.driver_data<ddragon_state>();
 	int i, length;
 	UINT8 *rom;
 
 	state->sound_irq = M6809_IRQ_LINE;
 	state->ym_irq = M6809_FIRQ_LINE;
 	state->technos_video_hw = 0;
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x3808, 0x3808, FUNC(toffy_bankswitch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x3808, 0x3808, FUNC(toffy_bankswitch_w));
 
 	/* the program rom has a simple bitswap encryption */
-	rom = machine->region("maincpu")->base();
-	length = machine->region("maincpu")->bytes();
+	rom = machine.region("maincpu")->base();
+	length = machine.region("maincpu")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 6,7,5,4,3,2,1,0);
 
 	/* and the fg gfx ... */
-	rom = machine->region("gfx1")->base();
-	length = machine->region("gfx1")->bytes();
+	rom = machine.region("gfx1")->base();
+	length = machine.region("gfx1")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0);
 
 	/* and the sprites gfx */
-	rom = machine->region("gfx2")->base();
-	length = machine->region("gfx2")->bytes();
+	rom = machine.region("gfx2")->base();
+	length = machine.region("gfx2")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
 
 	/* and the bg gfx */
-	rom = machine->region("gfx3")->base();
-	length = machine->region("gfx3")->bytes();
+	rom = machine.region("gfx3")->base();
+	length = machine.region("gfx3")->bytes();
 	for (i = 0; i < length / 2; i++)
 	{
 		rom[i + 0*length/2] = BITSWAP8(rom[i + 0*length/2], 7,6,1,4,3,2,5,0);
@@ -2068,12 +2068,12 @@ static DRIVER_INIT( toffy )
 
 static DRIVER_INIT( ddragon6809 )
 {
-	ddragon_state *state = machine->driver_data<ddragon_state>();
+	ddragon_state *state = machine.driver_data<ddragon_state>();
 	int i;
 	UINT8 *dst,*src;
 
-	src = machine->region("chars")->base();
-	dst = machine->region("gfx1")->base();
+	src = machine.region("chars")->base();
+	dst = machine.region("gfx1")->base();
 
 	for (i = 0; i < 0x8000; i++)
 	{

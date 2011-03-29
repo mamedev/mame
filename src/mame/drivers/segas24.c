@@ -348,9 +348,9 @@ Notes:
 // Floppy Fisk Controller
 
 
-static void fdc_init(running_machine *machine)
+static void fdc_init(running_machine &machine)
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	state->fdc_status = 0;
 	state->fdc_track = 0;
 	state->fdc_sector = 0;
@@ -363,7 +363,7 @@ static void fdc_init(running_machine *machine)
 
 static READ16_HANDLER( fdc_r )
 {
-	segas24_state *state = space->machine->driver_data<segas24_state>();
+	segas24_state *state = space->machine().driver_data<segas24_state>();
 	if(!state->track_size)
 		return 0xffff;
 
@@ -399,7 +399,7 @@ static READ16_HANDLER( fdc_r )
 
 static WRITE16_HANDLER( fdc_w )
 {
-	segas24_state *state = space->machine->driver_data<segas24_state>();
+	segas24_state *state = space->machine().driver_data<segas24_state>();
 	if(!state->track_size)
 		return;
 
@@ -423,7 +423,7 @@ static WRITE16_HANDLER( fdc_w )
 				break;
 			case 0x9:
 				logerror("Read multiple [%02x] %d..%d side %d track %d\n", data, state->fdc_sector, state->fdc_sector+state->fdc_data-1, data & 8 ? 1 : 0, state->fdc_phys_track);
-				state->fdc_pt = space->machine->region("floppy")->base() + state->track_size*(2*state->fdc_phys_track+(data & 8 ? 1 : 0));
+				state->fdc_pt = space->machine().region("floppy")->base() + state->track_size*(2*state->fdc_phys_track+(data & 8 ? 1 : 0));
 				state->fdc_span = state->track_size;
 				state->fdc_status = 3;
 				state->fdc_drq = 1;
@@ -431,7 +431,7 @@ static WRITE16_HANDLER( fdc_w )
 				break;
 			case 0xb:
 				logerror("Write multiple [%02x] %d..%d side %d track %d\n", data, state->fdc_sector, state->fdc_sector+state->fdc_data-1, data & 8 ? 1 : 0, state->fdc_phys_track);
-				state->fdc_pt = space->machine->region("floppy")->base() + state->track_size*(2*state->fdc_phys_track+(data & 8 ? 1 : 0));
+				state->fdc_pt = space->machine().region("floppy")->base() + state->track_size*(2*state->fdc_phys_track+(data & 8 ? 1 : 0));
 				state->fdc_span = state->track_size;
 				state->fdc_status = 3;
 				state->fdc_drq = 1;
@@ -485,7 +485,7 @@ static WRITE16_HANDLER( fdc_w )
 
 static READ16_HANDLER( fdc_status_r )
 {
-	segas24_state *state = space->machine->driver_data<segas24_state>();
+	segas24_state *state = space->machine().driver_data<segas24_state>();
 	if(!state->track_size)
 		return 0xffff;
 
@@ -501,7 +501,7 @@ static WRITE16_HANDLER( fdc_ctrl_w )
 
 // I/O Mappers
 
-static UINT8 hotrod_io_r(running_machine *machine, int port)
+static UINT8 hotrod_io_r(running_machine &machine, int port)
 {
 	switch(port)
 	{
@@ -525,7 +525,7 @@ static UINT8 hotrod_io_r(running_machine *machine, int port)
 	return 0x00;
 }
 
-static UINT8 dcclub_io_r(running_machine *machine, int port)
+static UINT8 dcclub_io_r(running_machine &machine, int port)
 {
 	switch(port)
 	{
@@ -553,9 +553,9 @@ static UINT8 dcclub_io_r(running_machine *machine, int port)
 }
 
 
-static UINT8 mahmajn_io_r(running_machine *machine, int port)
+static UINT8 mahmajn_io_r(running_machine &machine, int port)
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	static const char *const keynames[] = { "MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5", "P1", "P2" };
 
 	switch(port)
@@ -580,9 +580,9 @@ static UINT8 mahmajn_io_r(running_machine *machine, int port)
 	return 0x00;
 }
 
-static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
+static void mahmajn_io_w(running_machine &machine, int port, UINT8 data)
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	switch(port)
 	{
 	case 3:
@@ -590,21 +590,21 @@ static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
 			state->cur_input_line = (state->cur_input_line + 1) & 7;
 		break;
 	case 7: // DAC
-		dac_signed_data_w(machine->device("dac"), data);
+		dac_signed_data_w(machine.device("dac"), data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
 	}
 }
 
-static void hotrod_io_w(running_machine *machine, int port, UINT8 data)
+static void hotrod_io_w(running_machine &machine, int port, UINT8 data)
 {
 	switch(port)
 	{
 	case 3: // Lamps
 		break;
 	case 7: // DAC
-		dac_signed_data_w(machine->device("dac"), data);
+		dac_signed_data_w(machine.device("dac"), data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -614,40 +614,40 @@ static void hotrod_io_w(running_machine *machine, int port, UINT8 data)
 
 static WRITE16_HANDLER( hotrod3_ctrl_w )
 {
-	segas24_state *state = space->machine->driver_data<segas24_state>();
+	segas24_state *state = space->machine().driver_data<segas24_state>();
 	static const char *const portnames[] = { "PEDAL1", "PEDAL2", "PEDAL3", "PEDAL4" };
 
 	if(ACCESSING_BITS_0_7)
 	{
 		data &= 3;
-		state->hotrod_ctrl_cur = input_port_read_safe(space->machine, portnames[data], 0);
+		state->hotrod_ctrl_cur = input_port_read_safe(space->machine(), portnames[data], 0);
 	}
 }
 
 static READ16_HANDLER( hotrod3_ctrl_r )
 {
-	segas24_state *state = space->machine->driver_data<segas24_state>();
+	segas24_state *state = space->machine().driver_data<segas24_state>();
 	if(ACCESSING_BITS_0_7)
 	{
 		switch(offset)
 		{
 			// Steering dials
 			case 0:
-				return input_port_read_safe(space->machine, "DIAL1", 0) & 0xff;
+				return input_port_read_safe(space->machine(), "DIAL1", 0) & 0xff;
 			case 1:
-				return input_port_read_safe(space->machine, "DIAL1", 0) >> 8;
+				return input_port_read_safe(space->machine(), "DIAL1", 0) >> 8;
 			case 2:
-				return input_port_read_safe(space->machine, "DIAL2", 0) & 0xff;
+				return input_port_read_safe(space->machine(), "DIAL2", 0) & 0xff;
 			case 3:
-				return input_port_read_safe(space->machine, "DIAL2", 0) >> 8;
+				return input_port_read_safe(space->machine(), "DIAL2", 0) >> 8;
 			case 4:
-				return input_port_read_safe(space->machine, "DIAL3", 0) & 0xff;
+				return input_port_read_safe(space->machine(), "DIAL3", 0) & 0xff;
 			case 5:
-				return input_port_read_safe(space->machine, "DIAL3", 0) >> 8;
+				return input_port_read_safe(space->machine(), "DIAL3", 0) >> 8;
 			case 6:
-				return input_port_read_safe(space->machine, "DIAL4", 0) & 0xff;
+				return input_port_read_safe(space->machine(), "DIAL4", 0) & 0xff;
 			case 7:
-				return input_port_read_safe(space->machine, "DIAL4", 0) >> 8;
+				return input_port_read_safe(space->machine(), "DIAL4", 0) >> 8;
 
 			case 8:
 			{
@@ -676,9 +676,9 @@ static WRITE16_HANDLER( iod_w )
 // Cpu #1 reset control
 
 
-static void reset_reset(running_machine *machine)
+static void reset_reset(running_machine &machine)
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	int changed = state->resetcontrol ^ state->prev_resetcontrol;
 	if(changed & 2) {
 		if(state->resetcontrol & 2) {
@@ -698,20 +698,20 @@ static void reset_reset(running_machine *machine)
 
 static void resetcontrol_w(address_space *space, UINT8 data)
 {
-	segas24_state *state = space->machine->driver_data<segas24_state>();
+	segas24_state *state = space->machine().driver_data<segas24_state>();
 	state->resetcontrol = data;
 	logerror("Reset control %02x ('%s':%x)\n", state->resetcontrol, space->cpu->tag(), cpu_get_pc(space->cpu));
-	reset_reset(space->machine);
+	reset_reset(space->machine());
 }
 
 
 // Rom board bank access
 
 
-static void reset_bank(running_machine *machine)
+static void reset_bank(running_machine &machine)
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
-	if (machine->region("romboard")->base())
+	segas24_state *state = machine.driver_data<segas24_state>();
+	if (machine.region("romboard")->base())
 	{
 		memory_set_bank(machine, "bank1", state->curbank & 15);
 		memory_set_bank(machine, "bank2", state->curbank & 15);
@@ -720,16 +720,16 @@ static void reset_bank(running_machine *machine)
 
 static READ16_HANDLER( curbank_r )
 {
-	segas24_state *state = space->machine->driver_data<segas24_state>();
+	segas24_state *state = space->machine().driver_data<segas24_state>();
 	return state->curbank;
 }
 
 static WRITE16_HANDLER( curbank_w )
 {
-	segas24_state *state = space->machine->driver_data<segas24_state>();
+	segas24_state *state = space->machine().driver_data<segas24_state>();
 	if(ACCESSING_BITS_0_7) {
 		state->curbank = data & 0xff;
-		reset_bank(space->machine);
+		reset_bank(space->machine());
 	}
 }
 
@@ -748,13 +748,13 @@ static const UINT8   dcclub_mlt[8] = { 4, 7, 3, 0, 2, 6, 5, 1 };
 
 static READ16_HANDLER( mlatch_r )
 {
-	segas24_state *state = space->machine->driver_data<segas24_state>();
+	segas24_state *state = space->machine().driver_data<segas24_state>();
 	return state->mlatch;
 }
 
 static WRITE16_HANDLER( mlatch_w )
 {
-	segas24_state *state = space->machine->driver_data<segas24_state>();
+	segas24_state *state = space->machine().driver_data<segas24_state>();
 	if(ACCESSING_BITS_0_7) {
 		int i;
 		UINT8 mxor = 0;
@@ -791,27 +791,27 @@ enum {
 
 static TIMER_DEVICE_CALLBACK( irq_timer_cb )
 {
-	segas24_state *state = timer.machine->driver_data<segas24_state>();
+	segas24_state *state = timer.machine().driver_data<segas24_state>();
 	state->irq_timer_pend0 = state->irq_timer_pend1 = 1;
 	if(state->irq_allow0 & (1 << IRQ_TIMER))
-		cputag_set_input_line(timer.machine, "maincpu", IRQ_TIMER+1, ASSERT_LINE);
+		cputag_set_input_line(timer.machine(), "maincpu", IRQ_TIMER+1, ASSERT_LINE);
 	if(state->irq_allow1 & (1 << IRQ_TIMER))
-		cputag_set_input_line(timer.machine, "sub", IRQ_TIMER+1, ASSERT_LINE);
+		cputag_set_input_line(timer.machine(), "sub", IRQ_TIMER+1, ASSERT_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( irq_timer_clear_cb )
 {
-	segas24_state *state = timer.machine->driver_data<segas24_state>();
+	segas24_state *state = timer.machine().driver_data<segas24_state>();
 	state->irq_sprite = state->irq_vblank = 0;
-	cputag_set_input_line(timer.machine, "maincpu", IRQ_VBLANK+1, CLEAR_LINE);
-	cputag_set_input_line(timer.machine, "maincpu", IRQ_SPRITE+1, CLEAR_LINE);
-	cputag_set_input_line(timer.machine, "sub", IRQ_VBLANK+1, CLEAR_LINE);
-	cputag_set_input_line(timer.machine, "sub", IRQ_SPRITE+1, CLEAR_LINE);
+	cputag_set_input_line(timer.machine(), "maincpu", IRQ_VBLANK+1, CLEAR_LINE);
+	cputag_set_input_line(timer.machine(), "maincpu", IRQ_SPRITE+1, CLEAR_LINE);
+	cputag_set_input_line(timer.machine(), "sub", IRQ_VBLANK+1, CLEAR_LINE);
+	cputag_set_input_line(timer.machine(), "sub", IRQ_SPRITE+1, CLEAR_LINE);
 }
 
-static void irq_init(running_machine *machine)
+static void irq_init(running_machine &machine)
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	state->irq_timera = 0;
 	state->irq_timerb = 0;
 	state->irq_allow0 = 0;
@@ -820,13 +820,13 @@ static void irq_init(running_machine *machine)
 	state->irq_timer_pend1 = 0;
 	state->irq_vblank = 0;
 	state->irq_sprite = 0;
-	state->irq_timer = machine->device<timer_device>("irq_timer");
-	state->irq_timer_clear = machine->device<timer_device>("irq_timer_clear");
+	state->irq_timer = machine.device<timer_device>("irq_timer");
+	state->irq_timer_clear = machine.device<timer_device>("irq_timer_clear");
 }
 
-static void irq_timer_reset(running_machine *machine)
+static void irq_timer_reset(running_machine &machine)
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	int freq = (state->irq_timerb << 12) | state->irq_timera;
 	freq &= 0x1fff;
 
@@ -836,13 +836,13 @@ static void irq_timer_reset(running_machine *machine)
 
 static WRITE16_HANDLER(irq_w)
 {
-	segas24_state *state = space->machine->driver_data<segas24_state>();
+	segas24_state *state = space->machine().driver_data<segas24_state>();
 	switch(offset) {
 	case 0: {
 		UINT16 old_ta = state->irq_timera;
 		COMBINE_DATA(&state->irq_timera);
 		if(old_ta != state->irq_timera)
-			irq_timer_reset(space->machine);
+			irq_timer_reset(space->machine());
 		break;
 	}
 	case 1:
@@ -850,31 +850,31 @@ static WRITE16_HANDLER(irq_w)
 			UINT8 old_tb = state->irq_timerb;
 			state->irq_timerb = data;
 			if(old_tb != state->irq_timerb)
-				irq_timer_reset(space->machine);
+				irq_timer_reset(space->machine());
 		}
 		break;
 	case 2:
 		state->irq_allow0 = data;
 		state->irq_timer_pend0 = 0;
-		cputag_set_input_line(space->machine, "maincpu", IRQ_TIMER+1, CLEAR_LINE);
-		cputag_set_input_line(space->machine, "maincpu", IRQ_YM2151+1, state->irq_yms && (state->irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(space->machine, "maincpu", IRQ_VBLANK+1, state->irq_vblank && (state->irq_allow0 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(space->machine, "maincpu", IRQ_SPRITE+1, state->irq_sprite && (state->irq_allow0 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", IRQ_TIMER+1, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", IRQ_YM2151+1, state->irq_yms && (state->irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", IRQ_VBLANK+1, state->irq_vblank && (state->irq_allow0 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", IRQ_SPRITE+1, state->irq_sprite && (state->irq_allow0 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	case 3:
 		state->irq_allow1 = data;
 		state->irq_timer_pend1 = 0;
-		cputag_set_input_line(space->machine, "sub", IRQ_TIMER+1, CLEAR_LINE);
-		cputag_set_input_line(space->machine, "sub", IRQ_YM2151+1, state->irq_yms && (state->irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(space->machine, "sub", IRQ_VBLANK+1, state->irq_vblank && (state->irq_allow1 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(space->machine, "sub", IRQ_SPRITE+1, state->irq_sprite && (state->irq_allow1 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "sub", IRQ_TIMER+1, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "sub", IRQ_YM2151+1, state->irq_yms && (state->irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "sub", IRQ_VBLANK+1, state->irq_vblank && (state->irq_allow1 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "sub", IRQ_SPRITE+1, state->irq_sprite && (state->irq_allow1 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	}
 }
 
 static READ16_HANDLER(irq_r)
 {
-	segas24_state *state = space->machine->driver_data<segas24_state>();
+	segas24_state *state = space->machine().driver_data<segas24_state>();
 	switch(offset) {
 	case 0: {
 		int pc = cpu_get_pc(space->cpu);
@@ -896,11 +896,11 @@ static READ16_HANDLER(irq_r)
 	}
 	case 2:
 		state->irq_timer_pend0 = 0;
-		cputag_set_input_line(space->machine, "maincpu", IRQ_TIMER+1, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", IRQ_TIMER+1, CLEAR_LINE);
 		break;
 	case 3:
 		state->irq_timer_pend1 = 0;
-		cputag_set_input_line(space->machine, "sub", IRQ_TIMER+1, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "sub", IRQ_TIMER+1, CLEAR_LINE);
 		break;
 	}
 	return 0xffff;
@@ -908,7 +908,7 @@ static READ16_HANDLER(irq_r)
 
 static INTERRUPT_GEN(irq_vbl)
 {
-	segas24_state *state = device->machine->driver_data<segas24_state>();
+	segas24_state *state = device->machine().driver_data<segas24_state>();
 	int irq, mask;
 
 	if(cpu_getiloops(device)) {
@@ -924,10 +924,10 @@ static INTERRUPT_GEN(irq_vbl)
 	mask = 1 << irq;
 
 	if(state->irq_allow0 & mask)
-		cputag_set_input_line(device->machine, "maincpu", 1+irq, ASSERT_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", 1+irq, ASSERT_LINE);
 
 	if(state->irq_allow1 & mask)
-		cputag_set_input_line(device->machine, "sub", 1+irq, ASSERT_LINE);
+		cputag_set_input_line(device->machine(), "sub", 1+irq, ASSERT_LINE);
 
 	if(!cpu_getiloops(device)) {
 		// Ensure one index pulse every 20 frames
@@ -941,10 +941,10 @@ static INTERRUPT_GEN(irq_vbl)
 
 static void irq_ym(device_t *device, int irq)
 {
-	segas24_state *state = device->machine->driver_data<segas24_state>();
+	segas24_state *state = device->machine().driver_data<segas24_state>();
 	state->irq_yms = irq;
-	cputag_set_input_line(device->machine, "maincpu", IRQ_YM2151+1, state->irq_yms && (state->irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(device->machine, "sub", IRQ_YM2151+1, state->irq_yms && (state->irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", IRQ_YM2151+1, state->irq_yms && (state->irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "sub", IRQ_YM2151+1, state->irq_yms && (state->irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1073,11 +1073,11 @@ ADDRESS_MAP_END
 
 static MACHINE_START( system24 )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	if (state->track_size)
-		machine->device<nvram_device>("floppy_nvram")->set_base(machine->region("floppy")->base(), 2*state->track_size);
+		machine.device<nvram_device>("floppy_nvram")->set_base(machine.region("floppy")->base(), 2*state->track_size);
 
-	UINT8 *usr1 = machine->region("romboard")->base();
+	UINT8 *usr1 = machine.region("romboard")->base();
 	if (usr1)
 	{
 		memory_configure_bank(machine, "bank1", 0, 16, usr1, 0x40000);
@@ -1087,7 +1087,7 @@ static MACHINE_START( system24 )
 
 static MACHINE_RESET( system24 )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	cputag_set_input_line(machine, "sub", INPUT_LINE_HALT, ASSERT_LINE);
 	state->prev_resetcontrol = state->resetcontrol = 0x06;
 	fdc_init(machine);
@@ -2161,7 +2161,7 @@ ROM_END
 
 static DRIVER_INIT( qgh )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = qgh_mlt;
 	state->track_size = 0;
@@ -2169,7 +2169,7 @@ static DRIVER_INIT( qgh )
 
 static DRIVER_INIT( dcclub )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, dcclub_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = dcclub_mlt;
 	state->track_size = 0;
@@ -2177,7 +2177,7 @@ static DRIVER_INIT( dcclub )
 
 static DRIVER_INIT( qrouka )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = qrouka_mlt;
 	state->track_size = 0;
@@ -2185,7 +2185,7 @@ static DRIVER_INIT( qrouka )
 
 static DRIVER_INIT( quizmeku )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = quizmeku_mlt;
 	state->track_size = 0;
@@ -2193,7 +2193,7 @@ static DRIVER_INIT( quizmeku )
 
 static DRIVER_INIT( mahmajn )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, mahmajn_io_r, mahmajn_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = mahmajn_mlt;
 	state->track_size = 0;
@@ -2202,7 +2202,7 @@ static DRIVER_INIT( mahmajn )
 
 static DRIVER_INIT( mahmajn2 )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, mahmajn_io_r, mahmajn_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = mahmajn2_mlt;
 	state->track_size = 0;
@@ -2211,7 +2211,7 @@ static DRIVER_INIT( mahmajn2 )
 
 static DRIVER_INIT( hotrod )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = 0;
 
@@ -2228,7 +2228,7 @@ static DRIVER_INIT( hotrod )
 
 static DRIVER_INIT( bnzabros )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = bnzabros_mlt;
 
@@ -2246,7 +2246,7 @@ static DRIVER_INIT( bnzabros )
 
 static DRIVER_INIT( sspirits )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = 0;
 	state->track_size = 0x2d00;
@@ -2255,7 +2255,7 @@ static DRIVER_INIT( sspirits )
 
 static DRIVER_INIT( sspiritj )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = 0;
 	state->track_size = 0x2f00;
@@ -2264,7 +2264,7 @@ static DRIVER_INIT( sspiritj )
 
 static DRIVER_INIT( dcclubfd )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, dcclub_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = dcclub_mlt;
 	state->track_size = 0x2d00;
@@ -2274,7 +2274,7 @@ static DRIVER_INIT( dcclubfd )
 
 static DRIVER_INIT( sgmast )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = 0;
 	state->track_size = 0x2d00;
@@ -2283,7 +2283,7 @@ static DRIVER_INIT( sgmast )
 
 static DRIVER_INIT( qsww )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = 0;
 	state->track_size = 0x2d00;
@@ -2292,7 +2292,7 @@ static DRIVER_INIT( qsww )
 
 static DRIVER_INIT( gground )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = 0;
 	state->track_size = 0x2d00;
@@ -2301,7 +2301,7 @@ static DRIVER_INIT( gground )
 
 static DRIVER_INIT( crkdown )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = 0;
 	state->track_size = 0x2d00;
@@ -2310,7 +2310,7 @@ static DRIVER_INIT( crkdown )
 
 static DRIVER_INIT( roughrac )
 {
-	segas24_state *state = machine->driver_data<segas24_state>();
+	segas24_state *state = machine.driver_data<segas24_state>();
 	system24temp_sys16_io_set_callbacks(machine, hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	state->mlatch_table = 0;
 	state->track_size = 0x2d00;

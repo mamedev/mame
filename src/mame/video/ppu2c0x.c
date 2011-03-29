@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( ppu2c0x, AS_0, 8 )
 	AM_RANGE(0x3f00, 0x3fff) AM_READWRITE(ppu2c0x_palette_read, ppu2c0x_palette_write)
 ADDRESS_MAP_END
 
-void ppu2c0x_init_palette( running_machine *machine, int first_entry )
+void ppu2c0x_init_palette( running_machine &machine, int first_entry )
 {
 
 	/* This routine builds a palette using a transformation from */
@@ -285,13 +285,13 @@ void ppu2c0x_init_palette( running_machine *machine, int first_entry )
 	/* color tables are modified at run-time, and are initialized on 'ppu2c0x_reset' */
 }
 
-void ppu2c0x_init_palette_rgb( running_machine *machine, int first_entry )
+void ppu2c0x_init_palette_rgb( running_machine &machine, int first_entry )
 {
 	int color_emphasis, color_num;
 
 	int R, G, B;
 
-	UINT8 *palette_data = machine->region("palette")->base();
+	UINT8 *palette_data = machine.region("palette")->base();
 
 	/* Loop through the emphasis modes (8 total) */
 	for (color_emphasis = 0; color_emphasis < 8; color_emphasis++)
@@ -857,7 +857,7 @@ static TIMER_CALLBACK( scanline_callback )
 	/* increment our scanline count */
 	ppu2c0x->scanline++;
 
-//  logerror("starting scanline %d (MAME %d, beam %d)\n", ppu2c0x->scanline, device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos());
+//  logerror("starting scanline %d (MAME %d, beam %d)\n", ppu2c0x->scanline, device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos());
 
 	/* Note: this is called at the _end_ of each scanline */
 	if (ppu2c0x->scanline == PPU_VBLANK_FIRST_SCANLINE)
@@ -873,7 +873,7 @@ static TIMER_CALLBACK( scanline_callback )
 			// a game can read the high bit of $2002 before the NMI is called (potentially resetting the bit
 			// via a read from $2002 in the NMI handler).
 			// B-Wings is an example game that needs this.
-			ppu2c0x->nmi_timer->adjust(device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4));
+			ppu2c0x->nmi_timer->adjust(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4));
 		}
 	}
 
@@ -901,10 +901,10 @@ static TIMER_CALLBACK( scanline_callback )
 		next_scanline = 0;
 
 	// Call us back when the hblank starts for this scanline
-	ppu2c0x->hblank_timer->adjust(device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
+	ppu2c0x->hblank_timer->adjust(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	// trigger again at the start of the next scanline
-	ppu2c0x->scanline_timer->adjust(device->machine->primary_screen->time_until_pos(next_scanline * ppu2c0x->scan_scale));
+	ppu2c0x->scanline_timer->adjust(device->machine().primary_screen->time_until_pos(next_scanline * ppu2c0x->scan_scale));
 }
 
 /*************************************
@@ -1045,7 +1045,7 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 #ifdef MAME_DEBUG
 	if (ppu2c0x->scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
-		screen_device *screen = device->machine->primary_screen;
+		screen_device *screen = device->machine().primary_screen;
 		logerror("PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, ppu2c0x->scanline, screen->vpos(), screen->hpos());
 	}
 #endif
@@ -1307,23 +1307,23 @@ static DEVICE_START( ppu2c0x )
 		ppu2c0x->security_value = 0x1b;
 
 	/* initialize the scanline handling portion */
-	ppu2c0x->scanline_timer = device->machine->scheduler().timer_alloc(FUNC(scanline_callback), (void *) device);
-	ppu2c0x->scanline_timer->adjust(device->machine->primary_screen->time_until_pos(1));
+	ppu2c0x->scanline_timer = device->machine().scheduler().timer_alloc(FUNC(scanline_callback), (void *) device);
+	ppu2c0x->scanline_timer->adjust(device->machine().primary_screen->time_until_pos(1));
 
-	ppu2c0x->hblank_timer = device->machine->scheduler().timer_alloc(FUNC(hblank_callback), (void *) device);
-	ppu2c0x->hblank_timer->adjust(device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
+	ppu2c0x->hblank_timer = device->machine().scheduler().timer_alloc(FUNC(hblank_callback), (void *) device);
+	ppu2c0x->hblank_timer->adjust(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
 
-	ppu2c0x->nmi_timer = device->machine->scheduler().timer_alloc(FUNC(nmi_callback), (void *) device);
+	ppu2c0x->nmi_timer = device->machine().scheduler().timer_alloc(FUNC(nmi_callback), (void *) device);
 	ppu2c0x->nmi_timer->adjust(attotime::never);
 
 	ppu2c0x->nmi_callback_proc = intf->nmi_handler;
 	ppu2c0x->color_base = intf->color_base;
 
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
-	ppu2c0x->bitmap = auto_bitmap_alloc(device->machine, VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT, device->machine->primary_screen->format());
-	ppu2c0x->spriteram = auto_alloc_array_clear(device->machine, UINT8, SPRITERAM_SIZE);
-	ppu2c0x->colortable = auto_alloc_array(device->machine, pen_t, ARRAY_LENGTH(default_colortable));
-	ppu2c0x->colortable_mono = auto_alloc_array(device->machine, pen_t, ARRAY_LENGTH(default_colortable_mono));
+	ppu2c0x->bitmap = auto_bitmap_alloc(device->machine(), VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT, device->machine().primary_screen->format());
+	ppu2c0x->spriteram = auto_alloc_array_clear(device->machine(), UINT8, SPRITERAM_SIZE);
+	ppu2c0x->colortable = auto_alloc_array(device->machine(), pen_t, ARRAY_LENGTH(default_colortable));
+	ppu2c0x->colortable_mono = auto_alloc_array(device->machine(), pen_t, ARRAY_LENGTH(default_colortable_mono));
 
 	device->save_item(NAME(ppu2c0x->scanline));
 	device->save_item(NAME(ppu2c0x->refresh_data));

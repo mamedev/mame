@@ -92,7 +92,7 @@ READ16_HANDLER(galpanib_calc_r) /* Simulation of the CALC1 MCU */
 			return (((UINT32)hit.mult_a * (UINT32)hit.mult_b) & 0xffff);
 
 		case 0x14/2:
-			return (space->machine->rand() & 0xffff);
+			return (space->machine().rand() & 0xffff);
 
 		default:
 			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(space->cpu),offset<<1);
@@ -125,7 +125,7 @@ WRITE16_HANDLER(galpanib_calc_w)
 WRITE16_HANDLER(bloodwar_calc_w)
 {
 
-	int isbrap = ( !strcmp(space->machine->system().name,"brapboysj") || !strcmp(space->machine->system().name,"brapboys"));
+	int isbrap = ( !strcmp(space->machine().system().name,"brapboysj") || !strcmp(space->machine().system().name,"brapboys"));
 
 	/* our implementation is incomplete, b.rap boys requires some modifications */
 	if (isbrap)
@@ -200,7 +200,7 @@ READ16_HANDLER(bloodwar_calc_r)
 	INT16 x_coll, y_coll;
 
 	/* our implementation is incomplete, b.rap boys requires some modifications */
-	int isbrap = ( !strcmp(space->machine->system().name,"brapboysj") || !strcmp(space->machine->system().name,"brapboys"));
+	int isbrap = ( !strcmp(space->machine().system().name,"brapboysj") || !strcmp(space->machine().system().name,"brapboys"));
 
 	if (isbrap)
 	{
@@ -243,7 +243,7 @@ READ16_HANDLER(bloodwar_calc_r)
 			return data;
 
 		case 0x14/2:
-			return (space->machine->rand() & 0xffff);
+			return (space->machine().rand() & 0xffff);
 
 		case 0x20/2: return hit.x1p;
 		case 0x22/2: return hit.x1s;
@@ -488,7 +488,7 @@ static READ16_HANDLER(shogwarr_calc_r)
 			return shogwarr_hit.flags;
 
 		case 0x28:
-			return (space->machine->rand() & 0xffff);
+			return (space->machine().rand() & 0xffff);
 
 		case 0x40: return shogwarr_hit.x1po;
 		case 0x44: return shogwarr_hit.x1so;
@@ -561,7 +561,7 @@ void calc3_mcu_init(void)
 WRITE16_HANDLER( calc3_mcu_ram_w )
 {
 	COMBINE_DATA(&kaneko16_mcu_ram[offset]);
-	//calc3_mcu_run(space->machine);
+	//calc3_mcu_run(space->machine());
 }
 
 #define CALC3_MCU_COM_W(_n_)				\
@@ -1708,14 +1708,14 @@ static UINT8 shift_bits(UINT8 dat, int bits)
 }
 
 // endian safe? you're having a laugh
-static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, int dstoffset)
+static int calc3_decompress_table(running_machine& machine, int tabnum, UINT8* dstram, int dstoffset)
 {
 
 
 
 
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8* rom = machine->region("cpu1")->base();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8* rom = machine.region("cpu1")->base();
 	UINT8 numregions;
 	UINT16 length;
 	int local_counter=0;
@@ -1814,7 +1814,7 @@ static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* d
 					//printf("save to eeprom\n");
 
 					{
-						address_space *eeprom_space = space->machine->device<eeprom_device>("eeprom")->space();
+						address_space *eeprom_space = space->machine().device<eeprom_device>("eeprom")->space();
 
 						for (i=0;i<0x80;i++)
 						{
@@ -2024,7 +2024,7 @@ static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* d
 
 DRIVER_INIT(calc3_scantables)
 {
-	UINT8* rom = machine->region("cpu1")->base();
+	UINT8* rom = machine.region("cpu1")->base();
 	UINT8 numregions;
 
 	int x;
@@ -2057,13 +2057,13 @@ DRIVER_INIT(calc3_scantables)
 			if (calc3_blocksize_offset==3)
 			{
 				sprintf(filename,"data_%s_table_%04x k%02x m%02x u%02x length %04x",
-						machine->system().name,
+						machine.system().name,
 						x, calc3_decryption_key_byte, calc3_mode, calc3_alternateswaps, length);
 			}
 			else
 			{
 				sprintf(filename,"data_%s_table_%04x k%02x (use indirect size %02x) m%02x u%02x length %04x",
-					machine->system().name,
+					machine.system().name,
 					x, calc3_decryption_key_byte, calc3_blocksize_offset-3, calc3_mode, calc3_alternateswaps, length);
 			}
 
@@ -2089,7 +2089,7 @@ DRIVER_INIT(calc3_scantables)
 		char filename[256];
 
 		sprintf(filename,"data_%s_finalblock",
-		machine->system().name);
+		machine.system().name);
 
 		fp=fopen(filename, "w+b");
 		if (fp)
@@ -2103,11 +2103,11 @@ DRIVER_INIT(calc3_scantables)
 
 
 
-void calc3_mcu_run(running_machine *machine)
+void calc3_mcu_run(running_machine &machine)
 {
 	UINT16 mcu_command;
 	int i;
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if ( calc3_mcu_status != (1|2|4|8) )	return;
 
@@ -2121,7 +2121,7 @@ void calc3_mcu_run(running_machine *machine)
 	if (mcu_command == 0) return;
 
 	logerror("%s : MCU executed command at %04X: %04X\n",
-		machine->describe_context(),calc3_mcu_command_offset,mcu_command);
+		machine.describe_context(),calc3_mcu_command_offset,mcu_command);
 
 
 	if (mcu_command>0)
@@ -2164,7 +2164,7 @@ void calc3_mcu_run(running_machine *machine)
             */
 
 			{
-				address_space *eeprom_space = space->machine->device<eeprom_device>("eeprom")->space();
+				address_space *eeprom_space = space->machine().device<eeprom_device>("eeprom")->space();
 
 				for (i=0;i<0x80;i++)
 				{
@@ -2336,7 +2336,7 @@ static const UINT8 toybox_mcu_decryption_table_alt[0x100] = {
 DRIVER_INIT( decrypt_toybox_rom )
 {
 
-	UINT8 *src = (UINT8 *)machine->region("mcudata" )->base();
+	UINT8 *src = (UINT8 *)machine.region("mcudata" )->base();
 
 	int i;
 
@@ -2349,7 +2349,7 @@ DRIVER_INIT( decrypt_toybox_rom )
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"%s.mcudata", machine->system().name);
+		sprintf(filename,"%s.mcudata", machine.system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
@@ -2363,7 +2363,7 @@ DRIVER_INIT( decrypt_toybox_rom )
 DRIVER_INIT( decrypt_toybox_rom_alt )
 {
 
-	UINT8 *src = (UINT8 *)machine->region("mcudata" )->base();
+	UINT8 *src = (UINT8 *)machine.region("mcudata" )->base();
 
 	int i;
 
@@ -2373,9 +2373,9 @@ DRIVER_INIT( decrypt_toybox_rom_alt )
 	}
 }
 
-void toxboy_handle_04_subcommand(running_machine* machine,UINT8 mcu_subcmd, UINT16*mcu_ram)
+void toxboy_handle_04_subcommand(running_machine& machine,UINT8 mcu_subcmd, UINT16*mcu_ram)
 {
-	UINT8 *src = (UINT8 *)machine->region("mcudata")->base()+0x10000;
+	UINT8 *src = (UINT8 *)machine.region("mcudata")->base()+0x10000;
 	UINT8* dst = (UINT8 *)mcu_ram;
 
 	int offs = (mcu_subcmd&0x3f)*8;
@@ -2396,7 +2396,7 @@ void toxboy_handle_04_subcommand(running_machine* machine,UINT8 mcu_subcmd, UINT
 }
 
 
-void (*toybox_mcu_run)(running_machine *machine);
+void (*toybox_mcu_run)(running_machine &machine);
 
 static UINT16 toybox_mcu_com[4];
 
@@ -2415,7 +2415,7 @@ WRITE16_HANDLER( toybox_mcu_com##_n_##_w )				\
 	if (toybox_mcu_com[3] != 0xFFFF)	return;			\
 														\
 	memset(toybox_mcu_com, 0, 4 * sizeof( UINT16 ) );	\
-	toybox_mcu_run(space->machine);							\
+	toybox_mcu_run(space->machine());							\
 }
 
 TOYBOX_MCU_COM_W(0)
@@ -2437,7 +2437,7 @@ READ16_HANDLER( toybox_mcu_status_r )
                                 Blood Warrior
 ***************************************************************************/
 
-void bloodwar_mcu_run(running_machine *machine)
+void bloodwar_mcu_run(running_machine &machine)
 {
 	UINT16 mcu_command	=	kaneko16_mcu_ram[0x0010/2];
 	UINT16 mcu_offset	=	kaneko16_mcu_ram[0x0012/2] / 2;
@@ -2448,27 +2448,27 @@ void bloodwar_mcu_run(running_machine *machine)
 		case 0x02:	// Read from NVRAM
 		{
 			memcpy(&kaneko16_mcu_ram[mcu_offset], kaneko16_nvram_save, sizeof(kaneko16_nvram_save));
-			logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", machine->describe_context(), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", machine.describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x42:	// Write to NVRAM
 		{
 			memcpy(kaneko16_nvram_save, &kaneko16_mcu_ram[mcu_offset], sizeof(kaneko16_nvram_save));
-			logerror("%s : MCU executed command: %04X %04X (save NVRAM settings)\n", machine->describe_context(), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (save NVRAM settings)\n", machine.describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x03:	// DSW
 		{
 			kaneko16_mcu_ram[mcu_offset] = input_port_read(machine, "DSW1");
-			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", machine->describe_context(), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", machine.describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x04:	// Protection
 		{
-			logerror("%s : MCU executed command: %04X %04X %04X\n", machine->describe_context(), mcu_command, mcu_offset*2, mcu_data);
+			logerror("%s : MCU executed command: %04X %04X %04X\n", machine.describe_context(), mcu_command, mcu_offset*2, mcu_data);
 
 			toxboy_handle_04_subcommand(machine, mcu_data, kaneko16_mcu_ram);
 
@@ -2476,7 +2476,7 @@ void bloodwar_mcu_run(running_machine *machine)
 		break;
 
 		default:
-			logerror("%s : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", machine->describe_context(), mcu_command, mcu_offset*2, mcu_data);
+			logerror("%s : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", machine.describe_context(), mcu_command, mcu_offset*2, mcu_data);
 		break;
 	}
 }
@@ -2485,7 +2485,7 @@ void bloodwar_mcu_run(running_machine *machine)
                                 Bonk's Adventure
 ***************************************************************************/
 
-void bonkadv_mcu_run(running_machine *machine)
+void bonkadv_mcu_run(running_machine &machine)
 {
 	UINT16 mcu_command	=	kaneko16_mcu_ram[0x0010/2];
 	UINT16 mcu_offset	=	kaneko16_mcu_ram[0x0012/2] / 2;
@@ -2497,34 +2497,34 @@ void bonkadv_mcu_run(running_machine *machine)
 		case 0x02:	// Read from NVRAM
 		{
 			memcpy(&kaneko16_mcu_ram[mcu_offset], kaneko16_nvram_save, sizeof(kaneko16_nvram_save));
-			logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", machine->describe_context(), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", machine.describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x42:	// Write to NVRAM
 		{
 			memcpy(kaneko16_nvram_save, &kaneko16_mcu_ram[mcu_offset], sizeof(kaneko16_nvram_save));
-			logerror("%s : MCU executed command: %04X %04X (save NVRAM settings)\n", machine->describe_context(), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (save NVRAM settings)\n", machine.describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x43:	// Initialize NVRAM - MCU writes Default Data Set directly to NVRAM
 		{
 			memcpy(kaneko16_nvram_save, bonkadv_mcu_43, sizeof(bonkadv_mcu_43));
-			logerror("%s : MCU executed command: %04X %04X (restore default NVRAM settings)\n", machine->describe_context(), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (restore default NVRAM settings)\n", machine.describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x03:	// DSW
 		{
 			kaneko16_mcu_ram[mcu_offset] = input_port_read(machine, "DSW1");
-			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", machine->describe_context(), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", machine.describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x04:	// Protection
 		{
-			logerror("%s : MCU executed command: %04X %04X %04X\n", machine->describe_context(), mcu_command, mcu_offset*2, mcu_data);
+			logerror("%s : MCU executed command: %04X %04X %04X\n", machine.describe_context(), mcu_command, mcu_offset*2, mcu_data);
 
 
 			switch(mcu_data)
@@ -2546,7 +2546,7 @@ void bonkadv_mcu_run(running_machine *machine)
 		break;
 
 		default:
-			logerror("%s : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", machine->describe_context(), mcu_command, mcu_offset*2, mcu_data);
+			logerror("%s : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", machine.describe_context(), mcu_command, mcu_offset*2, mcu_data);
 		break;
 	}
 }
@@ -2563,13 +2563,13 @@ void bonkadv_mcu_run(running_machine *machine)
     - Read the DSWs
 */
 
-void gtmr_mcu_run(running_machine *machine)
+void gtmr_mcu_run(running_machine &machine)
 {
 	UINT16 mcu_command	=	kaneko16_mcu_ram[0x0010/2];
 	UINT16 mcu_offset	=	kaneko16_mcu_ram[0x0012/2] / 2;
 	UINT16 mcu_data		=	kaneko16_mcu_ram[0x0014/2];
 
-	logerror("%s : MCU executed command: %04X %04X %04X\n", machine->describe_context(), mcu_command, mcu_offset*2, mcu_data);
+	logerror("%s : MCU executed command: %04X %04X %04X\n", machine.describe_context(), mcu_command, mcu_offset*2, mcu_data);
 
 	switch (mcu_command >> 8)
 	{

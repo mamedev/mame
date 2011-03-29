@@ -742,7 +742,7 @@ VIDEO_START( atari )
 
 	/* reset the ANTIC color tables */
 	for( i = 0; i < 256; i ++ )
-        antic.color_lookup[i] = (machine->pens[0] << 8) + machine->pens[0];
+        antic.color_lookup[i] = (machine.pens[0] << 8) + machine.pens[0];
 
 	LOG(("atari cclk_init\n"));
     cclk_init();
@@ -755,7 +755,7 @@ VIDEO_START( atari )
 	LOG(("atari prio_init\n"));
     prio_init();
 
-	for( i = 0; i < machine->primary_screen->height(); i++ )
+	for( i = 0; i < machine.primary_screen->height(); i++ )
     {
 		antic.video[i] = auto_alloc_clear(machine, VIDEO);
     }
@@ -774,7 +774,7 @@ SCREEN_UPDATE( atari )
 
 	SCREEN_UPDATE_CALL(generic_bitmapped);
 
-	new_tv_artifacts = input_port_read_safe(screen->machine, "artifacts", 0);
+	new_tv_artifacts = input_port_read_safe(screen->machine(), "artifacts", 0);
 	if( tv_artifacts != new_tv_artifacts )
 	{
 		tv_artifacts = new_tv_artifacts;
@@ -938,7 +938,7 @@ static void artifacts_txt(UINT8 * src, UINT8 * dst, int width)
 }
 
 
-static void antic_linerefresh(running_machine *machine)
+static void antic_linerefresh(running_machine &machine)
 {
 	int x, y;
 	UINT8 *src;
@@ -946,7 +946,7 @@ static void antic_linerefresh(running_machine *machine)
 	UINT32 scanline[4 + (HCHARS * 2) + 4];
 
 	/* increment the scanline */
-    if( ++antic.scanline == machine->primary_screen->height() )
+    if( ++antic.scanline == machine.primary_screen->height() )
     {
         /* and return to the top if the frame was complete */
         antic.scanline = 0;
@@ -1043,20 +1043,20 @@ static void antic_linerefresh(running_machine *machine)
 	dst[2] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
 	dst[3] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
 
-	draw_scanline8(machine->generic.tmpbitmap, 12, y, MIN(machine->generic.tmpbitmap->width - 12, sizeof(scanline)), (const UINT8 *) scanline, NULL);
+	draw_scanline8(machine.generic.tmpbitmap, 12, y, MIN(machine.generic.tmpbitmap->width - 12, sizeof(scanline)), (const UINT8 *) scanline, NULL);
 }
 
-static int cycle(running_machine *machine)
+static int cycle(running_machine &machine)
 {
-	return machine->primary_screen->hpos() * CYCLES_PER_LINE / machine->primary_screen->width();
+	return machine.primary_screen->hpos() * CYCLES_PER_LINE / machine.primary_screen->width();
 }
 
-static void after(running_machine *machine, int cycles, timer_expired_func function, const char *funcname)
+static void after(running_machine &machine, int cycles, timer_expired_func function, const char *funcname)
 {
-    attotime duration = machine->primary_screen->scan_period() * cycles / CYCLES_PER_LINE;
+    attotime duration = machine.primary_screen->scan_period() * cycles / CYCLES_PER_LINE;
     (void)funcname;
 	LOG(("           after %3d (%5.1f us) %s\n", cycles, duration.as_double() * 1.0e6, funcname));
-	machine->scheduler().timer_set(duration, function, funcname);
+	machine.scheduler().timer_set(duration, function, funcname);
 }
 
 static TIMER_CALLBACK( antic_issue_dli )
@@ -1134,13 +1134,13 @@ static TIMER_CALLBACK( antic_line_done )
     {
 		LOG(("           @cycle #%3d release WSYNC\n", cycle(machine)));
         /* release the CPU if it was actually waiting for HSYNC */
-        machine->scheduler().trigger(TRIGGER_HSYNC);
+        machine.scheduler().trigger(TRIGGER_HSYNC);
         /* and turn off the 'wait for hsync' flag */
         antic.w.wsync = 0;
     }
 	LOG(("           @cycle #%3d release CPU\n", cycle(machine)));
     /* release the CPU (held for emulating cycles stolen by ANTIC DMA) */
-	machine->scheduler().trigger(TRIGGER_STEAL);
+	machine.scheduler().trigger(TRIGGER_STEAL);
 
 	/* refresh the display (translate color clocks to pixels) */
     antic_linerefresh(machine);
@@ -1160,7 +1160,7 @@ static TIMER_CALLBACK( antic_steal_cycles )
 	LOG(("           @cycle #%3d steal %d cycles\n", cycle(machine), antic.steal_cycles));
 	after(machine, antic.steal_cycles, FUNC(antic_line_done));
     antic.steal_cycles = 0;
-	device_spin_until_trigger( machine->device("maincpu"), TRIGGER_STEAL );
+	device_spin_until_trigger( machine.device("maincpu"), TRIGGER_STEAL );
 }
 
 
@@ -1174,7 +1174,7 @@ static TIMER_CALLBACK( antic_steal_cycles )
  *****************************************************************************/
 static TIMER_CALLBACK( antic_scanline_render )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	VIDEO *video = antic.video[antic.scanline];
 	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(machine), (antic.cmd & 0x0f), antic.modelines));
@@ -1234,7 +1234,7 @@ static TIMER_CALLBACK( antic_scanline_render )
 
 
 
-INLINE void LMS(running_machine *machine, int new_cmd)
+INLINE void LMS(running_machine &machine, int new_cmd)
 {
     /**************************************************************
      * If the LMS bit (load memory scan) of the current display
@@ -1244,7 +1244,7 @@ INLINE void LMS(running_machine *machine, int new_cmd)
      **************************************************************/
     if( new_cmd & ANTIC_LMS )
     {
-    	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+    	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 		int addr = RDANTIC(space);
         antic.doffs = (antic.doffs + 1) & DOFFS;
         addr += 256 * RDANTIC(space);
@@ -1267,9 +1267,9 @@ INLINE void LMS(running_machine *machine, int new_cmd)
  *  if so, read a new command and set up the renderer function
  *
  *****************************************************************************/
-static void antic_scanline_dma(running_machine *machine, int param)
+static void antic_scanline_dma(running_machine &machine, int param)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	LOG(("           @cycle #%3d DMA fetch\n", cycle(machine)));
 	if (antic.scanline == VBL_END)
 		antic.r.nmist &= ~VBL_NMI;
@@ -1354,7 +1354,7 @@ static void antic_scanline_dma(running_machine *machine, int param)
                         /* produce empty scanlines until vblank start */
 						antic.modelines = VBL_START + 1 - antic.scanline;
 						if( antic.modelines < 0 )
-							antic.modelines = machine->primary_screen->height() - antic.scanline;
+							antic.modelines = machine.primary_screen->height() - antic.scanline;
 						LOG(("           JVB $%04x\n", antic.dpage|antic.doffs));
 					}
 					else
@@ -1487,7 +1487,7 @@ static void antic_scanline_dma(running_machine *machine, int param)
  *
  *****************************************************************************/
 
-static void generic_atari_interrupt(running_machine *machine, void (*handle_keyboard)(running_machine *machine), int button_count)
+static void generic_atari_interrupt(running_machine &machine, void (*handle_keyboard)(running_machine &machine), int button_count)
 {
 	int button_port, i;
 
@@ -1521,7 +1521,7 @@ static void generic_atari_interrupt(running_machine *machine, void (*handle_keyb
 		handle_keyboard(machine);
 
 		/* do nothing new for the rest of the frame */
-		antic.modelines = machine->primary_screen->height() - VBL_START;
+		antic.modelines = machine.primary_screen->height() - VBL_START;
 		antic.renderer = antic_mode_0_xx;
 
 		/* if the CPU want's to be interrupted at vertical blank... */
@@ -1542,22 +1542,22 @@ static void generic_atari_interrupt(running_machine *machine, void (*handle_keyb
 
 INTERRUPT_GEN( a400_interrupt )
 {
-	generic_atari_interrupt(device->machine, a800_handle_keyboard, 4);
+	generic_atari_interrupt(device->machine(), a800_handle_keyboard, 4);
 }
 
 INTERRUPT_GEN( a800_interrupt )
 {
-	generic_atari_interrupt(device->machine, a800_handle_keyboard, 4);
+	generic_atari_interrupt(device->machine(), a800_handle_keyboard, 4);
 }
 
 INTERRUPT_GEN( a800xl_interrupt )
 {
-	generic_atari_interrupt(device->machine, a800_handle_keyboard, 2);
+	generic_atari_interrupt(device->machine(), a800_handle_keyboard, 2);
 }
 
 INTERRUPT_GEN( a5200_interrupt )
 {
-	generic_atari_interrupt(device->machine, a5200_handle_keypads, 4);
+	generic_atari_interrupt(device->machine(), a5200_handle_keypads, 4);
 }
 
 /**************************************************************

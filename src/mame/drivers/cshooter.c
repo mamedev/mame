@@ -109,9 +109,9 @@ public:
 
 #if 0
 
-static void ar_coin_hack(running_machine *machine)
+static void ar_coin_hack(running_machine &machine)
 {
-	cshooter_state *state = machine->driver_data<cshooter_state>();
+	cshooter_state *state = machine.driver_data<cshooter_state>();
 	if(input_port_read(machine, "COIN") & 1)
 	{
 		if(state->coin_stat==0)
@@ -135,7 +135,7 @@ static void ar_coin_hack(running_machine *machine)
 
 static TILE_GET_INFO( get_cstx_tile_info )
 {
-	cshooter_state *state = machine->driver_data<cshooter_state>();
+	cshooter_state *state = machine.driver_data<cshooter_state>();
 	int code = (state->txram[tile_index*2]);
 	int attr = (state->txram[tile_index*2+1]);
 	int rg;
@@ -152,22 +152,22 @@ static TILE_GET_INFO( get_cstx_tile_info )
 
 static WRITE8_HANDLER(cshooter_txram_w)
 {
-	cshooter_state *state = space->machine->driver_data<cshooter_state>();
+	cshooter_state *state = space->machine().driver_data<cshooter_state>();
 	state->txram[offset] = data;
 	tilemap_mark_tile_dirty(state->txtilemap,offset/2);
 }
 
 static VIDEO_START(cshooter)
 {
-	cshooter_state *state = machine->driver_data<cshooter_state>();
+	cshooter_state *state = machine.driver_data<cshooter_state>();
 	state->txtilemap = tilemap_create(machine, get_cstx_tile_info,tilemap_scan_rows, 8,8,32, 32);
 	tilemap_set_transparent_pen(state->txtilemap, 3);
 }
 
 static SCREEN_UPDATE(cshooter)
 {
-	cshooter_state *state = screen->machine->driver_data<cshooter_state>();
-	bitmap_fill(bitmap, cliprect, 0/*get_black_pen(screen->screen->machine)*/);
+	cshooter_state *state = screen->machine().driver_data<cshooter_state>();
+	bitmap_fill(bitmap, cliprect, 0/*get_black_pen(screen->screen->machine())*/);
 	tilemap_mark_all_tiles_dirty(state->txtilemap);
 
 	//sprites
@@ -180,25 +180,25 @@ static SCREEN_UPDATE(cshooter)
 			{
 				int tile=0x30+((spriteram[i]>>2)&0x1f);
 
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3],spriteram[i+2],3);
 
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3]+8,spriteram[i+2],3);
 
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3]+8,spriteram[i+2]+8,3);
 
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
@@ -217,21 +217,21 @@ static SCREEN_UPDATE(cshooter)
 
 static INTERRUPT_GEN( cshooter_interrupt )
 {
-	//cshooter_state *state = device->machine->driver_data<cshooter_state>();
+	//cshooter_state *state = device->machine().driver_data<cshooter_state>();
 	if(cpu_getiloops(device))
 		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x08);
 	else
       device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x10);
 
 //  if(state->mainram!=NULL)
-//      ar_coin_hack(device->machine);
+//      ar_coin_hack(device->machine());
 }
 
 
 
 static MACHINE_RESET( cshooter )
 {
-	cshooter_state *state = machine->driver_data<cshooter_state>();
+	cshooter_state *state = machine.driver_data<cshooter_state>();
 	state->counter = 0;
 }
 
@@ -242,11 +242,11 @@ static MACHINE_RESET( airraid )
 
 static READ8_HANDLER ( cshooter_coin_r )
 {
-	cshooter_state *state = space->machine->driver_data<cshooter_state>();
+	cshooter_state *state = space->machine().driver_data<cshooter_state>();
 	/* Even reads must return 0xff - Odd reads must return the contents of input port 5.
        Code at 0x5061 is executed once during P.O.S.T. where there is one read.
        Code at 0x50b4 is then executed each frame (not sure) where there are 2 reads. */
-	return ( (state->counter++ & 1) ? 0xff : input_port_read(space->machine, "COIN") );
+	return ( (state->counter++ & 1) ? 0xff : input_port_read(space->machine(), "COIN") );
 }
 
 static WRITE8_HANDLER ( cshooter_c500_w )
@@ -259,27 +259,27 @@ static WRITE8_HANDLER ( cshooter_c700_w )
 
 static WRITE8_HANDLER ( bank_w )
 {
-	memory_set_bankptr(space->machine, "bank1",&space->machine->region("user1")->base()[0x4000*((data>>4)&3)]);
+	memory_set_bankptr(space->machine(), "bank1",&space->machine().region("user1")->base()[0x4000*((data>>4)&3)]);
 }
 
 
 static WRITE8_HANDLER(pal_w)
 {
-	space->machine->generic.paletteram.u8[offset]=data;
+	space->machine().generic.paletteram.u8[offset]=data;
 	offset&=0xff;
-	palette_set_color_rgb(space->machine, offset, pal4bit(space->machine->generic.paletteram.u8[offset] >> 4), pal4bit(space->machine->generic.paletteram.u8[offset]), pal4bit(space->machine->generic.paletteram.u8[offset+0x100]));
+	palette_set_color_rgb(space->machine(), offset, pal4bit(space->machine().generic.paletteram.u8[offset] >> 4), pal4bit(space->machine().generic.paletteram.u8[offset]), pal4bit(space->machine().generic.paletteram.u8[offset+0x100]));
 }
 
 static WRITE8_HANDLER(pal2_w)
 {
-	space->machine->generic.paletteram.u8[offset]=data;
+	space->machine().generic.paletteram.u8[offset]=data;
 	offset&=0x1ff;
-	palette_set_color_rgb(space->machine, offset, pal4bit(space->machine->generic.paletteram.u8[offset] >> 4), pal4bit(space->machine->generic.paletteram.u8[offset]), pal4bit(space->machine->generic.paletteram.u8[offset+0x200]));
+	palette_set_color_rgb(space->machine(), offset, pal4bit(space->machine().generic.paletteram.u8[offset] >> 4), pal4bit(space->machine().generic.paletteram.u8[offset]), pal4bit(space->machine().generic.paletteram.u8[offset+0x200]));
 }
 
 static READ8_HANDLER(pal_r)
 {
-	return space->machine->generic.paletteram.u8[offset];
+	return space->machine().generic.paletteram.u8[offset];
 }
 
 static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8 )
@@ -687,19 +687,19 @@ ROM_END
 static DRIVER_INIT( cshooter )
 {
 	/* temp so it boots */
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	rom[0xa2] = 0x00;
 	rom[0xa3] = 0x00;
 	rom[0xa4] = 0x00;
-	memory_set_bankptr(machine, "bank1",&machine->region("user1")->base()[0]);
+	memory_set_bankptr(machine, "bank1",&machine.region("user1")->base()[0]);
 }
 
 static DRIVER_INIT( cshootere )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int A;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
 	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
@@ -729,7 +729,7 @@ static DRIVER_INIT( cshootere )
 			rom[A] = BITSWAP8(rom[A],7,6,1,4,3,2,5,0);
 	}
 
-	memory_set_bankptr(machine, "bank1",&machine->region("user1")->base()[0]);
+	memory_set_bankptr(machine, "bank1",&machine.region("user1")->base()[0]);
 	seibu_sound_decrypt(machine,"audiocpu",0x2000);
 }
 

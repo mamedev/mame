@@ -10,7 +10,7 @@ Atari Triple Hunt video emulation
 
 static TILE_GET_INFO( get_tile_info )
 {
-	triplhnt_state *state = machine->driver_data<triplhnt_state>();
+	triplhnt_state *state = machine.driver_data<triplhnt_state>();
 	int code = state->playfield_ram[tile_index] & 0x3f;
 
 	SET_TILE_INFO(2, code, code == 0x3f ? 1 : 0, 0);
@@ -19,8 +19,8 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( triplhnt )
 {
-	triplhnt_state *state = machine->driver_data<triplhnt_state>();
-	state->helper = machine->primary_screen->alloc_compatible_bitmap();
+	triplhnt_state *state = machine.driver_data<triplhnt_state>();
+	state->helper = machine.primary_screen->alloc_compatible_bitmap();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 }
@@ -32,9 +32,9 @@ static TIMER_CALLBACK( triplhnt_hit_callback )
 }
 
 
-static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
-	triplhnt_state *state = machine->driver_data<triplhnt_state>();
+	triplhnt_state *state = machine.driver_data<triplhnt_state>();
 	int i;
 
 	int hit_line = 999;
@@ -74,7 +74,7 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 
 		/* render sprite to auxiliary bitmap */
 
-		drawgfx_opaque(state->helper, cliprect, machine->gfx[state->sprite_zoom],
+		drawgfx_opaque(state->helper, cliprect, machine.gfx[state->sprite_zoom],
 			2 * code + state->sprite_bank, 0, code & 8, 0,
 			rect.min_x, rect.min_y);
 
@@ -114,20 +114,20 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 	}
 
 	if (hit_line != 999 && hit_code != 999)
-		machine->scheduler().timer_set(machine->primary_screen->time_until_pos(hit_line), FUNC(triplhnt_hit_callback), hit_code);
+		machine.scheduler().timer_set(machine.primary_screen->time_until_pos(hit_line), FUNC(triplhnt_hit_callback), hit_code);
 }
 
 
 SCREEN_UPDATE( triplhnt )
 {
-	triplhnt_state *state = screen->machine->driver_data<triplhnt_state>();
-	device_t *discrete = screen->machine->device("discrete");
+	triplhnt_state *state = screen->machine().driver_data<triplhnt_state>();
+	device_t *discrete = screen->machine().device("discrete");
 
 	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 
 	discrete_sound_w(discrete, TRIPLHNT_BEAR_ROAR_DATA, state->playfield_ram[0xfa] & 15);
 	discrete_sound_w(discrete, TRIPLHNT_SHOT_DATA, state->playfield_ram[0xfc] & 15);

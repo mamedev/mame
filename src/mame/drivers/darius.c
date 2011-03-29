@@ -139,25 +139,25 @@ sounds.
 #include "darius.lh"
 
 
-static void parse_control( running_machine *machine )	/* assumes Z80 sandwiched between 68Ks */
+static void parse_control( running_machine &machine )	/* assumes Z80 sandwiched between 68Ks */
 {
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	darius_state *state = machine->driver_data<darius_state>();
+	darius_state *state = machine.driver_data<darius_state>();
 	device_set_input_line(state->cpub, INPUT_LINE_RESET, (state->cpua_ctrl & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( cpua_ctrl_w )
 {
-	darius_state *state = space->machine->driver_data<darius_state>();
+	darius_state *state = space->machine().driver_data<darius_state>();
 
 	if ((data & 0xff00) && ((data & 0xff) == 0))
 		data = data >> 8;
 
 	state->cpua_ctrl = data;
 
-	parse_control(space->machine);
+	parse_control(space->machine());
 
 	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(space->cpu), data);
 }
@@ -174,7 +174,7 @@ static WRITE16_HANDLER( darius_watchdog_w )
 
 static READ16_HANDLER( darius_ioc_r )
 {
-	darius_state *state = space->machine->driver_data<darius_state>();
+	darius_state *state = space->machine().driver_data<darius_state>();
 
 	switch (offset)
 	{
@@ -182,19 +182,19 @@ static READ16_HANDLER( darius_ioc_r )
 			return (tc0140syt_comm_r(state->tc0140syt, 0) & 0xff);	/* sound interface read */
 
 		case 0x04:
-			return input_port_read(space->machine, "P1");
+			return input_port_read(space->machine(), "P1");
 
 		case 0x05:
-			return input_port_read(space->machine, "P2");
+			return input_port_read(space->machine(), "P2");
 
 		case 0x06:
-			return input_port_read(space->machine, "SYSTEM");
+			return input_port_read(space->machine(), "SYSTEM");
 
 		case 0x07:
 			return state->coin_word;	/* bits 3&4 coin lockouts, must return zero */
 
 		case 0x08:
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(space->cpu),offset);
@@ -204,7 +204,7 @@ logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(
 
 static WRITE16_HANDLER( darius_ioc_w )
 {
-	darius_state *state = space->machine->driver_data<darius_state>();
+	darius_state *state = space->machine().driver_data<darius_state>();
 
 	switch (offset)
 	{
@@ -225,10 +225,10 @@ static WRITE16_HANDLER( darius_ioc_w )
 		case 0x30:	/* coin control */
 			/* bits 7,5,4,0 used on reset */
 			/* bit 4 used whenever bg is blanked ? */
-			coin_lockout_w(space->machine, 0, ~data & 0x02);
-			coin_lockout_w(space->machine, 1, ~data & 0x04);
-			coin_counter_w(space->machine, 0, data & 0x08);
-			coin_counter_w(space->machine, 1, data & 0x40);
+			coin_lockout_w(space->machine(), 0, ~data & 0x02);
+			coin_lockout_w(space->machine(), 1, ~data & 0x04);
+			coin_counter_w(space->machine(), 0, data & 0x08);
+			coin_counter_w(space->machine(), 1, data & 0x40);
 			state->coin_word = data & 0xffff;
 //popmessage(" address %04x value %04x",offset,data);
 			return;
@@ -274,25 +274,25 @@ ADDRESS_MAP_END
                         SOUND
 *****************************************************/
 
-static void reset_sound_region( running_machine *machine )
+static void reset_sound_region( running_machine &machine )
 {
-	darius_state *state = machine->driver_data<darius_state>();
+	darius_state *state = machine.driver_data<darius_state>();
 	memory_set_bank(machine, "bank1", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	darius_state *state = space->machine->driver_data<darius_state>();
+	darius_state *state = space->machine().driver_data<darius_state>();
 
 	state->banknum = data & 0x03;
-	reset_sound_region(space->machine);
+	reset_sound_region(space->machine());
 //  banknum = data;
 //  reset_sound_region();
 }
 
 static WRITE8_HANDLER( adpcm_command_w )
 {
-	darius_state *state = space->machine->driver_data<darius_state>();
+	darius_state *state = space->machine().driver_data<darius_state>();
 	state->adpcm_command = data;
 	/* logerror("#ADPCM command write =%2x\n",data); */
 }
@@ -309,9 +309,9 @@ static WRITE8_HANDLER( display_value )
                Sound mixer/pan control
 *****************************************************/
 
-static void update_fm0( running_machine *machine )
+static void update_fm0( running_machine &machine )
 {
-	darius_state *state = machine->driver_data<darius_state>();
+	darius_state *state = machine.driver_data<darius_state>();
 	int left  = (        state->pan[0]  * state->vol[6]) >> 8;
 	int right = ((0xff - state->pan[0]) * state->vol[6]) >> 8;
 
@@ -321,9 +321,9 @@ static void update_fm0( running_machine *machine )
 		flt_volume_set_volume(state->filter0_3r, right / 100.0); /* FM #0 */
 }
 
-static void update_fm1( running_machine *machine )
+static void update_fm1( running_machine &machine )
 {
-	darius_state *state = machine->driver_data<darius_state>();
+	darius_state *state = machine.driver_data<darius_state>();
 	int left  = (        state->pan[1]  * state->vol[7]) >> 8;
 	int right = ((0xff - state->pan[1]) * state->vol[7]) >> 8;
 
@@ -333,9 +333,9 @@ static void update_fm1( running_machine *machine )
 		flt_volume_set_volume(state->filter1_3r, right / 100.0); /* FM #1 */
 }
 
-static void update_psg0( running_machine *machine, int port )
+static void update_psg0( running_machine &machine, int port )
 {
-	darius_state *state = machine->driver_data<darius_state>();
+	darius_state *state = machine.driver_data<darius_state>();
 	device_t *lvol = NULL, *rvol = NULL;
 	int left, right;
 
@@ -356,9 +356,9 @@ static void update_psg0( running_machine *machine, int port )
 		flt_volume_set_volume(rvol, right / 100.0);
 }
 
-static void update_psg1( running_machine *machine, int port )
+static void update_psg1( running_machine &machine, int port )
 {
-	darius_state *state = machine->driver_data<darius_state>();
+	darius_state *state = machine.driver_data<darius_state>();
 	device_t *lvol = NULL, *rvol = NULL;
 	int left, right;
 
@@ -379,9 +379,9 @@ static void update_psg1( running_machine *machine, int port )
 		flt_volume_set_volume(rvol, right / 100.0);
 }
 
-static void update_da( running_machine *machine )
+static void update_da( running_machine &machine )
 {
-	darius_state *state = machine->driver_data<darius_state>();
+	darius_state *state = machine.driver_data<darius_state>();
 	int left  = state->def_vol[(state->pan[4] >> 4) & 0x0f];
 	int right = state->def_vol[(state->pan[4] >> 0) & 0x0f];
 
@@ -393,48 +393,48 @@ static void update_da( running_machine *machine )
 
 static WRITE8_HANDLER( darius_fm0_pan )
 {
-	darius_state *state = space->machine->driver_data<darius_state>();
+	darius_state *state = space->machine().driver_data<darius_state>();
 	state->pan[0] = data & 0xff;  /* data 0x00:right 0xff:left */
-	update_fm0(space->machine);
+	update_fm0(space->machine());
 }
 
 static WRITE8_HANDLER( darius_fm1_pan )
 {
-	darius_state *state = space->machine->driver_data<darius_state>();
+	darius_state *state = space->machine().driver_data<darius_state>();
 	state->pan[1] = data & 0xff;
-	update_fm1(space->machine);
+	update_fm1(space->machine());
 }
 
 static WRITE8_HANDLER( darius_psg0_pan )
 {
-	darius_state *state = space->machine->driver_data<darius_state>();
+	darius_state *state = space->machine().driver_data<darius_state>();
 	state->pan[2] = data & 0xff;
-	update_psg0(space->machine, 0);
-	update_psg0(space->machine, 1);
-	update_psg0(space->machine, 2);
+	update_psg0(space->machine(), 0);
+	update_psg0(space->machine(), 1);
+	update_psg0(space->machine(), 2);
 }
 
 static WRITE8_HANDLER( darius_psg1_pan )
 {
-	darius_state *state = space->machine->driver_data<darius_state>();
+	darius_state *state = space->machine().driver_data<darius_state>();
 	state->pan[3] = data & 0xff;
-	update_psg1(space->machine, 0);
-	update_psg1(space->machine, 1);
-	update_psg1(space->machine, 2);
+	update_psg1(space->machine(), 0);
+	update_psg1(space->machine(), 1);
+	update_psg1(space->machine(), 2);
 }
 
 static WRITE8_HANDLER( darius_da_pan )
 {
-	darius_state *state = space->machine->driver_data<darius_state>();
+	darius_state *state = space->machine().driver_data<darius_state>();
 	state->pan[4] = data & 0xff;
-	update_da(space->machine);
+	update_da(space->machine());
 }
 
 /**** Mixer Control ****/
 
 static WRITE8_DEVICE_HANDLER( darius_write_portA0 )
 {
-	darius_state *state = device->machine->driver_data<darius_state>();
+	darius_state *state = device->machine().driver_data<darius_state>();
 
 	// volume control FM #0 PSG #0 A
 	//popmessage(" pan %02x %02x %02x %02x %02x", state->pan[0], state->pan[1], state->pan[2], state->pan[3], state->pan[4] );
@@ -442,47 +442,47 @@ static WRITE8_DEVICE_HANDLER( darius_write_portA0 )
 
 	state->vol[0] = state->def_vol[(data >> 4) & 0x0f];
 	state->vol[6] = state->def_vol[(data >> 0) & 0x0f];
-	update_fm0(device->machine);
-	update_psg0(device->machine, 0);
+	update_fm0(device->machine());
+	update_psg0(device->machine(), 0);
 }
 
 static WRITE8_DEVICE_HANDLER( darius_write_portA1 )
 {
-	darius_state *state = device->machine->driver_data<darius_state>();
+	darius_state *state = device->machine().driver_data<darius_state>();
 
 	// volume control FM #1 PSG #1 A
 	//popmessage(" pan %02x %02x %02x %02x %02x", state->pan[0], state->pan[1], state->pan[2], state->pan[3], state->pan[4] );
 
 	state->vol[3] = state->def_vol[(data >> 4) & 0x0f];
 	state->vol[7] = state->def_vol[(data >> 0) & 0x0f];
-	update_fm1(device->machine);
-	update_psg1(device->machine, 0);
+	update_fm1(device->machine());
+	update_psg1(device->machine(), 0);
 }
 
 static WRITE8_DEVICE_HANDLER( darius_write_portB0 )
 {
-	darius_state *state = device->machine->driver_data<darius_state>();
+	darius_state *state = device->machine().driver_data<darius_state>();
 
 	// volume control PSG #0 B/C
 	//popmessage(" pan %02x %02x %02x %02x %02x", state->pan[0], state->pan[1], state->pan[2], state->pan[3], state->pan[4] );
 
 	state->vol[1] = state->def_vol[(data >> 4) & 0x0f];
 	state->vol[2] = state->def_vol[(data >> 0) & 0x0f];
-	update_psg0(device->machine, 1);
-	update_psg0(device->machine, 2);
+	update_psg0(device->machine(), 1);
+	update_psg0(device->machine(), 2);
 }
 
 static WRITE8_DEVICE_HANDLER( darius_write_portB1 )
 {
-	darius_state *state = device->machine->driver_data<darius_state>();
+	darius_state *state = device->machine().driver_data<darius_state>();
 
 	// volume control PSG #1 B/C
 	//popmessage(" pan %02x %02x %02x %02x %02x", state->pan[0], state->pan[1], state->pan[2], state->pan[3], state->pan[4] );
 
 	state->vol[4] = state->def_vol[(data >> 4) & 0x0f];
 	state->vol[5] = state->def_vol[(data >> 0) & 0x0f];
-	update_psg1(device->machine, 1);
-	update_psg1(device->machine, 2);
+	update_psg1(device->machine(), 1);
+	update_psg1(device->machine(), 2);
 }
 
 
@@ -515,7 +515,7 @@ ADDRESS_MAP_END
 
 static void darius_adpcm_int( device_t *device )
 {
-	darius_state *state = device->machine->driver_data<darius_state>();
+	darius_state *state = device->machine().driver_data<darius_state>();
 
 	if (state->nmi_enable)
 		device_set_input_line(state->adpcm, INPUT_LINE_NMI, PULSE_LINE);
@@ -529,7 +529,7 @@ static const msm5205_interface msm5205_config =
 
 static READ8_HANDLER( adpcm_command_read )
 {
-	darius_state *state = space->machine->driver_data<darius_state>();
+	darius_state *state = space->machine().driver_data<darius_state>();
 
 	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, cpu_get_pc(space->cpu) ); */
 	return state->adpcm_command;
@@ -547,7 +547,7 @@ static READ8_HANDLER( readport3 )
 
 static WRITE8_HANDLER( adpcm_nmi_disable )
 {
-	darius_state *state = space->machine->driver_data<darius_state>();
+	darius_state *state = space->machine().driver_data<darius_state>();
 
 	state->nmi_enable = 0;
 	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, cpu_get_pc(space->cpu) ); */
@@ -555,7 +555,7 @@ static WRITE8_HANDLER( adpcm_nmi_disable )
 
 static WRITE8_HANDLER( adpcm_nmi_enable )
 {
-	darius_state *state = space->machine->driver_data<darius_state>();
+	darius_state *state = space->machine().driver_data<darius_state>();
 	state->nmi_enable = 1;
 	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", cpu_get_pc(space->cpu) ); */
 }
@@ -800,7 +800,7 @@ GFXDECODE_END
 /* handler called by the YM2203 emulator when the internal timers cause an IRQ */
 static void irqhandler( device_t *device, int irq )	/* assumes Z80 sandwiched between 68Ks */
 {
-	darius_state *state = device->machine->driver_data<darius_state>();
+	darius_state *state = device->machine().driver_data<darius_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -853,43 +853,43 @@ static STATE_POSTLOAD( darius_postload )
 
 static MACHINE_START( darius )
 {
-	darius_state *state = machine->driver_data<darius_state>();
+	darius_state *state = machine.driver_data<darius_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 4, machine->region("audiocpu")->base() + 0x10000, 0x8000);
-	memory_configure_bank(machine, "bank1", 4, 1, machine->region("audiocpu")->base(), 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000, 0x8000);
+	memory_configure_bank(machine, "bank1", 4, 1, machine.region("audiocpu")->base(), 0x8000);
 	memory_set_bank(machine, "bank1", 4);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->cpub = machine->device("cpub");
-	state->adpcm = machine->device("adpcm");
-	state->pc080sn = machine->device("pc080sn");
-	state->tc0140syt = machine->device("tc0140syt");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->cpub = machine.device("cpub");
+	state->adpcm = machine.device("adpcm");
+	state->pc080sn = machine.device("pc080sn");
+	state->tc0140syt = machine.device("tc0140syt");
 
-	state->lscreen = machine->device("lscreen");
-	state->mscreen = machine->device("mscreen");
-	state->rscreen = machine->device("rscreen");
+	state->lscreen = machine.device("lscreen");
+	state->mscreen = machine.device("mscreen");
+	state->rscreen = machine.device("rscreen");
 
-	state->filter0_0l = machine->device("filter0.0l");
-	state->filter0_0r = machine->device("filter0.0r");
-	state->filter0_1l = machine->device("filter0.1l");
-	state->filter0_1r = machine->device("filter0.1r");
-	state->filter0_2l = machine->device("filter0.2l");
-	state->filter0_2r = machine->device("filter0.2r");
-	state->filter0_3l = machine->device("filter0.3l");
-	state->filter0_3r = machine->device("filter0.3r");
+	state->filter0_0l = machine.device("filter0.0l");
+	state->filter0_0r = machine.device("filter0.0r");
+	state->filter0_1l = machine.device("filter0.1l");
+	state->filter0_1r = machine.device("filter0.1r");
+	state->filter0_2l = machine.device("filter0.2l");
+	state->filter0_2r = machine.device("filter0.2r");
+	state->filter0_3l = machine.device("filter0.3l");
+	state->filter0_3r = machine.device("filter0.3r");
 
-	state->filter1_0l = machine->device("filter1.0l");
-	state->filter1_0r = machine->device("filter1.0r");
-	state->filter1_1l = machine->device("filter1.1l");
-	state->filter1_1r = machine->device("filter1.1r");
-	state->filter1_2l = machine->device("filter1.2l");
-	state->filter1_2r = machine->device("filter1.2r");
-	state->filter1_3l = machine->device("filter1.3l");
-	state->filter1_3r = machine->device("filter1.3r");
+	state->filter1_0l = machine.device("filter1.0l");
+	state->filter1_0r = machine.device("filter1.0r");
+	state->filter1_1l = machine.device("filter1.1l");
+	state->filter1_1r = machine.device("filter1.1r");
+	state->filter1_2l = machine.device("filter1.2l");
+	state->filter1_2r = machine.device("filter1.2r");
+	state->filter1_3l = machine.device("filter1.3l");
+	state->filter1_3r = machine.device("filter1.3r");
 
-	state->msm5205_l = machine->device("msm5205.l");
-	state->msm5205_r = machine->device("msm5205.r");
+	state->msm5205_l = machine.device("msm5205.l");
+	state->msm5205_r = machine.device("msm5205.r");
 
 	state->save_item(NAME(state->cpua_ctrl));
 	state->save_item(NAME(state->coin_word));
@@ -899,13 +899,13 @@ static MACHINE_START( darius )
 	state->save_item(NAME(state->nmi_enable));
 	state->save_item(NAME(state->vol));
 	state->save_item(NAME(state->pan));
-	machine->state().register_postload(darius_postload, NULL);
+	machine.state().register_postload(darius_postload, NULL);
 }
 
 
 static MACHINE_RESET( darius )
 {
-	darius_state *state = machine->driver_data<darius_state>();
+	darius_state *state = machine.driver_data<darius_state>();
 	int  i;
 
 	state->cpua_ctrl = 0xff;
@@ -914,7 +914,7 @@ static MACHINE_RESET( darius )
 	state->adpcm_command = 0;
 	state->nmi_enable = 0;
 
-	machine->sound().system_enable(true);	/* mixer enabled */
+	machine.sound().system_enable(true);	/* mixer enabled */
 
 	for (i = 0; i < DARIUS_VOL_MAX; i++)
 		state->vol[i] = 0x00;	/* min volume */
@@ -1291,7 +1291,7 @@ ROM_END
 static DRIVER_INIT( darius )
 {
 	/**** setup sound bank image ****/
-	UINT8 *RAM = machine->region("audiocpu")->base();
+	UINT8 *RAM = machine.region("audiocpu")->base();
 	int  i;
 
 	for (i = 3; i >= 0; i--)

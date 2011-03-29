@@ -15,18 +15,18 @@ driver by Nicola Salmoria
 
 static READ8_HANDLER( sichuan2_dsw1_r )
 {
-	int ret = input_port_read(space->machine, "DSW1");
+	int ret = input_port_read(space->machine(), "DSW1");
 
 	/* Based on the coin mode fill in the upper bits */
-	if (input_port_read(space->machine, "DSW2") & 0x04)
+	if (input_port_read(space->machine(), "DSW2") & 0x04)
 	{
 		/* Mode 1 */
-		ret	|= (input_port_read(space->machine, "DSW1") << 4);
+		ret	|= (input_port_read(space->machine(), "DSW1") << 4);
 	}
 	else
 	{
 		/* Mode 2 */
-		ret	|= (input_port_read(space->machine, "DSW1") & 0xf0);
+		ret	|= (input_port_read(space->machine(), "DSW1") & 0xf0);
 	}
 
 	return ret;
@@ -36,8 +36,8 @@ static WRITE8_HANDLER( sichuan2_coin_w )
 {
 	if ((data & 0xf9) != 0x01) logerror("coin ctrl = %02x\n",data);
 
-	coin_counter_w(space->machine, 0, data & 0x02);
-	coin_counter_w(space->machine, 1, data & 0x04);
+	coin_counter_w(space->machine(), 0, data & 0x02);
+	coin_counter_w(space->machine(), 1, data & 0x04);
 }
 
 

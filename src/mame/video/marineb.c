@@ -14,7 +14,7 @@ PALETTE_INIT( marineb )
 {
 	int i;
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -25,13 +25,13 @@ PALETTE_INIT( marineb )
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		/* green component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i + machine->total_colors()] >> 0) & 0x01;
-		bit2 = (color_prom[i + machine->total_colors()] >> 1) & 0x01;
+		bit1 = (color_prom[i + machine.total_colors()] >> 0) & 0x01;
+		bit2 = (color_prom[i + machine.total_colors()] >> 1) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		/* blue component */
 		bit0 = 0;
-		bit1 = (color_prom[i + machine->total_colors()] >> 2) & 0x01;
-		bit2 = (color_prom[i + machine->total_colors()] >> 3) & 0x01;
+		bit1 = (color_prom[i + machine.total_colors()] >> 2) & 0x01;
+		bit2 = (color_prom[i + machine.total_colors()] >> 3) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette_set_color(machine, i, MAKE_RGB(r,g,b));
@@ -46,7 +46,7 @@ PALETTE_INIT( marineb )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	marineb_state *state = machine->driver_data<marineb_state>();
+	marineb_state *state = machine.driver_data<marineb_state>();
 
 	UINT8 code = state->videoram[tile_index];
 	UINT8 col = state->colorram[tile_index];
@@ -67,7 +67,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( marineb )
 {
-	marineb_state *state = machine->driver_data<marineb_state>();
+	marineb_state *state = machine.driver_data<marineb_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_cols(state->bg_tilemap, 32);
@@ -88,7 +88,7 @@ VIDEO_START( marineb )
 
 WRITE8_HANDLER( marineb_videoram_w )
 {
-	marineb_state *state = space->machine->driver_data<marineb_state>();
+	marineb_state *state = space->machine().driver_data<marineb_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -97,7 +97,7 @@ WRITE8_HANDLER( marineb_videoram_w )
 
 WRITE8_HANDLER( marineb_colorram_w )
 {
-	marineb_state *state = space->machine->driver_data<marineb_state>();
+	marineb_state *state = space->machine().driver_data<marineb_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -106,14 +106,14 @@ WRITE8_HANDLER( marineb_colorram_w )
 
 WRITE8_HANDLER( marineb_column_scroll_w )
 {
-	marineb_state *state = space->machine->driver_data<marineb_state>();
+	marineb_state *state = space->machine().driver_data<marineb_state>();
 	state->column_scroll = data;
 }
 
 
 WRITE8_HANDLER( marineb_palette_bank_0_w )
 {
-	marineb_state *state = space->machine->driver_data<marineb_state>();
+	marineb_state *state = space->machine().driver_data<marineb_state>();
 	UINT8 old = state->palette_bank;
 
 	state->palette_bank = (state->palette_bank & 0x02) | (data & 0x01);
@@ -127,7 +127,7 @@ WRITE8_HANDLER( marineb_palette_bank_0_w )
 
 WRITE8_HANDLER( marineb_palette_bank_1_w )
 {
-	marineb_state *state = space->machine->driver_data<marineb_state>();
+	marineb_state *state = space->machine().driver_data<marineb_state>();
 	UINT8 old = state->palette_bank;
 
 	state->palette_bank = (state->palette_bank & 0x01) | ((data & 0x01) << 1);
@@ -141,7 +141,7 @@ WRITE8_HANDLER( marineb_palette_bank_1_w )
 
 WRITE8_HANDLER( marineb_flipscreen_x_w )
 {
-	marineb_state *state = space->machine->driver_data<marineb_state>();
+	marineb_state *state = space->machine().driver_data<marineb_state>();
 
 	state->flipscreen_x = data ^ state->marineb_active_low_flipscreen;
 	tilemap_set_flip(state->bg_tilemap, (state->flipscreen_x ? TILEMAP_FLIPX : 0) | (state->flipscreen_y ? TILEMAP_FLIPY : 0));
@@ -150,7 +150,7 @@ WRITE8_HANDLER( marineb_flipscreen_x_w )
 
 WRITE8_HANDLER( marineb_flipscreen_y_w )
 {
-	marineb_state *state = space->machine->driver_data<marineb_state>();
+	marineb_state *state = space->machine().driver_data<marineb_state>();
 
 	state->flipscreen_y = data ^ state->marineb_active_low_flipscreen;
 	tilemap_set_flip(state->bg_tilemap, (state->flipscreen_x ? TILEMAP_FLIPX : 0) | (state->flipscreen_y ? TILEMAP_FLIPY : 0));
@@ -164,9 +164,9 @@ WRITE8_HANDLER( marineb_flipscreen_y_w )
  *
  *************************************/
 
-static void set_tilemap_scrolly( running_machine *machine, int cols )
+static void set_tilemap_scrolly( running_machine &machine, int cols )
 {
-	marineb_state *state = machine->driver_data<marineb_state>();
+	marineb_state *state = machine.driver_data<marineb_state>();
 	int col;
 
 	for (col = 0; col < cols; col++)
@@ -179,10 +179,10 @@ static void set_tilemap_scrolly( running_machine *machine, int cols )
 
 SCREEN_UPDATE( marineb )
 {
-	marineb_state *state = screen->machine->driver_data<marineb_state>();
+	marineb_state *state = screen->machine().driver_data<marineb_state>();
 	int offs;
 
-	set_tilemap_scrolly(screen->machine, 24);
+	set_tilemap_scrolly(screen->machine(), 24);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* draw the sprites */
@@ -220,7 +220,7 @@ SCREEN_UPDATE( marineb )
 
 		if (!state->flipscreen_y)
 		{
-			sy = 256 - screen->machine->gfx[gfx]->width - sy;
+			sy = 256 - screen->machine().gfx[gfx]->width - sy;
 			flipy = !flipy;
 		}
 
@@ -229,7 +229,7 @@ SCREEN_UPDATE( marineb )
 			sx++;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[gfx],
+		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[gfx],
 				code,
 				col,
 				flipx,flipy,
@@ -241,10 +241,10 @@ SCREEN_UPDATE( marineb )
 
 SCREEN_UPDATE( changes )
 {
-	marineb_state *state = screen->machine->driver_data<marineb_state>();
+	marineb_state *state = screen->machine().driver_data<marineb_state>();
 	int offs, sx, sy, code, col, flipx, flipy;
 
-	set_tilemap_scrolly(screen->machine, 26);
+	set_tilemap_scrolly(screen->machine(), 26);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* draw the small sprites */
@@ -263,7 +263,7 @@ SCREEN_UPDATE( changes )
 
 		if (!state->flipscreen_y)
 		{
-			sy = 256 - screen->machine->gfx[1]->width - sy;
+			sy = 256 - screen->machine().gfx[1]->width - sy;
 			flipy = !flipy;
 		}
 
@@ -272,7 +272,7 @@ SCREEN_UPDATE( changes )
 			sx++;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],
 				code >> 2,
 				col,
 				flipx,flipy,
@@ -290,7 +290,7 @@ SCREEN_UPDATE( changes )
 
 	if (!state->flipscreen_y)
 	{
-		sy = 256 - screen->machine->gfx[2]->width - sy;
+		sy = 256 - screen->machine().gfx[2]->width - sy;
 		flipy = !flipy;
 	}
 
@@ -301,7 +301,7 @@ SCREEN_UPDATE( changes )
 
 	code >>= 4;
 
-	drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[2],
+	drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[2],
 			code,
 			col,
 			flipx,flipy,
@@ -309,7 +309,7 @@ SCREEN_UPDATE( changes )
 
 	/* draw again for wrap around */
 
-	drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[2],
+	drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[2],
 			code,
 			col,
 			flipx,flipy,
@@ -320,10 +320,10 @@ SCREEN_UPDATE( changes )
 
 SCREEN_UPDATE( springer )
 {
-	marineb_state *state = screen->machine->driver_data<marineb_state>();
+	marineb_state *state = screen->machine().driver_data<marineb_state>();
 	int offs;
 
-	set_tilemap_scrolly(screen->machine, 0);
+	set_tilemap_scrolly(screen->machine(), 0);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* draw the sprites */
@@ -359,7 +359,7 @@ SCREEN_UPDATE( springer )
 
 		if (!state->flipscreen_y)
 		{
-			sy = 256 - screen->machine->gfx[gfx]->width - sy;
+			sy = 256 - screen->machine().gfx[gfx]->width - sy;
 			flipy = !flipy;
 		}
 
@@ -368,7 +368,7 @@ SCREEN_UPDATE( springer )
 			sx--;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[gfx],
+		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[gfx],
 				code,
 				col,
 				flipx,flipy,
@@ -380,10 +380,10 @@ SCREEN_UPDATE( springer )
 
 SCREEN_UPDATE( hoccer )
 {
-	marineb_state *state = screen->machine->driver_data<marineb_state>();
+	marineb_state *state = screen->machine().driver_data<marineb_state>();
 	int offs;
 
-	set_tilemap_scrolly(screen->machine, 0);
+	set_tilemap_scrolly(screen->machine(), 0);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* draw the sprites */
@@ -402,17 +402,17 @@ SCREEN_UPDATE( hoccer )
 
 		if (!state->flipscreen_y)
 		{
-			sy = 256 - screen->machine->gfx[1]->width - sy;
+			sy = 256 - screen->machine().gfx[1]->width - sy;
 			flipy = !flipy;
 		}
 
 		if (state->flipscreen_x)
 		{
-			sx = 256 - screen->machine->gfx[1]->width - sx;
+			sx = 256 - screen->machine().gfx[1]->width - sx;
 			flipx = !flipx;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],
 				code >> 2,
 				col,
 				flipx,flipy,
@@ -424,10 +424,10 @@ SCREEN_UPDATE( hoccer )
 
 SCREEN_UPDATE( hopprobo )
 {
-	marineb_state *state = screen->machine->driver_data<marineb_state>();
+	marineb_state *state = screen->machine().driver_data<marineb_state>();
 	int offs;
 
-	set_tilemap_scrolly(screen->machine, 0);
+	set_tilemap_scrolly(screen->machine(), 0);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* draw the sprites */
@@ -462,7 +462,7 @@ SCREEN_UPDATE( hopprobo )
 
 		if (!state->flipscreen_y)
 		{
-			sy = 256 - screen->machine->gfx[gfx]->width - sy;
+			sy = 256 - screen->machine().gfx[gfx]->width - sy;
 			flipy = !flipy;
 		}
 
@@ -471,7 +471,7 @@ SCREEN_UPDATE( hopprobo )
 			sx--;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[gfx],
+		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[gfx],
 				code,
 				col,
 				flipx,flipy,

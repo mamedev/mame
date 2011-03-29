@@ -16,7 +16,7 @@
  *
  *************************************/
 
-static void video_start_common(running_machine *machine, int type)
+static void video_start_common(running_machine &machine, int type)
 {
 	/* compute palette info */
 	segaic16_palette_init(0x800);
@@ -50,12 +50,12 @@ SCREEN_UPDATE( system16b )
 	/* if no drawing is happening, fill with black and get out */
 	if (!segaic16_display_enable)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 		return 0;
 	}
 
 	/* reset priorities */
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	/* draw background opaquely first, not setting any priorities */
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);

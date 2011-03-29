@@ -100,7 +100,7 @@ static DEVICE_START( ram )
 	/* the device named 'ram' can get ram options from command line */
 	if (strcmp(device->tag(), RAM_TAG) == 0)
 	{
-		const char *ramsize_string = device->machine->options().ram_size();
+		const char *ramsize_string = device->machine().options().ram_size();
 
 		if ((ramsize_string != NULL) && (ramsize_string[0] != '\0'))
 			ram->size = ram_parse_string(ramsize_string);
@@ -111,7 +111,7 @@ static DEVICE_START( ram )
 		ram->size = ram_parse_string(config->default_size);
 
 	/* allocate space for the ram */
-	ram->ram = auto_alloc_array(device->machine, UINT8, ram->size);
+	ram->ram = auto_alloc_array(device->machine(), UINT8, ram->size);
 
 	/* reset ram to the default value */
 	memset(ram->ram, config->default_value, ram->size);

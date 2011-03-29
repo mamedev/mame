@@ -29,9 +29,9 @@ public:
 
 
 
-static void acefruit_update_irq(running_machine *machine, int vpos )
+static void acefruit_update_irq(running_machine &machine, int vpos )
 {
-	acefruit_state *state = machine->driver_data<acefruit_state>();
+	acefruit_state *state = machine.driver_data<acefruit_state>();
 	int col;
 	int row = vpos / 8;
 
@@ -52,33 +52,33 @@ static void acefruit_update_irq(running_machine *machine, int vpos )
 
 static TIMER_CALLBACK( acefruit_refresh )
 {
-	acefruit_state *state = machine->driver_data<acefruit_state>();
-	int vpos = machine->primary_screen->vpos();
+	acefruit_state *state = machine.driver_data<acefruit_state>();
+	int vpos = machine.primary_screen->vpos();
 
-	machine->primary_screen->update_partial(vpos );
+	machine.primary_screen->update_partial(vpos );
 	acefruit_update_irq(machine, vpos );
 
 	vpos = ( ( vpos / 8 ) + 1 ) * 8;
 
-	state->refresh_timer->adjust( machine->primary_screen->time_until_pos(vpos) );
+	state->refresh_timer->adjust( machine.primary_screen->time_until_pos(vpos) );
 }
 
 static VIDEO_START( acefruit )
 {
-	acefruit_state *state = machine->driver_data<acefruit_state>();
-	state->refresh_timer = machine->scheduler().timer_alloc(FUNC(acefruit_refresh));
+	acefruit_state *state = machine.driver_data<acefruit_state>();
+	state->refresh_timer = machine.scheduler().timer_alloc(FUNC(acefruit_refresh));
 }
 
 static INTERRUPT_GEN( acefruit_vblank )
 {
-	acefruit_state *state = device->machine->driver_data<acefruit_state>();
+	acefruit_state *state = device->machine().driver_data<acefruit_state>();
 	device_set_input_line(device, 0, HOLD_LINE );
 	state->refresh_timer->adjust( attotime::zero );
 }
 
 static SCREEN_UPDATE( acefruit )
 {
-	acefruit_state *state = screen->machine->driver_data<acefruit_state>();
+	acefruit_state *state = screen->machine().driver_data<acefruit_state>();
 	int startrow = cliprect->min_y / 8;
 	int endrow = cliprect->max_y / 8;
 	int row;
@@ -98,7 +98,7 @@ static SCREEN_UPDATE( acefruit )
 
 			if( color < 0x4 )
 			{
-				drawgfx_opaque( bitmap, cliprect, screen->machine->gfx[ 1 ], code, color, 0, 0, col * 16, row * 8 );
+				drawgfx_opaque( bitmap, cliprect, screen->machine().gfx[ 1 ], code, color, 0, 0, col * 16, row * 8 );
 			}
 			else if( color >= 0x5 && color <= 0x7 )
 			{
@@ -106,7 +106,7 @@ static SCREEN_UPDATE( acefruit )
 				int x;
 				static const int spriteskip[] = { 1, 2, 4 };
 				int spritesize = spriteskip[ color - 5 ];
-				const gfx_element *gfx = screen->machine->gfx[ 0 ];
+				const gfx_element *gfx = screen->machine().gfx[ 0 ];
 
 				for( x = 0; x < 16; x++ )
 				{
@@ -168,9 +168,9 @@ static CUSTOM_INPUT( sidewndr_payout_r )
 	switch (bit_mask)
 	{
 		case 0x01:
-			return ((input_port_read(field->port->machine, "PAYOUT") & bit_mask) >> 0);
+			return ((input_port_read(field->port->machine(), "PAYOUT") & bit_mask) >> 0);
 		case 0x02:
-			return ((input_port_read(field->port->machine, "PAYOUT") & bit_mask) >> 1);
+			return ((input_port_read(field->port->machine(), "PAYOUT") & bit_mask) >> 1);
 		default:
 			logerror("sidewndr_payout_r : invalid %02X bit_mask\n",bit_mask);
 			return 0;
@@ -184,13 +184,13 @@ static CUSTOM_INPUT( starspnr_coinage_r )
 	switch (bit_mask)
 	{
 		case 0x01:
-			return ((input_port_read(field->port->machine, "COINAGE") & bit_mask) >> 0);
+			return ((input_port_read(field->port->machine(), "COINAGE") & bit_mask) >> 0);
 		case 0x02:
-			return ((input_port_read(field->port->machine, "COINAGE") & bit_mask) >> 1);
+			return ((input_port_read(field->port->machine(), "COINAGE") & bit_mask) >> 1);
 		case 0x04:
-			return ((input_port_read(field->port->machine, "COINAGE") & bit_mask) >> 2);
+			return ((input_port_read(field->port->machine(), "COINAGE") & bit_mask) >> 2);
 		case 0x08:
-			return ((input_port_read(field->port->machine, "COINAGE") & bit_mask) >> 3);
+			return ((input_port_read(field->port->machine(), "COINAGE") & bit_mask) >> 3);
 		default:
 			logerror("starspnr_coinage_r : invalid %02X bit_mask\n",bit_mask);
 			return 0;
@@ -204,11 +204,11 @@ static CUSTOM_INPUT( starspnr_payout_r )
 	switch (bit_mask)
 	{
 		case 0x01:
-			return ((input_port_read(field->port->machine, "PAYOUT") & bit_mask) >> 0);
+			return ((input_port_read(field->port->machine(), "PAYOUT") & bit_mask) >> 0);
 		case 0x02:
-			return ((input_port_read(field->port->machine, "PAYOUT") & bit_mask) >> 1);
+			return ((input_port_read(field->port->machine(), "PAYOUT") & bit_mask) >> 1);
 		case 0x04:
-			return ((input_port_read(field->port->machine, "PAYOUT") & bit_mask) >> 2);
+			return ((input_port_read(field->port->machine(), "PAYOUT") & bit_mask) >> 2);
 		default:
 			logerror("starspnr_payout_r : invalid %02X bit_mask\n",bit_mask);
 			return 0;
@@ -217,7 +217,7 @@ static CUSTOM_INPUT( starspnr_payout_r )
 
 static WRITE8_HANDLER( acefruit_colorram_w )
 {
-	acefruit_state *state = space->machine->driver_data<acefruit_state>();
+	acefruit_state *state = space->machine().driver_data<acefruit_state>();
 	state->colorram[ offset ] = data & 0xf;
 }
 
@@ -595,7 +595,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( sidewndr )
 {
-	UINT8 *ROM = machine->region( "maincpu" )->base();
+	UINT8 *ROM = machine.region( "maincpu" )->base();
 	/* replace "ret nc" ( 0xd0 ) with "di" */
 	ROM[ 0 ] = 0xf3;
 	/* this is either a bad dump or the cpu core should set the carry flag on reset */

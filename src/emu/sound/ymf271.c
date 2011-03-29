@@ -1589,7 +1589,7 @@ READ8_DEVICE_HANDLER( ymf271_r )
 	return 0;
 }
 
-static void init_tables(running_machine *machine)
+static void init_tables(running_machine &machine)
 {
 	int i,j;
 
@@ -1752,8 +1752,8 @@ static void init_state(YMF271Chip *chip, device_t *device)
 
 static void ymf271_init(device_t *device, YMF271Chip *chip, UINT8 *rom, void (*cb)(device_t *,int), const devcb_read8 *ext_read, const devcb_write8 *ext_write)
 {
-	chip->timA = device->machine->scheduler().timer_alloc(FUNC(ymf271_timer_a_tick), chip);
-	chip->timB = device->machine->scheduler().timer_alloc(FUNC(ymf271_timer_b_tick), chip);
+	chip->timA = device->machine().scheduler().timer_alloc(FUNC(ymf271_timer_a_tick), chip);
+	chip->timB = device->machine().scheduler().timer_alloc(FUNC(ymf271_timer_b_tick), chip);
 
 	chip->rom = rom;
 	chip->irq_callback = cb;
@@ -1761,7 +1761,7 @@ static void ymf271_init(device_t *device, YMF271Chip *chip, UINT8 *rom, void (*c
 	devcb_resolve_read8(&chip->ext_mem_read, ext_read, device);
 	devcb_resolve_write8(&chip->ext_mem_write, ext_write, device);
 
-	init_tables(device->machine);
+	init_tables(device->machine());
 	init_state(chip, device);
 }
 
@@ -1778,7 +1778,7 @@ static DEVICE_START( ymf271 )
 	intf = (device->baseconfig().static_config() != NULL) ? (const ymf271_interface *)device->baseconfig().static_config() : &defintrf;
 
 	ymf271_init(device, chip, *device->region(), intf->irq_callback, &intf->ext_read, &intf->ext_write);
-	chip->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock()/384, chip, ymf271_update);
+	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock()/384, chip, ymf271_update);
 
 	for (i = 0; i < 256; i++)
 	{

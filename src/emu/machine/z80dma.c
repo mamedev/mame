@@ -172,7 +172,7 @@ device_config *z80dma_device_config::static_alloc_device_config(const machine_co
 
 device_t *z80dma_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, z80dma_device(machine, *this));
+	return auto_alloc(machine, z80dma_device(machine, *this));
 }
 
 

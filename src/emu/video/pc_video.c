@@ -19,7 +19,7 @@
 
 ***************************************************************************/
 
-static pc_video_update_proc (*pc_choosevideomode)(running_machine *machine, int *width, int *height);
+static pc_video_update_proc (*pc_choosevideomode)(running_machine &machine, int *width, int *height);
 static int pc_anythingdirty;
 static int pc_current_height;
 static int pc_current_width;
@@ -38,22 +38,22 @@ static STATE_POSTLOAD( pc_video_postload )
 
 
 
-void pc_video_start(running_machine *machine,
-	pc_video_update_proc (*choosevideomode)(running_machine *machine, int *width, int *height),
+void pc_video_start(running_machine &machine,
+	pc_video_update_proc (*choosevideomode)(running_machine &machine, int *width, int *height),
 	size_t vramsize)
 {
 	pc_choosevideomode = choosevideomode;
 	pc_anythingdirty = 1;
 	pc_current_height = -1;
 	pc_current_width = -1;
-	machine->generic.tmpbitmap = NULL;
+	machine.generic.tmpbitmap = NULL;
 
 	if (vramsize)
 	{
 		video_start_generic_bitmapped(machine);
 	}
 
-	machine->state().register_postload(pc_video_postload, NULL);
+	machine.state().register_postload(pc_video_postload, NULL);
 }
 
 
@@ -64,7 +64,7 @@ SCREEN_UPDATE( pc_video )
 	int w = 0, h = 0;
 	pc_video_update_proc video_update;
 
-	video_update = pc_choosevideomode(screen->machine, &w, &h);
+	video_update = pc_choosevideomode(screen->machine(), &w, &h);
 
 	if (video_update)
 	{
@@ -88,11 +88,11 @@ SCREEN_UPDATE( pc_video )
 			bitmap_fill(bitmap, cliprect, 0);
 		}
 
-		video_update(screen->machine->generic.tmpbitmap ? screen->machine->generic.tmpbitmap : bitmap);
+		video_update(screen->machine().generic.tmpbitmap ? screen->machine().generic.tmpbitmap : bitmap);
 
-		if (screen->machine->generic.tmpbitmap)
+		if (screen->machine().generic.tmpbitmap)
 		{
-			copybitmap(bitmap, screen->machine->generic.tmpbitmap, 0, 0, 0, 0, cliprect);
+			copybitmap(bitmap, screen->machine().generic.tmpbitmap, 0, 0, 0, 0, cliprect);
 			if (!pc_anythingdirty)
 				rc = UPDATE_HAS_NOT_CHANGED;
 			pc_anythingdirty = 0;

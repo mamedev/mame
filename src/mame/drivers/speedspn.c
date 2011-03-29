@@ -66,7 +66,7 @@ static WRITE8_HANDLER(speedspn_banked_rom_change)
 {
 	/* is this weird banking some form of protection? */
 
-	UINT8 *rom = space->machine->region("maincpu")->base();
+	UINT8 *rom = space->machine().region("maincpu")->base();
 	int addr;
 
 	switch (data)
@@ -86,7 +86,7 @@ static WRITE8_HANDLER(speedspn_banked_rom_change)
 			break;
 	}
 
-	memory_set_bankptr(space->machine, "bank1",&rom[addr + 0x8000]);
+	memory_set_bankptr(space->machine(), "bank1",&rom[addr + 0x8000]);
 }
 
 /*** SOUND RELATED ***********************************************************/
@@ -94,7 +94,7 @@ static WRITE8_HANDLER(speedspn_banked_rom_change)
 static WRITE8_HANDLER(speedspn_sound_w)
 {
 	soundlatch_w(space, 1, data);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( oki_banking_w )

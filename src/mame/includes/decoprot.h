@@ -20,7 +20,7 @@ WRITE16_HANDLER( deco16_146_nitroball_prot_w );
 WRITE16_HANDLER( deco16_104_pktgaldx_prot_w );
 WRITE32_HANDLER( deco16_146_fghthist_prot_w );
 
-void decoprot_reset(running_machine *machine);
+void decoprot_reset(running_machine &machine);
 
 extern UINT16 *deco16_prot_ram;
 extern UINT32 *deco32_prot_ram;

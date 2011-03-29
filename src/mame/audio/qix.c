@@ -109,14 +109,14 @@ static TIMER_CALLBACK( deferred_sndpia1_porta_w )
 static WRITE8_DEVICE_HANDLER( sync_sndpia1_porta_w )
 {
 	/* we need to synchronize this so the sound CPU doesn't drop anything important */
-	device->machine->scheduler().synchronize(FUNC(deferred_sndpia1_porta_w), data, (void *)device);
+	device->machine().scheduler().synchronize(FUNC(deferred_sndpia1_porta_w), data, (void *)device);
 }
 
 
 static WRITE8_DEVICE_HANDLER( slither_coinctl_w )
 {
-	coin_lockout_w(device->machine, 0, (~data >> 6) & 1);
-	coin_counter_w(device->machine, 0, (data >> 5) & 1);
+	coin_lockout_w(device->machine(), 0, (~data >> 6) & 1);
+	coin_counter_w(device->machine(), 0, (data >> 5) & 1);
 }
 
 
@@ -132,7 +132,7 @@ static WRITE_LINE_DEVICE_HANDLER( qix_pia_dint )
 	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 
 	/* DINT is connected to the data CPU's IRQ line */
-	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -141,7 +141,7 @@ static WRITE_LINE_DEVICE_HANDLER( qix_pia_sint )
 	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 
 	/* SINT is connected to the sound CPU's IRQ line */
-	cputag_set_input_line(device->machine, "audiocpu", M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

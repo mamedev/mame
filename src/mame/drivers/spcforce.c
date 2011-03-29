@@ -40,43 +40,43 @@ a000-a3ff   R/W X/Y scroll position of each character (can be scrolled up
 
 static WRITE8_HANDLER( spcforce_SN76496_latch_w )
 {
-	spcforce_state *state = space->machine->driver_data<spcforce_state>();
+	spcforce_state *state = space->machine().driver_data<spcforce_state>();
 
 	state->sn76496_latch = data;
 }
 
 static READ8_HANDLER( spcforce_SN76496_select_r )
 {
-	spcforce_state *state = space->machine->driver_data<spcforce_state>();
+	spcforce_state *state = space->machine().driver_data<spcforce_state>();
 
-	if (~state->sn76496_select & 0x40) return sn76496_ready_r(space->machine->device("sn1"));
-	if (~state->sn76496_select & 0x20) return sn76496_ready_r(space->machine->device("sn2"));
-	if (~state->sn76496_select & 0x10) return sn76496_ready_r(space->machine->device("sn3"));
+	if (~state->sn76496_select & 0x40) return sn76496_ready_r(space->machine().device("sn1"));
+	if (~state->sn76496_select & 0x20) return sn76496_ready_r(space->machine().device("sn2"));
+	if (~state->sn76496_select & 0x10) return sn76496_ready_r(space->machine().device("sn3"));
 
 	return 0;
 }
 
 static WRITE8_HANDLER( spcforce_SN76496_select_w )
 {
-	spcforce_state *state = space->machine->driver_data<spcforce_state>();
+	spcforce_state *state = space->machine().driver_data<spcforce_state>();
 
 	state->sn76496_select = data;
 
-	if (~data & 0x40) sn76496_w(space->machine->device("sn1"), 0, state->sn76496_latch);
-	if (~data & 0x20) sn76496_w(space->machine->device("sn2"), 0, state->sn76496_latch);
-	if (~data & 0x10) sn76496_w(space->machine->device("sn3"), 0, state->sn76496_latch);
+	if (~data & 0x40) sn76496_w(space->machine().device("sn1"), 0, state->sn76496_latch);
+	if (~data & 0x20) sn76496_w(space->machine().device("sn2"), 0, state->sn76496_latch);
+	if (~data & 0x10) sn76496_w(space->machine().device("sn3"), 0, state->sn76496_latch);
 }
 
 static READ8_HANDLER( spcforce_t0_r )
 {
 	/* SN76496 status according to Al - not supported by MAME?? */
-	return space->machine->rand() & 1;
+	return space->machine().rand() & 1;
 }
 
 
 static WRITE8_HANDLER( spcforce_soundtrigger_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", 0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

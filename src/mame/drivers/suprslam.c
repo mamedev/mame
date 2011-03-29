@@ -92,7 +92,7 @@ EB26IC73.BIN    27C240      /  Main Program
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	suprslam_state *state = space->machine->driver_data<suprslam_state>();
+	suprslam_state *state = space->machine().driver_data<suprslam_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->pending_command = 1;
@@ -104,24 +104,24 @@ static WRITE16_HANDLER( sound_command_w )
 #if 0
 static READ16_HANDLER( pending_command_r )
 {
-	suprslam_state *state = space->machine->driver_data<suprslam_state>();
+	suprslam_state *state = space->machine().driver_data<suprslam_state>();
 	return pending_command;
 }
 #endif
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	suprslam_state *state = space->machine->driver_data<suprslam_state>();
+	suprslam_state *state = space->machine().driver_data<suprslam_state>();
 	state->pending_command = 0;
 }
 
 static WRITE8_HANDLER( suprslam_sh_bankswitch_w )
 {
-	UINT8 *RAM = space->machine->region("audiocpu")->base();
+	UINT8 *RAM = space->machine().region("audiocpu")->base();
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x8000;
-	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);
 }
 
 /*** MEMORY MAPS *************************************************************/
@@ -280,7 +280,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	suprslam_state *state = device->machine->driver_data<suprslam_state>();
+	suprslam_state *state = device->machine().driver_data<suprslam_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -298,10 +298,10 @@ static const k053936_interface suprslam_k053936_intf =
 
 static MACHINE_START( suprslam )
 {
-	suprslam_state *state = machine->driver_data<suprslam_state>();
+	suprslam_state *state = machine.driver_data<suprslam_state>();
 
-	state->audiocpu = machine->device("audiocpu");
-	state->k053936 = machine->device("k053936");
+	state->audiocpu = machine.device("audiocpu");
+	state->k053936 = machine.device("k053936");
 
 	state->save_item(NAME(state->screen_bank));
 	state->save_item(NAME(state->bg_bank));
@@ -310,7 +310,7 @@ static MACHINE_START( suprslam )
 
 static MACHINE_RESET( suprslam )
 {
-	suprslam_state *state = machine->driver_data<suprslam_state>();
+	suprslam_state *state = machine.driver_data<suprslam_state>();
 
 	state->screen_bank = 0;
 	state->bg_bank = 0;

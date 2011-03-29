@@ -317,7 +317,7 @@ void dsp_prg_ctrl(address_space *space, UINT32 data)
 	if(LEF) dsp_reg.pc = (data & 0xff);
 	if(EXF) dsp_execute_program(space);
 	if(EF && (!(stv_scu[40] & 0x0020)))
-		cputag_set_input_line_and_vector(space->machine, "maincpu", 0xa, HOLD_LINE , 0x45);
+		cputag_set_input_line_and_vector(space->machine(), "maincpu", 0xa, HOLD_LINE , 0x45);
 }
 
 void dsp_prg_data(UINT32 data)

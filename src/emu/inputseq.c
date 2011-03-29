@@ -132,7 +132,7 @@ INLINE void input_seq_backspace(input_seq *seq)
     sequence of switch inputs is "pressed"
 -------------------------------------------------*/
 
-int input_seq_pressed(running_machine *machine, const input_seq *seq)
+int input_seq_pressed(running_machine &machine, const input_seq *seq)
 {
 	int result = FALSE;
 	int invert = FALSE;
@@ -187,7 +187,7 @@ int input_seq_pressed(running_machine *machine, const input_seq *seq)
     axis defined in an input sequence
 -------------------------------------------------*/
 
-INT32 input_seq_axis_value(running_machine *machine, const input_seq *seq, input_item_class *itemclass_ptr)
+INT32 input_seq_axis_value(running_machine &machine, const input_seq *seq, input_item_class *itemclass_ptr)
 {
 	input_item_class itemclasszero = ITEM_CLASS_ABSOLUTE;
 	input_item_class itemclass = ITEM_CLASS_INVALID;
@@ -278,7 +278,7 @@ INT32 input_seq_axis_value(running_machine *machine, const input_seq *seq, input
     new sequence of the given itemclass
 -------------------------------------------------*/
 
-void input_seq_poll_start(running_machine *machine, input_item_class itemclass, const input_seq *startseq)
+void input_seq_poll_start(running_machine &machine, input_item_class itemclass, const input_seq *startseq)
 {
 	input_code dummycode;
 
@@ -309,7 +309,7 @@ void input_seq_poll_start(running_machine *machine, input_item_class itemclass, 
     input_seq_poll - continue polling
 -------------------------------------------------*/
 
-int input_seq_poll(running_machine *machine, input_seq *finalseq)
+int input_seq_poll(running_machine &machine, input_seq *finalseq)
 {
 	input_code lastcode = input_seq_get_last(&record_seq);
 	int has_or = FALSE;
@@ -406,7 +406,7 @@ int input_seq_poll(running_machine *machine, input_seq *finalseq)
     of a sequence
 -------------------------------------------------*/
 
-astring &input_seq_name(running_machine *machine, astring &string, const input_seq *seq)
+astring &input_seq_name(running_machine &machine, astring &string, const input_seq *seq)
 {
 	astring codestr;
 	int codenum, copycodenum;
@@ -464,7 +464,7 @@ astring &input_seq_name(running_machine *machine, astring &string, const input_s
     form of a sequence
 -------------------------------------------------*/
 
-astring &input_seq_to_tokens(running_machine *machine, astring &string, const input_seq *seq)
+astring &input_seq_to_tokens(running_machine &machine, astring &string, const input_seq *seq)
 {
 	astring codestr;
 	int codenum;
@@ -503,7 +503,7 @@ astring &input_seq_to_tokens(running_machine *machine, astring &string, const in
     form of a sequence
 -------------------------------------------------*/
 
-int input_seq_from_tokens(running_machine *machine, const char *string, input_seq *seq)
+int input_seq_from_tokens(running_machine &machine, const char *string, input_seq *seq)
 {
 	char *strcopy = auto_alloc_array(machine, char, strlen(string) + 1);
 	char *str = strcopy;

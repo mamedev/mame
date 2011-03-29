@@ -41,15 +41,15 @@ Stephh's notes (based on the game M6502 code and some tests) :
 
 static WRITE8_HANDLER( ctrl_w )
 {
-	scotrsht_state *state = space->machine->driver_data<scotrsht_state>();
+	scotrsht_state *state = space->machine().driver_data<scotrsht_state>();
 
 	state->irq_enable = data & 0x02;
-	flip_screen_set(space->machine, data & 0x08);
+	flip_screen_set(space->machine(), data & 0x08);
 }
 
 static INTERRUPT_GEN( scotrsht_interrupt )
 {
-	scotrsht_state *state = device->machine->driver_data<scotrsht_state>();
+	scotrsht_state *state = device->machine().driver_data<scotrsht_state>();
 
 	if (state->irq_enable)
 		device_set_input_line(device, 0, HOLD_LINE);
@@ -58,7 +58,7 @@ static INTERRUPT_GEN( scotrsht_interrupt )
 static WRITE8_HANDLER( scotrsht_soundlatch_w )
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( scotrsht_map, AS_PROGRAM, 8 )

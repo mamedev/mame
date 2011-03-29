@@ -153,28 +153,28 @@ public:
 
 static WRITE8_HANDLER( ppmast93_fgram_w )
 {
-	ppmast93_state *state = space->machine->driver_data<ppmast93_state>();
+	ppmast93_state *state = space->machine().driver_data<ppmast93_state>();
 	state->fgram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset/2);
 }
 
 static WRITE8_HANDLER( ppmast93_bgram_w )
 {
-	ppmast93_state *state = space->machine->driver_data<ppmast93_state>();
+	ppmast93_state *state = space->machine().driver_data<ppmast93_state>();
 	state->bgram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset/2);
 }
 
 static WRITE8_HANDLER( ppmast93_port4_w )
 {
-	UINT8 *rom = space->machine->region("maincpu")->base();
+	UINT8 *rom = space->machine().region("maincpu")->base();
 	int bank;
 
-	coin_counter_w(space->machine, 0, data & 0x08);
-	coin_counter_w(space->machine, 1, data & 0x10);
+	coin_counter_w(space->machine(), 0, data & 0x08);
+	coin_counter_w(space->machine(), 1, data & 0x10);
 
 	bank = data & 0x07;
-	memory_set_bankptr(space->machine, "bank1",&rom[0x10000+(bank*0x4000)]);
+	memory_set_bankptr(space->machine(), "bank1",&rom[0x10000+(bank*0x4000)]);
 }
 
 static ADDRESS_MAP_START( ppmast93_cpu1_map, AS_PROGRAM, 8 )
@@ -210,8 +210,8 @@ static WRITE8_HANDLER(ppmast_sound_w)
 	switch(offset&0xff)
 	{
 		case 0:
-		case 1: ym2413_w(space->machine->device("ymsnd"),offset,data); break;
-		case 2: dac_data_w(space->machine->device("dac"),data);break;
+		case 1: ym2413_w(space->machine().device("ymsnd"),offset,data); break;
+		case 2: dac_data_w(space->machine().device("dac"),data);break;
 		default: logerror("%x %x - %x\n",offset,data,cpu_get_previouspc(space->cpu));
 	}
 }
@@ -320,7 +320,7 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_ppmast93_bg_tile_info )
 {
-	ppmast93_state *state = machine->driver_data<ppmast93_state>();
+	ppmast93_state *state = machine.driver_data<ppmast93_state>();
 	int code = (state->bgram[tile_index*2+1] << 8) | state->bgram[tile_index*2];
 	SET_TILE_INFO(
 			0,
@@ -331,7 +331,7 @@ static TILE_GET_INFO( get_ppmast93_bg_tile_info )
 
 static TILE_GET_INFO( get_ppmast93_fg_tile_info )
 {
-	ppmast93_state *state = machine->driver_data<ppmast93_state>();
+	ppmast93_state *state = machine.driver_data<ppmast93_state>();
 	int code = (state->fgram[tile_index*2+1] << 8) | state->fgram[tile_index*2];
 	SET_TILE_INFO(
 			0,
@@ -342,7 +342,7 @@ static TILE_GET_INFO( get_ppmast93_fg_tile_info )
 
 static VIDEO_START( ppmast93 )
 {
-	ppmast93_state *state = machine->driver_data<ppmast93_state>();
+	ppmast93_state *state = machine.driver_data<ppmast93_state>();
 	state->bg_tilemap = tilemap_create(machine, get_ppmast93_bg_tile_info,tilemap_scan_rows,8,8,32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_ppmast93_fg_tile_info,tilemap_scan_rows,8,8,32, 32);
 
@@ -351,7 +351,7 @@ static VIDEO_START( ppmast93 )
 
 static SCREEN_UPDATE( ppmast93 )
 {
-	ppmast93_state *state = screen->machine->driver_data<ppmast93_state>();
+	ppmast93_state *state = screen->machine().driver_data<ppmast93_state>();
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
 	return 0;

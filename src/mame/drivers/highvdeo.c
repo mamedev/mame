@@ -112,7 +112,7 @@ static VIDEO_START(tourvisn)
 
 static SCREEN_UPDATE(tourvisn)
 {
-	highvdeo_state *state = screen->machine->driver_data<highvdeo_state>();
+	highvdeo_state *state = screen->machine().driver_data<highvdeo_state>();
 	int x,y,count;
 
 	count = (0/2);
@@ -126,12 +126,12 @@ static SCREEN_UPDATE(tourvisn)
 			color = ((state->blit_ram[count]) & 0x00ff)>>0;
 
 			if((x*2)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-				*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine->pens[color];
+				*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine().pens[color];
 
 			color = ((state->blit_ram[count]) & 0xff00)>>8;
 
 			if(((x*2)+1)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-				*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine->pens[color];
+				*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine().pens[color];
 
 			count++;
 		}
@@ -143,7 +143,7 @@ static SCREEN_UPDATE(tourvisn)
 /*Later HW, RGB565 instead of RAM-based pens (+ ramdac).*/
 static SCREEN_UPDATE(brasil)
 {
-	highvdeo_state *state = screen->machine->driver_data<highvdeo_state>();
+	highvdeo_state *state = screen->machine().driver_data<highvdeo_state>();
 	int x,y,count;
 
 	count = (0/2);
@@ -176,22 +176,22 @@ static SCREEN_UPDATE(brasil)
 
 static READ16_HANDLER( read1_r )
 {
-	return input_port_read(space->machine, "IN0");
+	return input_port_read(space->machine(), "IN0");
 }
 
 static READ16_HANDLER( read2_r )
 {
-	return input_port_read(space->machine, "IN1");
+	return input_port_read(space->machine(), "IN1");
 }
 
 static READ16_HANDLER( read3_r )
 {
-	return input_port_read(space->machine, "IN2");
+	return input_port_read(space->machine(), "IN2");
 }
 
 static WRITE16_HANDLER( tv_vcf_paletteram_w )
 {
-	highvdeo_state *state = space->machine->driver_data<highvdeo_state>();
+	highvdeo_state *state = space->machine().driver_data<highvdeo_state>();
 	switch(offset*2)
 	{
 		case 0:
@@ -213,7 +213,7 @@ static WRITE16_HANDLER( tv_vcf_paletteram_w )
 					break;
 				case 2:
 					state->pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					palette_set_color(space->machine, state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
+					palette_set_color(space->machine(), state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
 					state->pal.offs_internal = 0;
 					state->pal.offs++;
 					break;
@@ -226,12 +226,12 @@ static WRITE16_HANDLER( tv_vcf_paletteram_w )
 static WRITE16_HANDLER( tv_vcf_bankselect_w )
 {
 	UINT32 bankaddress;
-	UINT8 *ROM = space->machine->region("user1")->base();
+	UINT8 *ROM = space->machine().region("user1")->base();
 
 	/* bits 0, 1 select the ROM bank */
 	bankaddress = (data & 0x03) * 0x40000;
 
-	memory_set_bankptr(space->machine, "bank1", &ROM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank1", &ROM[bankaddress]);
 }
 
 
@@ -295,7 +295,7 @@ static READ16_HANDLER( tv_ncf_read2_r )
 	// machine resets itself.
 	resetpulse ^= 0x40;
 
-	return (input_port_read(space->machine, "IN1") & 0xbf) | resetpulse;
+	return (input_port_read(space->machine(), "IN1") & 0xbf) | resetpulse;
 }
 
 static WRITE16_DEVICE_HANDLER( tv_ncf_oki6395_w )
@@ -329,25 +329,25 @@ static WRITE16_HANDLER( tv_tcf_paletteram_w )
 {
 	int r, g, b, color;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 
-	color = space->machine->generic.paletteram.u16[offset];
+	color = space->machine().generic.paletteram.u16[offset];
 	r = (color >> 8) & 0xf8;
 	g = (color >> 3) & 0xf8;
 	b = (color << 3) & 0xf8;
 
-	palette_set_color_rgb(space->machine, offset, r, g, b);
+	palette_set_color_rgb(space->machine(), offset, r, g, b);
 }
 
 static WRITE16_HANDLER( tv_tcf_bankselect_w )
 {
 	UINT32 bankaddress;
-	UINT8 *ROM = space->machine->region("user1")->base();
+	UINT8 *ROM = space->machine().region("user1")->base();
 
 	/* bits 0, 1, 2 select the ROM bank */
 	bankaddress = (data & 0x07) * 0x40000;
 
-	memory_set_bankptr(space->machine, "bank1", &ROM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank1", &ROM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( tv_tcf_map, AS_PROGRAM, 16 )
@@ -386,13 +386,13 @@ static READ16_HANDLER( newmcard_status_r )
 
 static READ16_HANDLER( newmcard_vblank_r )
 {
-	highvdeo_state *state = space->machine->driver_data<highvdeo_state>();
+	highvdeo_state *state = space->machine().driver_data<highvdeo_state>();
 	return state->vblank_bit; //0x80
 }
 
 static WRITE16_HANDLER( newmcard_vblank_w )
 {
-	highvdeo_state *state = space->machine->driver_data<highvdeo_state>();
+	highvdeo_state *state = space->machine().driver_data<highvdeo_state>();
 	state->vblank_bit = data;
 }
 
@@ -404,8 +404,8 @@ static WRITE16_HANDLER( write2_w )
 
 	for(i=0;i<4;i++)
 	{
-		coin_counter_w(space->machine, i,data & 0x20);
-		coin_lockout_w(space->machine, i,~data & 0x08);
+		coin_counter_w(space->machine(), i,data & 0x20);
+		coin_lockout_w(space->machine(), i,~data & 0x08);
 	}
 }
 
@@ -440,7 +440,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( brasil_status_r )
 {
-	highvdeo_state *state = space->machine->driver_data<highvdeo_state>();
+	highvdeo_state *state = space->machine().driver_data<highvdeo_state>();
 	static UINT16 resetpulse;
 
 	switch(offset*2)
@@ -460,9 +460,9 @@ static READ16_HANDLER( brasil_status_r )
 /*bankaddress might be incorrect.*/
 static WRITE16_HANDLER( brasil_status_w )
 {
-	highvdeo_state *state = space->machine->driver_data<highvdeo_state>();
+	highvdeo_state *state = space->machine().driver_data<highvdeo_state>();
 	UINT32 bankaddress;
-	UINT8 *ROM = space->machine->region("user1")->base();
+	UINT8 *ROM = space->machine().region("user1")->base();
 
 	switch(data & 3) //data & 7?
 	{
@@ -473,7 +473,7 @@ static WRITE16_HANDLER( brasil_status_w )
 
 	bankaddress = (data & 0x07) * 0x40000;
 
-	memory_set_bankptr(space->machine, "bank1", &ROM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank1", &ROM[bankaddress]);
 
 //  popmessage("%04x",data);
 }
@@ -1159,7 +1159,7 @@ static READ16_HANDLER( ciclone_status_r )
 
 static DRIVER_INIT( ciclone )
 {
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x0030, 0x0033, FUNC(ciclone_status_r) );
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x0030, 0x0033, FUNC(ciclone_status_r) );
 }
 
 /*
@@ -1222,14 +1222,14 @@ static WRITE16_HANDLER( fashion_output_w )
 
 	for(i=0;i<4;i++)
 	{
-		coin_counter_w(space->machine, i,data & 0x20);
-		coin_lockout_w(space->machine, i,~data & 0x01);
+		coin_counter_w(space->machine(), i,data & 0x20);
+		coin_lockout_w(space->machine(), i,~data & 0x01);
 	}
 }
 
 static DRIVER_INIT( fashion )
 {
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x0002, 0x0003, FUNC(fashion_output_w) );
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x0002, 0x0003, FUNC(fashion_output_w) );
 }
 
 GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf,   0,       ROT0,  "High Video", "Tour 4000",         0, layout_fashion )

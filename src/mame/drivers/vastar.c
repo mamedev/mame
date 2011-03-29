@@ -77,28 +77,28 @@ static WRITE8_HANDLER( vastar_hold_cpu2_w )
 {
 	/* I'm not sure that this works exactly like this */
 	if (data & 1)
-		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static READ8_HANDLER( vastar_sharedram_r )
 {
-	vastar_state *state = space->machine->driver_data<vastar_state>();
+	vastar_state *state = space->machine().driver_data<vastar_state>();
 
 	return state->sharedram[offset];
 }
 
 static WRITE8_HANDLER( vastar_sharedram_w )
 {
-	vastar_state *state = space->machine->driver_data<vastar_state>();
+	vastar_state *state = space->machine().driver_data<vastar_state>();
 
 	state->sharedram[offset] = data;
 }
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(space->machine, data);
+	flip_screen_set(space->machine(), data);
 }
 
 

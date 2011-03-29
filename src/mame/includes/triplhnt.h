@@ -41,7 +41,7 @@ public:
 
 /*----------- defined in drivers/triplhnt.c -----------*/
 
-void triplhnt_set_collision(running_machine *machine, int data);
+void triplhnt_set_collision(running_machine &machine, int data);
 
 
 /*----------- defined in audio/triplhnt.c -----------*/

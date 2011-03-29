@@ -50,7 +50,7 @@ PALETTE_INIT( fastfred )
 			4, resistances, bweights, 470, 0);
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x100);
+	machine.colortable = colortable_alloc(machine, 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -79,12 +79,12 @@ PALETTE_INIT( fastfred )
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* characters and sprites use the same palette */
 	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine->colortable, i, i);
+		colortable_entry_set_value(machine.colortable, i, i);
 }
 
 /***************************************************************************
@@ -95,7 +95,7 @@ PALETTE_INIT( fastfred )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	fastfred_state *state = machine->driver_data<fastfred_state>();
+	fastfred_state *state = machine.driver_data<fastfred_state>();
 	UINT8 x = tile_index & 0x1f;
 
 	UINT16 code = state->charbank | state->videoram[tile_index];
@@ -114,7 +114,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( fastfred )
 {
-	fastfred_state *state = machine->driver_data<fastfred_state>();
+	fastfred_state *state = machine.driver_data<fastfred_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_transparent_pen(state->bg_tilemap, 0);
@@ -130,7 +130,7 @@ VIDEO_START( fastfred )
 
 WRITE8_HANDLER( fastfred_videoram_w )
 {
-	fastfred_state *state = space->machine->driver_data<fastfred_state>();
+	fastfred_state *state = space->machine().driver_data<fastfred_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -138,7 +138,7 @@ WRITE8_HANDLER( fastfred_videoram_w )
 
 WRITE8_HANDLER( fastfred_attributes_w )
 {
-	fastfred_state *state = space->machine->driver_data<fastfred_state>();
+	fastfred_state *state = space->machine().driver_data<fastfred_state>();
 	if (state->attributesram[offset] != data)
 	{
 		if (offset & 0x01)
@@ -162,7 +162,7 @@ WRITE8_HANDLER( fastfred_attributes_w )
 
 WRITE8_HANDLER( fastfred_charbank1_w )
 {
-	fastfred_state *state = space->machine->driver_data<fastfred_state>();
+	fastfred_state *state = space->machine().driver_data<fastfred_state>();
 	UINT16 new_data = (state->charbank & 0x0200) | ((data & 0x01) << 8);
 
 	if (new_data != state->charbank)
@@ -175,7 +175,7 @@ WRITE8_HANDLER( fastfred_charbank1_w )
 
 WRITE8_HANDLER( fastfred_charbank2_w )
 {
-	fastfred_state *state = space->machine->driver_data<fastfred_state>();
+	fastfred_state *state = space->machine().driver_data<fastfred_state>();
 	UINT16 new_data = (state->charbank & 0x0100) | ((data & 0x01) << 9);
 
 	if (new_data != state->charbank)
@@ -189,7 +189,7 @@ WRITE8_HANDLER( fastfred_charbank2_w )
 
 WRITE8_HANDLER( fastfred_colorbank1_w )
 {
-	fastfred_state *state = space->machine->driver_data<fastfred_state>();
+	fastfred_state *state = space->machine().driver_data<fastfred_state>();
 	UINT8 new_data = (state->colorbank & 0x10) | ((data & 0x01) << 3);
 
 	if (new_data != state->colorbank)
@@ -202,7 +202,7 @@ WRITE8_HANDLER( fastfred_colorbank1_w )
 
 WRITE8_HANDLER( fastfred_colorbank2_w )
 {
-	fastfred_state *state = space->machine->driver_data<fastfred_state>();
+	fastfred_state *state = space->machine().driver_data<fastfred_state>();
 	UINT8 new_data = (state->colorbank & 0x08) | ((data & 0x01) << 4);
 
 	if (new_data != state->colorbank)
@@ -217,23 +217,23 @@ WRITE8_HANDLER( fastfred_colorbank2_w )
 
 WRITE8_HANDLER( fastfred_flip_screen_x_w )
 {
-	fastfred_state *state = space->machine->driver_data<fastfred_state>();
-	if (flip_screen_x_get(space->machine) != (data & 0x01))
+	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+	if (flip_screen_x_get(space->machine()) != (data & 0x01))
 	{
-		flip_screen_x_set(space->machine, data & 0x01);
+		flip_screen_x_set(space->machine(), data & 0x01);
 
-		tilemap_set_flip(state->bg_tilemap, (flip_screen_x_get(space->machine) ? TILEMAP_FLIPX : 0) | (flip_screen_y_get(space->machine) ? TILEMAP_FLIPY : 0));
+		tilemap_set_flip(state->bg_tilemap, (flip_screen_x_get(space->machine()) ? TILEMAP_FLIPX : 0) | (flip_screen_y_get(space->machine()) ? TILEMAP_FLIPY : 0));
 	}
 }
 
 WRITE8_HANDLER( fastfred_flip_screen_y_w )
 {
-	fastfred_state *state = space->machine->driver_data<fastfred_state>();
-	if (flip_screen_y_get(space->machine) != (data & 0x01))
+	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+	if (flip_screen_y_get(space->machine()) != (data & 0x01))
 	{
-		flip_screen_y_set(space->machine, data & 0x01);
+		flip_screen_y_set(space->machine(), data & 0x01);
 
-		tilemap_set_flip(state->bg_tilemap, (flip_screen_x_get(space->machine) ? TILEMAP_FLIPX : 0) | (flip_screen_y_get(space->machine) ? TILEMAP_FLIPY : 0));
+		tilemap_set_flip(state->bg_tilemap, (flip_screen_x_get(space->machine()) ? TILEMAP_FLIPX : 0) | (flip_screen_y_get(space->machine()) ? TILEMAP_FLIPY : 0));
 	}
 }
 
@@ -245,9 +245,9 @@ WRITE8_HANDLER( fastfred_flip_screen_y_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	fastfred_state *state = machine->driver_data<fastfred_state>();
+	fastfred_state *state = machine.driver_data<fastfred_state>();
 	int offs;
 
 	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
@@ -299,7 +299,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,flip_screen_x_get(machine) ? &spritevisibleareaflipx : &spritevisiblearea,machine->gfx[1],
+		drawgfx_transpen(bitmap,flip_screen_x_get(machine) ? &spritevisibleareaflipx : &spritevisiblearea,machine.gfx[1],
 				code,
 				state->colorbank | (state->spriteram[offs + 2] & 0x07),
 				flipx,flipy,
@@ -310,10 +310,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( fastfred )
 {
-	fastfred_state *state = screen->machine->driver_data<fastfred_state>();
+	fastfred_state *state = screen->machine().driver_data<fastfred_state>();
 	bitmap_fill(bitmap, cliprect, *state->background_color);
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 
 	return 0;
 }
@@ -321,7 +321,7 @@ SCREEN_UPDATE( fastfred )
 
 static TILE_GET_INFO( imago_get_tile_info_bg )
 {
-	fastfred_state *state = machine->driver_data<fastfred_state>();
+	fastfred_state *state = machine.driver_data<fastfred_state>();
 	UINT8 x = tile_index & 0x1f;
 
 	UINT16 code = state->charbank * 0x100 + state->videoram[tile_index];
@@ -332,7 +332,7 @@ static TILE_GET_INFO( imago_get_tile_info_bg )
 
 static TILE_GET_INFO( imago_get_tile_info_fg )
 {
-	fastfred_state *state = machine->driver_data<fastfred_state>();
+	fastfred_state *state = machine.driver_data<fastfred_state>();
 	int code = state->imago_fg_videoram[tile_index];
 	SET_TILE_INFO(2, code, 2, 0);
 }
@@ -344,14 +344,14 @@ static TILE_GET_INFO( imago_get_tile_info_web )
 
 WRITE8_HANDLER( imago_fg_videoram_w )
 {
-	fastfred_state *state = space->machine->driver_data<fastfred_state>();
+	fastfred_state *state = space->machine().driver_data<fastfred_state>();
 	state->imago_fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( imago_charbank_w )
 {
-	fastfred_state *state = space->machine->driver_data<fastfred_state>();
+	fastfred_state *state = space->machine().driver_data<fastfred_state>();
 	if( state->charbank != data )
 	{
 		state->charbank = data;
@@ -361,7 +361,7 @@ WRITE8_HANDLER( imago_charbank_w )
 
 VIDEO_START( imago )
 {
-	fastfred_state *state = machine->driver_data<fastfred_state>();
+	fastfred_state *state = machine.driver_data<fastfred_state>();
 	state->web_tilemap = tilemap_create(machine, imago_get_tile_info_web,tilemap_scan_rows,     8,8,32,32);
 	state->bg_tilemap   = tilemap_create(machine, imago_get_tile_info_bg, tilemap_scan_rows,8,8,32,32);
 	state->fg_tilemap   = tilemap_create(machine, imago_get_tile_info_fg, tilemap_scan_rows,8,8,32,32);
@@ -380,11 +380,11 @@ VIDEO_START( imago )
 
 SCREEN_UPDATE( imago )
 {
-	fastfred_state *state = screen->machine->driver_data<fastfred_state>();
+	fastfred_state *state = screen->machine().driver_data<fastfred_state>();
 	tilemap_draw(bitmap,cliprect,state->web_tilemap,0,0);
-	galaxold_draw_stars(screen->machine, bitmap, cliprect);
+	galaxold_draw_stars(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
 
 	return 0;

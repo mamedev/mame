@@ -29,7 +29,9 @@ TODO: Add CDDA support
 typedef struct _akiko_state akiko_state;
 struct _akiko_state
 {
-	running_machine *machine;
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
+	running_machine *m_machine;
 	address_space *space;
 
 	/* chunky to planar converter */
@@ -95,11 +97,11 @@ static DEVICE_STOP( akiko )
 
 static DEVICE_RESET( akiko )
 {
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	akiko_state *state = get_safe_token(device);
 
 	device_t *cddevice;
-	cddevice = machine->device("cdrom");
+	cddevice = machine.device("cdrom");
 	if (cddevice!=NULL)
 	{
 		// MESS case
@@ -167,11 +169,11 @@ static DEVICE_RESET( akiko )
 
 static DEVICE_START( akiko )
 {
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	akiko_state *state = get_safe_token(device);
 
-	state->machine = machine;
-	state->space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	state->m_machine = &machine;
+	state->space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	state->c2p_input_index = 0;
 	state->c2p_output_index = 0;
 
@@ -196,9 +198,9 @@ static DEVICE_START( akiko )
 	state->cdrom_cmd_resp = 0;
 
 	state->cdrom_toc = NULL;
-	state->dma_timer = machine->scheduler().timer_alloc(FUNC(akiko_dma_proc), state);
-	state->frame_timer = machine->scheduler().timer_alloc(FUNC(akiko_frame_proc), state);
-	state->i2cmem = machine->device("i2cmem");
+	state->dma_timer = machine.scheduler().timer_alloc(FUNC(akiko_dma_proc), state);
+	state->frame_timer = machine.scheduler().timer_alloc(FUNC(akiko_frame_proc), state);
+	state->i2cmem = machine.device("i2cmem");
 
 
 }
@@ -319,7 +321,7 @@ static const char* get_akiko_reg_name(int reg)
 
 static void akiko_cdda_stop(akiko_state *state)
 {
-	device_t *cdda = cdda_from_cdrom(state->machine, state->cdrom);
+	device_t *cdda = cdda_from_cdrom(state->machine(), state->cdrom);
 
 	if (cdda != NULL)
 	{
@@ -330,7 +332,7 @@ static void akiko_cdda_stop(akiko_state *state)
 
 static void akiko_cdda_play(akiko_state *state, UINT32 lba, UINT32 num_blocks)
 {
-	device_t *cdda = cdda_from_cdrom(state->machine, state->cdrom);
+	device_t *cdda = cdda_from_cdrom(state->machine(), state->cdrom);
 	if (cdda != NULL)
 	{
 		cdda_start_audio(cdda, lba, num_blocks);
@@ -340,7 +342,7 @@ static void akiko_cdda_play(akiko_state *state, UINT32 lba, UINT32 num_blocks)
 
 static void akiko_cdda_pause(akiko_state *state, int pause)
 {
-	device_t *cdda = cdda_from_cdrom(state->machine, state->cdrom);
+	device_t *cdda = cdda_from_cdrom(state->machine(), state->cdrom);
 	if (cdda != NULL)
 	{
 		if (cdda_audio_active(cdda) && cdda_audio_paused(cdda) != pause )
@@ -361,7 +363,7 @@ static void akiko_cdda_pause(akiko_state *state, int pause)
 
 static UINT8 akiko_cdda_getstatus(akiko_state *state, UINT32 *lba)
 {
-	device_t *cdda = cdda_from_cdrom(state->machine, state->cdrom);
+	device_t *cdda = cdda_from_cdrom(state->machine(), state->cdrom);
 
 	if ( lba ) *lba = 0;
 
@@ -447,7 +449,7 @@ static TIMER_CALLBACK(akiko_dma_proc)
 
 	if ( state->cdrom_readreqmask & ( 1 << index ) )
 	{
-		amiga_state *amiga = machine->driver_data<amiga_state>();
+		amiga_state *amiga = machine.driver_data<amiga_state>();
 		UINT32	track = cdrom_get_track( state->cdrom, state->cdrom_lba_cur );
 		UINT32	datasize = cdrom_get_toc( state->cdrom )->tracks[track].datasize;
 		UINT32	subsize = cdrom_get_toc( state->cdrom )->tracks[track].subsize;
@@ -664,7 +666,7 @@ static void akiko_update_cdrom(akiko_state *state)
 
 				if ( cmdbuf[7] == 0x80 )
 				{
-					if (LOG_AKIKO_CD) logerror( "%s:AKIKO CD: Data read - start lba: %08x - end lba: %08x\n", state->machine->describe_context(), startpos, endpos );
+					if (LOG_AKIKO_CD) logerror( "%s:AKIKO CD: Data read - start lba: %08x - end lba: %08x\n", state->machine().describe_context(), startpos, endpos );
 					state->cdrom_speed = (cmdbuf[8] & 0x40) ? 2 : 1;
 					state->cdrom_lba_start = startpos;
 					state->cdrom_lba_end = endpos;
@@ -701,7 +703,7 @@ static void akiko_update_cdrom(akiko_state *state)
 		{
 			state->cdrom_cmd_start = (state->cdrom_cmd_start+3) & 0xff;
 
-			state->machine->scheduler().timer_set( attotime::from_msec(1), FUNC(akiko_cd_delayed_cmd ), resp[0], state);
+			state->machine().scheduler().timer_set( attotime::from_msec(1), FUNC(akiko_cd_delayed_cmd ), resp[0], state);
 
 			break;
 		}
@@ -782,7 +784,7 @@ READ32_DEVICE_HANDLER( amiga_akiko32_r )
 	switch( offset )
 	{
 		case 0x00/4:	/* ID */
-			if ( state->cdrom != NULL ) cdda_set_cdrom(space->machine->device("cdda"), state->cdrom);
+			if ( state->cdrom != NULL ) cdda_set_cdrom(space->machine().device("cdda"), state->cdrom);
 			return 0x0000cafe;
 
 		case 0x04/4:	/* CDROM STATUS 1 */

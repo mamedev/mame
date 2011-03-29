@@ -328,14 +328,14 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 
 	/* allocate a timer for the compare interrupt */
 	if ((cap & PPCCAP_OEA) && (ppc->tb_divisor))
-		ppc->decrementer_int_timer = device->machine->scheduler().timer_alloc(FUNC(decrementer_int_callback), ppc);
+		ppc->decrementer_int_timer = device->machine().scheduler().timer_alloc(FUNC(decrementer_int_callback), ppc);
 
 	/* and for the 4XX interrupts if needed */
 	if (cap & PPCCAP_4XX)
 	{
-		ppc->fit_timer = device->machine->scheduler().timer_alloc(FUNC(ppc4xx_fit_callback), ppc);
-		ppc->pit_timer = device->machine->scheduler().timer_alloc(FUNC(ppc4xx_pit_callback), ppc);
-		ppc->spu.timer = device->machine->scheduler().timer_alloc(FUNC(ppc4xx_spu_callback), ppc);
+		ppc->fit_timer = device->machine().scheduler().timer_alloc(FUNC(ppc4xx_fit_callback), ppc);
+		ppc->pit_timer = device->machine().scheduler().timer_alloc(FUNC(ppc4xx_pit_callback), ppc);
+		ppc->spu.timer = device->machine().scheduler().timer_alloc(FUNC(ppc4xx_spu_callback), ppc);
 	}
 
 	/* register for save states */
@@ -403,7 +403,7 @@ void ppccom_reset(powerpc_state *ppc)
 		ppc->dec_zero_cycles = ppc->device->total_cycles();
 		if (ppc->tb_divisor)
 		{
-			decrementer_int_callback(ppc->device->machine, ppc, 0);
+			decrementer_int_callback(ppc->device->machine(), ppc, 0);
 		}
 	}
 
@@ -676,7 +676,7 @@ void ppccom_execute_tlbl(powerpc_state *ppc)
 	int entrynum;
 
 	/* determine entry number; we use rand() for associativity */
-	entrynum = ((address >> 12) & 0x1f) | (ppc->device->machine->rand() & 0x20) | (isitlb ? 0x40 : 0);
+	entrynum = ((address >> 12) & 0x1f) | (ppc->device->machine().rand() & 0x20) | (isitlb ? 0x40 : 0);
 
 	/* determine the flags */
 	flags = VTLB_FLAG_VALID | VTLB_READ_ALLOWED | VTLB_FETCH_ALLOWED;
@@ -946,9 +946,9 @@ void ppccom_execute_mtspr(powerpc_state *ppc)
 			case SPR4XX_TCR:
 				ppc->spr[SPR4XX_TCR] = ppc->param1 | (oldval & PPC4XX_TCR_WRC_MASK);
 				if ((oldval ^ ppc->spr[SPR4XX_TCR]) & PPC4XX_TCR_FIE)
-					ppc4xx_fit_callback(ppc->device->machine, ppc, FALSE);
+					ppc4xx_fit_callback(ppc->device->machine(), ppc, FALSE);
 				if ((oldval ^ ppc->spr[SPR4XX_TCR]) & PPC4XX_TCR_PIE)
-					ppc4xx_pit_callback(ppc->device->machine, ppc, FALSE);
+					ppc4xx_pit_callback(ppc->device->machine(), ppc, FALSE);
 				return;
 
 			/* timer status register */
@@ -961,7 +961,7 @@ void ppccom_execute_mtspr(powerpc_state *ppc)
 			case SPR4XX_PIT:
 				ppc->spr[SPR4XX_PIT] = ppc->param1;
 				ppc->pit_reload = ppc->param1;
-				ppc4xx_pit_callback(ppc->device->machine, ppc, FALSE);
+				ppc4xx_pit_callback(ppc->device->machine(), ppc, FALSE);
 				return;
 
 			/* timebase */

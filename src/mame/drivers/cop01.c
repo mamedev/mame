@@ -68,14 +68,14 @@ Mighty Guy board layout:
 
 static WRITE8_HANDLER( cop01_sound_command_w )
 {
-	cop01_state *state = space->machine->driver_data<cop01_state>();
+	cop01_state *state = space->machine().driver_data<cop01_state>();
 	soundlatch_w(space, offset, data);
 	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static READ8_HANDLER( cop01_sound_command_r )
 {
-	cop01_state *state = space->machine->driver_data<cop01_state>();
+	cop01_state *state = space->machine().driver_data<cop01_state>();
 	int res = (soundlatch_r(space, offset) & 0x7f) << 1;
 
 	/* bit 0 seems to be a timer */
@@ -96,7 +96,7 @@ static READ8_HANDLER( cop01_sound_command_r )
 static CUSTOM_INPUT( mightguy_area_r )
 {
 	int bit_mask = (FPTR)param;
-	return (input_port_read(field->port->machine, "FAKE") & bit_mask) ? 0x01 : 0x00;
+	return (input_port_read(field->port->machine(), "FAKE") & bit_mask) ? 0x01 : 0x00;
 }
 
 
@@ -156,7 +156,7 @@ ADDRESS_MAP_END
 /* this just gets some garbage out of the YM3526 */
 static READ8_HANDLER( kludge )
 {
-	cop01_state *state = space->machine->driver_data<cop01_state>();
+	cop01_state *state = space->machine().driver_data<cop01_state>();
 	return state->timer++;
 }
 
@@ -414,9 +414,9 @@ GFXDECODE_END
 
 static MACHINE_START( cop01 )
 {
-	cop01_state *state = machine->driver_data<cop01_state>();
+	cop01_state *state = machine.driver_data<cop01_state>();
 
-	state->audiocpu = machine->device<cpu_device>("audiocpu");
+	state->audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->pulse));
 	state->save_item(NAME(state->timer));
@@ -425,7 +425,7 @@ static MACHINE_START( cop01 )
 
 static MACHINE_RESET( cop01 )
 {
-	cop01_state *state = machine->driver_data<cop01_state>();
+	cop01_state *state = machine.driver_data<cop01_state>();
 
 	state->pulse = 0;
 	state->timer = 0;
@@ -641,7 +641,7 @@ static DRIVER_INIT( mightguy )
 #if MIGHTGUY_HACK
 	/* This is a hack to fix the game code to get a fully working
        "Starting Area" fake Dip Switch */
-	UINT8 *RAM = (UINT8 *)machine->region("maincpu")->base();
+	UINT8 *RAM = (UINT8 *)machine.region("maincpu")->base();
 	RAM[0x00e4] = 0x07;	// rlca
 	RAM[0x00e5] = 0x07;	// rlca
 	RAM[0x00e6] = 0x07;	// rlca

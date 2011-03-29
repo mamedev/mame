@@ -190,7 +190,7 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 		int format = xml_get_attribute_int_format(itemnode, "value");
 
 		// allocate and append a new item
-		item &curitem = m_itemlist.append(*auto_alloc(&manager.machine(), item(itemnode->value, value, format)));
+		item &curitem = m_itemlist.append(*auto_alloc(manager.machine(), item(itemnode->value, value, format)));
 
 		// ensure the maximum expands to suit
 		m_maxval = MAX(m_maxval, curitem.value());
@@ -366,11 +366,11 @@ cheat_script::cheat_script(cheat_manager &manager, symbol_table &symbols, const 
 	{
 		// handle action nodes
 		if (strcmp(entrynode->name, "action") == 0)
-			m_entrylist.append(*auto_alloc(&manager.machine(), script_entry(manager, symbols, filename, *entrynode, true)));
+			m_entrylist.append(*auto_alloc(manager.machine(), script_entry(manager, symbols, filename, *entrynode, true)));
 
 		// handle output nodes
 		else if (strcmp(entrynode->name, "output") == 0)
-			m_entrylist.append(*auto_alloc(&manager.machine(), script_entry(manager, symbols, filename, *entrynode, false)));
+			m_entrylist.append(*auto_alloc(manager.machine(), script_entry(manager, symbols, filename, *entrynode, false)));
 
 		// anything else is ignored
 		else
@@ -476,7 +476,7 @@ cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &s
 			int totalargs = 0;
 			for (xml_data_node *argnode = xml_get_sibling(entrynode.child, "argument"); argnode != NULL; argnode = xml_get_sibling(argnode->next, "argument"))
 			{
-				output_argument &curarg = m_arglist.append(*auto_alloc(&manager.machine(), output_argument(manager, symbols, filename, *argnode)));
+				output_argument &curarg = m_arglist.append(*auto_alloc(manager.machine(), output_argument(manager, symbols, filename, *argnode)));
 
 				// verify we didn't overrun the argument count
 				totalargs += curarg.count();
@@ -766,7 +766,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 		if (paramnode != NULL)
 		{
 			// load this parameter
-			m_parameter = auto_alloc(&manager.machine(), cheat_parameter(manager, m_symbols, filename, *paramnode));
+			m_parameter = auto_alloc(manager.machine(), cheat_parameter(manager, m_symbols, filename, *paramnode));
 
 			// only one parameter allowed
 			paramnode = xml_get_sibling(paramnode->next, "parameter");
@@ -778,7 +778,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 		for (xml_data_node *scriptnode = xml_get_sibling(cheatnode.child, "script"); scriptnode != NULL; scriptnode = xml_get_sibling(scriptnode->next, "script"))
 		{
 			// load this entry
-			cheat_script *curscript = auto_alloc(&manager.machine(), cheat_script(manager, m_symbols, filename, *scriptnode));
+			cheat_script *curscript = auto_alloc(manager.machine(), cheat_script(manager, m_symbols, filename, *scriptnode));
 
 			// if we have a script already for this slot, it is an error
 			cheat_script *&slot = script_for_state(curscript->state());
@@ -803,11 +803,11 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 
 cheat_entry::~cheat_entry()
 {
-	auto_free(&m_manager.machine(), m_on_script);
-	auto_free(&m_manager.machine(), m_off_script);
-	auto_free(&m_manager.machine(), m_change_script);
-	auto_free(&m_manager.machine(), m_run_script);
-	auto_free(&m_manager.machine(), m_parameter);
+	auto_free(m_manager.machine(), m_on_script);
+	auto_free(m_manager.machine(), m_off_script);
+	auto_free(m_manager.machine(), m_change_script);
+	auto_free(m_manager.machine(), m_run_script);
+	auto_free(m_manager.machine(), m_parameter);
 }
 
 
@@ -1107,7 +1107,7 @@ cheat_manager::cheat_manager(running_machine &machine)
 	// we rely on the debugger expression callbacks; if the debugger isn't
     // enabled, we must jumpstart them manually
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0)
-		debug_cpu_init(&machine);
+		debug_cpu_init(machine);
 
 	// configure for memory access (shared with debugger)
 	debug_cpu_configure_memory(machine, m_symtable);
@@ -1446,7 +1446,7 @@ void cheat_manager::load_cheats(const char *filename)
 			for (xml_data_node *cheatnode = xml_get_sibling(mamecheatnode->child, "cheat"); cheatnode != NULL; cheatnode = xml_get_sibling(cheatnode->next, "cheat"))
 			{
 				// load this entry
-				cheat_entry *curcheat = auto_alloc(&m_machine, cheat_entry(*this, m_symtable, filename, *cheatnode));
+				cheat_entry *curcheat = auto_alloc(m_machine, cheat_entry(*this, m_symtable, filename, *cheatnode));
 
 				// make sure we're not a duplicate
 				cheat_entry *scannode = NULL;
@@ -1462,7 +1462,7 @@ void cheat_manager::load_cheats(const char *filename)
 				if (scannode == NULL)
 					m_cheatlist.append(*curcheat);
 				else
-					auto_free(&m_machine, curcheat);
+					auto_free(m_machine, curcheat);
 			}
 
 			// free the file and loop for the next one

@@ -17,61 +17,61 @@ robbiex@rocketmail.com
 
 WRITE8_HANDLER( tehkanwc_videoram_w )
 {
-	tehkanwc_state *state = space->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( tehkanwc_colorram_w )
 {
-	tehkanwc_state *state = space->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( tehkanwc_videoram2_w )
 {
-	tehkanwc_state *state = space->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
 	state->videoram2[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( tehkanwc_scroll_x_w )
 {
-	tehkanwc_state *state = space->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
 	state->scroll_x[offset] = data;
 }
 
 WRITE8_HANDLER( tehkanwc_scroll_y_w )
 {
-	tehkanwc_state *state = space->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
 	tilemap_set_scrolly(state->bg_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( tehkanwc_flipscreen_x_w )
 {
-	flip_screen_x_set(space->machine, data & 0x40);
+	flip_screen_x_set(space->machine(), data & 0x40);
 }
 
 WRITE8_HANDLER( tehkanwc_flipscreen_y_w )
 {
-	flip_screen_y_set(space->machine, data & 0x40);
+	flip_screen_y_set(space->machine(), data & 0x40);
 }
 
 WRITE8_HANDLER( gridiron_led0_w )
 {
-	tehkanwc_state *state = space->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
 	state->led0 = data;
 }
 WRITE8_HANDLER( gridiron_led1_w )
 {
-	tehkanwc_state *state = space->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
 	state->led1 = data;
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	tehkanwc_state *state = machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = machine.driver_data<tehkanwc_state>();
 	int offs = tile_index * 2;
 	int attr = state->videoram2[offs + 1];
 	int code = state->videoram2[offs] + ((attr & 0x30) << 4);
@@ -83,7 +83,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	tehkanwc_state *state = machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = machine.driver_data<tehkanwc_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + ((attr & 0x10) << 4);
 	int color = attr & 0x0f;
@@ -96,7 +96,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( tehkanwc )
 {
-	tehkanwc_state *state = machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = machine.driver_data<tehkanwc_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 16, 8, 32, 32);
 
@@ -123,7 +123,7 @@ VIDEO_START( tehkanwc )
    bit 7 = enable (0 = display off)
  */
 
-static void gridiron_draw_led(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 led,int player)
+static void gridiron_draw_led(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 led,int player)
 {
 	if (led&0x80)
 		output_set_digit_value(player, led&0x7f);
@@ -131,9 +131,9 @@ static void gridiron_draw_led(running_machine *machine, bitmap_t *bitmap, const 
 		output_set_digit_value(player, 0x00);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	tehkanwc_state *state = machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = machine.driver_data<tehkanwc_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -159,20 +159,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[1],
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[1],
 			code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
 SCREEN_UPDATE( tehkanwc )
 {
-	tehkanwc_state *state = screen->machine->driver_data<tehkanwc_state>();
+	tehkanwc_state *state = screen->machine().driver_data<tehkanwc_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll_x[0] + 256 * state->scroll_x[1]);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 1, 0);
-	gridiron_draw_led(screen->machine, bitmap, cliprect, state->led0, 0);
-	gridiron_draw_led(screen->machine, bitmap, cliprect, state->led1, 1);
+	gridiron_draw_led(screen->machine(), bitmap, cliprect, state->led0, 0);
+	gridiron_draw_led(screen->machine(), bitmap, cliprect, state->led1, 1);
 	return 0;
 }

@@ -335,13 +335,13 @@ static READ16_HANDLER( superman_dsw_input_r )
 	switch (offset)
 	{
 		case 0x00:
-			return  input_port_read(space->machine, "DSWA") & 0x0f;
+			return  input_port_read(space->machine(), "DSWA") & 0x0f;
 		case 0x01:
-			return (input_port_read(space->machine, "DSWA") & 0xf0) >> 4;
+			return (input_port_read(space->machine(), "DSWA") & 0xf0) >> 4;
 		case 0x02:
-			return  input_port_read(space->machine, "DSWB") & 0x0f;
+			return  input_port_read(space->machine(), "DSWB") & 0x0f;
 		case 0x03:
-			return (input_port_read(space->machine, "DSWB") & 0xf0) >> 4;
+			return (input_port_read(space->machine(), "DSWB") & 0xf0) >> 4;
 		default:
 			logerror("taitox unknown dsw read offset: %04x\n", offset);
 			return 0x00;
@@ -353,11 +353,11 @@ static READ16_HANDLER( daisenpu_input_r )
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_read(space->machine, "IN0");    /* Player 1 controls + START1 */
+			return input_port_read(space->machine(), "IN0");    /* Player 1 controls + START1 */
 		case 0x01:
-			return input_port_read(space->machine, "IN1");    /* Player 2 controls + START2 */
+			return input_port_read(space->machine(), "IN1");    /* Player 2 controls + START2 */
 		case 0x02:
-			return input_port_read(space->machine, "IN2");    /* COINn + SERVICE1 + TILT */
+			return input_port_read(space->machine(), "IN2");    /* COINn + SERVICE1 + TILT */
 
 		default:
 			logerror("taitox unknown input read offset: %04x\n", offset);
@@ -370,10 +370,10 @@ static WRITE16_HANDLER( daisenpu_input_w )
 	switch (offset)
 	{
 		case 0x04:	/* coin counters and lockout */
-			coin_counter_w(space->machine, 0,data & 0x01);
-			coin_counter_w(space->machine, 1,data & 0x02);
-			coin_lockout_w(space->machine, 0,~data & 0x04);
-			coin_lockout_w(space->machine, 1,~data & 0x08);
+			coin_counter_w(space->machine(), 0,data & 0x01);
+			coin_counter_w(space->machine(), 1,data & 0x02);
+			coin_lockout_w(space->machine(), 0,~data & 0x04);
+			coin_lockout_w(space->machine(), 1,~data & 0x08);
 //logerror("taitox coin control %04x to offset %04x\n",data,offset);
 			break;
 
@@ -388,10 +388,10 @@ static WRITE16_HANDLER( kyustrkr_input_w )
 	switch (offset)
 	{
 		case 0x04:	/* coin counters and lockout */
-			coin_counter_w(space->machine, 0,data & 0x01);
-			coin_counter_w(space->machine, 1,data & 0x02);
-			coin_lockout_w(space->machine, 0,data & 0x04);
-			coin_lockout_w(space->machine, 1,data & 0x08);
+			coin_counter_w(space->machine(), 0,data & 0x01);
+			coin_counter_w(space->machine(), 1,data & 0x02);
+			coin_lockout_w(space->machine(), 0,data & 0x04);
+			coin_lockout_w(space->machine(), 1,data & 0x08);
 //logerror("taitox coin control %04x to offset %04x\n",data,offset);
 			break;
 
@@ -403,19 +403,19 @@ static WRITE16_HANDLER( kyustrkr_input_w )
 
 /**************************************************************************/
 
-static void reset_sound_region(running_machine *machine)
+static void reset_sound_region(running_machine &machine)
 {
-	taitox_state *state = machine->driver_data<taitox_state>();
+	taitox_state *state = machine.driver_data<taitox_state>();
 
-	memory_set_bankptr(machine,  "bank2", machine->region("audiocpu")->base() + (state->banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr(machine,  "bank2", machine.region("audiocpu")->base() + (state->banknum * 0x4000) + 0x10000 );
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	taitox_state *state = space->machine->driver_data<taitox_state>();
+	taitox_state *state = space->machine().driver_data<taitox_state>();
 
 	state->banknum = (data - 1) & 3;
-	reset_sound_region(space->machine);
+	reset_sound_region(space->machine());
 }
 
 
@@ -882,7 +882,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -902,11 +902,11 @@ static STATE_POSTLOAD( taitox_postload )
 
 static MACHINE_START( taitox )
 {
-	taitox_state *state = machine->driver_data<taitox_state>();
+	taitox_state *state = machine.driver_data<taitox_state>();
 
 	state->banknum = -1;
 	state->save_item(NAME(state->banknum));
-	machine->state().register_postload(taitox_postload, NULL);
+	machine.state().register_postload(taitox_postload, NULL);
 }
 
 static const tc0140syt_interface taitox_tc0140syt_intf =
@@ -1324,7 +1324,7 @@ ROM_END
 
 static DRIVER_INIT( kyustrkr )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x900000, 0x90000f, FUNC(kyustrkr_input_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x900000, 0x90000f, FUNC(kyustrkr_input_w));
 }
 
 

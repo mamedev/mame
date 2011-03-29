@@ -60,27 +60,27 @@
 
 static WRITE8_DEVICE_HANDLER( dipsw_w )
 {
-	blueprnt_state *state = device->machine->driver_data<blueprnt_state>();
+	blueprnt_state *state = device->machine().driver_data<blueprnt_state>();
 	state->dipsw = data;
 }
 
 static READ8_HANDLER( blueprnt_sh_dipsw_r )
 {
-	blueprnt_state *state = space->machine->driver_data<blueprnt_state>();
+	blueprnt_state *state = space->machine().driver_data<blueprnt_state>();
 	return state->dipsw;
 }
 
 static WRITE8_HANDLER( blueprnt_sound_command_w )
 {
-	blueprnt_state *state = space->machine->driver_data<blueprnt_state>();
+	blueprnt_state *state = space->machine().driver_data<blueprnt_state>();
 	soundlatch_w(space, offset, data);
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( blueprnt_coin_counter_w )
 {
-	coin_counter_w(space->machine, 0, data & 0x01);
-	coin_counter_w(space->machine, 1, data & 0x02);
+	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(space->machine(), 1, data & 0x02);
 }
 
 /*************************************
@@ -281,16 +281,16 @@ static const ay8910_interface ay8910_interface_2 =
 
 static MACHINE_START( blueprnt )
 {
-	blueprnt_state *state = machine->driver_data<blueprnt_state>();
+	blueprnt_state *state = machine.driver_data<blueprnt_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->dipsw));
 }
 
 static MACHINE_RESET( blueprnt )
 {
-	blueprnt_state *state = machine->driver_data<blueprnt_state>();
+	blueprnt_state *state = machine.driver_data<blueprnt_state>();
 
 	state->gfx_bank = 0;
 	state->dipsw = 0;

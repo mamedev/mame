@@ -80,7 +80,7 @@ public:
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	jackie_state *state = machine->driver_data<jackie_state>();
+	jackie_state *state = machine.driver_data<jackie_state>();
 	int code = state->fg_tile_ram[tile_index] | (state->fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;
 	SET_TILE_INFO(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
@@ -88,14 +88,14 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static WRITE8_HANDLER( fg_tile_w )
 {
-	jackie_state *state = space->machine->driver_data<jackie_state>();
+	jackie_state *state = space->machine().driver_data<jackie_state>();
 	state->fg_tile_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
 }
 
 static WRITE8_HANDLER( fg_color_w )
 {
-	jackie_state *state = space->machine->driver_data<jackie_state>();
+	jackie_state *state = space->machine().driver_data<jackie_state>();
 	state->fg_color_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
 }
@@ -105,21 +105,21 @@ static WRITE8_HANDLER( fg_color_w )
 
 static WRITE8_HANDLER( bg_scroll_w )
 {
-	jackie_state *state = space->machine->driver_data<jackie_state>();
+	jackie_state *state = space->machine().driver_data<jackie_state>();
 	state->bg_scroll[offset] = data;
 }
 
 
 static WRITE8_HANDLER( jackie_reel1_ram_w )
 {
-	jackie_state *state = space->machine->driver_data<jackie_state>();
+	jackie_state *state = space->machine().driver_data<jackie_state>();
 	state->reel1_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel1_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_jackie_reel1_tile_info )
 {
-	jackie_state *state = machine->driver_data<jackie_state>();
+	jackie_state *state = machine.driver_data<jackie_state>();
 	int code = state->reel1_ram[tile_index];
 	SET_TILE_INFO(1, code, 0, 0);
 }
@@ -128,14 +128,14 @@ static TILE_GET_INFO( get_jackie_reel1_tile_info )
 
 static WRITE8_HANDLER( jackie_reel2_ram_w )
 {
-	jackie_state *state = space->machine->driver_data<jackie_state>();
+	jackie_state *state = space->machine().driver_data<jackie_state>();
 	state->reel2_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel2_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_jackie_reel2_tile_info )
 {
-	jackie_state *state = machine->driver_data<jackie_state>();
+	jackie_state *state = machine.driver_data<jackie_state>();
 	int code = state->reel2_ram[tile_index];
 	SET_TILE_INFO(1, code, 0, 0);
 }
@@ -143,21 +143,21 @@ static TILE_GET_INFO( get_jackie_reel2_tile_info )
 
 static WRITE8_HANDLER( jackie_reel3_ram_w )
 {
-	jackie_state *state = space->machine->driver_data<jackie_state>();
+	jackie_state *state = space->machine().driver_data<jackie_state>();
 	state->reel3_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel3_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_jackie_reel3_tile_info )
 {
-	jackie_state *state = machine->driver_data<jackie_state>();
+	jackie_state *state = machine.driver_data<jackie_state>();
 	int code = state->reel3_ram[tile_index];
 	SET_TILE_INFO(1, code, 0, 0);
 }
 
 static VIDEO_START(jackie)
 {
-	jackie_state *state = machine->driver_data<jackie_state>();
+	jackie_state *state = machine.driver_data<jackie_state>();
 	state->reel1_tilemap = tilemap_create(machine,get_jackie_reel1_tile_info,tilemap_scan_rows,8,32, 64, 8);
 	state->reel2_tilemap = tilemap_create(machine,get_jackie_reel2_tile_info,tilemap_scan_rows,8,32, 64, 8);
 	state->reel3_tilemap = tilemap_create(machine,get_jackie_reel3_tile_info,tilemap_scan_rows,8,32, 64, 8);
@@ -173,12 +173,12 @@ static VIDEO_START(jackie)
 
 static SCREEN_UPDATE(jackie)
 {
-	jackie_state *state = screen->machine->driver_data<jackie_state>();
+	jackie_state *state = screen->machine().driver_data<jackie_state>();
 	int i,j;
 	int startclipmin = 0;
 	const rectangle &visarea = screen->visible_area();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	for (i=0;i < 0x40;i++)
 	{
@@ -226,7 +226,7 @@ static SCREEN_UPDATE(jackie)
 
 static MACHINE_RESET( jackie )
 {
-	jackie_state *state = machine->driver_data<jackie_state>();
+	jackie_state *state = machine.driver_data<jackie_state>();
 	state->irq_enable	=	1;
 	state->nmi_enable	=	0;
 	state->hopper		=	0;
@@ -235,7 +235,7 @@ static MACHINE_RESET( jackie )
 
 static INTERRUPT_GEN( jackie_interrupt )
 {
-	jackie_state *state = device->machine->driver_data<jackie_state>();
+	jackie_state *state = device->machine().driver_data<jackie_state>();
 	if (cpu_getiloops(device) % 2) {
 		if (state->irq_enable)
 		device_set_input_line(device, 0, HOLD_LINE);
@@ -260,7 +260,7 @@ static void show_out(jackie_state *state)
 
 static void jackie_unk_reg_lo_w( address_space *space, int offset, UINT8 data, int reg )
 {
-	jackie_state *state = space->machine->driver_data<jackie_state>();
+	jackie_state *state = space->machine().driver_data<jackie_state>();
 	state->unk_reg[reg][offset] &= 0xff00;
 	state->unk_reg[reg][offset] |= data;
 	show_out(state);
@@ -272,7 +272,7 @@ static WRITE8_HANDLER( jackie_unk_reg3_lo_w ) { jackie_unk_reg_lo_w( space, offs
 
 static void jackie_unk_reg_hi_w( address_space *space, int offset, UINT8 data, int reg )
 {
-	jackie_state *state = space->machine->driver_data<jackie_state>();
+	jackie_state *state = space->machine().driver_data<jackie_state>();
 	state->unk_reg[reg][offset] &= 0xff;
 	state->unk_reg[reg][offset] |= data << 8;
 	show_out(state);
@@ -284,13 +284,13 @@ static WRITE8_HANDLER( jackie_unk_reg3_hi_w ) { jackie_unk_reg_hi_w( space, offs
 
 static WRITE8_HANDLER( jackie_nmi_and_coins_w )
 {
-	jackie_state *state = space->machine->driver_data<jackie_state>();
-	coin_counter_w(space->machine, 0,		data & 0x01);	// coin_a
-	coin_counter_w(space->machine, 1,		data & 0x04);	// coin_c
-	coin_counter_w(space->machine, 2,		data & 0x08);	// key in
-	coin_counter_w(space->machine, 3,		data & 0x10);	// coin state->out mech
+	jackie_state *state = space->machine().driver_data<jackie_state>();
+	coin_counter_w(space->machine(), 0,		data & 0x01);	// coin_a
+	coin_counter_w(space->machine(), 1,		data & 0x04);	// coin_c
+	coin_counter_w(space->machine(), 2,		data & 0x08);	// key in
+	coin_counter_w(space->machine(), 3,		data & 0x10);	// coin state->out mech
 
-	set_led_status(space->machine, 6,		data & 0x20);	// led for coin state->out / state->hopper active
+	set_led_status(space->machine(), 6,		data & 0x20);	// led for coin state->out / state->hopper active
 
 	state->exp_bank   = (data & 0x02) ? 1 : 0;		// expram bank number
 	state->nmi_enable = data & 0x80;     // nmi enable?
@@ -301,7 +301,7 @@ static WRITE8_HANDLER( jackie_nmi_and_coins_w )
 
 static WRITE8_HANDLER( jackie_lamps_w )
 {
-	jackie_state *state = space->machine->driver_data<jackie_state>();
+	jackie_state *state = space->machine().driver_data<jackie_state>();
 /*
     - Lbits -
     7654 3210
@@ -328,23 +328,23 @@ static WRITE8_HANDLER( jackie_lamps_w )
 
 static READ8_HANDLER( igs_irqack_r )
 {
-	jackie_state *state = space->machine->driver_data<jackie_state>();
+	jackie_state *state = space->machine().driver_data<jackie_state>();
 	state->irq_enable = 1;
 	return 0;
 }
 
 static WRITE8_HANDLER( igs_irqack_w )
 {
-	jackie_state *state = space->machine->driver_data<jackie_state>();
-//  cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	jackie_state *state = space->machine().driver_data<jackie_state>();
+//  cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 	state->out[2] = data;
 	show_out(state);
 }
 
 static READ8_HANDLER( expram_r )
 {
-	jackie_state *state = space->machine->driver_data<jackie_state>();
-	UINT8 *rom = space->machine->region("gfx3")->base();
+	jackie_state *state = space->machine().driver_data<jackie_state>();
+	UINT8 *rom = space->machine().region("gfx3")->base();
 
 	offset += state->exp_bank * 0x8000;
 //  logerror("PC %06X: %04x = %02x\n",cpu_get_pc(space->cpu),offset,rom[offset]);
@@ -391,9 +391,9 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( hopper_r )
 {
-	jackie_state *state = field->port->machine->driver_data<jackie_state>();
-	if (state->hopper) return !(field->port->machine->primary_screen->frame_number()%10);
-	return input_code_pressed(field->port->machine, KEYCODE_H);
+	jackie_state *state = field->port->machine().driver_data<jackie_state>();
+	if (state->hopper) return !(field->port->machine().primary_screen->frame_number()%10);
+	return input_code_pressed(field->port->machine(), KEYCODE_H);
 }
 
 static INPUT_PORTS_START( jackie )
@@ -539,7 +539,7 @@ static DRIVER_INIT( jackie )
 {
 
 	int A;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	for (A = 0;A < 0xf000;A++)
 	{

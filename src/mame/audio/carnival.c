@@ -127,7 +127,7 @@ static int psgData = 0;
 WRITE8_HANDLER( carnival_audio_1_w )
 {
 	static int port1State = 0;
-	device_t *samples = space->machine->device("samples");
+	device_t *samples = space->machine().device("samples");
 	int bitsChanged;
 	int bitsGoneHigh;
 	int bitsGoneLow;
@@ -206,7 +206,7 @@ WRITE8_HANDLER( carnival_audio_1_w )
 
 WRITE8_HANDLER( carnival_audio_2_w )
 {
-	device_t *samples = space->machine->device("samples");
+	device_t *samples = space->machine().device("samples");
 	int bitsChanged;
 	int bitsGoneHigh;
 	int bitsGoneLow;
@@ -236,7 +236,7 @@ WRITE8_HANDLER( carnival_audio_2_w )
 
 	if ( bitsGoneHigh & OUT_PORT_2_MUSIC_RESET )
 		/* reset output is no longer asserted active low */
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE );
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE );
 }
 
 

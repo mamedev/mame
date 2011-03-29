@@ -204,10 +204,10 @@ static VIDEO_START( jetwave )
 
 static SCREEN_UPDATE( jetwave )
 {
-	zr107_state *state = screen->machine->driver_data<zr107_state>();
-	device_t *k001604 = screen->machine->device("k001604");
+	zr107_state *state = screen->machine().driver_data<zr107_state>();
+	device_t *k001604 = screen->machine().device("k001604");
 
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
+	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
 
 	K001005_draw(bitmap, cliprect);
 
@@ -216,7 +216,7 @@ static SCREEN_UPDATE( jetwave )
 	draw_7segment_led(bitmap, 3, 3, state->led_reg0);
 	draw_7segment_led(bitmap, 9, 3, state->led_reg1);
 
-	sharc_set_flag_input(screen->machine->device("dsp"), 1, ASSERT_LINE);
+	sharc_set_flag_input(screen->machine().device("dsp"), 1, ASSERT_LINE);
 	return 0;
 }
 
@@ -225,22 +225,22 @@ static SCREEN_UPDATE( jetwave )
 
 static WRITE32_HANDLER( paletteram32_w )
 {
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
-	data = space->machine->generic.paletteram.u32[offset];
-	palette_set_color_rgb(space->machine, (offset * 2) + 0, pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16));
-	palette_set_color_rgb(space->machine, (offset * 2) + 1, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	data = space->machine().generic.paletteram.u32[offset];
+	palette_set_color_rgb(space->machine(), (offset * 2) + 0, pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16));
+	palette_set_color_rgb(space->machine(), (offset * 2) + 1, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 #define NUM_LAYERS	2
 
-static void game_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags)
+static void game_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags)
 {
 	*color += layer * 0x40;
 }
 
 static VIDEO_START( zr107 )
 {
-	device_t *k056832 = machine->device("k056832");
+	device_t *k056832 = machine.device("k056832");
 
 	k056832_set_layer_offs(k056832, 0, -29, -27);
 	k056832_set_layer_offs(k056832, 1, -29, -27);
@@ -257,9 +257,9 @@ static VIDEO_START( zr107 )
 
 static SCREEN_UPDATE( zr107 )
 {
-	zr107_state *state = screen->machine->driver_data<zr107_state>();
-	device_t *k056832 = screen->machine->device("k056832");
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
+	zr107_state *state = screen->machine().driver_data<zr107_state>();
+	device_t *k056832 = screen->machine().device("k056832");
+	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
 
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 1, 0, 0);
 	K001005_draw(bitmap, cliprect);
@@ -268,7 +268,7 @@ static SCREEN_UPDATE( zr107 )
 	draw_7segment_led(bitmap, 3, 3, state->led_reg0);
 	draw_7segment_led(bitmap, 9, 3, state->led_reg1);
 
-	sharc_set_flag_input(screen->machine->device("dsp"), 1, ASSERT_LINE);
+	sharc_set_flag_input(screen->machine().device("dsp"), 1, ASSERT_LINE);
 	return 0;
 }
 
@@ -286,7 +286,7 @@ static READ8_HANDLER( sysreg_r )
 		case 2:	/* I/O port 2 */
 		case 3:	/* System Port 0 */
 		case 4:	/* System Port 1 */
-			r = input_port_read(space->machine, portnames[offset]);
+			r = input_port_read(space->machine(), portnames[offset]);
 			break;
 
 		case 5:	/* Parallel data port */
@@ -297,7 +297,7 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
-	zr107_state *state = space->machine->driver_data<zr107_state>();
+	zr107_state *state = space->machine().driver_data<zr107_state>();
 	switch (offset)
 	{
 		case 0:	/* LED Register 0 */
@@ -323,8 +323,8 @@ static WRITE8_HANDLER( sysreg_w )
                 0x02 = EEPCLK
                 0x01 = EEPDI
             */
-			input_port_write(space->machine, "EEPROMOUT", data & 0x07, 0xff);
-			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			input_port_write(space->machine(), "EEPROMOUT", data & 0x07, 0xff);
+			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;
 
@@ -340,11 +340,11 @@ static WRITE8_HANDLER( sysreg_w )
                 0x01 = ADDSCLK (ADC SCLK)
             */
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
-				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
-				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
-			input_port_write(space->machine, "OUT4", data, 0xff);
+			input_port_write(space->machine(), "OUT4", data, 0xff);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
 
@@ -353,7 +353,7 @@ static WRITE8_HANDLER( sysreg_w )
                 0x01 = AFE
             */
 			if (data & 0x01)
-				watchdog_reset(space->machine);
+				watchdog_reset(space->machine());
 			break;
 
 	}
@@ -361,7 +361,7 @@ static WRITE8_HANDLER( sysreg_w )
 
 static READ32_HANDLER( ccu_r )
 {
-	zr107_state *state = space->machine->driver_data<zr107_state>();
+	zr107_state *state = space->machine().driver_data<zr107_state>();
 	UINT32 r = 0;
 	switch (offset)
 	{
@@ -394,12 +394,12 @@ static WRITE32_HANDLER( ccu_w )
 
 static MACHINE_START( zr107 )
 {
-	zr107_state *state = machine->driver_data<zr107_state>();
+	zr107_state *state = machine.driver_data<zr107_state>();
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine->device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x000fffff, FALSE, state->workram);
+	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x000fffff, FALSE, state->workram);
 }
 
 static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32 )
@@ -425,9 +425,9 @@ ADDRESS_MAP_END
 
 static WRITE32_HANDLER( jetwave_palette_w )
 {
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
-	data = space->machine->generic.paletteram.u32[offset];
-	palette_set_color_rgb(space->machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	data = space->machine().generic.paletteram.u32[offset];
+	palette_set_color_rgb(space->machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static ADDRESS_MAP_START( jetwave_map, AS_PROGRAM, 32 )
@@ -460,9 +460,9 @@ static READ16_HANDLER( dual539_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_BITS_0_7)
-		ret |= k054539_r(space->machine->device("konami2"), offset);
+		ret |= k054539_r(space->machine().device("konami2"), offset);
 	if (ACCESSING_BITS_8_15)
-		ret |= k054539_r(space->machine->device("konami1"), offset)<<8;
+		ret |= k054539_r(space->machine().device("konami1"), offset)<<8;
 
 	return ret;
 }
@@ -470,9 +470,9 @@ static READ16_HANDLER( dual539_r )
 static WRITE16_HANDLER( dual539_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k054539_w(space->machine->device("konami2"), offset, data);
+		k054539_w(space->machine().device("konami2"), offset, data);
 	if (ACCESSING_BITS_8_15)
-		k054539_w(space->machine->device("konami1"), offset, data>>8);
+		k054539_w(space->machine().device("konami1"), offset, data>>8);
 }
 
 static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16 )
@@ -494,13 +494,13 @@ static const k054539_interface k054539_config =
 
 static READ32_HANDLER( dsp_dataram_r )
 {
-	zr107_state *state = space->machine->driver_data<zr107_state>();
+	zr107_state *state = space->machine().driver_data<zr107_state>();
 	return state->sharc_dataram[offset] & 0xffff;
 }
 
 static WRITE32_HANDLER( dsp_dataram_w )
 {
-	zr107_state *state = space->machine->driver_data<zr107_state>();
+	zr107_state *state = space->machine().driver_data<zr107_state>();
 	state->sharc_dataram[offset] = data;
 }
 
@@ -662,11 +662,11 @@ static double adc0838_callback( device_t *device, UINT8 input )
 	switch (input)
 	{
 	case ADC083X_CH0:
-		return (double)(5 * input_port_read(device->machine, "ANALOG1")) / 255.0;
+		return (double)(5 * input_port_read(device->machine(), "ANALOG1")) / 255.0;
 	case ADC083X_CH1:
-		return (double)(5 * input_port_read(device->machine, "ANALOG2")) / 255.0;
+		return (double)(5 * input_port_read(device->machine(), "ANALOG2")) / 255.0;
 	case ADC083X_CH2:
-		return (double)(5 * input_port_read(device->machine, "ANALOG3")) / 255.0;
+		return (double)(5 * input_port_read(device->machine(), "ANALOG3")) / 255.0;
 	case ADC083X_CH3:
 		return 0;
 	case ADC083X_COM:
@@ -690,12 +690,12 @@ static TIMER_CALLBACK( irq_off )
 	cputag_set_input_line(machine, "audiocpu", param, CLEAR_LINE);
 }
 
-static void sound_irq_callback( running_machine *machine, int irq )
+static void sound_irq_callback( running_machine &machine, int irq )
 {
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
 	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
-	machine->scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off), line);
+	machine.scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off), line);
 }
 
 static const k056800_interface zr107_k056800_interface =
@@ -851,14 +851,14 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-static void init_zr107(running_machine *machine)
+static void init_zr107(running_machine &machine)
 {
-	zr107_state *state = machine->driver_data<zr107_state>();
+	zr107_state *state = machine.driver_data<zr107_state>();
 	state->sharc_dataram = auto_alloc_array(machine, UINT32, 0x100000/4);
 	state->led_reg0 = state->led_reg1 = 0x7f;
 	state->ccu_vcth = state->ccu_vctl = 0;
 
-	K001005_preprocess_texture_data(machine->region("gfx1")->base(), machine->region("gfx1")->bytes(), 0);
+	K001005_preprocess_texture_data(machine.region("gfx1")->base(), machine.region("gfx1")->bytes(), 0);
 }
 
 static DRIVER_INIT(zr107)

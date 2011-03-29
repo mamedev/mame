@@ -14,24 +14,24 @@ Video hardware driver by Uki
 
 WRITE8_DEVICE_HANDLER( xxmissio_scroll_x_w )
 {
-	xxmissio_state *state = device->machine->driver_data<xxmissio_state>();
+	xxmissio_state *state = device->machine().driver_data<xxmissio_state>();
 	state->xscroll = data;
 }
 WRITE8_DEVICE_HANDLER( xxmissio_scroll_y_w )
 {
-	xxmissio_state *state = device->machine->driver_data<xxmissio_state>();
+	xxmissio_state *state = device->machine().driver_data<xxmissio_state>();
 	state->yscroll = data;
 }
 
 WRITE8_HANDLER( xxmissio_flipscreen_w )
 {
-	xxmissio_state *state = space->machine->driver_data<xxmissio_state>();
+	xxmissio_state *state = space->machine().driver_data<xxmissio_state>();
 	state->flipscreen = data & 0x01;
 }
 
 WRITE8_HANDLER( xxmissio_bgram_w )
 {
-	xxmissio_state *state = space->machine->driver_data<xxmissio_state>();
+	xxmissio_state *state = space->machine().driver_data<xxmissio_state>();
 	int x = (offset + (state->xscroll >> 3)) & 0x1f;
 	offset = (offset & 0x7e0) | x;
 
@@ -39,7 +39,7 @@ WRITE8_HANDLER( xxmissio_bgram_w )
 }
 READ8_HANDLER( xxmissio_bgram_r )
 {
-	xxmissio_state *state = space->machine->driver_data<xxmissio_state>();
+	xxmissio_state *state = space->machine().driver_data<xxmissio_state>();
 	int x = (offset + (state->xscroll >> 3)) & 0x1f;
 	offset = (offset & 0x7e0) | x;
 
@@ -55,7 +55,7 @@ WRITE8_HANDLER( xxmissio_paletteram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	xxmissio_state *state = machine->driver_data<xxmissio_state>();
+	xxmissio_state *state = machine.driver_data<xxmissio_state>();
 	int code = ((state->bgram[0x400 | tile_index] & 0xc0) << 2) | state->bgram[0x000 | tile_index];
 	int color =  state->bgram[0x400 | tile_index] & 0x0f;
 
@@ -64,7 +64,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	xxmissio_state *state = machine->driver_data<xxmissio_state>();
+	xxmissio_state *state = machine.driver_data<xxmissio_state>();
 	int code = state->fgram[0x000 | tile_index];
 	int color = state->fgram[0x400 | tile_index] & 0x07;
 
@@ -73,7 +73,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( xxmissio )
 {
-	xxmissio_state *state = machine->driver_data<xxmissio_state>();
+	xxmissio_state *state = machine.driver_data<xxmissio_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 8, 32, 32);
 
@@ -87,7 +87,7 @@ VIDEO_START( xxmissio )
 
 static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx)
 {
-	xxmissio_state *state = gfx->machine->driver_data<xxmissio_state>();
+	xxmissio_state *state = gfx->machine().driver_data<xxmissio_state>();
 	int offs;
 	int chr,col;
 	int x,y,px,py,fx,fy;
@@ -138,15 +138,15 @@ static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_
 
 SCREEN_UPDATE( xxmissio )
 {
-	xxmissio_state *state = screen->machine->driver_data<xxmissio_state>();
-	tilemap_mark_all_tiles_dirty_all(screen->machine);
-	tilemap_set_flip_all(screen->machine, state->flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	xxmissio_state *state = screen->machine().driver_data<xxmissio_state>();
+	tilemap_mark_all_tiles_dirty_all(screen->machine());
+	tilemap_set_flip_all(screen->machine(), state->flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->xscroll * 2);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->yscroll);
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(bitmap, cliprect, screen->machine->gfx[1]);
+	draw_sprites(bitmap, cliprect, screen->machine().gfx[1]);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 
 	return 0;

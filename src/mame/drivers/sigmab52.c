@@ -158,7 +158,7 @@ static VIDEO_START( jwildb52 )
 
 static SCREEN_UPDATE( jwildb52 )
 {
-	device_t *hd63484 = screen->machine->device("hd63484");
+	device_t *hd63484 = screen->machine().device("hd63484");
 
 	int x, y, b, src;
 
@@ -166,7 +166,7 @@ static SCREEN_UPDATE( jwildb52 )
 
 //save vram to file
 #if 0
-	if (input_code_pressed_once(screen->machine, KEYCODE_Q))
+	if (input_code_pressed_once(screen->machine(), KEYCODE_Q))
 	{
 		FILE *p = fopen("vram.bin", "wb");
 		fwrite(&HD63484_ram[0], 1, 0x40000 * 4, p);
@@ -190,7 +190,7 @@ static SCREEN_UPDATE( jwildb52 )
 		}
 	}
 
-if (!input_code_pressed(screen->machine, KEYCODE_O))
+if (!input_code_pressed(screen->machine(), KEYCODE_O))
 	if ((hd63484_regs_r(hd63484, 0x06/2, 0xffff) & 0x0300) == 0x0300)
 	{
 		int sy = (hd63484_regs_r(hd63484, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(hd63484, 0x88/2, 0xffff) >> 8);
@@ -236,8 +236,8 @@ static PALETTE_INIT( jwildb52 )
 
 static WRITE8_HANDLER(acrtc_w)
 {
-	sigmab52_state *state = space->machine->driver_data<sigmab52_state>();
-	device_t *hd63484 = space->machine->device("hd63484");
+	sigmab52_state *state = space->machine().driver_data<sigmab52_state>();
+	device_t *hd63484 = space->machine().device("hd63484");
 	if(!offset)
 	{
 		//address select
@@ -268,7 +268,7 @@ static READ8_HANDLER(acrtc_r)
 {
 	if(offset&1)
 	{
-		device_t *hd63484 = space->machine->device("hd63484");
+		device_t *hd63484 = space->machine().device("hd63484");
 		return hd63484_data_r(hd63484, 0, 0xff);
 	}
 
@@ -290,7 +290,7 @@ static READ8_HANDLER(unk_f700_r)
 
 static WRITE8_HANDLER(unk_f710_w)
 {
-	memory_set_bankptr(space->machine, "bank1" ,&space->machine->region("maincpu")->base()[0x10000 + ((data&0x80)?0x4000:0x0000)]);
+	memory_set_bankptr(space->machine(), "bank1" ,&space->machine().region("maincpu")->base()[0x10000 + ((data&0x80)?0x4000:0x0000)]);
 }
 
 static READ8_HANDLER(unk_f721_r)
@@ -538,11 +538,11 @@ static INTERRUPT_GEN( timer_irq )
 
 static MACHINE_START(jwildb52)
 {
-	memory_set_bankptr(machine, "bank1", &machine->region("maincpu")->base()[0x10000 + 0x0000]);
+	memory_set_bankptr(machine, "bank1", &machine.region("maincpu")->base()[0x10000 + 0x0000]);
 
-	memory_set_bankptr(machine, "bank2", &machine->region("maincpu")->base()[0x10000 + 0xf800]);
+	memory_set_bankptr(machine, "bank2", &machine.region("maincpu")->base()[0x10000 + 0xf800]);
 
-	memory_set_bankptr(machine, "bank3", &machine->region("maincpu")->base()[0x10000 + 0x8000]);
+	memory_set_bankptr(machine, "bank3", &machine.region("maincpu")->base()[0x10000 + 0x8000]);
 
 /*
 
@@ -556,10 +556,10 @@ static MACHINE_START(jwildb52)
 */
 
 	{
-		UINT16 *rom = (UINT16*)machine->region("gfx1")->base();
+		UINT16 *rom = (UINT16*)machine.region("gfx1")->base();
 		int i;
 
-		device_t *hd63484 = machine->device("hd63484");
+		device_t *hd63484 = machine.device("hd63484");
 
 		for(i = 0; i < 0x40000/2; ++i)
 		{

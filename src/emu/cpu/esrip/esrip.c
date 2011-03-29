@@ -116,8 +116,8 @@ typedef struct
 
 	read16_device_func	fdt_r;
 	write16_device_func	fdt_w;
-	UINT8 (*status_in)(running_machine *machine);
-	int (*draw)(running_machine *machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank);
+	UINT8 (*status_in)(running_machine &machine);
+	int (*draw)(running_machine &machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank);
 } esrip_state;
 
 
@@ -256,19 +256,19 @@ static CPU_INIT( esrip )
 	/* Register configuration structure callbacks */
 	cpustate->fdt_r = _config->fdt_r;
 	cpustate->fdt_w = _config->fdt_w;
-	cpustate->lbrm = (UINT8*)device->machine->region(_config->lbrm_prom)->base();
+	cpustate->lbrm = (UINT8*)device->machine().region(_config->lbrm_prom)->base();
 	cpustate->status_in = _config->status_in;
 	cpustate->draw = _config->draw;
 
 	/* Allocate image pointer table RAM */
-	cpustate->ipt_ram = auto_alloc_array(device->machine, UINT16, IPT_RAM_SIZE/2);
+	cpustate->ipt_ram = auto_alloc_array(device->machine(), UINT16, IPT_RAM_SIZE/2);
 
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 
 	/* Create the instruction decode lookup table */
-	cpustate->optable = auto_alloc_array(device->machine, UINT8, 65536);
+	cpustate->optable = auto_alloc_array(device->machine(), UINT8, 65536);
 	make_ops(cpustate);
 
 	/* Register stuff for state saving */
@@ -354,9 +354,9 @@ static CPU_EXIT( esrip )
     PRIVATE FUNCTIONS
 ***************************************************************************/
 
-static int get_hblank(running_machine *machine)
+static int get_hblank(running_machine &machine)
 {
-	return machine->primary_screen->hblank();
+	return machine.primary_screen->hblank();
 }
 
 /* Return the state of the LBRM line (Y-scaling related) */
@@ -384,7 +384,7 @@ INLINE int check_jmp(esrip_state *cpustate, UINT8 jmp_ctrl)
 			/* T3 */      case 6: ret = BIT(cpustate->t, 2);  break;
 			/* T4 */      case 1: ret = BIT(cpustate->t, 3);  break;
 			/* /LBRM */   case 5: ret = !get_lbrm(cpustate);  break;
-			/* /HBLANK */ case 3: ret = !get_hblank(cpustate->device->machine); break;
+			/* /HBLANK */ case 3: ret = !get_hblank(cpustate->device->machine()); break;
 			/* JMP */     case 7: ret = 0;                    break;
 		}
 
@@ -1664,11 +1664,11 @@ INLINE void am29116_execute(esrip_state *cpustate, UINT16 inst, int _sre)
 static CPU_EXECUTE( esrip )
 {
 	esrip_state *cpustate = get_safe_token(device);
-	int calldebugger = (device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0;
+	int calldebugger = (device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0;
 	UINT8 status;
 
 	/* I think we can get away with placing this outside of the loop */
-	status = cpustate->status_in(device->machine);
+	status = cpustate->status_in(device->machine());
 
 	/* Core execution loop */
 	do
@@ -1811,7 +1811,7 @@ static CPU_EXECUTE( esrip )
 			cpustate->attr_latch = x_bus;
 
 			cpustate->fig = 1;
-			cpustate->fig_cycles = cpustate->draw(device->machine, cpustate->adl_latch, cpustate->adr_latch, cpustate->fig_latch, cpustate->attr_latch, cpustate->iaddr_latch, cpustate->c_latch, cpustate->x_scale, cpustate->img_bank);
+			cpustate->fig_cycles = cpustate->draw(device->machine(), cpustate->adl_latch, cpustate->adr_latch, cpustate->fig_latch, cpustate->attr_latch, cpustate->iaddr_latch, cpustate->c_latch, cpustate->x_scale, cpustate->img_bank);
 		}
 
 		/* X-scale */
@@ -1943,7 +1943,7 @@ CPU_GET_INFO( esrip )
 																		cpustate->status & 0x04 ? 'N' : '.',
 																		cpustate->status & 0x02 ? 'C' : '.',
 																		cpustate->status & 0x01 ? 'Z' : '.',
-																		get_hblank(device->machine) ? 'H' : '.'); break;
+																		get_hblank(device->machine()) ? 'H' : '.'); break;
 
 		case CPUINFO_STR_REGISTER + ESRIP_PC:			sprintf(info->s, "PC: %04X", RIP_PC); break;
 		case CPUINFO_STR_REGISTER + ESRIP_ACC:			sprintf(info->s, "ACC: %04X", cpustate->acc); break;

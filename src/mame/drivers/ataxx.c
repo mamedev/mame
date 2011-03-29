@@ -711,7 +711,7 @@ static DRIVER_INIT( ataxx )
 	leland_rotate_memory(machine, "slave");
 
 	/* set up additional input ports */
-	machine->device("master")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x03, FUNC(ataxx_trackball_r));
+	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x03, FUNC(ataxx_trackball_r));
 }
 
 
@@ -721,7 +721,7 @@ static DRIVER_INIT( ataxxj )
 	leland_rotate_memory(machine, "slave");
 
 	/* set up additional input ports */
-	machine->device("master")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x03, FUNC(ataxx_trackball_r));
+	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x03, FUNC(ataxx_trackball_r));
 }
 
 
@@ -731,9 +731,9 @@ static DRIVER_INIT( wsf )
 	leland_rotate_memory(machine, "slave");
 
 	/* set up additional input ports */
-	machine->device("master")->memory().space(AS_IO)->install_read_port(0x0d, 0x0d, "P1_P2");
-	machine->device("master")->memory().space(AS_IO)->install_read_port(0x0e, 0x0e, "P3_P4");
-	machine->device("master")->memory().space(AS_IO)->install_read_port(0x0f, 0x0f, "BUTTONS");
+	machine.device("master")->memory().space(AS_IO)->install_read_port(0x0d, 0x0d, "P1_P2");
+	machine.device("master")->memory().space(AS_IO)->install_read_port(0x0e, 0x0e, "P3_P4");
+	machine.device("master")->memory().space(AS_IO)->install_read_port(0x0f, 0x0f, "BUTTONS");
 }
 
 
@@ -743,14 +743,14 @@ static DRIVER_INIT( indyheat )
 	leland_rotate_memory(machine, "slave");
 
 	/* set up additional input ports */
-	machine->device("master")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x02, FUNC(indyheat_wheel_r));
-	machine->device("master")->memory().space(AS_IO)->install_legacy_read_handler(0x08, 0x0b, FUNC(indyheat_analog_r));
-	machine->device("master")->memory().space(AS_IO)->install_read_port(0x0d, 0x0d, "P1");
-	machine->device("master")->memory().space(AS_IO)->install_read_port(0x0e, 0x0e, "P2");
-	machine->device("master")->memory().space(AS_IO)->install_read_port(0x0f, 0x0f, "P3");
+	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x02, FUNC(indyheat_wheel_r));
+	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0x08, 0x0b, FUNC(indyheat_analog_r));
+	machine.device("master")->memory().space(AS_IO)->install_read_port(0x0d, 0x0d, "P1");
+	machine.device("master")->memory().space(AS_IO)->install_read_port(0x0e, 0x0e, "P2");
+	machine.device("master")->memory().space(AS_IO)->install_read_port(0x0f, 0x0f, "P3");
 
 	/* set up additional output ports */
-	machine->device("master")->memory().space(AS_IO)->install_legacy_write_handler(0x08, 0x0b, FUNC(indyheat_analog_w));
+	machine.device("master")->memory().space(AS_IO)->install_legacy_write_handler(0x08, 0x0b, FUNC(indyheat_analog_w));
 }
 
 
@@ -760,9 +760,9 @@ static DRIVER_INIT( brutforc )
 	leland_rotate_memory(machine, "slave");
 
 	/* set up additional input ports */
-	machine->device("master")->memory().space(AS_IO)->install_read_port(0x0d, 0x0d, "P2");
-	machine->device("master")->memory().space(AS_IO)->install_read_port(0x0e, 0x0e, "P1");
-	machine->device("master")->memory().space(AS_IO)->install_read_port(0x0f, 0x0f, "P3");
+	machine.device("master")->memory().space(AS_IO)->install_read_port(0x0d, 0x0d, "P2");
+	machine.device("master")->memory().space(AS_IO)->install_read_port(0x0e, 0x0e, "P1");
+	machine.device("master")->memory().space(AS_IO)->install_read_port(0x0f, 0x0f, "P3");
 }
 
 
@@ -772,12 +772,12 @@ static DRIVER_INIT( asylum )
 	leland_rotate_memory(machine, "slave");
 
 	/* asylum appears to have some extra RAM for the slave CPU */
-	machine->device("slave")->memory().space(AS_PROGRAM)->install_ram(0xf000, 0xfffb);
+	machine.device("slave")->memory().space(AS_PROGRAM)->install_ram(0xf000, 0xfffb);
 
 	/* set up additional input ports */
-	machine->device("master")->memory().space(AS_IO)->install_read_port(0x0d, 0x0d, "P2");
-	machine->device("master")->memory().space(AS_IO)->install_read_port(0x0e, 0x0e, "P1");
-	machine->device("master")->memory().space(AS_IO)->install_read_port(0x0f, 0x0f, "P3");
+	machine.device("master")->memory().space(AS_IO)->install_read_port(0x0d, 0x0d, "P2");
+	machine.device("master")->memory().space(AS_IO)->install_read_port(0x0e, 0x0e, "P1");
+	machine.device("master")->memory().space(AS_IO)->install_read_port(0x0f, 0x0f, "P3");
 }
 
 

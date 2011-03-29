@@ -38,7 +38,7 @@ public:
 
 static VIDEO_START(laserbas)
 {
-	laserbas_state *state = machine->driver_data<laserbas_state>();
+	laserbas_state *state = machine.driver_data<laserbas_state>();
 
 	state->save_item(NAME(state->vram1));
 	state->save_item(NAME(state->vram2));
@@ -46,7 +46,7 @@ static VIDEO_START(laserbas)
 
 static SCREEN_UPDATE(laserbas)
 {
-	laserbas_state *state = screen->machine->driver_data<laserbas_state>();
+	laserbas_state *state = screen->machine().driver_data<laserbas_state>();
 	int x, y;
 
 	for (y = 0; y < 256; y++)
@@ -67,7 +67,7 @@ static SCREEN_UPDATE(laserbas)
 
 static READ8_HANDLER(vram_r)
 {
-	laserbas_state *state = space->machine->driver_data<laserbas_state>();
+	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
 	if(!state->vrambank)
 		return state->vram1[offset];
@@ -77,7 +77,7 @@ static READ8_HANDLER(vram_r)
 
 static WRITE8_HANDLER(vram_w)
 {
-	laserbas_state *state = space->machine->driver_data<laserbas_state>();
+	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
 	if(!state->vrambank)
 		state->vram1[offset] = data;
@@ -87,7 +87,7 @@ static WRITE8_HANDLER(vram_w)
 
 static READ8_HANDLER( read_unk )
 {
-	laserbas_state *state = space->machine->driver_data<laserbas_state>();
+	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
 	state->count ^= 0x80;
 	return state->count | 0x7f;
@@ -95,12 +95,12 @@ static READ8_HANDLER( read_unk )
 
 static WRITE8_HANDLER(palette_w)
 {
-	palette_set_color_rgb(space->machine, offset, pal3bit(data >> 5), pal3bit(data >> 2), pal2bit(data));
+	palette_set_color_rgb(space->machine(), offset, pal3bit(data >> 5), pal3bit(data >> 2), pal2bit(data));
 }
 
 static WRITE8_HANDLER(vrambank_w)
 {
-	laserbas_state *state = space->machine->driver_data<laserbas_state>();
+	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
 	if ((offset & 0xf1) == 0x10)
 		state->vrambank = data & 0x40;
@@ -146,7 +146,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( laserbas_interrupt )
 {
-	if(device->machine->primary_screen->vblank())
+	if(device->machine().primary_screen->vblank())
 		device_set_input_line(device, 0, HOLD_LINE);
 	else
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
@@ -154,7 +154,7 @@ static INTERRUPT_GEN( laserbas_interrupt )
 
 static MACHINE_START( laserbas )
 {
-	laserbas_state *state = machine->driver_data<laserbas_state>();
+	laserbas_state *state = machine.driver_data<laserbas_state>();
 
 	state->save_item(NAME(state->vrambank));
 	state->save_item(NAME(state->count));
@@ -162,7 +162,7 @@ static MACHINE_START( laserbas )
 
 static MACHINE_RESET( laserbas )
 {
-	laserbas_state *state = machine->driver_data<laserbas_state>();
+	laserbas_state *state = machine.driver_data<laserbas_state>();
 
 	state->vrambank = 0;
 	state->count = 0;

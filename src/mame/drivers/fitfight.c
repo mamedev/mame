@@ -90,14 +90,14 @@ Stephh's notes :
 
 static READ16_HANDLER(fitfight_700000_r)
 {
-	fitfight_state *state = space->machine->driver_data<fitfight_state>();
+	fitfight_state *state = space->machine().driver_data<fitfight_state>();
 	UINT16 data = state->fof_700000_data;
 	return (data << 2);
 }
 
 static READ16_HANDLER(histryma_700000_r)
 {
-	fitfight_state *state = space->machine->driver_data<fitfight_state>();
+	fitfight_state *state = space->machine().driver_data<fitfight_state>();
 	UINT16 data = (state->fof_700000_data & 0x00AA);
 	data |= ((state->fof_700000_data & 0x0055) >> 2);
 	return (data);
@@ -105,7 +105,7 @@ static READ16_HANDLER(histryma_700000_r)
 
 static READ16_HANDLER(bbprot_700000_r)
 {
-	fitfight_state *state = space->machine->driver_data<fitfight_state>();
+	fitfight_state *state = space->machine().driver_data<fitfight_state>();
 	UINT16 data = 0;
 	data  =  (state->fof_700000_data & 0x000b);
 	data |= ((state->fof_700000_data & 0x01d0) >> 2);
@@ -116,7 +116,7 @@ static READ16_HANDLER(bbprot_700000_r)
 
 static WRITE16_HANDLER(fitfight_700000_w)
 {
-	fitfight_state *state = space->machine->driver_data<fitfight_state>();
+	fitfight_state *state = space->machine().driver_data<fitfight_state>();
 	COMBINE_DATA(&state->fof_700000[offset]);		// needed for scrolling
 
 	if (data < 0x0200)				// to avoid considering writes of 0x0200
@@ -219,19 +219,19 @@ ADDRESS_MAP_END
 static READ8_HANDLER(snd_porta_r)
 {
 	//mame_printf_debug("PA R @%x\n",cpu_get_pc(space->cpu));
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static READ8_HANDLER(snd_portb_r)
 {
 	//mame_printf_debug("PB R @%x\n",cpu_get_pc(space->cpu));
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static READ8_HANDLER(snd_portc_r)
 {
 	//mame_printf_debug("PC R @%x\n",cpu_get_pc(space->cpu));
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static WRITE8_HANDLER(snd_porta_w)
@@ -719,14 +719,14 @@ GFXDECODE_END
 
 static MACHINE_START( fitfight )
 {
-	fitfight_state *state = machine->driver_data<fitfight_state>();
+	fitfight_state *state = machine.driver_data<fitfight_state>();
 
 	state->save_item(NAME(state->fof_700000_data));
 }
 
 static MACHINE_RESET( fitfight )
 {
-	fitfight_state *state = machine->driver_data<fitfight_state>();
+	fitfight_state *state = machine.driver_data<fitfight_state>();
 
 	state->fof_700000_data = 0;
 }
@@ -975,25 +975,25 @@ ROM_END
 
 static DRIVER_INIT( fitfight )
 {
-//  UINT16 *mem16 = (UINT16 *)machine->region("maincpu")->base();
+//  UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
 //  mem16[0x0165B2/2] = 0x4e71; // for now so it boots
-	fitfight_state *state = machine->driver_data<fitfight_state>();
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x700000, 0x700001, FUNC(fitfight_700000_r));
+	fitfight_state *state = machine.driver_data<fitfight_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x700000, 0x700001, FUNC(fitfight_700000_r));
 	state->bbprot_kludge = 0;
 }
 
 static DRIVER_INIT( histryma )
 {
-//  UINT16 *mem16 = (UINT16 *)machine->region("maincpu")->base();
+//  UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
 //  mem16[0x017FDC/2] = 0x4e71; // for now so it boots
-	fitfight_state *state = machine->driver_data<fitfight_state>();
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x700000, 0x700001, FUNC(histryma_700000_r));
+	fitfight_state *state = machine.driver_data<fitfight_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x700000, 0x700001, FUNC(histryma_700000_r));
 	state->bbprot_kludge = 0;
 }
 
 static DRIVER_INIT( bbprot )
 {
-	fitfight_state *state = machine->driver_data<fitfight_state>();
+	fitfight_state *state = machine.driver_data<fitfight_state>();
 	state->bbprot_kludge = 1;
 }
 

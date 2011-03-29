@@ -48,74 +48,74 @@ TODO:
 
 static WRITE8_HANDLER( exzisus_cpua_bankswitch_w )
 {
-	exzisus_state *state = space->machine->driver_data<exzisus_state>();
-	UINT8 *RAM = space->machine->region("cpua")->base();
+	exzisus_state *state = space->machine().driver_data<exzisus_state>();
+	UINT8 *RAM = space->machine().region("cpua")->base();
 
 	if ( (data & 0x0f) != state->cpua_bank )
 	{
 		state->cpua_bank = data & 0x0f;
 		if (state->cpua_bank >= 2)
 		{
-			memory_set_bankptr(space->machine,  "bank2", &RAM[ 0x10000 + ( (state->cpua_bank - 2) * 0x4000 ) ] );
+			memory_set_bankptr(space->machine(),  "bank2", &RAM[ 0x10000 + ( (state->cpua_bank - 2) * 0x4000 ) ] );
 		}
 	}
 
-	flip_screen_set(space->machine, data & 0x40);
+	flip_screen_set(space->machine(), data & 0x40);
 }
 
 static WRITE8_HANDLER( exzisus_cpub_bankswitch_w )
 {
-	exzisus_state *state = space->machine->driver_data<exzisus_state>();
-	UINT8 *RAM = space->machine->region("cpub")->base();
+	exzisus_state *state = space->machine().driver_data<exzisus_state>();
+	UINT8 *RAM = space->machine().region("cpub")->base();
 
 	if ( (data & 0x0f) != state->cpub_bank )
 	{
 		state->cpub_bank = data & 0x0f;
 		if (state->cpub_bank >= 2)
 		{
-			memory_set_bankptr(space->machine,  "bank1", &RAM[ 0x10000 + ( (state->cpub_bank - 2) * 0x4000 ) ] );
+			memory_set_bankptr(space->machine(),  "bank1", &RAM[ 0x10000 + ( (state->cpub_bank - 2) * 0x4000 ) ] );
 		}
 	}
 
-	flip_screen_set(space->machine, data & 0x40);
+	flip_screen_set(space->machine(), data & 0x40);
 }
 
 static WRITE8_HANDLER( exzisus_coincounter_w )
 {
-	coin_lockout_w(space->machine, 0,~data & 0x01);
-	coin_lockout_w(space->machine, 1,~data & 0x02);
-	coin_counter_w(space->machine, 0,data & 0x04);
-	coin_counter_w(space->machine, 1,data & 0x08);
+	coin_lockout_w(space->machine(), 0,~data & 0x01);
+	coin_lockout_w(space->machine(), 1,~data & 0x02);
+	coin_counter_w(space->machine(), 0,data & 0x04);
+	coin_counter_w(space->machine(), 1,data & 0x08);
 }
 
 static READ8_HANDLER( exzisus_sharedram_ab_r )
 {
-	exzisus_state *state = space->machine->driver_data<exzisus_state>();
+	exzisus_state *state = space->machine().driver_data<exzisus_state>();
 	return state->sharedram_ab[offset];
 }
 
 static READ8_HANDLER( exzisus_sharedram_ac_r )
 {
-	exzisus_state *state = space->machine->driver_data<exzisus_state>();
+	exzisus_state *state = space->machine().driver_data<exzisus_state>();
 	return state->sharedram_ac[offset];
 }
 
 static WRITE8_HANDLER( exzisus_sharedram_ab_w )
 {
-	exzisus_state *state = space->machine->driver_data<exzisus_state>();
+	exzisus_state *state = space->machine().driver_data<exzisus_state>();
 	state->sharedram_ab[offset] = data;
 }
 
 static WRITE8_HANDLER( exzisus_sharedram_ac_w )
 {
-	exzisus_state *state = space->machine->driver_data<exzisus_state>();
+	exzisus_state *state = space->machine().driver_data<exzisus_state>();
 	state->sharedram_ac[offset] = data;
 }
 
 // is it ok that cpub_reset refers to cpuc?
 static WRITE8_HANDLER( exzisus_cpub_reset_w )
 {
-	cputag_set_input_line(space->machine, "cpuc", INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "cpuc", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 #if 0
@@ -123,7 +123,7 @@ static WRITE8_HANDLER( exzisus_cpub_reset_w )
 // the RAM check to work
 static DRIVER_INIT( exzisus )
 {
-	UINT8 *RAM = machine->region("cpua")->base();
+	UINT8 *RAM = machine.region("cpua")->base();
 
 	/* Fix WORK RAM error */
 	RAM[0x67fd] = 0x18;
@@ -260,7 +260,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

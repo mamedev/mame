@@ -284,9 +284,9 @@ public:
 
 static VIDEO_START(coolridr)
 {
-	coolridr_state *state = machine->driver_data<coolridr_state>();
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	coolridr_state *state = machine.driver_data<coolridr_state>();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	state->temp_bitmap_sprites  = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
 	state->test_offs = 0x2000;
@@ -294,35 +294,35 @@ static VIDEO_START(coolridr)
 
 static SCREEN_UPDATE(coolridr)
 {
-	coolridr_state *state = screen->machine->driver_data<coolridr_state>();
+	coolridr_state *state = screen->machine().driver_data<coolridr_state>();
 	/* planes seems to basically be at 0x8000 and 0x28000... */
-	const gfx_element *gfx = screen->machine->gfx[2];
+	const gfx_element *gfx = screen->machine().gfx[2];
 	UINT32 count;
 	int y,x;
 
 
-	if(input_code_pressed(screen->machine,KEYCODE_Z))
+	if(input_code_pressed(screen->machine(),KEYCODE_Z))
 		state->test_offs+=4;
 
-	if(input_code_pressed(screen->machine,KEYCODE_X))
+	if(input_code_pressed(screen->machine(),KEYCODE_X))
 		state->test_offs-=4;
 
-	if(input_code_pressed(screen->machine,KEYCODE_C))
+	if(input_code_pressed(screen->machine(),KEYCODE_C))
 		state->test_offs+=0x40;
 
-	if(input_code_pressed(screen->machine,KEYCODE_V))
+	if(input_code_pressed(screen->machine(),KEYCODE_V))
 		state->test_offs-=0x40;
 
-	if(input_code_pressed(screen->machine,KEYCODE_B))
+	if(input_code_pressed(screen->machine(),KEYCODE_B))
 		state->test_offs+=0x400;
 
-	if(input_code_pressed(screen->machine,KEYCODE_N))
+	if(input_code_pressed(screen->machine(),KEYCODE_N))
 		state->test_offs-=0x400;
 
-	if(input_code_pressed_once(screen->machine,KEYCODE_A))
+	if(input_code_pressed_once(screen->machine(),KEYCODE_A))
 		state->color++;
 
-	if(input_code_pressed_once(screen->machine,KEYCODE_S))
+	if(input_code_pressed_once(screen->machine(),KEYCODE_S))
 		state->color--;
 
 	if(state->test_offs > 0x100000*4)
@@ -360,7 +360,7 @@ static SCREEN_UPDATE(coolridr)
 /* unknown purpose */
 static READ32_HANDLER(sysh1_unk_r)
 {
-	coolridr_state *state = space->machine->driver_data<coolridr_state>();
+	coolridr_state *state = space->machine().driver_data<coolridr_state>();
 	switch(offset)
 	{
 		case 0x08/4:
@@ -380,7 +380,7 @@ static READ32_HANDLER(sysh1_unk_r)
 
 static WRITE32_HANDLER(sysh1_unk_w)
 {
-	coolridr_state *state = space->machine->driver_data<coolridr_state>();
+	coolridr_state *state = space->machine().driver_data<coolridr_state>();
 	COMBINE_DATA(&state->h1_unk[offset]);
 }
 
@@ -388,7 +388,7 @@ static WRITE32_HANDLER(sysh1_unk_w)
 #if 0
 static READ32_HANDLER(sysh1_ioga_r)
 {
-	//return space->machine->rand();//h1_ioga[offset];
+	//return space->machine().rand();//h1_ioga[offset];
 	return h1_ioga[offset];
 }
 
@@ -429,7 +429,7 @@ CMD = ac90 PARAM = 0001 DATA = 03f40170
 /* this looks like an exotic I/O-based tilemap / sprite blitter, very unusual from Sega... */
 static WRITE32_HANDLER( sysh1_txt_blit_w )
 {
-	coolridr_state *state = space->machine->driver_data<coolridr_state>();
+	coolridr_state *state = space->machine().driver_data<coolridr_state>();
 
 	COMBINE_DATA(&state->sysh1_txt_blit[offset]);
 
@@ -464,7 +464,7 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 
 					{
 						int x2,y2;
-						const gfx_element *gfx = space->machine->gfx[1];
+						const gfx_element *gfx = space->machine().gfx[1];
 						rectangle clip;
 
 						y2 = (state->attr_buff[9] & 0x01ff0000) >> 16;
@@ -505,23 +505,23 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 static WRITE32_HANDLER( sysh1_pal_w )
 {
 	int r,g,b;
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
 
-	r = ((space->machine->generic.paletteram.u32[offset] & 0x00007c00) >> 10);
-	g = ((space->machine->generic.paletteram.u32[offset] & 0x000003e0) >> 5);
-	b = ((space->machine->generic.paletteram.u32[offset] & 0x0000001f) >> 0);
-	palette_set_color_rgb(space->machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
-	r = ((space->machine->generic.paletteram.u32[offset] & 0x7c000000) >> 26);
-	g = ((space->machine->generic.paletteram.u32[offset] & 0x03e00000) >> 21);
-	b = ((space->machine->generic.paletteram.u32[offset] & 0x001f0000) >> 16);
-	palette_set_color_rgb(space->machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
+	r = ((space->machine().generic.paletteram.u32[offset] & 0x00007c00) >> 10);
+	g = ((space->machine().generic.paletteram.u32[offset] & 0x000003e0) >> 5);
+	b = ((space->machine().generic.paletteram.u32[offset] & 0x0000001f) >> 0);
+	palette_set_color_rgb(space->machine(),(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
+	r = ((space->machine().generic.paletteram.u32[offset] & 0x7c000000) >> 26);
+	g = ((space->machine().generic.paletteram.u32[offset] & 0x03e00000) >> 21);
+	b = ((space->machine().generic.paletteram.u32[offset] & 0x001f0000) >> 16);
+	palette_set_color_rgb(space->machine(),offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 
 /* FIXME: this seems to do a hell lot of stuff, it's not ST-V SCU but still somewhat complex :/ */
 static void sysh1_dma_transfer( address_space *space, UINT16 dma_index )
 {
-	coolridr_state *state = space->machine->driver_data<coolridr_state>();
+	coolridr_state *state = space->machine().driver_data<coolridr_state>();
 	UINT32 src,dst,size,type,s_i;
 	UINT8 end_dma_mark;
 
@@ -570,7 +570,7 @@ static void sysh1_dma_transfer( address_space *space, UINT16 dma_index )
 			//size/=2;
 			if((src & 0xff00000) == 0x3e00000)
 				return; //FIXME: kludge to avoid palette corruption
-			//debugger_break(space->machine);
+			//debugger_break(space->machine());
 		}
 
 		if(type == 0xc || type == 0xd || type == 0xe)
@@ -597,7 +597,7 @@ static void sysh1_dma_transfer( address_space *space, UINT16 dma_index )
 
 static WRITE32_HANDLER( sysh1_dma_w )
 {
-	coolridr_state *state = space->machine->driver_data<coolridr_state>();
+	coolridr_state *state = space->machine().driver_data<coolridr_state>();
 	COMBINE_DATA(&state->framebuffer_vram[offset]);
 
 	if(offset*4 == 0x000)
@@ -609,18 +609,18 @@ static WRITE32_HANDLER( sysh1_dma_w )
 
 static WRITE32_HANDLER( sysh1_char_w )
 {
-	coolridr_state *state = space->machine->driver_data<coolridr_state>();
+	coolridr_state *state = space->machine().driver_data<coolridr_state>();
 	COMBINE_DATA(&state->h1_charram[offset]);
 
 	{
-		UINT8 *gfx = space->machine->region("ram_gfx")->base();
+		UINT8 *gfx = space->machine().region("ram_gfx")->base();
 
 		gfx[offset*4+0] = (state->h1_charram[offset] & 0xff000000) >> 24;
 		gfx[offset*4+1] = (state->h1_charram[offset] & 0x00ff0000) >> 16;
 		gfx[offset*4+2] = (state->h1_charram[offset] & 0x0000ff00) >> 8;
 		gfx[offset*4+3] = (state->h1_charram[offset] & 0x000000ff) >> 0;
 
-		gfx_element_mark_dirty(space->machine->gfx[2], offset/64); //*4/256
+		gfx_element_mark_dirty(space->machine().gfx[2], offset/64); //*4/256
 	}
 }
 
@@ -1166,7 +1166,7 @@ ROM_END
 #if 0
 static READ32_HANDLER( coolridr_hack1_r )
 {
-	coolridr_state *state = space->machine->driver_data<coolridr_state>();
+	coolridr_state *state = space->machine().driver_data<coolridr_state>();
 	offs_t pc = downcast<cpu_device *>(space->cpu)->pc();
 	if(pc == 0x6012374 || pc == 0x6012392)
 		return 0;
@@ -1177,7 +1177,7 @@ static READ32_HANDLER( coolridr_hack1_r )
 
 static READ32_HANDLER( coolridr_hack2_r )
 {
-	coolridr_state *state = space->machine->driver_data<coolridr_state>();
+	coolridr_state *state = space->machine().driver_data<coolridr_state>();
 	offs_t pc = downcast<cpu_device *>(space->cpu)->pc();
 	if(pc == 0x6002cba || pc == 0x6002d42)
 		return 0;
@@ -1187,8 +1187,8 @@ static READ32_HANDLER( coolridr_hack2_r )
 
 static DRIVER_INIT( coolridr )
 {
-//  machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60d88a4, 0x060d88a7, FUNC(coolridr_hack1_r) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60d8894, 0x060d8897, FUNC(coolridr_hack2_r) );
+//  machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60d88a4, 0x060d88a7, FUNC(coolridr_hack1_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60d8894, 0x060d8897, FUNC(coolridr_hack2_r) );
 }
 
 GAME( 1995, coolridr,    0, coolridr,    coolridr,    coolridr, ROT0,  "Sega", "Cool Riders (US)",GAME_NOT_WORKING|GAME_NO_SOUND )

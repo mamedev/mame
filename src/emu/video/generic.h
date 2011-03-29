@@ -38,7 +38,7 @@ extern const gfx_layout gfx_16x16x4_planar;
 /* ----- initialization ----- */
 
 /* set up all the common systems */
-void generic_video_init(running_machine *machine);
+void generic_video_init(running_machine &machine);
 
 /* generic video start with a temporary bitmap */
 VIDEO_START( generic_bitmapped );
@@ -59,21 +59,21 @@ WRITE16_HANDLER( buffer_spriteram16_2_w );
 WRITE32_HANDLER( buffer_spriteram32_2_w );
 
 /* perform the actual buffering */
-void buffer_spriteram(running_machine *machine, UINT8 *ptr, int length);
-void buffer_spriteram_2(running_machine *machine, UINT8 *ptr, int length);
+void buffer_spriteram(running_machine &machine, UINT8 *ptr, int length);
+void buffer_spriteram_2(running_machine &machine, UINT8 *ptr, int length);
 
 
 
 /* ----- global attributes ----- */
 
 /* set global attributes */
-void flip_screen_set(running_machine *machine, int on);
-void flip_screen_set_no_update(running_machine *machine, int on);	/* will not call update_flip */
-void flip_screen_x_set(running_machine *machine, int on);
-void flip_screen_y_set(running_machine *machine, int on);
-int flip_screen_get(running_machine *machine);
-int flip_screen_x_get(running_machine *machine);
-int flip_screen_y_get(running_machine *machine);
+void flip_screen_set(running_machine &machine, int on);
+void flip_screen_set_no_update(running_machine &machine, int on);	/* will not call update_flip */
+void flip_screen_x_set(running_machine &machine, int on);
+void flip_screen_y_set(running_machine &machine, int on);
+int flip_screen_get(running_machine &machine);
+int flip_screen_x_get(running_machine &machine);
+int flip_screen_y_get(running_machine &machine);
 
 //#define flip_screen flip_screen_get(machine)
 

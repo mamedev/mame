@@ -60,7 +60,7 @@ Grndtour:
 
 static WRITE8_HANDLER( iqblock_prot_w )
 {
-	iqblock_state *state = space->machine->driver_data<iqblock_state>();
+	iqblock_state *state = space->machine().driver_data<iqblock_state>();
     state->rambase[0xe26] = data;
     state->rambase[0xe27] = data;
     state->rambase[0xe1c] = data;
@@ -68,7 +68,7 @@ static WRITE8_HANDLER( iqblock_prot_w )
 
 static WRITE8_HANDLER( grndtour_prot_w )
 {
-	iqblock_state *state = space->machine->driver_data<iqblock_state>();
+	iqblock_state *state = space->machine().driver_data<iqblock_state>();
 	state->rambase[0xe39] = data;
     state->rambase[0xe3a] = data;
     state->rambase[0xe2f] = data;
@@ -86,25 +86,25 @@ static INTERRUPT_GEN( iqblock_interrupt )
 
 static WRITE8_HANDLER( iqblock_irqack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( extrarom_r )
 {
-	return space->machine->region("user1")->base()[offset];
+	return space->machine().region("user1")->base()[offset];
 }
 
 
 static WRITE8_DEVICE_HANDLER( port_C_w )
 {
-	iqblock_state *state = device->machine->driver_data<iqblock_state>();
+	iqblock_state *state = device->machine().driver_data<iqblock_state>();
 	/* bit 4 unknown; it is pulsed at the end of every NMI */
 
 	/* bit 5 seems to be 0 during screen redraw */
 	state->videoenable = data & 0x20;
 
 	/* bit 6 is coin counter */
-	coin_counter_w(device->machine, 0,data & 0x40);
+	coin_counter_w(device->machine(), 0,data & 0x40);
 
 	/* bit 7 could be a second coin counter, but coin 2 doesn't seem to work... */
 }
@@ -427,8 +427,8 @@ ROM_END
 
 static DRIVER_INIT( iqblock )
 {
-	iqblock_state *state = machine->driver_data<iqblock_state>();
-	UINT8 *rom = machine->region("maincpu")->base();
+	iqblock_state *state = machine.driver_data<iqblock_state>();
+	UINT8 *rom = machine.region("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */
@@ -440,18 +440,18 @@ static DRIVER_INIT( iqblock )
 	}
 
 	/* initialize pointers for I/O mapped RAM */
-	machine->generic.paletteram.u8         = rom + 0x12000;
-	machine->generic.paletteram2.u8       = rom + 0x12800;
+	machine.generic.paletteram.u8         = rom + 0x12000;
+	machine.generic.paletteram2.u8       = rom + 0x12800;
 	state->fgvideoram = rom + 0x16800;
 	state->bgvideoram = rom + 0x17000;
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe26, 0xfe26, FUNC(iqblock_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe26, 0xfe26, FUNC(iqblock_prot_w));
 	state->video_type=1;
 }
 
 static DRIVER_INIT( grndtour )
 {
-	iqblock_state *state = machine->driver_data<iqblock_state>();
-	UINT8 *rom = machine->region("maincpu")->base();
+	iqblock_state *state = machine.driver_data<iqblock_state>();
+	UINT8 *rom = machine.region("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */
@@ -463,11 +463,11 @@ static DRIVER_INIT( grndtour )
 	}
 
 	/* initialize pointers for I/O mapped RAM */
-	machine->generic.paletteram.u8         = rom + 0x12000;
-	machine->generic.paletteram2.u8       = rom + 0x12800;
+	machine.generic.paletteram.u8         = rom + 0x12000;
+	machine.generic.paletteram2.u8       = rom + 0x12800;
 	state->fgvideoram = rom + 0x16800;
 	state->bgvideoram = rom + 0x17000;
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe39, 0xfe39, FUNC(grndtour_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe39, 0xfe39, FUNC(grndtour_prot_w));
 	state->video_type=0;
 }
 

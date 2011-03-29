@@ -168,7 +168,7 @@ static READ8_HANDLER( speech_p1_r )
 
 static READ8_HANDLER( speech_rom_r )
 {
-	return space->machine->region("speech")->base()[0x100 * (speech_p2 & 0x3f) + offset];
+	return space->machine().region("speech")->base()[0x100 * (speech_p2 & 0x3f) + offset];
 }
 
 static WRITE8_HANDLER( speech_p1_w )
@@ -222,7 +222,7 @@ static TIMER_CALLBACK( delayed_speech_w )
 
 WRITE8_HANDLER( sega_speech_data_w )
 {
-	space->machine->scheduler().synchronize(FUNC(delayed_speech_w), data);
+	space->machine().scheduler().synchronize(FUNC(delayed_speech_w), data);
 }
 
 
@@ -308,7 +308,7 @@ static TIMER_DEVICE_CALLBACK( increment_t1_clock )
 }
 
 
-void sega_usb_reset(running_machine *machine, UINT8 t1_clock_mask)
+void sega_usb_reset(running_machine &machine, UINT8 t1_clock_mask)
 {
 	/* halt the USB CPU at reset time */
 	device_set_input_line(usb.cpu, INPUT_LINE_RESET, ASSERT_LINE);
@@ -356,10 +356,10 @@ static TIMER_CALLBACK( delayed_usb_data_w )
 WRITE8_HANDLER( sega_usb_data_w )
 {
 	LOG(("%04X:usb_data_w = %02X\n", cpu_get_pc(space->cpu), data));
-	space->machine->scheduler().synchronize(FUNC(delayed_usb_data_w), data);
+	space->machine().scheduler().synchronize(FUNC(delayed_usb_data_w), data);
 
 	/* boost the interleave so that sequences can be sent */
-	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
+	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
 }
 
 
@@ -638,19 +638,19 @@ static STREAM_UPDATE( usb_stream_update )
 
 static DEVICE_START( usb_sound )
 {
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	filter_state temp;
 	int tchan, tgroup;
 
 	/* find the CPU we are associated with */
-	usb.cpu = machine->device("usbcpu");
+	usb.cpu = machine.device("usbcpu");
 	assert(usb.cpu != NULL);
 
 	/* allocate work RAM */
 	usb.work_ram = auto_alloc_array(machine, UINT8, 0x400);
 
 	/* create a sound stream */
-	usb.stream = device->machine->sound().stream_alloc(*device, 0, 1, SAMPLE_RATE, NULL, usb_stream_update);
+	usb.stream = device->machine().sound().stream_alloc(*device, 0, 1, SAMPLE_RATE, NULL, usb_stream_update);
 
 	/* initialize state */
 	usb.noise_shift = 0x15555;

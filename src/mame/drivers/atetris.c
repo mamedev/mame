@@ -68,7 +68,7 @@
 
 static TIMER_CALLBACK( interrupt_gen )
 {
-	atetris_state *state = machine->driver_data<atetris_state>();
+	atetris_state *state = machine.driver_data<atetris_state>();
 	int scanline = param;
 
 	/* assert/deassert the interrupt */
@@ -78,13 +78,13 @@ static TIMER_CALLBACK( interrupt_gen )
 	scanline += 32;
 	if (scanline >= 256)
 		scanline -= 256;
-	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
+	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -95,9 +95,9 @@ static WRITE8_HANDLER( irq_ack_w )
  *
  *************************************/
 
-static void reset_bank(running_machine *machine)
+static void reset_bank(running_machine &machine)
 {
-	atetris_state *state = machine->driver_data<atetris_state>();
+	atetris_state *state = machine.driver_data<atetris_state>();
 
 	memcpy(state->slapstic_base, &state->slapstic_source[state->current_bank * 0x4000], 0x4000);
 }
@@ -111,21 +111,21 @@ static STATE_POSTLOAD( atetris_postload )
 
 static MACHINE_START( atetris )
 {
-	atetris_state *state = machine->driver_data<atetris_state>();
+	atetris_state *state = machine.driver_data<atetris_state>();
 
 	/* Allocate interrupt timer */
-	state->interrupt_timer = machine->scheduler().timer_alloc(FUNC(interrupt_gen));
+	state->interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_gen));
 
 	/* Set up save state */
 	state->save_item(NAME(state->current_bank));
 	state->save_item(NAME(state->nvram_write_enable));
-	machine->state().register_postload(atetris_postload, NULL);
+	machine.state().register_postload(atetris_postload, NULL);
 }
 
 
 static MACHINE_RESET( atetris )
 {
-	atetris_state *state = machine->driver_data<atetris_state>();
+	atetris_state *state = machine.driver_data<atetris_state>();
 
 	/* reset the slapstic */
 	slapstic_reset();
@@ -133,7 +133,7 @@ static MACHINE_RESET( atetris )
 	reset_bank(machine);
 
 	/* start interrupts going (32V clocked by 16V) */
-	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(48), 48);
+	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(48), 48);
 }
 
 
@@ -146,7 +146,7 @@ static MACHINE_RESET( atetris )
 
 static READ8_HANDLER( atetris_slapstic_r )
 {
-	atetris_state *state = space->machine->driver_data<atetris_state>();
+	atetris_state *state = space->machine().driver_data<atetris_state>();
 	int result = state->slapstic_base[0x2000 + offset];
 	int new_bank = slapstic_tweak(space, offset) & 1;
 
@@ -169,8 +169,8 @@ static READ8_HANDLER( atetris_slapstic_r )
 
 static WRITE8_HANDLER( coincount_w )
 {
-	coin_counter_w(space->machine, 0, (data >> 5) & 1);
-	coin_counter_w(space->machine, 1, (data >> 4) & 1);
+	coin_counter_w(space->machine(), 0, (data >> 5) & 1);
+	coin_counter_w(space->machine(), 1, (data >> 4) & 1);
 }
 
 
@@ -183,7 +183,7 @@ static WRITE8_HANDLER( coincount_w )
 
 static WRITE8_HANDLER( nvram_w )
 {
-	atetris_state *state = space->machine->driver_data<atetris_state>();
+	atetris_state *state = space->machine().driver_data<atetris_state>();
 
 	if (state->nvram_write_enable)
 		state->m_nvram[offset] = data;
@@ -193,7 +193,7 @@ static WRITE8_HANDLER( nvram_w )
 
 static WRITE8_HANDLER( nvram_enable_w )
 {
-	atetris_state *state = space->machine->driver_data<atetris_state>();
+	atetris_state *state = space->machine().driver_data<atetris_state>();
 
 	state->nvram_write_enable = 1;
 }
@@ -496,8 +496,8 @@ ROM_END
 
 static DRIVER_INIT( atetris )
 {
-	atetris_state *state = machine->driver_data<atetris_state>();
-	UINT8 *rgn = machine->region("maincpu")->base();
+	atetris_state *state = machine.driver_data<atetris_state>();
+	UINT8 *rgn = machine.region("maincpu")->base();
 
 	slapstic_init(machine, 101);
 	state->slapstic_source = &rgn[0x10000];

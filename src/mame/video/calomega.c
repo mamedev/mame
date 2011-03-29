@@ -19,21 +19,21 @@
 
 WRITE8_HANDLER( calomega_videoram_w )
 {
-	calomega_state *state = space->machine->driver_data<calomega_state>();
+	calomega_state *state = space->machine().driver_data<calomega_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( calomega_colorram_w )
 {
-	calomega_state *state = space->machine->driver_data<calomega_state>();
+	calomega_state *state = space->machine().driver_data<calomega_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	calomega_state *state = machine->driver_data<calomega_state>();
+	calomega_state *state = machine.driver_data<calomega_state>();
 /*  - bits -
     7654 3210
     --xx xx--   tiles color.
@@ -59,13 +59,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( calomega )
 {
-	calomega_state *state = machine->driver_data<calomega_state>();
+	calomega_state *state = machine.driver_data<calomega_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 31);
 }
 
 SCREEN_UPDATE( calomega )
 {
-	calomega_state *state = screen->machine->driver_data<calomega_state>();
+	calomega_state *state = screen->machine().driver_data<calomega_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
@@ -84,7 +84,7 @@ PALETTE_INIT( calomega )
 	/* 00000BGR */
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 

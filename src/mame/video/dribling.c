@@ -17,7 +17,7 @@
 
 PALETTE_INIT( dribling )
 {
-	const UINT8 *prom = machine->region("proms")->base() + 0x400;
+	const UINT8 *prom = machine.region("proms")->base() + 0x400;
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -44,7 +44,7 @@ PALETTE_INIT( dribling )
 
 WRITE8_HANDLER( dribling_colorram_w )
 {
-	dribling_state *state = space->machine->driver_data<dribling_state>();
+	dribling_state *state = space->machine().driver_data<dribling_state>();
 
 	/* it is very important that we mask off the two bits here */
 	state->colorram[offset & 0x1f9f] = data;
@@ -60,9 +60,9 @@ WRITE8_HANDLER( dribling_colorram_w )
 
 SCREEN_UPDATE( dribling )
 {
-	dribling_state *state = screen->machine->driver_data<dribling_state>();
-	UINT8 *prombase = screen->machine->region("proms")->base();
-	UINT8 *gfxbase = screen->machine->region("gfx1")->base();
+	dribling_state *state = screen->machine().driver_data<dribling_state>();
+	UINT8 *prombase = screen->machine().region("proms")->base();
+	UINT8 *gfxbase = screen->machine().region("gfx1")->base();
 	int x, y;
 
 	/* loop over rows */

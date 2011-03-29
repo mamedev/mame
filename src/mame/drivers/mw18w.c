@@ -31,7 +31,7 @@ public:
 static WRITE8_HANDLER( mw18w_sound0_w )
 {
 	// sound write (airhorn, brake, crash) plus motor speed for backdrop, and coin counter
-	coin_counter_w(space->machine, 0, data&1);
+	coin_counter_w(space->machine(), 0, data&1);
 }
 
 static WRITE8_HANDLER( mw18w_sound1_w )
@@ -58,7 +58,7 @@ static WRITE8_HANDLER( mw18w_led_display_w )
 
 static WRITE8_HANDLER( mw18w_irq0_clear_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static CUSTOM_INPUT( mw18w_sensors_r )

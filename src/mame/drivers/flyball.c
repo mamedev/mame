@@ -55,7 +55,7 @@ static TILEMAP_MAPPER( flyball_get_memory_offset )
 
 static TILE_GET_INFO( flyball_get_tile_info )
 {
-	flyball_state *state = machine->driver_data<flyball_state>();
+	flyball_state *state = machine.driver_data<flyball_state>();
 	UINT8 data = state->playfield_ram[tile_index];
 	int flags = ((data & 0x40) ? TILE_FLIPX : 0) | ((data & 0x80) ? TILE_FLIPY : 0);
 	int code = data & 63;
@@ -71,14 +71,14 @@ static TILE_GET_INFO( flyball_get_tile_info )
 
 static VIDEO_START( flyball )
 {
-	flyball_state *state = machine->driver_data<flyball_state>();
+	flyball_state *state = machine.driver_data<flyball_state>();
 	state->tmap = tilemap_create(machine, flyball_get_tile_info, flyball_get_memory_offset, 8, 16, 32, 16);
 }
 
 
 static SCREEN_UPDATE( flyball )
 {
-	flyball_state *state = screen->machine->driver_data<flyball_state>();
+	flyball_state *state = screen->machine().driver_data<flyball_state>();
 	int pitcherx = state->pitcher_horz;
 	int pitchery = state->pitcher_vert - 31;
 
@@ -94,7 +94,7 @@ static SCREEN_UPDATE( flyball )
 	tilemap_draw(bitmap, cliprect, state->tmap, 0, 0);
 
 	/* draw pitcher */
-	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], state->pitcher_pic ^ 0xf, 0, 1, 0, pitcherx, pitchery, 1);
+	drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1], state->pitcher_pic ^ 0xf, 0, 1, 0, pitcherx, pitchery, 1);
 
 	/* draw ball */
 
@@ -111,7 +111,7 @@ static SCREEN_UPDATE( flyball )
 
 static TIMER_CALLBACK( flyball_joystick_callback )
 {
-	flyball_state *state = machine->driver_data<flyball_state>();
+	flyball_state *state = machine.driver_data<flyball_state>();
 	int potsense = param;
 
 	if (potsense & ~state->potmask)
@@ -123,7 +123,7 @@ static TIMER_CALLBACK( flyball_joystick_callback )
 
 static TIMER_CALLBACK( flyball_quarter_callback	)
 {
-	flyball_state *state = machine->driver_data<flyball_state>();
+	flyball_state *state = machine.driver_data<flyball_state>();
 	int scanline = param;
 	int potsense[64], i;
 
@@ -136,12 +136,12 @@ static TIMER_CALLBACK( flyball_quarter_callback	)
 
 	for (i = 0; i < 64; i++)
 		if (potsense[i] != 0)
-			machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline + i), FUNC(flyball_joystick_callback), potsense[i]);
+			machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline + i), FUNC(flyball_joystick_callback), potsense[i]);
 
 	scanline += 0x40;
 	scanline &= 0xff;
 
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(flyball_quarter_callback), scanline);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(flyball_quarter_callback), scanline);
 
 	state->potsense = 0;
 	state->potmask = 0;
@@ -157,53 +157,53 @@ static TIMER_CALLBACK( flyball_quarter_callback	)
 /* two physical buttons (start game and stop runner) share the same port bit */
 static READ8_HANDLER( flyball_input_r )
 {
-	return input_port_read(space->machine, "IN0") & input_port_read(space->machine, "IN1");
+	return input_port_read(space->machine(), "IN0") & input_port_read(space->machine(), "IN1");
 }
 
 static READ8_HANDLER( flyball_scanline_r )
 {
-	return space->machine->primary_screen->vpos() & 0x3f;
+	return space->machine().primary_screen->vpos() & 0x3f;
 }
 
 static READ8_HANDLER( flyball_potsense_r )
 {
-	flyball_state *state = space->machine->driver_data<flyball_state>();
+	flyball_state *state = space->machine().driver_data<flyball_state>();
 	return state->potsense & ~state->potmask;
 }
 
 static WRITE8_HANDLER( flyball_potmask_w )
 {
-	flyball_state *state = space->machine->driver_data<flyball_state>();
+	flyball_state *state = space->machine().driver_data<flyball_state>();
 	state->potmask |= data & 0xf;
 }
 
 static WRITE8_HANDLER( flyball_pitcher_pic_w )
 {
-	flyball_state *state = space->machine->driver_data<flyball_state>();
+	flyball_state *state = space->machine().driver_data<flyball_state>();
 	state->pitcher_pic = data & 0xf;
 }
 
 static WRITE8_HANDLER( flyball_ball_vert_w )
 {
-	flyball_state *state = space->machine->driver_data<flyball_state>();
+	flyball_state *state = space->machine().driver_data<flyball_state>();
 	state->ball_vert = data;
 }
 
 static WRITE8_HANDLER( flyball_ball_horz_w )
 {
-	flyball_state *state = space->machine->driver_data<flyball_state>();
+	flyball_state *state = space->machine().driver_data<flyball_state>();
 	state->ball_horz = data;
 }
 
 static WRITE8_HANDLER( flyball_pitcher_vert_w )
 {
-	flyball_state *state = space->machine->driver_data<flyball_state>();
+	flyball_state *state = space->machine().driver_data<flyball_state>();
 	state->pitcher_vert = data;
 }
 
 static WRITE8_HANDLER( flyball_pitcher_horz_w )
 {
-	flyball_state *state = space->machine->driver_data<flyball_state>();
+	flyball_state *state = space->machine().driver_data<flyball_state>();
 	state->pitcher_horz = data;
 }
 
@@ -214,7 +214,7 @@ static WRITE8_HANDLER( flyball_misc_w )
 	switch (offset)
 	{
 	case 0:
-		set_led_status(space->machine, 0, bit);
+		set_led_status(space->machine(), 0, bit);
 		break;
 	case 1:
 		/* crowd very loud */
@@ -361,9 +361,9 @@ static PALETTE_INIT( flyball )
 
 static MACHINE_START( flyball )
 {
-	flyball_state *state = machine->driver_data<flyball_state>();
+	flyball_state *state = machine.driver_data<flyball_state>();
 
-	state->maincpu = machine->device("maincpu");
+	state->maincpu = machine.device("maincpu");
 
 	state->save_item(NAME(state->pitcher_vert));
 	state->save_item(NAME(state->pitcher_horz));
@@ -376,18 +376,18 @@ static MACHINE_START( flyball )
 
 static MACHINE_RESET( flyball )
 {
-	flyball_state *state = machine->driver_data<flyball_state>();
+	flyball_state *state = machine.driver_data<flyball_state>();
 	int i;
 
 	/* address bits 0 through 8 are inverted */
-	UINT8* ROM = machine->region("maincpu")->base() + 0x2000;
+	UINT8* ROM = machine.region("maincpu")->base() + 0x2000;
 
 	for (i = 0; i < 0x1000; i++)
 		state->rombase[i] = ROM[i ^ 0x1ff];
 
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(flyball_quarter_callback));
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(flyball_quarter_callback));
 
 	state->pitcher_vert = 0;
 	state->pitcher_horz = 0;

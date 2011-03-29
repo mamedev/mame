@@ -17,19 +17,19 @@ XX Mission (c) 1986 UPL
 
 static WRITE8_HANDLER( xxmissio_bank_sel_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 7);
+	memory_set_bank(space->machine(), "bank1", data & 7);
 }
 
 static CUSTOM_INPUT( xxmissio_status_r )
 {
-	xxmissio_state *state = field->port->machine->driver_data<xxmissio_state>();
+	xxmissio_state *state = field->port->machine().driver_data<xxmissio_state>();
 	int bit_mask = (FPTR)param;
 	return (state->status & bit_mask) ? 1 : 0;
 }
 
 static WRITE8_HANDLER ( xxmissio_status_m_w )
 {
-	xxmissio_state *state = space->machine->driver_data<xxmissio_state>();
+	xxmissio_state *state = space->machine().driver_data<xxmissio_state>();
 	switch (data)
 	{
 		case 0x00:
@@ -38,7 +38,7 @@ static WRITE8_HANDLER ( xxmissio_status_m_w )
 
 		case 0x40:
 			state->status &= ~0x08;
-			cputag_set_input_line_and_vector(space->machine, "sub", 0, HOLD_LINE, 0x10);
+			cputag_set_input_line_and_vector(space->machine(), "sub", 0, HOLD_LINE, 0x10);
 			break;
 
 		case 0x80:
@@ -49,7 +49,7 @@ static WRITE8_HANDLER ( xxmissio_status_m_w )
 
 static WRITE8_HANDLER ( xxmissio_status_s_w )
 {
-	xxmissio_state *state = space->machine->driver_data<xxmissio_state>();
+	xxmissio_state *state = space->machine().driver_data<xxmissio_state>();
 	switch (data)
 	{
 		case 0x00:
@@ -62,28 +62,28 @@ static WRITE8_HANDLER ( xxmissio_status_s_w )
 
 		case 0x80:
 			state->status &= ~0x04;
-			cputag_set_input_line_and_vector(space->machine, "maincpu", 0, HOLD_LINE, 0x10);
+			cputag_set_input_line_and_vector(space->machine(), "maincpu", 0, HOLD_LINE, 0x10);
 			break;
 	}
 }
 
 static INTERRUPT_GEN( xxmissio_interrupt_m )
 {
-	xxmissio_state *state = device->machine->driver_data<xxmissio_state>();
+	xxmissio_state *state = device->machine().driver_data<xxmissio_state>();
 	state->status &= ~0x20;
 	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( xxmissio_interrupt_s )
 {
-	xxmissio_state *state = device->machine->driver_data<xxmissio_state>();
+	xxmissio_state *state = device->machine().driver_data<xxmissio_state>();
 	state->status &= ~0x10;
 	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_START( xxmissio )
 {
-	memory_configure_bank(machine, "bank1", 0, 8, machine->region("user1")->base(), 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, machine.region("user1")->base(), 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 }
 

@@ -49,7 +49,7 @@
 
 static void update_irq_state( device_t *cpu )
 {
-	dcheese_state *state = cpu->machine->driver_data<dcheese_state>();
+	dcheese_state *state = cpu->machine().driver_data<dcheese_state>();
 
 	int i;
 	for (i = 1; i < 5; i++)
@@ -59,7 +59,7 @@ static void update_irq_state( device_t *cpu )
 
 static IRQ_CALLBACK( irq_callback )
 {
-	dcheese_state *state = device->machine->driver_data<dcheese_state>();
+	dcheese_state *state = device->machine().driver_data<dcheese_state>();
 
 	/* auto-ack the IRQ */
 	state->irq_state[irqline] = 0;
@@ -70,9 +70,9 @@ static IRQ_CALLBACK( irq_callback )
 }
 
 
-void dcheese_signal_irq( running_machine *machine, int which )
+void dcheese_signal_irq( running_machine &machine, int which )
 {
-	dcheese_state *state = machine->driver_data<dcheese_state>();
+	dcheese_state *state = machine.driver_data<dcheese_state>();
 
 	state->irq_state[which] = 1;
 	update_irq_state(state->maincpu);
@@ -82,7 +82,7 @@ void dcheese_signal_irq( running_machine *machine, int which )
 static INTERRUPT_GEN( dcheese_vblank )
 {
 	logerror("---- VBLANK ----\n");
-	dcheese_signal_irq(device->machine, 4);
+	dcheese_signal_irq(device->machine(), 4);
 }
 
 
@@ -95,11 +95,11 @@ static INTERRUPT_GEN( dcheese_vblank )
 
 static MACHINE_START( dcheese )
 {
-	dcheese_state *state = machine->driver_data<dcheese_state>();
+	dcheese_state *state = machine.driver_data<dcheese_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->bsmt = machine->device("bsmt");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->bsmt = machine.device("bsmt");
 
 	device_set_irq_callback(state->maincpu, irq_callback);
 
@@ -119,7 +119,7 @@ static MACHINE_START( dcheese )
 
 static CUSTOM_INPUT( sound_latch_state_r )
 {
-	dcheese_state *state = field->port->machine->driver_data<dcheese_state>();
+	dcheese_state *state = field->port->machine().driver_data<dcheese_state>();
 	return state->soundlatch_full;
 }
 
@@ -130,15 +130,15 @@ static WRITE16_HANDLER( eeprom_control_w )
 	/* bits $0080-$0010 are probably lamps */
 	if (ACCESSING_BITS_0_7)
 	{
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
-		ticket_dispenser_w(space->machine->device("ticket"), 0, (data & 1) << 7);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+		ticket_dispenser_w(space->machine().device("ticket"), 0, (data & 1) << 7);
 	}
 }
 
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	dcheese_state *state = space->machine->driver_data<dcheese_state>();
+	dcheese_state *state = space->machine().driver_data<dcheese_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -159,7 +159,7 @@ static WRITE16_HANDLER( sound_command_w )
 
 static READ8_HANDLER( sound_command_r )
 {
-	dcheese_state *state = space->machine->driver_data<dcheese_state>();
+	dcheese_state *state = space->machine().driver_data<dcheese_state>();
 
 	/* read the latch and clear the IRQ */
 	state->soundlatch_full = 0;
@@ -171,14 +171,14 @@ static READ8_HANDLER( sound_command_r )
 static READ8_HANDLER( sound_status_r )
 {
 	/* seems to be ready signal on BSMT or latching hardware */
-	bsmt2000_device *bsmt = space->machine->device<bsmt2000_device>("bsmt");
+	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
 	return bsmt->read_status() << 7;
 }
 
 
 static WRITE8_HANDLER( sound_control_w )
 {
-	dcheese_state *state = space->machine->driver_data<dcheese_state>();
+	dcheese_state *state = space->machine().driver_data<dcheese_state>();
 	UINT8 diff = data ^ state->sound_control;
 	state->sound_control = data;
 
@@ -193,8 +193,8 @@ static WRITE8_HANDLER( sound_control_w )
 
 static WRITE8_HANDLER( bsmt_data_w )
 {
-	dcheese_state *state = space->machine->driver_data<dcheese_state>();
-	bsmt2000_device *bsmt = space->machine->device<bsmt2000_device>("bsmt");
+	dcheese_state *state = space->machine().driver_data<dcheese_state>();
+	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
 
 	/* writes come in pairs; even bytes latch, odd bytes write */
 	if (offset % 2 == 0)

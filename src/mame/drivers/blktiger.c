@@ -28,20 +28,20 @@ Protection comms between main cpu and i8751
 
 static READ8_HANDLER( blktiger_from_mcu_r )
 {
-	blktiger_state *state = space->machine->driver_data<blktiger_state>();
+	blktiger_state *state = space->machine().driver_data<blktiger_state>();
 	return state->i8751_latch;
 }
 
 static WRITE8_HANDLER( blktiger_to_mcu_w )
 {
-	blktiger_state *state = space->machine->driver_data<blktiger_state>();
+	blktiger_state *state = space->machine().driver_data<blktiger_state>();
 	device_set_input_line(state->mcu, MCS51_INT1_LINE, ASSERT_LINE);
 	state->z80_latch = data;
 }
 
 static READ8_HANDLER( blktiger_from_main_r )
 {
-	blktiger_state *state = space->machine->driver_data<blktiger_state>();
+	blktiger_state *state = space->machine().driver_data<blktiger_state>();
 	device_set_input_line(state->mcu, MCS51_INT1_LINE, CLEAR_LINE);
 	//printf("%02x read\n",latch);
 	return state->z80_latch;
@@ -49,7 +49,7 @@ static READ8_HANDLER( blktiger_from_main_r )
 
 static WRITE8_HANDLER( blktiger_to_main_w )
 {
-	blktiger_state *state = space->machine->driver_data<blktiger_state>();
+	blktiger_state *state = space->machine().driver_data<blktiger_state>();
 	//printf("%02x write\n",data);
 	state->i8751_latch = data;
 }
@@ -58,15 +58,15 @@ static WRITE8_HANDLER( blktiger_to_main_w )
 
 static WRITE8_HANDLER( blktiger_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 }
 
 static WRITE8_HANDLER( blktiger_coinlockout_w )
 {
-	if (input_port_read(space->machine, "COIN_LOCKOUT") & 0x01)
+	if (input_port_read(space->machine(), "COIN_LOCKOUT") & 0x01)
 	{
-		coin_lockout_w(space->machine, 0,~data & 0x01);
-		coin_lockout_w(space->machine, 1,~data & 0x02);
+		coin_lockout_w(space->machine(), 0,~data & 0x01);
+		coin_lockout_w(space->machine(), 1,~data & 0x02);
 	}
 }
 
@@ -265,7 +265,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler( device_t *device, int irq )
 {
-	blktiger_state *state = device->machine->driver_data<blktiger_state>();
+	blktiger_state *state = device->machine().driver_data<blktiger_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -281,13 +281,13 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( blktiger )
 {
-	blktiger_state *state = machine->driver_data<blktiger_state>();
+	blktiger_state *state = machine.driver_data<blktiger_state>();
 
-	state->audiocpu = machine->device("audiocpu");
-	state->mcu = machine->device("mcu");
+	state->audiocpu = machine.device("audiocpu");
+	state->mcu = machine.device("mcu");
 
 	/* configure bankswitching */
-	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	state->save_item(NAME(state->scroll_bank));
 	state->save_item(NAME(state->screen_layout));
@@ -302,10 +302,10 @@ static MACHINE_START( blktiger )
 
 static MACHINE_RESET( blktiger )
 {
-	blktiger_state *state = machine->driver_data<blktiger_state>();
+	blktiger_state *state = machine.driver_data<blktiger_state>();
 
 	/* configure bankswitching */
-	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	state->scroll_x[0] = 0;
 	state->scroll_x[1] = 0;

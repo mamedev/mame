@@ -175,10 +175,10 @@ float vector_get_beam(void)
 
 VIDEO_START( vector )
 {
-	beam_width = machine->options().beam();
+	beam_width = machine.options().beam();
 
 	/* Grab the settings for this session */
-	vector_set_flicker(machine->options().flicker());
+	vector_set_flicker(machine.options().flicker());
 
 	vector_index = 0;
 
@@ -191,7 +191,7 @@ VIDEO_START( vector )
  * Adds a line end point to the vertices list. The vector processor emulation
  * needs to call this.
  */
-void vector_add_point (running_machine *machine, int x, int y, rgb_t color, int intensity)
+void vector_add_point (running_machine &machine, int x, int y, rgb_t color, int intensity)
 {
 	point *newpoint;
 
@@ -200,7 +200,7 @@ void vector_add_point (running_machine *machine, int x, int y, rgb_t color, int 
 
 	if (flicker && (intensity > 0))
 	{
-		intensity += (intensity * (0x80-(machine->rand()&0xff)) * flicker)>>16;
+		intensity += (intensity * (0x80-(machine.rand()&0xff)) * flicker)>>16;
 		if (intensity < 0)
 			intensity = 0;
 		if (intensity > 0xff)
@@ -256,7 +256,7 @@ void vector_clear_list (void)
 
 SCREEN_UPDATE( vector )
 {
-	UINT32 flags = PRIMFLAG_ANTIALIAS(screen->machine->options().antialias() ? 1 : 0) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD);
+	UINT32 flags = PRIMFLAG_ANTIALIAS(screen->machine().options().antialias() ? 1 : 0) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD);
 	const rectangle &visarea = screen->visible_area();
 	float xscale = 1.0f / (65536 * (visarea.max_x - visarea.min_x));
 	float yscale = 1.0f / (65536 * (visarea.max_y - visarea.min_y));

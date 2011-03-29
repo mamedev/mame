@@ -144,13 +144,13 @@ public:
 
 static WRITE16_HANDLER( ddealer_flipscreen_w )
 {
-	ddealer_state *state = space->machine->driver_data<ddealer_state>();
+	ddealer_state *state = space->machine().driver_data<ddealer_state>();
 	state->flipscreen = data & 0x01;
 }
 
 static TILE_GET_INFO( get_back_tile_info )
 {
-	ddealer_state *state = machine->driver_data<ddealer_state>();
+	ddealer_state *state = machine.driver_data<ddealer_state>();
 	int code = state->back_vram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -161,14 +161,14 @@ static TILE_GET_INFO( get_back_tile_info )
 
 static VIDEO_START( ddealer )
 {
-	ddealer_state *state = machine->driver_data<ddealer_state>();
+	ddealer_state *state = machine.driver_data<ddealer_state>();
 	state->flipscreen = 0;
 	state->back_tilemap = tilemap_create(machine, get_back_tile_info, tilemap_scan_cols, 8, 8, 64, 32);
 }
 
-static void ddealer_draw_video_layer( running_machine *machine, UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_t* bitmap, const rectangle *cliprect, int flipy)
+static void ddealer_draw_video_layer( running_machine &machine, UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_t* bitmap, const rectangle *cliprect, int flipy)
 {
-	const gfx_element *gfx = machine->gfx[1];
+	const gfx_element *gfx = machine.gfx[1];
 
 	INT16 sx, sy;
 	int x,y, count;
@@ -251,7 +251,7 @@ static void ddealer_draw_video_layer( running_machine *machine, UINT16* vreg_bas
 
 static SCREEN_UPDATE( ddealer )
 {
-	ddealer_state *state = screen->machine->driver_data<ddealer_state>();
+	ddealer_state *state = screen->machine().driver_data<ddealer_state>();
 	tilemap_set_scrollx(state->back_tilemap, 0, state->flipscreen ? -192 : -64);
 	tilemap_set_flip(state->back_tilemap, state->flipscreen ? TILEMAP_FLIPY | TILEMAP_FLIPX : 0);
 	tilemap_draw(bitmap, cliprect, state->back_tilemap, 0, 0);
@@ -266,24 +266,24 @@ static SCREEN_UPDATE( ddealer )
 	{
 		if (state->vregs[0xcc / 2] & 0x80)
 		{
-			ddealer_draw_video_layer(screen->machine, &state->vregs[0x1e0 / 2], state->left_fg_vram_top, state->left_fg_vram_bottom, bitmap, cliprect, state->flipscreen);
-			ddealer_draw_video_layer(screen->machine, &state->vregs[0xcc / 2], state->right_fg_vram_top, state->right_fg_vram_bottom, bitmap, cliprect, state->flipscreen);
+			ddealer_draw_video_layer(screen->machine(), &state->vregs[0x1e0 / 2], state->left_fg_vram_top, state->left_fg_vram_bottom, bitmap, cliprect, state->flipscreen);
+			ddealer_draw_video_layer(screen->machine(), &state->vregs[0xcc / 2], state->right_fg_vram_top, state->right_fg_vram_bottom, bitmap, cliprect, state->flipscreen);
 		}
 		else
 		{
-			ddealer_draw_video_layer(screen->machine, &state->vregs[0x1e0 / 2], state->left_fg_vram_top, state->left_fg_vram_bottom, bitmap, cliprect, state->flipscreen);
+			ddealer_draw_video_layer(screen->machine(), &state->vregs[0x1e0 / 2], state->left_fg_vram_top, state->left_fg_vram_bottom, bitmap, cliprect, state->flipscreen);
 		}
 	}
 	else
 	{
 		if (state->vregs[0xcc / 2] & 0x80)
 		{
-			ddealer_draw_video_layer(screen->machine, &state->vregs[0xcc / 2], state->left_fg_vram_top, state->left_fg_vram_bottom, bitmap, cliprect, state->flipscreen);
-			ddealer_draw_video_layer(screen->machine, &state->vregs[0x1e0 / 2], state->right_fg_vram_top, state->right_fg_vram_bottom, bitmap, cliprect, state->flipscreen);
+			ddealer_draw_video_layer(screen->machine(), &state->vregs[0xcc / 2], state->left_fg_vram_top, state->left_fg_vram_bottom, bitmap, cliprect, state->flipscreen);
+			ddealer_draw_video_layer(screen->machine(), &state->vregs[0x1e0 / 2], state->right_fg_vram_top, state->right_fg_vram_bottom, bitmap, cliprect, state->flipscreen);
 		}
 		else
 		{
-			ddealer_draw_video_layer(screen->machine, &state->vregs[0x1e0 / 2], state->left_fg_vram_top, state->left_fg_vram_bottom, bitmap, cliprect, state->flipscreen);
+			ddealer_draw_video_layer(screen->machine(), &state->vregs[0x1e0 / 2], state->left_fg_vram_top, state->left_fg_vram_bottom, bitmap, cliprect, state->flipscreen);
 		}
 
 	}
@@ -293,11 +293,11 @@ static SCREEN_UPDATE( ddealer )
 
 static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 {
-	ddealer_state *state = timer.machine->driver_data<ddealer_state>();
+	ddealer_state *state = timer.machine().driver_data<ddealer_state>();
 
 	/*coin/credit simulation*/
 	/*$fe002 is used,might be for multiple coins for one credit settings.*/
-	state->coin_input = (~(input_port_read(timer.machine, "IN0")));
+	state->coin_input = (~(input_port_read(timer.machine(), "IN0")));
 
 	if (state->coin_input & 0x01)//coin 1
 	{
@@ -350,17 +350,17 @@ static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 	}
 
 	/*random number generators,controls order of cards*/
-	state->mcu_shared_ram[0x10 / 2] = timer.machine->rand() & 0xffff;
-	state->mcu_shared_ram[0x12 / 2] = timer.machine->rand() & 0xffff;
-	state->mcu_shared_ram[0x14 / 2] = timer.machine->rand() & 0xffff;
-	state->mcu_shared_ram[0x16 / 2] = timer.machine->rand() & 0xffff;
+	state->mcu_shared_ram[0x10 / 2] = timer.machine().rand() & 0xffff;
+	state->mcu_shared_ram[0x12 / 2] = timer.machine().rand() & 0xffff;
+	state->mcu_shared_ram[0x14 / 2] = timer.machine().rand() & 0xffff;
+	state->mcu_shared_ram[0x16 / 2] = timer.machine().rand() & 0xffff;
 }
 
 
 
 static WRITE16_HANDLER( back_vram_w )
 {
-	ddealer_state *state = space->machine->driver_data<ddealer_state>();
+	ddealer_state *state = space->machine().driver_data<ddealer_state>();
 	COMBINE_DATA(&state->back_vram[offset]);
 	tilemap_mark_tile_dirty(state->back_tilemap, offset);
 }
@@ -368,7 +368,7 @@ static WRITE16_HANDLER( back_vram_w )
 
 static WRITE16_HANDLER( ddealer_vregs_w )
 {
-	ddealer_state *state = space->machine->driver_data<ddealer_state>();
+	ddealer_state *state = space->machine().driver_data<ddealer_state>();
 	COMBINE_DATA(&state->vregs[offset]);
 }
 
@@ -396,7 +396,7 @@ Protection handling,identical to Hacha Mecha Fighter / Thunder Dragon with diffe
 
 static WRITE16_HANDLER( ddealer_mcu_shared_w )
 {
-	ddealer_state *state = space->machine->driver_data<ddealer_state>();
+	ddealer_state *state = space->machine().driver_data<ddealer_state>();
 	COMBINE_DATA(&state->mcu_shared_ram[offset]);
 
 	switch(offset)
@@ -590,7 +590,7 @@ GFXDECODE_END
 
 static MACHINE_START( ddealer )
 {
-	ddealer_state *state = machine->driver_data<ddealer_state>();
+	ddealer_state *state = machine.driver_data<ddealer_state>();
 
 	state->save_item(NAME(state->respcount));
 	state->save_item(NAME(state->flipscreen));
@@ -600,7 +600,7 @@ static MACHINE_START( ddealer )
 
 static MACHINE_RESET (ddealer)
 {
-	ddealer_state *state = machine->driver_data<ddealer_state>();
+	ddealer_state *state = machine.driver_data<ddealer_state>();
 
 	state->respcount = 0;
 	state->flipscreen = 0;
@@ -650,7 +650,7 @@ MACHINE_CONFIG_END
 
 static READ16_HANDLER( ddealer_mcu_r )
 {
-	ddealer_state *state = space->machine->driver_data<ddealer_state>();
+	ddealer_state *state = space->machine().driver_data<ddealer_state>();
 	static const int resp[] =
 	{
 		0x93, 0xc7, 0x00, 0x8000,
@@ -671,7 +671,7 @@ static READ16_HANDLER( ddealer_mcu_r )
 
 static DRIVER_INIT( ddealer )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfe01c, 0xfe01d, FUNC(ddealer_mcu_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfe01c, 0xfe01d, FUNC(ddealer_mcu_r) );
 }
 
 ROM_START( ddealer )

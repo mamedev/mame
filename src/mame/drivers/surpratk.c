@@ -20,21 +20,21 @@ static KONAMI_SETLINES_CALLBACK( surpratk_banking );
 
 static INTERRUPT_GEN( surpratk_interrupt )
 {
-	surpratk_state *state = device->machine->driver_data<surpratk_state>();
+	surpratk_state *state = device->machine().driver_data<surpratk_state>();
 	if (k052109_is_irq_enabled(state->k052109))
 		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( bankedram_r )
 {
-	surpratk_state *state = space->machine->driver_data<surpratk_state>();
+	surpratk_state *state = space->machine().driver_data<surpratk_state>();
 
 	if (state->videobank & 0x02)
 	{
 		if (state->videobank & 0x04)
-			return space->machine->generic.paletteram.u8[offset + 0x0800];
+			return space->machine().generic.paletteram.u8[offset + 0x0800];
 		else
-			return space->machine->generic.paletteram.u8[offset];
+			return space->machine().generic.paletteram.u8[offset];
 	}
 	else if (state->videobank & 0x01)
 		return k053245_r(state->k053244, offset);
@@ -44,7 +44,7 @@ static READ8_HANDLER( bankedram_r )
 
 static WRITE8_HANDLER( bankedram_w )
 {
-	surpratk_state *state = space->machine->driver_data<surpratk_state>();
+	surpratk_state *state = space->machine().driver_data<surpratk_state>();
 
 	if (state->videobank & 0x02)
 	{
@@ -61,7 +61,7 @@ static WRITE8_HANDLER( bankedram_w )
 
 static WRITE8_HANDLER( surpratk_videobank_w )
 {
-	surpratk_state *state = space->machine->driver_data<surpratk_state>();
+	surpratk_state *state = space->machine().driver_data<surpratk_state>();
 
 	logerror("%04x: videobank = %02x\n",cpu_get_pc(space->cpu),data);
 	/* bit 0 = select 053245 at 0000-07ff */
@@ -72,14 +72,14 @@ static WRITE8_HANDLER( surpratk_videobank_w )
 
 static WRITE8_HANDLER( surpratk_5fc0_w )
 {
-	surpratk_state *state = space->machine->driver_data<surpratk_state>();
+	surpratk_state *state = space->machine().driver_data<surpratk_state>();
 
 	if ((data & 0xf4) != 0x10)
 		logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bit 0/1 = coin counters */
-	coin_counter_w(space->machine, 0, data & 0x01);
-	coin_counter_w(space->machine, 1, data & 0x02);
+	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(space->machine(), 1, data & 0x02);
 
 	/* bit 3 = enable char ROM reading through the video RAM */
 	k052109_set_rmrd_line(state->k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
@@ -170,7 +170,7 @@ INPUT_PORTS_END
 
 static void irqhandler( device_t *device, int linestate )
 {
-	surpratk_state *state = device->machine->driver_data<surpratk_state>();
+	surpratk_state *state = device->machine().driver_data<surpratk_state>();
 	device_set_input_line(state->maincpu, KONAMI_FIRQ_LINE, linestate);
 }
 
@@ -200,33 +200,33 @@ static const k05324x_interface surpratk_k05324x_intf =
 
 static MACHINE_START( surpratk )
 {
-	surpratk_state *state = machine->driver_data<surpratk_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	surpratk_state *state = machine.driver_data<surpratk_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 28, &ROM[0x10000], 0x2000);
 	memory_configure_bank(machine, "bank1", 28, 4, &ROM[0x08000], 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
-	machine->generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x1000);
+	machine.generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x1000);
 
-	state->maincpu = machine->device("maincpu");
-	state->k053244 = machine->device("k053244");
-	state->k053251 = machine->device("k053251");
-	state->k052109 = machine->device("k052109");
+	state->maincpu = machine.device("maincpu");
+	state->k053244 = machine.device("k053244");
+	state->k053251 = machine.device("k053251");
+	state->k052109 = machine.device("k052109");
 
 	state->save_item(NAME(state->videobank));
 	state->save_item(NAME(state->sprite_colorbase));
 	state->save_item(NAME(state->layer_colorbase));
 	state->save_item(NAME(state->layerpri));
-	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x1000);
+	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x1000);
 }
 
 static MACHINE_RESET( surpratk )
 {
-	surpratk_state *state = machine->driver_data<surpratk_state>();
+	surpratk_state *state = machine.driver_data<surpratk_state>();
 	int i;
 
-	konami_configure_set_lines(machine->device("maincpu"), surpratk_banking);
+	konami_configure_set_lines(machine.device("maincpu"), surpratk_banking);
 
 	for (i = 0; i < 3; i++)
 	{
@@ -335,7 +335,7 @@ ROM_END
 static KONAMI_SETLINES_CALLBACK( surpratk_banking )
 {
 	logerror("%04x: setlines %02x\n",cpu_get_pc(device), lines);
-	memory_set_bank(device->machine, "bank1", lines & 0x1f);
+	memory_set_bank(device->machine(), "bank1", lines & 0x1f);
 }
 
 

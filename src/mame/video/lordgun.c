@@ -48,9 +48,9 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 // xxxxBBBBGGGGRRRR, but repeat ecah color for each priority code (since we stuff it in the high bits of the pen)
 WRITE16_HANDLER( lordgun_paletteram_w )
 {
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 	for (int pri = 0; pri < 8; pri++)
-		palette_set_color_rgb(space->machine, offset+0x800*pri, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
+		palette_set_color_rgb(space->machine(), offset+0x800*pri, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
 }
 
 
@@ -63,7 +63,7 @@ WRITE16_HANDLER( lordgun_paletteram_w )
 
 static TILE_GET_INFO( get_tile_info_0 )
 {
-	lordgun_state *state = machine->driver_data<lordgun_state>();
+	lordgun_state *state = machine.driver_data<lordgun_state>();
 	UINT16 attr = state->vram_0[ tile_index * 2 + 0 ];
 	UINT16 code = state->vram_0[ tile_index * 2 + 1 ];
 	UINT16 pri  = (attr & 0x0e00) >> 9;
@@ -72,7 +72,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
-	lordgun_state *state = machine->driver_data<lordgun_state>();
+	lordgun_state *state = machine.driver_data<lordgun_state>();
 	UINT16 attr = state->vram_1[ tile_index * 2 + 0 ];
 	UINT16 code = state->vram_1[ tile_index * 2 + 1 ];
 	UINT16 pri  = (attr & 0x0e00) >> 9;
@@ -81,7 +81,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 static TILE_GET_INFO( get_tile_info_2 )
 {
-	lordgun_state *state = machine->driver_data<lordgun_state>();
+	lordgun_state *state = machine.driver_data<lordgun_state>();
 	UINT16 attr = state->vram_2[ tile_index * 2 + 0 ];
 	UINT16 code = state->vram_2[ tile_index * 2 + 1 ];
 	UINT16 pri  = (attr & 0x0e00) >> 9;
@@ -90,7 +90,7 @@ static TILE_GET_INFO( get_tile_info_2 )
 
 static TILE_GET_INFO( get_tile_info_3 )
 {
-	lordgun_state *state = machine->driver_data<lordgun_state>();
+	lordgun_state *state = machine.driver_data<lordgun_state>();
 	UINT16 attr = state->vram_3[ tile_index * 2 + 0 ];
 	UINT16 code = state->vram_3[ tile_index * 2 + 1 ];
 	UINT16 pri  = (attr & 0x0e00) >> 9;
@@ -99,28 +99,28 @@ static TILE_GET_INFO( get_tile_info_3 )
 
 WRITE16_HANDLER( lordgun_vram_0_w )
 {
-	lordgun_state *state = space->machine->driver_data<lordgun_state>();
+	lordgun_state *state = space->machine().driver_data<lordgun_state>();
 	COMBINE_DATA(&state->vram_0[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_0, offset/2);
 }
 
 WRITE16_HANDLER( lordgun_vram_1_w )
 {
-	lordgun_state *state = space->machine->driver_data<lordgun_state>();
+	lordgun_state *state = space->machine().driver_data<lordgun_state>();
 	COMBINE_DATA(&state->vram_1[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_1, offset/2);
 }
 
 WRITE16_HANDLER( lordgun_vram_2_w )
 {
-	lordgun_state *state = space->machine->driver_data<lordgun_state>();
+	lordgun_state *state = space->machine().driver_data<lordgun_state>();
 	COMBINE_DATA(&state->vram_2[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_2, offset/2);
 }
 
 WRITE16_HANDLER( lordgun_vram_3_w )
 {
-	lordgun_state *state = space->machine->driver_data<lordgun_state>();
+	lordgun_state *state = space->machine().driver_data<lordgun_state>();
 	COMBINE_DATA(&state->vram_3[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_3, offset/2);
 }
@@ -134,10 +134,10 @@ WRITE16_HANDLER( lordgun_vram_3_w )
 
 VIDEO_START( lordgun )
 {
-	lordgun_state *state = machine->driver_data<lordgun_state>();
+	lordgun_state *state = machine.driver_data<lordgun_state>();
 	int i;
-	int w = machine->primary_screen->width();
-	int h = machine->primary_screen->height();
+	int w = machine.primary_screen->width();
+	int h = machine.primary_screen->height();
 
 	// 0x800 x 200
 	state->tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
@@ -225,9 +225,9 @@ float lordgun_crosshair_mapper(const input_field_config *field, float linear_val
 	return lordgun_gun_x_table[x] * 1.0f / 0x1BF;
 }
 
-static void lorddgun_calc_gun_scr(running_machine *machine, int i)
+static void lorddgun_calc_gun_scr(running_machine &machine, int i)
 {
-	lordgun_state *state = machine->driver_data<lordgun_state>();
+	lordgun_state *state = machine.driver_data<lordgun_state>();
 //  popmessage("%03x, %02x", input_port_read(machine, "LIGHT0_X"), input_port_read(machine, "LIGHT0_Y"));
 
 	int x = input_port_read(machine, gunnames[i]) - 0x3c;
@@ -239,10 +239,10 @@ static void lorddgun_calc_gun_scr(running_machine *machine, int i)
 	state->gun[i].scr_y = input_port_read(machine, gunnames[i+2]);
 }
 
-void lordgun_update_gun(running_machine *machine, int i)
+void lordgun_update_gun(running_machine &machine, int i)
 {
-	lordgun_state *state = machine->driver_data<lordgun_state>();
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	lordgun_state *state = machine.driver_data<lordgun_state>();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	state->gun[i].hw_x = input_port_read(machine, gunnames[i]);
 	state->gun[i].hw_y = input_port_read(machine, gunnames[i+2]);
@@ -281,9 +281,9 @@ void lordgun_update_gun(running_machine *machine, int i)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	lordgun_state *state = machine->driver_data<lordgun_state>();
+	lordgun_state *state = machine.driver_data<lordgun_state>();
 	UINT16 *s		=	state->spriteram;
 	UINT16 *end		=	state->spriteram + state->spriteram_size/2;
 
@@ -324,7 +324,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			for (x = x0; x != x1; x += dx)
 			{
-				drawgfx_transpen(	bitmap,	cliprect, machine->gfx[4],
+				drawgfx_transpen(	bitmap,	cliprect, machine.gfx[4],
 									code, color + pri * 0x800/0x40,
 									flipx, flipy,
 									sx + x * 0x10, sy + y * 0x10,
@@ -365,26 +365,26 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( lordgun )
 {
-	lordgun_state *state = screen->machine->driver_data<lordgun_state>();
+	lordgun_state *state = screen->machine().driver_data<lordgun_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed(screen->machine, KEYCODE_Z))
+	if (input_code_pressed(screen->machine(), KEYCODE_Z))
 	{
 		int msk = 0;
 
-		if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
-		if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
-		if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 4;
-		if (input_code_pressed(screen->machine, KEYCODE_R))	msk |= 8;
-		if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 16;
+		if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1;
+		if (input_code_pressed(screen->machine(), KEYCODE_W))	msk |= 2;
+		if (input_code_pressed(screen->machine(), KEYCODE_E))	msk |= 4;
+		if (input_code_pressed(screen->machine(), KEYCODE_R))	msk |= 8;
+		if (input_code_pressed(screen->machine(), KEYCODE_A))	msk |= 16;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
 	if (state->whitescreen)
 	{
-		bitmap_fill(bitmap, cliprect, get_white_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_white_pen(screen->machine()));
 		return 0;
 	}
 
@@ -420,7 +420,7 @@ SCREEN_UPDATE( lordgun )
 	if (layers_ctrl & 2)	tilemap_draw(state->bitmaps[1], cliprect, state->tilemap_1, 0, 0);
 	if (layers_ctrl & 4)	tilemap_draw(state->bitmaps[2], cliprect, state->tilemap_2, 0, 0);
 	if (layers_ctrl & 8)	tilemap_draw(state->bitmaps[3], cliprect, state->tilemap_3, 0, 0);
-	if (layers_ctrl & 16)	draw_sprites(screen->machine, state->bitmaps[4], cliprect);
+	if (layers_ctrl & 16)	draw_sprites(screen->machine(), state->bitmaps[4], cliprect);
 
 	// copy to screen bitmap
 

@@ -52,7 +52,7 @@ public:
 
 /*----------- defined in drivers/namcos1.c -----------*/
 
-void namcos1_init_DACs(running_machine *machine);
+void namcos1_init_DACs(running_machine &machine);
 
 
 /*----------- defined in machine/namcos1.c -----------*/

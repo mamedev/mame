@@ -71,7 +71,7 @@ The only viable way to do this is to have one tilemap per bank (0x0a-0x20), and 
 //#define DEBUG_KEYS
 //#define DEBUG_MESSAGE
 
-static UINT8 alphatable[256];	// this might be moved to psikyosh_state, if we ever add a *machine parameter to drawgfxm.h macros
+static UINT8 alphatable[256];	// this might be moved to psikyosh_state, if we ever add a machine parameter to drawgfxm.h macros
 
 
 /*-------------------------------------------------
@@ -220,7 +220,7 @@ static void drawgfx_alphastore(bitmap_t *dest, const rectangle *cliprect, const 
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* early out if completely transparent */
 	if (gfx->pen_usage != NULL && (gfx->pen_usage[code] & ~(1 << 0)) == 0)
@@ -265,7 +265,7 @@ static void drawgfx_alphatable(bitmap_t *dest, const rectangle *cliprect, const 
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* early out if completely transparent */
 	if (gfx->pen_usage != NULL && (gfx->pen_usage[code] & ~(1 << 0)) == 0)
@@ -279,16 +279,16 @@ static void drawgfx_alphatable(bitmap_t *dest, const rectangle *cliprect, const 
 
 /* 'Normal' layers, no line/columnscroll. No per-line effects.
 Zooming isn't supported just because it's not used and it would be slow */
-static void draw_bglayer( running_machine *machine, int layer, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
+static void draw_bglayer( running_machine &machine, int layer, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
 {
-	psikyosh_state *state = machine->driver_data<psikyosh_state>();
+	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	gfx_element *gfx;
 	int offs = 0, sx, sy;
 	int scrollx, scrolly, regbank, tilebank, alpha, alphamap, zoom, pri, size, width;
 
 	assert(!BG_LINE(layer));
 
-	gfx = BG_DEPTH_8BPP(layer) ? machine->gfx[1] : machine->gfx[0];
+	gfx = BG_DEPTH_8BPP(layer) ? machine.gfx[1] : machine.gfx[0];
 	size = BG_LARGE(layer) ? 32 : 16;
 	width = 16 * size;
 
@@ -387,12 +387,12 @@ static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, 
 Bitmap is first rendered to an ARGB image, taking into account the per-pen alpha (if used).
 From there we extract data as we compose the image, one scanline at a time, blending the ARGB pixels
 into the RGB32 bitmap (with either the alpha information from the ARGB, or per-line alpha */
-static void draw_bglayerscroll( running_machine *machine, int layer, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
+static void draw_bglayerscroll( running_machine &machine, int layer, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
 {
-	psikyosh_state *state = machine->driver_data<psikyosh_state>();
+	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	assert(BG_LINE(layer));
 
-	gfx_element *gfx = BG_DEPTH_8BPP(layer) ? machine->gfx[1] : machine->gfx[0];
+	gfx_element *gfx = BG_DEPTH_8BPP(layer) ? machine.gfx[1] : machine.gfx[0];
 	int size = BG_LARGE(layer) ? 32 : 16;
 	int width = size * 16;
 
@@ -482,9 +482,9 @@ static void draw_bglayerscroll( running_machine *machine, int layer, bitmap_t *b
 }
 
 /* 3 BG layers, with priority */
-static void draw_background( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
+static void draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
 {
-	psikyosh_state *state = machine->driver_data<psikyosh_state>();
+	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	int i;
 
 #ifdef DEBUG_KEYS
@@ -529,12 +529,12 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 /* sx and sy is top-left of entire sprite regardless of flip */
 /* Note that Level 5-4 of sbomberb boss is perfect! (Alpha blended zoomed) as well as S1945II logo */
 /* pixel is only plotted if z is >= priority_buffer[y][x] */
-static void psikyosh_drawgfxzoom( running_machine *machine,
+static void psikyosh_drawgfxzoom( running_machine &machine,
 		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 		int alpha, int zoomx, int zoomy, int wide, int high, UINT32 z)
 {
-	psikyosh_state *state = machine->driver_data<psikyosh_state>();
+	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	rectangle myclip; /* Clip to screen boundaries */
 	int code_offset = 0;
 	int xtile, ytile, xpixel, ypixel;
@@ -580,7 +580,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 			{
 				for (xtile = xstart; xtile != xend; xtile += xinc)
 				{
-					const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+					const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 					const UINT8 *code_base = gfx_element_get_data(gfx, (code + code_offset++) % gfx->total_elements);
 
 					int x_index_base, y_index, sx, sy, ex, ey;
@@ -846,7 +846,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 		/* Start drawing */
 		if (gfx)
 		{
-			const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 
 			int sprite_screen_height = ((high * gfx->height * (0x400 * 0x400)) / zoomy + 0x200) >> 10; /* Round up to nearest pixel */
 			int sprite_screen_width = ((wide * gfx->width * (0x400 * 0x400)) / zoomx + 0x200) >> 10;
@@ -1069,7 +1069,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 }
 
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri)
 {
 	/*- Sprite Format 0x0000 - 0x37ff -**
 
@@ -1115,9 +1115,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 #endif
 
 
-	psikyosh_state *state = machine->driver_data<psikyosh_state>();
+	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	const gfx_element *gfx;
-	UINT32 *src = machine->generic.buffered_spriteram.u32; /* Use buffered spriteram */
+	UINT32 *src = machine.generic.buffered_spriteram.u32; /* Use buffered spriteram */
 	UINT16 *list = (UINT16 *)src + 0x3800 / 2;
 	UINT16 listlen = 0x800/2;
 	UINT16 *zoom_table = (UINT16 *)state->zoomram;
@@ -1164,7 +1164,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			alphamap = (alpha_table[BYTE4_XOR_BE(alpha)] & 0x80)? 1:0;
 			alpha = alpha_table[BYTE4_XOR_BE(alpha)] & 0x3f;
 
-			gfx = dpth ? machine->gfx[1] : machine->gfx[0];
+			gfx = dpth ? machine.gfx[1] : machine.gfx[0];
 
 			if (alphamap) /* alpha values are per-pen */
 				alpha = -1;
@@ -1189,13 +1189,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-static void psikyosh_prelineblend( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void psikyosh_prelineblend( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	/* There are 224 values for pre-lineblending. Using one for every row currently */
 	/* I suspect that it should be blended against black by the amount specified as
        gnbarich sets the 0x000000ff to 0x7f in test mode whilst the others use 0x80.
        tgm2 sets it to 0x00 on warning screen. Likely has no effect. */
-	psikyosh_state *state = machine->driver_data<psikyosh_state>();
+	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	UINT32 *dstline;
 	int bank = (state->vidregs[7] & 0xff000000) >> 24; /* bank is always 8 (0x4000) except for daraku/soldivid */
 	UINT32 *linefill = &state->bgram[(bank * 0x800) / 4 - 0x4000 / 4]; /* Per row */
@@ -1216,10 +1216,10 @@ static void psikyosh_prelineblend( running_machine *machine, bitmap_t *bitmap, c
 }
 
 
-static void psikyosh_postlineblend( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
+static void psikyosh_postlineblend( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
 {
 	/* There are 224 values for post-lineblending. Using one for every row currently */
-	psikyosh_state *state = machine->driver_data<psikyosh_state>();
+	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	UINT32 *dstline;
 	int bank = (state->vidregs[7] & 0xff000000) >> 24; /* bank is always 8 (i.e. 0x4000) except for daraku/soldivid */
 	UINT32 *lineblend = &state->bgram[(bank * 0x800) / 4 - 0x4000 / 4 + 0x400 / 4]; /* Per row */
@@ -1253,16 +1253,16 @@ static void psikyosh_postlineblend( running_machine *machine, bitmap_t *bitmap, 
 
 VIDEO_START( psikyosh )
 {
-	psikyosh_state *state = machine->driver_data<psikyosh_state>();
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	psikyosh_state *state = machine.driver_data<psikyosh_state>();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	state->z_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16); /* z-buffer */
 	state->zoom_bitmap = auto_bitmap_alloc(machine, 16*16, 16*16, BITMAP_FORMAT_INDEXED8); /* temp buffer for assembling sprites */
 	state->bg_bitmap = auto_bitmap_alloc(machine, 32*16, 32*16, BITMAP_FORMAT_RGB32); /* temp buffer for assembling tilemaps */
 	state->bg_zoom = auto_alloc_array(machine, UINT16, 256);
 
-	machine->gfx[1]->color_granularity = 16; /* 256 colour sprites with palette selectable on 16 colour boundaries */
+	machine.gfx[1]->color_granularity = 16; /* 256 colour sprites with palette selectable on 16 colour boundaries */
 
 	/* Pens 0xc0-0xff have a gradient of alpha values associated with them */
 	int i;
@@ -1291,7 +1291,7 @@ VIDEO_START( psikyosh )
 SCREEN_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct priority */
 {
 	int i;
-	psikyosh_state *state = screen->machine->driver_data<psikyosh_state>();
+	psikyosh_state *state = screen->machine().driver_data<psikyosh_state>();
 
 	// show only the priority associated with a given keypress(s) and/or hide sprites/tilemaps
 	int pri_debug = false;
@@ -1301,14 +1301,14 @@ SCREEN_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct pri
 #ifdef DEBUG_KEYS
 	for (i = 0; i <= 7; i++)
 	{
-		if(input_code_pressed(screen->machine, pri_keys[i])) {
+		if(input_code_pressed(screen->machine(), pri_keys[i])) {
 			pri_debug = true;
 		}
 	}
-	if(input_code_pressed(screen->machine, KEYCODE_G)) {
+	if(input_code_pressed(screen->machine(), KEYCODE_G)) {
 		sprites = false;
 	}
-	if(input_code_pressed(screen->machine, KEYCODE_H)) {
+	if(input_code_pressed(screen->machine(), KEYCODE_H)) {
 		backgrounds = false;
 	}
 #endif
@@ -1323,18 +1323,18 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
 
 	bitmap_fill(state->z_bitmap, cliprect, 0); /* z-buffer */
 
-	psikyosh_prelineblend(screen->machine, bitmap, cliprect); // fills screen
+	psikyosh_prelineblend(screen->machine(), bitmap, cliprect); // fills screen
 	for (i = 0; i <= 7; i++)
 	{
-		if(!pri_debug || input_code_pressed(screen->machine, pri_keys[i]))
+		if(!pri_debug || input_code_pressed(screen->machine(), pri_keys[i]))
 		{
 			if(sprites) {
-				draw_sprites(screen->machine, bitmap, cliprect, i); // When same priority bg's have higher pri
+				draw_sprites(screen->machine(), bitmap, cliprect, i); // When same priority bg's have higher pri
 			}
 			if(backgrounds) {
-				draw_background(screen->machine, bitmap, cliprect, i);
+				draw_background(screen->machine(), bitmap, cliprect, i);
 			}
-			psikyosh_postlineblend(screen->machine, bitmap, cliprect, i); // assume this has highest priority at same priority level
+			psikyosh_postlineblend(screen->machine(), bitmap, cliprect, i); // assume this has highest priority at same priority level
 		}
 	}
 	return 0;
@@ -1342,7 +1342,7 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
 
 SCREEN_EOF( psikyosh )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	buffer_spriteram32_w(space, 0, 0, 0xffffffff);
 }
 

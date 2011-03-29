@@ -23,12 +23,12 @@
 
 
 /* function prototypes */
-static int command2(running_machine *machine);
-static int command3(running_machine *machine);
-static int command4(running_machine *machine);
-static int command5(running_machine *machine);
-static int command6(running_machine *machine);
-static int command7(running_machine *machine);
+static int command2(running_machine &machine);
+static int command3(running_machine &machine);
+static int command4(running_machine &machine);
+static int command5(running_machine &machine);
+static int command6(running_machine &machine);
+static int command7(running_machine &machine);
 
 
 
@@ -40,7 +40,7 @@ static int command7(running_machine *machine);
 
 VIDEO_START( victory )
 {
-	victory_state *state = machine->driver_data<victory_state>();
+	victory_state *state = machine.driver_data<victory_state>();
 	/* allocate bitmapram */
 	state->rram = auto_alloc_array(machine, UINT8, 0x4000);
 	state->gram = auto_alloc_array(machine, UINT8, 0x4000);
@@ -57,7 +57,7 @@ VIDEO_START( victory )
 	state->scrollx = state->scrolly = 0;
 	state->video_control = 0;
 	memset(&state->micro, 0, sizeof(state->micro));
-	state->micro.timer = machine->scheduler().timer_alloc(FUNC(NULL));
+	state->micro.timer = machine.scheduler().timer_alloc(FUNC(NULL));
 
 	/* register for state saving */
 	state_save_register_global_array(machine, state->paletteram);
@@ -71,9 +71,9 @@ VIDEO_START( victory )
  *
  *************************************/
 
-static void victory_update_irq(running_machine *machine)
+static void victory_update_irq(running_machine &machine)
 {
-	victory_state *state = machine->driver_data<victory_state>();
+	victory_state *state = machine.driver_data<victory_state>();
 	if (state->vblank_irq || state->fgcoll || (state->bgcoll && (state->video_control & 0x20)))
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 	else
@@ -83,10 +83,10 @@ static void victory_update_irq(running_machine *machine)
 
 INTERRUPT_GEN( victory_vblank_interrupt )
 {
-	victory_state *state = device->machine->driver_data<victory_state>();
+	victory_state *state = device->machine().driver_data<victory_state>();
 	state->vblank_irq = 1;
 
-	victory_update_irq(device->machine);
+	victory_update_irq(device->machine());
 }
 
 
@@ -99,14 +99,14 @@ INTERRUPT_GEN( victory_vblank_interrupt )
 
 WRITE8_HANDLER( victory_paletteram_w )
 {
-	victory_state *state = space->machine->driver_data<victory_state>();
+	victory_state *state = space->machine().driver_data<victory_state>();
 	state->paletteram[offset & 0x3f] = ((offset & 0x80) << 1) | data;
 }
 
 
-static void set_palette(running_machine *machine)
+static void set_palette(running_machine &machine)
 {
-	victory_state *state = machine->driver_data<victory_state>();
+	victory_state *state = machine.driver_data<victory_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x40; offs++)
@@ -127,7 +127,7 @@ static void set_palette(running_machine *machine)
 
 READ8_HANDLER( victory_video_control_r )
 {
-	victory_state *state = space->machine->driver_data<victory_state>();
+	victory_state *state = space->machine().driver_data<victory_state>();
 	int result = 0;
 
 	switch (offset)
@@ -142,7 +142,7 @@ READ8_HANDLER( victory_video_control_r )
 			if (state->fgcoll)
 			{
 				state->fgcoll = 0;
-				victory_update_irq(space->machine);
+				victory_update_irq(space->machine());
 			}
 			if (LOG_COLLISION) logerror("%04X:5CLFIQ read = %02X\n", cpu_get_previouspc(space->cpu), result);
 			return result;
@@ -157,7 +157,7 @@ READ8_HANDLER( victory_video_control_r )
 			if (state->bgcoll)
 			{
 				state->bgcoll = 0;
-				victory_update_irq(space->machine);
+				victory_update_irq(space->machine());
 			}
 			if (LOG_COLLISION) logerror("%04X:5BACKY read = %02X\n", cpu_get_previouspc(space->cpu), result);
 			return result;
@@ -173,7 +173,7 @@ READ8_HANDLER( victory_video_control_r )
 			result |= (~state->fgcoll & 1) << 6;
 			result |= (~state->vblank_irq & 1) << 5;
 			result |= (~state->bgcoll & 1) << 4;
-			result |= (space->machine->primary_screen->vpos() & 0x100) >> 5;
+			result |= (space->machine().primary_screen->vpos() & 0x100) >> 5;
 			if (LOG_COLLISION) logerror("%04X:5STAT read = %02X\n", cpu_get_previouspc(space->cpu), result);
 			return result;
 
@@ -194,7 +194,7 @@ READ8_HANDLER( victory_video_control_r )
 
 WRITE8_HANDLER( victory_video_control_w )
 {
-	victory_state *state = space->machine->driver_data<victory_state>();
+	victory_state *state = space->machine().driver_data<victory_state>();
 	struct micro_t &micro = state->micro;
 	switch (offset)
 	{
@@ -209,7 +209,7 @@ WRITE8_HANDLER( victory_video_control_w )
 			if (micro.cmdlo == 5)
 			{
 				if (LOG_MICROCODE) logerror("  Command 5 triggered by write to IH\n");
-				command5(space->machine);
+				command5(space->machine());
 			}
 			break;
 
@@ -224,7 +224,7 @@ WRITE8_HANDLER( victory_video_control_w )
 			else if (micro.cmdlo == 6)
 			{
 				if (LOG_MICROCODE) logerror("  Command 6 triggered\n");
-				command6(space->machine);
+				command6(space->machine());
 			}
 			break;
 
@@ -239,7 +239,7 @@ WRITE8_HANDLER( victory_video_control_w )
 			if (micro.cmdlo == 3)
 			{
 				if (LOG_MICROCODE) logerror(" Command 3 triggered by write to X\n");
-				command3(space->machine);
+				command3(space->machine());
 			}
 			break;
 
@@ -249,7 +249,7 @@ WRITE8_HANDLER( victory_video_control_w )
 			if (micro.cmdlo == 4)
 			{
 				if (LOG_MICROCODE) logerror("  Command 4 triggered by write to Y\n");
-				command4(space->machine);
+				command4(space->machine());
 			}
 			break;
 
@@ -264,12 +264,12 @@ WRITE8_HANDLER( victory_video_control_w )
 			if (micro.cmdlo == 2)
 			{
 				if (LOG_MICROCODE) logerror("  Command 2 triggered by write to B\n");
-				command2(space->machine);
+				command2(space->machine());
 			}
 			else if (micro.cmdlo == 7)
 			{
 				if (LOG_MICROCODE) logerror("  Command 7 triggered by write to B\n");
-				command7(space->machine);
+				command7(space->machine());
 			}
 			break;
 
@@ -298,7 +298,7 @@ WRITE8_HANDLER( victory_video_control_w )
 		case 0x0b:	/* CLRVIRQ */
 			if (LOG_MICROCODE) logerror("%04X:CLRVIRQ write = %02X\n", cpu_get_previouspc(space->cpu), data);
 			state->vblank_irq = 0;
-			victory_update_irq(space->machine);
+			victory_update_irq(space->machine());
 			break;
 
 		default:
@@ -530,9 +530,9 @@ INLINE void count_states(struct micro_t &micro, int states)
  *
  *************************************/
 
-static int command2(running_machine *machine)
+static int command2(running_machine &machine)
 {
-	victory_state *state = machine->driver_data<victory_state>();
+	victory_state *state = machine.driver_data<victory_state>();
 	struct micro_t &micro = state->micro;
 /*
     Actual microcode:
@@ -564,9 +564,9 @@ static int command2(running_machine *machine)
  *
  *************************************/
 
-static int command3(running_machine *machine)
+static int command3(running_machine &machine)
 {
-	victory_state *state = machine->driver_data<victory_state>();
+	victory_state *state = machine.driver_data<victory_state>();
 	struct micro_t &micro = state->micro;
 /*
     Actual microcode:
@@ -673,9 +673,9 @@ static int command3(running_machine *machine)
  *
  *************************************/
 
-static int command4(running_machine *machine)
+static int command4(running_machine &machine)
 {
-	victory_state *state = machine->driver_data<victory_state>();
+	victory_state *state = machine.driver_data<victory_state>();
 	struct micro_t &micro = state->micro;
 /*
     Actual microcode:
@@ -738,9 +738,9 @@ static int command4(running_machine *machine)
  *
  *************************************/
 
-static int command5(running_machine *machine)
+static int command5(running_machine &machine)
 {
-	victory_state *state = machine->driver_data<victory_state>();
+	victory_state *state = machine.driver_data<victory_state>();
 	struct micro_t &micro = state->micro;
 /*
     Actual microcode:
@@ -877,9 +877,9 @@ static int command5(running_machine *machine)
  *
  *************************************/
 
-static int command6(running_machine *machine)
+static int command6(running_machine &machine)
 {
-	victory_state *state = machine->driver_data<victory_state>();
+	victory_state *state = machine.driver_data<victory_state>();
 	struct micro_t &micro = state->micro;
 /*
     Actual microcode:
@@ -928,9 +928,9 @@ static int command6(running_machine *machine)
  *
  *************************************/
 
-static int command7(running_machine *machine)
+static int command7(running_machine &machine)
 {
-	victory_state *state = machine->driver_data<victory_state>();
+	victory_state *state = machine.driver_data<victory_state>();
 	struct micro_t &micro = state->micro;
 /*
     Actual microcode:
@@ -1008,9 +1008,9 @@ static int command7(running_machine *machine)
  *
  *************************************/
 
-static void update_background(running_machine *machine)
+static void update_background(running_machine &machine)
 {
-	victory_state *state = machine->driver_data<victory_state>();
+	victory_state *state = machine.driver_data<victory_state>();
 	int x, y, row, offs;
 
 	for (y = offs = 0; y < 32; y++)
@@ -1044,9 +1044,9 @@ static void update_background(running_machine *machine)
  *
  *************************************/
 
-static void update_foreground(running_machine *machine)
+static void update_foreground(running_machine &machine)
 {
-	victory_state *state = machine->driver_data<victory_state>();
+	victory_state *state = machine.driver_data<victory_state>();
 	int x, y;
 
 	for (y = 0; y < 256; y++)
@@ -1075,7 +1075,7 @@ static void update_foreground(running_machine *machine)
 
 static TIMER_CALLBACK( bgcoll_irq_callback )
 {
-	victory_state *state = machine->driver_data<victory_state>();
+	victory_state *state = machine.driver_data<victory_state>();
 	state->bgcollx = param & 0xff;
 	state->bgcolly = param >> 8;
 	state->bgcoll = 1;
@@ -1092,17 +1092,17 @@ static TIMER_CALLBACK( bgcoll_irq_callback )
 
 SCREEN_UPDATE( victory )
 {
-	victory_state *state = screen->machine->driver_data<victory_state>();
+	victory_state *state = screen->machine().driver_data<victory_state>();
 	int bgcollmask = (state->video_control & 4) ? 4 : 7;
 	int count = 0;
 	int x, y;
 
 	/* copy the palette from palette RAM */
-	set_palette(screen->machine);
+	set_palette(screen->machine());
 
 	/* update the foreground & background */
-	update_foreground(screen->machine);
-	update_background(screen->machine);
+	update_foreground(screen->machine());
+	update_background(screen->machine());
 
 	/* blend the bitmaps and do collision detection */
 	for (y = 0; y < 256; y++)
@@ -1119,7 +1119,7 @@ SCREEN_UPDATE( victory )
 			int bpix = bg[(x + state->scrollx) & 255];
 			scanline[x] = bpix | (fpix << 3);
 			if (fpix && (bpix & bgcollmask) && count++ < 128)
-				screen->machine->scheduler().timer_set(screen->time_until_pos(y, x), FUNC(bgcoll_irq_callback), x | (y << 8));
+				screen->machine().scheduler().timer_set(screen->time_until_pos(y, x), FUNC(bgcoll_irq_callback), x | (y << 8));
 		}
 	}
 

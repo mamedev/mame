@@ -688,8 +688,8 @@ DISCRETE_SOUND_END
 
 WRITE8_HANDLER( copsnrob_misc_w )
 {
-	device_t *device = space->machine->device("discrete");
-	copsnrob_state *state = space->machine->driver_data<copsnrob_state>();
+	device_t *device = space->machine().device("discrete");
+	copsnrob_state *state = space->machine().driver_data<copsnrob_state>();
 	UINT8 latched_data = state->ic_h3_data;
 	UINT8 special_data = data & 0x01;
 
@@ -730,12 +730,12 @@ WRITE8_HANDLER( copsnrob_misc_w )
 
 		case 0x06:
 			/* One Start */
-			set_led_status(space->machine, 0, !special_data);
+			set_led_status(space->machine(), 0, !special_data);
 			break;
 
 		case 0x07:
 			discrete_sound_w(device, COPSNROB_AUDIO_ENABLE, special_data);
-			//space->machine->sound().system_mute(special_data);
+			//space->machine().sound().system_mute(special_data);
 			break;
 
 	}

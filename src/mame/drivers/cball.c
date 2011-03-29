@@ -27,7 +27,7 @@ public:
 
 static TILE_GET_INFO( get_tile_info )
 {
-	cball_state *state = machine->driver_data<cball_state>();
+	cball_state *state = machine.driver_data<cball_state>();
 	UINT8 code = state->video_ram[tile_index];
 
 	SET_TILE_INFO(0, code, code >> 7, 0);
@@ -36,7 +36,7 @@ static TILE_GET_INFO( get_tile_info )
 
 static WRITE8_HANDLER( cball_vram_w )
 {
-	cball_state *state = space->machine->driver_data<cball_state>();
+	cball_state *state = space->machine().driver_data<cball_state>();
 
 	state->video_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -45,20 +45,20 @@ static WRITE8_HANDLER( cball_vram_w )
 
 static VIDEO_START( cball )
 {
-	cball_state *state = machine->driver_data<cball_state>();
+	cball_state *state = machine.driver_data<cball_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
 static SCREEN_UPDATE( cball )
 {
-	cball_state *state = screen->machine->driver_data<cball_state>();
+	cball_state *state = screen->machine().driver_data<cball_state>();
 
 	/* draw playfield */
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* draw sprite */
-	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
+	drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
 		state->video_ram[0x399] >> 4,
 		0,
 		0, 0,
@@ -70,7 +70,7 @@ static SCREEN_UPDATE( cball )
 
 static TIMER_CALLBACK( interrupt_callback )
 {
-	cball_state *state = machine->driver_data<cball_state>();
+	cball_state *state = machine.driver_data<cball_state>();
 	int scanline = param;
 
 	generic_pulse_irq_line(state->maincpu, 0);
@@ -80,19 +80,19 @@ static TIMER_CALLBACK( interrupt_callback )
 	if (scanline >= 262)
 		scanline = 16;
 
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(interrupt_callback), scanline);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(interrupt_callback), scanline);
 }
 
 
 static MACHINE_START( cball )
 {
-	cball_state *state = machine->driver_data<cball_state>();
-	state->maincpu = machine->device("maincpu");
+	cball_state *state = machine.driver_data<cball_state>();
+	state->maincpu = machine.device("maincpu");
 }
 
 static MACHINE_RESET( cball )
 {
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(16), FUNC(interrupt_callback), 16);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(16), FUNC(interrupt_callback), 16);
 }
 
 
@@ -109,7 +109,7 @@ static PALETTE_INIT( cball )
 
 static READ8_HANDLER( cball_wram_r )
 {
-	cball_state *state = space->machine->driver_data<cball_state>();
+	cball_state *state = space->machine().driver_data<cball_state>();
 
 	return state->video_ram[0x380 + offset];
 }
@@ -117,7 +117,7 @@ static READ8_HANDLER( cball_wram_r )
 
 static WRITE8_HANDLER( cball_wram_w )
 {
-	cball_state *state = space->machine->driver_data<cball_state>();
+	cball_state *state = space->machine().driver_data<cball_state>();
 
 	state->video_ram[0x380 + offset] = data;
 }

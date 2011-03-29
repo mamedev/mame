@@ -108,8 +108,8 @@ public:
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	calorie_state *state = machine->driver_data<calorie_state>();
-	UINT8 *src = machine->region("user1")->base();
+	calorie_state *state = machine.driver_data<calorie_state>();
+	UINT8 *src = machine.region("user1")->base();
 	int bg_base = (state->bg_bank & 0x0f) * 0x200;
 	int code  = src[bg_base + tile_index] | (((src[bg_base + tile_index + 0x100]) & 0x10) << 4);
 	int color = src[bg_base + tile_index + 0x100] & 0x0f;
@@ -120,7 +120,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	calorie_state *state = machine->driver_data<calorie_state>();
+	calorie_state *state = machine.driver_data<calorie_state>();
 	int code  = ((state->fg_ram[tile_index + 0x400] & 0x30) << 4) | state->fg_ram[tile_index];
 	int color = state->fg_ram[tile_index + 0x400] & 0x0f;
 
@@ -130,7 +130,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static VIDEO_START( calorie )
 {
-	calorie_state *state = machine->driver_data<calorie_state>();
+	calorie_state *state = machine.driver_data<calorie_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -140,7 +140,7 @@ static VIDEO_START( calorie )
 
 static SCREEN_UPDATE( calorie )
 {
-	calorie_state *state = screen->machine->driver_data<calorie_state>();
+	calorie_state *state = screen->machine().driver_data<calorie_state>();
 	int x;
 
 	if (state->bg_bank & 0x10)
@@ -165,7 +165,7 @@ static SCREEN_UPDATE( calorie )
 		ypos = 0xff - state->sprites[x + 2];
 		xpos = state->sprites[x + 3];
 
-		if (flip_screen_get(screen->machine))
+		if (flip_screen_get(screen->machine()))
 		{
 			if (state->sprites[x + 1] & 0x10)
 				ypos = 0xff - ypos + 32;
@@ -180,12 +180,12 @@ static SCREEN_UPDATE( calorie )
 		if (state->sprites[x + 1] & 0x10)
 		{
 			 /* 32x32 sprites */
-			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[3], tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
+			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[3], tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
 		}
 		else
 		{
 			/* 16x16 sprites */
-			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2], tileno, color, flipx, flipy, xpos, ypos - 15, 0);
+			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[2], tileno, color, flipx, flipy, xpos, ypos - 15, 0);
 		}
 	}
 	return 0;
@@ -199,14 +199,14 @@ static SCREEN_UPDATE( calorie )
 
 static WRITE8_HANDLER( fg_ram_w )
 {
-	calorie_state *state = space->machine->driver_data<calorie_state>();
+	calorie_state *state = space->machine().driver_data<calorie_state>();
 	state->fg_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x3ff);
 }
 
 static WRITE8_HANDLER( bg_bank_w )
 {
-	calorie_state *state = space->machine->driver_data<calorie_state>();
+	calorie_state *state = space->machine().driver_data<calorie_state>();
 	if((state->bg_bank & ~0x10) != (data & ~0x10))
 		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 
@@ -215,7 +215,7 @@ static WRITE8_HANDLER( bg_bank_w )
 
 static WRITE8_HANDLER( calorie_flipscreen_w )
 {
-	flip_screen_set(space->machine, data & 1);
+	flip_screen_set(space->machine(), data & 1);
 }
 
 static READ8_HANDLER( calorie_soundlatch_r )
@@ -416,14 +416,14 @@ GFXDECODE_END
 
 static MACHINE_START( calorie )
 {
-	calorie_state *state = machine->driver_data<calorie_state>();
+	calorie_state *state = machine.driver_data<calorie_state>();
 
 	state->save_item(NAME(state->bg_bank));
 }
 
 static MACHINE_RESET( calorie )
 {
-	calorie_state *state = machine->driver_data<calorie_state>();
+	calorie_state *state = machine.driver_data<calorie_state>();
 
 	state->bg_bank = 0;
 }
@@ -550,8 +550,8 @@ static DRIVER_INIT( calorie )
 
 static DRIVER_INIT( calorieb )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x10000);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	space->set_decrypted_region(0x0000, 0x7fff, machine.region("maincpu")->base() + 0x10000);
 }
 
 

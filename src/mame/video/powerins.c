@@ -50,12 +50,12 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 WRITE16_HANDLER( powerins_flipscreen_w )
 {
-	if (ACCESSING_BITS_0_7)	flip_screen_set(space->machine,  data & 1 );
+	if (ACCESSING_BITS_0_7)	flip_screen_set(space->machine(),  data & 1 );
 }
 
 WRITE16_HANDLER( powerins_tilebank_w )
 {
-	powerins_state *state = space->machine->driver_data<powerins_state>();
+	powerins_state *state = space->machine().driver_data<powerins_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data != state->tile_bank)
@@ -81,13 +81,13 @@ WRITE16_HANDLER( powerins_paletteram16_w )
 	/*  RRRR GGGG BBBB RGBx */
 	/*  4321 4321 4321 000x */
 
-	UINT16 newword = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	UINT16 newword = COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 
 	int r = ((newword >> 11) & 0x1E ) | ((newword >> 3) & 0x01);
 	int g = ((newword >>  7) & 0x1E ) | ((newword >> 2) & 0x01);
 	int b = ((newword >>  3) & 0x1E ) | ((newword >> 1) & 0x01);
 
-	palette_set_color_rgb( space->machine,offset, pal5bit(r),pal5bit(g),pal5bit(b) );
+	palette_set_color_rgb( space->machine(),offset, pal5bit(r),pal5bit(g),pal5bit(b) );
 }
 
 
@@ -121,7 +121,7 @@ Offset:
 
 static TILE_GET_INFO( get_tile_info_0 )
 {
-	powerins_state *state = machine->driver_data<powerins_state>();
+	powerins_state *state = machine.driver_data<powerins_state>();
 	UINT16 code = state->vram_0[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -132,7 +132,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 
 WRITE16_HANDLER( powerins_vram_0_w )
 {
-	powerins_state *state = space->machine->driver_data<powerins_state>();
+	powerins_state *state = space->machine().driver_data<powerins_state>();
 	COMBINE_DATA(&state->vram_0[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_0, offset);
 }
@@ -163,7 +163,7 @@ Offset:
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
-	powerins_state *state = machine->driver_data<powerins_state>();
+	powerins_state *state = machine.driver_data<powerins_state>();
 	UINT16 code = state->vram_1[tile_index];
 	SET_TILE_INFO(
 			1,
@@ -174,7 +174,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 WRITE16_HANDLER( powerins_vram_1_w )
 {
-	powerins_state *state = space->machine->driver_data<powerins_state>();
+	powerins_state *state = space->machine().driver_data<powerins_state>();
 	COMBINE_DATA(&state->vram_1[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_1, offset);
 }
@@ -193,7 +193,7 @@ WRITE16_HANDLER( powerins_vram_1_w )
 
 VIDEO_START( powerins )
 {
-	powerins_state *state = machine->driver_data<powerins_state>();
+	powerins_state *state = machine.driver_data<powerins_state>();
 	state->tilemap_0 = tilemap_create(	machine, get_tile_info_0,
 								powerins_get_memory_offset_0,
 
@@ -263,14 +263,14 @@ Offset:     Format:                 Value:
 #define SIGN_EXTEND_POS(_var_)	{_var_ &= 0x3ff; if (_var_ > 0x1ff) _var_ -= 0x400;}
 
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	powerins_state *state = machine->driver_data<powerins_state>();
+	powerins_state *state = machine.driver_data<powerins_state>();
 	UINT16 *source = state->spriteram + 0x8000/2;
 	UINT16 *finish = state->spriteram + 0x9000/2;
 
-	int screen_w = machine->primary_screen->width();
-	int screen_h = machine->primary_screen->height();
+	int screen_w = machine.primary_screen->width();
+	int screen_h = machine.primary_screen->height();
 
 	for ( ; source < finish; source += 16/2 )
 	{
@@ -313,7 +313,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		{
 			for (y = 0 ; y < dimy ; y++)
 			{
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+				drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 						code,
 						color,
 						flipx, flipy,
@@ -342,7 +342,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( powerins )
 {
-	powerins_state *state = screen->machine->driver_data<powerins_state>();
+	powerins_state *state = screen->machine().driver_data<powerins_state>();
 	int layers_ctrl = -1;
 
 	int scrollx = (state->vctrl_0[2/2]&0xff) + (state->vctrl_0[0/2]&0xff)*256;
@@ -355,21 +355,21 @@ SCREEN_UPDATE( powerins )
 	tilemap_set_scrolly( state->tilemap_1, 0,  0x00);
 
 #ifdef MAME_DEBUG
-if (input_code_pressed(screen->machine, KEYCODE_Z))
+if (input_code_pressed(screen->machine(), KEYCODE_Z))
 {
 	int msk = 0;
 
-	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
-	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
-//  if (input_code_pressed(screen->machine, KEYCODE_E))    msk |= 4;
-	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 8;
+	if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1;
+	if (input_code_pressed(screen->machine(), KEYCODE_W))	msk |= 2;
+//  if (input_code_pressed(screen->machine(), KEYCODE_E))    msk |= 4;
+	if (input_code_pressed(screen->machine(), KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
 	if (layers_ctrl&1)		tilemap_draw(bitmap,cliprect, state->tilemap_0, 0, 0);
 	else					bitmap_fill(bitmap,cliprect,0);
-	if (layers_ctrl&8)		draw_sprites(screen->machine,bitmap,cliprect);
+	if (layers_ctrl&8)		draw_sprites(screen->machine(),bitmap,cliprect);
 	if (layers_ctrl&2)		tilemap_draw(bitmap,cliprect, state->tilemap_1, 0, 0);
 	return 0;
 }

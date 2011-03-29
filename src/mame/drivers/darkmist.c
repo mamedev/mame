@@ -32,9 +32,9 @@ TODO:
 
 static WRITE8_HANDLER(darkmist_hw_w)
 {
-	darkmist_state *state = space->machine->driver_data<darkmist_state>();
+	darkmist_state *state = space->machine().driver_data<darkmist_state>();
 	state->hw=data;
-	memory_set_bankptr(space->machine, "bank1",&space->machine->region("maincpu")->base()[0x010000+((data&0x80)?0x4000:0)]);
+	memory_set_bankptr(space->machine(), "bank1",&space->machine().region("maincpu")->base()[0x010000+((data&0x80)?0x4000:0)]);
 }
 
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
@@ -313,15 +313,15 @@ ROM_START( darkmist )
 ROM_END
 
 
-static void decrypt_gfx(running_machine *machine)
+static void decrypt_gfx(running_machine &machine)
 {
 	UINT8 *buf = auto_alloc_array(machine, UINT8, 0x40000);
 	UINT8 *rom;
 	int size;
 	int i;
 
-	rom = machine->region("gfx1")->base();
-	size = machine->region("gfx1")->bytes();
+	rom = machine.region("gfx1")->base();
+	size = machine.region("gfx1")->bytes();
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -343,8 +343,8 @@ static void decrypt_gfx(running_machine *machine)
 	}
 
 
-	rom = machine->region("gfx2")->base();
-	size = machine->region("gfx2")->bytes();
+	rom = machine.region("gfx2")->base();
+	size = machine.region("gfx2")->bytes();
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -366,8 +366,8 @@ static void decrypt_gfx(running_machine *machine)
 	}
 
 
-	rom = machine->region("gfx3")->base();
-	size = machine->region("gfx3")->bytes();
+	rom = machine.region("gfx3")->base();
+	size = machine.region("gfx3")->bytes();
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -391,10 +391,10 @@ static void decrypt_gfx(running_machine *machine)
 	auto_free(machine, buf);
 }
 
-static void decrypt_snd(running_machine *machine)
+static void decrypt_snd(running_machine &machine)
 {
 	int i;
-	UINT8 *ROM = machine->region("t5182")->base();
+	UINT8 *ROM = machine.region("t5182")->base();
 
 	for(i=0x8000;i<0x10000;i++)
 		ROM[i] = BITSWAP8(ROM[i], 7,1,2,3,4,5,6,0);
@@ -402,9 +402,9 @@ static void decrypt_snd(running_machine *machine)
 
 static DRIVER_INIT(darkmist)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i, len;
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
@@ -437,11 +437,11 @@ static DRIVER_INIT(darkmist)
 	}
 
 	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
-	memory_set_bankptr(space->machine, "bank1",&ROM[0x010000]);
+	memory_set_bankptr(space->machine(), "bank1",&ROM[0x010000]);
 
 	/* adr line swaps */
-	ROM = machine->region("user1")->base();
-	len = machine->region("user1")->bytes();
+	ROM = machine.region("user1")->base();
+	len = machine.region("user1")->bytes();
 	memcpy( buffer, ROM, len );
 
 	for(i=0;i<len;i++)
@@ -449,24 +449,24 @@ static DRIVER_INIT(darkmist)
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,6,5,4,3,2,14,13,12,11,8,7,1,0,10,9)];
 	}
 
-	ROM = machine->region("user2")->base();
-	len = machine->region("user2")->bytes();
+	ROM = machine.region("user2")->base();
+	len = machine.region("user2")->bytes();
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,6,5,4,3,2,14,13,12,11,8,7,1,0,10,9)];
 	}
 
-	ROM = machine->region("user3")->base();
-	len = machine->region("user3")->bytes();
+	ROM = machine.region("user3")->base();
+	len = machine.region("user3")->bytes();
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14 ,5,4,3,2,11,10,9,8,13,12,1,0,7,6)];
 	}
 
-	ROM = machine->region("user4")->base();
-	len = machine->region("user4")->bytes();
+	ROM = machine.region("user4")->base();
+	len = machine.region("user4")->bytes();
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{

@@ -19,18 +19,18 @@ static TIMER_CALLBACK( changela_scanline_callback );
 
 VIDEO_START( changela )
 {
-	changela_state *state = machine->driver_data<changela_state>();
+	changela_state *state = machine.driver_data<changela_state>();
 
 	state->memory_devices = auto_alloc_array(machine, UINT8, 4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
 	state->tree_ram = auto_alloc_array(machine, UINT8, 2 * 0x20);
 
-	state->obj0_bitmap  = machine->primary_screen->alloc_compatible_bitmap();
-	state->river_bitmap = machine->primary_screen->alloc_compatible_bitmap();
-	state->tree0_bitmap = machine->primary_screen->alloc_compatible_bitmap();
-	state->tree1_bitmap = machine->primary_screen->alloc_compatible_bitmap();
+	state->obj0_bitmap  = machine.primary_screen->alloc_compatible_bitmap();
+	state->river_bitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->tree0_bitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->tree1_bitmap = machine.primary_screen->alloc_compatible_bitmap();
 
-	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(changela_scanline_callback));
-	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(30), 30);
+	state->scanline_timer = machine.scheduler().timer_alloc(FUNC(changela_scanline_callback));
+	state->scanline_timer->adjust(machine.primary_screen->time_until_pos(30), 30);
 
 	state->save_pointer(NAME(state->memory_devices), 4 * 0x800);
 	state->save_pointer(NAME(state->tree_ram), 2 * 0x20);
@@ -42,12 +42,12 @@ VIDEO_START( changela )
 
 ***************************************************************************/
 
-static void draw_obj0( running_machine *machine, bitmap_t *bitmap, int sy )
+static void draw_obj0( running_machine &machine, bitmap_t *bitmap, int sy )
 {
-	changela_state *state = machine->driver_data<changela_state>();
+	changela_state *state = machine.driver_data<changela_state>();
 	int sx, i;
 
-	UINT8* ROM = machine->region("user1")->base();
+	UINT8* ROM = machine.region("user1")->base();
 	UINT8* RAM = state->spriteram;
 
 	for (sx = 0; sx < 256; sx++)
@@ -105,12 +105,12 @@ static void draw_obj0( running_machine *machine, bitmap_t *bitmap, int sy )
 
 ***************************************************************************/
 
-static void draw_obj1( running_machine *machine, bitmap_t *bitmap )
+static void draw_obj1( running_machine &machine, bitmap_t *bitmap )
 {
-	changela_state *state = machine->driver_data<changela_state>();
+	changela_state *state = machine.driver_data<changela_state>();
 	int sx, sy;
 
-	UINT8* ROM = machine->region("gfx2")->base();
+	UINT8* ROM = machine.region("gfx2")->base();
 	UINT8* RAM = state->videoram;
 
 	UINT8 reg[4] = { 0 }; /* 4x4-bit registers (U58, U59) */
@@ -170,16 +170,16 @@ static void draw_obj1( running_machine *machine, bitmap_t *bitmap )
 
 ***************************************************************************/
 
-static void draw_river( running_machine *machine, bitmap_t *bitmap, int sy )
+static void draw_river( running_machine &machine, bitmap_t *bitmap, int sy )
 {
-	changela_state *state = machine->driver_data<changela_state>();
+	changela_state *state = machine.driver_data<changela_state>();
 	int sx, i, j;
 
-	UINT8* ROM = machine->region("user2")->base();
+	UINT8* ROM = machine.region("user2")->base();
 	UINT8* RAM = state->memory_devices + 0x800;
-	UINT8* TILE_ROM = machine->region("gfx1")->base();
+	UINT8* TILE_ROM = machine.region("gfx1")->base();
 	UINT8* TILE_RAM = state->memory_devices + 0x1000;
-	UINT8* PROM = machine->region("proms")->base();
+	UINT8* PROM = machine.region("proms")->base();
 
 	int preload = ((sy < 32) ? 1 : 0);
 
@@ -349,20 +349,20 @@ static void draw_river( running_machine *machine, bitmap_t *bitmap, int sy )
 
 ***************************************************************************/
 
-static void draw_tree( running_machine *machine, bitmap_t *bitmap, int sy, int tree_num )
+static void draw_tree( running_machine &machine, bitmap_t *bitmap, int sy, int tree_num )
 {
-	changela_state *state = machine->driver_data<changela_state>();
+	changela_state *state = machine.driver_data<changela_state>();
 	int sx, i, j;
 
 	/* State machine */
-	UINT8* ROM = machine->region("user2")->base();
+	UINT8* ROM = machine.region("user2")->base();
 	UINT8* RAM = state->memory_devices + 0x840 + 0x40 * tree_num;
-	UINT8* PROM = machine->region("proms")->base();
+	UINT8* PROM = machine.region("proms")->base();
 
 	/* Tree Data */
 	UINT8* RAM2 = state->tree_ram + 0x20 * tree_num;
-	UINT8* TILE_ROM = (tree_num ? (machine->region("user3")->base() + 0x1000) : (machine->region("gfx1")->base() + 0x2000));
-	UINT8* TILE_RAM = (tree_num ? (machine->region("user3")->base()) : (state->memory_devices + 0x1800));
+	UINT8* TILE_ROM = (tree_num ? (machine.region("user3")->base() + 0x1000) : (machine.region("gfx1")->base() + 0x2000));
+	UINT8* TILE_RAM = (tree_num ? (machine.region("user3")->base()) : (state->memory_devices + 0x1800));
 
 	int preload = ((sy < 32) ? 1 : 0);
 
@@ -647,7 +647,7 @@ e:|7 6 5 4 3 2 1 0 Hex|/RAMw /RAMr /ROM  /AdderOutput  AdderInput TrainInputs|
 
 static TIMER_CALLBACK( changela_scanline_callback )
 {
-	changela_state *state = machine->driver_data<changela_state>();
+	changela_state *state = machine.driver_data<changela_state>();
 	int sy = param;
 	int sx;
 
@@ -719,17 +719,17 @@ static TIMER_CALLBACK( changela_scanline_callback )
 
 	sy++;
 	if (sy > 256) sy = 30;
-	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(sy), sy);
+	state->scanline_timer->adjust(machine.primary_screen->time_until_pos(sy), sy);
 }
 
 SCREEN_UPDATE( changela )
 {
-	changela_state *state = screen->machine->driver_data<changela_state>();
+	changela_state *state = screen->machine().driver_data<changela_state>();
 	copybitmap(bitmap, state->river_bitmap, 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, state->obj0_bitmap,  0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, state->tree0_bitmap, 0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, state->tree1_bitmap, 0, 0, 0, 0, cliprect, 0);
-	draw_obj1(screen->machine, bitmap);
+	draw_obj1(screen->machine(), bitmap);
 
 	return 0;
 }
@@ -767,30 +767,30 @@ WRITE8_HANDLER( changela_colors_w )
 	g = color_table[(c >> 3) & 0x07];
 	b = color_table[(c >> 6) & 0x07];
 
-	palette_set_color_rgb(space->machine,color_index,r,g,b);
+	palette_set_color_rgb(space->machine(),color_index,r,g,b);
 }
 
 
 WRITE8_HANDLER( changela_mem_device_select_w )
 {
-	changela_state *state = space->machine->driver_data<changela_state>();
+	changela_state *state = space->machine().driver_data<changela_state>();
 	state->mem_dev_selected = (data & 0x07) * 0x800;
 	state->tree_en = (data & 0x30) >> 4;
 
 	/*
     (data & 0x07) possible settings:
     0 - not connected (no device)
-    1 - ADR1 is 2114 RAM at U59 (state space->machine) (accessible range: 0x0000-0x003f)
+    1 - ADR1 is 2114 RAM at U59 (state space->machine()) (accessible range: 0x0000-0x003f)
     2 - ADR2 is 2128 RAM at U109 (River RAM)    (accessible range: 0x0000-0x07ff)
     3 - ADR3 is 2128 RAM at U114 (Tree RAM)    (accessible range: 0x0000-0x07ff)
     4 - ADR4 is 2732 ROM at U7    (Tree ROM)    (accessible range: 0x0000-0x07ff)
-    5 - SLOPE is ROM at U44 (state space->machine)     (accessible range: 0x0000-0x07ff)
+    5 - SLOPE is ROM at U44 (state space->machine())     (accessible range: 0x0000-0x07ff)
     */
 }
 
 WRITE8_HANDLER( changela_mem_device_w )
 {
-	changela_state *state = space->machine->driver_data<changela_state>();
+	changela_state *state = space->machine().driver_data<changela_state>();
 	state->memory_devices[state->mem_dev_selected + offset] = data;
 
 	if (state->mem_dev_selected == 0x800)
@@ -803,20 +803,20 @@ WRITE8_HANDLER( changela_mem_device_w )
 
 READ8_HANDLER( changela_mem_device_r )
 {
-	changela_state *state = space->machine->driver_data<changela_state>();
+	changela_state *state = space->machine().driver_data<changela_state>();
 	return state->memory_devices[state->mem_dev_selected + offset];
 }
 
 
 WRITE8_HANDLER( changela_slope_rom_addr_hi_w )
 {
-	changela_state *state = space->machine->driver_data<changela_state>();
+	changela_state *state = space->machine().driver_data<changela_state>();
 	state->slopeROM_bank = (data & 0x03) << 9;
 }
 
 WRITE8_HANDLER( changela_slope_rom_addr_lo_w )
 {
-	changela_state *state = space->machine->driver_data<changela_state>();
+	changela_state *state = space->machine().driver_data<changela_state>();
 	state->horizon = data;
 }
 

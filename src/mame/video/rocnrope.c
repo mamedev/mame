@@ -43,7 +43,7 @@ PALETTE_INIT( rocnrope )
 			2, &resistances_b[0],  bweights, 1000, 0);
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x20);
+	machine.colortable = colortable_alloc(machine, 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -68,7 +68,7 @@ PALETTE_INIT( rocnrope )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -78,36 +78,36 @@ PALETTE_INIT( rocnrope )
 	for (i = 0; i < 0x200; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 }
 
 WRITE8_HANDLER( rocnrope_videoram_w )
 {
-	rocnrope_state *state = space->machine->driver_data<rocnrope_state>();
+	rocnrope_state *state = space->machine().driver_data<rocnrope_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( rocnrope_colorram_w )
 {
-	rocnrope_state *state = space->machine->driver_data<rocnrope_state>();
+	rocnrope_state *state = space->machine().driver_data<rocnrope_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( rocnrope_flipscreen_w )
 {
-	if (flip_screen_get(space->machine) != (~data & 0x01))
+	if (flip_screen_get(space->machine()) != (~data & 0x01))
 	{
-		flip_screen_set(space->machine, ~data & 0x01);
-		tilemap_mark_all_tiles_dirty_all(space->machine);
+		flip_screen_set(space->machine(), ~data & 0x01);
+		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	rocnrope_state *state = machine->driver_data<rocnrope_state>();
+	rocnrope_state *state = machine.driver_data<rocnrope_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + 2 * (attr & 0x80);
 	int color = attr & 0x0f;
@@ -118,13 +118,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( rocnrope )
 {
-	rocnrope_state *state = machine->driver_data<rocnrope_state>();
+	rocnrope_state *state = machine.driver_data<rocnrope_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	rocnrope_state *state = machine->driver_data<rocnrope_state>();
+	rocnrope_state *state = machine.driver_data<rocnrope_state>();
 	UINT8 *spriteram = state->spriteram;
 	UINT8 *spriteram_2 = state->spriteram2;
 	int offs;
@@ -133,19 +133,19 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	{
 		int color = spriteram_2[offs] & 0x0f;
 
-		drawgfx_transmask(bitmap, cliprect, machine->gfx[0],
+		drawgfx_transmask(bitmap, cliprect, machine.gfx[0],
 				spriteram[offs + 1],
 				color,
 				spriteram_2[offs] & 0x40,~spriteram_2[offs] & 0x80,
 				240 - spriteram[offs], spriteram_2[offs + 1],
-				colortable_get_transpen_mask(machine->colortable, machine->gfx[0], color, 0));
+				colortable_get_transpen_mask(machine.colortable, machine.gfx[0], color, 0));
 	}
 }
 
 SCREEN_UPDATE( rocnrope )
 {
-	rocnrope_state *state = screen->machine->driver_data<rocnrope_state>();
+	rocnrope_state *state = screen->machine().driver_data<rocnrope_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

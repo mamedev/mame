@@ -31,7 +31,7 @@ public:
 
 /*----------- defined in video/jackal.c -----------*/
 
-void jackal_mark_tile_dirty(running_machine *machine, int offset);
+void jackal_mark_tile_dirty(running_machine &machine, int offset);
 
 PALETTE_INIT( jackal );
 VIDEO_START( jackal );

@@ -28,7 +28,7 @@ device_config *sknsspr_device_config::static_alloc_device_config(const machine_c
 
 device_t *sknsspr_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, sknsspr_device(machine, *this));
+	return auto_alloc(machine, sknsspr_device(machine, *this));
 }
 
 sknsspr_device::sknsspr_device(running_machine &_machine, const sknsspr_device_config &config)
@@ -47,7 +47,7 @@ void sknsspr_device::device_reset()
 	//printf("sknsspr_device::device_reset()\n");
 }
 
-int sknsspr_device::skns_rle_decode ( running_machine *machine, int romoffset, int size, UINT8*gfx_source, size_t gfx_length )
+int sknsspr_device::skns_rle_decode ( running_machine &machine, int romoffset, int size, UINT8*gfx_source, size_t gfx_length )
 {
 	UINT8 *src = gfx_source;
 	size_t srcsize = gfx_length;
@@ -242,7 +242,7 @@ static void (*const blit_z[4])(bitmap_t *bitmap, const rectangle *cliprect, cons
 	blit_fxy_z,
 };
 
-void sknsspr_device::skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32* spriteram_source, size_t spriteram_size, UINT8* gfx_source, size_t gfx_length, UINT32* sprite_regs)
+void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32* spriteram_source, size_t spriteram_size, UINT8* gfx_source, size_t gfx_length, UINT32* sprite_regs)
 {
 	/*- SPR RAM Format -**
 
@@ -409,12 +409,12 @@ void sknsspr_device::skns_draw_sprites(running_machine *machine, bitmap_t *bitma
 			if (sprite_flip&2)
 			{
 				xflip ^= 1;
-				sx = machine->primary_screen->visible_area().max_x+1 - sx;
+				sx = machine.primary_screen->visible_area().max_x+1 - sx;
 			}
 			if (sprite_flip&1)
 			{
 				yflip ^= 1;
-				sy = machine->primary_screen->visible_area().max_y+1 - sy;
+				sy = machine.primary_screen->visible_area().max_y+1 - sy;
 			}
 
 			/* Palette linking */

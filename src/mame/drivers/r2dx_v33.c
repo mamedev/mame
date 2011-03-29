@@ -80,9 +80,9 @@ static TILE_GET_INFO( get_tx_tile_info )
 }
 
 /* copied from Legionnaire */
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
-	r2dx_v33_state *state = machine->driver_data<r2dx_v33_state>();
+	r2dx_v33_state *state = machine.driver_data<r2dx_v33_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	int offs,fx,fy,x,y,color,sprite;
 //  int cur_pri;
@@ -124,7 +124,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+						drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 						sprite++,
 						color,fx,fy,x+ax*16,y+ay*16,15);
 					}
@@ -134,7 +134,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+						drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 						sprite++,
 						color,fx,fy,x+ax*16,y+(dy-ay-1)*16,15);
 					}
@@ -147,7 +147,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+						drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 						sprite++,
 						color,fx,fy,x+(dx-ax-1)*16,y+ay*16,15);
 					}
@@ -157,7 +157,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+						drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 						sprite++,
 						color,fx,fy,x+(dx-ax-1)*16,y+(dy-ay-1)*16,15);
 					}
@@ -181,13 +181,13 @@ static VIDEO_START( rdx_v33 )
 
 static SCREEN_UPDATE( rdx_v33 )
 {
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, md_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
-	draw_sprites(screen->machine,bitmap,cliprect,0);
+	draw_sprites(screen->machine(),bitmap,cliprect,0);
 
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
 
@@ -196,23 +196,23 @@ static SCREEN_UPDATE( rdx_v33 )
 	{
 		static UINT32 src_addr = 0x100000;
 		static int frame;
-		address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-		//if(input_code_pressed_once(screen->machine,KEYCODE_A))
+		//if(input_code_pressed_once(screen->machine(),KEYCODE_A))
 		//  src_addr+=0x800;
 
-		//if(input_code_pressed_once(screen->machine,KEYCODE_S))
+		//if(input_code_pressed_once(screen->machine(),KEYCODE_S))
 		//  src_addr-=0x800;
 
 		frame++;
 
 		popmessage("%08x 0",src_addr);
 
-		//if(input_code_pressed_once(screen->machine,KEYCODE_Z))
+		//if(input_code_pressed_once(screen->machine(),KEYCODE_Z))
 		if(frame == 5)
 		{
 			int i,data;
-			static UINT8 *rom = space->machine->region("mainprg")->base();
+			static UINT8 *rom = space->machine().region("mainprg")->base();
 
 			for(i=0;i<0x800;i+=2)
 			{
@@ -267,7 +267,7 @@ WRITE16_HANDLER( mcu_prog_w2 )
     {
 		char tmp[64];
         FILE *fp;
-	    sprintf(tmp,"cop3_%s.data", space->machine->system().name);
+	    sprintf(tmp,"cop3_%s.data", space->machine().system().name);
 
 		fp=fopen(tmp, "w+b");
         if (fp)
@@ -310,7 +310,7 @@ static WRITE16_HANDLER( rdx_tx_vram_w )
 
 static READ16_HANDLER( rdx_v33_unknown_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 
@@ -719,7 +719,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT(rdx_v33)
 {
-	memory_configure_bank(machine, "bank1", 0, 0x20, machine->region("mainprg")->base(), 0x20000);
+	memory_configure_bank(machine, "bank1", 0, 0x20, machine.region("mainprg")->base(), 0x20000);
 
 	raiden2_decrypt_sprites(machine);
 
@@ -728,7 +728,7 @@ static DRIVER_INIT(rdx_v33)
 
 static DRIVER_INIT(nzerotea)
 {
-	memory_configure_bank(machine, "bank1", 0, 2, machine->region("mainprg")->base(), 0x20000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine.region("mainprg")->base(), 0x20000);
 
 	raiden2_decrypt_sprites(machine);
 

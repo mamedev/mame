@@ -36,11 +36,11 @@ static READ16_HANDLER( supbtime_controls_r )
 	switch (offset << 1)
 	{
 		case 0:
-			return input_port_read(space->machine, "INPUTS");
+			return input_port_read(space->machine(), "INPUTS");
 		case 2:
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 		case 8:
-			return input_port_read(space->machine, "COIN");
+			return input_port_read(space->machine(), "COIN");
 		case 10: /* ?  Not used for anything */
 		case 12:
 			return 0;
@@ -52,7 +52,7 @@ static READ16_HANDLER( supbtime_controls_r )
 
 static WRITE16_HANDLER( sound_w )
 {
-	supbtime_state *state = space->machine->driver_data<supbtime_state>();
+	supbtime_state *state = space->machine().driver_data<supbtime_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
@@ -311,7 +311,7 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int state)
 {
-	supbtime_state *driver_state = device->machine->driver_data<supbtime_state>();
+	supbtime_state *driver_state = device->machine().driver_data<supbtime_state>();
 	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
@@ -333,11 +333,11 @@ static const deco16ic_interface supbtime_deco16ic_tilegen1_intf =
 
 static MACHINE_START( supbtime )
 {
-	supbtime_state *state = machine->driver_data<supbtime_state>();
+	supbtime_state *state = machine.driver_data<supbtime_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->deco_tilegen1 = machine->device("tilegen1");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->deco_tilegen1 = machine.device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( supbtime, supbtime_state )

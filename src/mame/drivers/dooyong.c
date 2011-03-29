@@ -87,24 +87,24 @@ be verified on real PCB.
 
 static WRITE8_HANDLER( lastday_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x07);
+	memory_set_bank(space->machine(), "bank1", data & 0x07);
 
 	if (data & 0xf8) popmessage("bankswitch %02x",data);
 }
 
 static MACHINE_START( lastday )
 {
-	memory_configure_bank(machine, "bank1", 0, 8, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(space->machine, data);
+	flip_screen_set(space->machine(), data);
 }
 
 static MACHINE_RESET( sound_ym2203 )
 {
-	dooyong_state *state = machine->driver_data<dooyong_state>();
+	dooyong_state *state = machine.driver_data<dooyong_state>();
 
 	state->interrupt_line_1=0;
 	state->interrupt_line_2=0;
@@ -777,21 +777,21 @@ static READ8_DEVICE_HANDLER( unk_r )
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static void irqhandler_2203_1(device_t *device, int irq)
 {
-	dooyong_state *state = device->machine->driver_data<dooyong_state>();
+	dooyong_state *state = device->machine().driver_data<dooyong_state>();
 	state->interrupt_line_1=irq;
-	cputag_set_input_line(device->machine, "audiocpu", 0, (state->interrupt_line_1 | state->interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, (state->interrupt_line_1 | state->interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static void irqhandler_2203_2(device_t *device, int irq)
 {
-	dooyong_state *state = device->machine->driver_data<dooyong_state>();
+	dooyong_state *state = device->machine().driver_data<dooyong_state>();
 	state->interrupt_line_2=irq;
-	cputag_set_input_line(device->machine, "audiocpu", 0, (state->interrupt_line_1 | state->interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, (state->interrupt_line_1 | state->interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_interface_1 =

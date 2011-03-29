@@ -31,9 +31,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	atarig42_state *state = machine->driver_data<atarig42_state>();
+	atarig42_state *state = machine.driver_data<atarig42_state>();
 	cputag_set_input_line(machine, "maincpu", 4, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 5, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -41,7 +41,7 @@ static void update_interrupts(running_machine *machine)
 
 static MACHINE_START( atarig42 )
 {
-	atarig42_state *state = machine->driver_data<atarig42_state>();
+	atarig42_state *state = machine.driver_data<atarig42_state>();
 	atarigen_init(machine);
 
 	state->save_item(NAME(state->analog_data));
@@ -54,11 +54,11 @@ static MACHINE_START( atarig42 )
 
 static MACHINE_RESET( atarig42 )
 {
-	atarig42_state *state = machine->driver_data<atarig42_state>();
+	atarig42_state *state = machine.driver_data<atarig42_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine->primary_screen, atarig42_scanline_update, 8);
+	atarigen_scanline_timer_reset(*machine.primary_screen, atarig42_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -72,8 +72,8 @@ static MACHINE_RESET( atarig42 )
 
 static READ16_HANDLER( special_port2_r )
 {
-	atarig42_state *state = space->machine->driver_data<atarig42_state>();
-	int temp = input_port_read(space->machine, "IN2");
+	atarig42_state *state = space->machine().driver_data<atarig42_state>();
+	int temp = input_port_read(space->machine(), "IN2");
 	if (state->cpu_to_sound_ready) temp ^= 0x0020;
 	if (state->sound_to_cpu_ready) temp ^= 0x0010;
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
@@ -84,15 +84,15 @@ static READ16_HANDLER( special_port2_r )
 static WRITE16_HANDLER( a2d_select_w )
 {
 	static const char *const portnames[] = { "A2D0", "A2D1" };
-	atarig42_state *state = space->machine->driver_data<atarig42_state>();
+	atarig42_state *state = space->machine().driver_data<atarig42_state>();
 
-	state->analog_data = input_port_read(space->machine, portnames[offset != 0]);
+	state->analog_data = input_port_read(space->machine(), portnames[offset != 0]);
 }
 
 
 static READ16_HANDLER( a2d_data_r )
 {
-	atarig42_state *state = space->machine->driver_data<atarig42_state>();
+	atarig42_state *state = space->machine().driver_data<atarig42_state>();
 	return state->analog_data << 8;
 }
 
@@ -102,10 +102,10 @@ static WRITE16_HANDLER( io_latch_w )
 	/* upper byte */
 	if (ACCESSING_BITS_8_15)
 	{
-		atarig42_state *state = space->machine->driver_data<atarig42_state>();
+		atarig42_state *state = space->machine().driver_data<atarig42_state>();
 
 		/* bit 14 controls the ASIC65 reset line */
-		asic65_reset(space->machine, (~data >> 14) & 1);
+		asic65_reset(space->machine(), (~data >> 14) & 1);
 
 		/* bits 13-11 are the MO control bits */
 		atarirle_control_w(state->rle, (data >> 11) & 7);
@@ -115,7 +115,7 @@ static WRITE16_HANDLER( io_latch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 4 resets the sound CPU */
-		cputag_set_input_line(space->machine, "jsa", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "jsa", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 		if (!(data & 0x10)) atarijsa_reset();
 
 		/* bit 5 is /XRESET, probably related to the ASIC */
@@ -127,7 +127,7 @@ static WRITE16_HANDLER( io_latch_w )
 
 static WRITE16_HANDLER( mo_command_w )
 {
-	atarig42_state *state = space->machine->driver_data<atarig42_state>();
+	atarig42_state *state = space->machine().driver_data<atarig42_state>();
 	COMBINE_DATA(state->mo_command);
 	atarirle_command_w(state->rle, (data == 0) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
@@ -266,7 +266,7 @@ static void roadriot_sloop_tweak(atarig42_state *state, int offset)
 
 static READ16_HANDLER( roadriot_sloop_data_r )
 {
-	atarig42_state *state = space->machine->driver_data<atarig42_state>();
+	atarig42_state *state = space->machine().driver_data<atarig42_state>();
 	roadriot_sloop_tweak(state, offset);
 	if (offset < 0x78000/2)
 		return state->sloop_base[offset];
@@ -277,7 +277,7 @@ static READ16_HANDLER( roadriot_sloop_data_r )
 
 static WRITE16_HANDLER( roadriot_sloop_data_w )
 {
-	atarig42_state *state = space->machine->driver_data<atarig42_state>();
+	atarig42_state *state = space->machine().driver_data<atarig42_state>();
 	roadriot_sloop_tweak(state, offset);
 }
 
@@ -325,7 +325,7 @@ static void guardians_sloop_tweak(atarig42_state *state, int offset)
 
 static READ16_HANDLER( guardians_sloop_data_r )
 {
-	atarig42_state *state = space->machine->driver_data<atarig42_state>();
+	atarig42_state *state = space->machine().driver_data<atarig42_state>();
 	guardians_sloop_tweak(state, offset);
 	if (offset < 0x78000/2)
 		return state->sloop_base[offset];
@@ -336,7 +336,7 @@ static READ16_HANDLER( guardians_sloop_data_r )
 
 static WRITE16_HANDLER( guardians_sloop_data_w )
 {
-	atarig42_state *state = space->machine->driver_data<atarig42_state>();
+	atarig42_state *state = space->machine().driver_data<atarig42_state>();
 	guardians_sloop_tweak(state, offset);
 }
 
@@ -795,14 +795,14 @@ ROM_END
 
 static DRIVER_INIT( roadriot )
 {
-	atarig42_state *state = machine->driver_data<atarig42_state>();
+	atarig42_state *state = machine.driver_data<atarig42_state>();
 	atarijsa_init(machine, "IN2", 0x0040);
 
 	state->playfield_base = 0x400;
 
-	address_space *main = machine->device<m68000_device>("maincpu")->space(AS_PROGRAM);
+	address_space *main = machine.device<m68000_device>("maincpu")->space(AS_PROGRAM);
 	state->sloop_base = main->install_legacy_readwrite_handler(0x000000, 0x07ffff, FUNC(roadriot_sloop_data_r), FUNC(roadriot_sloop_data_w));
-	main->set_direct_update_handler(direct_update_delegate_create_static(atarig42_sloop_direct_handler, *machine));
+	main->set_direct_update_handler(direct_update_delegate_create_static(atarig42_sloop_direct_handler, machine));
 
 	asic65_config(machine, ASIC65_ROMBASED);
 /*
@@ -830,18 +830,18 @@ static DRIVER_INIT( roadriot )
 
 static DRIVER_INIT( guardian )
 {
-	atarig42_state *state = machine->driver_data<atarig42_state>();
+	atarig42_state *state = machine.driver_data<atarig42_state>();
 	atarijsa_init(machine, "IN2", 0x0040);
 
 	state->playfield_base = 0x000;
 
 	/* it looks like they jsr to $80000 as some kind of protection */
 	/* put an RTS there so we don't die */
-	*(UINT16 *)&machine->region("maincpu")->base()[0x80000] = 0x4E75;
+	*(UINT16 *)&machine.region("maincpu")->base()[0x80000] = 0x4E75;
 
-	address_space *main = machine->device<m68000_device>("maincpu")->space(AS_PROGRAM);
+	address_space *main = machine.device<m68000_device>("maincpu")->space(AS_PROGRAM);
 	state->sloop_base = main->install_legacy_readwrite_handler(0x000000, 0x07ffff, FUNC(guardians_sloop_data_r), FUNC(guardians_sloop_data_w));
-	main->set_direct_update_handler(direct_update_delegate_create_static(atarig42_sloop_direct_handler, *machine));
+	main->set_direct_update_handler(direct_update_delegate_create_static(atarig42_sloop_direct_handler, machine));
 
 	asic65_config(machine, ASIC65_GUARDIANS);
 /*

@@ -46,7 +46,7 @@ public:
 
 /*----------- defined in video/psikyo.c -----------*/
 
-void psikyo_switch_banks(running_machine *machine, int tmap, int bank);
+void psikyo_switch_banks(running_machine &machine, int tmap, int bank);
 
 WRITE32_HANDLER( psikyo_vram_0_w );
 WRITE32_HANDLER( psikyo_vram_1_w );

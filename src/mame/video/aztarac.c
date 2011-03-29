@@ -24,7 +24,7 @@ INLINE void read_vectorram(UINT16 *vectorram, int addr, int *x, int *y, int *c)
 
 WRITE16_HANDLER( aztarac_ubr_w )
 {
-    aztarac_state *state = space->machine->driver_data<aztarac_state>();
+    aztarac_state *state = space->machine().driver_data<aztarac_state>();
     UINT16 *vectorram = state->vectorram;
     int x, y, c, intensity, xoffset, yoffset, color;
     int defaddr, objaddr=0, ndefs;
@@ -44,7 +44,7 @@ WRITE16_HANDLER( aztarac_ubr_w )
             if ((c & 0x2000) == 0)
             {
                 defaddr = (c >> 1) & 0x7ff;
-                AVECTOR (space->machine, xoffset, yoffset, 0, 0);
+                AVECTOR (space->machine(), xoffset, yoffset, 0, 0);
 
                 read_vectorram(vectorram, defaddr, &x, &ndefs, &c);
                 ndefs++;
@@ -59,9 +59,9 @@ WRITE16_HANDLER( aztarac_ubr_w )
                         defaddr++;
                         read_vectorram(vectorram, defaddr, &x, &y, &c);
                         if ((c & 0xff00) == 0)
-                            AVECTOR (space->machine, x + xoffset, y + yoffset, 0, 0);
+                            AVECTOR (space->machine(), x + xoffset, y + yoffset, 0, 0);
                         else
-                            AVECTOR (space->machine, x + xoffset, y + yoffset, color, intensity);
+                            AVECTOR (space->machine(), x + xoffset, y + yoffset, color, intensity);
                     }
                 }
                 else
@@ -72,7 +72,7 @@ WRITE16_HANDLER( aztarac_ubr_w )
                         defaddr++;
                         read_vectorram(vectorram, defaddr, &x, &y, &c);
                         color = VECTOR_COLOR222(c & 0x3f);
-                        AVECTOR (space->machine, x + xoffset, y + yoffset, color, c >> 8);
+                        AVECTOR (space->machine(), x + xoffset, y + yoffset, color, c >> 8);
                     }
                 }
             }
@@ -83,8 +83,8 @@ WRITE16_HANDLER( aztarac_ubr_w )
 
 VIDEO_START( aztarac )
 {
-	aztarac_state *state = machine->driver_data<aztarac_state>();
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	aztarac_state *state = machine.driver_data<aztarac_state>();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	int xmin = visarea.min_x;
 	int ymin = visarea.min_y;

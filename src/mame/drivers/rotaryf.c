@@ -40,7 +40,7 @@ public:
 
 static INTERRUPT_GEN( rotaryf_interrupt )
 {
-	if (device->machine->primary_screen->vblank())
+	if (device->machine().primary_screen->vblank())
 		device_set_input_line(device, I8085_RST55_LINE, HOLD_LINE);
 	else
 	{
@@ -59,7 +59,7 @@ static INTERRUPT_GEN( rotaryf_interrupt )
 
 static SCREEN_UPDATE( rotaryf )
 {
-	rotaryf_state *state = screen->machine->driver_data<rotaryf_state>();
+	rotaryf_state *state = screen->machine().driver_data<rotaryf_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->videoram_size; offs++)

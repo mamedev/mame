@@ -50,7 +50,7 @@
 
 WRITE8_HANDLER( tunhunt_videoram_w )
 {
-	tunhunt_state *state = space->machine->driver_data<tunhunt_state>();
+	tunhunt_state *state = space->machine().driver_data<tunhunt_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -58,7 +58,7 @@ WRITE8_HANDLER( tunhunt_videoram_w )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	tunhunt_state *state = machine->driver_data<tunhunt_state>();
+	tunhunt_state *state = machine.driver_data<tunhunt_state>();
 	int attr = state->videoram[tile_index];
 	int code = attr & 0x3f;
 	int color = attr >> 6;
@@ -74,9 +74,9 @@ VIDEO_START( tunhunt )
     We keep track of dirty lines and cache the expanded bitmap.
     With max RLE expansion, bitmap size is 256x64.
     */
-	tunhunt_state *state = machine->driver_data<tunhunt_state>();
+	tunhunt_state *state = machine.driver_data<tunhunt_state>();
 
-	machine->generic.tmpbitmap = auto_bitmap_alloc(machine, 256, 64, machine->primary_screen->format());
+	machine.generic.tmpbitmap = auto_bitmap_alloc(machine, 256, 64, machine.primary_screen->format());
 
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
@@ -94,11 +94,11 @@ PALETTE_INIT( tunhunt )
      */
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x10);
+	machine.colortable = colortable_alloc(machine, 0x10);
 
 	/* motion objects/box */
 	for (i = 0; i < 0x10; i++)
-		colortable_entry_set_value(machine->colortable, i, i);
+		colortable_entry_set_value(machine.colortable, i, i);
 
 	/* AlphaNumerics (1bpp)
      *  2 bits of hilite select from 4 different background colors
@@ -107,26 +107,26 @@ PALETTE_INIT( tunhunt )
      */
 
 	/* alpha hilite#0 */
-	colortable_entry_set_value(machine->colortable, 0x10, 0x0); /* background color#0 (transparent) */
-	colortable_entry_set_value(machine->colortable, 0x11, 0x4); /* foreground color */
+	colortable_entry_set_value(machine.colortable, 0x10, 0x0); /* background color#0 (transparent) */
+	colortable_entry_set_value(machine.colortable, 0x11, 0x4); /* foreground color */
 
 	/* alpha hilite#1 */
-	colortable_entry_set_value(machine->colortable, 0x12, 0x5); /* background color#1 */
-	colortable_entry_set_value(machine->colortable, 0x13, 0x4); /* foreground color */
+	colortable_entry_set_value(machine.colortable, 0x12, 0x5); /* background color#1 */
+	colortable_entry_set_value(machine.colortable, 0x13, 0x4); /* foreground color */
 
 	/* alpha hilite#2 */
-	colortable_entry_set_value(machine->colortable, 0x14, 0x6); /* background color#2 */
-	colortable_entry_set_value(machine->colortable, 0x15, 0x4); /* foreground color */
+	colortable_entry_set_value(machine.colortable, 0x14, 0x6); /* background color#2 */
+	colortable_entry_set_value(machine.colortable, 0x15, 0x4); /* foreground color */
 
 	/* alpha hilite#3 */
-	colortable_entry_set_value(machine->colortable, 0x16, 0xf); /* background color#3 */
-	colortable_entry_set_value(machine->colortable, 0x17, 0x4); /* foreground color */
+	colortable_entry_set_value(machine.colortable, 0x16, 0xf); /* background color#3 */
+	colortable_entry_set_value(machine.colortable, 0x17, 0x4); /* foreground color */
 
 	/* shell graphics; these are either 1bpp (2 banks) or 2bpp.  It isn't clear which.
      * In any event, the following pens are associated with the shell graphics:
      */
-	colortable_entry_set_value(machine->colortable, 0x18, 0);
-	colortable_entry_set_value(machine->colortable, 0x19, 4);//1;
+	colortable_entry_set_value(machine.colortable, 0x18, 0);
+	colortable_entry_set_value(machine.colortable, 0x19, 4);//1;
 }
 
 /*
@@ -142,7 +142,7 @@ Color Array Ram Assignments:
         8-E             Lines (as normal) background
         F               Hilight 3
 */
-static void set_pens(running_machine *machine)
+static void set_pens(running_machine &machine)
 {
 /*
     The actual contents of the color proms (unused by this driver)
@@ -156,7 +156,7 @@ static void set_pens(running_machine *machine)
     0020:   00 f0 f0 f0 b0 b0 00 f0
             00 f0 f0 00 b0 00 f0 f0
 */
-	//const UINT8 *color_prom = machine->region( "proms" )->base();
+	//const UINT8 *color_prom = machine.region( "proms" )->base();
 	int color;
 	int shade;
 	int i;
@@ -164,7 +164,7 @@ static void set_pens(running_machine *machine)
 
 	for( i=0; i<16; i++ )
 	{
-		color = machine->generic.paletteram.u8[i];
+		color = machine.generic.paletteram.u8[i];
 		shade = 0xf^(color>>4);
 
 		color &= 0xf; /* hue select */
@@ -196,11 +196,11 @@ static void set_pens(running_machine *machine)
 		green	= APPLY_SHADE(green,shade);
 		blue	= APPLY_SHADE(blue,shade);
 
-		colortable_palette_set_color( machine->colortable,i,MAKE_RGB(red,green,blue) );
+		colortable_palette_set_color( machine.colortable,i,MAKE_RGB(red,green,blue) );
 	}
 }
 
-static void draw_motion_object(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_motion_object(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 /*
  *      VSTRLO  0x1202
@@ -213,8 +213,8 @@ static void draw_motion_object(running_machine *machine, bitmap_t *bitmap, const
  *          always 0x00?
  */
 
-	tunhunt_state *state = machine->driver_data<tunhunt_state>();
-	bitmap_t *tmpbitmap = machine->generic.tmpbitmap;
+	tunhunt_state *state = machine.driver_data<tunhunt_state>();
+	bitmap_t *tmpbitmap = machine.generic.tmpbitmap;
 	UINT8 *spriteram = state->spriteram;
 	UINT8 *tunhunt_ram = state->workram;
 	//int skip = tunhunt_ram[MOBST];
@@ -272,7 +272,7 @@ static void draw_motion_object(running_machine *machine, bitmap_t *bitmap, const
 	);
 }
 
-static void draw_box(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_box(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 /*
     This is unnecessarily slow, but the box priorities aren't completely understood,
@@ -292,7 +292,7 @@ static void draw_box(running_machine *machine, bitmap_t *bitmap, const rectangle
         1280: 07 03 00      01  07 06 04 05 02 07 03 00     09 0a   0b 0c       palette select
         ->hue 06 02 ff      60  06 05 03 04 01 06 02 ff     d2 00   c2 ff
 */
-	tunhunt_state *state = machine->driver_data<tunhunt_state>();
+	tunhunt_state *state = machine.driver_data<tunhunt_state>();
 	UINT8 *tunhunt_ram = state->workram;
 	int span,x,y;
 	int color;
@@ -326,7 +326,7 @@ static void draw_box(running_machine *machine, bitmap_t *bitmap, const rectangle
 }
 
 /* "shell" graphics are 16x16 pixel tiles used for player shots and targeting cursor */
-static void draw_shell(running_machine *machine,
+static void draw_shell(running_machine &machine,
 		bitmap_t *bitmap,
 		const rectangle *cliprect,
 		int picture_code,
@@ -344,7 +344,7 @@ static void draw_shell(running_machine *machine,
 			for( sy=0; sy<256; sy+=16 )
 			{
 				drawgfx_transpen( bitmap, cliprect,
-					machine->gfx[1],
+					machine.gfx[1],
 					picture_code,
 					0, /* color */
 					0,0, /* flip */
@@ -369,7 +369,7 @@ static void draw_shell(running_machine *machine,
 
     */
 	drawgfx_transpen( bitmap, cliprect,
-			machine->gfx[1],
+			machine.gfx[1],
 			picture_code,
 			0, /* color */
 			0,0, /* flip */
@@ -378,14 +378,14 @@ static void draw_shell(running_machine *machine,
 
 SCREEN_UPDATE( tunhunt )
 {
-	tunhunt_state *state = screen->machine->driver_data<tunhunt_state>();
-	set_pens(screen->machine);
+	tunhunt_state *state = screen->machine().driver_data<tunhunt_state>();
+	set_pens(screen->machine());
 
-	draw_box(screen->machine, bitmap, cliprect);
+	draw_box(screen->machine(), bitmap, cliprect);
 
-	draw_motion_object(screen->machine, bitmap, cliprect);
+	draw_motion_object(screen->machine(), bitmap, cliprect);
 
-	draw_shell(screen->machine, bitmap, cliprect,
+	draw_shell(screen->machine(), bitmap, cliprect,
 		state->workram[SHL0PC],	/* picture code */
 		state->workram[SHEL0H],	/* hposition */
 		state->workram[SHL0V],	/* vstart */
@@ -393,7 +393,7 @@ SCREEN_UPDATE( tunhunt )
 		state->workram[SHL0ST],	/* vstretch */
 		state->control&0x08 ); /* hstretch */
 
-	draw_shell(screen->machine, bitmap, cliprect,
+	draw_shell(screen->machine(), bitmap, cliprect,
 		state->workram[SHL1PC],	/* picture code */
 		state->workram[SHEL1H],	/* hposition */
 		state->workram[SHL1V],	/* vstart */

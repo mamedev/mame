@@ -2781,13 +2781,13 @@ void drcbe_x64::op_debug(x86code *&dst, const instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
-	if ((m_device.machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		// normalize parameters
 		be_parameter pcp(*this, inst.param(0), PTYPE_MRI);
 
 		// test and branch
-		emit_mov_r64_imm(dst, REG_RAX, (FPTR)&m_device.machine->debug_flags);			// mov   rax,&debug_flags
+		emit_mov_r64_imm(dst, REG_RAX, (FPTR)m_device.machine().debug_flags);			// mov   rax,&debug_flags
 		emit_test_m32_imm(dst, MBD(REG_RAX, 0), DEBUG_FLAG_CALL_HOOK);					// test  [debug_flags],DEBUG_FLAG_CALL_HOOK
 		emit_link skip = { 0 };
 		emit_jcc_short_link(dst, x64emit::COND_Z, skip);								// jz    skip

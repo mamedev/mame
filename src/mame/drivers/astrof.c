@@ -81,7 +81,7 @@
 
 static READ8_HANDLER( irq_clear_r )
 {
-	astrof_state *state = space->machine->driver_data<astrof_state>();
+	astrof_state *state = space->machine().driver_data<astrof_state>();
 	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 
 	return 0;
@@ -90,7 +90,7 @@ static READ8_HANDLER( irq_clear_r )
 
 static TIMER_DEVICE_CALLBACK( irq_callback )
 {
-	astrof_state *state = timer.machine->driver_data<astrof_state>();
+	astrof_state *state = timer.machine().driver_data<astrof_state>();
 	device_set_input_line(state->maincpu, 0, ASSERT_LINE);
 }
 
@@ -104,17 +104,17 @@ static TIMER_DEVICE_CALLBACK( irq_callback )
 
 static INPUT_CHANGED( coin_inserted )
 {
-	astrof_state *state = field->port->machine->driver_data<astrof_state>();
+	astrof_state *state = field->port->machine().driver_data<astrof_state>();
 
 	/* coin insertion causes an NMI */
 	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
-	coin_counter_w(field->port->machine, 0, newval);
+	coin_counter_w(field->port->machine(), 0, newval);
 }
 
 
 static INPUT_CHANGED( service_coin_inserted )
 {
-	astrof_state *state = field->port->machine->driver_data<astrof_state>();
+	astrof_state *state = field->port->machine().driver_data<astrof_state>();
 
 	/* service coin insertion causes an NMI */
 	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -123,7 +123,7 @@ static INPUT_CHANGED( service_coin_inserted )
 
 static CUSTOM_INPUT( astrof_p1_controls_r )
 {
-	return input_port_read(field->port->machine, "P1");
+	return input_port_read(field->port->machine(), "P1");
 }
 
 
@@ -134,10 +134,10 @@ static CUSTOM_INPUT( astrof_p2_controls_r )
 	/* on an upright cabinet, a single set of controls
        is connected to both sets of pins on the edge
        connector */
-	if (input_port_read(field->port->machine, "CAB"))
-		ret = input_port_read(field->port->machine, "P2");
+	if (input_port_read(field->port->machine(), "CAB"))
+		ret = input_port_read(field->port->machine(), "P2");
 	else
-		ret = input_port_read(field->port->machine, "P1");
+		ret = input_port_read(field->port->machine(), "P1");
 
 	return ret;
 }
@@ -146,16 +146,16 @@ static CUSTOM_INPUT( astrof_p2_controls_r )
 static CUSTOM_INPUT( tomahawk_controls_r )
 {
 	UINT32 ret;
-	astrof_state *state = field->port->machine->driver_data<astrof_state>();
+	astrof_state *state = field->port->machine().driver_data<astrof_state>();
 
 	/* on a cocktail cabinet, two sets of controls are
        multiplexed on a single set of inputs
          (not verified on pcb) */
 
 	if (state->flipscreen)
-		ret = input_port_read(field->port->machine, "P2");
+		ret = input_port_read(field->port->machine(), "P2");
 	else
-		ret = input_port_read(field->port->machine, "P1");
+		ret = input_port_read(field->port->machine(), "P1");
 
 	return ret;
 }
@@ -174,7 +174,7 @@ static CUSTOM_INPUT( tomahawk_controls_r )
 
 static VIDEO_START( astrof )
 {
-	astrof_state *state = machine->driver_data<astrof_state>();
+	astrof_state *state = machine.driver_data<astrof_state>();
 
 	/* allocate the color RAM -- half the size of the video RAM as A0 is not connected */
 	state->colorram = auto_alloc_array(machine, UINT8, state->videoram_size / 2);
@@ -182,9 +182,9 @@ static VIDEO_START( astrof )
 }
 
 
-static rgb_t make_pen( running_machine *machine, UINT8 data )
+static rgb_t make_pen( running_machine &machine, UINT8 data )
 {
-	astrof_state *state = machine->driver_data<astrof_state>();
+	astrof_state *state = machine.driver_data<astrof_state>();
 
 	UINT8 r1_bit = state->red_on ? 0x01 : (data >> 0) & 0x01;
 	UINT8 r2_bit = state->red_on ? 0x01 : (data >> 1) & 0x01;
@@ -203,13 +203,13 @@ static rgb_t make_pen( running_machine *machine, UINT8 data )
 }
 
 
-static void astrof_get_pens( running_machine *machine, pen_t *pens )
+static void astrof_get_pens( running_machine &machine, pen_t *pens )
 {
-	astrof_state *state = machine->driver_data<astrof_state>();
+	astrof_state *state = machine.driver_data<astrof_state>();
 	offs_t i;
 	UINT8 bank = (state->astrof_palette_bank ? 0x10 : 0x00);
 	UINT8 config = input_port_read_safe(machine, "FAKE", 0x00);
-	UINT8 *prom = machine->region("proms")->base();
+	UINT8 *prom = machine.region("proms")->base();
 
 	/* a common wire hack to the pcb causes the prom halves to be inverted */
 	/* this results in e.g. astrof background being black */
@@ -240,10 +240,10 @@ static void astrof_get_pens( running_machine *machine, pen_t *pens )
 }
 
 
-static void tomahawk_get_pens( running_machine *machine, pen_t *pens )
+static void tomahawk_get_pens( running_machine &machine, pen_t *pens )
 {
 	offs_t i;
-	UINT8 *prom = machine->region("proms")->base();
+	UINT8 *prom = machine.region("proms")->base();
 	UINT8 config = input_port_read_safe(machine, "FAKE", 0x00);
 
 	for (i = 0; i < TOMAHAWK_NUM_PENS; i++)
@@ -282,7 +282,7 @@ static void tomahawk_get_pens( running_machine *machine, pen_t *pens )
 
 static WRITE8_HANDLER( astrof_videoram_w )
 {
-	astrof_state *state = space->machine->driver_data<astrof_state>();
+	astrof_state *state = space->machine().driver_data<astrof_state>();
 
 	state->videoram[offset] = data;
 	state->colorram[offset >> 1] = *state->astrof_color & 0x0e;
@@ -291,7 +291,7 @@ static WRITE8_HANDLER( astrof_videoram_w )
 
 static WRITE8_HANDLER( tomahawk_videoram_w )
 {
-	astrof_state *state = space->machine->driver_data<astrof_state>();
+	astrof_state *state = space->machine().driver_data<astrof_state>();
 
 	state->videoram[offset] = data;
 	state->colorram[offset >> 1] = (*state->astrof_color & 0x0e) | ((*state->astrof_color & 0x01) << 4);
@@ -300,9 +300,9 @@ static WRITE8_HANDLER( tomahawk_videoram_w )
 
 static WRITE8_HANDLER( video_control_1_w )
 {
-	astrof_state *state = space->machine->driver_data<astrof_state>();
+	astrof_state *state = space->machine().driver_data<astrof_state>();
 
-	state->flipscreen = ((data >> 0) & 0x01) & input_port_read(space->machine, "CAB");
+	state->flipscreen = ((data >> 0) & 0x01) & input_port_read(space->machine(), "CAB");
 
 	/* this ties to the CLR pin of the shift registers */
 	state->screen_off = (data & 0x02) ? TRUE : FALSE;
@@ -310,13 +310,13 @@ static WRITE8_HANDLER( video_control_1_w )
 	/* D2 - not connected in the schematics, but at one point Astro Fighter sets it to 1 */
 	/* D3-D7 - not connected */
 
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 }
 
 
-static void astrof_set_video_control_2( running_machine *machine, UINT8 data )
+static void astrof_set_video_control_2( running_machine &machine, UINT8 data )
 {
-	astrof_state *state = machine->driver_data<astrof_state>();
+	astrof_state *state = machine.driver_data<astrof_state>();
 
 	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
@@ -332,14 +332,14 @@ static void astrof_set_video_control_2( running_machine *machine, UINT8 data )
 
 static WRITE8_HANDLER( astrof_video_control_2_w )
 {
-	astrof_set_video_control_2(space->machine, data);
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+	astrof_set_video_control_2(space->machine(), data);
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 }
 
 
-static void spfghmk2_set_video_control_2( running_machine *machine, UINT8 data )
+static void spfghmk2_set_video_control_2( running_machine &machine, UINT8 data )
 {
-	astrof_state *state = machine->driver_data<astrof_state>();
+	astrof_state *state = machine.driver_data<astrof_state>();
 
 	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
@@ -352,14 +352,14 @@ static void spfghmk2_set_video_control_2( running_machine *machine, UINT8 data )
 
 static WRITE8_HANDLER( spfghmk2_video_control_2_w )
 {
-	spfghmk2_set_video_control_2(space->machine, data);
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+	spfghmk2_set_video_control_2(space->machine(), data);
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 }
 
 
-static void tomahawk_set_video_control_2( running_machine *machine, UINT8 data )
+static void tomahawk_set_video_control_2( running_machine &machine, UINT8 data )
 {
-	astrof_state *state = machine->driver_data<astrof_state>();
+	astrof_state *state = machine.driver_data<astrof_state>();
 
 	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
@@ -371,14 +371,14 @@ static void tomahawk_set_video_control_2( running_machine *machine, UINT8 data )
 
 static WRITE8_HANDLER( tomahawk_video_control_2_w )
 {
-	tomahawk_set_video_control_2(space->machine, data);
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+	tomahawk_set_video_control_2(space->machine(), data);
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 }
 
 
-static void video_update_common( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, pen_t *pens )
+static void video_update_common( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, pen_t *pens )
 {
-	astrof_state *state = machine->driver_data<astrof_state>();
+	astrof_state *state = machine.driver_data<astrof_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->videoram_size; offs++)
@@ -425,9 +425,9 @@ static SCREEN_UPDATE( astrof )
 {
 	pen_t pens[ASTROF_NUM_PENS];
 
-	astrof_get_pens(screen->machine, pens);
+	astrof_get_pens(screen->machine(), pens);
 
-	video_update_common(screen->machine, bitmap, cliprect, pens);
+	video_update_common(screen->machine(), bitmap, cliprect, pens);
 
 	return 0;
 }
@@ -437,9 +437,9 @@ static SCREEN_UPDATE( tomahawk )
 {
 	pen_t pens[TOMAHAWK_NUM_PENS];
 
-	tomahawk_get_pens(screen->machine, pens);
+	tomahawk_get_pens(screen->machine(), pens);
 
-	video_update_common(screen->machine, bitmap, cliprect, pens);
+	video_update_common(screen->machine(), bitmap, cliprect, pens);
 
 	return 0;
 }
@@ -455,13 +455,13 @@ static SCREEN_UPDATE( tomahawk )
 static READ8_HANDLER( shoot_r )
 {
 	/* not really sure about this */
-	return space->machine->rand() & 8;
+	return space->machine().rand() & 8;
 }
 
 
 static READ8_HANDLER( abattle_coin_prot_r )
 {
-	astrof_state *state = space->machine->driver_data<astrof_state>();
+	astrof_state *state = space->machine().driver_data<astrof_state>();
 
 	state->abattle_count = (state->abattle_count + 1) % 0x0101;
 	return state->abattle_count ? 0x07 : 0x00;
@@ -470,7 +470,7 @@ static READ8_HANDLER( abattle_coin_prot_r )
 
 static READ8_HANDLER( afire_coin_prot_r )
 {
-	astrof_state *state = space->machine->driver_data<astrof_state>();
+	astrof_state *state = space->machine().driver_data<astrof_state>();
 
 	state->abattle_count = state->abattle_count ^ 0x01;
 	return state->abattle_count ? 0x07 : 0x00;
@@ -479,7 +479,7 @@ static READ8_HANDLER( afire_coin_prot_r )
 
 static READ8_HANDLER( tomahawk_protection_r )
 {
-	astrof_state *state = space->machine->driver_data<astrof_state>();
+	astrof_state *state = space->machine().driver_data<astrof_state>();
 
 	/* flip the byte */
 	return BITSWAP8(*state->tomahawk_protection, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -495,13 +495,13 @@ static READ8_HANDLER( tomahawk_protection_r )
 
 static MACHINE_START( astrof )
 {
-	astrof_state *state = machine->driver_data<astrof_state>();
+	astrof_state *state = machine.driver_data<astrof_state>();
 
 	/* the 74175 outputs all HI's if not otherwise set */
 	astrof_set_video_control_2(machine, 0xff);
 
-	state->maincpu = machine->device("maincpu");
-	state->samples = machine->device("samples");
+	state->maincpu = machine.device("maincpu");
+	state->samples = machine.device("samples");
 
 	/* register for state saving */
 	state->save_item(NAME(state->red_on));
@@ -518,7 +518,7 @@ static MACHINE_START( astrof )
 
 static MACHINE_START( abattle )
 {
-	astrof_state *state = machine->driver_data<astrof_state>();
+	astrof_state *state = machine.driver_data<astrof_state>();
 
 	/* register for state saving */
 	state->save_item(NAME(state->abattle_count));
@@ -529,12 +529,12 @@ static MACHINE_START( abattle )
 
 static MACHINE_START( spfghmk2 )
 {
-	astrof_state *state = machine->driver_data<astrof_state>();
+	astrof_state *state = machine.driver_data<astrof_state>();
 
 	/* the 74175 outputs all HI's if not otherwise set */
 	spfghmk2_set_video_control_2(machine, 0xff);
 
-	state->maincpu = machine->device("maincpu");
+	state->maincpu = machine.device("maincpu");
 
 	/* the red background circuit is disabled */
 	state->red_on = FALSE;
@@ -548,13 +548,13 @@ static MACHINE_START( spfghmk2 )
 
 static MACHINE_START( tomahawk )
 {
-	astrof_state *state = machine->driver_data<astrof_state>();
+	astrof_state *state = machine.driver_data<astrof_state>();
 
 	/* the 74175 outputs all HI's if not otherwise set */
 	tomahawk_set_video_control_2(machine, 0xff);
 
-	state->maincpu = machine->device("maincpu");
-	state->sn = machine->device("snsnd");
+	state->maincpu = machine.device("maincpu");
+	state->sn = machine.device("snsnd");
 
 	/* register for state saving */
 	state->save_item(NAME(state->red_on));
@@ -572,7 +572,7 @@ static MACHINE_START( tomahawk )
 
 static MACHINE_RESET( abattle )
 {
-	astrof_state *state = machine->driver_data<astrof_state>();
+	astrof_state *state = machine.driver_data<astrof_state>();
 	state->abattle_count = 0;
 }
 
@@ -1300,44 +1300,44 @@ ROM_END
 static DRIVER_INIT( abattle )
 {
 	/* use the protection PROM to decrypt the ROMs */
-	UINT8 *rom = machine->region("maincpu")->base();
-	UINT8 *prom = machine->region("user1")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *prom = machine.region("user1")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
 		rom[i] = prom[rom[i]];
 
 	/* set up protection handlers */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa003, 0xa003, FUNC(shoot_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa004, 0xa004, FUNC(abattle_coin_prot_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa003, 0xa003, FUNC(shoot_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa004, 0xa004, FUNC(abattle_coin_prot_r));
 }
 
 
 static DRIVER_INIT( afire )
 {
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa003, 0xa003, FUNC(shoot_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa004, 0xa004, FUNC(afire_coin_prot_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa003, 0xa003, FUNC(shoot_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa004, 0xa004, FUNC(afire_coin_prot_r));
 }
 
 
 static DRIVER_INIT( sstarbtl )
 {
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa003, 0xa003, FUNC(shoot_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa004, 0xa004, FUNC(abattle_coin_prot_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa003, 0xa003, FUNC(shoot_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa004, 0xa004, FUNC(abattle_coin_prot_r));
 }
 
 

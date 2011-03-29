@@ -914,9 +914,9 @@ static const ay8910_interface hexa_ay8910_config =
 
 static MACHINE_START( arkanoid )
 {
-	arkanoid_state *state = machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 
-	state->mcu = machine->device("mcu");
+	state->mcu = machine.device("mcu");
 
 	state->save_item(NAME(state->bootleg_cmd));
 
@@ -939,7 +939,7 @@ static MACHINE_START( arkanoid )
 
 static MACHINE_RESET( arkanoid )
 {
-	arkanoid_state *state = machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 
 	state->port_a_in = 0;
 	state->port_a_out = 0;
@@ -1444,34 +1444,34 @@ ROM_END
 
 /* Driver Initialization */
 
-static void arkanoid_bootleg_init( running_machine *machine )
+static void arkanoid_bootleg_init( running_machine &machine )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf000, 0xf000, FUNC(arkanoid_bootleg_f000_r) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf002, 0xf002, FUNC(arkanoid_bootleg_f002_r) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd018, 0xd018, FUNC(arkanoid_bootleg_d018_w) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd008, 0xd008, FUNC(arkanoid_bootleg_d008_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf000, 0xf000, FUNC(arkanoid_bootleg_f000_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf002, 0xf002, FUNC(arkanoid_bootleg_f002_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd018, 0xd018, FUNC(arkanoid_bootleg_d018_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd008, 0xd008, FUNC(arkanoid_bootleg_d008_r) );
 }
 
 static DRIVER_INIT( arkangc )
 {
-	arkanoid_state *state = machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 	state->bootleg_id = ARKANGC;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkangc2 )
 {
-	arkanoid_state *state = machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 	state->bootleg_id = ARKANGC2;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( block2 )
 {
-	arkanoid_state *state = machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 	// the graphics on this bootleg have the data scrambled
 	int tile;
-	UINT8* srcgfx = machine->region("gfx1")->base();
+	UINT8* srcgfx = machine.region("gfx1")->base();
 	UINT8* buffer = auto_alloc_array(machine, UINT8, 0x18000);
 
 	for (tile = 0; tile < 0x3000; tile++)
@@ -1504,28 +1504,28 @@ static DRIVER_INIT( block2 )
 
 static DRIVER_INIT( arkblock )
 {
-	arkanoid_state *state = machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 	state->bootleg_id = ARKBLOCK;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkbloc2 )
 {
-	arkanoid_state *state = machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 	state->bootleg_id = ARKBLOC2;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkgcbl )
 {
-	arkanoid_state *state = machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 	state->bootleg_id = ARKGCBL;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( paddle2 )
 {
-	arkanoid_state *state = machine->driver_data<arkanoid_state>();
+	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 	state->bootleg_id = PADDLE2;
 	arkanoid_bootleg_init(machine);
 }
@@ -1533,7 +1533,7 @@ static DRIVER_INIT( paddle2 )
 
 static DRIVER_INIT( tetrsark )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	int x;
 
 	for (x = 0; x < 0x8000; x++)
@@ -1541,13 +1541,13 @@ static DRIVER_INIT( tetrsark )
 		ROM[x] = ROM[x] ^ 0x94;
 	}
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd008, 0xd008, FUNC(tetrsark_d008_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd008, 0xd008, FUNC(tetrsark_d008_w) );
 }
 
 
 static DRIVER_INIT( hexa )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 #if 0
 
 

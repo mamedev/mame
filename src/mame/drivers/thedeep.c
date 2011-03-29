@@ -40,21 +40,21 @@ Notes:
 
 static WRITE8_HANDLER( thedeep_nmi_w )
 {
-	thedeep_state *state = space->machine->driver_data<thedeep_state>();
+	thedeep_state *state = space->machine().driver_data<thedeep_state>();
 	state->nmi_enable = data;
 }
 
 static WRITE8_HANDLER( thedeep_sound_w )
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static MACHINE_RESET( thedeep )
 {
-	thedeep_state *state = machine->driver_data<thedeep_state>();
-	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000 + 0 * 0x4000);
+	thedeep_state *state = machine.driver_data<thedeep_state>();
+	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x10000 + 0 * 0x4000);
 	state->scroll[0] = 0;
 	state->scroll[1] = 0;
 	state->scroll[2] = 0;
@@ -67,16 +67,16 @@ static MACHINE_RESET( thedeep )
 
 static WRITE8_HANDLER( thedeep_protection_w )
 {
-	thedeep_state *state = space->machine->driver_data<thedeep_state>();
+	thedeep_state *state = space->machine().driver_data<thedeep_state>();
 	state->protection_command = data;
 	switch (state->protection_command)
 	{
 		case 0x11:
-			flip_screen_set(space->machine, 1);
+			flip_screen_set(space->machine(), 1);
 		break;
 
 		case 0x20:
-			flip_screen_set(space->machine, 0);
+			flip_screen_set(space->machine(), 0);
 		break;
 
 		case 0x30:
@@ -88,8 +88,8 @@ static WRITE8_HANDLER( thedeep_protection_w )
 			int new_rombank = state->protection_command & 3;
 			if (state->rombank == new_rombank)	break;
 			state->rombank = new_rombank;
-			rom = space->machine->region("maincpu")->base();
-			memory_set_bankptr(space->machine, "bank1", rom + 0x10000 + state->rombank * 0x4000);
+			rom = space->machine().region("maincpu")->base();
+			memory_set_bankptr(space->machine(), "bank1", rom + 0x10000 + state->rombank * 0x4000);
 			/* there's code which falls through from the fixed ROM to bank #1, I have to */
 			/* copy it there otherwise the CPU bank switching support will not catch it. */
 			memcpy(rom + 0x08000, rom + 0x10000 + state->rombank * 0x4000, 0x4000);
@@ -118,7 +118,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 // d166-d174:   hl = (hl + 2*a)
 // d175-d181:   hl *= e (e must be non zero)
 // d182-d19a:   hl /= de
-				state->protection_data = space->machine->region("cpu3")->base()[0x185+state->protection_index++];
+				state->protection_data = space->machine().region("cpu3")->base()[0x185+state->protection_index++];
 			else
 				state->protection_data = 0xc9;
 
@@ -133,13 +133,13 @@ static WRITE8_HANDLER( thedeep_protection_w )
 
 static READ8_HANDLER( thedeep_e004_r )
 {
-	thedeep_state *state = space->machine->driver_data<thedeep_state>();
+	thedeep_state *state = space->machine().driver_data<thedeep_state>();
 	return state->protection_irq ? 1 : 0;
 }
 
 static READ8_HANDLER( thedeep_protection_r )
 {
-	thedeep_state *state = space->machine->driver_data<thedeep_state>();
+	thedeep_state *state = space->machine().driver_data<thedeep_state>();
 	state->protection_irq = 0;
 	return state->protection_data;
 }
@@ -309,7 +309,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface thedeep_ym2203_intf =
@@ -324,12 +324,12 @@ static const ym2203_interface thedeep_ym2203_intf =
 
 static INTERRUPT_GEN( thedeep_interrupt )
 {
-	thedeep_state *state = device->machine->driver_data<thedeep_state>();
+	thedeep_state *state = device->machine().driver_data<thedeep_state>();
 	if (cpu_getiloops(device))
 	{
 		if (state->protection_command != 0x59)
 		{
-			int coins = input_port_read(device->machine, "MCU");
+			int coins = input_port_read(device->machine(), "MCU");
 			if		(coins & 1)	state->protection_data = 1;
 			else if	(coins & 2)	state->protection_data = 2;
 			else if	(coins & 4)	state->protection_data = 3;

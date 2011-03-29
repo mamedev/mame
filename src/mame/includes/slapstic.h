@@ -11,7 +11,7 @@
 
 /*----------- defined in machine/slapstic.c -----------*/
 
-void slapstic_init(running_machine *machine, int chip);
+void slapstic_init(running_machine &machine, int chip);
 void slapstic_reset(void);
 
 int slapstic_bank(void);

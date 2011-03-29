@@ -6,7 +6,7 @@
 
 VIDEO_START( groundfx )
 {
-	groundfx_state *state = machine->driver_data<groundfx_state>();
+	groundfx_state *state = machine.driver_data<groundfx_state>();
 	state->spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
 
 	/* Hack */
@@ -63,11 +63,11 @@ Heavy use is made of sprite zooming.
 
 ***************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int do_hack,int x_offs,int y_offs)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int do_hack,int x_offs,int y_offs)
 {
-	groundfx_state *state = machine->driver_data<groundfx_state>();
+	groundfx_state *state = machine.driver_data<groundfx_state>();
 	UINT32 *spriteram32 = state->spriteram;
-	UINT16 *spritemap = (UINT16 *)machine->region("user1")->base();
+	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -185,13 +185,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		else
 			clipper=cliprect;
 
-		pdrawgfxzoom_transpen(bitmap,clipper,machine->gfx[sprite_ptr->gfx],
+		pdrawgfxzoom_transpen(bitmap,clipper,machine.gfx[sprite_ptr->gfx],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				machine->priority_bitmap,primasks[sprite_ptr->pri],0);
+				machine.priority_bitmap,primasks[sprite_ptr->pri],0);
 	}
 }
 
@@ -201,9 +201,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( groundfx )
 {
-	groundfx_state *state = screen->machine->driver_data<groundfx_state>();
-	device_t *tc0100scn = screen->machine->device("tc0100scn");
-	device_t *tc0480scp = screen->machine->device("tc0480scp");
+	groundfx_state *state = screen->machine().driver_data<groundfx_state>();
+	device_t *tc0100scn = screen->machine().device("tc0100scn");
+	device_t *tc0480scp = screen->machine().device("tc0480scp");
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;
@@ -223,7 +223,7 @@ SCREEN_UPDATE( groundfx )
 	pivlayer[1] = pivlayer[0]^1;
 	pivlayer[2] = 2;
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
 
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
@@ -256,7 +256,7 @@ SCREEN_UPDATE( groundfx )
 
 		if (tc0480scp_long_r(tc0480scp, 0x20 / 4, 0xffffffff) != 0x240866) /* Stupid hack for start of race */
 			tc0480scp_tilemap_draw(tc0480scp, bitmap, &state->hack_cliprect, layer[0], 0, 0);
-		draw_sprites(screen->machine, bitmap, cliprect, 1, 44, -574);
+		draw_sprites(screen->machine(), bitmap, cliprect, 1, 44, -574);
 	}
 	else
 	{
@@ -267,7 +267,7 @@ SCREEN_UPDATE( groundfx )
 
 		tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);
 
-		draw_sprites(screen->machine, bitmap, cliprect, 0, 44, -574);
+		draw_sprites(screen->machine(), bitmap, cliprect, 0, 44, -574);
 	}
 
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);	/* TC0480SCP text layer */

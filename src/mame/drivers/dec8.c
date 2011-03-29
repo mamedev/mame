@@ -55,25 +55,25 @@ To do:
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
 static SCREEN_EOF( dec8 )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	buffer_spriteram_w(space, 0, 0);
 }
 
 static READ8_HANDLER( i8751_h_r )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 	return state->i8751_return >> 8; /* MSB */
 }
 
 static READ8_HANDLER( i8751_l_r )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 	return state->i8751_return & 0xff; /* LSB */
 }
 
 static WRITE8_HANDLER( i8751_reset_w )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 	state->i8751_return = 0;
 }
 
@@ -81,28 +81,28 @@ static WRITE8_HANDLER( i8751_reset_w )
 
 static READ8_HANDLER( gondo_player_1_r )
 {
-	int val = 1 << input_port_read(space->machine, "AN0");
+	int val = 1 << input_port_read(space->machine(), "AN0");
 
 	switch (offset)
 	{
 		case 0: /* Rotary low byte */
 			return ~(val & 0xff);
 		case 1: /* Joystick = bottom 4 bits, rotary = top 4 */
-			return ((~val >> 4) & 0xf0) | (input_port_read(space->machine, "IN0") & 0xf);
+			return ((~val >> 4) & 0xf0) | (input_port_read(space->machine(), "IN0") & 0xf);
 	}
 	return 0xff;
 }
 
 static READ8_HANDLER( gondo_player_2_r )
 {
-	int val = 1 << input_port_read(space->machine, "AN1");
+	int val = 1 << input_port_read(space->machine(), "AN1");
 
 	switch (offset)
 	{
 		case 0: /* Rotary low byte */
 			return ~(val & 0xff);
 		case 1: /* Joystick = bottom 4 bits, rotary = top 4 */
-			return ((~val >> 4) & 0xf0) | (input_port_read(space->machine, "IN1") & 0xf);
+			return ((~val >> 4) & 0xf0) | (input_port_read(space->machine(), "IN1") & 0xf);
 	}
 	return 0xff;
 }
@@ -119,20 +119,20 @@ static TIMER_CALLBACK( dec8_i8751_timer_callback )
 {
 	// The schematics show a clocked LS194 shift register (3A) is used to automatically
 	// clear the IRQ request.  The MCU does not clear it itself.
-	dec8_state *state = machine->driver_data<dec8_state>();
+	dec8_state *state = machine.driver_data<dec8_state>();
 	device_set_input_line(state->mcu, MCS51_INT1_LINE, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( dec8_i8751_w )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 
 	switch (offset)
 	{
 	case 0: /* High byte - SECIRQ is trigged on activating this latch */
 		state->i8751_value = (state->i8751_value & 0xff) | (data << 8);
 		device_set_input_line(state->mcu, MCS51_INT1_LINE, ASSERT_LINE);
-		space->machine->scheduler().timer_set(state->mcu->clocks_to_attotime(64), FUNC(dec8_i8751_timer_callback)); // 64 clocks not confirmed
+		space->machine().scheduler().timer_set(state->mcu->clocks_to_attotime(64), FUNC(dec8_i8751_timer_callback)); // 64 clocks not confirmed
 		break;
 	case 1: /* Low byte */
 		state->i8751_value = (state->i8751_value & 0xff00) | data;
@@ -148,7 +148,7 @@ static WRITE8_HANDLER( dec8_i8751_w )
 
 static WRITE8_HANDLER( srdarwin_i8751_w )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 	state->i8751_return = 0;
 
 	switch (offset)
@@ -168,8 +168,8 @@ static WRITE8_HANDLER( srdarwin_i8751_w )
 	if (state->i8751_value == 0x5000) state->i8751_return = ((state->coin1 / 10) << 4) | (state->coin1 % 10);	/* Coin request */
 	if (state->i8751_value == 0x6000) {state->i8751_value = -1; state->coin1--; }	/* Coin clear */
 	/* Nb:  Command 0x4000 for setting coinage options is not sup3ed */
-	if ((input_port_read(space->machine, "FAKE") & 1) == 1) state->latch = 1;
-	if ((input_port_read(space->machine, "FAKE") & 1) != 1 && state->latch) {state->coin1++; state->latch = 0;}
+	if ((input_port_read(space->machine(), "FAKE") & 1) == 1) state->latch = 1;
+	if ((input_port_read(space->machine(), "FAKE") & 1) != 1 && state->latch) {state->coin1++; state->latch = 0;}
 
 	/* This next value is the index to a series of tables,
     each table controls the end of level bad guy, wrong values crash the
@@ -223,7 +223,7 @@ bb63           = Square things again
 
 static WRITE8_HANDLER( shackled_i8751_w )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 	state->i8751_return = 0;
 
 	switch (offset)
@@ -238,9 +238,9 @@ static WRITE8_HANDLER( shackled_i8751_w )
 	}
 
 	/* Coins are controlled by the i8751 */
-	if (/*(input_port_read(space->machine, "IN2") & 3) == 3*/!state->latch) {state->latch = 1; state->coin1 = state->coin2 = 0;}
-	if ((input_port_read(space->machine, "IN2") & 1) != 1 && state->latch)  {state->coin1 = 1; state->latch = 0;}
-	if ((input_port_read(space->machine, "IN2") & 2) != 2 && state->latch)  {state->coin2 = 1; state->latch = 0;}
+	if (/*(input_port_read(space->machine(), "IN2") & 3) == 3*/!state->latch) {state->latch = 1; state->coin1 = state->coin2 = 0;}
+	if ((input_port_read(space->machine(), "IN2") & 1) != 1 && state->latch)  {state->coin1 = 1; state->latch = 0;}
+	if ((input_port_read(space->machine(), "IN2") & 2) != 2 && state->latch)  {state->coin2 = 1; state->latch = 0;}
 
 	if (state->i8751_value == 0x0050) state->i8751_return = 0; /* Breywood ID */
 	if (state->i8751_value == 0x0051) state->i8751_return = 0; /* Shackled ID */
@@ -252,7 +252,7 @@ static WRITE8_HANDLER( shackled_i8751_w )
 
 static WRITE8_HANDLER( lastmisn_i8751_w )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 	state->i8751_return = 0;
 
 	switch (offset)
@@ -269,8 +269,8 @@ static WRITE8_HANDLER( lastmisn_i8751_w )
 	if (offset == 0)
 	{
 		/* Coins are controlled by the i8751 */
-		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !state->latch) state->latch = 1;
-		if ((input_port_read(space->machine, "IN2") & 3) != 3 && state->latch) {state->coin1++; state->latch = 0; state->snd = 0x400; state->i8751_return = 0x400; return;}
+		if ((input_port_read(space->machine(), "IN2") & 3) == 3 && !state->latch) state->latch = 1;
+		if ((input_port_read(space->machine(), "IN2") & 3) != 3 && state->latch) {state->coin1++; state->latch = 0; state->snd = 0x400; state->i8751_return = 0x400; return;}
 		if (state->i8751_value == 0x007a) state->i8751_return = 0x0185; /* Japan ID code */
 		if (state->i8751_value == 0x007b) state->i8751_return = 0x0184; /* USA ID code */
 		if (state->i8751_value == 0x0001) {state->coin1 = state->snd = 0;}//???
@@ -284,7 +284,7 @@ static WRITE8_HANDLER( lastmisn_i8751_w )
 
 static WRITE8_HANDLER( csilver_i8751_w )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 	state->i8751_return = 0;
 
 	switch (offset)
@@ -301,8 +301,8 @@ static WRITE8_HANDLER( csilver_i8751_w )
 	if (offset == 0)
 	{
 		/* Coins are controlled by the i8751 */
-		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !state->latch) state->latch = 1;
-		if ((input_port_read(space->machine, "IN2") & 3) != 3 && state->latch) {state->coin1++; state->latch = 0; state->snd = 0x1200; state->i8751_return = 0x1200; return;}
+		if ((input_port_read(space->machine(), "IN2") & 3) == 3 && !state->latch) state->latch = 1;
+		if ((input_port_read(space->machine(), "IN2") & 3) != 3 && state->latch) {state->coin1++; state->latch = 0; state->snd = 0x1200; state->i8751_return = 0x1200; return;}
 
 		if (state->i8751_value == 0x054a) {state->i8751_return = ~(0x4a); state->coin1 = 0; state->snd = 0;} /* Captain Silver (Japan) ID */
 		if (state->i8751_value == 0x054c) {state->i8751_return = ~(0x4c); state->coin1 = 0; state->snd = 0;} /* Captain Silver (World) ID */
@@ -314,7 +314,7 @@ static WRITE8_HANDLER( csilver_i8751_w )
 
 static WRITE8_HANDLER( garyoret_i8751_w )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 	state->i8751_return = 0;
 
 	switch (offset)
@@ -328,9 +328,9 @@ static WRITE8_HANDLER( garyoret_i8751_w )
 	}
 
 	/* Coins are controlled by the i8751 */
-	if ((input_port_read(space->machine, "I8751") & 3) == 3) state->latch = 1;
-	if ((input_port_read(space->machine, "I8751") & 1) != 1 && state->latch) {state->coin1++; state->latch = 0;}
-	if ((input_port_read(space->machine, "I8751") & 2) != 2 && state->latch) {state->coin2++; state->latch = 0;}
+	if ((input_port_read(space->machine(), "I8751") & 3) == 3) state->latch = 1;
+	if ((input_port_read(space->machine(), "I8751") & 1) != 1 && state->latch) {state->coin1++; state->latch = 0;}
+	if ((input_port_read(space->machine(), "I8751") & 2) != 2 && state->latch) {state->coin2++; state->latch = 0;}
 
 	/* Work out return values */
 	if ((state->i8751_value >> 8) == 0x00) {state->i8751_return = 0; state->coin1 = state->coin2 = 0;}
@@ -344,13 +344,13 @@ static WRITE8_HANDLER( garyoret_i8751_w )
 
 static WRITE8_HANDLER( dec8_bank_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 }
 
 /* Used by Ghostbusters, Meikyuu Hunter G & Gondomania */
 static WRITE8_HANDLER( ghostb_bank_w )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 
 	/* Bit 0: SECCLR - acknowledge interrupt from I8751
        Bit 1: NMI enable/disable
@@ -359,11 +359,11 @@ static WRITE8_HANDLER( ghostb_bank_w )
        Bits 4-7: Bank switch
     */
 
-	memory_set_bank(space->machine, "bank1", data >> 4);
+	memory_set_bank(space->machine(), "bank1", data >> 4);
 
 	if ((data&1)==0) device_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 	if (data & 2) state->nmi_enable =1; else state->nmi_enable = 0;
-	flip_screen_set(space->machine, data & 0x08);
+	flip_screen_set(space->machine(), data & 0x08);
 }
 
 static WRITE8_HANDLER( csilver_control_w )
@@ -375,19 +375,19 @@ static WRITE8_HANDLER( csilver_control_w )
         Bit 0x40 - Unused.
         Bit 0x80 - Hold subcpu reset line high if clear, else low?  (Not needed anyway)
     */
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 }
 
 static WRITE8_HANDLER( dec8_sound_w )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 	soundlatch_w(space, 0, data);
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void csilver_adpcm_int( device_t *device )
 {
-	dec8_state *state = device->machine->driver_data<dec8_state>();
+	dec8_state *state = device->machine().driver_data<dec8_state>();
 	state->toggle ^= 1;
 	if (state->toggle)
 		device_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
@@ -404,20 +404,20 @@ static READ8_DEVICE_HANDLER( csilver_adpcm_reset_r )
 
 static WRITE8_HANDLER( csilver_adpcm_data_w )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 	state->msm5205next = data;
 }
 
 static WRITE8_HANDLER( csilver_sound_bank_w )
 {
-	memory_set_bank(space->machine, "bank3", (data & 0x08) >> 3);
+	memory_set_bank(space->machine(), "bank3", (data & 0x08) >> 3);
 }
 
 /******************************************************************************/
 
 static WRITE8_HANDLER( oscar_int_w )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 	/* Deal with interrupts, coins also generate NMI to CPU 0 */
 	switch (offset)
 	{
@@ -439,7 +439,7 @@ static WRITE8_HANDLER( oscar_int_w )
 /* Used by Shackled, Last Mission, Captain Silver */
 static WRITE8_HANDLER( shackled_int_w )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 #if 0
 /* This is correct, but the cpus in Shackled need an interleave of about 5000!
     With lower interleave CPU 0 misses an interrupt at the start of the game
@@ -482,16 +482,16 @@ static WRITE8_HANDLER( shackled_int_w )
 
 /******************************************************************************/
 
-static READ8_HANDLER( shackled_sprite_r ) { return space->machine->generic.spriteram.u8[offset]; }
-static WRITE8_HANDLER( shackled_sprite_w ) { space->machine->generic.spriteram.u8[offset] = data; }
-static WRITE8_HANDLER( flip_screen_w ) { flip_screen_set(space->machine, data); }
+static READ8_HANDLER( shackled_sprite_r ) { return space->machine().generic.spriteram.u8[offset]; }
+static WRITE8_HANDLER( shackled_sprite_w ) { space->machine().generic.spriteram.u8[offset] = data; }
+static WRITE8_HANDLER( flip_screen_w ) { flip_screen_set(space->machine(), data); }
 
 /******************************************************************************/
 
 static WRITE8_HANDLER( dec8_mxc06_buffer_spriteram_w)
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
-	UINT8* spriteram = space->machine->generic.spriteram.u8;
+	dec8_state *state = space->machine().driver_data<dec8_state>();
+	UINT8* spriteram = space->machine().generic.spriteram.u8;
 	// copy to a 16-bit region for the sprite chip
 	for (int i=0;i<0x800/2;i++)
 	{
@@ -842,7 +842,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( dec8_mcu_from_main_r )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 
 	switch (offset)
 	{
@@ -853,7 +853,7 @@ static READ8_HANDLER( dec8_mcu_from_main_r )
 		case 2:
 			return 0xff;
 		case 3:
-			return input_port_read(space->machine, "I8751");
+			return input_port_read(space->machine(), "I8751");
 	}
 
 	return 0xff; //compile safe.
@@ -861,7 +861,7 @@ static READ8_HANDLER( dec8_mcu_from_main_r )
 
 static WRITE8_HANDLER( dec8_mcu_to_main_w )
 {
-	dec8_state *state = space->machine->driver_data<dec8_state>();
+	dec8_state *state = space->machine().driver_data<dec8_state>();
 
 	// Outputs P0 and P1 are latched
 	if (offset==0) state->i8751_port0=data;
@@ -1898,7 +1898,7 @@ GFXDECODE_END
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler( device_t *device, int linestate )
 {
-	dec8_state *state = device->machine->driver_data<dec8_state>();
+	dec8_state *state = device->machine().driver_data<dec8_state>();
 	device_set_input_line(state->audiocpu, 0, linestate); /* M6502_IRQ_LINE */
 }
 
@@ -1922,7 +1922,7 @@ static const msm5205_interface msm5205_config =
 
 static INTERRUPT_GEN( gondo_interrupt )
 {
-	dec8_state *state = device->machine->driver_data<dec8_state>();
+	dec8_state *state = device->machine().driver_data<dec8_state>();
 	if (state->nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); /* VBL */
 }
@@ -1930,9 +1930,9 @@ static INTERRUPT_GEN( gondo_interrupt )
 /* Coins generate NMI's */
 static INTERRUPT_GEN( oscar_interrupt )
 {
-	dec8_state *state = device->machine->driver_data<dec8_state>();
-	if ((input_port_read(device->machine, "IN2") & 0x7) == 0x7) state->latch = 1;
-	if (state->latch && (input_port_read(device->machine, "IN2") & 0x7) != 0x7)
+	dec8_state *state = device->machine().driver_data<dec8_state>();
+	if ((input_port_read(device->machine(), "IN2") & 0x7) == 0x7) state->latch = 1;
+	if (state->latch && (input_port_read(device->machine(), "IN2") & 0x7) != 0x7)
 	{
 		state->latch = 0;
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
@@ -1944,12 +1944,12 @@ static INTERRUPT_GEN( oscar_interrupt )
 
 static MACHINE_START( dec8 )
 {
-	dec8_state *state = machine->driver_data<dec8_state>();
+	dec8_state *state = machine.driver_data<dec8_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->subcpu = machine->device("sub");
-	state->audiocpu = machine->device("audiocpu");
-	state->mcu = machine->device("mcu");
+	state->maincpu = machine.device("maincpu");
+	state->subcpu = machine.device("sub");
+	state->audiocpu = machine.device("audiocpu");
+	state->mcu = machine.device("mcu");
 
 	state->save_item(NAME(state->latch));
 	state->save_item(NAME(state->nmi_enable));
@@ -1970,7 +1970,7 @@ static MACHINE_START( dec8 )
 
 static MACHINE_RESET( dec8 )
 {
-	dec8_state *state = machine->driver_data<dec8_state>();
+	dec8_state *state = machine.driver_data<dec8_state>();
 	int i;
 
 	state->nmi_enable = state->i8751_port0 = state->i8751_port1 = 0;
@@ -3443,21 +3443,21 @@ ROM_END
 
 static DRIVER_INIT( dec8 )
 {
-	dec8_state *state = machine->driver_data<dec8_state>();
+	dec8_state *state = machine.driver_data<dec8_state>();
 	state->latch = 0;
 }
 
 /* Ghostbusters, Darwin, Oscar use a "Deco 222" custom 6502 for sound. */
 static DRIVER_INIT( deco222 )
 {
-	dec8_state *state = machine->driver_data<dec8_state>();
-	address_space *space = machine->device("audiocpu")->memory().space(AS_PROGRAM);
+	dec8_state *state = machine.driver_data<dec8_state>();
+	address_space *space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
 	int A;
 	UINT8 *decrypt;
 	UINT8 *rom;
 
 	/* bits 5 and 6 of the opcodes are swapped */
-	rom = machine->region("audiocpu")->base();
+	rom = machine.region("audiocpu")->base();
 	decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
 	space->set_decrypted_region(0x8000, 0xffff, decrypt);
@@ -3471,8 +3471,8 @@ static DRIVER_INIT( deco222 )
 /* Below, I set up the correct number of banks depending on the "maincpu" region size */
 static DRIVER_INIT( ghostb )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
-	UINT8 *RAM = machine->region("proms")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *RAM = machine.region("proms")->base();
 
 	/* Blank out unused garbage in colour prom to avoid colour overflow */
 	memset(RAM + 0x20, 0, 0xe0);
@@ -3483,8 +3483,8 @@ static DRIVER_INIT( ghostb )
 
 static DRIVER_INIT( meikyuh )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
-	UINT8 *RAM = machine->region("proms")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *RAM = machine.region("proms")->base();
 
 	/* Blank out unused garbage in colour prom to avoid colour overflow */
 	memset(RAM + 0x20, 0, 0xe0);
@@ -3495,36 +3495,36 @@ static DRIVER_INIT( meikyuh )
 
 static DRIVER_INIT( cobracom )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
 static DRIVER_INIT( oscar )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( deco222 );
 }
 
 static DRIVER_INIT( gondo )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
 static DRIVER_INIT( garyoret )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
 static DRIVER_INIT( csilver )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
-	UINT8 *RAM = machine->region("audiocpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *RAM = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 14, &ROM[0x10000], 0x4000);
 	memory_configure_bank(machine, "bank3", 0, 2, &RAM[0x10000], 0x4000);
@@ -3533,21 +3533,21 @@ static DRIVER_INIT( csilver )
 
 static DRIVER_INIT( shackled )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 14, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
 static DRIVER_INIT( lastmisn )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
 static DRIVER_INIT( srdarwin )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( deco222 );
 }

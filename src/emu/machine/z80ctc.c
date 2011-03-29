@@ -108,7 +108,7 @@ device_config *z80ctc_device_config::static_alloc_device_config(const machine_co
 
 device_t *z80ctc_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, z80ctc_device(machine, *this));
+	return auto_alloc(machine, z80ctc_device(machine, *this));
 }
 
 
@@ -336,7 +336,7 @@ void z80ctc_device::ctc_channel::start(z80ctc_device *device, int index, bool no
 	if (write_line != NULL)
 		devcb_resolve_write_line(&m_zc, write_line, m_device);
 	m_notimer = notimer;
-	m_timer = m_device->machine->scheduler().timer_alloc(FUNC(static_timer_callback), this);
+	m_timer = m_device->machine().scheduler().timer_alloc(FUNC(static_timer_callback), this);
 
 	// register for save states
     m_device->save_item(NAME(m_mode), m_index);

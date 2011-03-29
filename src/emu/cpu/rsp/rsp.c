@@ -207,7 +207,7 @@ static void set_cop0_reg(rsp_state *rsp, int reg, UINT32 data)
 
 static void unimplemented_opcode(rsp_state *rsp, UINT32 op)
 {
-	if ((rsp->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((rsp->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		char string[200];
 		rsp_dasm_one(string, rsp->ppc, op);
@@ -303,7 +303,7 @@ static CPU_INIT( rsp )
 #endif
 
 	// ...except for the accumulators.
-	// We're not calling machine->rand() because initializing something with machine->rand()
+	// We're not calling machine.rand() because initializing something with machine.rand()
 	//   makes me retch uncontrollably.
 	for(accumIdx = 0; accumIdx < 8; accumIdx++ )
 	{

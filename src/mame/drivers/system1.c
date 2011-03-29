@@ -341,16 +341,16 @@ static const UINT8 cc_ex[0x100] = {
 
 static MACHINE_START( system1 )
 {
-	system1_state *state = machine->driver_data<system1_state>();
-	UINT32 numbanks = (machine->region("maincpu")->bytes() - 0x10000) / 0x4000;
+	system1_state *state = machine.driver_data<system1_state>();
+	UINT32 numbanks = (machine.region("maincpu")->bytes() - 0x10000) / 0x4000;
 
 	if (numbanks > 0)
-		memory_configure_bank(machine, "bank1", 0, numbanks, machine->region("maincpu")->base() + 0x10000, 0x4000);
+		memory_configure_bank(machine, "bank1", 0, numbanks, machine.region("maincpu")->base() + 0x10000, 0x4000);
 	else
-		memory_configure_bank(machine, "bank1", 0, 1, machine->region("maincpu")->base() + 0x8000, 0);
+		memory_configure_bank(machine, "bank1", 0, 1, machine.region("maincpu")->base() + 0x8000, 0);
 	memory_set_bank(machine, "bank1", 0);
 
-	z80_set_cycle_tables(machine->device("maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
+	z80_set_cycle_tables(machine.device("maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
 
 	state->mute_xor = 0x00;
 
@@ -363,7 +363,7 @@ static MACHINE_START( system1 )
 
 static MACHINE_START( system2 )
 {
-	system1_state *state = machine->driver_data<system1_state>();
+	system1_state *state = machine.driver_data<system1_state>();
 	MACHINE_START_CALL(system1);
 	state->mute_xor = 0x01;
 }
@@ -371,7 +371,7 @@ static MACHINE_START( system2 )
 
 static MACHINE_RESET( system1 )
 {
-	system1_state *state = machine->driver_data<system1_state>();
+	system1_state *state = machine.driver_data<system1_state>();
 	state->dakkochn_mux_data = 0;
 }
 
@@ -383,14 +383,14 @@ static MACHINE_RESET( system1 )
  *
  *************************************/
 
-static void bank44_custom_w(running_machine *machine, UINT8 data, UINT8 prevdata)
+static void bank44_custom_w(running_machine &machine, UINT8 data, UINT8 prevdata)
 {
 	/* bank bits are bits 6 and 2 */
 	memory_set_bank(machine, "bank1", ((data & 0x40) >> 5) | ((data & 0x04) >> 2));
 }
 
 
-static void bank0c_custom_w(running_machine *machine, UINT8 data, UINT8 prevdata)
+static void bank0c_custom_w(running_machine &machine, UINT8 data, UINT8 prevdata)
 {
 	/* bank bits are bits 3 and 2 */
 	memory_set_bank(machine, "bank1", (data & 0x0c) >> 2);
@@ -399,8 +399,8 @@ static void bank0c_custom_w(running_machine *machine, UINT8 data, UINT8 prevdata
 
 static WRITE8_HANDLER( videomode_w )
 {
-	system1_state *state = space->machine->driver_data<system1_state>();
-	device_t *i8751 = space->machine->device("mcu");
+	system1_state *state = space->machine().driver_data<system1_state>();
+	device_t *i8751 = space->machine().device("mcu");
 
 	/* bit 6 is connected to the 8751 IRQ */
 	if (i8751 != NULL)
@@ -408,11 +408,11 @@ static WRITE8_HANDLER( videomode_w )
 
 	/* handle any custom banking or other stuff */
 	if (state->videomode_custom != NULL)
-		(*state->videomode_custom)(space->machine, data, state->videomode_prev);
+		(*state->videomode_custom)(space->machine(), data, state->videomode_prev);
 	state->videomode_prev = data;
 
 	/* bit 0 is for the coin counters */
-	coin_counter_w(space->machine, 0, data & 1);
+	coin_counter_w(space->machine(), 0, data & 1);
 
 	/* remaining signals are video-related */
 	system1_videomode_w(space, 0, data);
@@ -428,23 +428,23 @@ static WRITE8_HANDLER( videomode_w )
 
 static CUSTOM_INPUT( dakkochn_mux_data_r )
 {
-	system1_state *state = field->port->machine->driver_data<system1_state>();
+	system1_state *state = field->port->machine().driver_data<system1_state>();
 	static const char *const ports[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6" };
-	return input_port_read(field->port->machine, ports[state->dakkochn_mux_data]);
+	return input_port_read(field->port->machine(), ports[state->dakkochn_mux_data]);
 }
 
 
 static CUSTOM_INPUT( dakkochn_mux_status_r )
 {
-	system1_state *state = field->port->machine->driver_data<system1_state>();
+	system1_state *state = field->port->machine().driver_data<system1_state>();
 	/* reads from here indicate which mux port is selected */
 	return 1 << (state->dakkochn_mux_data);
 }
 
 
-static void dakkochn_custom_w(running_machine *machine, UINT8 data, UINT8 prevdata)
+static void dakkochn_custom_w(running_machine &machine, UINT8 data, UINT8 prevdata)
 {
-	system1_state *state = machine->driver_data<system1_state>();
+	system1_state *state = machine.driver_data<system1_state>();
 	/* bit 1 toggling on clocks the mux; we store the previous state in the high bit of dakkochn_mux_data */
 	if ((data & 0x02) && !(prevdata & 0x02))
 		state->dakkochn_mux_data = (state->dakkochn_mux_data + 1) % 7;
@@ -463,14 +463,14 @@ static void dakkochn_custom_w(running_machine *machine, UINT8 data, UINT8 prevda
 
 static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
-	system1_state *state = device->machine->driver_data<system1_state>();
+	system1_state *state = device->machine().driver_data<system1_state>();
 	/* bit 0 = MUTE (inverted sense on System 2) */
-	device->machine->sound().system_mute((data ^ state->mute_xor) & 1);
+	device->machine().sound().system_mute((data ^ state->mute_xor) & 1);
 
 	/* bit 6 = feedback from sound board that read occurrred */
 
 	/* bit 7 controls the sound CPU's NMI line */
-	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine(), "soundcpu", INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* remaining bits are used for video RAM banking */
 	system1_videoram_bank_w(device, offset, data);
@@ -479,8 +479,8 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	ppi8255_device *ppi = space->machine->device<ppi8255_device>("ppi");
-	z80pio_device *pio = space->machine->device<z80pio_device>("pio");
+	ppi8255_device *ppi = space->machine().device<ppi8255_device>("ppi");
+	z80pio_device *pio = space->machine().device<z80pio_device>("pio");
 
 	/* if we have an 8255 PPI, get the data from the port and toggle the ack */
 	if (ppi != NULL)
@@ -508,14 +508,14 @@ static WRITE8_HANDLER( soundport_w )
 {
 	/* boost interleave when communicating with the sound CPU */
 	soundlatch_w(space, 0, data);
-	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 
 static TIMER_DEVICE_CALLBACK( soundirq_gen )
 {
 	/* sound IRQ is generated on 32V, 96V, ... and auto-acknowledged */
-	cputag_set_input_line(timer.machine, "soundcpu", 0, HOLD_LINE);
+	cputag_set_input_line(timer.machine(), "soundcpu", 0, HOLD_LINE);
 }
 
 
@@ -528,7 +528,7 @@ static TIMER_DEVICE_CALLBACK( soundirq_gen )
 
 static WRITE8_HANDLER( mcu_control_w )
 {
-	system1_state *state = space->machine->driver_data<system1_state>();
+	system1_state *state = space->machine().driver_data<system1_state>();
 	/*
         Bit 7 -> connects to TD62003 pins 5 & 6 @ IC151
         Bit 6 -> via PLS153, when high, asserts the BUSREQ signal, halting the Z80
@@ -540,22 +540,22 @@ static WRITE8_HANDLER( mcu_control_w )
         Bit 0 -> Directly connected to Z80 /INT line
     */
 	state->mcu_control = data;
-	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(space->machine, "maincpu", 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( mcu_io_w )
 {
-	system1_state *state = space->machine->driver_data<system1_state>();
+	system1_state *state = space->machine().driver_data<system1_state>();
 	switch ((state->mcu_control >> 3) & 3)
 	{
 		case 0:
-			space->machine->device<z80_device>("maincpu")->space(AS_PROGRAM)->write_byte(offset, data);
+			space->machine().device<z80_device>("maincpu")->space(AS_PROGRAM)->write_byte(offset, data);
 			break;
 
 		case 2:
-			space->machine->device<z80_device>("maincpu")->space(AS_IO)->write_byte(offset, data);
+			space->machine().device<z80_device>("maincpu")->space(AS_IO)->write_byte(offset, data);
 			break;
 
 		default:
@@ -568,17 +568,17 @@ static WRITE8_HANDLER( mcu_io_w )
 
 static READ8_HANDLER( mcu_io_r )
 {
-	system1_state *state = space->machine->driver_data<system1_state>();
+	system1_state *state = space->machine().driver_data<system1_state>();
 	switch ((state->mcu_control >> 3) & 3)
 	{
 		case 0:
-			return space->machine->device<z80_device>("maincpu")->space(AS_PROGRAM)->read_byte(offset);
+			return space->machine().device<z80_device>("maincpu")->space(AS_PROGRAM)->read_byte(offset);
 
 		case 1:
-			return space->machine->region("maincpu")->base()[offset + 0x10000];
+			return space->machine().region("maincpu")->base()[offset + 0x10000];
 
 		case 2:
-			return space->machine->device<z80_device>("maincpu")->space(AS_IO)->read_byte(offset);
+			return space->machine().device<z80_device>("maincpu")->space(AS_IO)->read_byte(offset);
 
 		default:
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",
@@ -595,7 +595,7 @@ static INTERRUPT_GEN( mcu_irq_assert )
 	device_set_input_line(device, MCS51_INT0_LINE, CLEAR_LINE);
 
 	/* boost interleave to ensure that the MCU can break the Z80 out of a HALT */
-	device->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+	device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
 
@@ -605,7 +605,7 @@ static TIMER_DEVICE_CALLBACK( mcu_t0_callback )
        enough, the MCU will fail; on shtngmst this happens after 3
        VBLANKs without a tick */
 
-	device_t *mcu = timer.machine->device("mcu");
+	device_t *mcu = timer.machine().device("mcu");
 	device_set_input_line(mcu, MCS51_T0_LINE, ASSERT_LINE);
 	device_set_input_line(mcu, MCS51_T0_LINE, CLEAR_LINE);
 }
@@ -620,7 +620,7 @@ static TIMER_DEVICE_CALLBACK( mcu_t0_callback )
 
 static WRITE8_HANDLER( nob_mcu_control_p2_w )
 {
-	system1_state *state = space->machine->driver_data<system1_state>();
+	system1_state *state = space->machine().driver_data<system1_state>();
 	/* bit 0 triggers a read from MCU port 0 */
 	if (((state->mcu_control ^ data) & 0x01) && !(data & 0x01))
 		*state->nob_mcu_latch = state->nob_maincpu_latch;
@@ -645,23 +645,23 @@ static WRITE8_HANDLER( nob_mcu_control_p2_w )
 
 static READ8_HANDLER( nob_maincpu_latch_r )
 {
-	system1_state *state = space->machine->driver_data<system1_state>();
+	system1_state *state = space->machine().driver_data<system1_state>();
 	return state->nob_maincpu_latch;
 }
 
 
 static WRITE8_HANDLER( nob_maincpu_latch_w )
 {
-	system1_state *state = space->machine->driver_data<system1_state>();
+	system1_state *state = space->machine().driver_data<system1_state>();
 	state->nob_maincpu_latch = data;
-	cputag_set_input_line(space->machine, "mcu", MCS51_INT0_LINE, ASSERT_LINE);
-	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	cputag_set_input_line(space->machine(), "mcu", MCS51_INT0_LINE, ASSERT_LINE);
+	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 
 static READ8_HANDLER( nob_mcu_status_r )
 {
-	system1_state *state = space->machine->driver_data<system1_state>();
+	system1_state *state = space->machine().driver_data<system1_state>();
 	return *state->nob_mcu_status;
 }
 
@@ -689,14 +689,14 @@ static READ8_HANDLER( nobb_inport22_r )
 
 static READ8_HANDLER( nobb_inport23_r )
 {
-	system1_state *state = space->machine->driver_data<system1_state>();
+	system1_state *state = space->machine().driver_data<system1_state>();
 //  logerror("IN  $23 : pc = %04x - step = %02x\n",cpu_get_pc(space->cpu),state->nobb_inport23_step);
 	return(state->nobb_inport23_step);
 }
 
 static WRITE8_HANDLER( nobb_outport24_w )
 {
-	system1_state *state = space->machine->driver_data<system1_state>();
+	system1_state *state = space->machine().driver_data<system1_state>();
 //  logerror("OUT $24 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),data);
 	state->nobb_inport23_step = data;
 }
@@ -4496,18 +4496,18 @@ ROM_END
 
 static DRIVER_INIT( bank00 )
 {
-	system1_state *state = machine->driver_data<system1_state>();
+	system1_state *state = machine.driver_data<system1_state>();
 	state->videomode_custom = NULL;
 }
 static DRIVER_INIT( bank44 )
 {
-	system1_state *state = machine->driver_data<system1_state>();
+	system1_state *state = machine.driver_data<system1_state>();
 	state->videomode_custom = bank44_custom_w;
 }
 
 static DRIVER_INIT( bank0c )
 {
-	system1_state *state = machine->driver_data<system1_state>();
+	system1_state *state = machine.driver_data<system1_state>();
 	state->videomode_custom = bank0c_custom_w;
 }
 
@@ -4541,16 +4541,16 @@ static DRIVER_INIT( wboysys2 )	{ DRIVER_INIT_CALL(bank0c); sega_315_5177_decode(
 
 static DRIVER_INIT( dakkochn )
 {
-	system1_state *state = machine->driver_data<system1_state>();
+	system1_state *state = machine.driver_data<system1_state>();
 	state->videomode_custom = dakkochn_custom_w;
 
 	mc8123_decrypt_rom(machine, "maincpu", "key", "bank1", 4);
 
-//  machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(dakkochn_port_00_r));
-//  machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x03, 0x03, FUNC(dakkochn_port_03_r));
-//  machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x04, 0x04, FUNC(dakkochn_port_04_r));
+//  machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(dakkochn_port_00_r));
+//  machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x03, 0x03, FUNC(dakkochn_port_03_r));
+//  machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x04, 0x04, FUNC(dakkochn_port_04_r));
 
-//  machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x15, 0x15, FUNC(dakkochn_port_15_w));
+//  machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x15, 0x15, FUNC(dakkochn_port_15_w));
 }
 
 
@@ -4563,12 +4563,12 @@ static DRIVER_INIT( myherok )
 
 	/* additionally to the usual protection, all the program ROMs have data lines */
 	/* D0 and D1 swapped. */
-	rom = machine->region("maincpu")->base();
+	rom = machine.region("maincpu")->base();
 	for (A = 0;A < 0xc000;A++)
 		rom[A] = (rom[A] & 0xfc) | ((rom[A] & 1) << 1) | ((rom[A] & 2) >> 1);
 
 	/* the tile gfx ROMs are mangled as well: */
-	rom = machine->region("tiles")->base();
+	rom = machine.region("tiles")->base();
 
 	/* the first ROM has data lines D0 and D6 swapped. */
 	for (A = 0x0000;A < 0x4000;A++)
@@ -4603,13 +4603,13 @@ static DRIVER_INIT( myherok )
 static READ8_HANDLER( nob_start_r )
 {
 	/* in reality, it's likely some M1-dependent behavior */
-	return (cpu_get_pc(space->cpu) <= 0x0003) ? 0x80 : space->machine->region("maincpu")->base()[1];
+	return (cpu_get_pc(space->cpu) <= 0x0003) ? 0x80 : space->machine().region("maincpu")->base()[1];
 }
 
 static DRIVER_INIT( nob )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
 
 	DRIVER_INIT_CALL(bank44);
 
@@ -4628,7 +4628,7 @@ static DRIVER_INIT( nobb )
 	/* Patch to get PRG ROMS ('T', 'R' and 'S) status as "GOOD" in the "test mode" */
 	/* not really needed */
 
-//  UINT8 *ROM = machine->region("maincpu")->base();
+//  UINT8 *ROM = machine.region("maincpu")->base();
 
 //  ROM[0x3296] = 0x18;     // 'jr' instead of 'jr z' - 'T' (PRG Main ROM)
 //  ROM[0x32be] = 0x18;     // 'jr' instead of 'jr z' - 'R' (Banked ROM 1)
@@ -4640,8 +4640,8 @@ static DRIVER_INIT( nobb )
 //  ROM[0x10000 + 0 * 0x8000 + 0x3347] = 0x18;  // 'jr' instead of 'jr z'
 
 	/* Patch to get sound in later levels(the program enters into a tight loop)*/
-	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
-	UINT8 *ROM2 = machine->region("soundcpu")->base();
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
+	UINT8 *ROM2 = machine.region("soundcpu")->base();
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
 
@@ -4656,23 +4656,23 @@ static DRIVER_INIT( nobb )
 
 static DRIVER_INIT( bootleg )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x10000);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	space->set_decrypted_region(0x0000, 0x7fff, machine.region("maincpu")->base() + 0x10000);
 	DRIVER_INIT_CALL(bank00);
 }
 
 
 static DRIVER_INIT( bootsys2 )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x20000);
-	memory_configure_bank_decrypted(machine, "bank1", 0, 4, machine->region("maincpu")->base() + 0x30000, 0x4000);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	space->set_decrypted_region(0x0000, 0x7fff, machine.region("maincpu")->base() + 0x20000);
+	memory_configure_bank_decrypted(machine, "bank1", 0, 4, machine.region("maincpu")->base() + 0x30000, 0x4000);
 	DRIVER_INIT_CALL(bank0c);
 }
 
 static DRIVER_INIT( choplift )
 {
-	UINT8 *mcurom = machine->region("mcu")->base();
+	UINT8 *mcurom = machine.region("mcu")->base();
 
 	/* the ROM dump we have is bad; the following patches make it work */
 	mcurom[0x100] = 0x55;		/* D5 in current dump */
@@ -4684,7 +4684,7 @@ static DRIVER_INIT( choplift )
 
 static DRIVER_INIT( shtngmst )
 {
-	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
 	iospace->install_read_port(0x12, 0x12, 0x00, 0x00, "TRIGGER");
 	iospace->install_read_port(0x18, 0x18, 0x00, 0x03, "18");
 	iospace->install_read_port(0x1c, 0x1c, 0x00, 0x02, "GUNX");

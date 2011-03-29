@@ -22,11 +22,11 @@
 
 ***************************************************************************/
 
-static void get_pens( running_machine *machine, pen_t *pens )
+static void get_pens( running_machine &machine, pen_t *pens )
 {
 	offs_t i;
-	const UINT8 *prom = machine->region("proms")->base();
-	int len = machine->region("proms")->bytes();
+	const UINT8 *prom = machine.region("proms")->base();
+	int len = machine.region("proms")->bytes();
 
 	for (i = 0; i < len; i++)
 	{
@@ -55,7 +55,7 @@ static void get_pens( running_machine *machine, pen_t *pens )
 
 WRITE8_HANDLER( epos_port_1_w )
 {
-	epos_state *state = space->machine->driver_data<epos_state>();
+	epos_state *state = space->machine().driver_data<epos_state>();
 	/* D0 - start light #1
        D1 - start light #2
        D2 - coin counter
@@ -63,10 +63,10 @@ WRITE8_HANDLER( epos_port_1_w )
        D4-D7 - unused
      */
 
-	set_led_status(space->machine, 0, (data >> 0) & 0x01);
-	set_led_status(space->machine, 1, (data >> 1) & 0x01);
+	set_led_status(space->machine(), 0, (data >> 0) & 0x01);
+	set_led_status(space->machine(), 1, (data >> 1) & 0x01);
 
-	coin_counter_w(space->machine, 0, (data >> 2) & 0x01);
+	coin_counter_w(space->machine(), 0, (data >> 2) & 0x01);
 
 	state->palette = (data >> 3) & 0x01;
 }
@@ -74,11 +74,11 @@ WRITE8_HANDLER( epos_port_1_w )
 
 SCREEN_UPDATE( epos )
 {
-	epos_state *state = screen->machine->driver_data<epos_state>();
+	epos_state *state = screen->machine().driver_data<epos_state>();
 	pen_t pens[0x20];
 	offs_t offs;
 
-	get_pens(screen->machine, pens);
+	get_pens(screen->machine(), pens);
 
 	for (offs = 0; offs < state->videoram_size; offs++)
 	{

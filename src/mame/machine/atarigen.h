@@ -60,7 +60,7 @@
     TYPES & STRUCTURES
 ***************************************************************************/
 
-typedef void (*atarigen_int_func)(running_machine *machine);
+typedef void (*atarigen_int_func)(running_machine &machine);
 
 typedef void (*atarigen_scanline_func)(screen_device &screen, int scanline);
 
@@ -190,7 +190,7 @@ public:
     OVERALL INIT
 ---------------------------------------------------------------*/
 
-void atarigen_init(running_machine *machine);
+void atarigen_init(running_machine &machine);
 
 
 /*---------------------------------------------------------------
@@ -198,7 +198,7 @@ void atarigen_init(running_machine *machine);
 ---------------------------------------------------------------*/
 
 void atarigen_interrupt_reset(atarigen_state *state, atarigen_int_func update_int);
-void atarigen_update_interrupts(running_machine *machine);
+void atarigen_update_interrupts(running_machine &machine);
 
 void atarigen_scanline_int_set(screen_device &screen, int scanline);
 INTERRUPT_GEN( atarigen_scanline_int_gen );
@@ -261,7 +261,7 @@ READ16_HANDLER( atarigen_sound_upper_r );
 WRITE32_HANDLER( atarigen_sound_upper32_w );
 READ32_HANDLER( atarigen_sound_upper32_r );
 
-void atarigen_sound_reset(running_machine *machine);
+void atarigen_sound_reset(running_machine &machine);
 WRITE16_HANDLER( atarigen_sound_reset_w );
 WRITE8_HANDLER( atarigen_6502_sound_w );
 READ8_HANDLER( atarigen_6502_sound_r );
@@ -271,11 +271,11 @@ READ8_HANDLER( atarigen_6502_sound_r );
     SOUND HELPERS
 ---------------------------------------------------------------*/
 
-void atarigen_set_ym2151_vol(running_machine *machine, int volume);
-void atarigen_set_ym2413_vol(running_machine *machine, int volume);
-void atarigen_set_pokey_vol(running_machine *machine, int volume);
-void atarigen_set_tms5220_vol(running_machine *machine, int volume);
-void atarigen_set_oki6295_vol(running_machine *machine, int volume);
+void atarigen_set_ym2151_vol(running_machine &machine, int volume);
+void atarigen_set_ym2413_vol(running_machine &machine, int volume);
+void atarigen_set_pokey_vol(running_machine &machine, int volume);
+void atarigen_set_tms5220_vol(running_machine &machine, int volume);
+void atarigen_set_oki6295_vol(running_machine &machine, int volume);
 
 
 /*---------------------------------------------------------------
@@ -331,7 +331,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w );
 ---------------------------------------------------------------*/
 
 void atarigen_swap_mem(void *ptr1, void *ptr2, int bytes);
-void atarigen_blend_gfx(running_machine *machine, int gfx0, int gfx1, int mask0, int mask1);
+void atarigen_blend_gfx(running_machine &machine, int gfx0, int gfx1, int mask0, int mask1);
 
 
 

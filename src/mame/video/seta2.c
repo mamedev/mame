@@ -124,7 +124,7 @@ WRITE16_HANDLER( seta2_vregs_w )
                grdians =  019a
     */
 
-	seta2_state *state = space->machine->driver_data<seta2_state>();
+	seta2_state *state = space->machine().driver_data<seta2_state>();
 	UINT16 olddata = state->vregs[offset];
 
 	COMBINE_DATA(&state->vregs[offset]);
@@ -134,15 +134,15 @@ WRITE16_HANDLER( seta2_vregs_w )
 	switch( offset*2 )
 	{
 	case 0x1c:	// FLIP SCREEN (myangel)    <- this is actually zoom
-		flip_screen_set(space->machine,  data & 1 );
+		flip_screen_set(space->machine(),  data & 1 );
 		if (data & ~1)	logerror("CPU #0 PC %06X: flip screen unknown bits %04X\n",cpu_get_pc(space->cpu),data);
 		break;
 	case 0x2a:	// FLIP X (pzlbowl)
-		flip_screen_x_set(space->machine,  data & 1 );
+		flip_screen_x_set(space->machine(),  data & 1 );
 		if (data & ~1)	logerror("CPU #0 PC %06X: flipx unknown bits %04X\n",cpu_get_pc(space->cpu),data);
 		break;
 	case 0x2c:	// FLIP Y (pzlbowl)
-		flip_screen_y_set(space->machine,  data & 1 );
+		flip_screen_y_set(space->machine(),  data & 1 );
 		if (data & ~1)	logerror("CPU #0 PC %06X: flipy unknown bits %04X\n",cpu_get_pc(space->cpu),data);
 		break;
 
@@ -212,11 +212,11 @@ static void seta_drawgfx(	bitmap_t *bitmap, const rectangle *cliprect, const gfx
 	}
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	// Sprites list
 
-	seta2_state *state = machine->driver_data<seta2_state>();
+	seta2_state *state = machine.driver_data<seta2_state>();
 	// When debugging, use state->spriteram here, and run mame -update_in_pause
 	UINT16 *buffered_spriteram16 = state->buffered_spriteram;
 	UINT16 *s1  = buffered_spriteram16 + 0x3000/2;
@@ -250,37 +250,37 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			default:
 				popmessage("unknown gfxset %x",(num & 0x0700)>>8);
 				shadow_depth = 0;
-				gfx = machine->gfx[machine->rand()&3];
+				gfx = machine.gfx[machine.rand()&3];
 				break;
 			case 0x0700:			// 8bpp tiles (76543210)
 				shadow_depth = 8;	// ?
-				gfx = machine->gfx[3];
+				gfx = machine.gfx[3];
 				break;
 			case 0x0600:			// 6bpp tiles (--543210) (myangel sliding blocks test)
 				shadow_depth = 6;	// ?
-				gfx = machine->gfx[2];
+				gfx = machine.gfx[2];
 				break;
 			case 0x0500:			// 4bpp tiles (3210----)
 				shadow_depth = 4;	// ?
-				gfx = machine->gfx[1];
+				gfx = machine.gfx[1];
 				break;
 			case 0x0400:			// 4bpp tiles (----3210)
 				shadow_depth = 3;	// reelquak
-				gfx = machine->gfx[0];
+				gfx = machine.gfx[0];
 				break;
 //          case 0x0300:
 //              unknown
 			case 0x0200:			// 3bpp tiles?  (-----210) (myangel "Graduate Tests")
 				shadow_depth = 3;	// ?
-				gfx = machine->gfx[4];
+				gfx = machine.gfx[4];
 				break;
 			case 0x0100:			// 2bpp tiles??? (--10----) (myangel2 question bubble, myangel endgame)
 				shadow_depth = 2;	// myangel2
-				gfx = machine->gfx[5];
+				gfx = machine.gfx[5];
 				break;
 			case 0x0000:			// no idea!
 				shadow_depth = 4;	// ?
-				gfx = machine->gfx[0];
+				gfx = machine.gfx[0];
 				break;
 		}
 		if (!use_shadow)
@@ -444,12 +444,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_START( seta2 )
 {
-	seta2_state *state = machine->driver_data<seta2_state>();
+	seta2_state *state = machine.driver_data<seta2_state>();
 
-	machine->gfx[2]->color_granularity = 16;
-	machine->gfx[3]->color_granularity = 16;
-	machine->gfx[4]->color_granularity = 16;
-	machine->gfx[5]->color_granularity = 16;
+	machine.gfx[2]->color_granularity = 16;
+	machine.gfx[3]->color_granularity = 16;
+	machine.gfx[4]->color_granularity = 16;
+	machine.gfx[5]->color_granularity = 16;
 
 	state->buffered_spriteram = auto_alloc_array(machine, UINT16, state->spriteram_size/2);
 
@@ -461,7 +461,7 @@ VIDEO_START( seta2 )
 
 VIDEO_START( seta2_xoffset )
 {
-	seta2_state *state = machine->driver_data<seta2_state>();
+	seta2_state *state = machine.driver_data<seta2_state>();
 
 	VIDEO_START_CALL(seta2);
 
@@ -470,7 +470,7 @@ VIDEO_START( seta2_xoffset )
 
 VIDEO_START( seta2_yoffset )
 {
-	seta2_state *state = machine->driver_data<seta2_state>();
+	seta2_state *state = machine.driver_data<seta2_state>();
 
 	VIDEO_START_CALL(seta2);
 
@@ -479,20 +479,20 @@ VIDEO_START( seta2_yoffset )
 
 SCREEN_UPDATE( seta2 )
 {
-	seta2_state *state = screen->machine->driver_data<seta2_state>();
+	seta2_state *state = screen->machine().driver_data<seta2_state>();
 
 	// Black or pen 0?
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
+	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
 
 	if ( (state->vregs[0x30/2] & 1) == 0 )	// 1 = BLANK SCREEN
-		draw_sprites(screen->machine, bitmap, cliprect);
+		draw_sprites(screen->machine(), bitmap, cliprect);
 
 	return 0;
 }
 
 SCREEN_EOF( seta2 )
 {
-	seta2_state *state = machine->driver_data<seta2_state>();
+	seta2_state *state = machine.driver_data<seta2_state>();
 
 	// Buffer sprites by 1 frame
 	memcpy(state->buffered_spriteram, state->spriteram, state->spriteram_size);

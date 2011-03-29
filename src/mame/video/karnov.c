@@ -39,7 +39,7 @@ PALETTE_INIT( karnov )
 {
 	int i;
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -53,10 +53,10 @@ PALETTE_INIT( karnov )
 		bit2 = (color_prom[0] >> 6) & 0x01;
 		bit3 = (color_prom[0] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[machine->total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[machine->total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[machine->total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[machine->total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[machine.total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[machine.total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[machine.total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[machine.total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
@@ -64,16 +64,16 @@ PALETTE_INIT( karnov )
 	}
 }
 
-void karnov_flipscreen_w( running_machine *machine, int data )
+void karnov_flipscreen_w( running_machine &machine, int data )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
+	karnov_state *state = machine.driver_data<karnov_state>();
 	state->flipscreen = data;
 	tilemap_set_flip_all(machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
-static void draw_background( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
+	karnov_state *state = machine.driver_data<karnov_state>();
 	int my, mx, offs, color, tile, fx, fy;
 	int scrollx = state->scroll[0];
 	int scrolly = state->scroll[1];
@@ -99,10 +99,10 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 		color = tile >> 12;
 		tile = tile & 0x7ff;
 		if (state->flipscreen)
-			drawgfx_opaque(state->bitmap_f, 0, machine->gfx[1],tile,
+			drawgfx_opaque(state->bitmap_f, 0, machine.gfx[1],tile,
 				color, fx, fy, 496-16*mx,496-16*my);
 		else
-			drawgfx_opaque(state->bitmap_f, 0, machine->gfx[1],tile,
+			drawgfx_opaque(state->bitmap_f, 0, machine.gfx[1],tile,
 				color, fx, fy, 16*mx,16*my);
 	}
 
@@ -120,10 +120,10 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 	copyscrollbitmap(bitmap, state->bitmap_f, 1, &scrollx, 1, &scrolly, cliprect);
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
-	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
+	karnov_state *state = machine.driver_data<karnov_state>();
+	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
 	int offs;
 
 	for (offs = 0; offs <0x800; offs += 4)
@@ -171,13 +171,13 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		else
 			sprite2 = sprite + 1;
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 				sprite,
 				colour,fx,fy,x,y,0);
 
     	/* 1 more sprite drawn underneath */
     	if (extra)
-    		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+    		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 				sprite2,
 				colour,fx,fy,x,y+16,0);
 	}
@@ -187,9 +187,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( karnov )
 {
-	karnov_state *state = screen->machine->driver_data<karnov_state>();
-	draw_background(screen->machine, bitmap, cliprect);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	karnov_state *state = screen->machine().driver_data<karnov_state>();
+	draw_background(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
 	return 0;
 }
@@ -198,7 +198,7 @@ SCREEN_UPDATE( karnov )
 
 static TILE_GET_INFO( get_fix_tile_info )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
+	karnov_state *state = machine.driver_data<karnov_state>();
 	int tile = state->videoram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -209,14 +209,14 @@ static TILE_GET_INFO( get_fix_tile_info )
 
 WRITE16_HANDLER( karnov_videoram_w )
 {
-	karnov_state *state = space->machine->driver_data<karnov_state>();
+	karnov_state *state = space->machine().driver_data<karnov_state>();
 	COMBINE_DATA(&state->videoram[offset]);
 	tilemap_mark_tile_dirty(state->fix_tilemap, offset);
 }
 
 WRITE16_HANDLER( karnov_playfield_swap_w )
 {
-	karnov_state *state = space->machine->driver_data<karnov_state>();
+	karnov_state *state = space->machine().driver_data<karnov_state>();
 	offset = ((offset & 0x1f) << 5) | ((offset & 0x3e0) >> 5);
 	COMBINE_DATA(&state->pf_data[offset]);
 }
@@ -225,10 +225,10 @@ WRITE16_HANDLER( karnov_playfield_swap_w )
 
 VIDEO_START( karnov )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
+	karnov_state *state = machine.driver_data<karnov_state>();
 
 	/* Allocate bitmap & tilemap */
-	state->bitmap_f = auto_bitmap_alloc(machine, 512, 512, machine->primary_screen->format());
+	state->bitmap_f = auto_bitmap_alloc(machine, 512, 512, machine.primary_screen->format());
 	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	state->save_item(NAME(*state->bitmap_f));
@@ -238,10 +238,10 @@ VIDEO_START( karnov )
 
 VIDEO_START( wndrplnt )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
+	karnov_state *state = machine.driver_data<karnov_state>();
 
 	/* Allocate bitmap & tilemap */
-	state->bitmap_f = auto_bitmap_alloc(machine, 512, 512, machine->primary_screen->format());
+	state->bitmap_f = auto_bitmap_alloc(machine, 512, 512, machine.primary_screen->format());
 	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
 	state->save_item(NAME(*state->bitmap_f));

@@ -85,12 +85,12 @@ static int texel_width;
 static void exit_handler(running_machine &machine);
 
 static void zeus_pointer_w(UINT32 which, UINT32 data, int logit);
-static void zeus_register16_w(running_machine *machine, offs_t offset, UINT16 data, int logit);
-static void zeus_register32_w(running_machine *machine, offs_t offset, UINT32 data, int logit);
-static void zeus_register_update(running_machine *machine, offs_t offset);
-static int zeus_fifo_process(running_machine *machine, const UINT32 *data, int numwords);
-static void zeus_draw_model(running_machine *machine, UINT32 texdata, int logit);
-static void zeus_draw_quad(running_machine *machine, const UINT32 *databuffer, UINT32 texdata, int logit);
+static void zeus_register16_w(running_machine &machine, offs_t offset, UINT16 data, int logit);
+static void zeus_register32_w(running_machine &machine, offs_t offset, UINT32 data, int logit);
+static void zeus_register_update(running_machine &machine, offs_t offset);
+static int zeus_fifo_process(running_machine &machine, const UINT32 *data, int numwords);
+static void zeus_draw_model(running_machine &machine, UINT32 texdata, int logit);
+static void zeus_draw_quad(running_machine &machine, const UINT32 *databuffer, UINT32 texdata, int logit);
 
 static void render_poly_4bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
 static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
@@ -259,7 +259,7 @@ VIDEO_START( midzeus )
 	poly = poly_alloc(machine, 10000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 
 	/* we need to cleanup on exit */
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, exit_handler);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, exit_handler);
 
 	yoffs = 0;
 	texel_width = 256;
@@ -317,7 +317,7 @@ SCREEN_UPDATE( midzeus )
 	poly_wait(poly, "VIDEO_UPDATE");
 
 	/* normal update case */
-	if (!input_code_pressed(screen->machine, KEYCODE_W))
+	if (!input_code_pressed(screen->machine(), KEYCODE_W))
 	{
 		const void *base = waveram1_ptr_from_expanded_addr(zeusbase[0xcc]);
 		int xoffs = screen->visible_area().min_x;
@@ -334,10 +334,10 @@ SCREEN_UPDATE( midzeus )
 	{
 		const void *base;
 
-		if (input_code_pressed(screen->machine, KEYCODE_DOWN)) yoffs += input_code_pressed(screen->machine, KEYCODE_LSHIFT) ? 0x40 : 1;
-		if (input_code_pressed(screen->machine, KEYCODE_UP)) yoffs -= input_code_pressed(screen->machine, KEYCODE_LSHIFT) ? 0x40 : 1;
-		if (input_code_pressed(screen->machine, KEYCODE_LEFT) && texel_width > 4) { texel_width >>= 1; while (input_code_pressed(screen->machine, KEYCODE_LEFT)) ; }
-		if (input_code_pressed(screen->machine, KEYCODE_RIGHT) && texel_width < 512) { texel_width <<= 1; while (input_code_pressed(screen->machine, KEYCODE_RIGHT)) ; }
+		if (input_code_pressed(screen->machine(), KEYCODE_DOWN)) yoffs += input_code_pressed(screen->machine(), KEYCODE_LSHIFT) ? 0x40 : 1;
+		if (input_code_pressed(screen->machine(), KEYCODE_UP)) yoffs -= input_code_pressed(screen->machine(), KEYCODE_LSHIFT) ? 0x40 : 1;
+		if (input_code_pressed(screen->machine(), KEYCODE_LEFT) && texel_width > 4) { texel_width >>= 1; while (input_code_pressed(screen->machine(), KEYCODE_LEFT)) ; }
+		if (input_code_pressed(screen->machine(), KEYCODE_RIGHT) && texel_width < 512) { texel_width <<= 1; while (input_code_pressed(screen->machine(), KEYCODE_RIGHT)) ; }
 
 		if (yoffs < 0) yoffs = 0;
 		base = waveram0_ptr_from_block_addr(yoffs << 12);
@@ -373,18 +373,18 @@ READ32_HANDLER( zeus_r )
 	switch (offset & ~1)
 	{
 		case 0xf0:
-			result = space->machine->primary_screen->hpos();
+			result = space->machine().primary_screen->hpos();
 			logit = 0;
 			break;
 
 		case 0xf2:
-			result = space->machine->primary_screen->vpos();
+			result = space->machine().primary_screen->vpos();
 			logit = 0;
 			break;
 
 		case 0xf4:
 			result = 6;
-			if (space->machine->primary_screen->vblank())
+			if (space->machine().primary_screen->vblank())
 				result |= 0x800;
 			logit = 0;
 			break;
@@ -444,11 +444,11 @@ WRITE32_HANDLER( zeus_w )
 
 	/* 32-bit mode */
 	if (zeusbase[0x80] & 0x00020000)
-		zeus_register32_w(space->machine, offset, data, logit);
+		zeus_register32_w(space->machine(), offset, data, logit);
 
 	/* 16-bit mode */
 	else
-		zeus_register16_w(space->machine, offset, data, logit);
+		zeus_register16_w(space->machine(), offset, data, logit);
 }
 
 
@@ -522,11 +522,11 @@ static void zeus_pointer_w(UINT32 which, UINT32 data, int logit)
  *
  *************************************/
 
-static void zeus_register16_w(running_machine *machine, offs_t offset, UINT16 data, int logit)
+static void zeus_register16_w(running_machine &machine, offs_t offset, UINT16 data, int logit)
 {
 	/* writes to register $CC need to force a partial update */
 	if ((offset & ~1) == 0xcc)
-		machine->primary_screen->update_partial(machine->primary_screen->vpos());
+		machine.primary_screen->update_partial(machine.primary_screen->vpos());
 
 	/* write to high part on odd addresses */
 	if (offset & 1)
@@ -546,11 +546,11 @@ static void zeus_register16_w(running_machine *machine, offs_t offset, UINT16 da
 }
 
 
-static void zeus_register32_w(running_machine *machine, offs_t offset, UINT32 data, int logit)
+static void zeus_register32_w(running_machine &machine, offs_t offset, UINT32 data, int logit)
 {
 	/* writes to register $CC need to force a partial update */
 	if ((offset & ~1) == 0xcc)
-		machine->primary_screen->update_partial(machine->primary_screen->vpos());
+		machine.primary_screen->update_partial(machine.primary_screen->vpos());
 
 	/* always write to low word? */
 	zeusbase[offset & ~1] = data;
@@ -579,7 +579,7 @@ static void zeus_register32_w(running_machine *machine, offs_t offset, UINT32 da
  *
  *************************************/
 
-static void zeus_register_update(running_machine *machine, offs_t offset)
+static void zeus_register_update(running_machine &machine, offs_t offset)
 {
 	/* handle the writes; only trigger on low accesses */
 	switch (offset)
@@ -717,7 +717,7 @@ static void zeus_register_update(running_machine *machine, offs_t offset)
 		case 0xc6:
 		case 0xc8:
 		case 0xca:
-			machine->primary_screen->update_partial(machine->primary_screen->vpos());
+			machine.primary_screen->update_partial(machine.primary_screen->vpos());
 			{
 				int vtotal = zeusbase[0xca] >> 16;
 				int htotal = zeusbase[0xc6] >> 16;
@@ -729,7 +729,7 @@ static void zeus_register_update(running_machine *machine, offs_t offset)
 				visarea.max_y = zeusbase[0xc8] & 0xffff;
 				if (htotal > 0 && vtotal > 0 && visarea.min_x < visarea.max_x && visarea.max_y < vtotal)
 				{
-					machine->primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS((double)MIDZEUS_VIDEO_CLOCK / 8.0 / (htotal * vtotal)));
+					machine.primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS((double)MIDZEUS_VIDEO_CLOCK / 8.0 / (htotal * vtotal)));
 					zeus_cliprect = visarea;
 					zeus_cliprect.max_x -= zeus_cliprect.min_x;
 					zeus_cliprect.min_x = 0;
@@ -738,7 +738,7 @@ static void zeus_register_update(running_machine *machine, offs_t offset)
 			break;
 
 		case 0xcc:
-			machine->primary_screen->update_partial(machine->primary_screen->vpos());
+			machine.primary_screen->update_partial(machine.primary_screen->vpos());
 			log_fifo = input_code_pressed(machine, KEYCODE_L);
 			break;
 
@@ -758,7 +758,7 @@ static void zeus_register_update(running_machine *machine, offs_t offset)
  *
  *************************************/
 
-static int zeus_fifo_process(running_machine *machine, const UINT32 *data, int numwords)
+static int zeus_fifo_process(running_machine &machine, const UINT32 *data, int numwords)
 {
 	/* handle logging */
 	switch (data[0] >> 24)
@@ -959,7 +959,7 @@ static int zeus_fifo_process(running_machine *machine, const UINT32 *data, int n
  *
  *************************************/
 
-static void zeus_draw_model(running_machine *machine, UINT32 texdata, int logit)
+static void zeus_draw_model(running_machine &machine, UINT32 texdata, int logit)
 {
 	UINT32 databuffer[32];
 	int databufcount = 0;
@@ -1057,7 +1057,7 @@ static void zeus_draw_model(running_machine *machine, UINT32 texdata, int logit)
  *
  *************************************/
 
-static void zeus_draw_quad(running_machine *machine, const UINT32 *databuffer, UINT32 texdata, int logit)
+static void zeus_draw_quad(running_machine &machine, const UINT32 *databuffer, UINT32 texdata, int logit)
 {
 	poly_draw_scanline_func callback;
 	poly_extra_data *extra;

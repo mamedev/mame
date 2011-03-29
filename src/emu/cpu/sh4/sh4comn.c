@@ -193,7 +193,7 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 	sh4->sgr = sh4->r[15];
 
 	sh4->sr |= MD;
-	if ((sh4->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((sh4->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		sh4_syncronize_register_bank(sh4, (sh4->sr & sRB) >> 29);
 	if (!(sh4->sr & sRB))
 		sh4_change_register_bank(sh4, 1);
@@ -1160,24 +1160,24 @@ void sh4_common_init(device_t *device)
 
 	for (i=0; i<3; i++)
 	{
-		sh4->timer[i] = device->machine->scheduler().timer_alloc(FUNC(sh4_timer_callback), sh4);
+		sh4->timer[i] = device->machine().scheduler().timer_alloc(FUNC(sh4_timer_callback), sh4);
 		sh4->timer[i]->adjust(attotime::never, i);
 	}
 
 	for (i=0; i<4; i++)
 	{
-		sh4->dma_timer[i] = device->machine->scheduler().timer_alloc(FUNC(sh4_dmac_callback), sh4);
+		sh4->dma_timer[i] = device->machine().scheduler().timer_alloc(FUNC(sh4_dmac_callback), sh4);
 		sh4->dma_timer[i]->adjust(attotime::never, i);
 	}
 
-	sh4->refresh_timer = device->machine->scheduler().timer_alloc(FUNC(sh4_refresh_timer_callback), sh4);
+	sh4->refresh_timer = device->machine().scheduler().timer_alloc(FUNC(sh4_refresh_timer_callback), sh4);
 	sh4->refresh_timer->adjust(attotime::never);
 	sh4->refresh_timer_base = 0;
 
-	sh4->rtc_timer = device->machine->scheduler().timer_alloc(FUNC(sh4_rtc_timer_callback), sh4);
+	sh4->rtc_timer = device->machine().scheduler().timer_alloc(FUNC(sh4_rtc_timer_callback), sh4);
 	sh4->rtc_timer->adjust(attotime::never);
 
-	sh4->m = auto_alloc_array(device->machine, UINT32, 16384);
+	sh4->m = auto_alloc_array(device->machine(), UINT32, 16384);
 }
 
 void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)

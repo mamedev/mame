@@ -36,20 +36,20 @@
 
 static WRITE8_HANDLER( triothep_control_select_w )
 {
-	actfancr_state *state = space->machine->driver_data<actfancr_state>();
+	actfancr_state *state = space->machine().driver_data<actfancr_state>();
 	state->trio_control_select = data;
 }
 
 static READ8_HANDLER( triothep_control_r )
 {
-	actfancr_state *state = space->machine->driver_data<actfancr_state>();
+	actfancr_state *state = space->machine().driver_data<actfancr_state>();
 	switch (state->trio_control_select)
 	{
-		case 0: return input_port_read(space->machine, "P1");
-		case 1: return input_port_read(space->machine, "P2");
-		case 2: return input_port_read(space->machine, "DSW1");
-		case 3: return input_port_read(space->machine, "DSW2");
-		case 4: return input_port_read(space->machine, "SYSTEM");	/* VBL */
+		case 0: return input_port_read(space->machine(), "P1");
+		case 1: return input_port_read(space->machine(), "P2");
+		case 2: return input_port_read(space->machine(), "DSW1");
+		case 3: return input_port_read(space->machine(), "DSW2");
+		case 4: return input_port_read(space->machine(), "SYSTEM");	/* VBL */
 	}
 
 	return 0xff;
@@ -57,7 +57,7 @@ static READ8_HANDLER( triothep_control_r )
 
 static WRITE8_HANDLER( actfancr_sound_w )
 {
-	actfancr_state *state = space->machine->driver_data<actfancr_state>();
+	actfancr_state *state = space->machine().driver_data<actfancr_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -66,11 +66,11 @@ static WRITE8_HANDLER( actfancr_sound_w )
 
 static WRITE8_HANDLER( actfancr_buffer_spriteram_w)
 {
-	actfancr_state *state = space->machine->driver_data<actfancr_state>();
+	actfancr_state *state = space->machine().driver_data<actfancr_state>();
 
-	UINT8* buffered_spriteram = space->machine->generic.buffered_spriteram.u8;
+	UINT8* buffered_spriteram = space->machine().generic.buffered_spriteram.u8;
 	// make a buffered copy
-	memcpy(buffered_spriteram, space->machine->generic.spriteram.u8, 0x800);
+	memcpy(buffered_spriteram, space->machine().generic.spriteram.u8, 0x800);
 	// copy to a 16-bit region for our sprite draw code too
 	for (int i=0;i<0x800/2;i++)
 	{
@@ -284,7 +284,7 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int linestate)
 {
-	actfancr_state *state = device->machine->driver_data<actfancr_state>();
+	actfancr_state *state = device->machine().driver_data<actfancr_state>();
 	device_set_input_line(state->audiocpu, 0, linestate); /* IRQ */
 }
 
@@ -297,15 +297,15 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_START( actfancr )
 {
-	actfancr_state *state = machine->driver_data<actfancr_state>();
+	actfancr_state *state = machine.driver_data<actfancr_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 }
 
 static MACHINE_START( triothep )
 {
-	actfancr_state *state = machine->driver_data<actfancr_state>();
+	actfancr_state *state = machine.driver_data<actfancr_state>();
 
 	MACHINE_START_CALL(actfancr);
 
@@ -314,13 +314,13 @@ static MACHINE_START( triothep )
 
 static MACHINE_RESET( actfancr )
 {
-	actfancr_state *state = machine->driver_data<actfancr_state>();
+	actfancr_state *state = machine.driver_data<actfancr_state>();
 	state->flipscreen = 0;
 }
 
 static MACHINE_RESET( triothep )
 {
-	actfancr_state *state = machine->driver_data<actfancr_state>();
+	actfancr_state *state = machine.driver_data<actfancr_state>();
 
 	MACHINE_RESET_CALL(actfancr);
 	state->trio_control_select = 0;

@@ -7,7 +7,7 @@ PALETTE_INIT( labyrunr )
 	int pal;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x80);
+	machine.colortable = colortable_alloc(machine, 0x80);
 
 	for (pal = 0; pal < 8; pal++)
 	{
@@ -17,7 +17,7 @@ PALETTE_INIT( labyrunr )
 			int i;
 
 			for (i = 0; i < 0x100; i++)
-				colortable_entry_set_value(machine->colortable, (pal << 8) | i, (pal << 4) | (i & 0x0f));
+				colortable_entry_set_value(machine.colortable, (pal << 8) | i, (pal << 4) | (i & 0x0f));
 		}
 		/* sprites */
 		else
@@ -33,16 +33,16 @@ PALETTE_INIT( labyrunr )
 				else
 					ctabentry = (pal << 4) | (color_prom[i] & 0x0f);
 
-				colortable_entry_set_value(machine->colortable, (pal << 8) | i, ctabentry);
+				colortable_entry_set_value(machine.colortable, (pal << 8) | i, ctabentry);
 			}
 		}
 	}
 }
 
 
-static void set_pens( running_machine *machine )
+static void set_pens( running_machine &machine )
 {
-	labyrunr_state *state = machine->driver_data<labyrunr_state>();
+	labyrunr_state *state = machine.driver_data<labyrunr_state>();
 	int i;
 
 	for (i = 0x00; i < 0x100; i += 2)
@@ -51,7 +51,7 @@ static void set_pens( running_machine *machine )
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine->colortable, i >> 1, color);
+		colortable_palette_set_color(machine.colortable, i >> 1, color);
 	}
 }
 
@@ -65,7 +65,7 @@ static void set_pens( running_machine *machine )
 
 static TILE_GET_INFO( get_tile_info0 )
 {
-	labyrunr_state *state = machine->driver_data<labyrunr_state>();
+	labyrunr_state *state = machine.driver_data<labyrunr_state>();
 	UINT8 ctrl_3 = k007121_ctrlram_r(state->k007121, 3);
 	UINT8 ctrl_4 = k007121_ctrlram_r(state->k007121, 4);
 	UINT8 ctrl_5 = k007121_ctrlram_r(state->k007121, 5);
@@ -95,7 +95,7 @@ static TILE_GET_INFO( get_tile_info0 )
 
 static TILE_GET_INFO( get_tile_info1 )
 {
-	labyrunr_state *state = machine->driver_data<labyrunr_state>();
+	labyrunr_state *state = machine.driver_data<labyrunr_state>();
 	UINT8 ctrl_3 = k007121_ctrlram_r(state->k007121, 3);
 	UINT8 ctrl_4 = k007121_ctrlram_r(state->k007121, 4);
 	UINT8 ctrl_5 = k007121_ctrlram_r(state->k007121, 5);
@@ -132,7 +132,7 @@ static TILE_GET_INFO( get_tile_info1 )
 
 VIDEO_START( labyrunr )
 {
-	labyrunr_state *state = machine->driver_data<labyrunr_state>();
+	labyrunr_state *state = machine.driver_data<labyrunr_state>();
 
 	state->layer0 = tilemap_create(machine, get_tile_info0, tilemap_scan_rows, 8, 8, 32, 32);
 	state->layer1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 8, 8, 32, 32);
@@ -140,10 +140,10 @@ VIDEO_START( labyrunr )
 	tilemap_set_transparent_pen(state->layer0, 0);
 	tilemap_set_transparent_pen(state->layer1, 0);
 
-	state->clip0 = machine->primary_screen->visible_area();
+	state->clip0 = machine.primary_screen->visible_area();
 	state->clip0.min_x += 40;
 
-	state->clip1 = machine->primary_screen->visible_area();
+	state->clip1 = machine.primary_screen->visible_area();
 	state->clip1.max_x = 39;
 	state->clip1.min_x = 0;
 
@@ -160,14 +160,14 @@ VIDEO_START( labyrunr )
 
 WRITE8_HANDLER( labyrunr_vram1_w )
 {
-	labyrunr_state *state = space->machine->driver_data<labyrunr_state>();
+	labyrunr_state *state = space->machine().driver_data<labyrunr_state>();
 	state->videoram1[offset] = data;
 	tilemap_mark_tile_dirty(state->layer0, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( labyrunr_vram2_w )
 {
-	labyrunr_state *state = space->machine->driver_data<labyrunr_state>();
+	labyrunr_state *state = space->machine().driver_data<labyrunr_state>();
 	state->videoram2[offset] = data;
 	tilemap_mark_tile_dirty(state->layer1, offset & 0x3ff);
 }
@@ -182,14 +182,14 @@ WRITE8_HANDLER( labyrunr_vram2_w )
 
 SCREEN_UPDATE( labyrunr )
 {
-	labyrunr_state *state = screen->machine->driver_data<labyrunr_state>();
+	labyrunr_state *state = screen->machine().driver_data<labyrunr_state>();
 	UINT8 ctrl_0 = k007121_ctrlram_r(state->k007121, 0);
 	rectangle finalclip0, finalclip1;
 
-	set_pens(screen->machine);
+	set_pens(screen->machine());
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect,0);
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(screen->machine().priority_bitmap, cliprect,0);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	if (~k007121_ctrlram_r(state->k007121, 3) & 0x20)
 	{
@@ -214,7 +214,7 @@ SCREEN_UPDATE( labyrunr )
 		}
 
 		tilemap_draw(bitmap, &finalclip0, state->layer0, TILEMAP_DRAW_OPAQUE, 0);
-		k007121_sprites_draw(state->k007121, bitmap, cliprect, screen->machine->gfx[0], screen->machine->colortable, state->spriteram,(k007121_ctrlram_r(state->k007121, 6) & 0x30) * 2, 40,0,(k007121_ctrlram_r(state->k007121, 3) & 0x40) >> 5);
+		k007121_sprites_draw(state->k007121, bitmap, cliprect, screen->machine().gfx[0], screen->machine().colortable, state->spriteram,(k007121_ctrlram_r(state->k007121, 6) & 0x30) * 2, 40,0,(k007121_ctrlram_r(state->k007121, 3) & 0x40) >> 5);
 		/* we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites */
 		tilemap_draw(bitmap, &finalclip1, state->layer1, TILEMAP_DRAW_OPAQUE, 0);
 	}
@@ -284,7 +284,7 @@ SCREEN_UPDATE( labyrunr )
 		if(use_clip3[1])
 			tilemap_draw(bitmap, &finalclip3, state->layer1, 0, 1);
 
-		k007121_sprites_draw(state->k007121, bitmap, cliprect, screen->machine->gfx[0], screen->machine->colortable, state->spriteram, (k007121_ctrlram_r(state->k007121, 6) & 0x30) * 2,40,0,(k007121_ctrlram_r(state->k007121, 3) & 0x40) >> 5);
+		k007121_sprites_draw(state->k007121, bitmap, cliprect, screen->machine().gfx[0], screen->machine().colortable, state->spriteram, (k007121_ctrlram_r(state->k007121, 6) & 0x30) * 2,40,0,(k007121_ctrlram_r(state->k007121, 3) & 0x40) >> 5);
 	}
 	return 0;
 }

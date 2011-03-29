@@ -13,7 +13,7 @@ subs_init_machine
 ***************************************************************************/
 MACHINE_RESET( subs )
 {
-	subs_state *state = machine->driver_data<subs_state>();
+	subs_state *state = machine.driver_data<subs_state>();
 	state->steering_buf1 = 0;
 	state->steering_buf2 = 0;
 	state->steering_val1 = 0x00;
@@ -26,7 +26,7 @@ subs_interrupt
 INTERRUPT_GEN( subs_interrupt )
 {
 	/* only do NMI interrupt if not in TEST mode */
-	if ((input_port_read(device->machine, "IN1") & 0x40)==0x40)
+	if ((input_port_read(device->machine(), "IN1") & 0x40)==0x40)
 		device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 }
 
@@ -37,9 +37,9 @@ When D7 is high, the steering wheel has moved.
 If D6 is high, it moved left.  If D6 is low, it moved right.
 Be sure to keep returning a direction until steer_reset is called.
 ***************************************************************************/
-static int subs_steering_1(running_machine *machine)
+static int subs_steering_1(running_machine &machine)
 {
-	subs_state *state = machine->driver_data<subs_state>();
+	subs_state *state = machine.driver_data<subs_state>();
 	int this_val;
 	int delta;
 
@@ -66,9 +66,9 @@ static int subs_steering_1(running_machine *machine)
 	return state->steering_val1;
 }
 
-static int subs_steering_2(running_machine *machine)
+static int subs_steering_2(running_machine &machine)
 {
-	subs_state *state = machine->driver_data<subs_state>();
+	subs_state *state = machine.driver_data<subs_state>();
 	int this_val;
 	int delta;
 
@@ -100,7 +100,7 @@ subs_steer_reset
 ***************************************************************************/
 WRITE8_HANDLER( subs_steer_reset_w )
 {
-	subs_state *state = space->machine->driver_data<subs_state>();
+	subs_state *state = space->machine().driver_data<subs_state>();
 	state->steering_val1 = 0x00;
 	state->steering_val2 = 0x00;
 }
@@ -110,7 +110,7 @@ subs_control_r
 ***************************************************************************/
 READ8_HANDLER( subs_control_r )
 {
-	int inport = input_port_read(space->machine, "IN0");
+	int inport = input_port_read(space->machine(), "IN0");
 
 	switch (offset & 0x07)
 	{
@@ -118,10 +118,10 @@ READ8_HANDLER( subs_control_r )
 		case 0x01:		return ((inport & 0x02) << 6);	/* diag hold */
 		case 0x02:		return ((inport & 0x04) << 5);	/* slam */
 		case 0x03:		return ((inport & 0x08) << 4);	/* spare */
-		case 0x04:		return ((subs_steering_1(space->machine) & 0x40) << 1);	/* steer dir 1 */
-		case 0x05:		return ((subs_steering_1(space->machine) & 0x80) << 0);	/* steer flag 1 */
-		case 0x06:		return ((subs_steering_2(space->machine) & 0x40) << 1);	/* steer dir 2 */
-		case 0x07:		return ((subs_steering_2(space->machine) & 0x80) << 0);	/* steer flag 2 */
+		case 0x04:		return ((subs_steering_1(space->machine()) & 0x40) << 1);	/* steer dir 1 */
+		case 0x05:		return ((subs_steering_1(space->machine()) & 0x80) << 0);	/* steer flag 1 */
+		case 0x06:		return ((subs_steering_2(space->machine()) & 0x40) << 1);	/* steer dir 2 */
+		case 0x07:		return ((subs_steering_2(space->machine()) & 0x80) << 0);	/* steer flag 2 */
 	}
 
 	return 0;
@@ -132,7 +132,7 @@ subs_coin_r
 ***************************************************************************/
 READ8_HANDLER( subs_coin_r )
 {
-	int inport = input_port_read(space->machine, "IN1");
+	int inport = input_port_read(space->machine(), "IN1");
 
 	switch (offset & 0x07)
 	{
@@ -154,7 +154,7 @@ subs_options_r
 ***************************************************************************/
 READ8_HANDLER( subs_options_r )
 {
-	int opts = input_port_read(space->machine, "DSW");
+	int opts = input_port_read(space->machine(), "DSW");
 
 	switch (offset & 0x03)
 	{
@@ -172,7 +172,7 @@ subs_lamp1_w
 ***************************************************************************/
 WRITE8_HANDLER( subs_lamp1_w )
 {
-	set_led_status(space->machine, 0,~offset & 1);
+	set_led_status(space->machine(), 0,~offset & 1);
 }
 
 /***************************************************************************
@@ -180,5 +180,5 @@ subs_lamp2_w
 ***************************************************************************/
 WRITE8_HANDLER( subs_lamp2_w )
 {
-	set_led_status(space->machine, 1,~offset & 1);
+	set_led_status(space->machine(), 1,~offset & 1);
 }

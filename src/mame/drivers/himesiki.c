@@ -91,7 +91,7 @@ A                                                   12.000MHz
 
 static WRITE8_HANDLER( himesiki_rombank_w )
 {
-	memory_set_bank(space->machine, "bank1", ((data & 0x08) >> 3));
+	memory_set_bank(space->machine(), "bank1", ((data & 0x08) >> 3));
 
 	if (data & 0xf7)
 		logerror("p06_w %02x\n", data);
@@ -99,7 +99,7 @@ static WRITE8_HANDLER( himesiki_rombank_w )
 
 static WRITE8_HANDLER( himesiki_sound_w )
 {
-	himesiki_state *state = space->machine->driver_data<himesiki_state>();
+	himesiki_state *state = space->machine().driver_data<himesiki_state>();
 	soundlatch_w(space, offset, data);
 	device_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -269,12 +269,12 @@ GFXDECODE_END
 
 static MACHINE_START( himesiki )
 {
-	himesiki_state *state = machine->driver_data<himesiki_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	himesiki_state *state = machine.driver_data<himesiki_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
 
-	state->subcpu = machine->device("sub");
+	state->subcpu = machine.device("sub");
 
 	state->save_item(NAME(state->scrollx));
 	state->save_item(NAME(state->flipscreen));
@@ -282,7 +282,7 @@ static MACHINE_START( himesiki )
 
 static MACHINE_RESET( himesiki )
 {
-	himesiki_state *state = machine->driver_data<himesiki_state>();
+	himesiki_state *state = machine.driver_data<himesiki_state>();
 
 	state->scrollx[0] = 0;
 	state->scrollx[1] = 0;

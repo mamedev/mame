@@ -349,7 +349,7 @@ enum
 
 static WRITE8_HANDLER (i8275_preg_w) //param reg
 {
-	dwarfd_state *state = space->machine->driver_data<dwarfd_state>();
+	dwarfd_state *state = space->machine().driver_data<dwarfd_state>();
 
 	switch (state->i8275Command)
 	{
@@ -470,7 +470,7 @@ static READ8_HANDLER (i8275_preg_r) //param reg
 
 static WRITE8_HANDLER (i8275_creg_w) //comand reg
 {
-	dwarfd_state *state = space->machine->driver_data<dwarfd_state>();
+	dwarfd_state *state = space->machine().driver_data<dwarfd_state>();
 
 	switch (data>>5)
 	{
@@ -515,7 +515,7 @@ static READ8_HANDLER (i8275_sreg_r) //status
 
 static READ8_HANDLER(dwarfd_ram_r)
 {
-	dwarfd_state *state = space->machine->driver_data<dwarfd_state>();
+	dwarfd_state *state = space->machine().driver_data<dwarfd_state>();
 
 	if (state->crt_access == 0)
 	{
@@ -531,7 +531,7 @@ static READ8_HANDLER(dwarfd_ram_r)
 
 static WRITE8_HANDLER(dwarfd_ram_w)
 {
-	dwarfd_state *state = space->machine->driver_data<dwarfd_state>();
+	dwarfd_state *state = space->machine().driver_data<dwarfd_state>();
 	state->dw_ram[offset] = data;
 }
 
@@ -568,7 +568,7 @@ static WRITE8_HANDLER(output2_w)
 
 static READ8_HANDLER(qc_b8_r)
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8 )
@@ -680,9 +680,9 @@ static VIDEO_START(dwarfd)
 {
 }
 
-static void drawCrt( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
+static void drawCrt( running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	dwarfd_state *state = machine->driver_data<dwarfd_state>();
+	dwarfd_state *state = machine.driver_data<dwarfd_state>();
 	int x, y;
 	for (y = 0; y < maxy; y++)
 	{
@@ -725,13 +725,13 @@ static void drawCrt( running_machine *machine, bitmap_t *bitmap,const rectangle 
 					if ((tile & 0xc0) == 0xc0)
 					{
 						b = 1;
-						tile = machine->rand() & 0x7f;//(tile >> 2) & 0xf;
+						tile = machine.rand() & 0x7f;//(tile >> 2) & 0xf;
 					}
 				}
 				else
 					b = 1;
 			}
-			drawgfx_transpen(bitmap, cliprect, machine->gfx[0],
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[0],
 				tile + (state->bank + bank2) * 128,
 				0,
 				0, 0,
@@ -743,14 +743,14 @@ static void drawCrt( running_machine *machine, bitmap_t *bitmap,const rectangle 
 
 static SCREEN_UPDATE( dwarfd )
 {
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
-	drawCrt(screen->machine, bitmap, cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	drawCrt(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( dwarfd_sod_callback )
 {
-	dwarfd_state *driver_state = device->machine->driver_data<dwarfd_state>();
+	dwarfd_state *driver_state = device->machine().driver_data<dwarfd_state>();
 	driver_state->crt_access = state;
 }
 
@@ -767,7 +767,7 @@ static I8085_CONFIG( dwarfd_i8085_config )
 #define NUM_LINES 25
 static INTERRUPT_GEN( dwarfd_interrupt )
 {
-	dwarfd_state *state = device->machine->driver_data<dwarfd_state>();
+	dwarfd_state *state = device->machine().driver_data<dwarfd_state>();
 
 	if (cpu_getiloops(device) < NUM_LINES)
 	{
@@ -887,9 +887,9 @@ static PALETTE_INIT(dwarfd)
 
 	for (i = 0; i < 256; i++)
 	{
-		int r = machine->rand()|0x80;
-		int g = machine->rand()|0x80;
-		int b = machine->rand()|0x80;
+		int r = machine.rand()|0x80;
+		int g = machine.rand()|0x80;
+		int b = machine.rand()|0x80;
 		if (i == 0) r = g = b = 0;
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
@@ -913,7 +913,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( dwarfd )
 {
-	dwarfd_state *state = machine->driver_data<dwarfd_state>();
+	dwarfd_state *state = machine.driver_data<dwarfd_state>();
 
 	state->save_item(NAME(state->bank));
 	state->save_item(NAME(state->line));
@@ -937,7 +937,7 @@ static MACHINE_START( dwarfd )
 
 static MACHINE_RESET( dwarfd )
 {
-	dwarfd_state *state = machine->driver_data<dwarfd_state>();
+	dwarfd_state *state = machine.driver_data<dwarfd_state>();
 
 	state->bank = 0;
 	state->line = 0;
@@ -1136,13 +1136,13 @@ ROM_END
 
 static DRIVER_INIT(dwarfd)
 {
-	dwarfd_state *state = machine->driver_data<dwarfd_state>();
+	dwarfd_state *state = machine.driver_data<dwarfd_state>();
 	int i;
 	UINT8 *src, *dst;
 
 	/* expand gfx roms */
-	src = machine->region("gfx1")->base();
-	dst = machine->region("gfx2")->base();
+	src = machine.region("gfx1")->base();
+	dst = machine.region("gfx2")->base();
 
 	for (i = 0; i < 0x4000; i++)
 	{
@@ -1155,7 +1155,7 @@ static DRIVER_INIT(dwarfd)
 	}
 
 	/* use low bit as 'interpolation' bit */
-	src = machine->region("gfx2")->base();
+	src = machine.region("gfx2")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
 		if (src[i] & 0x10)
@@ -1186,12 +1186,12 @@ static DRIVER_INIT(qc)
 	DRIVER_INIT_CALL(dwarfd);
 
 	// hacks for program to proceed
-	machine->region("maincpu")->base()[0x6564] = 0x00;
-	machine->region("maincpu")->base()[0x6565] = 0x00;
+	machine.region("maincpu")->base()[0x6564] = 0x00;
+	machine.region("maincpu")->base()[0x6565] = 0x00;
 
-	machine->region("maincpu")->base()[0x59b2] = 0x00;
-	machine->region("maincpu")->base()[0x59b3] = 0x00;
-	machine->region("maincpu")->base()[0x59b4] = 0x00;
+	machine.region("maincpu")->base()[0x59b2] = 0x00;
+	machine.region("maincpu")->base()[0x59b3] = 0x00;
+	machine.region("maincpu")->base()[0x59b4] = 0x00;
 
 }
 

@@ -631,14 +631,14 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 
 static SAMPLES_START( kageki_init_samples )
 {
-	running_machine *machine = device->machine;
-	tnzs_state *state = machine->driver_data<tnzs_state>();
+	running_machine &machine = device->machine();
+	tnzs_state *state = machine.driver_data<tnzs_state>();
 	UINT8 *scan, *src;
 	INT16 *dest;
 	int start, size;
 	int i, n;
 
-	src = machine->region("samples")->base() + 0x0090;
+	src = machine.region("samples")->base() + 0x0090;
 	for (i = 0; i < MAX_SAMPLES; i++)
 	{
 		start = (src[(i * 2) + 1] * 256) + src[(i * 2)];
@@ -676,11 +676,11 @@ static SAMPLES_START( kageki_init_samples )
 
 static READ8_DEVICE_HANDLER( kageki_csport_r )
 {
-	tnzs_state *state = device->machine->driver_data<tnzs_state>();
+	tnzs_state *state = device->machine().driver_data<tnzs_state>();
 	int dsw, dsw1, dsw2;
 
-	dsw1 = input_port_read(device->machine, "DSWA");
-	dsw2 = input_port_read(device->machine, "DSWB");
+	dsw1 = input_port_read(device->machine(), "DSWA");
+	dsw2 = input_port_read(device->machine(), "DSWB");
 
 	switch (state->kageki_csport_sel)
 	{
@@ -706,7 +706,7 @@ static READ8_DEVICE_HANDLER( kageki_csport_r )
 
 static WRITE8_DEVICE_HANDLER( kageki_csport_w )
 {
-	tnzs_state *state = device->machine->driver_data<tnzs_state>();
+	tnzs_state *state = device->machine().driver_data<tnzs_state>();
 	char mess[80];
 
 	if (data > 0x3f)
@@ -736,7 +736,7 @@ static WRITE8_DEVICE_HANDLER( kabukiz_sound_bank_w )
 {
 	// to avoid the write when the sound chip is initialized
 	if (data != 0xff)
-		memory_set_bank(device->machine, "bank3", data & 0x07);
+		memory_set_bank(device->machine(), "bank3", data & 0x07);
 }
 
 static WRITE8_DEVICE_HANDLER( kabukiz_sample_w )
@@ -805,7 +805,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tnzsb_sound_command_w )
 {
-	tnzs_state *state = space->machine->driver_data<tnzs_state>();
+	tnzs_state *state = space->machine().driver_data<tnzs_state>();
 	soundlatch_w(space, offset, data);
 	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
@@ -870,18 +870,18 @@ static WRITE8_HANDLER( jpopnics_palette_w )
 {
 	int r, g, b;
 	UINT16 paldata;
-	space->machine->generic.paletteram.u8[offset] = data;
+	space->machine().generic.paletteram.u8[offset] = data;
 
 	offset = offset >> 1;
 
-	paldata = (space->machine->generic.paletteram.u8[offset * 2] << 8) | space->machine->generic.paletteram.u8[(offset * 2 + 1)];
+	paldata = (space->machine().generic.paletteram.u8[offset * 2] << 8) | space->machine().generic.paletteram.u8[(offset * 2 + 1)];
 
 	g = (paldata >> 12) & 0x000f;
 	r = (paldata >> 4) & 0x000f;
 	b = (paldata >> 8) & 0x000f;
 	// the other bits seem to be used, and the colours are wrong..
 
-	palette_set_color_rgb(space->machine, offset, r << 4, g << 4, b << 4);
+	palette_set_color_rgb(space->machine(), offset, r << 4, g << 4, b << 4);
 }
 
 static ADDRESS_MAP_START( jpopnics_main_map, AS_PROGRAM, 8 )
@@ -900,7 +900,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( jpopnics_subbankswitch_w )
 {
 	/* bits 0-1 select ROM bank */
-	memory_set_bank(space->machine, "bank2", data & 0x03);
+	memory_set_bank(space->machine(), "bank2", data & 0x03);
 }
 
 static ADDRESS_MAP_START( jpopnics_sub_map, AS_PROGRAM, 8 )
@@ -1561,7 +1561,7 @@ static const ym2203_interface ym2203_config =
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler( device_t *device, int irq )
 {
-	tnzs_state *state = device->machine->driver_data<tnzs_state>();
+	tnzs_state *state = device->machine().driver_data<tnzs_state>();
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 

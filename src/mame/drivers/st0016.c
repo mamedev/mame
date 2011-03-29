@@ -47,17 +47,17 @@ static READ8_HANDLER(mux_r)
         xxxx - input port #2
     xxxx     - dip switches (2x8 bits) (multiplexed)
 */
-	int retval = input_port_read(space->machine, "SYSTEM") & 0x0f;
+	int retval = input_port_read(space->machine(), "SYSTEM") & 0x0f;
 	switch(mux_port & 0x30)
 	{
-		case 0x00: retval |= ((input_port_read(space->machine, "DSW1") & 1) << 4) | ((input_port_read(space->machine, "DSW1") & 0x10) << 1)
-								| ((input_port_read(space->machine, "DSW2") & 1) << 6) | ((input_port_read(space->machine, "DSW2") & 0x10) <<3); break;
-		case 0x10: retval |= ((input_port_read(space->machine, "DSW1") & 2) << 3) | ((input_port_read(space->machine, "DSW1") & 0x20)   )
-								| ((input_port_read(space->machine, "DSW2") & 2) << 5) | ((input_port_read(space->machine, "DSW2") & 0x20) <<2); break;
-		case 0x20: retval |= ((input_port_read(space->machine, "DSW1") & 4) << 2) | ((input_port_read(space->machine, "DSW1") & 0x40) >> 1)
-								| ((input_port_read(space->machine, "DSW2") & 4) << 4) | ((input_port_read(space->machine, "DSW2") & 0x40) <<1); break;
-		case 0x30: retval |= ((input_port_read(space->machine, "DSW1") & 8) << 1) | ((input_port_read(space->machine, "DSW1") & 0x80) >> 2)
-								| ((input_port_read(space->machine, "DSW2") & 8) << 3) | ((input_port_read(space->machine, "DSW2") & 0x80)    ); break;
+		case 0x00: retval |= ((input_port_read(space->machine(), "DSW1") & 1) << 4) | ((input_port_read(space->machine(), "DSW1") & 0x10) << 1)
+								| ((input_port_read(space->machine(), "DSW2") & 1) << 6) | ((input_port_read(space->machine(), "DSW2") & 0x10) <<3); break;
+		case 0x10: retval |= ((input_port_read(space->machine(), "DSW1") & 2) << 3) | ((input_port_read(space->machine(), "DSW1") & 0x20)   )
+								| ((input_port_read(space->machine(), "DSW2") & 2) << 5) | ((input_port_read(space->machine(), "DSW2") & 0x20) <<2); break;
+		case 0x20: retval |= ((input_port_read(space->machine(), "DSW1") & 4) << 2) | ((input_port_read(space->machine(), "DSW1") & 0x40) >> 1)
+								| ((input_port_read(space->machine(), "DSW2") & 4) << 4) | ((input_port_read(space->machine(), "DSW2") & 0x40) <<1); break;
+		case 0x30: retval |= ((input_port_read(space->machine(), "DSW1") & 8) << 1) | ((input_port_read(space->machine(), "DSW1") & 0x80) >> 2)
+								| ((input_port_read(space->machine(), "DSW2") & 8) << 3) | ((input_port_read(space->machine(), "DSW2") & 0x80)    ); break;
 	}
 	return retval;
 }
@@ -69,7 +69,7 @@ static WRITE8_HANDLER(mux_select_w)
 
 WRITE8_HANDLER(st0016_rom_bank_w)
 {
-	memory_set_bankptr(space->machine,  "bank1", space->machine->region("maincpu")->base() + (data* 0x4000) + 0x10000 );
+	memory_set_bankptr(space->machine(),  "bank1", space->machine().region("maincpu")->base() + (data* 0x4000) + 0x10000 );
 	st0016_rom_bank=data;
 }
 
@@ -111,7 +111,7 @@ static WRITE32_HANDLER(latch32_w)
 	if(!offset)
 		latches[2]|=1;
 	COMBINE_DATA(&latches[offset]);
-	space->machine->scheduler().synchronize();
+	space->machine().scheduler().synchronize();
 }
 
 static READ8_HANDLER(latch8_r)
@@ -126,7 +126,7 @@ static WRITE8_HANDLER(latch8_w)
 	if(!offset)
 		latches[2]|=2;
 	latches[offset]=data;
-	space->machine->scheduler().synchronize();
+	space->machine().scheduler().synchronize();
 }
 
 static ADDRESS_MAP_START( v810_mem,AS_PROGRAM, 32 )
@@ -670,13 +670,13 @@ static DRIVER_INIT(nratechu)
 static DRIVER_INIT(mayjinsn)
 {
 	st0016_game=4|0x80;
-	memory_set_bankptr(machine, "bank2", machine->region("user1")->base());
+	memory_set_bankptr(machine, "bank2", machine.region("user1")->base());
 }
 
 static DRIVER_INIT(mayjisn2)
 {
 	st0016_game=4;
-	memory_set_bankptr(machine, "bank2", machine->region("user1")->base());
+	memory_set_bankptr(machine, "bank2", machine.region("user1")->base());
 }
 
 /*************************************

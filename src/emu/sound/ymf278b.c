@@ -340,7 +340,7 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 	}
 }
 
-static void ymf278b_irq_check(running_machine *machine, YMF278BChip *chip)
+static void ymf278b_irq_check(running_machine &machine, YMF278BChip *chip)
 {
 	int prev_line = chip->irq_line;
 	chip->irq_line = chip->current_irq ? ASSERT_LINE : CLEAR_LINE;
@@ -398,7 +398,7 @@ static void ymf278b_timer_b_reset(YMF278BChip *chip)
 		chip->timer_b->adjust(attotime::never);
 }
 
-static void ymf278b_A_w(running_machine *machine, YMF278BChip *chip, UINT8 reg, UINT8 data)
+static void ymf278b_A_w(running_machine &machine, YMF278BChip *chip, UINT8 reg, UINT8 data)
 {
 	switch(reg)
 	{
@@ -620,7 +620,7 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 			return chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
 
 		default:
-			logerror("%s: unexpected read at offset %X from ymf278b\n", device->machine->describe_context(), offset);
+			logerror("%s: unexpected read at offset %X from ymf278b\n", device->machine().describe_context(), offset);
 			break;
 	}
 	return 0xff;
@@ -637,7 +637,7 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 			break;
 
 		case 1:
-			ymf278b_A_w(device->machine, chip, chip->port_A, data);
+			ymf278b_A_w(device->machine(), chip, chip->port_A, data);
 			break;
 
 		case 2:
@@ -657,7 +657,7 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 			break;
 
 		default:
-			logerror("%s: unexpected write at offset %X to ymf278b = %02X\n", device->machine->describe_context(), offset, data);
+			logerror("%s: unexpected write at offset %X to ymf278b = %02X\n", device->machine().describe_context(), offset, data);
 			break;
 	}
 }
@@ -666,8 +666,8 @@ static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_
 {
 	chip->rom = *device->region();
 	chip->irq_callback = cb;
-	chip->timer_a = device->machine->scheduler().timer_alloc(FUNC(ymf278b_timer_a_tick), chip);
-	chip->timer_b = device->machine->scheduler().timer_alloc(FUNC(ymf278b_timer_b_tick), chip);
+	chip->timer_a = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_a_tick), chip);
+	chip->timer_b = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_b_tick), chip);
 	chip->irq_line = CLEAR_LINE;
 	chip->clock = device->clock();
 }
@@ -741,7 +741,7 @@ static DEVICE_START( ymf278b )
 	intf = (device->baseconfig().static_config() != NULL) ? (const ymf278b_interface *)device->baseconfig().static_config() : &defintrf;
 
 	ymf278b_init(device, chip, intf->irq_callback);
-	chip->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock()/768, chip, ymf278b_pcm_update);
+	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock()/768, chip, ymf278b_pcm_update);
 
 	// Volume table, 1 = -0.375dB, 8 = -3dB, 256 = -96dB
 	for(i = 0; i < 256; i++)

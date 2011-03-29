@@ -67,25 +67,25 @@ TODO:
 /* Sound comm between CPU's */
 static READ8_HANDLER( sraider_sound_low_r )
 {
-	ladybug_state *state = space->machine->driver_data<ladybug_state>();
+	ladybug_state *state = space->machine().driver_data<ladybug_state>();
 	return state->sound_low;
 }
 
 static READ8_HANDLER( sraider_sound_high_r )
 {
-	ladybug_state *state = space->machine->driver_data<ladybug_state>();
+	ladybug_state *state = space->machine().driver_data<ladybug_state>();
 	return state->sound_high;
 }
 
 static WRITE8_HANDLER( sraider_sound_low_w )
 {
-	ladybug_state *state = space->machine->driver_data<ladybug_state>();
+	ladybug_state *state = space->machine().driver_data<ladybug_state>();
 	state->sound_low = data;
 }
 
 static WRITE8_HANDLER( sraider_sound_high_w )
 {
-	ladybug_state *state = space->machine->driver_data<ladybug_state>();
+	ladybug_state *state = space->machine().driver_data<ladybug_state>();
 	state->sound_high = data;
 }
 
@@ -100,7 +100,7 @@ static READ8_HANDLER( sraider_8005_r )
 /* Unknown IO */
 static WRITE8_HANDLER( sraider_misc_w )
 {
-	ladybug_state *state = space->machine->driver_data<ladybug_state>();
+	ladybug_state *state = space->machine().driver_data<ladybug_state>();
 
 	switch(offset)
 	{
@@ -189,7 +189,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin1_inserted )
 {
-	ladybug_state *state = field->port->machine->driver_data<ladybug_state>();
+	ladybug_state *state = field->port->machine().driver_data<ladybug_state>();
 
 	/* left coin insertion causes an NMI */
 	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -197,7 +197,7 @@ static INPUT_CHANGED( coin1_inserted )
 
 static INPUT_CHANGED( coin2_inserted )
 {
-	ladybug_state *state = field->port->machine->driver_data<ladybug_state>();
+	ladybug_state *state = field->port->machine().driver_data<ladybug_state>();
 
 	/* right coin insertion causes an IRQ */
 	if (newval)
@@ -210,7 +210,7 @@ static INPUT_CHANGED( coin2_inserted )
 
 static CUSTOM_INPUT( ladybug_p1_control_r )
 {
-	return input_port_read(field->port->machine, LADYBUG_P1_CONTROL_PORT_TAG);
+	return input_port_read(field->port->machine(), LADYBUG_P1_CONTROL_PORT_TAG);
 }
 
 static CUSTOM_INPUT( ladybug_p2_control_r )
@@ -218,10 +218,10 @@ static CUSTOM_INPUT( ladybug_p2_control_r )
 	UINT32 ret;
 
 	/* upright cabinet only uses a single set of controls */
-	if (input_port_read(field->port->machine, "DSW0") & 0x20)
-		ret = input_port_read(field->port->machine, LADYBUG_P2_CONTROL_PORT_TAG);
+	if (input_port_read(field->port->machine(), "DSW0") & 0x20)
+		ret = input_port_read(field->port->machine(), LADYBUG_P2_CONTROL_PORT_TAG);
 	else
-		ret = input_port_read(field->port->machine, LADYBUG_P1_CONTROL_PORT_TAG);
+		ret = input_port_read(field->port->machine(), LADYBUG_P1_CONTROL_PORT_TAG);
 
 	return ret;
 }
@@ -724,15 +724,15 @@ GFXDECODE_END
 
 static MACHINE_START( ladybug )
 {
-	ladybug_state *state = machine->driver_data<ladybug_state>();
-	state->maincpu = machine->device("maincpu");
+	ladybug_state *state = machine.driver_data<ladybug_state>();
+	state->maincpu = machine.device("maincpu");
 }
 
 static MACHINE_START( sraider )
 {
-	ladybug_state *state = machine->driver_data<ladybug_state>();
+	ladybug_state *state = machine.driver_data<ladybug_state>();
 
-	state->maincpu = machine->device("maincpu");
+	state->maincpu = machine.device("maincpu");
 
 	state->save_item(NAME(state->grid_color));
 	state->save_item(NAME(state->sound_low));
@@ -752,7 +752,7 @@ static MACHINE_START( sraider )
 
 static MACHINE_RESET( sraider )
 {
-	ladybug_state *state = machine->driver_data<ladybug_state>();
+	ladybug_state *state = machine.driver_data<ladybug_state>();
 	int i;
 
 	state->grid_color = 0;
@@ -1062,10 +1062,10 @@ static DRIVER_INIT( dorodon )
 	/* decode the opcodes */
 
 	offs_t i;
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x6000);
-	UINT8 *rom = machine->region("maincpu")->base();
-	UINT8 *table = machine->region("user1")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *table = machine.region("user1")->base();
 
 	space->set_decrypted_region(0x0000, 0x5fff, decrypted);
 

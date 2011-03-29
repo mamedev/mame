@@ -41,7 +41,7 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
 	/* input port handlers */
 	if (config->type == DEVCB_TYPE_INPUT)
 	{
-		resolved->target = device->machine->port(config->tag);
+		resolved->target = device->machine().port(config->tag);
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_read_line: unable to find input port '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
 		resolved->read = trampoline_read_port_to_read_line;
@@ -74,7 +74,7 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
 		if (config->type == DEVCB_TYPE_SELF)
 			resolved->target = device;
 		else if (config->type == DEVCB_TYPE_DRIVER)
-			resolved->target = device->machine->driver_data();
+			resolved->target = device->machine().driver_data();
 		else
 			if (strcmp(config->tag, DEVICE_SELF_OWNER) == 0)
 				resolved->target = device->owner();
@@ -130,7 +130,7 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 
 	if (config->type == DEVCB_TYPE_INPUT)
 	{
-		resolved->target = device->machine->port(config->tag);
+		resolved->target = device->machine().port(config->tag);
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_write_line: unable to find input port '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
 		resolved->write = trampoline_write_port_to_write_line;
@@ -178,7 +178,7 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 		if (config->type == DEVCB_TYPE_SELF)
 			resolved->target = device;
 		else if (config->type == DEVCB_TYPE_DRIVER)
-			resolved->target = device->machine->driver_data();
+			resolved->target = device->machine().driver_data();
 		else
 			if (strcmp(config->tag, DEVICE_SELF_OWNER) == 0)
 				resolved->target = device->owner();
@@ -228,7 +228,7 @@ void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *conf
 	/* input port handlers */
 	if (config->type == DEVCB_TYPE_INPUT)
 	{
-		resolved->target = device->machine->port(config->tag);
+		resolved->target = device->machine().port(config->tag);
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_read8: unable to find input port '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
 		resolved->read = trampoline_read_port_to_read8;
@@ -258,7 +258,7 @@ void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *conf
 		if (config->type == DEVCB_TYPE_SELF)
 			resolved->target = device;
 		else if (config->type == DEVCB_TYPE_DRIVER)
-			resolved->target = device->machine->driver_data();
+			resolved->target = device->machine().driver_data();
 		else
 			if (strcmp(config->tag, DEVICE_SELF_OWNER) == 0)
 				resolved->target = device->owner();
@@ -307,7 +307,7 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 
 	if (config->type == DEVCB_TYPE_INPUT)
 	{
-		resolved->target = device->machine->port(config->tag);
+		resolved->target = device->machine().port(config->tag);
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_read_line: unable to find input port '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
 		resolved->write = trampoline_write_port_to_write8;
@@ -337,7 +337,7 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 		if (config->type == DEVCB_TYPE_SELF)
 			resolved->target = device;
 		else if (config->type == DEVCB_TYPE_DRIVER)
-			resolved->target = device->machine->driver_data();
+			resolved->target = device->machine().driver_data();
 		else
 			if (strcmp(config->tag, DEVICE_SELF_OWNER) == 0)
 				resolved->target = device->owner();

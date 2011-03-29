@@ -18,7 +18,7 @@
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	relief_state *state = machine->driver_data<relief_state>();
+	relief_state *state = machine.driver_data<relief_state>();
 	UINT16 data1 = state->playfield[tile_index];
 	UINT16 data2 = state->playfield_upper[tile_index] & 0xff;
 	int code = data1 & 0x7fff;
@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_playfield_tile_info )
 
 static TILE_GET_INFO( get_playfield2_tile_info )
 {
-	relief_state *state = machine->driver_data<relief_state>();
+	relief_state *state = machine.driver_data<relief_state>();
 	UINT16 data1 = state->playfield2[tile_index];
 	UINT16 data2 = state->playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x7fff;
@@ -83,10 +83,10 @@ VIDEO_START( relief )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	relief_state *state = machine->driver_data<relief_state>();
+	relief_state *state = machine.driver_data<relief_state>();
 
 	/* MOs are 5bpp but with a 4-bit color granularity */
-	machine->gfx[1]->color_granularity = 16;
+	machine.gfx[1]->color_granularity = 16;
 
 	/* initialize the playfield */
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
@@ -109,8 +109,8 @@ VIDEO_START( relief )
 
 SCREEN_UPDATE( relief )
 {
-	relief_state *state = screen->machine->driver_data<relief_state>();
-	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
+	relief_state *state = screen->machine().driver_data<relief_state>();
+	bitmap_t *priority_bitmap = screen->machine().priority_bitmap;
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

@@ -51,18 +51,18 @@
 
 static INTERRUPT_GEN( battlex_interrupt )
 {
-	battlex_state *state = device->machine->driver_data<battlex_state>();
+	battlex_state *state = device->machine().driver_data<battlex_state>();
 	state->in0_b4 = 1;
 	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static CUSTOM_INPUT( battlex_in0_b4_r )
 {
-	battlex_state *state = field->port->machine->driver_data<battlex_state>();
+	battlex_state *state = field->port->machine().driver_data<battlex_state>();
 	UINT32 ret = state->in0_b4;
 	if (state->in0_b4)
 	{
-		cputag_set_input_line(field->port->machine, "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(field->port->machine(), "maincpu", 0, CLEAR_LINE);
 		state->in0_b4 = 0;
 	}
 
@@ -229,7 +229,7 @@ static const ay8910_interface battlex_ay8910_interface =
 
 static MACHINE_START( battlex )
 {
-	battlex_state *state = machine->driver_data<battlex_state>();
+	battlex_state *state = machine.driver_data<battlex_state>();
 
 	/* register for save states */
 	state->save_item(NAME(state->scroll_lsb));
@@ -240,7 +240,7 @@ static MACHINE_START( battlex )
 
 static MACHINE_RESET( battlex )
 {
-	battlex_state *state = machine->driver_data<battlex_state>();
+	battlex_state *state = machine.driver_data<battlex_state>();
 
 	state->scroll_lsb = 0;
 	state->scroll_msb = 0;
@@ -318,9 +318,9 @@ ROM_END
 
 static DRIVER_INIT( battlex )
 {
-	UINT8 *colormask = machine->region("user1")->base();
-	UINT8 *gfxdata = machine->region("user2")->base();
-	UINT8 *dest = machine->region("gfx1")->base();
+	UINT8 *colormask = machine.region("user1")->base();
+	UINT8 *gfxdata = machine.region("user2")->base();
+	UINT8 *dest = machine.region("gfx1")->base();
 
 	int tile, line, bit;
 

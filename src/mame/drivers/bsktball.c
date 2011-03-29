@@ -40,29 +40,29 @@ static PALETTE_INIT( bsktball )
 {
 	int i;
 
-	machine->colortable = colortable_alloc(machine, 4);
+	machine.colortable = colortable_alloc(machine, 4);
 
-	colortable_palette_set_color(machine->colortable,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-	colortable_palette_set_color(machine->colortable,1,MAKE_RGB(0x80,0x80,0x80)); /* LIGHT GREY */
-	colortable_palette_set_color(machine->colortable,2,MAKE_RGB(0x50,0x50,0x50)); /* DARK GREY */
-	colortable_palette_set_color(machine->colortable,3,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+	colortable_palette_set_color(machine.colortable,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+	colortable_palette_set_color(machine.colortable,1,MAKE_RGB(0x80,0x80,0x80)); /* LIGHT GREY */
+	colortable_palette_set_color(machine.colortable,2,MAKE_RGB(0x50,0x50,0x50)); /* DARK GREY */
+	colortable_palette_set_color(machine.colortable,3,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 
 	/* playfield */
 	for (i = 0; i < 2; i++)
 	{
-		colortable_entry_set_value(machine->colortable, i*4 + 0, 1);
-		colortable_entry_set_value(machine->colortable, i*4 + 1, 3 * i);
-		colortable_entry_set_value(machine->colortable, i*4 + 2, 3 * i);
-		colortable_entry_set_value(machine->colortable, i*4 + 3, 3 * i);
+		colortable_entry_set_value(machine.colortable, i*4 + 0, 1);
+		colortable_entry_set_value(machine.colortable, i*4 + 1, 3 * i);
+		colortable_entry_set_value(machine.colortable, i*4 + 2, 3 * i);
+		colortable_entry_set_value(machine.colortable, i*4 + 3, 3 * i);
 	}
 
 	/* motion */
 	for (i = 0; i < 4*4*4; i++)
 	{
-		colortable_entry_set_value(machine->colortable, 2*4 + i*4 + 0, 1);
-		colortable_entry_set_value(machine->colortable, 2*4 + i*4 + 1, (i >> 2) & 3);
-		colortable_entry_set_value(machine->colortable, 2*4 + i*4 + 2, (i >> 0) & 3);
-		colortable_entry_set_value(machine->colortable, 2*4 + i*4 + 3, (i >> 4) & 3);
+		colortable_entry_set_value(machine.colortable, 2*4 + i*4 + 0, 1);
+		colortable_entry_set_value(machine.colortable, 2*4 + i*4 + 1, (i >> 2) & 3);
+		colortable_entry_set_value(machine.colortable, 2*4 + i*4 + 2, (i >> 0) & 3);
+		colortable_entry_set_value(machine.colortable, 2*4 + i*4 + 3, (i >> 4) & 3);
 	}
 }
 
@@ -212,7 +212,7 @@ GFXDECODE_END
 
 static MACHINE_START( bsktball )
 {
-	bsktball_state *state = machine->driver_data<bsktball_state>();
+	bsktball_state *state = machine.driver_data<bsktball_state>();
 
 	state->save_item(NAME(state->nmi_on));
 	state->save_item(NAME(state->i256v));
@@ -230,7 +230,7 @@ static MACHINE_START( bsktball )
 
 static MACHINE_RESET( bsktball )
 {
-	bsktball_state *state = machine->driver_data<bsktball_state>();
+	bsktball_state *state = machine.driver_data<bsktball_state>();
 
 	state->nmi_on = 0;
 	state->i256v = 0;

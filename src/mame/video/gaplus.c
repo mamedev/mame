@@ -28,7 +28,7 @@ PALETTE_INIT( gaplus )
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 256);
+	machine.colortable = colortable_alloc(machine, 256);
 
 	for (i = 0;i < 256;i++)
 	{
@@ -53,20 +53,20 @@ PALETTE_INIT( gaplus )
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine.colortable,i,MAKE_RGB(r,g,b));
 	}
 
 	color_prom += 0x300;
 	/* color_prom now points to the beginning of the lookup table */
 
 	/* characters use colors 0xf0-0xff */
-	for (i = 0;i < machine->gfx[0]->total_colors * machine->gfx[0]->color_granularity;i++)
-		colortable_entry_set_value(machine->colortable, machine->gfx[0]->color_base + i, 0xf0 + (*color_prom++ & 0x0f));
+	for (i = 0;i < machine.gfx[0]->total_colors * machine.gfx[0]->color_granularity;i++)
+		colortable_entry_set_value(machine.colortable, machine.gfx[0]->color_base + i, 0xf0 + (*color_prom++ & 0x0f));
 
 	/* sprites */
-	for (i = 0;i < machine->gfx[1]->total_colors * machine->gfx[1]->color_granularity;i++)
+	for (i = 0;i < machine.gfx[1]->total_colors * machine.gfx[1]->color_granularity;i++)
 	{
-		colortable_entry_set_value(machine->colortable, machine->gfx[1]->color_base + i, (color_prom[0] & 0x0f) + ((color_prom[0x200] & 0x0f) << 4));
+		colortable_entry_set_value(machine.colortable, machine.gfx[1]->color_base + i, (color_prom[0] & 0x0f) + ((color_prom[0x200] & 0x0f) << 4));
 		color_prom++;
 	}
 }
@@ -96,7 +96,7 @@ static TILEMAP_MAPPER( tilemap_scan )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	gaplus_state *state = machine->driver_data<gaplus_state>();
+	gaplus_state *state = machine.driver_data<gaplus_state>();
 	UINT8 attr = state->videoram[tile_index + 0x400];
 	tileinfo->category = (attr & 0x40) >> 6;
 	tileinfo->group = attr & 0x3f;
@@ -125,16 +125,16 @@ static TILE_GET_INFO( get_tile_info )
 #define SPEED_2 1.0
 #define SPEED_3 2.0
 
-static void starfield_init(running_machine *machine)
+static void starfield_init(running_machine &machine)
 {
-	gaplus_state *state = machine->driver_data<gaplus_state>();
+	gaplus_state *state = machine.driver_data<gaplus_state>();
 	struct star *stars = state->stars;
 	int generator = 0;
 	int x,y;
 	int set = 0;
 
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	state->total_stars = 0;
 
@@ -181,10 +181,10 @@ static void starfield_init(running_machine *machine)
 
 VIDEO_START( gaplus )
 {
-	gaplus_state *state = machine->driver_data<gaplus_state>();
+	gaplus_state *state = machine.driver_data<gaplus_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan,8,8,36,28);
 
-	colortable_configure_tilemap_groups(machine->colortable, state->bg_tilemap, machine->gfx[0], 0xff);
+	colortable_configure_tilemap_groups(machine.colortable, state->bg_tilemap, machine.gfx[0], 0xff);
 
 	starfield_init(machine);
 }
@@ -199,20 +199,20 @@ VIDEO_START( gaplus )
 
 READ8_HANDLER( gaplus_videoram_r )
 {
-	gaplus_state *state = space->machine->driver_data<gaplus_state>();
+	gaplus_state *state = space->machine().driver_data<gaplus_state>();
 	return state->videoram[offset];
 }
 
 WRITE8_HANDLER( gaplus_videoram_w )
 {
-	gaplus_state *state = space->machine->driver_data<gaplus_state>();
+	gaplus_state *state = space->machine().driver_data<gaplus_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( gaplus_starfield_control_w )
 {
-	gaplus_state *state = space->machine->driver_data<gaplus_state>();
+	gaplus_state *state = space->machine().driver_data<gaplus_state>();
 	offset &= 3;
 	state->starfield_control[offset] = data;
 }
@@ -225,14 +225,14 @@ WRITE8_HANDLER( gaplus_starfield_control_w )
 
 ***************************************************************************/
 
-static void starfield_render(running_machine *machine, bitmap_t *bitmap)
+static void starfield_render(running_machine &machine, bitmap_t *bitmap)
 {
-	gaplus_state *state = machine->driver_data<gaplus_state>();
+	gaplus_state *state = machine.driver_data<gaplus_state>();
 	struct star *stars = state->stars;
 	int i;
 
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	/* check if we're running */
 	if ( ( state->starfield_control[0] & 1 ) == 0 )
@@ -253,9 +253,9 @@ static void starfield_render(running_machine *machine, bitmap_t *bitmap)
 	}
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	gaplus_state *state = machine->driver_data<gaplus_state>();
+	gaplus_state *state = machine.driver_data<gaplus_state>();
 	UINT8 *spriteram = state->spriteram + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
@@ -295,12 +295,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					drawgfx_transmask(bitmap,cliprect,machine->gfx[1],
+					drawgfx_transmask(bitmap,cliprect,machine.gfx[1],
 						sprite + (duplicate ? 0 : (gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)])),
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
-						colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0xff));
+						colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0xff));
 				}
 			}
 		}
@@ -309,18 +309,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( gaplus )
 {
-	gaplus_state *state = screen->machine->driver_data<gaplus_state>();
+	gaplus_state *state = screen->machine().driver_data<gaplus_state>();
 	/* flip screen control is embedded in RAM */
-	flip_screen_set(screen->machine, state->spriteram[0x1f7f-0x800] & 1);
+	flip_screen_set(screen->machine(), state->spriteram[0x1f7f-0x800] & 1);
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	starfield_render(screen->machine, bitmap);
+	starfield_render(screen->machine(), bitmap);
 
 	/* draw the low priority characters */
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 
 	/* draw the high priority characters */
 	/* (I don't know if this feature is used by Gaplus, but it's shown in the schematics) */
@@ -331,12 +331,12 @@ SCREEN_UPDATE( gaplus )
 
 SCREEN_EOF( gaplus )	/* update starfields */
 {
-	gaplus_state *state = machine->driver_data<gaplus_state>();
+	gaplus_state *state = machine.driver_data<gaplus_state>();
 	struct star *stars = state->stars;
 	int i;
 
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	/* check if we're running */
 	if ( ( state->starfield_control[0] & 1 ) == 0 )

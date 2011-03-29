@@ -219,18 +219,18 @@ static void mtlog_dump(void) { }
 //  (main thread)
 //============================================================
 
-void winwindow_init(running_machine *machine)
+void winwindow_init(running_machine &machine)
 {
 	size_t temp;
 
 	// determine if we are using multithreading or not
-	multithreading_enabled = downcast<windows_options &>(machine->options()).multithreading();
+	multithreading_enabled = downcast<windows_options &>(machine.options()).multithreading();
 
 	// get the main thread ID before anything else
 	main_threadid = GetCurrentThreadId();
 
 	// ensure we get called on the way out
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, winwindow_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, winwindow_exit);
 
 	// set up window class and register it
 	create_window_class();
@@ -268,18 +268,18 @@ void winwindow_init(running_machine *machine)
 	// initialize the drawers
 	if (video_config.mode == VIDEO_MODE_D3D)
 	{
-		if (drawd3d_init(*machine, &draw))
+		if (drawd3d_init(machine, &draw))
 			video_config.mode = VIDEO_MODE_GDI;
 	}
 	if (video_config.mode == VIDEO_MODE_DDRAW)
 	{
-		if (drawdd_init(*machine, &draw))
+		if (drawdd_init(machine, &draw))
 			video_config.mode = VIDEO_MODE_GDI;
 	}
 	if (video_config.mode == VIDEO_MODE_GDI)
-		drawgdi_init(*machine, &draw);
+		drawgdi_init(machine, &draw);
 	if (video_config.mode == VIDEO_MODE_NONE)
-		drawnone_init(*machine, &draw);
+		drawnone_init(machine, &draw);
 
 	// set up the window list
 	last_window_ptr = &win_window_list;
@@ -339,7 +339,7 @@ static void winwindow_exit(running_machine &machine)
 //  (main thread)
 //============================================================
 
-void winwindow_process_events_periodic(running_machine *machine)
+void winwindow_process_events_periodic(running_machine &machine)
 {
 	DWORD currticks = GetTickCount();
 
@@ -375,14 +375,14 @@ static BOOL is_mame_window(HWND hwnd)
 //  (main thread)
 //============================================================
 
-void winwindow_process_events(running_machine *machine, int ingame)
+void winwindow_process_events(running_machine &machine, int ingame)
 {
 	MSG message;
 
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// if we're running, disable some parts of the debugger
-	if (ingame && (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
+	if (ingame && (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
 		debugwin_update_during_game(machine);
 
 	// remember the last time we did this
@@ -462,7 +462,7 @@ void winwindow_process_events(running_machine *machine, int ingame)
 //  (main thread)
 //============================================================
 
-void winwindow_dispatch_message(running_machine *machine, MSG *message)
+void winwindow_dispatch_message(running_machine &machine, MSG *message)
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
@@ -471,7 +471,7 @@ void winwindow_dispatch_message(running_machine *machine, MSG *message)
 	{
 		// special case for quit
 		case WM_QUIT:
-			machine->schedule_exit();
+			machine.schedule_exit();
 			break;
 
 		// temporary pause from the window thread
@@ -511,7 +511,7 @@ void winwindow_toggle_full_screen(void)
 
 	// if we are in debug mode, never go full screen
 	for (window = win_window_list; window != NULL; window = window->next)
-		if (window->machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
+		if (window->machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
 			return;
 
 	// toggle the window mode
@@ -549,7 +549,7 @@ BOOL winwindow_has_focus(void)
 //  (main thread)
 //============================================================
 
-void winwindow_update_cursor_state(running_machine *machine)
+void winwindow_update_cursor_state(running_machine &machine)
 {
 	static POINT saved_cursor_pos = { -1, -1 };
 
@@ -561,7 +561,7 @@ void winwindow_update_cursor_state(running_machine *machine)
 	//   2. we also hide the cursor in full screen mode and when the window doesn't have a menu
 	//   3. we also hide the cursor in windowed mode if we're not paused and
 	//      the input system requests it
-	if (winwindow_has_focus() && ((!video_config.windowed && !win_has_menu(win_window_list)) || (!machine->paused() && wininput_should_hide_mouse())))
+	if (winwindow_has_focus() && ((!video_config.windowed && !win_has_menu(win_window_list)) || (!machine.paused() && wininput_should_hide_mouse())))
 	{
 		win_window_info *window = win_window_list;
 		RECT bounds;
@@ -602,7 +602,7 @@ void winwindow_update_cursor_state(running_machine *machine)
 //  (main thread)
 //============================================================
 
-void winwindow_video_window_create(running_machine *machine, int index, win_monitor_info *monitor, const win_window_config *config)
+void winwindow_video_window_create(running_machine &machine, int index, win_monitor_info *monitor, const win_window_config *config)
 {
 	win_window_info *window, *win;
 
@@ -615,7 +615,7 @@ void winwindow_video_window_create(running_machine *machine, int index, win_moni
 	window->refresh = config->refresh;
 	window->monitor = monitor;
 	window->fullscreen = !video_config.windowed;
-	window->machine = machine;
+	window->m_machine = &machine;
 
 	// see if we are safe for fullscreen
 	window->fullscreen_safe = TRUE;
@@ -631,10 +631,10 @@ void winwindow_video_window_create(running_machine *machine, int index, win_moni
 	window->render_lock = osd_lock_alloc();
 
 	// load the layout
-	window->target = machine->render().target_alloc();
+	window->target = machine.render().target_alloc();
 
 	// set the specific view
-	windows_options &options = downcast<windows_options &>(machine->options());
+	windows_options &options = downcast<windows_options &>(machine.options());
 	set_starting_view(index, window, options.view(index));
 
 	// remember the current values in case they change
@@ -644,9 +644,9 @@ void winwindow_video_window_create(running_machine *machine, int index, win_moni
 
 	// make the window title
 	if (video_config.numscreens == 1)
-		sprintf(window->title, APPNAME ": %s [%s]", machine->system().description, machine->system().name);
+		sprintf(window->title, APPNAME ": %s [%s]", machine.system().description, machine.system().name);
 	else
-		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", machine->system().description, machine->system().name, index);
+		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", machine.system().description, machine.system().name, index);
 
 	// set the initial maximized state
 	window->startmaximized = options.maximize();
@@ -695,7 +695,7 @@ static void winwindow_video_window_destroy(win_window_info *window)
 		SendMessage(window->hwnd, WM_USER_SELF_TERMINATE, 0, 0);
 
 	// free the render target
-	window->machine->render().target_free(window->target);
+	window->machine().render().target_free(window->target);
 
 	// free the lock
 	osd_lock_free(window->render_lock);
@@ -748,7 +748,7 @@ void winwindow_video_window_update(win_window_info *window)
 		mtlog_add("winwindow_video_window_update: try lock");
 
 		// only block if we're throttled
-		if (window->machine->video().throttled() || timeGetTime() - last_update_time > 250)
+		if (window->machine().video().throttled() || timeGetTime() - last_update_time > 250)
 			osd_lock_acquire(window->render_lock);
 		else
 			got_lock = osd_lock_try(window->render_lock);
@@ -849,7 +849,7 @@ static void create_window_class(void)
 
 static void set_starting_view(int index, win_window_info *window, const char *view)
 {
-	const char *defview = downcast<windows_options &>(window->machine->options()).view();
+	const char *defview = downcast<windows_options &>(window->machine().options()).view();
 	int viewindex;
 
 	assert(GetCurrentThreadId() == main_threadid);
@@ -872,7 +872,7 @@ static void set_starting_view(int index, win_window_info *window, const char *vi
 //  (main thread)
 //============================================================
 
-void winwindow_ui_pause_from_main_thread(running_machine *machine, int pause)
+void winwindow_ui_pause_from_main_thread(running_machine &machine, int pause)
 {
 	int old_temp_pause = ui_temp_pause;
 
@@ -885,9 +885,9 @@ void winwindow_ui_pause_from_main_thread(running_machine *machine, int pause)
 		if (ui_temp_pause++ == 0)
 		{
 			// only call mame_pause if we weren't already paused due to some external reason
-			ui_temp_was_paused = machine->paused();
+			ui_temp_was_paused = machine.paused();
 			if (!ui_temp_was_paused)
-				machine->pause();
+				machine.pause();
 
 			SetEvent(ui_pause_event);
 		}
@@ -901,7 +901,7 @@ void winwindow_ui_pause_from_main_thread(running_machine *machine, int pause)
 		{
 			// but only do it if we were the ones who initiated it
 			if (!ui_temp_was_paused)
-				machine->resume();
+				machine.resume();
 
 			ResetEvent(ui_pause_event);
 		}
@@ -918,7 +918,7 @@ void winwindow_ui_pause_from_main_thread(running_machine *machine, int pause)
 //  (window thread)
 //============================================================
 
-void winwindow_ui_pause_from_window_thread(running_machine *machine, int pause)
+void winwindow_ui_pause_from_window_thread(running_machine &machine, int pause)
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
@@ -967,9 +967,9 @@ void winwindow_ui_exec_on_main_thread(void (*func)(void *), void *param)
 //  winwindow_ui_is_paused
 //============================================================
 
-int winwindow_ui_is_paused(running_machine *machine)
+int winwindow_ui_is_paused(running_machine &machine)
 {
-	return machine->paused() && ui_temp_was_paused;
+	return machine.paused() && ui_temp_was_paused;
 }
 
 
@@ -1120,9 +1120,9 @@ static int complete_create(win_window_info *window)
 	monitorbounds = window->monitor->info.rcMonitor;
 
 	// create the window menu if needed
-	if (downcast<windows_options &>(window->machine->options()).menu())
+	if (downcast<windows_options &>(window->machine().options()).menu())
 	{
-		if (win_create_menu(window->machine, &menu))
+		if (win_create_menu(window->machine(), &menu))
 			return 1;
 	}
 
@@ -1232,17 +1232,17 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 
 		// input events
 		case WM_MOUSEMOVE:
-			ui_input_push_mouse_move_event(window->machine, window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			ui_input_push_mouse_move_event(window->machine(), window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			break;
 
 		case WM_MOUSELEAVE:
-			ui_input_push_mouse_leave_event(window->machine, window->target);
+			ui_input_push_mouse_leave_event(window->machine(), window->target);
 			break;
 
 		case WM_LBUTTONDOWN:
 		{
 			DWORD ticks = GetTickCount();
-			ui_input_push_mouse_down_event(window->machine, window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			ui_input_push_mouse_down_event(window->machine(), window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 
 			// check for a double-click
 			if (ticks - window->lastclicktime < GetDoubleClickTime() &&
@@ -1250,7 +1250,7 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 				GET_Y_LPARAM(lparam) >= window->lastclicky - 4 && GET_Y_LPARAM(lparam) <= window->lastclicky + 4)
 			{
 				window->lastclicktime = 0;
-				ui_input_push_mouse_double_click_event(window->machine, window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+				ui_input_push_mouse_double_click_event(window->machine(), window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			}
 			else
 			{
@@ -1262,25 +1262,25 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 		}
 
 		case WM_LBUTTONUP:
-			ui_input_push_mouse_up_event(window->machine, window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			ui_input_push_mouse_up_event(window->machine(), window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			break;
 
 		case WM_CHAR:
-			ui_input_push_char_event(window->machine, window->target, (unicode_char) wparam);
+			ui_input_push_char_event(window->machine(), window->target, (unicode_char) wparam);
 			break;
 
 		// pause the system when we start a menu or resize
 		case WM_ENTERSIZEMOVE:
 			window->resize_state = RESIZE_STATE_RESIZING;
 		case WM_ENTERMENULOOP:
-			winwindow_ui_pause_from_window_thread(window->machine, TRUE);
+			winwindow_ui_pause_from_window_thread(window->machine(), TRUE);
 			break;
 
 		// unpause the system when we stop a menu or resize and force a redraw
 		case WM_EXITSIZEMOVE:
 			window->resize_state = RESIZE_STATE_PENDING;
 		case WM_EXITMENULOOP:
-			winwindow_ui_pause_from_window_thread(window->machine, FALSE);
+			winwindow_ui_pause_from_window_thread(window->machine(), FALSE);
 			InvalidateRect(wnd, NULL, FALSE);
 			break;
 
@@ -1336,7 +1336,7 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 			if (multithreading_enabled)
 				PostThreadMessage(main_threadid, WM_QUIT, 0, 0);
 			else
-				window->machine->schedule_exit();
+				window->machine().schedule_exit();
 			break;
 
 		// destroy: clean up all attached rendering bits and NULL out our hwnd

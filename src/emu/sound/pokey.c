@@ -648,15 +648,15 @@ static DEVICE_START( pokey )
 	chip->clockmult = DIV_64;
 	chip->KBCODE = 0x09;		 /* Atari 800 'no key' */
 	chip->SKCTL = SK_RESET;	 /* let the RNG run after reset */
-	chip->rtimer = device->machine->scheduler().timer_alloc(FUNC(NULL));
+	chip->rtimer = device->machine().scheduler().timer_alloc(FUNC(NULL));
 
-	chip->timer[0] = device->machine->scheduler().timer_alloc(FUNC(pokey_timer_expire), chip);
-	chip->timer[1] = device->machine->scheduler().timer_alloc(FUNC(pokey_timer_expire), chip);
-	chip->timer[2] = device->machine->scheduler().timer_alloc(FUNC(pokey_timer_expire), chip);
+	chip->timer[0] = device->machine().scheduler().timer_alloc(FUNC(pokey_timer_expire), chip);
+	chip->timer[1] = device->machine().scheduler().timer_alloc(FUNC(pokey_timer_expire), chip);
+	chip->timer[2] = device->machine().scheduler().timer_alloc(FUNC(pokey_timer_expire), chip);
 
 	for (i=0; i<8; i++)
 	{
-		chip->ptimer[i] = device->machine->scheduler().timer_alloc(FUNC(pokey_pot_trigger), chip);
+		chip->ptimer[i] = device->machine().scheduler().timer_alloc(FUNC(pokey_pot_trigger), chip);
 		devcb_resolve_read8(&chip->pot_r[i], &chip->intf.pot_r[i], device);
 	}
 	devcb_resolve_read8(&chip->allpot_r, &chip->intf.allpot_r, device);
@@ -664,7 +664,7 @@ static DEVICE_START( pokey )
 	devcb_resolve_write8(&chip->serout_w, &chip->intf.serout_w, device);
 	chip->interrupt_cb = chip->intf.interrupt_cb;
 
-	chip->channel = device->machine->sound().stream_alloc(*device, 0, 1, sample_rate, chip, pokey_update);
+	chip->channel = device->machine().sound().stream_alloc(*device, 0, 1, sample_rate, chip, pokey_update);
 
 	register_for_save(chip, device);
 }
@@ -843,7 +843,7 @@ READ8_DEVICE_HANDLER( pokey_r )
 			}
 		}
 		else
-			logerror("%s: warning - read '%s' POT%d\n", p->device->machine->describe_context(), p->device->tag(), pot);
+			logerror("%s: warning - read '%s' POT%d\n", p->device->machine().describe_context(), p->device->tag(), pot);
 		break;
 
     case ALLPOT_C:
@@ -943,7 +943,7 @@ READ8_HANDLER( quad_pokey_r )
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset % 8) | control;
 
-	return pokey_r(space->machine->device(devname[pokey_num]), pokey_reg);
+	return pokey_r(space->machine().device(devname[pokey_num]), pokey_reg);
 }
 
 
@@ -1138,9 +1138,9 @@ WRITE8_DEVICE_HANDLER( pokey_w )
          * loaders from Ballblazer and Escape from Fractalus
          * The real times are unknown
          */
-        device->machine->scheduler().timer_set(attotime::from_usec(200), FUNC(pokey_serout_ready_cb), 0, p);
+        device->machine().scheduler().timer_set(attotime::from_usec(200), FUNC(pokey_serout_ready_cb), 0, p);
         /* 10 bits (assumption 1 start, 8 data and 1 stop bit) take how long? */
-        device->machine->scheduler().timer_set(attotime::from_usec(2000), FUNC(pokey_serout_complete), 0, p);
+        device->machine().scheduler().timer_set(attotime::from_usec(2000), FUNC(pokey_serout_complete), 0, p);
         break;
 
     case IRQEN_C:
@@ -1329,13 +1329,13 @@ WRITE8_HANDLER( quad_pokey_w )
     int control = (offset & 0x20) >> 2;
     int pokey_reg = (offset % 8) | control;
 
-    pokey_w(space->machine->device(devname[pokey_num]), pokey_reg, data);
+    pokey_w(space->machine().device(devname[pokey_num]), pokey_reg, data);
 }
 
 void pokey_serin_ready(device_t *device, int after)
 {
 	pokey_state *p = get_safe_token(device);
-	device->machine->scheduler().timer_set(p->clock_period * after, FUNC(pokey_serin_ready_cb), 0, p);
+	device->machine().scheduler().timer_set(p->clock_period * after, FUNC(pokey_serin_ready_cb), 0, p);
 }
 
 void pokey_break_w(device_t *device, int shift)

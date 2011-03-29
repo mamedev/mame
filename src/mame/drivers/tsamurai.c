@@ -51,13 +51,13 @@ TODO:
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
 	state->nmi_enabled = data;
 }
 
 static INTERRUPT_GEN( samurai_interrupt )
 {
-	tsamurai_state *state = device->machine->driver_data<tsamurai_state>();
+	tsamurai_state *state = device->machine().driver_data<tsamurai_state>();
 	if (state->nmi_enabled) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -88,33 +88,33 @@ static READ8_HANDLER( unknown_d938_r )
 
 static WRITE8_HANDLER( sound_command1_w )
 {
-	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
 	state->sound_command1 = data;
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE );
+	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_command2_w )
 {
-	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
 	state->sound_command2 = data;
-	cputag_set_input_line(space->machine, "audio2", 0, HOLD_LINE );
+	cputag_set_input_line(space->machine(), "audio2", 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_command3_w )
 {
-	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
 	state->sound_command3 = data;
-	cputag_set_input_line(space->machine, "audio3", 0, HOLD_LINE );
+	cputag_set_input_line(space->machine(), "audio3", 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(space->machine, data);
+	flip_screen_set(space->machine(), data);
 }
 
 static WRITE8_HANDLER( tsamurai_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset,data);
+	coin_counter_w(space->machine(), offset,data);
 }
 
 
@@ -205,19 +205,19 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( sound_command1_r )
 {
-	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
 	return state->sound_command1;
 }
 
 static READ8_HANDLER( sound_command2_r )
 {
-	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
 	return state->sound_command2;
 }
 
 static READ8_HANDLER( sound_command3_r )
 {
-	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
 	return state->sound_command3;
 }
 
@@ -279,13 +279,13 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( vsgongf_sound_nmi_enable_w )
 {
-	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
 	state->vsgongf_sound_nmi_enabled = data;
 }
 
 static INTERRUPT_GEN( vsgongf_sound_interrupt )
 {
-	tsamurai_state *state = device->machine->driver_data<tsamurai_state>();
+	tsamurai_state *state = device->machine().driver_data<tsamurai_state>();
 	if (state->vsgongf_sound_nmi_enabled) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -294,9 +294,9 @@ static INTERRUPT_GEN( vsgongf_sound_interrupt )
 static READ8_HANDLER( vsgongf_a006_r )
 {
 	/* sound CPU busy? */
-	if (!strcmp(space->machine->system().name,"vsgongf"))  return 0x80;
-	if (!strcmp(space->machine->system().name,"ringfgt"))  return 0x80;
-	if (!strcmp(space->machine->system().name,"ringfgt2")) return 0xc0;
+	if (!strcmp(space->machine().system().name,"vsgongf"))  return 0x80;
+	if (!strcmp(space->machine().system().name,"ringfgt"))  return 0x80;
+	if (!strcmp(space->machine().system().name,"ringfgt2")) return 0xc0;
 
 	logerror ("unhandled read from a006\n");
 	return 0x00;
@@ -305,9 +305,9 @@ static READ8_HANDLER( vsgongf_a006_r )
 static READ8_HANDLER( vsgongf_a100_r )
 {
 	/* protection? */
-	if (!strcmp(space->machine->system().name,"vsgongf"))  return 0xaa;
-	if (!strcmp(space->machine->system().name,"ringfgt"))  return 0x63;
-	if (!strcmp(space->machine->system().name,"ringfgt2")) return 0x6a;
+	if (!strcmp(space->machine().system().name,"vsgongf"))  return 0xaa;
+	if (!strcmp(space->machine().system().name,"ringfgt"))  return 0x63;
+	if (!strcmp(space->machine().system().name,"ringfgt2")) return 0x6a;
 
 	logerror ("unhandled read from a100\n");
 	return 0x00;
@@ -316,7 +316,7 @@ static READ8_HANDLER( vsgongf_a100_r )
 static WRITE8_HANDLER( vsgongf_sound_command_w )
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( vsgongf_map, AS_PROGRAM, 8 )

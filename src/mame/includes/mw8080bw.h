@@ -119,12 +119,12 @@ MACHINE_CONFIG_EXTERN( mw8080bw_root );
 MACHINE_CONFIG_EXTERN( invaders );
 extern const char layout_invaders[];
 
-UINT8 tornbase_get_cabinet_type(running_machine *machine);
+UINT8 tornbase_get_cabinet_type(running_machine &machine);
 
 CUSTOM_INPUT( invaders_in1_control_r );
 CUSTOM_INPUT( invaders_in2_control_r );
 
-int invaders_is_cabinet_cocktail(running_machine *machine);
+int invaders_is_cabinet_cocktail(running_machine &machine);
 
 
 /*----------- defined in machine/mw8080bw.c -----------*/

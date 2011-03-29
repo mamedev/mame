@@ -8,12 +8,12 @@
 #include "cpu/v60/v60.h"
 #include "includes/model1.h"
 
-#define TGP_FUNCTION(name) void name(running_machine *machine)
+#define TGP_FUNCTION(name) void name(running_machine &machine)
 
 
 static UINT32 fifoout_pop(address_space *space)
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	UINT32 v;
 	if(state->fifoout_wpos == state->fifoout_rpos) {
 		fatalerror("TGP FIFOOUT underflow (%x)", cpu_get_pc(space->cpu));
@@ -59,7 +59,7 @@ static UINT32 fifoin_pop(model1_state *state)
 
 static void fifoin_push(address_space *space, UINT32 data)
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	//  logerror("TGP FIFOIN write %08x (%x)\n", data, cpu_get_pc(space->cpu));
 	state->fifoin_data[state->fifoin_wpos++] = data;
 	if(state->fifoin_wpos == FIFO_SIZE)
@@ -68,7 +68,7 @@ static void fifoin_push(address_space *space, UINT32 data)
 		logerror("TGP FIFOIN overflow\n");
 	state->fifoin_cbcount--;
 	if(!state->fifoin_cbcount)
-		state->fifoin_cb(space->machine);
+		state->fifoin_cb(space->machine());
 }
 
 static float fifoin_pop_f(model1_state *state)
@@ -121,7 +121,7 @@ static float ram_get_f(model1_state *state)
 
 static TGP_FUNCTION( fadd )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float r = a+b;
@@ -132,7 +132,7 @@ static TGP_FUNCTION( fadd )
 
 static TGP_FUNCTION( fsub )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float r = a-b;
@@ -144,7 +144,7 @@ static TGP_FUNCTION( fsub )
 
 static TGP_FUNCTION( fmul )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float r = a*b;
@@ -155,7 +155,7 @@ static TGP_FUNCTION( fmul )
 
 static TGP_FUNCTION( fdiv )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 //  float r = !b ? 1e39 : a/b;
@@ -167,7 +167,7 @@ static TGP_FUNCTION( fdiv )
 
 static TGP_FUNCTION( matrix_push )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	if(state->mat_stack_pos != MAT_STACK_SIZE) {
 		memcpy(state->mat_stack[state->mat_stack_pos], state->cmat, sizeof(state->cmat));
 		state->mat_stack_pos++;
@@ -178,7 +178,7 @@ static TGP_FUNCTION( matrix_push )
 
 static TGP_FUNCTION( matrix_pop )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	if(state->mat_stack_pos) {
 		state->mat_stack_pos--;
 		memcpy(state->cmat, state->mat_stack[state->mat_stack_pos], sizeof(state->cmat));
@@ -189,7 +189,7 @@ static TGP_FUNCTION( matrix_pop )
 
 static TGP_FUNCTION( matrix_write )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	int i;
 	for(i=0; i<12; i++)
 		state->cmat[i] = fifoin_pop_f(state);
@@ -201,7 +201,7 @@ static TGP_FUNCTION( matrix_write )
 
 static TGP_FUNCTION( clear_stack )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	logerror("TGP clear_stack (%x)\n", state->pushpc);
 	state->mat_stack_pos = 0;
 	next_fn(state);
@@ -209,7 +209,7 @@ static TGP_FUNCTION( clear_stack )
 
 static TGP_FUNCTION( matrix_mul )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float m[12];
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
@@ -243,7 +243,7 @@ static TGP_FUNCTION( matrix_mul )
 
 static TGP_FUNCTION( anglev )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	logerror("TGP anglev %f, %f (%x)\n", a, b, state->pushpc);
@@ -264,7 +264,7 @@ static TGP_FUNCTION( anglev )
 
 static TGP_FUNCTION( f11 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -292,7 +292,7 @@ static TGP_FUNCTION( f11 )
 
 static TGP_FUNCTION( normalize )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -306,7 +306,7 @@ static TGP_FUNCTION( normalize )
 
 static TGP_FUNCTION( acc_seti )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	INT32 a = fifoin_pop(state);
 	state->dump = 1;
 	logerror("TGP acc_seti %d (%x)\n", a, state->pushpc);
@@ -316,7 +316,7 @@ static TGP_FUNCTION( acc_seti )
 
 static TGP_FUNCTION( track_select )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	INT32 a = fifoin_pop(state);
 	logerror("TGP track_select %d (%x)\n", a, state->pushpc);
 	state->tgp_vr_select = a;
@@ -325,7 +325,7 @@ static TGP_FUNCTION( track_select )
 
 static TGP_FUNCTION( f14 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	state->tgp_vr_base[0] = fifoin_pop_f(state);
 	state->tgp_vr_base[1] = fifoin_pop_f(state);
 	state->tgp_vr_base[2] = fifoin_pop_f(state);
@@ -336,7 +336,7 @@ static TGP_FUNCTION( f14 )
 
 static TGP_FUNCTION( f15_swa )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	logerror("TGP f15_swa (%x)\n", state->pushpc);
 
 	next_fn(state);
@@ -344,7 +344,7 @@ static TGP_FUNCTION( f15_swa )
 
 static TGP_FUNCTION( anglep )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -369,7 +369,7 @@ static TGP_FUNCTION( anglep )
 
 static TGP_FUNCTION( matrix_ident )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	logerror("TGP matrix_ident (%x)\n", state->pushpc);
 	memset(state->cmat, 0, sizeof(state->cmat));
 	state->cmat[0] = 1.0;
@@ -380,7 +380,7 @@ static TGP_FUNCTION( matrix_ident )
 
 static TGP_FUNCTION( matrix_read )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	int i;
 	logerror("TGP matrix_read (%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f) (%x)\n",
 			 state->cmat[0], state->cmat[1], state->cmat[2], state->cmat[3], state->cmat[4], state->cmat[5], state->cmat[6], state->cmat[7], state->cmat[8], state->cmat[9], state->cmat[10], state->cmat[11], state->pushpc);
@@ -391,7 +391,7 @@ static TGP_FUNCTION( matrix_read )
 
 static TGP_FUNCTION( matrix_trans )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -404,7 +404,7 @@ static TGP_FUNCTION( matrix_trans )
 
 static TGP_FUNCTION( matrix_scale )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -423,7 +423,7 @@ static TGP_FUNCTION( matrix_scale )
 
 static TGP_FUNCTION( matrix_rotx )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	INT16 a = fifoin_pop(state);
 	float s = tsin(a);
 	float c = tcos(a);
@@ -446,7 +446,7 @@ static TGP_FUNCTION( matrix_rotx )
 
 static TGP_FUNCTION( matrix_roty )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	INT16 a = fifoin_pop(state);
 	float s = tsin(a);
 	float c = tcos(a);
@@ -470,7 +470,7 @@ static TGP_FUNCTION( matrix_roty )
 
 static TGP_FUNCTION( matrix_rotz )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	INT16 a = fifoin_pop(state);
 	float s = tsin(a);
 	float c = tcos(a);
@@ -494,8 +494,8 @@ static TGP_FUNCTION( matrix_rotz )
 
 static TGP_FUNCTION( track_read_quad )
 {
-	model1_state *state = machine->driver_data<model1_state>();
-	const UINT32 *tgp_data = (const UINT32 *)machine->region("user2")->base();
+	model1_state *state = machine.driver_data<model1_state>();
+	const UINT32 *tgp_data = (const UINT32 *)machine.region("user2")->base();
 	UINT32 a = fifoin_pop(state);
 	int offd;
 
@@ -519,7 +519,7 @@ static TGP_FUNCTION( track_read_quad )
 
 static TGP_FUNCTION( f24_swa )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -541,7 +541,7 @@ static TGP_FUNCTION( f24_swa )
 
 static TGP_FUNCTION( transform_point )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float x = fifoin_pop_f(state);
 	float y = fifoin_pop_f(state);
 	float z = fifoin_pop_f(state);
@@ -555,7 +555,7 @@ static TGP_FUNCTION( transform_point )
 
 static TGP_FUNCTION( fcos_m1 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	INT16 a = fifoin_pop(state);
 	logerror("TGP fcos %d (%x)\n", a, state->pushpc);
 	fifoout_push_f(state, tcos(a));
@@ -564,7 +564,7 @@ static TGP_FUNCTION( fcos_m1 )
 
 static TGP_FUNCTION( fsin_m1 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	INT16 a = fifoin_pop(state);
 	logerror("TGP fsin %d (%x)\n", a, state->pushpc);
 	fifoout_push_f(state, tsin(a));
@@ -573,7 +573,7 @@ static TGP_FUNCTION( fsin_m1 )
 
 static TGP_FUNCTION( fcosm_m1 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	INT16 a = fifoin_pop(state);
 	float b = fifoin_pop_f(state);
 	logerror("TGP fcosm %d, %f (%x)\n", a, b, state->pushpc);
@@ -583,7 +583,7 @@ static TGP_FUNCTION( fcosm_m1 )
 
 static TGP_FUNCTION( fsinm_m1 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	INT16 a = fifoin_pop(state);
 	float b = fifoin_pop_f(state);
 	state->dump = 1;
@@ -594,7 +594,7 @@ static TGP_FUNCTION( fsinm_m1 )
 
 static TGP_FUNCTION( distance3 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -611,7 +611,7 @@ static TGP_FUNCTION( distance3 )
 
 static TGP_FUNCTION( ftoi )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	logerror("TGP ftoi %f (%x)\n", a, state->pushpc);
 	fifoout_push(state, (int)a);
@@ -620,7 +620,7 @@ static TGP_FUNCTION( ftoi )
 
 static TGP_FUNCTION( itof )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	INT32 a = fifoin_pop(state);
 	logerror("TGP itof %d (%x)\n", a, state->pushpc);
 	fifoout_push_f(state, a);
@@ -629,7 +629,7 @@ static TGP_FUNCTION( itof )
 
 static TGP_FUNCTION( acc_set )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	logerror("TGP acc_set %f (%x)\n", a, state->pushpc);
 	state->acc = a;
@@ -638,7 +638,7 @@ static TGP_FUNCTION( acc_set )
 
 static TGP_FUNCTION( acc_get )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	logerror("TGP acc_get (%x)\n", state->pushpc);
 	fifoout_push_f(state, state->acc);
 	next_fn(state);
@@ -646,7 +646,7 @@ static TGP_FUNCTION( acc_get )
 
 static TGP_FUNCTION( acc_add )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	logerror("TGP acc_add %f (%x)\n", a, state->pushpc);
 	state->acc += a;
@@ -655,7 +655,7 @@ static TGP_FUNCTION( acc_add )
 
 static TGP_FUNCTION( acc_sub )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	logerror("TGP acc_sub %f (%x)\n", a, state->pushpc);
 	state->acc -= a;
@@ -664,7 +664,7 @@ static TGP_FUNCTION( acc_sub )
 
 static TGP_FUNCTION( acc_mul )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	logerror("TGP acc_mul %f (%x)\n", a, state->pushpc);
 	state->acc *= a;
@@ -673,7 +673,7 @@ static TGP_FUNCTION( acc_mul )
 
 static TGP_FUNCTION( acc_div )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	logerror("TGP acc_div %f (%x)\n", a, state->pushpc);
 	state->acc /= a;
@@ -682,7 +682,7 @@ static TGP_FUNCTION( acc_div )
 
 static TGP_FUNCTION( f42 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -690,7 +690,7 @@ static TGP_FUNCTION( f42 )
 	(void)b;
 	(void)c;
 	logerror("TGP f42 %f, %f, %f (%x)\n", a, b, c, state->pushpc);
-	//  fifoout_push_f((machine->rand() % 1000) - 500);
+	//  fifoout_push_f((machine.rand() % 1000) - 500);
 	fifoout_push_f(state, 0);
 	fifoout_push_f(state, 0);
 	fifoout_push_f(state, 0);
@@ -705,7 +705,7 @@ static TGP_FUNCTION( f42 )
 
 static TGP_FUNCTION( xyz2rqf )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -744,7 +744,7 @@ static TGP_FUNCTION( xyz2rqf )
 
 static TGP_FUNCTION( f43 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -767,7 +767,7 @@ static TGP_FUNCTION( f43 )
 
 static TGP_FUNCTION( f43_swa )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	int b = fifoin_pop(state);
 	int c = fifoin_pop(state);
@@ -783,7 +783,7 @@ static TGP_FUNCTION( f43_swa )
 
 static TGP_FUNCTION( f44 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	(void)a;
 	logerror("TGP f44 %f (%x)\n", a, state->pushpc);
@@ -795,7 +795,7 @@ static TGP_FUNCTION( f44 )
 
 static TGP_FUNCTION( matrix_sdir )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -846,7 +846,7 @@ static TGP_FUNCTION( matrix_sdir )
 
 static TGP_FUNCTION( f45 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	(void)a;
 	logerror("TGP f45 %f (%x)\n", a, state->pushpc);
@@ -856,7 +856,7 @@ static TGP_FUNCTION( f45 )
 
 static TGP_FUNCTION( vlength )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state) - state->tgp_vr_base[0];
 	float b = fifoin_pop_f(state) - state->tgp_vr_base[1];
 	float c = fifoin_pop_f(state) - state->tgp_vr_base[2];
@@ -872,7 +872,7 @@ static TGP_FUNCTION( vlength )
 
 static TGP_FUNCTION( f47 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -884,8 +884,8 @@ static TGP_FUNCTION( f47 )
 
 static TGP_FUNCTION( track_read_info )
 {
-	model1_state *state = machine->driver_data<model1_state>();
-	const UINT32 *tgp_data = (const UINT32 *)machine->region("user2")->base();
+	model1_state *state = machine.driver_data<model1_state>();
+	const UINT32 *tgp_data = (const UINT32 *)machine.region("user2")->base();
 	UINT16 a = fifoin_pop(state);
 	int offd;
 
@@ -898,7 +898,7 @@ static TGP_FUNCTION( track_read_info )
 
 static TGP_FUNCTION( colbox_set )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -929,7 +929,7 @@ static TGP_FUNCTION( colbox_set )
 
 static TGP_FUNCTION( colbox_test )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -946,7 +946,7 @@ static TGP_FUNCTION( colbox_test )
 
 static TGP_FUNCTION( f49_swa )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -965,7 +965,7 @@ static TGP_FUNCTION( f49_swa )
 
 static TGP_FUNCTION( f50_swa )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -981,14 +981,14 @@ static TGP_FUNCTION( f50_swa )
 
 static TGP_FUNCTION( f52 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	logerror("TGP f52 (%x)\n", state->pushpc);
 	next_fn(state);
 }
 
 static TGP_FUNCTION( matrix_rdir )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -1038,8 +1038,8 @@ static void tri_calc_pq(float ax, float ay, float bx, float by, float cx, float 
 
 static TGP_FUNCTION( track_lookup )
 {
-	model1_state *state = machine->driver_data<model1_state>();
-	const UINT32 *tgp_data = (const UINT32 *)machine->region("user2")->base();
+	model1_state *state = machine.driver_data<model1_state>();
+	const UINT32 *tgp_data = (const UINT32 *)machine.region("user2")->base();
 	float a = fifoin_pop_f(state);
 	UINT32 b = fifoin_pop(state);
 	float c = fifoin_pop_f(state);
@@ -1097,7 +1097,7 @@ static TGP_FUNCTION( track_lookup )
 
 static TGP_FUNCTION( f56 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -1120,7 +1120,7 @@ static TGP_FUNCTION( f56 )
 
 static TGP_FUNCTION( f57 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	logerror("TGP f57 (%x)\n", state->pushpc);
 	fifoout_push_f(state, 0);
 	fifoout_push_f(state, 0);
@@ -1130,7 +1130,7 @@ static TGP_FUNCTION( f57 )
 
 static TGP_FUNCTION( matrix_readt )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	logerror("TGP matrix_readt (%x)\n", state->pushpc);
 	fifoout_push_f(state, state->cmat[9]);
 	fifoout_push_f(state, state->cmat[10]);
@@ -1140,7 +1140,7 @@ static TGP_FUNCTION( matrix_readt )
 
 static TGP_FUNCTION( acc_geti )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	logerror("TGP acc_geti (%x)\n", state->pushpc);
 	fifoout_push(state, (int)state->acc);
 	next_fn(state);
@@ -1148,7 +1148,7 @@ static TGP_FUNCTION( acc_geti )
 
 static TGP_FUNCTION( f60 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	logerror("TGP f60 (%x)\n", state->pushpc);
 	fifoout_push_f(state, 0);
 	fifoout_push_f(state, 0);
@@ -1158,7 +1158,7 @@ static TGP_FUNCTION( f60 )
 
 static TGP_FUNCTION( col_setcirc )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -1171,7 +1171,7 @@ static TGP_FUNCTION( col_setcirc )
 
 static TGP_FUNCTION( col_testpt )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float x, y;
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
@@ -1184,7 +1184,7 @@ static TGP_FUNCTION( col_testpt )
 
 static TGP_FUNCTION( push_and_ident )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	if(state->mat_stack_pos != MAT_STACK_SIZE) {
 		memcpy(state->mat_stack[state->mat_stack_pos], state->cmat, sizeof(state->cmat));
 		state->mat_stack_pos++;
@@ -1199,7 +1199,7 @@ static TGP_FUNCTION( push_and_ident )
 
 static TGP_FUNCTION( catmull_rom )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -1234,7 +1234,7 @@ static TGP_FUNCTION( catmull_rom )
 
 static TGP_FUNCTION( distance )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -1248,7 +1248,7 @@ static TGP_FUNCTION( distance )
 
 static TGP_FUNCTION( car_move )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	INT16 a = fifoin_pop(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -1268,7 +1268,7 @@ static TGP_FUNCTION( car_move )
 
 static TGP_FUNCTION( cpa )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float dv_x, dv_y, dv_z, dv2, dw_x, dw_y, dw_z, dt;
 
 	float a = fifoin_pop_f(state);
@@ -1313,7 +1313,7 @@ static TGP_FUNCTION( cpa )
 
 static TGP_FUNCTION( vmat_store )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	UINT32 a = fifoin_pop(state);
 	if(a<21)
 		memcpy(state->mat_vector[a], state->cmat, sizeof(state->cmat));
@@ -1325,7 +1325,7 @@ static TGP_FUNCTION( vmat_store )
 
 static TGP_FUNCTION( vmat_restore )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	UINT32 a = fifoin_pop(state);
 	if(a<21)
 		memcpy(state->cmat, state->mat_vector[a], sizeof(state->cmat));
@@ -1337,7 +1337,7 @@ static TGP_FUNCTION( vmat_restore )
 
 static TGP_FUNCTION( vmat_mul )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	UINT32 a = fifoin_pop(state);
 	UINT32 b = fifoin_pop(state);
 	if(a<21 && b<21) {
@@ -1361,7 +1361,7 @@ static TGP_FUNCTION( vmat_mul )
 
 static TGP_FUNCTION( vmat_read )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	UINT32 a = fifoin_pop(state);
 	logerror("TGP vmat_read %d (%x)\n", a, state->pushpc);
 	if(a<21) {
@@ -1379,7 +1379,7 @@ static TGP_FUNCTION( vmat_read )
 
 static TGP_FUNCTION( matrix_rtrans )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	logerror("TGP matrix_rtrans (%x)\n", state->pushpc);
 	fifoout_push_f(state, state->cmat[ 9]);
 	fifoout_push_f(state, state->cmat[10]);
@@ -1389,7 +1389,7 @@ static TGP_FUNCTION( matrix_rtrans )
 
 static TGP_FUNCTION( matrix_unrot )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	logerror("TGP matrix_unrot (%x)\n", state->pushpc);
 	memset(state->cmat, 0, 9*sizeof(state->cmat[0]));
 	state->cmat[0] = 1.0;
@@ -1400,7 +1400,7 @@ static TGP_FUNCTION( matrix_unrot )
 
 static TGP_FUNCTION( f80 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	logerror("TGP f80 (%x)\n", state->pushpc);
 	//  state->cmat[9] = state->cmat[10] = state->cmat[11] = 0;
 	next_fn(state);
@@ -1408,7 +1408,7 @@ static TGP_FUNCTION( f80 )
 
 static TGP_FUNCTION( vmat_save )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	UINT32 a = fifoin_pop(state);
 	int i;
 	logerror("TGP vmat_save 0x%x (%x)\n", a, state->pushpc);
@@ -1419,7 +1419,7 @@ static TGP_FUNCTION( vmat_save )
 
 static TGP_FUNCTION( vmat_load )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	UINT32 a = fifoin_pop(state);
 	int i;
 	logerror("TGP vmat_load 0x%x (%x)\n", a, state->pushpc);
@@ -1430,7 +1430,7 @@ static TGP_FUNCTION( vmat_load )
 
 static TGP_FUNCTION( ram_setadr )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	state->ram_scanadr = fifoin_pop(state) - 0x8000;
 	logerror("TGP f0 ram_setadr 0x%x (%x)\n", state->ram_scanadr+0x8000, state->pushpc);
 	next_fn(state);
@@ -1438,7 +1438,7 @@ static TGP_FUNCTION( ram_setadr )
 
 static TGP_FUNCTION( groundbox_test )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	int out_x, out_y, out_z;
 	float x, /*y,*/ z;
 	float a = fifoin_pop_f(state);
@@ -1462,7 +1462,7 @@ static TGP_FUNCTION( groundbox_test )
 
 static TGP_FUNCTION( f89 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	UINT32 a = fifoin_pop(state);
 	UINT32 b = fifoin_pop(state);
 	UINT32 c = fifoin_pop(state);
@@ -1477,7 +1477,7 @@ static TGP_FUNCTION( f89 )
 
 static TGP_FUNCTION( f92 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -1492,7 +1492,7 @@ static TGP_FUNCTION( f92 )
 
 static TGP_FUNCTION( f93 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	(void)a;
 	logerror("TGP f93 %f (%x)\n", a, state->pushpc);
@@ -1501,7 +1501,7 @@ static TGP_FUNCTION( f93 )
 
 static TGP_FUNCTION( f94 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	UINT32 a = fifoin_pop(state);
 	(void)a;
 	logerror("TGP f94 %d (%x)\n", a, state->pushpc);
@@ -1510,7 +1510,7 @@ static TGP_FUNCTION( f94 )
 
 static TGP_FUNCTION( vmat_flatten )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	int i;
 	float m[12];
 	logerror("TGP vmat_flatten (%x)\n", state->pushpc);
@@ -1537,7 +1537,7 @@ static TGP_FUNCTION( vmat_flatten )
 
 static TGP_FUNCTION( vmat_load1 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	UINT32 a = fifoin_pop(state);
 	logerror("TGP vmat_load1 0x%x (%x)\n", a, state->pushpc);
 	memcpy(state->cmat, state->ram_data+a, sizeof(state->cmat));
@@ -1546,7 +1546,7 @@ static TGP_FUNCTION( vmat_load1 )
 
 static TGP_FUNCTION( ram_trans )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = ram_get_f(state);
 	float b = ram_get_f(state);
 	float c = ram_get_f(state);
@@ -1559,7 +1559,7 @@ static TGP_FUNCTION( ram_trans )
 
 static TGP_FUNCTION( f98_load )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	int i;
 	for(i=0; i<state->list_length; i++) {
 		float f = fifoin_pop_f(state);
@@ -1571,7 +1571,7 @@ static TGP_FUNCTION( f98_load )
 
 static TGP_FUNCTION( f98 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	UINT32 a = fifoin_pop(state);
 	(void)a;
 	logerror("TGP load list start %d (%x)\n", a, state->pushpc);
@@ -1581,24 +1581,24 @@ static TGP_FUNCTION( f98 )
 
 static TGP_FUNCTION( f99 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	logerror("TGP f99 (%x)\n", state->pushpc);
 	next_fn(state);
 }
 
 static TGP_FUNCTION( f100 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	int i;
 	logerror("TGP f100 get list (%x)\n", state->pushpc);
 	for(i=0; i<state->list_length; i++)
-		fifoout_push_f(state, (machine->rand() % 1000)/100.0);
+		fifoout_push_f(state, (machine.rand() % 1000)/100.0);
 	next_fn(state);
 }
 
 static TGP_FUNCTION( groundbox_set )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
 	float c = fifoin_pop_f(state);
@@ -1620,7 +1620,7 @@ static TGP_FUNCTION( groundbox_set )
 
 static TGP_FUNCTION( f102 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	float px, py, pz;
 	float a = fifoin_pop_f(state);
 	float b = fifoin_pop_f(state);
@@ -1673,7 +1673,7 @@ static TGP_FUNCTION( f102 )
 
 static TGP_FUNCTION( f103 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	state->ram_scanadr = fifoin_pop(state) - 0x8000;
 	logerror("TGP f0 mve_setadr 0x%x (%x)\n", state->ram_scanadr, state->pushpc);
 	ram_get_i(state);
@@ -1881,7 +1881,7 @@ static const struct function ftab_swa[] = {
 
 static TGP_FUNCTION( dump )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	logerror("TGP FIFOIN write %08x (%x)\n", fifoin_pop(state), state->pushpc);
 	state->fifoin_cbcount = 1;
 	state->fifoin_cb = dump;
@@ -1889,7 +1889,7 @@ static TGP_FUNCTION( dump )
 
 static TGP_FUNCTION( function_get_vf )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	UINT32 f = fifoin_pop(state) >> 23;
 
 	if(state->fifoout_rpos != state->fifoout_wpos) {
@@ -1913,7 +1913,7 @@ static TGP_FUNCTION( function_get_vf )
 
 static TGP_FUNCTION( function_get_swa )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	UINT32 f = fifoin_pop(state);
 
 	if(state->fifoout_rpos != state->fifoout_wpos) {
@@ -1937,7 +1937,7 @@ static TGP_FUNCTION( function_get_swa )
 
 READ16_HANDLER( model1_tgp_copro_r )
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	if(!offset) {
 		state->copro_r = fifoout_pop(space);
 		return state->copro_r;
@@ -1947,7 +1947,7 @@ READ16_HANDLER( model1_tgp_copro_r )
 
 WRITE16_HANDLER( model1_tgp_copro_w )
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	if(offset) {
 		state->copro_w = (state->copro_w & 0x0000ffff) | (data << 16);
 		state->pushpc = cpu_get_pc(space->cpu);
@@ -1958,19 +1958,19 @@ WRITE16_HANDLER( model1_tgp_copro_w )
 
 READ16_HANDLER( model1_tgp_copro_adr_r )
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	return state->ram_adr;
 }
 
 WRITE16_HANDLER( model1_tgp_copro_adr_w )
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	COMBINE_DATA(&state->ram_adr);
 }
 
 READ16_HANDLER( model1_tgp_copro_ram_r )
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	if(!offset) {
 		logerror("TGP f0 ram read %04x, %08x (%f) (%x)\n", state->ram_adr, state->ram_data[state->ram_adr], u2f(state->ram_data[state->ram_adr]), cpu_get_pc(space->cpu));
 		return state->ram_data[state->ram_adr];
@@ -1980,7 +1980,7 @@ READ16_HANDLER( model1_tgp_copro_ram_r )
 
 WRITE16_HANDLER( model1_tgp_copro_ram_w )
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	COMBINE_DATA(state->ram_latch+offset);
 	if(offset) {
 		UINT32 v = state->ram_latch[0]|(state->ram_latch[1]<<16);
@@ -1992,7 +1992,7 @@ WRITE16_HANDLER( model1_tgp_copro_ram_w )
 
 MACHINE_START( model1 )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	state->ram_data = auto_alloc_array(machine, UINT32, 0x10000);
 
 	state_save_register_global_pointer(machine, state->ram_data, 0x10000);
@@ -2013,9 +2013,9 @@ MACHINE_START( model1 )
 	state_save_register_global(machine, state->list_length);
 }
 
-void model1_tgp_reset(running_machine *machine, int swa)
+void model1_tgp_reset(running_machine &machine, int swa)
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	state->ram_adr = 0;
 	memset(state->ram_data, 0, 0x10000*4);
 
@@ -2039,9 +2039,9 @@ void model1_tgp_reset(running_machine *machine, int swa)
 /*********************************** Virtua Racing ***********************************/
 
 
-void model1_vr_tgp_reset( running_machine *machine )
+void model1_vr_tgp_reset( running_machine &machine )
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	state->ram_adr = 0;
 	memset(state->ram_data, 0, 0x8000*4);
 
@@ -2056,7 +2056,7 @@ void model1_vr_tgp_reset( running_machine *machine )
 /* FIFO */
 static int copro_fifoin_pop(device_t *device, UINT32 *result)
 {
-	model1_state *state = device->machine->driver_data<model1_state>();
+	model1_state *state = device->machine().driver_data<model1_state>();
 	UINT32 r;
 
 	if (state->copro_fifoin_num == 0)
@@ -2080,7 +2080,7 @@ static int copro_fifoin_pop(device_t *device, UINT32 *result)
 
 static void copro_fifoin_push(address_space *space, UINT32 data)
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	if (state->copro_fifoin_num == FIFO_SIZE)
 	{
 		fatalerror("Copro FIFOIN overflow (at %08X)", cpu_get_pc(space->cpu));
@@ -2099,15 +2099,15 @@ static void copro_fifoin_push(address_space *space, UINT32 data)
 
 static UINT32 copro_fifoout_pop(address_space *space)
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	UINT32 r;
 
 	if (state->copro_fifoout_num == 0)
 	{
 		// Reading from empty FIFO causes the v60 to enter wait state
-		v60_stall(space->machine->device("maincpu"));
+		v60_stall(space->machine().device("maincpu"));
 
-		space->machine->scheduler().synchronize();
+		space->machine().scheduler().synchronize();
 
 		return 0;
 	}
@@ -2126,7 +2126,7 @@ static UINT32 copro_fifoout_pop(address_space *space)
 
 static void copro_fifoout_push(device_t *device, UINT32 data)
 {
-	model1_state *state = device->machine->driver_data<model1_state>();
+	model1_state *state = device->machine().driver_data<model1_state>();
 	if (state->copro_fifoout_num == FIFO_SIZE)
 	{
 		fatalerror("Copro FIFOOUT overflow (at %08X)", cpu_get_pc(device));
@@ -2145,19 +2145,19 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 
 static READ32_HANDLER(copro_ram_r)
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	return state->ram_data[offset & 0x7fff];
 }
 
 static WRITE32_HANDLER(copro_ram_w)
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	state->ram_data[offset&0x7fff] = data;
 }
 
 READ16_HANDLER( model1_tgp_vr_adr_r )
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	if ( state->ram_adr == 0 && state->copro_fifoin_num != 0 )
 	{
 		/* spin the main cpu and let the TGP catch up */
@@ -2169,13 +2169,13 @@ READ16_HANDLER( model1_tgp_vr_adr_r )
 
 WRITE16_HANDLER( model1_tgp_vr_adr_w )
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	COMBINE_DATA(&state->ram_adr);
 }
 
 READ16_HANDLER( model1_vr_tgp_ram_r )
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	UINT16	r;
 
 	if (!offset)
@@ -2201,7 +2201,7 @@ READ16_HANDLER( model1_vr_tgp_ram_r )
 
 WRITE16_HANDLER( model1_vr_tgp_ram_w )
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	COMBINE_DATA(state->ram_latch+offset);
 
 	if (offset)
@@ -2215,7 +2215,7 @@ WRITE16_HANDLER( model1_vr_tgp_ram_w )
 
 READ16_HANDLER( model1_vr_tgp_r )
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	if (!offset)
 	{
 		state->vr_r = copro_fifoout_pop(space);
@@ -2227,7 +2227,7 @@ READ16_HANDLER( model1_vr_tgp_r )
 
 WRITE16_HANDLER( model1_vr_tgp_w )
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	if (offset)
 	{
 		state->vr_w = (state->vr_w & 0x0000ffff) | (data << 16);

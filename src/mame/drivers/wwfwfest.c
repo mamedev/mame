@@ -103,15 +103,15 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( wwfwfest_irq_ack_w )
 {
 	if (offset == 0)
-		cputag_set_input_line(space->machine, "maincpu", 3, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", 3, CLEAR_LINE);
 
 	else
-		cputag_set_input_line(space->machine, "maincpu", 2, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", 2, CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( wwfwfest_flipscreen_w )
 {
-	flip_screen_set(space->machine, data&1);
+	flip_screen_set(space->machine(), data&1);
 }
 
 /*- Palette Reads/Writes -*/
@@ -119,7 +119,7 @@ static WRITE16_HANDLER( wwfwfest_flipscreen_w )
 static READ16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r )
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
-	return space->machine->generic.paletteram.u16[offset];
+	return space->machine().generic.paletteram.u16[offset];
 }
 
 static WRITE16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w )
@@ -133,7 +133,7 @@ static WRITE16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w )
 
 static WRITE16_HANDLER( wwfwfest_1410_write )
 {
-	wwfwfest_state *state = space->machine->driver_data<wwfwfest_state>();
+	wwfwfest_state *state = space->machine().driver_data<wwfwfest_state>();
 	state->pri = data;
 }
 
@@ -141,7 +141,7 @@ static WRITE16_HANDLER( wwfwfest_1410_write )
 
 static WRITE16_HANDLER( wwfwfest_scroll_write )
 {
-	wwfwfest_state *state = space->machine->driver_data<wwfwfest_state>();
+	wwfwfest_state *state = space->machine().driver_data<wwfwfest_state>();
 	switch (offset) {
 		case 0x00:
 			state->bg0_scrollx = data;
@@ -168,7 +168,7 @@ static WRITE8_DEVICE_HANDLER( oki_bankswitch_w )
 static WRITE16_HANDLER ( wwfwfest_soundwrite )
 {
 	soundlatch_w(space,1,data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /*******************************************************************************
@@ -181,13 +181,13 @@ static WRITE16_HANDLER ( wwfwfest_soundwrite )
 static CUSTOM_INPUT( dsw_3f_r )
 {
 	const char *tag = (const char *)param;
-	return input_port_read(field->port->machine, tag) & 0x3f;
+	return input_port_read(field->port->machine(), tag) & 0x3f;
 }
 
 static CUSTOM_INPUT( dsw_c0_r )
 {
 	const char *tag = (const char *)param;
-	return (input_port_read(field->port->machine, tag) & 0xc0) >> 6;
+	return (input_port_read(field->port->machine(), tag) & 0xc0) >> 6;
 }
 
 
@@ -353,15 +353,15 @@ static TIMER_DEVICE_CALLBACK( wwfwfest_scanline )
 	if (scanline % 16 == 0)
 	{
 		if (scanline > 0)
-			timer.machine->primary_screen->update_partial(scanline - 1);
-		cputag_set_input_line(timer.machine, "maincpu", 2, ASSERT_LINE);
+			timer.machine().primary_screen->update_partial(scanline - 1);
+		cputag_set_input_line(timer.machine(), "maincpu", 2, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 248 */
 	if (scanline == 248)
 	{
-		timer.machine->primary_screen->update_partial(scanline - 1);
-		cputag_set_input_line(timer.machine, "maincpu", 3, ASSERT_LINE);
+		timer.machine().primary_screen->update_partial(scanline - 1);
+		cputag_set_input_line(timer.machine(), "maincpu", 3, ASSERT_LINE);
 	}
 }
 
@@ -373,7 +373,7 @@ static TIMER_DEVICE_CALLBACK( wwfwfest_scanline )
 
 static void dd3_ymirq_handler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(device->machine(), "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -383,7 +383,7 @@ static const ym2151_interface ym2151_config =
 
 static SCREEN_EOF( wwfwfest )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	buffer_spriteram16_w(space,0,0,0xffff);
 }

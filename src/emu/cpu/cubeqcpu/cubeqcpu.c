@@ -275,7 +275,7 @@ static void cquestsnd_state_register(device_t *device)
 	device->save_item(NAME(cpustate->prev_ipram));
 	device->save_item(NAME(cpustate->prev_ipwrt));
 
-	device->machine->state().register_postload(cquestsnd_postload, (void *)device);
+	device->machine().state().register_postload(cquestsnd_postload, (void *)device);
 }
 
 static CPU_INIT( cquestsnd )
@@ -286,14 +286,14 @@ static CPU_INIT( cquestsnd )
 	memset(cpustate, 0, sizeof(*cpustate));
 
 	cpustate->dac_w = _config->dac_w;
-	cpustate->sound_data = (UINT16*)device->machine->region(_config->sound_data_region)->base();
+	cpustate->sound_data = (UINT16*)device->machine().region(_config->sound_data_region)->base();
 
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 
 	/* Allocate RAM shared with 68000 */
-	cpustate->sram = auto_alloc_array(device->machine, UINT16, 4096/2);
+	cpustate->sram = auto_alloc_array(device->machine(), UINT16, 4096/2);
 
 	cquestsnd_state_register(device);
 }
@@ -349,7 +349,7 @@ static void cquestrot_state_register(device_t *device)
 	device->save_pointer(NAME(cpustate->dram), 16384);
 	device->save_pointer(NAME(cpustate->sram), 2048);
 
-	device->machine->state().register_postload(cquestrot_postload, (void *)device);
+	device->machine().state().register_postload(cquestrot_postload, (void *)device);
 }
 
 static CPU_INIT( cquestrot )
@@ -359,11 +359,11 @@ static CPU_INIT( cquestrot )
 	memset(cpustate, 0, sizeof(*cpustate));
 
 	/* Allocate RAM */
-	cpustate->dram = auto_alloc_array(device->machine, UINT16, 16384);  /* Shared with 68000 */
-	cpustate->sram = auto_alloc_array(device->machine, UINT16, 2048);   /* Private */
+	cpustate->dram = auto_alloc_array(device->machine(), UINT16, 16384);  /* Shared with 68000 */
+	cpustate->sram = auto_alloc_array(device->machine(), UINT16, 2048);   /* Private */
 
 	cpustate->device = device;
-	cpustate->lindevice = device->machine->device<legacy_cpu_device>(rotconfig->lin_cpu_tag);
+	cpustate->lindevice = device->machine().device<legacy_cpu_device>(rotconfig->lin_cpu_tag);
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 
@@ -433,7 +433,7 @@ static void cquestlin_state_register(device_t *device)
 	device->save_pointer(NAME(cpustate->e_stack), 32768);
 	device->save_pointer(NAME(cpustate->o_stack), 32768);
 
-	device->machine->state().register_postload(cquestlin_postload, (void *)device);
+	device->machine().state().register_postload(cquestlin_postload, (void *)device);
 }
 
 static CPU_INIT( cquestlin )
@@ -443,13 +443,13 @@ static CPU_INIT( cquestlin )
 	memset(cpustate, 0, sizeof(*cpustate));
 
 	/* Allocate RAM */
-	cpustate->sram = auto_alloc_array(device->machine, UINT16, 4096);      /* Shared with rotate CPU */
-	cpustate->ptr_ram = auto_alloc_array(device->machine, UINT8, 1024);                    /* Pointer RAM */
-	cpustate->e_stack = auto_alloc_array(device->machine, UINT32, 32768);  /* Stack DRAM: 32kx20 */
-	cpustate->o_stack = auto_alloc_array(device->machine, UINT32, 32768);  /* Stack DRAM: 32kx20 */
+	cpustate->sram = auto_alloc_array(device->machine(), UINT16, 4096);      /* Shared with rotate CPU */
+	cpustate->ptr_ram = auto_alloc_array(device->machine(), UINT8, 1024);                    /* Pointer RAM */
+	cpustate->e_stack = auto_alloc_array(device->machine(), UINT32, 32768);  /* Stack DRAM: 32kx20 */
+	cpustate->o_stack = auto_alloc_array(device->machine(), UINT32, 32768);  /* Stack DRAM: 32kx20 */
 
 	cpustate->device = device;
-	cpustate->rotdevice = device->machine->device<legacy_cpu_device>(linconfig->rot_cpu_tag);
+	cpustate->rotdevice = device->machine().device<legacy_cpu_device>(linconfig->rot_cpu_tag);
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 
@@ -503,7 +503,7 @@ static int do_sndjmp(cquestsnd_state *cpustate, int jmp)
 static CPU_EXECUTE( cquestsnd )
 {
 	cquestsnd_state *cpustate = get_safe_token_snd(device);
-	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	int calldebugger = ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
 	/* Core execution loop */
 	do
@@ -764,7 +764,7 @@ static CPU_EXECUTE( cquestrot )
 {
 	cquestrot_state *cpustate = get_safe_token_rot(device);
 	cquestlin_state *lincpustate = get_safe_token_lin(cpustate->lindevice);
-	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	int calldebugger = ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
 	/* Core execution loop */
 	do
@@ -1177,7 +1177,7 @@ static CPU_EXECUTE( cquestlin )
 
 	cquestlin_state *cpustate = get_safe_token_lin(device);
 	cquestrot_state *rotcpustate = get_safe_token_rot(cpustate->rotdevice);
-	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	int calldebugger = ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
 	UINT32	*stack_ram;
 	UINT8	*ptr_ram;
 

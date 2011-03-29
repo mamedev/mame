@@ -300,12 +300,12 @@ enum
 	GEN_VDP = 3   // Genesis VDP running in SMS2 Mode
 };
 
-static int sms_vdp_null_irq_callback(running_machine *machine, int status)
+static int sms_vdp_null_irq_callback(running_machine &machine, int status)
 {
 	return -1;
 }
 
-static int sms_vdp_cpu0_irq_callback(running_machine *machine, int status)
+static int sms_vdp_cpu0_irq_callback(running_machine &machine, int status)
 {
 	if (status == 1)
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
@@ -315,7 +315,7 @@ static int sms_vdp_cpu0_irq_callback(running_machine *machine, int status)
 	return 0;
 }
 
-static int sms_vdp_cpu1_irq_callback(running_machine *machine, int status)
+static int sms_vdp_cpu1_irq_callback(running_machine &machine, int status)
 {
 	if (status == 1)
 		cputag_set_input_line(machine, "genesis_snd_z80", 0, HOLD_LINE);
@@ -326,7 +326,7 @@ static int sms_vdp_cpu1_irq_callback(running_machine *machine, int status)
 }
 
 
-static int sms_vdp_cpu2_irq_callback(running_machine *machine, int status)
+static int sms_vdp_cpu2_irq_callback(running_machine &machine, int status)
 {
 	if (status == 1)
 		cputag_set_input_line(machine, "mtbios", 0, HOLD_LINE);
@@ -378,13 +378,13 @@ struct sms_vdp
 	int sms_framerate;
 	emu_timer* sms_scanline_timer;
 	UINT16* cram_mamecolours; // for use on RGB_DIRECT screen
-	int	 (*set_irq)(running_machine *machine, int state);
+	int	 (*set_irq)(running_machine &machine, int state);
 
 };
 
 
 
-static void *start_vdp(running_machine *machine, int type)
+static void *start_vdp(running_machine &machine, int type)
 {
 	struct sms_vdp *chip;
 
@@ -438,7 +438,7 @@ static void *start_vdp(running_machine *machine, int type)
 	chip->writemode = 0;
 	chip->r_bitmap = auto_bitmap_alloc(machine, 256, 256, BITMAP_FORMAT_RGB15);
 
-	chip->sms_scanline_timer = machine->scheduler().timer_alloc(FUNC(sms_scanline_timer_callback), chip);
+	chip->sms_scanline_timer = machine.scheduler().timer_alloc(FUNC(sms_scanline_timer_callback), chip);
 
 	return chip;
 }
@@ -521,7 +521,7 @@ static void vdp_data_w(address_space *space, UINT8 data, struct sms_vdp* chip)
 					r = (palword & 0x000f)>>0;
 					g = (palword & 0x00f0)>>4;
 					b = (palword & 0x0f00)>>8;
-					palette_set_color_rgb(space->machine,(chip->addr_reg&0x3e)/2, pal4bit(r), pal4bit(g), pal4bit(b));
+					palette_set_color_rgb(space->machine(),(chip->addr_reg&0x3e)/2, pal4bit(r), pal4bit(g), pal4bit(b));
 					chip->cram_mamecolours[(chip->addr_reg&0x3e)/2]=(b<<1)|(g<<6)|(r<<11);
 				}
 			}
@@ -536,7 +536,7 @@ static void vdp_data_w(address_space *space, UINT8 data, struct sms_vdp* chip)
 				r = (data & 0x03)>>0;
 				g = (data & 0x0c)>>2;
 				b = (data & 0x30)>>4;
-				palette_set_color_rgb(space->machine,chip->addr_reg&0x1f, pal2bit(r), pal2bit(g), pal2bit(b));
+				palette_set_color_rgb(space->machine(),chip->addr_reg&0x1f, pal2bit(r), pal2bit(g), pal2bit(b));
 				chip->cram_mamecolours[chip->addr_reg&0x1f]=(b<<3)|(g<<8)|(r<<13);
 			}
 
@@ -563,7 +563,7 @@ static UINT8 vdp_ctrl_r(address_space *space, struct sms_vdp *chip)
 	chip->sprite_collision = 0;
 	chip->sprite_overflow = 0;
 
-	(chip->set_irq)(space->machine, 0); // clear IRQ;
+	(chip->set_irq)(space->machine(), 0); // clear IRQ;
 
 
 	return retvalue;
@@ -576,7 +576,7 @@ static void vdp_update_code_addr_regs(struct sms_vdp *chip)
 	chip->cmd_reg = (chip->cmd_part2&0xc0)>>6;
 }
 
-static void vdp_set_register(running_machine *machine, struct sms_vdp *chip)
+static void vdp_set_register(running_machine &machine, struct sms_vdp *chip)
 {
 	UINT8 reg = chip->cmd_part2&0x0f;
 	chip->regs[reg] = chip->cmd_part1;
@@ -634,7 +634,7 @@ static void vdp_ctrl_w(address_space *space, UINT8 data, struct sms_vdp *chip)
 				break;
 
 			case 0x2: /* REG setting */
-				vdp_set_register(space->machine, chip);
+				vdp_set_register(space->machine(), chip);
 				chip->writemode = 0;
 				break;
 
@@ -1137,7 +1137,7 @@ static void show_tiles(struct sms_vdp* chip)
  Even though some games set bit 7, it does nothing.
  */
 
-static void end_of_frame(running_machine *machine, struct sms_vdp *chip)
+static void end_of_frame(running_machine &machine, struct sms_vdp *chip)
 {
 	UINT8 m1 = (chip->regs[0x1]&0x10)>>4;
 	UINT8 m2 = (chip->regs[0x0]&0x02)>>1;
@@ -1155,7 +1155,7 @@ static void end_of_frame(running_machine *machine, struct sms_vdp *chip)
 		visarea.min_y = 0;
 		visarea.max_y = sms_mode_table[chip->screen_mode].sms2_height-1;
 
-		if (chip->chip_id==3) machine->primary_screen->configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
+		if (chip->chip_id==3) machine.primary_screen->configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
 
 	}
 	else /* 160x144 */
@@ -1166,7 +1166,7 @@ static void end_of_frame(running_machine *machine, struct sms_vdp *chip)
 		visarea.min_y = (192-144)/2;
 		visarea.max_y = (192-144)/2+144-1;
 
-		machine->primary_screen->configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
+		machine.primary_screen->configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
 	}
 
 
@@ -1379,7 +1379,7 @@ WRITE8_HANDLER( sms_vdp_2_ctrl_w )
 }
 
 
-void init_for_megadrive(running_machine *machine)
+void init_for_megadrive(running_machine &machine)
 {
 	md_sms_vdp = (struct sms_vdp *)start_vdp(machine, GEN_VDP);
 	md_sms_vdp->set_irq = sms_vdp_cpu1_irq_callback;
@@ -1457,7 +1457,7 @@ DRIVER_INIT( sms )
 	smsgg_backupram = 0;
 }
 
-static UINT8 ioport_gg00_r(running_machine* machine)
+static UINT8 ioport_gg00_r(running_machine& machine)
 {
 	UINT8 GG_START_BUTTON = input_port_read_safe(machine,"GGSTART",0x00);
 
@@ -1474,13 +1474,13 @@ static UINT8 ioport_gg00_r(running_machine* machine)
 
 READ8_HANDLER( sms_ioport_gg00_r )
 {
-	return ioport_gg00_r(space->machine);
+	return ioport_gg00_r(space->machine());
 }
 
 
-void init_extra_gg_ports(running_machine* machine, const char* tag)
+void init_extra_gg_ports(running_machine& machine, const char* tag)
 {
-	address_space *io = machine->device(tag)->memory().space(AS_IO);
+	address_space *io = machine.device(tag)->memory().space(AS_IO);
 	io->install_legacy_read_handler     (0x00, 0x00, FUNC(sms_ioport_gg00_r));
 }
 
@@ -1559,7 +1559,7 @@ static UINT8* sms_rom;
 /* the SMS inputs should be more complex, like the megadrive ones */
 READ8_HANDLER (megatech_sms_ioport_dc_r)
 {
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 4: TL-A; bit 5: TR-A */
 	return (input_port_read(machine, "PAD1") & 0x3f) | ((input_port_read(machine, "PAD2") & 0x03) << 6);
@@ -1567,7 +1567,7 @@ READ8_HANDLER (megatech_sms_ioport_dc_r)
 
 READ8_HANDLER (megatech_sms_ioport_dd_r)
 {
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 2: TL-B; bit 3: TR-B; bit 4: RESET; bit 5: unused; bit 6: TH-A; bit 7: TH-B*/
 	return ((input_port_read(machine, "PAD2") & 0x3c) >> 2) | 0x10;
@@ -1608,13 +1608,13 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 			//printf("bank ram??\n");
 			break;
 		case 1:
-			memcpy(sms_rom+0x0000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x0000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 		case 2:
-			memcpy(sms_rom+0x4000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x4000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 		case 3:
-			memcpy(sms_rom+0x8000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x8000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 
 	}
@@ -1623,28 +1623,28 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 static WRITE8_HANDLER( codemasters_rom_bank_0000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x0000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x0000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 static WRITE8_HANDLER( codemasters_rom_bank_4000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x4000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x4000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 static WRITE8_HANDLER( codemasters_rom_bank_8000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x8000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x8000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 
-static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine, const char* tag)
+static void megatech_set_genz80_as_sms_standard_ports(running_machine &machine, const char* tag)
 {
 	/* INIT THE PORTS *********************************************************************************************/
 
-	address_space *io = machine->device(tag)->memory().space(AS_IO);
-	device_t *sn = machine->device("snsnd");
+	address_space *io = machine.device(tag)->memory().space(AS_IO);
+	device_t *sn = machine.device("snsnd");
 
 	io->install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_port_r), FUNC(z80_unmapped_port_w));
 
@@ -1661,36 +1661,36 @@ static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine, 
 	io->install_legacy_read_handler      (0xdf, 0xdf, FUNC(megatech_sms_ioport_dd_r)); // adams family
 }
 
-void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const char* tag, int mapper)
+void megatech_set_genz80_as_sms_standard_map(running_machine &machine, const char* tag, int mapper)
 {
 	/* INIT THE MEMMAP / BANKING *********************************************************************************/
 
 	/* catch any addresses that don't get mapped */
-	machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_r), FUNC(z80_unmapped_w));
+	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_r), FUNC(z80_unmapped_w));
 
 	/* main ram area */
-	sms_mainram = (UINT8 *)machine->device(tag)->memory().space(AS_PROGRAM)->install_ram(0xc000, 0xdfff, 0, 0x2000);
+	sms_mainram = (UINT8 *)machine.device(tag)->memory().space(AS_PROGRAM)->install_ram(0xc000, 0xdfff, 0, 0x2000);
 	memset(sms_mainram,0x00,0x2000);
 
 	megatech_set_genz80_as_sms_standard_ports(machine,  tag);
 
 	/* fixed rom bank area */
-	sms_rom = (UINT8 *)machine->device(tag)->memory().space(AS_PROGRAM)->install_rom(0x0000, 0xbfff, NULL);
+	sms_rom = (UINT8 *)machine.device(tag)->memory().space(AS_PROGRAM)->install_rom(0x0000, 0xbfff, NULL);
 
-	memcpy(sms_rom, machine->region("maincpu")->base(), 0xc000);
+	memcpy(sms_rom, machine.region("maincpu")->base(), 0xc000);
 
 	if (mapper == MAPPER_STANDARD )
 	{
 
 
-		machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfffc, 0xffff, FUNC(mt_sms_standard_rom_bank_w));
+		machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfffc, 0xffff, FUNC(mt_sms_standard_rom_bank_w));
 
 	}
 	else if (mapper == MAPPER_CODEMASTERS )
 	{
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0000, 0x0000, FUNC(codemasters_rom_bank_0000_w));
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4000, 0x4000, FUNC(codemasters_rom_bank_4000_w));
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0x8000, FUNC(codemasters_rom_bank_8000_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0000, 0x0000, FUNC(codemasters_rom_bank_0000_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4000, 0x4000, FUNC(codemasters_rom_bank_4000_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0x8000, FUNC(codemasters_rom_bank_8000_w));
 	}
 //  smsgg_backupram = NULL;
 }

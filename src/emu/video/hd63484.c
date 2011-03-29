@@ -1037,7 +1037,7 @@ static void hd63484_command_w(device_t *device, UINT16 cmd)
 #if LOG_COMMANDS
 		int i;
 
-		logerror("%s: HD63484 command %s (%04x) ", device->machine->describe_context(), instruction_name[hd63484->fifo[0] >> 10], hd63484->fifo[0]);
+		logerror("%s: HD63484 command %s (%04x) ", device->machine().describe_context(), instruction_name[hd63484->fifo[0] >> 10], hd63484->fifo[0]);
 		for (i = 1; i < hd63484->fifo_counter; i++)
 			logerror("%04x ", hd63484->fifo[i]);
 		logerror("\n");
@@ -1470,7 +1470,7 @@ READ16_DEVICE_HANDLER( hd63484_status_r )
 //  if (cpu_get_pc(space->cpu) != 0xfced6 && cpu_get_pc(space->cpu) != 0xfe1d6)
 //      logerror("%05x: HD63484 status read\n",cpu_get_pc(space->cpu));
 
-	return 0xff22 | (device->machine->rand() & 0x0004);	/* write FIFO ready + command end    +  (read FIFO ready or read FIFO not ready) */
+	return 0xff22 | (device->machine().rand() & 0x0004);	/* write FIFO ready + command end    +  (read FIFO ready or read FIFO not ready) */
 }
 
 WRITE16_DEVICE_HANDLER( hd63484_address_w )
@@ -1508,7 +1508,7 @@ READ16_DEVICE_HANDLER( hd63484_data_r )
 	int res;
 
 	if (hd63484->regno == 0x80)
-		res = device->machine->primary_screen->vpos();
+		res = device->machine().primary_screen->vpos();
 	else if (hd63484->regno == 0)
 	{
 #if LOG_COMMANDS
@@ -1562,7 +1562,7 @@ static DEVICE_START( hd63484 )
 	const hd63484_interface *intf = get_interface(device);
 
 	hd63484->skattva_hack = intf->skattva_hack;
-	hd63484->ram = auto_alloc_array_clear(device->machine, UINT16, HD63484_RAM_SIZE);
+	hd63484->ram = auto_alloc_array_clear(device->machine(), UINT16, HD63484_RAM_SIZE);
 
 //  device->save_item(NAME(hd63484->clear_bitmap));
 //  device->save_pointer(NAME(hd63484->spriteram), 0x1000);

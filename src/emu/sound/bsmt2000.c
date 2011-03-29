@@ -134,7 +134,7 @@ device_config *bsmt2000_device_config::static_alloc_device_config(const machine_
 
 device_t *bsmt2000_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, bsmt2000_device(machine, *this));
+	return auto_alloc(machine, bsmt2000_device(machine, *this));
 }
 
 

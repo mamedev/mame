@@ -291,7 +291,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( travrusa )
 {
-	travrusa_state *state = machine->driver_data<travrusa_state>();
+	travrusa_state *state = machine.driver_data<travrusa_state>();
 
 	state->scrollx[0] = 0;
 	state->scrollx[1] = 0;
@@ -454,7 +454,7 @@ ROM_END
 static DRIVER_INIT( motorace )
 {
 	int A, j;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x2000);
 
 	memcpy(buffer, rom, 0x2000);
@@ -472,7 +472,7 @@ static DRIVER_INIT( motorace )
 static DRIVER_INIT( shtridra )
 {
 	int A;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	/* D3/D4  and  D5/D6 swapped */
 	for (A = 0; A < 0x2000; A++)

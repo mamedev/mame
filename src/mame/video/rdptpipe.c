@@ -10,11 +10,11 @@ namespace RDP
 
 #define RELATIVE(x, y)	((((x) >> 3) - (y)) << 3) | (x & 7);
 
-void TexturePipe::SetMachine(running_machine *machine)
+void TexturePipe::SetMachine(running_machine &machine)
 {
-	_n64_state *state = machine->driver_data<_n64_state>();
+	_n64_state *state = machine.driver_data<_n64_state>();
 
-	m_machine = machine;
+	m_machine = &machine;
 	m_rdp = &state->m_rdp;
 	m_other_modes = m_rdp->GetOtherModes();
 	m_misc_state = m_rdp->GetMiscState();

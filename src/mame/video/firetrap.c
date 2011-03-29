@@ -39,7 +39,7 @@ PALETTE_INIT( firetrap )
 	int i;
 
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -54,10 +54,10 @@ PALETTE_INIT( firetrap )
 		bit2 = (color_prom[i] >> 6) & 0x01;
 		bit3 = (color_prom[i] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[i + machine->total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[i + machine->total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[i + machine->total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[i + machine->total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[i + machine.total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[i + machine.total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[i + machine.total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[i + machine.total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette_set_color(machine, i, MAKE_RGB(r,g,b));
@@ -85,7 +85,7 @@ static TILEMAP_MAPPER( get_bg_memory_offset )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	firetrap_state *state = machine->driver_data<firetrap_state>();
+	firetrap_state *state = machine.driver_data<firetrap_state>();
 	int code = state->fgvideoram[tile_index];
 	int color = state->fgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
@@ -95,7 +95,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0);
 }
 
-INLINE void get_bg_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index, UINT8 *bgvideoram, int gfx_region)
+INLINE void get_bg_tile_info(running_machine &machine, tile_data *tileinfo, int tile_index, UINT8 *bgvideoram, int gfx_region)
 {
 	int code = bgvideoram[tile_index];
 	int color = bgvideoram[tile_index + 0x100];
@@ -108,13 +108,13 @@ INLINE void get_bg_tile_info(running_machine *machine, tile_data *tileinfo, int 
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	firetrap_state *state = machine->driver_data<firetrap_state>();
+	firetrap_state *state = machine.driver_data<firetrap_state>();
 	get_bg_tile_info(machine, tileinfo, tile_index, state->bg1videoram, 1);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	firetrap_state *state = machine->driver_data<firetrap_state>();
+	firetrap_state *state = machine.driver_data<firetrap_state>();
 	get_bg_tile_info(machine, tileinfo, tile_index, state->bg2videoram, 2);
 }
 
@@ -127,7 +127,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 VIDEO_START( firetrap )
 {
-	firetrap_state *state = machine->driver_data<firetrap_state>();
+	firetrap_state *state = machine.driver_data<firetrap_state>();
 	state->fg_tilemap  = tilemap_create(machine, get_fg_tile_info, get_fg_memory_offset, 8, 8, 32, 32);
 	state->bg1_tilemap = tilemap_create(machine, get_bg1_tile_info, get_bg_memory_offset, 16, 16, 32, 32);
 	state->bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, get_bg_memory_offset, 16, 16, 32, 32);
@@ -145,21 +145,21 @@ VIDEO_START( firetrap )
 
 WRITE8_HANDLER( firetrap_fgvideoram_w )
 {
-	firetrap_state *state = space->machine->driver_data<firetrap_state>();
+	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	state->fgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( firetrap_bg1videoram_w )
 {
-	firetrap_state *state = space->machine->driver_data<firetrap_state>();
+	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	state->bg1videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg1_tilemap, offset & 0x6ff);
 }
 
 WRITE8_HANDLER( firetrap_bg2videoram_w )
 {
-	firetrap_state *state = space->machine->driver_data<firetrap_state>();
+	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	state->bg2videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg2_tilemap, offset & 0x6ff);
 }
@@ -167,28 +167,28 @@ WRITE8_HANDLER( firetrap_bg2videoram_w )
 
 WRITE8_HANDLER( firetrap_bg1_scrollx_w )
 {
-	firetrap_state *state = space->machine->driver_data<firetrap_state>();
+	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	state->scroll1_x[offset] = data;
 	tilemap_set_scrollx(state->bg1_tilemap, 0, state->scroll1_x[0] | (state->scroll1_x[1] << 8));
 }
 
 WRITE8_HANDLER( firetrap_bg1_scrolly_w )
 {
-	firetrap_state *state = space->machine->driver_data<firetrap_state>();
+	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	state->scroll1_y[offset] = data;
 	tilemap_set_scrolly(state->bg1_tilemap, 0, -(state->scroll1_y[0] | (state->scroll1_y[1] << 8)));
 }
 
 WRITE8_HANDLER( firetrap_bg2_scrollx_w )
 {
-	firetrap_state *state = space->machine->driver_data<firetrap_state>();
+	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	state->scroll2_x[offset] = data;
 	tilemap_set_scrollx(state->bg2_tilemap, 0, state->scroll2_x[0] | (state->scroll2_x[1] << 8));
 }
 
 WRITE8_HANDLER( firetrap_bg2_scrolly_w )
 {
-	firetrap_state *state = space->machine->driver_data<firetrap_state>();
+	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	state->scroll2_y[offset] = data;
 	tilemap_set_scrolly(state->bg2_tilemap, 0, -(state->scroll2_y[0] | (state->scroll2_y[1] << 8)));
 }
@@ -200,9 +200,9 @@ WRITE8_HANDLER( firetrap_bg2_scrolly_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	firetrap_state *state = machine->driver_data<firetrap_state>();
+	firetrap_state *state = machine.driver_data<firetrap_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -230,24 +230,24 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		{
 			if (flip_screen_get(machine)) sy -= 16;
 
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 					code & ~1,
 					color,
 					flipx,flipy,
 					sx,flipy ? sy : sy + 16,0);
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 					code | 1,
 					color,
 					flipx,flipy,
 					sx,flipy ? sy + 16 : sy,0);
 
 			/* redraw with wraparound */
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 					code & ~1,
 					color,
 					flipx,flipy,
 					sx - 256,flipy ? sy : sy + 16,0);
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 					code | 1,
 					color,
 					flipx,flipy,
@@ -255,14 +255,14 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		}
 		else
 		{
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 					code,
 					color,
 					flipx,flipy,
 					sx,sy,0);
 
 			/* redraw with wraparound */
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 					code,
 					color,
 					flipx,flipy,
@@ -273,10 +273,10 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( firetrap )
 {
-	firetrap_state *state = screen->machine->driver_data<firetrap_state>();
+	firetrap_state *state = screen->machine().driver_data<firetrap_state>();
 	tilemap_draw(bitmap, cliprect, state->bg2_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->bg1_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
 }

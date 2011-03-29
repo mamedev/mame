@@ -69,8 +69,8 @@ DIP locations verified for:
 
 static WRITE8_DEVICE_HANDLER( bagman_ls259_w )
 {
-	bagman_state *state = device->machine->driver_data<bagman_state>();
-	address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	bagman_state *state = device->machine().driver_data<bagman_state>();
+	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	bagman_pal16r6_w(space, offset,data); /*this is just a simulation*/
 
 	if (state->ls259_buf[offset] != (data&1) )
@@ -99,7 +99,7 @@ static WRITE8_DEVICE_HANDLER( bagman_ls259_w )
 
 static WRITE8_HANDLER( bagman_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset,data);
+	coin_counter_w(space->machine(), offset,data);
 }
 
 static WRITE8_DEVICE_HANDLER( bagman_interrupt_w )
@@ -378,10 +378,10 @@ static const ay8910_interface ay8910_config =
    I don't know if the following is correct, there can possbily be multiple solutions for the same problem. */
 static READ8_DEVICE_HANDLER( dial_input_p1_r )
 {
-	bagman_state *state = device->machine->driver_data<bagman_state>();
+	bagman_state *state = device->machine().driver_data<bagman_state>();
 	UINT8 dial_val;
 
-	dial_val = input_port_read(device->machine, "DIAL_P1");
+	dial_val = input_port_read(device->machine(), "DIAL_P1");
 
 	if(state->p1_res != 0x60)
 		state->p1_res = 0x60;
@@ -394,15 +394,15 @@ static READ8_DEVICE_HANDLER( dial_input_p1_r )
 
 	state->p1_old_val = dial_val;
 
-	return (input_port_read(device->machine, "P1") & 0x9f) | (state->p1_res);
+	return (input_port_read(device->machine(), "P1") & 0x9f) | (state->p1_res);
 }
 
 static READ8_DEVICE_HANDLER( dial_input_p2_r )
 {
-	bagman_state *state = device->machine->driver_data<bagman_state>();
+	bagman_state *state = device->machine().driver_data<bagman_state>();
 	UINT8 dial_val;
 
-	dial_val = input_port_read(device->machine, "DIAL_P2");
+	dial_val = input_port_read(device->machine(), "DIAL_P2");
 
 	if(state->p2_res != 0x60)
 		state->p2_res = 0x60;
@@ -415,7 +415,7 @@ static READ8_DEVICE_HANDLER( dial_input_p2_r )
 
 	state->p2_old_val = dial_val;
 
-	return (input_port_read(device->machine, "P2") & 0x9f) | (state->p2_res);
+	return (input_port_read(device->machine(), "P2") & 0x9f) | (state->p2_res);
 }
 
 static const ay8910_interface ay8910_dial_config =
@@ -930,11 +930,11 @@ ROM_END
 
 static DRIVER_INIT( bagman )
 {
-	bagman_state *state = machine->driver_data<bagman_state>();
+	bagman_state *state = machine.driver_data<bagman_state>();
 
 	/* Unmap video enable register, not available on earlier hardware revision(s)
        Bagman is supposed to have glitches during screen transitions */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xa003, 0xa003);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xa003, 0xa003);
 	*state->video_enable = 1;
 }
 

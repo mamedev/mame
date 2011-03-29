@@ -557,7 +557,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, legacy
 	int regnum;
 
 	/* allocate enough space for the cache and the core */
-	cache = auto_alloc(device->machine, drc_cache(CACHE_SIZE + sizeof(*ppc)));
+	cache = auto_alloc(device->machine(), drc_cache(CACHE_SIZE + sizeof(*ppc)));
 
 	/* allocate the core from the near cache */
 	*(powerpc_state **)device->token() = ppc = (powerpc_state *)cache->alloc_near(sizeof(*ppc));
@@ -578,7 +578,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, legacy
 		flags |= DRCUML_OPTION_LOG_UML;
 	if (LOG_NATIVE)
 		flags |= DRCUML_OPTION_LOG_NATIVE;
-	ppc->impstate->drcuml = auto_alloc(device->machine, drcuml_state(*device, *cache, flags, 8, 32, 2));
+	ppc->impstate->drcuml = auto_alloc(device->machine(), drcuml_state(*device, *cache, flags, 8, 32, 2));
 
 	/* add symbols for our stuff */
 	ppc->impstate->drcuml->symbol_add(&ppc->pc, sizeof(ppc->pc), "pc");
@@ -624,7 +624,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, legacy
 	ppc->impstate->drcuml->symbol_add(&ppc->impstate->fcmp_cr_table, sizeof(ppc->impstate->fcmp_cr_table), "fcmp_cr_table");
 
 	/* initialize the front-end helper */
-	ppc->impstate->drcfe = auto_alloc(device->machine, ppc_frontend(*ppc, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
+	ppc->impstate->drcfe = auto_alloc(device->machine(), ppc_frontend(*ppc, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
 
 	/* initialize the implementation state tables */
 	memcpy(ppc->impstate->fpmode, fpmode_source, sizeof(fpmode_source));
@@ -716,9 +716,9 @@ static CPU_EXIT( ppcdrc )
 	ppccom_exit(ppc);
 
 	/* clean up the DRC */
-	auto_free(device->machine, ppc->impstate->drcfe);
-	auto_free(device->machine, ppc->impstate->drcuml);
-	auto_free(device->machine, ppc->impstate->cache);
+	auto_free(device->machine(), ppc->impstate->drcfe);
+	auto_free(device->machine(), ppc->impstate->drcuml);
+	auto_free(device->machine(), ppc->impstate->cache);
 }
 
 
@@ -1511,7 +1511,7 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 		UML_AND(block, I0, I0, 0x7fffffff);									// and     i0,i0,0x7fffffff
 	UML_XOR(block, I0, I0, (mode & MODE_LITTLE_ENDIAN) ? (8 - size) : 0);	// xor     i0,i0,8-size
 
-	if ((ppc->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((ppc->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		for (ramnum = 0; ramnum < PPC_MAX_FASTRAM; ramnum++)
 			if (ppc->impstate->fastram[ramnum].base != NULL && (!iswrite || !ppc->impstate->fastram[ramnum].readonly))
 			{
@@ -2127,7 +2127,7 @@ static void generate_sequence_instruction(powerpc_state *ppc, drcuml_block *bloc
 	}
 
 	/* if we are debugging, call the debugger */
-	if ((ppc->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((ppc->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		UML_MOV(block, mem(&ppc->pc), desc->pc);										// mov     [pc],desc->pc
 		save_fast_iregs(ppc, block);														// <save fastregs>

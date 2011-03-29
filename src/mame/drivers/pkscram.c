@@ -39,21 +39,21 @@ enum { interrupt_scanline=192 };
 
 static WRITE16_HANDLER( pkscramble_fgtilemap_w )
 {
-	pkscram_state *state = space->machine->driver_data<pkscram_state>();
+	pkscram_state *state = space->machine().driver_data<pkscram_state>();
 	COMBINE_DATA(&state->pkscramble_fgtilemap_ram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset >> 1);
 }
 
 static WRITE16_HANDLER( pkscramble_mdtilemap_w )
 {
-	pkscram_state *state = space->machine->driver_data<pkscram_state>();
+	pkscram_state *state = space->machine().driver_data<pkscram_state>();
 	COMBINE_DATA(&state->pkscramble_mdtilemap_ram[offset]);
 	tilemap_mark_tile_dirty(state->md_tilemap, offset >> 1);
 }
 
 static WRITE16_HANDLER( pkscramble_bgtilemap_w )
 {
-	pkscram_state *state = space->machine->driver_data<pkscram_state>();
+	pkscram_state *state = space->machine().driver_data<pkscram_state>();
 	COMBINE_DATA(&state->pkscramble_bgtilemap_ram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset >> 1);
 }
@@ -62,7 +62,7 @@ static WRITE16_HANDLER( pkscramble_bgtilemap_w )
 // it should stay high for some time (currently we cheat keeping the input always active)
 static WRITE16_HANDLER( pkscramble_output_w )
 {
-	pkscram_state *state = space->machine->driver_data<pkscram_state>();
+	pkscram_state *state = space->machine().driver_data<pkscram_state>();
 	// OUTPUT
 	// BIT
 	// 0x0001 -> STL
@@ -87,11 +87,11 @@ static WRITE16_HANDLER( pkscramble_output_w )
 
 	if (!(state->out & 0x2000) && state->interrupt_line_active)
 	{
-	    cputag_set_input_line(space->machine, "maincpu", 1, CLEAR_LINE);
+	    cputag_set_input_line(space->machine(), "maincpu", 1, CLEAR_LINE);
 		state->interrupt_line_active = 0;
 	}
 
-	coin_counter_w(space->machine, 0, data & 0x80);
+	coin_counter_w(space->machine(), 0, data & 0x80);
 }
 
 static ADDRESS_MAP_START( pkscramble_map, AS_PROGRAM, 16 )
@@ -183,7 +183,7 @@ INPUT_PORTS_END
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	pkscram_state *state = machine->driver_data<pkscram_state>();
+	pkscram_state *state = machine.driver_data<pkscram_state>();
 	int tile  = state->pkscramble_bgtilemap_ram[tile_index*2];
 	int color = state->pkscramble_bgtilemap_ram[tile_index*2 + 1] & 0x7f;
 
@@ -192,7 +192,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_md_tile_info )
 {
-	pkscram_state *state = machine->driver_data<pkscram_state>();
+	pkscram_state *state = machine.driver_data<pkscram_state>();
 	int tile  = state->pkscramble_mdtilemap_ram[tile_index*2];
 	int color = state->pkscramble_mdtilemap_ram[tile_index*2 + 1] & 0x7f;
 
@@ -201,7 +201,7 @@ static TILE_GET_INFO( get_md_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	pkscram_state *state = machine->driver_data<pkscram_state>();
+	pkscram_state *state = machine.driver_data<pkscram_state>();
 	int tile  = state->pkscramble_fgtilemap_ram[tile_index*2];
 	int color = state->pkscramble_fgtilemap_ram[tile_index*2 + 1] & 0x7f;
 
@@ -210,26 +210,26 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TIMER_DEVICE_CALLBACK( scanline_callback )
 {
-	pkscram_state *state = timer.machine->driver_data<pkscram_state>();
+	pkscram_state *state = timer.machine().driver_data<pkscram_state>();
 	if (param == interrupt_scanline)
 	{
     	if (state->out & 0x2000)
-    		cputag_set_input_line(timer.machine, "maincpu", 1, ASSERT_LINE);
-		timer.adjust(timer.machine->primary_screen->time_until_pos(param + 1), param+1);
+    		cputag_set_input_line(timer.machine(), "maincpu", 1, ASSERT_LINE);
+		timer.adjust(timer.machine().primary_screen->time_until_pos(param + 1), param+1);
 		state->interrupt_line_active = 1;
 	}
 	else
 	{
 		if (state->interrupt_line_active)
-	    	cputag_set_input_line(timer.machine, "maincpu", 1, CLEAR_LINE);
-		timer.adjust(timer.machine->primary_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
+	    	cputag_set_input_line(timer.machine(), "maincpu", 1, CLEAR_LINE);
+		timer.adjust(timer.machine().primary_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 		state->interrupt_line_active = 0;
 	}
 }
 
 static VIDEO_START( pkscramble )
 {
-	pkscram_state *state = machine->driver_data<pkscram_state>();
+	pkscram_state *state = machine.driver_data<pkscram_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8,32,32);
 	state->md_tilemap = tilemap_create(machine, get_md_tile_info, tilemap_scan_rows, 8, 8,32,32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8,32,32);
@@ -240,7 +240,7 @@ static VIDEO_START( pkscramble )
 
 static SCREEN_UPDATE( pkscramble )
 {
-	pkscram_state *state = screen->machine->driver_data<pkscram_state>();
+	pkscram_state *state = screen->machine().driver_data<pkscram_state>();
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->md_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
@@ -265,9 +265,9 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	pkscram_state *state = device->machine->driver_data<pkscram_state>();
+	pkscram_state *state = device->machine().driver_data<pkscram_state>();
 	if(state->out & 0x10)
-		cputag_set_input_line(device->machine, "maincpu", 2, irq ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", 2, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -282,18 +282,18 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( pkscramble)
 {
-	pkscram_state *state = machine->driver_data<pkscram_state>();
+	pkscram_state *state = machine.driver_data<pkscram_state>();
 	state_save_register_global(machine, state->out);
 	state_save_register_global(machine, state->interrupt_line_active);
 }
 
 static MACHINE_RESET( pkscramble)
 {
-	pkscram_state *state = machine->driver_data<pkscram_state>();
+	pkscram_state *state = machine.driver_data<pkscram_state>();
 	state->out = 0;
 	state->interrupt_line_active=0;
-	timer_device *scanline_timer = machine->device<timer_device>("scan_timer");
-	scanline_timer->adjust(machine->primary_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
+	timer_device *scanline_timer = machine.device<timer_device>("scan_timer");
+	scanline_timer->adjust(machine.primary_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 }
 
 static MACHINE_CONFIG_START( pkscramble, pkscram_state )

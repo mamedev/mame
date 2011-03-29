@@ -76,34 +76,34 @@ IO ports and memory map changes. Dip switches differ too.
 
 static WRITE8_HANDLER( control_w )
 {
-	kchamp_state *state = space->machine->driver_data<kchamp_state>();
+	kchamp_state *state = space->machine().driver_data<kchamp_state>();
 	state->nmi_enable = data & 1;
 }
 
 static WRITE8_HANDLER( sound_reset_w )
 {
-	kchamp_state *state = space->machine->driver_data<kchamp_state>();
+	kchamp_state *state = space->machine().driver_data<kchamp_state>();
 	if (!(data & 1))
 		device_set_input_line(state->audiocpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
-	kchamp_state *state = device->machine->driver_data<kchamp_state>();
+	kchamp_state *state = device->machine().driver_data<kchamp_state>();
 	msm5205_reset_w(device, !(data & 1));
 	state->sound_nmi_enable = ((data >> 1) & 1);
 }
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	kchamp_state *state = space->machine->driver_data<kchamp_state>();
+	kchamp_state *state = space->machine().driver_data<kchamp_state>();
 	soundlatch_w(space, 0, data);
 	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( sound_msm_w )
 {
-	kchamp_state *state = space->machine->driver_data<kchamp_state>();
+	kchamp_state *state = space->machine().driver_data<kchamp_state>();
 	state->msm_data = data;
 	state->msm_play_lo_nibble = 1;
 }
@@ -148,14 +148,14 @@ ADDRESS_MAP_END
 ********************/
 static READ8_HANDLER( sound_reset_r )
 {
-	kchamp_state *state = space->machine->driver_data<kchamp_state>();
+	kchamp_state *state = space->machine().driver_data<kchamp_state>();
 	device_set_input_line(state->audiocpu, INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
 static WRITE8_HANDLER( kc_sound_control_w )
 {
-	kchamp_state *state = space->machine->driver_data<kchamp_state>();
+	kchamp_state *state = space->machine().driver_data<kchamp_state>();
 
 	if (offset == 0)
 		state->sound_nmi_enable = ((data >> 7) & 1);
@@ -348,14 +348,14 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( kc_interrupt )
 {
-	kchamp_state *state = device->machine->driver_data<kchamp_state>();
+	kchamp_state *state = device->machine().driver_data<kchamp_state>();
 	if (state->nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void msmint( device_t *device )
 {
-	kchamp_state *state = device->machine->driver_data<kchamp_state>();
+	kchamp_state *state = device->machine().driver_data<kchamp_state>();
 
 	if (state->msm_play_lo_nibble)
 		msm5205_data_w(device, state->msm_data & 0x0f);
@@ -383,7 +383,7 @@ static const msm5205_interface msm_interface =
 
 static INTERRUPT_GEN( sound_int )
 {
-	kchamp_state *state = device->machine->driver_data<kchamp_state>();
+	kchamp_state *state = device->machine().driver_data<kchamp_state>();
 	if (state->sound_nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -391,9 +391,9 @@ static INTERRUPT_GEN( sound_int )
 
 static MACHINE_START( kchamp )
 {
-	kchamp_state *state = machine->driver_data<kchamp_state>();
+	kchamp_state *state = machine.driver_data<kchamp_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->nmi_enable));
 	state->save_item(NAME(state->sound_nmi_enable));
@@ -401,7 +401,7 @@ static MACHINE_START( kchamp )
 
 static MACHINE_START( kchampvs )
 {
-	kchamp_state *state = machine->driver_data<kchamp_state>();
+	kchamp_state *state = machine.driver_data<kchamp_state>();
 
 	MACHINE_START_CALL(kchamp);
 
@@ -412,7 +412,7 @@ static MACHINE_START( kchampvs )
 
 static MACHINE_RESET( kchamp )
 {
-	kchamp_state *state = machine->driver_data<kchamp_state>();
+	kchamp_state *state = machine.driver_data<kchamp_state>();
 
 	state->nmi_enable = 0;
 	state->sound_nmi_enable = 0;
@@ -728,11 +728,11 @@ ROM_START( karatevs )
 ROM_END
 
 
-static UINT8 *decrypt_code(running_machine *machine)
+static UINT8 *decrypt_code(running_machine &machine)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	int A;
 
 	space->set_decrypted_region(0x0000, 0xffff, decrypted);
@@ -746,8 +746,8 @@ static UINT8 *decrypt_code(running_machine *machine)
 
 static DRIVER_INIT( kchampvs )
 {
-	kchamp_state *state = machine->driver_data<kchamp_state>();
-	UINT8 *rom = machine->region("maincpu")->base();
+	kchamp_state *state = machine.driver_data<kchamp_state>();
+	UINT8 *rom = machine.region("maincpu")->base();
 	UINT8 *decrypted = decrypt_code(machine);
 	int A;
 
@@ -778,7 +778,7 @@ static DRIVER_INIT( kchampvs )
 
 static DRIVER_INIT( kchampvs2 )
 {
-	kchamp_state *state = machine->driver_data<kchamp_state>();
+	kchamp_state *state = machine.driver_data<kchamp_state>();
 
 	decrypt_code(machine);
 	state->counter = 0;

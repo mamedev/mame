@@ -280,7 +280,7 @@ static const UINT16 *const palette_data_lookup[] =
 
 static TIMER_CALLBACK( volfied_timer_callback )
 {
-	volfied_state *state = machine->driver_data<volfied_state>();
+	volfied_state *state = machine.driver_data<volfied_state>();
 
 	// Palette commands - palette data written to bank 0: $10 - $af
 	if (state->current_cmd >= 0x1 && state->current_cmd < 0x12)
@@ -335,13 +335,13 @@ WRITE16_HANDLER( volfied_cchip_ctrl_w )
 
 WRITE16_HANDLER( volfied_cchip_bank_w )
 {
-	volfied_state *state = space->machine->driver_data<volfied_state>();
+	volfied_state *state = space->machine().driver_data<volfied_state>();
 	state->current_bank = data & 7;
 }
 
 WRITE16_HANDLER( volfied_cchip_ram_w )
 {
-	volfied_state *state = space->machine->driver_data<volfied_state>();
+	volfied_state *state = space->machine().driver_data<volfied_state>();
 
 	state->cchip_ram[(state->current_bank * 0x400) + offset] = data;
 
@@ -354,10 +354,10 @@ WRITE16_HANDLER( volfied_cchip_ram_w )
 		{
 			state->cc_port = data;
 
-			coin_lockout_w(space->machine, 1, data & 0x80);
-			coin_lockout_w(space->machine, 0, data & 0x40);
-			coin_counter_w(space->machine, 1, data & 0x20);
-			coin_counter_w(space->machine, 0, data & 0x10);
+			coin_lockout_w(space->machine(), 1, data & 0x80);
+			coin_lockout_w(space->machine(), 0, data & 0x40);
+			coin_counter_w(space->machine(), 1, data & 0x20);
+			coin_counter_w(space->machine(), 0, data & 0x10);
 		}
 
 		if (offset == 0x3fe)
@@ -392,12 +392,12 @@ WRITE16_HANDLER( volfied_cchip_ram_w )
 			// Palette request cmd - verified to take around 122242 68000 cycles to complete
 			if (state->current_cmd >= 0x1 && state->current_cmd < 0x12)
 			{
-				space->machine->scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(122242), FUNC(volfied_timer_callback));
+				space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(122242), FUNC(volfied_timer_callback));
 			}
 			// Unknown cmd - verified to take around 105500 68000 cycles to complete
 			else if (state->current_cmd >= 0x81 && state->current_cmd < 0x92)
 			{
-				space->machine->scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(105500), FUNC(volfied_timer_callback));
+				space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(105500), FUNC(volfied_timer_callback));
 			}
 			else
 			{
@@ -432,17 +432,17 @@ READ16_HANDLER( volfied_cchip_ctrl_r )
 
 READ16_HANDLER( volfied_cchip_ram_r )
 {
-	volfied_state *state = space->machine->driver_data<volfied_state>();
+	volfied_state *state = space->machine().driver_data<volfied_state>();
 
 	/* Check for input ports */
 	if (state->current_bank == 0)
 	{
 		switch (offset)
 		{
-		case 0x03: return input_port_read(space->machine, "F00007");    /* STARTn + SERVICE1 */
-		case 0x04: return input_port_read(space->machine, "F00009");    /* COINn */
-		case 0x05: return input_port_read(space->machine, "F0000B");    /* Player controls + TILT */
-		case 0x06: return input_port_read(space->machine, "F0000D");    /* Player controls (cocktail) */
+		case 0x03: return input_port_read(space->machine(), "F00007");    /* STARTn + SERVICE1 */
+		case 0x04: return input_port_read(space->machine(), "F00009");    /* COINn */
+		case 0x05: return input_port_read(space->machine(), "F0000B");    /* Player controls + TILT */
+		case 0x06: return input_port_read(space->machine(), "F0000D");    /* Player controls (cocktail) */
 		case 0x08: return state->cc_port;
 		}
 	}
@@ -485,9 +485,9 @@ READ16_HANDLER( volfied_cchip_ram_r )
  *
  *************************************/
 
-void volfied_cchip_init( running_machine *machine )
+void volfied_cchip_init( running_machine &machine )
 {
-	volfied_state *state = machine->driver_data<volfied_state>();
+	volfied_state *state = machine.driver_data<volfied_state>();
 
 	state->cchip_ram = auto_alloc_array_clear(machine, UINT8, 0x400 * 8);
 
@@ -498,9 +498,9 @@ void volfied_cchip_init( running_machine *machine )
 	state->save_pointer(NAME(state->cchip_ram), 0x400 * 8);
 }
 
-void volfied_cchip_reset( running_machine *machine )
+void volfied_cchip_reset( running_machine &machine )
 {
-	volfied_state *state = machine->driver_data<volfied_state>();
+	volfied_state *state = machine.driver_data<volfied_state>();
 
 	state->current_bank = 0;
 	state->current_flag = 0;

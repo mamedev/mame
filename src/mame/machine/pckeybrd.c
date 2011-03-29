@@ -305,13 +305,13 @@ static const extended_keyboard_code at_keyboard_extended_codes_set_2_3[]=
 static void at_keyboard_queue_insert(UINT8 data);
 
 static int at_keyboard_queue_size(void);
-static int at_keyboard_queue_chars(running_machine *machine, const unicode_char *text, size_t text_len);
-static int at_keyboard_accept_char(running_machine *machine, unicode_char ch);
-static int at_keyboard_charqueue_empty(running_machine *machine);
+static int at_keyboard_queue_chars(running_machine &machine, const unicode_char *text, size_t text_len);
+static int at_keyboard_accept_char(running_machine &machine, unicode_char ch);
+static int at_keyboard_charqueue_empty(running_machine &machine);
 
 
 
-void at_keyboard_init(running_machine *machine, AT_KEYBOARD_TYPE type)
+void at_keyboard_init(running_machine &machine, AT_KEYBOARD_TYPE type)
 {
 	int i;
 
@@ -336,7 +336,7 @@ void at_keyboard_init(running_machine *machine, AT_KEYBOARD_TYPE type)
 	{
 		astring buf;
 		buf.printf("pc_keyboard_%d", i);
-		keyboard.ports[i] = machine->port(buf);
+		keyboard.ports[i] = machine.port(buf);
 	}
 
 	inputx_setup_natural_keyboard(machine,
@@ -347,7 +347,7 @@ void at_keyboard_init(running_machine *machine, AT_KEYBOARD_TYPE type)
 
 
 
-void at_keyboard_reset(running_machine *machine)
+void at_keyboard_reset(running_machine &machine)
 {
 	keyboard.head = keyboard.tail = 0;
 	keyboard.input_state = 0;
@@ -666,7 +666,7 @@ Note:   each command is acknowledged by FAh (ACK), if not mentioned otherwise.
 SeeAlso: #P046
 */
 
-void at_keyboard_write(running_machine *machine, UINT8 data)
+void at_keyboard_write(running_machine &machine, UINT8 data)
 {
 	if (LOG_KEYBOARD)
 		logerror("keyboard write %.2x\n",data);
@@ -968,7 +968,7 @@ static UINT8 unicode_char_to_at_keycode(unicode_char ch)
   at_keyboard_queue_chars
 ***************************************************************************/
 
-static int at_keyboard_queue_chars(running_machine *machine, const unicode_char *text, size_t text_len)
+static int at_keyboard_queue_chars(running_machine &machine, const unicode_char *text, size_t text_len)
 {
 	int i;
 	UINT8 b;
@@ -1237,14 +1237,14 @@ INPUT_PORTS_END
   Inputx stuff
 ***************************************************************************/
 
-static int at_keyboard_accept_char(running_machine *machine, unicode_char ch)
+static int at_keyboard_accept_char(running_machine &machine, unicode_char ch)
 {
 	return unicode_char_to_at_keycode(ch) != 0;
 }
 
 
 
-static int at_keyboard_charqueue_empty(running_machine *machine)
+static int at_keyboard_charqueue_empty(running_machine &machine)
 {
 	return at_keyboard_queue_size() == 0;
 }

@@ -14,43 +14,43 @@ PALETTE_INIT( buggychl )
 
 VIDEO_START( buggychl )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
-	state->tmp_bitmap1 = machine->primary_screen->alloc_compatible_bitmap();
-	state->tmp_bitmap2 = machine->primary_screen->alloc_compatible_bitmap();
+	buggychl_state *state = machine.driver_data<buggychl_state>();
+	state->tmp_bitmap1 = machine.primary_screen->alloc_compatible_bitmap();
+	state->tmp_bitmap2 = machine.primary_screen->alloc_compatible_bitmap();
 
 	state->save_item(NAME(*state->tmp_bitmap1));
 	state->save_item(NAME(*state->tmp_bitmap2));
 
-	gfx_element_set_source(machine->gfx[0], state->charram);
+	gfx_element_set_source(machine.gfx[0], state->charram);
 }
 
 
 
 WRITE8_HANDLER( buggychl_chargen_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	buggychl_state *state = space->machine().driver_data<buggychl_state>();
 	if (state->charram[offset] != data)
 	{
 		state->charram[offset] = data;
-		gfx_element_mark_dirty(space->machine->gfx[0], (offset / 8) & 0xff);
+		gfx_element_mark_dirty(space->machine().gfx[0], (offset / 8) & 0xff);
 	}
 }
 
 WRITE8_HANDLER( buggychl_sprite_lookup_bank_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	buggychl_state *state = space->machine().driver_data<buggychl_state>();
 	state->sl_bank = (data & 0x10) << 8;
 }
 
 WRITE8_HANDLER( buggychl_sprite_lookup_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	buggychl_state *state = space->machine().driver_data<buggychl_state>();
 	state->sprite_lookup[offset + state->sl_bank] = data;
 }
 
 WRITE8_HANDLER( buggychl_ctrl_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	buggychl_state *state = space->machine().driver_data<buggychl_state>();
 /*
     bit7 = lamp
     bit6 = lockout
@@ -61,21 +61,21 @@ WRITE8_HANDLER( buggychl_ctrl_w )
     bit0 = VINV
 */
 
-	flip_screen_y_set(space->machine, data & 0x01);
-	flip_screen_x_set(space->machine, data & 0x02);
+	flip_screen_y_set(space->machine(), data & 0x01);
+	flip_screen_x_set(space->machine(), data & 0x02);
 
 	state->bg_on = data & 0x04;
 	state->sky_on = data & 0x08;
 
 	state->sprite_color_base = (data & 0x10) ? 1 * 16 : 3 * 16;
 
-	coin_lockout_global_w(space->machine, (~data & 0x40) >> 6);
-	set_led_status(space->machine, 0, ~data & 0x80);
+	coin_lockout_global_w(space->machine(), (~data & 0x40) >> 6);
+	set_led_status(space->machine(), 0, ~data & 0x80);
 }
 
 WRITE8_HANDLER( buggychl_bg_scrollx_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	buggychl_state *state = space->machine().driver_data<buggychl_state>();
 	state->bg_scrollx = -(data - 0x12);
 }
 
@@ -90,9 +90,9 @@ static void draw_sky( bitmap_t *bitmap, const rectangle *cliprect )
 }
 
 
-static void draw_bg( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_bg( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	buggychl_state *state = machine.driver_data<buggychl_state>();
 	int offs;
 	int scroll[256];
 
@@ -113,7 +113,7 @@ static void draw_bg( running_machine *machine, bitmap_t *bitmap, const rectangle
 		if (flip_screen_y_get(machine))
 			sy = 31 - sy;
 
-		drawgfx_opaque(state->tmp_bitmap1, NULL, machine->gfx[0],
+		drawgfx_opaque(state->tmp_bitmap1, NULL, machine.gfx[0],
 				code,
 				2,
 				flip_screen_x_get(machine),flip_screen_y_get(machine),
@@ -134,9 +134,9 @@ static void draw_bg( running_machine *machine, bitmap_t *bitmap, const rectangle
 }
 
 
-static void draw_fg( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_fg( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	buggychl_state *state = machine.driver_data<buggychl_state>();
 	int offs;
 
 	for (offs = 0; offs < 0x400; offs++)
@@ -153,7 +153,7 @@ static void draw_fg( running_machine *machine, bitmap_t *bitmap, const rectangle
 		if (flipy)
 			sy = 31 - sy;
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				code,
 				0,
 				flipx,flipy,
@@ -163,16 +163,16 @@ static void draw_fg( running_machine *machine, bitmap_t *bitmap, const rectangle
 }
 
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	buggychl_state *state = machine.driver_data<buggychl_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 	const UINT8 *gfx;
 
 	g_profiler.start(PROFILER_USER1);
 
-	gfx = machine->region("gfx2")->base();
+	gfx = machine.region("gfx2")->base();
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
 	{
 		int sx, sy, flipy, zoom, ch, x, px, y;
@@ -211,7 +211,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 					code = 8 * (lookup[pos] | ((lookup[pos + 1] & 0x07) << 8));
 					realflipy = (lookup[pos + 1] & 0x80) ? !flipy : flipy;
 					code += (realflipy ? (charline ^ 7) : charline);
-					pendata = gfx_element_get_data(machine->gfx[1], code);
+					pendata = gfx_element_get_data(machine.gfx[1], code);
 
 					for (x = 0; x < 16; x++)
 					{
@@ -238,7 +238,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( buggychl )
 {
-	buggychl_state *state = screen->machine->driver_data<buggychl_state>();
+	buggychl_state *state = screen->machine().driver_data<buggychl_state>();
 
 	if (state->sky_on)
 		draw_sky(bitmap, cliprect);
@@ -246,11 +246,11 @@ SCREEN_UPDATE( buggychl )
 		bitmap_fill(bitmap, cliprect, 0);
 
 	if (state->bg_on)
-		draw_bg(screen->machine, bitmap, cliprect);
+		draw_bg(screen->machine(), bitmap, cliprect);
 
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 
-	draw_fg(screen->machine, bitmap, cliprect);
+	draw_fg(screen->machine(), bitmap, cliprect);
 
 	return 0;
 }

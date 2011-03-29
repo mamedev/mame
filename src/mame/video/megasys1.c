@@ -194,7 +194,7 @@ actual code sent to the hardware.
 #include "emu.h"
 #include "includes/megasys1.h"
 
-static void create_tilemaps(running_machine *machine);
+static void create_tilemaps(running_machine &machine);
 
 
 #ifdef MAME_DEBUG
@@ -222,7 +222,7 @@ static void create_tilemaps(running_machine *machine);
 
 VIDEO_START( megasys1 )
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
 	int i;
 
 	state->spriteram = &state->ram[0x8000/2];
@@ -267,14 +267,14 @@ VIDEO_START( megasys1 )
 	state->_8x8_scroll_factor[1] = 1;	state->_16x16_scroll_factor[1] = 4;
 	state->_8x8_scroll_factor[2] = 1;	state->_16x16_scroll_factor[2] = 4;
 
-	if (strcmp(machine->system().name, "soldamj") == 0)
+	if (strcmp(machine.system().name, "soldamj") == 0)
 	{
 		state->_8x8_scroll_factor[1] = 4;	state->_16x16_scroll_factor[1] = 4;
 	}
 
 	state->hardware_type_z = 0;
-	if (strcmp(machine->system().name, "lomakai") == 0 ||
-		strcmp(machine->system().name, "makaiden") == 0)
+	if (strcmp(machine.system().name, "lomakai") == 0 ||
+		strcmp(machine.system().name, "makaiden") == 0)
 		state->hardware_type_z = 1;
 }
 
@@ -293,7 +293,7 @@ VIDEO_START( megasys1 )
 
 INLINE void scrollram_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int which)
 {
-	megasys1_state *state = space->machine->driver_data<megasys1_state>();
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
 	COMBINE_DATA(&state->scrollram[which][offset]);
 	if (offset < 0x40000/2 && state->tmap[which])
 	{
@@ -351,7 +351,7 @@ static TILEMAP_MAPPER( megasys1_scan_16x16 )
 
 static TILE_GET_INFO( megasys1_get_scroll_tile_info_8x8 )
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
 	int tmap = (FPTR)param;
 	UINT16 code = state->scrollram[tmap][tile_index];
 	SET_TILE_INFO(tmap, (code & 0xfff) * state->_8x8_scroll_factor[tmap], code >> (16 - state->bits_per_color_code), 0);
@@ -359,15 +359,15 @@ static TILE_GET_INFO( megasys1_get_scroll_tile_info_8x8 )
 
 static TILE_GET_INFO( megasys1_get_scroll_tile_info_16x16 )
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
 	int tmap = (FPTR)param;
 	UINT16 code = state->scrollram[tmap][tile_index/4];
 	SET_TILE_INFO(tmap, (code & 0xfff) * state->_16x16_scroll_factor[tmap] + (tile_index & 3), code >> (16 - state->bits_per_color_code), 0);
 }
 
-static void create_tilemaps(running_machine *machine)
+static void create_tilemaps(running_machine &machine)
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
 	int layer, i;
 
 	for (layer = 0; layer < 3; layer++)
@@ -416,7 +416,7 @@ static void megasys1_set_vreg_flag(megasys1_state *state, int which, int data)
 /* Used by MS1-A/Z, B */
 WRITE16_HANDLER( megasys1_vregs_A_w )
 {
-	megasys1_state *state = space->machine->driver_data<megasys1_state>();
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
 	UINT16 new_data = COMBINE_DATA(&state->vregs[offset]);
 
 	switch (offset)
@@ -438,17 +438,17 @@ WRITE16_HANDLER( megasys1_vregs_A_w )
 		case 0x100/2   :	state->sprite_flag = new_data;		break;
 
 		case 0x300/2   :	state->screen_flag = new_data;
-							if (space->machine->device("soundcpu"))
+							if (space->machine().device("soundcpu"))
 							{
 								if (new_data & 0x10)
-									cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
+									cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
 								else
-									cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
+									cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
 							}
 							break;
 
 		case 0x308/2   :	soundlatch_word_w(space,0,new_data,0xffff);
-							cputag_set_input_line(space->machine, "soundcpu", 4, HOLD_LINE);
+							cputag_set_input_line(space->machine(), "soundcpu", 4, HOLD_LINE);
 							break;
 
 		default		 :	SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
@@ -462,7 +462,7 @@ WRITE16_HANDLER( megasys1_vregs_A_w )
 /* Used by MS1-C only */
 READ16_HANDLER( megasys1_vregs_C_r )
 {
-	megasys1_state *state = space->machine->driver_data<megasys1_state>();
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
 	switch (offset)
 	{
 		case 0x8000/2:	return soundlatch2_word_r(space,0,0xffff);
@@ -472,7 +472,7 @@ READ16_HANDLER( megasys1_vregs_C_r )
 
 WRITE16_HANDLER( megasys1_vregs_C_w )
 {
-	megasys1_state *state = space->machine->driver_data<megasys1_state>();
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
 	UINT16 new_data = COMBINE_DATA(&state->vregs[offset]);
 
 	switch (offset)
@@ -495,14 +495,14 @@ WRITE16_HANDLER( megasys1_vregs_C_w )
 
 		case 0x2308/2   :	state->screen_flag = new_data;
 							if (new_data & 0x10)
-								cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
+								cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
 							else
-								cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
+								cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
 							break;
 
 		case 0x8000/2   :	/* Cybattler reads sound latch on irq 2 */
 							soundlatch_word_w(space, 0, new_data, 0xffff);
-							cputag_set_input_line(space->machine, "soundcpu", 2, HOLD_LINE);
+							cputag_set_input_line(space->machine(), "soundcpu", 2, HOLD_LINE);
 							break;
 
 		default:		SHOW_WRITE_ERROR("vreg %04X <- %04X", offset * 2, data);
@@ -514,7 +514,7 @@ WRITE16_HANDLER( megasys1_vregs_C_w )
 /* Used by MS1-D only */
 WRITE16_HANDLER( megasys1_vregs_D_w )
 {
-	megasys1_state *state = space->machine->driver_data<megasys1_state>();
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
 	UINT16 new_data = COMBINE_DATA(&state->vregs[offset]);
 
 	switch (offset)
@@ -567,9 +567,9 @@ WRITE16_HANDLER( megasys1_vregs_D_w )
     0C      Y position
     0E      Code                                            */
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
 	int color,code,sx,sy,flipx,flipy,attr,sprite,offs,color_mask;
 
 /* objram: 0x100*4 entries      spritedata: 0x80 entries */
@@ -611,12 +611,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				color = (attr & color_mask);
 
 				pdrawgfx_transpen(bitmap,cliprect,
-						machine->gfx[3],
+						machine.gfx[3],
 						(code & 0xfff ) + ((state->sprite_bank & 1) << 12),
 						color,
 						flipx, flipy,
 						sx, sy,
-						machine->priority_bitmap,
+						machine.priority_bitmap,
 						(attr & 0x08) ? 0x0c : 0x0a,15);
 			}	/* sprite */
 		}	/* offs */
@@ -652,12 +652,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			}
 
 			pdrawgfx_transpen(bitmap,cliprect,
-					machine->gfx[2],
+					machine.gfx[2],
 					code,
 					color,
 					flipx, flipy,
 					sx, sy,
-					machine->priority_bitmap,
+					machine.priority_bitmap,
 					(attr & 0x08) ? 0x0c : 0x0a,15);
 		}	/* sprite */
 	}	/* Z hw */
@@ -757,7 +757,7 @@ static const struct priority priorities[] =
 
 PALETTE_INIT( megasys1 )
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
 	int pri_code, offset, i, order;
 
 	/* First check if we have an hand-crafted priority scheme
@@ -766,8 +766,8 @@ PALETTE_INIT( megasys1 )
 
 	i = 0;
 	while (	priorities[i].driver &&
-			strcmp(priorities[i].driver, machine->system().name) != 0 &&
-			strcmp(priorities[i].driver, machine->system().parent) != 0)
+			strcmp(priorities[i].driver, machine.system().name) != 0 &&
+			strcmp(priorities[i].driver, machine.system().parent) != 0)
 		i++;
 
 	if (priorities[i].driver)
@@ -926,7 +926,7 @@ PALETTE_INIT( megasys1 )
 
 SCREEN_UPDATE( megasys1 )
 {
-	megasys1_state *state = screen->machine->driver_data<megasys1_state>();
+	megasys1_state *state = screen->machine().driver_data<megasys1_state>();
 	int i,flag,pri,primask;
 	int active_layers;
 
@@ -960,7 +960,7 @@ SCREEN_UPDATE( megasys1 )
 		active_layers |= 1 << ((pri & 0xf0000) >> 16);	// bottom layer can't be disabled
 	}
 
-	tilemap_set_flip_all( screen->machine, (state->screen_flag & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0 );
+	tilemap_set_flip_all( screen->machine(), (state->screen_flag & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0 );
 
 	for (i = 0;i < 3;i++)
 	{
@@ -973,7 +973,7 @@ SCREEN_UPDATE( megasys1 )
 		}
 	}
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
 
 	flag = TILEMAP_DRAW_OPAQUE;
 	primask = 0;
@@ -1016,13 +1016,13 @@ SCREEN_UPDATE( megasys1 )
 	}
 
 	if (active_layers & 0x08)
-		draw_sprites(screen->machine,bitmap,cliprect);
+		draw_sprites(screen->machine(),bitmap,cliprect);
 	return 0;
 }
 
 SCREEN_EOF( megasys1 )
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
 	/* Sprite are TWO frames ahead, like NMK16 HW. */
 //state->objectram
 	memcpy(state->buffer2_objectram,state->buffer_objectram, 0x2000);

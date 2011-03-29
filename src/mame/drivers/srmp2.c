@@ -85,7 +85,7 @@ static INTERRUPT_GEN( srmp2_interrupt )
 
 static MACHINE_START( srmp2 )
 {
-	srmp2_state *state = machine->driver_data<srmp2_state>();
+	srmp2_state *state = machine.driver_data<srmp2_state>();
 	iox_t &iox = state->iox;
 
 	iox.reset = 0x1f;
@@ -100,7 +100,7 @@ static MACHINE_START( srmp2 )
 
 static MACHINE_START( srmp3 )
 {
-	srmp2_state *state = machine->driver_data<srmp2_state>();
+	srmp2_state *state = machine.driver_data<srmp2_state>();
 	iox_t &iox = state->iox;
 
 	iox.reset = 0xc8;
@@ -114,7 +114,7 @@ static MACHINE_START( srmp3 )
 
 static MACHINE_START( rmgoldyh )
 {
-	srmp2_state *state = machine->driver_data<srmp2_state>();
+	srmp2_state *state = machine.driver_data<srmp2_state>();
 	iox_t &iox = state->iox;
 
 	iox.reset = 0xc8;
@@ -141,10 +141,10 @@ static WRITE16_HANDLER( srmp2_flags_w )
     x--- ---- : Palette Bank
 */
 
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
+	srmp2_state *state = space->machine().driver_data<srmp2_state>();
 
-	coin_counter_w( space->machine, 0, ((data & 0x01) >> 0) );
-	coin_lockout_w( space->machine, 0, (((~data) & 0x10) >> 4) );
+	coin_counter_w( space->machine(), 0, ((data & 0x01) >> 0) );
+	coin_lockout_w( space->machine(), 0, (((~data) & 0x10) >> 4) );
 	state->adpcm_bank = ( (data & 0x20) >> 5 );
 	state->color_bank = ( (data & 0x80) >> 7 );
 }
@@ -157,8 +157,8 @@ static WRITE16_HANDLER( mjyuugi_flags_w )
     ---x ---- : Coin Lock Out
 */
 
-	coin_counter_w( space->machine, 0, ((data & 0x01) >> 0) );
-	coin_lockout_w( space->machine, 0, (((~data) & 0x10) >> 4) );
+	coin_counter_w( space->machine(), 0, ((data & 0x01) >> 0) );
+	coin_lockout_w( space->machine(), 0, (((~data) & 0x10) >> 4) );
 }
 
 
@@ -169,7 +169,7 @@ static WRITE16_HANDLER( mjyuugi_adpcm_bank_w )
     --xx ---- : GFX Bank
 */
 
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
+	srmp2_state *state = space->machine().driver_data<srmp2_state>();
 
 	state->adpcm_bank = (data & 0x0f);
 	state->gfx_bank = ((data >> 4) & 0x03);
@@ -185,8 +185,8 @@ static WRITE16_DEVICE_HANDLER( srmp2_adpcm_code_w )
       table and plays the ADPCM for itself.
 */
 
-	srmp2_state *state = device->machine->driver_data<srmp2_state>();
-	UINT8 *ROM = device->machine->region("adpcm")->base();
+	srmp2_state *state = device->machine().driver_data<srmp2_state>();
+	UINT8 *ROM = device->machine().region("adpcm")->base();
 
 	state->adpcm_sptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	state->adpcm_eptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -209,8 +209,8 @@ static WRITE8_DEVICE_HANDLER( srmp3_adpcm_code_w )
       table and plays the ADPCM for itself.
 */
 
-	srmp2_state *state = device->machine->driver_data<srmp2_state>();
-	UINT8 *ROM = device->machine->region("adpcm")->base();
+	srmp2_state *state = device->machine().driver_data<srmp2_state>();
+	UINT8 *ROM = device->machine().region("adpcm")->base();
 
 	state->adpcm_sptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	state->adpcm_eptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -226,8 +226,8 @@ static WRITE8_DEVICE_HANDLER( srmp3_adpcm_code_w )
 
 static void srmp2_adpcm_int(device_t *device)
 {
-	srmp2_state *state = device->machine->driver_data<srmp2_state>();
-	UINT8 *ROM = device->machine->region("adpcm")->base();
+	srmp2_state *state = device->machine().driver_data<srmp2_state>();
+	UINT8 *ROM = device->machine().region("adpcm")->base();
 
 	if (state->adpcm_sptr)
 	{
@@ -265,7 +265,7 @@ static READ8_HANDLER( vox_status_r )
 }
 
 
-static UINT8 iox_key_matrix_calc(running_machine *machine,UINT8 p_side)
+static UINT8 iox_key_matrix_calc(running_machine &machine,UINT8 p_side)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 	int i, j, t;
@@ -288,7 +288,7 @@ static UINT8 iox_key_matrix_calc(running_machine *machine,UINT8 p_side)
 
 static READ8_HANDLER( iox_mux_r )
 {
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
+	srmp2_state *state = space->machine().driver_data<srmp2_state>();
 	iox_t &iox = state->iox;
 
 	/* first off check any pending protection value */
@@ -316,8 +316,8 @@ static READ8_HANDLER( iox_mux_r )
 		/* both side checks */
 		if(iox.mux == 1)
 		{
-			UINT8 p1_side = iox_key_matrix_calc(space->machine,0);
-			UINT8 p2_side = iox_key_matrix_calc(space->machine,4);
+			UINT8 p1_side = iox_key_matrix_calc(space->machine(),0);
+			UINT8 p2_side = iox_key_matrix_calc(space->machine(),4);
 
 			if(p1_side != 0)
 				return p1_side;
@@ -326,10 +326,10 @@ static READ8_HANDLER( iox_mux_r )
 		}
 
 		/* check individual input side */
-		return iox_key_matrix_calc(space->machine,(iox.mux == 2) ? 0 : 4);
+		return iox_key_matrix_calc(space->machine(),(iox.mux == 2) ? 0 : 4);
 	}
 
-	return input_port_read(space->machine,"SERVICE") & 0xff;
+	return input_port_read(space->machine(),"SERVICE") & 0xff;
 }
 
 static READ8_HANDLER( iox_status_r )
@@ -339,7 +339,7 @@ static READ8_HANDLER( iox_status_r )
 
 static WRITE8_HANDLER( iox_command_w )
 {
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
+	srmp2_state *state = space->machine().driver_data<srmp2_state>();
 	iox_t &iox = state->iox;
 	/*
     bit wise command port apparently
@@ -354,7 +354,7 @@ static WRITE8_HANDLER( iox_command_w )
 
 static WRITE8_HANDLER( iox_data_w )
 {
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
+	srmp2_state *state = space->machine().driver_data<srmp2_state>();
 	iox_t &iox = state->iox;
 	iox.data = data;
 
@@ -375,8 +375,8 @@ static WRITE8_HANDLER( srmp3_rombank_w )
     xxx- ---- : ADPCM ROM bank
 */
 
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
-	UINT8 *ROM = space->machine->region("maincpu")->base();
+	srmp2_state *state = space->machine().driver_data<srmp2_state>();
+	UINT8 *ROM = space->machine().region("maincpu")->base();
 	int addr;
 
 	state->adpcm_bank = ((data & 0xe0) >> 5);
@@ -384,7 +384,7 @@ static WRITE8_HANDLER( srmp3_rombank_w )
 	if (data & 0x1f) addr = ((0x10000 + (0x2000 * (data & 0x0f))) - 0x8000);
 	else addr = 0x10000;
 
-	memory_set_bankptr(space->machine, "bank1", &ROM[addr]);
+	memory_set_bankptr(space->machine(), "bank1", &ROM[addr]);
 }
 
 /**************************************************************************
@@ -448,10 +448,10 @@ static WRITE8_HANDLER( srmp3_flags_w )
     xx-- ---- : GFX Bank
 */
 
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
+	srmp2_state *state = space->machine().driver_data<srmp2_state>();
 
-	coin_counter_w( space->machine, 0, ((data & 0x01) >> 0) );
-	coin_lockout_w( space->machine, 0, (((~data) & 0x10) >> 4) );
+	coin_counter_w( space->machine(), 0, ((data & 0x01) >> 0) );
+	coin_lockout_w( space->machine(), 0, (((~data) & 0x10) >> 4) );
 	state->gfx_bank = (data >> 6) & 0x03;
 }
 
@@ -497,8 +497,8 @@ static WRITE8_HANDLER( rmgoldyh_rombank_w )
     xxx- ---- : ADPCM ROM bank
 */
 
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
-	UINT8 *ROM = space->machine->region("maincpu")->base();
+	srmp2_state *state = space->machine().driver_data<srmp2_state>();
+	UINT8 *ROM = space->machine().region("maincpu")->base();
 	int addr;
 
 	state->adpcm_bank = ((data & 0xe0) >> 5);
@@ -506,7 +506,7 @@ static WRITE8_HANDLER( rmgoldyh_rombank_w )
 	if (data & 0x1f) addr = ((0x10000 + (0x2000 * (data & 0x1f))) - 0x8000);
 	else addr = 0x10000;
 
-	memory_set_bankptr(space->machine, "bank1", &ROM[addr]);
+	memory_set_bankptr(space->machine(), "bank1", &ROM[addr]);
 }
 
 static ADDRESS_MAP_START( rmgoldyh_io_map, AS_IO, 8 )

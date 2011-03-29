@@ -48,7 +48,7 @@ public:
 /* VIDEO GOODS */
 static SCREEN_UPDATE( istellar )
 {
-	istellar_state *state = screen->machine->driver_data<istellar_state>();
+	istellar_state *state = screen->machine().driver_data<istellar_state>();
 	int charx, chary;
 
 	/* clear */
@@ -70,7 +70,7 @@ static SCREEN_UPDATE( istellar )
 		{
 			int current_screen_character = (chary*32) + charx;
 
-			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0],
+			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0],
 					state->tile_ram[current_screen_character],
 					(state->tile_control_ram[current_screen_character] & 0x0f),
 					0, 0, charx*8, chary*8, 0);
@@ -86,8 +86,8 @@ static SCREEN_UPDATE( istellar )
 
 static MACHINE_START( istellar )
 {
-	istellar_state *state = machine->driver_data<istellar_state>();
-	state->laserdisc = machine->device("laserdisc");
+	istellar_state *state = machine.driver_data<istellar_state>();
+	state->laserdisc = machine.device("laserdisc");
 }
 
 
@@ -96,14 +96,14 @@ static MACHINE_START( istellar )
 /* Z80 0 R/W */
 static READ8_HANDLER(z80_0_latch1_read)
 {
-	istellar_state *state = space->machine->driver_data<istellar_state>();
+	istellar_state *state = space->machine().driver_data<istellar_state>();
 	/*logerror("CPU0 : reading LDP status latch (%x)\n", state->ldp_latch1);*/
 	return state->ldp_latch1;
 }
 
 static WRITE8_HANDLER(z80_0_latch2_write)
 {
-	istellar_state *state = space->machine->driver_data<istellar_state>();
+	istellar_state *state = space->machine().driver_data<istellar_state>();
 	/*logerror("CPU0 : writing cpu_latch2 (%x).  Potentially followed by an IRQ.\n", data);*/
 	state->ldp_latch2 = data;
 
@@ -111,7 +111,7 @@ static WRITE8_HANDLER(z80_0_latch2_write)
 	if (state->z80_2_nmi_enable)
 	{
 		logerror("Executing an NMI on CPU2\n");
-		cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);		/* Maybe this is a ASSERT_LINE, CLEAR_LINE combo? */
+		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_NMI, PULSE_LINE);		/* Maybe this is a ASSERT_LINE, CLEAR_LINE combo? */
 		state->z80_2_nmi_enable = 0;
 	}
 }
@@ -123,7 +123,7 @@ static WRITE8_HANDLER(z80_0_latch2_write)
 /* Z80 2 R/W */
 static READ8_HANDLER(z80_2_ldp_read)
 {
-	istellar_state *state = space->machine->driver_data<istellar_state>();
+	istellar_state *state = space->machine().driver_data<istellar_state>();
 	UINT8 readResult = laserdisc_data_r(state->laserdisc);
 	logerror("CPU2 : reading LDP : %x\n", readResult);
 	return readResult;
@@ -131,14 +131,14 @@ static READ8_HANDLER(z80_2_ldp_read)
 
 static READ8_HANDLER(z80_2_latch2_read)
 {
-	istellar_state *state = space->machine->driver_data<istellar_state>();
+	istellar_state *state = space->machine().driver_data<istellar_state>();
 	logerror("CPU2 : reading latch2 (%x)\n", state->ldp_latch2);
 	return state->ldp_latch2;
 }
 
 static READ8_HANDLER(z80_2_nmienable)
 {
-	istellar_state *state = space->machine->driver_data<istellar_state>();
+	istellar_state *state = space->machine().driver_data<istellar_state>();
 	logerror("CPU2 : ENABLING NMI\n");
 	state->z80_2_nmi_enable = 1;
 	return 0x00;
@@ -152,14 +152,14 @@ static READ8_HANDLER(z80_2_unknown_read)
 
 static WRITE8_HANDLER(z80_2_latch1_write)
 {
-	istellar_state *state = space->machine->driver_data<istellar_state>();
+	istellar_state *state = space->machine().driver_data<istellar_state>();
 	logerror("CPU2 : writing latch1 (%x)\n", data);
 	state->ldp_latch1 = data;
 }
 
 static WRITE8_HANDLER(z80_2_ldp_write)
 {
-	istellar_state *state = space->machine->driver_data<istellar_state>();
+	istellar_state *state = space->machine().driver_data<istellar_state>();
 	logerror("CPU2 : writing LDP : 0x%x\n", data);
 	laserdisc_data_w(state->laserdisc,data);
 }
@@ -274,7 +274,7 @@ static PALETTE_INIT( istellar )
 	int i;
 
 	/* Oddly enough, the top 4 bits of each byte is 0 */
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		int r,g,b;
 		int bit0,bit1,bit2,bit3;
@@ -330,7 +330,7 @@ static INTERRUPT_GEN( vblank_callback_istellar )
 	device_set_input_line(device, 0, ASSERT_LINE);
 
 	/* Interrupt presumably comes from the LDP's status strobe */
-	cputag_set_input_line(device->machine, "sub", 0, ASSERT_LINE);
+	cputag_set_input_line(device->machine(), "sub", 0, ASSERT_LINE);
 }
 
 
@@ -411,7 +411,7 @@ ROM_END
 
 static DRIVER_INIT( istellar )
 {
-	istellar_state *state = machine->driver_data<istellar_state>();
+	istellar_state *state = machine.driver_data<istellar_state>();
 	state->z80_2_nmi_enable = 0;
 }
 

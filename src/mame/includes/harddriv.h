@@ -299,7 +299,7 @@ READ16_HANDLER( hdds3_speedup_r );
 
 /*----------- defined in audio/harddriv.c -----------*/
 
-void hdsnd_init(running_machine *machine);
+void hdsnd_init(running_machine &machine);
 
 READ16_HANDLER( hd68k_snd_data_r );
 READ16_HANDLER( hd68k_snd_status_r );

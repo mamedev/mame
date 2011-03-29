@@ -43,14 +43,14 @@ write
 
 static TIMER_CALLBACK( interrupt_disable )
 {
-	marineb_state *state = machine->driver_data<marineb_state>();
+	marineb_state *state = machine.driver_data<marineb_state>();
 	//interrupt_enable = 0;
 	cpu_interrupt_enable(state->maincpu, 0);
 }
 
 static MACHINE_RESET( marineb )
 {
-	marineb_state *state = machine->driver_data<marineb_state>();
+	marineb_state *state = machine.driver_data<marineb_state>();
 
 	state->palette_bank = 0;
 	state->column_scroll = 0;
@@ -59,12 +59,12 @@ static MACHINE_RESET( marineb )
 	state->marineb_active_low_flipscreen = 0;
 
 	/* we must start with NMI interrupts disabled */
-	machine->scheduler().synchronize(FUNC(interrupt_disable));
+	machine.scheduler().synchronize(FUNC(interrupt_disable));
 }
 
 static MACHINE_RESET( springer )
 {
-	marineb_state *state = machine->driver_data<marineb_state>();
+	marineb_state *state = machine.driver_data<marineb_state>();
 
 	MACHINE_RESET_CALL( marineb );
 
@@ -73,9 +73,9 @@ static MACHINE_RESET( springer )
 
 static MACHINE_START( marineb )
 {
-	marineb_state *state = machine->driver_data<marineb_state>();
+	marineb_state *state = machine.driver_data<marineb_state>();
 
-	state->maincpu = machine->device("maincpu");
+	state->maincpu = machine.device("maincpu");
 	state->audiocpu = NULL;
 
 	state->save_item(NAME(state->marineb_active_low_flipscreen));

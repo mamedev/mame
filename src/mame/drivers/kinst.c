@@ -165,11 +165,11 @@ public:
 
 static MACHINE_START( kinst )
 {
-	kinst_state *state = machine->driver_data<kinst_state>();
-	device_t *ide = machine->device("ide");
+	kinst_state *state = machine.driver_data<kinst_state>();
+	device_t *ide = machine.device("ide");
 	UINT8 *features = ide_get_features(ide);
 
-	if (strncmp(machine->system().name, "kinst2", 6) != 0)
+	if (strncmp(machine.system().name, "kinst2", 6) != 0)
 	{
 		/* kinst: tweak the model number so we pass the check */
 		features[27*2+0] = 0x54;
@@ -199,12 +199,12 @@ static MACHINE_START( kinst )
 	}
 
 	/* set the fastest DRC options */
-	mips3drc_set_options(machine->device("maincpu"), MIPS3DRC_FASTEST_OPTIONS);
+	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine->device("maincpu"), 0x08000000, 0x087fffff, FALSE, state->rambase2);
-	mips3drc_add_fastram(machine->device("maincpu"), 0x00000000, 0x0007ffff, FALSE, state->rambase);
-	mips3drc_add_fastram(machine->device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  state->rombase);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x08000000, 0x087fffff, FALSE, state->rambase2);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x0007ffff, FALSE, state->rambase);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  state->rombase);
 }
 
 
@@ -217,7 +217,7 @@ static MACHINE_START( kinst )
 
 static MACHINE_RESET( kinst )
 {
-	kinst_state *state = machine->driver_data<kinst_state>();
+	kinst_state *state = machine.driver_data<kinst_state>();
 	/* set a safe base location for video */
 	state->video_base = &state->rambase[0x30000/4];
 }
@@ -232,7 +232,7 @@ static MACHINE_RESET( kinst )
 
 static SCREEN_UPDATE( kinst )
 {
-	kinst_state *state = screen->machine->driver_data<kinst_state>();
+	kinst_state *state = screen->machine().driver_data<kinst_state>();
 	int y;
 
 	/* loop over rows and copy to the destination */
@@ -272,13 +272,13 @@ static TIMER_CALLBACK( irq0_stop )
 static INTERRUPT_GEN( irq0_start )
 {
 	device_set_input_line(device, 0, ASSERT_LINE);
-	device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(irq0_stop));
+	device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(irq0_stop));
 }
 
 
 static void ide_interrupt(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine, "maincpu", 1, state);
+	cputag_set_input_line(device->machine(), "maincpu", 1, state);
 }
 
 
@@ -322,7 +322,7 @@ static WRITE32_DEVICE_HANDLER( kinst_ide_extra_w )
 
 static READ32_HANDLER( kinst_control_r )
 {
-	kinst_state *state = space->machine->driver_data<kinst_state>();
+	kinst_state *state = space->machine().driver_data<kinst_state>();
 	UINT32 result;
 	static const char *const portnames[] = { "P1", "P2", "VOLUME", "UNUSED", "DSW" };
 
@@ -333,7 +333,7 @@ static READ32_HANDLER( kinst_control_r )
 	switch (offset)
 	{
 		case 2:		/* $90 -- sound return */
-			result = input_port_read(space->machine, portnames[offset]);
+			result = input_port_read(space->machine(), portnames[offset]);
 			result &= ~0x0002;
 			if (dcs_control_r() & 0x800)
 				result |= 0x0002;
@@ -342,11 +342,11 @@ static READ32_HANDLER( kinst_control_r )
 		case 0:		/* $80 */
 		case 1:		/* $88 */
 		case 3:		/* $98 */
-			result = input_port_read(space->machine, portnames[offset]);
+			result = input_port_read(space->machine(), portnames[offset]);
 			break;
 
 		case 4:		/* $a0 */
-			result = input_port_read(space->machine, portnames[offset]);
+			result = input_port_read(space->machine(), portnames[offset]);
 			if (cpu_get_pc(space->cpu) == 0x802d428)
 				device_spin_until_interrupt(space->cpu);
 			break;
@@ -358,7 +358,7 @@ static READ32_HANDLER( kinst_control_r )
 
 static WRITE32_HANDLER( kinst_control_w )
 {
-	kinst_state *state = space->machine->driver_data<kinst_state>();
+	kinst_state *state = space->machine().driver_data<kinst_state>();
 	UINT32 olddata;
 
 	/* apply shuffling */
@@ -887,7 +887,7 @@ ROM_END
 
 static DRIVER_INIT( kinst )
 {
-	kinst_state *state = machine->driver_data<kinst_state>();
+	kinst_state *state = machine.driver_data<kinst_state>();
 	static const UINT8 kinst_control_map[8] = { 0,1,2,3,4,5,6,7 };
 
 	dcs_init(machine);
@@ -899,7 +899,7 @@ static DRIVER_INIT( kinst )
 
 static DRIVER_INIT( kinst2 )
 {
-	kinst_state *state = machine->driver_data<kinst_state>();
+	kinst_state *state = machine.driver_data<kinst_state>();
 	static const UINT8 kinst2_control_map[8] = { 2,4,1,0,3,5,6,7 };
 
 	// read: $80 on ki2 = $90 on ki

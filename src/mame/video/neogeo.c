@@ -18,9 +18,9 @@
  *
  *************************************/
 
-static void set_videoram_offset( running_machine *machine, UINT16 data )
+static void set_videoram_offset( running_machine &machine, UINT16 data )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	state->videoram_offset = data;
 
 	/* the read happens right away */
@@ -28,16 +28,16 @@ static void set_videoram_offset( running_machine *machine, UINT16 data )
 }
 
 
-static UINT16 get_videoram_data( running_machine *machine )
+static UINT16 get_videoram_data( running_machine &machine )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	return state->videoram_read_buffer;
 }
 
 
-static void set_videoram_data( running_machine *machine, UINT16 data)
+static void set_videoram_data( running_machine &machine, UINT16 data)
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	state->videoram[state->videoram_offset] = data;
 
 	/* auto increment/decrement the current offset - A15 is NOT effected */
@@ -48,16 +48,16 @@ static void set_videoram_data( running_machine *machine, UINT16 data)
 }
 
 
-static void set_videoram_modulo( running_machine *machine, UINT16 data)
+static void set_videoram_modulo( running_machine &machine, UINT16 data)
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	state->videoram_modulo = data;
 }
 
 
-static UINT16 get_videoram_modulo( running_machine *machine )
+static UINT16 get_videoram_modulo( running_machine &machine )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	return state->videoram_modulo;
 }
 
@@ -69,9 +69,9 @@ static UINT16 get_videoram_modulo( running_machine *machine )
  *
  *************************************/
 
-static void compute_rgb_weights( running_machine *machine )
+static void compute_rgb_weights( running_machine &machine )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	static const int resistances[] = { 220, 470, 1000, 2200, 3900 };
 
 	/* compute four sets of weights - with or without the pulldowns -
@@ -99,9 +99,9 @@ static void compute_rgb_weights( running_machine *machine )
 }
 
 
-static pen_t get_pen( running_machine *machine, UINT16 data )
+static pen_t get_pen( running_machine &machine, UINT16 data )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	double *weights;
 	UINT8 r, g, b;
 
@@ -147,7 +147,7 @@ static pen_t get_pen( running_machine *machine, UINT16 data )
 
 static STATE_POSTLOAD( regenerate_pens )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	int i;
 
 	for (i = 0; i < NUM_PENS; i++)
@@ -155,9 +155,9 @@ static STATE_POSTLOAD( regenerate_pens )
 }
 
 
-void neogeo_set_palette_bank( running_machine *machine, UINT8 data )
+void neogeo_set_palette_bank( running_machine &machine, UINT8 data )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	if (data != state->palette_bank)
 	{
 		state->palette_bank = data;
@@ -167,9 +167,9 @@ void neogeo_set_palette_bank( running_machine *machine, UINT8 data )
 }
 
 
-void neogeo_set_screen_dark( running_machine *machine, UINT8 data )
+void neogeo_set_screen_dark( running_machine &machine, UINT8 data )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	if (data != state->screen_dark)
 	{
 		state->screen_dark = data;
@@ -181,19 +181,19 @@ void neogeo_set_screen_dark( running_machine *machine, UINT8 data )
 
 READ16_HANDLER( neogeo_paletteram_r )
 {
-	neogeo_state *state = space->machine->driver_data<neogeo_state>();
+	neogeo_state *state = space->machine().driver_data<neogeo_state>();
 	return state->palettes[state->palette_bank][offset];
 }
 
 
 WRITE16_HANDLER( neogeo_paletteram_w )
 {
-	neogeo_state *state = space->machine->driver_data<neogeo_state>();
+	neogeo_state *state = space->machine().driver_data<neogeo_state>();
 	UINT16 *addr = &state->palettes[state->palette_bank][offset];
 
 	COMBINE_DATA(addr);
 
-	state->pens[offset] = get_pen(space->machine, *addr);
+	state->pens[offset] = get_pen(space->machine(), *addr);
 }
 
 
@@ -204,30 +204,30 @@ WRITE16_HANDLER( neogeo_paletteram_w )
  *
  *************************************/
 
-static void set_auto_animation_speed( running_machine *machine, UINT8 data)
+static void set_auto_animation_speed( running_machine &machine, UINT8 data)
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	state->auto_animation_speed = data;
 }
 
 
-static void set_auto_animation_disabled( running_machine *machine, UINT8 data)
+static void set_auto_animation_disabled( running_machine &machine, UINT8 data)
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	state->auto_animation_disabled = data;
 }
 
 
-UINT8 neogeo_get_auto_animation_counter( running_machine *machine )
+UINT8 neogeo_get_auto_animation_counter( running_machine &machine )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	return state->auto_animation_counter;
 }
 
 
 static TIMER_CALLBACK( auto_animation_timer_callback )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	if (state->auto_animation_frame_counter == 0)
 	{
 		state->auto_animation_frame_counter = state->auto_animation_speed;
@@ -236,21 +236,21 @@ static TIMER_CALLBACK( auto_animation_timer_callback )
 	else
 		state->auto_animation_frame_counter = state->auto_animation_frame_counter - 1;
 
-	state->auto_animation_timer->adjust(machine->primary_screen->time_until_pos(NEOGEO_VSSTART));
+	state->auto_animation_timer->adjust(machine.primary_screen->time_until_pos(NEOGEO_VSSTART));
 }
 
 
-static void create_auto_animation_timer( running_machine *machine )
+static void create_auto_animation_timer( running_machine &machine )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
-	state->auto_animation_timer = machine->scheduler().timer_alloc(FUNC(auto_animation_timer_callback));
+	neogeo_state *state = machine.driver_data<neogeo_state>();
+	state->auto_animation_timer = machine.scheduler().timer_alloc(FUNC(auto_animation_timer_callback));
 }
 
 
-static void start_auto_animation_timer( running_machine *machine )
+static void start_auto_animation_timer( running_machine &machine )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
-	state->auto_animation_timer->adjust(machine->primary_screen->time_until_pos(NEOGEO_VSSTART));
+	neogeo_state *state = machine.driver_data<neogeo_state>();
+	state->auto_animation_timer->adjust(machine.primary_screen->time_until_pos(NEOGEO_VSSTART));
 }
 
 
@@ -261,20 +261,20 @@ static void start_auto_animation_timer( running_machine *machine )
  *
  *************************************/
 
-void neogeo_set_fixed_layer_source( running_machine *machine, UINT8 data )
+void neogeo_set_fixed_layer_source( running_machine &machine, UINT8 data )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	state->fixed_layer_source = data;
 }
 
 
-static void draw_fixed_layer( running_machine *machine, bitmap_t *bitmap, int scanline )
+static void draw_fixed_layer( running_machine &machine, bitmap_t *bitmap, int scanline )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	int x;
 
-	UINT8* gfx_base = machine->region(state->fixed_layer_source ? "fixed" : "fixedbios")->base();
-	UINT32 addr_mask = machine->region(state->fixed_layer_source ? "fixed" : "fixedbios")->bytes() - 1;
+	UINT8* gfx_base = machine.region(state->fixed_layer_source ? "fixed" : "fixedbios")->base();
+	UINT32 addr_mask = machine.region(state->fixed_layer_source ? "fixed" : "fixedbios")->bytes() - 1;
 	UINT16 *video_data = &state->videoram[0x7000 | (scanline >> 3)];
 	UINT32 *pixel_addr = BITMAP_ADDR32(bitmap, scanline, NEOGEO_HBEND);
 
@@ -401,9 +401,9 @@ INLINE int sprite_on_scanline(int scanline, int y, int rows)
 }
 
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, int scanline )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, int scanline )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	int sprite_index;
 	int max_sprite_index;
 
@@ -590,9 +590,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, int scanli
 }
 
 
-static void parse_sprites( running_machine *machine, int scanline )
+static void parse_sprites( running_machine &machine, int scanline )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	UINT16 sprite_number;
 	int y = 0;
 	int rows = 0;
@@ -644,40 +644,40 @@ static void parse_sprites( running_machine *machine, int scanline )
 
 static TIMER_CALLBACK( sprite_line_timer_callback )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 	int scanline = param;
 
 	/* we are at the beginning of a scanline -
        we need to draw the previous scanline and parse the sprites on the current one */
 	if (scanline != 0)
-		machine->primary_screen->update_partial(scanline - 1);
+		machine.primary_screen->update_partial(scanline - 1);
 
 	parse_sprites(machine, scanline);
 
 	/* let's come back at the beginning of the next line */
 	scanline = (scanline + 1) % NEOGEO_VTOTAL;
 
-	state->sprite_line_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
+	state->sprite_line_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
 
-static void create_sprite_line_timer( running_machine *machine )
+static void create_sprite_line_timer( running_machine &machine )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
-	state->sprite_line_timer = machine->scheduler().timer_alloc(FUNC(sprite_line_timer_callback));
+	neogeo_state *state = machine.driver_data<neogeo_state>();
+	state->sprite_line_timer = machine.scheduler().timer_alloc(FUNC(sprite_line_timer_callback));
 }
 
 
-static void start_sprite_line_timer( running_machine *machine )
+static void start_sprite_line_timer( running_machine &machine )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
-	state->sprite_line_timer->adjust(machine->primary_screen->time_until_pos(0));
+	neogeo_state *state = machine.driver_data<neogeo_state>();
+	state->sprite_line_timer->adjust(machine.primary_screen->time_until_pos(0));
 }
 
 
-static void optimize_sprite_data( running_machine *machine )
+static void optimize_sprite_data( running_machine &machine )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 
 	/* convert the sprite graphics data into a format that
        allows faster blitting */
@@ -691,7 +691,7 @@ static void optimize_sprite_data( running_machine *machine )
        power of 2 */
 	state->sprite_gfx_address_mask = 0xffffffff;
 
-	len = machine->region("sprites")->bytes();
+	len = machine.region("sprites")->bytes();
 
 	for (bit = 0x80000000; bit != 0; bit >>= 1)
 	{
@@ -703,7 +703,7 @@ static void optimize_sprite_data( running_machine *machine )
 
 	state->sprite_gfx = auto_alloc_array_clear(machine, UINT8, state->sprite_gfx_address_mask + 1);
 
-	src = machine->region("sprites")->base();
+	src = machine.region("sprites")->base();
 	dest = state->sprite_gfx;
 
 	for (i = 0; i < len; i += 0x80, src += 0x80)
@@ -741,7 +741,7 @@ static void optimize_sprite_data( running_machine *machine )
  *
  *************************************/
 
-static UINT16 get_video_control( running_machine *machine )
+static UINT16 get_video_control( running_machine &machine )
 {
 	UINT16 ret;
 	UINT16 v_counter;
@@ -768,23 +768,23 @@ static UINT16 get_video_control( running_machine *machine )
     */
 
 	/* the vertical counter chain goes from 0xf8 - 0x1ff */
-	v_counter = machine->primary_screen->vpos() + 0x100;
+	v_counter = machine.primary_screen->vpos() + 0x100;
 
 	if (v_counter >= 0x200)
 		v_counter = v_counter - NEOGEO_VTOTAL;
 
 	ret = (v_counter << 7) | (neogeo_get_auto_animation_counter(machine) & 0x0007);
 
-	if (VERBOSE) logerror("%s: video_control read (%04x)\n", machine->describe_context(), ret);
+	if (VERBOSE) logerror("%s: video_control read (%04x)\n", machine.describe_context(), ret);
 
 	return ret;
 }
 
 
-static void set_video_control( running_machine *machine, UINT16 data )
+static void set_video_control( running_machine &machine, UINT16 data )
 {
 	/* this does much more than this, but I'm not sure exactly what */
-	if (VERBOSE) logerror("%s: video control write %04x\n", machine->describe_context(), data);
+	if (VERBOSE) logerror("%s: video control write %04x\n", machine.describe_context(), data);
 
 	set_auto_animation_speed(machine, data >> 8);
 	set_auto_animation_disabled(machine, data & 0x0008);
@@ -806,9 +806,9 @@ READ16_HANDLER( neogeo_video_register_r )
 		{
 		default:
 		case 0x00:
-		case 0x01: ret = get_videoram_data(space->machine); break;
-		case 0x02: ret = get_videoram_modulo(space->machine); break;
-		case 0x03: ret = get_video_control(space->machine); break;
+		case 0x01: ret = get_videoram_data(space->machine()); break;
+		case 0x02: ret = get_videoram_modulo(space->machine()); break;
+		case 0x03: ret = get_video_control(space->machine()); break;
 		}
 	}
 
@@ -827,13 +827,13 @@ WRITE16_HANDLER( neogeo_video_register_w )
 
 		switch (offset)
 		{
-		case 0x00: set_videoram_offset(space->machine, data); break;
-		case 0x01: set_videoram_data(space->machine, data); break;
-		case 0x02: set_videoram_modulo(space->machine, data); break;
-		case 0x03: set_video_control(space->machine, data); break;
+		case 0x00: set_videoram_offset(space->machine(), data); break;
+		case 0x01: set_videoram_data(space->machine(), data); break;
+		case 0x02: set_videoram_modulo(space->machine(), data); break;
+		case 0x03: set_video_control(space->machine(), data); break;
 		case 0x04: neogeo_set_display_counter_msb(space, data); break;
 		case 0x05: neogeo_set_display_counter_lsb(space, data); break;
-		case 0x06: neogeo_acknowledge_interrupt(space->machine, data); break;
+		case 0x06: neogeo_acknowledge_interrupt(space->machine(), data); break;
 		case 0x07: break; /* unknown, see get_video_control */
 		}
 	}
@@ -849,7 +849,7 @@ WRITE16_HANDLER( neogeo_video_register_w )
 
 VIDEO_START( neogeo )
 {
-	neogeo_state *state = machine->driver_data<neogeo_state>();
+	neogeo_state *state = machine.driver_data<neogeo_state>();
 
 	/* allocate memory not directly mapped */
 	state->palettes[0] = auto_alloc_array(machine, UINT16, NUM_PENS);
@@ -892,9 +892,9 @@ VIDEO_START( neogeo )
 	state->save_item(NAME(state->auto_animation_counter));
 	state->save_item(NAME(state->auto_animation_frame_counter));
 
-	machine->state().register_postload(regenerate_pens, NULL);
+	machine.state().register_postload(regenerate_pens, NULL);
 
-	state->region_zoomy = machine->region("zoomy")->base();
+	state->region_zoomy = machine.region("zoomy")->base();
 }
 
 
@@ -922,14 +922,14 @@ VIDEO_RESET( neogeo )
 
 SCREEN_UPDATE( neogeo )
 {
-	neogeo_state *state = screen->machine->driver_data<neogeo_state>();
+	neogeo_state *state = screen->machine().driver_data<neogeo_state>();
 
 	/* fill with background color first */
 	bitmap_fill(bitmap, cliprect, state->pens[0x0fff]);
 
-	draw_sprites(screen->machine, bitmap, cliprect->min_y);
+	draw_sprites(screen->machine(), bitmap, cliprect->min_y);
 
-	draw_fixed_layer(screen->machine, bitmap, cliprect->min_y);
+	draw_fixed_layer(screen->machine(), bitmap, cliprect->min_y);
 
 	return 0;
 }

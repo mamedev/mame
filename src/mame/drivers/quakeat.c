@@ -114,7 +114,7 @@ ADDRESS_MAP_END
 
 static WRITE_LINE_DEVICE_HANDLER( quakeat_pic8259_1_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface quakeat_pic8259_1_config =
@@ -136,7 +136,7 @@ INPUT_PORTS_END
 
 static IRQ_CALLBACK(irq_callback)
 {
-	quakeat_state *state = device->machine->driver_data<quakeat_state>();
+	quakeat_state *state = device->machine().driver_data<quakeat_state>();
 	int r = 0;
 	r = pic8259_acknowledge( state->pic8259_2);
 	if (r==0)
@@ -148,11 +148,11 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_START(quakeat)
 {
-	quakeat_state *state = machine->driver_data<quakeat_state>();
-	device_set_irq_callback(machine->device("maincpu"), irq_callback);
+	quakeat_state *state = machine.driver_data<quakeat_state>();
+	device_set_irq_callback(machine.device("maincpu"), irq_callback);
 
-	state->pic8259_1 = machine->device( "pic8259_1" );
-	state->pic8259_2 = machine->device( "pic8259_2" );
+	state->pic8259_1 = machine.device( "pic8259_1" );
+	state->pic8259_2 = machine.device( "pic8259_2" );
 }
 /*************************************************************/
 

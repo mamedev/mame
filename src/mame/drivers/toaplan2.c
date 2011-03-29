@@ -363,10 +363,10 @@ To Do / Unknowns:
 
 static MACHINE_START( toaplan2 )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	state->main_cpu = machine->device("maincpu");
-	state->sub_cpu = machine->device("audiocpu");
+	state->main_cpu = machine.device("maincpu");
+	state->sub_cpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->mcu_data));
 	state->save_item(NAME(state->video_status));
@@ -378,7 +378,7 @@ static MACHINE_START( toaplan2 )
 
 static void toaplan2_reset(device_t *device)
 {
-	toaplan2_state *state = device->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = device->machine().driver_data<toaplan2_state>();
 
 	if (state->sub_cpu != NULL)
 		device_set_input_line(state->sub_cpu, INPUT_LINE_RESET, PULSE_LINE);
@@ -387,7 +387,7 @@ static void toaplan2_reset(device_t *device)
 
 static MACHINE_RESET( toaplan2 )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
 	state->mcu_data = 0x00;
 
@@ -400,7 +400,7 @@ static MACHINE_RESET( toaplan2 )
 
 static MACHINE_RESET( ghox )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
 	MACHINE_RESET_CALL(toaplan2);
 	state->old_p1_paddle_h = 0;
@@ -410,7 +410,7 @@ static MACHINE_RESET( ghox )
 
 static DRIVER_INIT( dogyuun )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
 	state->v25_reset_line = 0x20;
 }
@@ -418,7 +418,7 @@ static DRIVER_INIT( dogyuun )
 
 static DRIVER_INIT( fixeight )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
 	state->v25_reset_line = 0x08;
 }
@@ -426,7 +426,7 @@ static DRIVER_INIT( fixeight )
 
 static DRIVER_INIT( fixeightbl )
 {
-	UINT8 *ROM = machine->region("oki")->base();
+	UINT8 *ROM = machine.region("oki")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 5, &ROM[0x30000], 0x10000);
 }
@@ -434,7 +434,7 @@ static DRIVER_INIT( fixeightbl )
 
 static DRIVER_INIT( vfive )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
 	state->v25_reset_line = 0x10;
 }
@@ -444,7 +444,7 @@ static DRIVER_INIT( pipibibsbl )
 {
 	int A;
 	int oldword, newword;
-	UINT16 *pipibibi_68k_rom = (UINT16 *)(machine->region("maincpu")->base());
+	UINT16 *pipibibi_68k_rom = (UINT16 *)(machine.region("maincpu")->base());
 
 	// unscramble the 68K ROM data
 
@@ -521,7 +521,7 @@ static DRIVER_INIT( pipibibsbl )
 
 static DRIVER_INIT( bgaregga )
 {
-	UINT8 *Z80 = machine->region("audiocpu")->base();
+	UINT8 *Z80 = machine.region("audiocpu")->base();
 
 	// seems to only use banks 0x0a to 0x0f
 	memory_configure_bank(machine, "bank1", 8, 8, Z80, 0x4000);
@@ -530,8 +530,8 @@ static DRIVER_INIT( bgaregga )
 
 static DRIVER_INIT( batrider )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-	UINT8 *Z80 = machine->region("audiocpu")->base();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
+	UINT8 *Z80 = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 16, Z80, 0x4000);
 	state->sndirq_line = 4;
@@ -540,7 +540,7 @@ static DRIVER_INIT( batrider )
 
 static DRIVER_INIT( bbakraid )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
 	state->sndirq_line = 2;
 }
@@ -553,20 +553,20 @@ static DRIVER_INIT( bbakraid )
 
 static TIMER_CALLBACK( toaplan2_raise_irq )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
 	device_set_input_line(state->main_cpu, param, HOLD_LINE);
 }
 
-static void toaplan2_vblank_irq(running_machine *machine, int irq_line)
+static void toaplan2_vblank_irq(running_machine &machine, int irq_line)
 {
 	// the IRQ appears to fire at line 0xe6
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0xe6), FUNC(toaplan2_raise_irq), irq_line);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0xe6), FUNC(toaplan2_raise_irq), irq_line);
 }
 
-static INTERRUPT_GEN( toaplan2_vblank_irq1 ) { toaplan2_vblank_irq(device->machine, 1); }
-static INTERRUPT_GEN( toaplan2_vblank_irq2 ) { toaplan2_vblank_irq(device->machine, 2); }
-static INTERRUPT_GEN( toaplan2_vblank_irq4 ) { toaplan2_vblank_irq(device->machine, 4); }
+static INTERRUPT_GEN( toaplan2_vblank_irq1 ) { toaplan2_vblank_irq(device->machine(), 1); }
+static INTERRUPT_GEN( toaplan2_vblank_irq2 ) { toaplan2_vblank_irq(device->machine(), 2); }
+static INTERRUPT_GEN( toaplan2_vblank_irq4 ) { toaplan2_vblank_irq(device->machine(), 4); }
 
 
 static READ16_HANDLER( video_count_r )
@@ -577,9 +577,9 @@ static READ16_HANDLER( video_count_r )
 	/* +---------+---------+--------+---------------------------+ */
 	/*************** Control Signals are active low ***************/
 
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-	int hpos = space->machine->primary_screen->hpos();
-	int vpos = space->machine->primary_screen->vpos();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
+	int hpos = space->machine().primary_screen->hpos();
+	int vpos = space->machine().primary_screen->vpos();
 
 	state->video_status = 0xff00;	// Set signals inactive
 
@@ -601,7 +601,7 @@ static READ16_HANDLER( video_count_r )
 	else
 		state->video_status |= 0xff;
 
-//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,space->machine->primary_screen->vblank());
+//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,space->machine().primary_screen->vblank());
 
 	return state->video_status;
 }
@@ -615,14 +615,14 @@ static WRITE8_HANDLER( toaplan2_coin_w )
 
 	if (data & 0x0f)
 	{
-		coin_lockout_w( space->machine, 0, ((data & 4) ? 0 : 1) );
-		coin_lockout_w( space->machine, 1, ((data & 8) ? 0 : 1) );
-		coin_counter_w( space->machine, 0, (data & 1) );
-		coin_counter_w( space->machine, 1, (data & 2) );
+		coin_lockout_w( space->machine(), 0, ((data & 4) ? 0 : 1) );
+		coin_lockout_w( space->machine(), 1, ((data & 8) ? 0 : 1) );
+		coin_counter_w( space->machine(), 0, (data & 1) );
+		coin_counter_w( space->machine(), 1, (data & 2) );
 	}
 	else
 	{
-		coin_lockout_global_w(space->machine, 1);	// Lock all coin slots
+		coin_lockout_global_w(space->machine(), 1);	// Lock all coin slots
 	}
 	if (data & 0xe0)
 	{
@@ -650,7 +650,7 @@ static WRITE16_HANDLER( toaplan2_v25_coin_word_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 		toaplan2_coin_w(space, offset, data & 0x0f);
 
@@ -668,7 +668,7 @@ static WRITE16_HANDLER( shippumd_coin_word_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		toaplan2_coin_w(space, offset, data & 0xff);
-		space->machine->device<okim6295_device>("oki")->set_bank_base(((data & 0x10) >> 4) * 0x40000);
+		space->machine().device<okim6295_device>("oki")->set_bank_base(((data & 0x10) >> 4) * 0x40000);
 	}
 	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
 	{
@@ -679,7 +679,7 @@ static WRITE16_HANDLER( shippumd_coin_word_w )
 
 static READ16_HANDLER( shared_ram_r )
 {
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 	return state->shared_ram[offset];
 }
@@ -689,7 +689,7 @@ static WRITE16_HANDLER( shared_ram_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 		state->shared_ram[offset] = data;
 	}
@@ -703,7 +703,7 @@ static WRITE16_HANDLER( toaplan2_hd647180_cpu_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 		state->mcu_data = data & 0xff;
 		logerror("PC:%08x Writing command (%04x) to secondary CPU shared port\n", cpu_get_previouspc(space->cpu), state->mcu_data);
@@ -713,7 +713,7 @@ static WRITE16_HANDLER( toaplan2_hd647180_cpu_w )
 
 static CUSTOM_INPUT( c2map_r )
 {
-	toaplan2_state *state = field->port->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = field->port->machine().driver_data<toaplan2_state>();
 
 	// For Teki Paki hardware
 	// bit 4 high signifies secondary CPU is ready
@@ -726,10 +726,10 @@ static CUSTOM_INPUT( c2map_r )
 
 static READ16_HANDLER( ghox_p1_h_analog_r )
 {
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 	INT8 value, new_value;
 
-	new_value = input_port_read(space->machine, "PAD1");
+	new_value = input_port_read(space->machine(), "PAD1");
 	if (new_value == state->old_p1_paddle_h) return 0;
 	value = new_value - state->old_p1_paddle_h;
 	state->old_p1_paddle_h = new_value;
@@ -739,10 +739,10 @@ static READ16_HANDLER( ghox_p1_h_analog_r )
 
 static READ16_HANDLER( ghox_p2_h_analog_r )
 {
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 	INT8 value, new_value;
 
-	new_value = input_port_read(space->machine, "PAD2");
+	new_value = input_port_read(space->machine(), "PAD2");
 	if (new_value == state->old_p2_paddle_h) return 0;
 	value = new_value - state->old_p2_paddle_h;
 	state->old_p2_paddle_h = new_value;
@@ -760,7 +760,7 @@ static WRITE16_HANDLER( ghox_mcu_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 		UINT16 *toaplan2_shared_ram16 = state->shared_ram16;
 
 		state->mcu_data = data;
@@ -814,7 +814,7 @@ static READ16_HANDLER( ghox_shared_ram_r )
 	// Offset $44 and $42 are accessed from around PC:0FB52
 	// Offset $48 and $46 are accessed from around PC:06776
 
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 	return state->shared_ram16[offset] & 0xff;
 }
@@ -824,7 +824,7 @@ static WRITE16_HANDLER( ghox_shared_ram_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 		state->shared_ram16[offset] = data & 0xff;
 	}
@@ -833,7 +833,7 @@ static WRITE16_HANDLER( ghox_shared_ram_w )
 
 static WRITE16_HANDLER( fixeight_subcpu_ctrl_w )
 {
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 	device_set_input_line(state->sub_cpu, INPUT_LINE_RESET, (data & state->v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -853,26 +853,26 @@ static WRITE16_HANDLER( fixeightbl_oki_bankswitch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 7;
-		if (data <= 4) memory_set_bank(space->machine, "bank1", data);
+		if (data <= 4) memory_set_bank(space->machine(), "bank1", data);
 	}
 }
 
 
 static READ8_HANDLER( v25_dswa_r )
 {
-	return input_port_read(space->machine, "DSWA") ^ 0xff;
+	return input_port_read(space->machine(), "DSWA") ^ 0xff;
 }
 
 
 static READ8_HANDLER( v25_dswb_r )
 {
-	return input_port_read(space->machine, "DSWB") ^ 0xff;
+	return input_port_read(space->machine(), "DSWB") ^ 0xff;
 }
 
 
 static READ8_HANDLER( v25_jmpr_r )
 {
-	return input_port_read(space->machine, "JMPR") ^ 0xff;
+	return input_port_read(space->machine(), "JMPR") ^ 0xff;
 }
 
 
@@ -884,22 +884,22 @@ static READ8_HANDLER( fixeight_region_r )
 	// this code, and the default eeproms use should be considered subject
 	// to change
 
-	if (!strcmp(space->machine->system().name,"fixeightkt"))	return 0x00;
-	if (!strcmp(space->machine->system().name,"fixeightk"))	return 0x01;
-	if (!strcmp(space->machine->system().name,"fixeightht"))	return 0x02;
-	if (!strcmp(space->machine->system().name,"fixeighth"))	return 0x03;
-	if (!strcmp(space->machine->system().name,"fixeighttwt"))	return 0x04;
-	if (!strcmp(space->machine->system().name,"fixeighttw"))	return 0x05;
-	if (!strcmp(space->machine->system().name,"fixeightat"))	return 0x06;
-	if (!strcmp(space->machine->system().name,"fixeighta"))	return 0x07;
-	if (!strcmp(space->machine->system().name,"fixeightt"))	return 0x08;
-	if (!strcmp(space->machine->system().name,"fixeight9"))	return 0x09;
-	if (!strcmp(space->machine->system().name,"fixeighta"))	return 0x0a;
-	if (!strcmp(space->machine->system().name,"fixeightu"))	return 0x0b;
-//  if (!strcmp(space->machine->system().name,"fixeightc")) return 0x0c; // invalid
-//  if (!strcmp(space->machine->system().name,"fixeightd")) return 0x0d; // invalid
-	if (!strcmp(space->machine->system().name,"fixeightj"))	return 0x0e;
-	if (!strcmp(space->machine->system().name,"fixeightjt"))	return 0x0f;
+	if (!strcmp(space->machine().system().name,"fixeightkt"))	return 0x00;
+	if (!strcmp(space->machine().system().name,"fixeightk"))	return 0x01;
+	if (!strcmp(space->machine().system().name,"fixeightht"))	return 0x02;
+	if (!strcmp(space->machine().system().name,"fixeighth"))	return 0x03;
+	if (!strcmp(space->machine().system().name,"fixeighttwt"))	return 0x04;
+	if (!strcmp(space->machine().system().name,"fixeighttw"))	return 0x05;
+	if (!strcmp(space->machine().system().name,"fixeightat"))	return 0x06;
+	if (!strcmp(space->machine().system().name,"fixeighta"))	return 0x07;
+	if (!strcmp(space->machine().system().name,"fixeightt"))	return 0x08;
+	if (!strcmp(space->machine().system().name,"fixeight9"))	return 0x09;
+	if (!strcmp(space->machine().system().name,"fixeighta"))	return 0x0a;
+	if (!strcmp(space->machine().system().name,"fixeightu"))	return 0x0b;
+//  if (!strcmp(space->machine().system().name,"fixeightc")) return 0x0c; // invalid
+//  if (!strcmp(space->machine().system().name,"fixeightd")) return 0x0d; // invalid
+	if (!strcmp(space->machine().system().name,"fixeightj"))	return 0x0e;
+	if (!strcmp(space->machine().system().name,"fixeightjt"))	return 0x0f;
 
 	return 0x00;
 }
@@ -912,7 +912,7 @@ static READ8_HANDLER( fixeight_region_r )
 
 static WRITE8_HANDLER( raizing_z80_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 }
 
 
@@ -923,7 +923,7 @@ static WRITE8_HANDLER( raizing_z80_bankswitch_w )
 
 static WRITE8_HANDLER( raizing_oki_bankswitch_w )
 {
-	nmk112_device *nmk112 = space->machine->device<nmk112_device>("nmk112");
+	nmk112_device *nmk112 = space->machine().device<nmk112_device>("nmk112");
 
 	nmk112_okibank_w(nmk112, offset,     data        & 0x0f);
 	nmk112_okibank_w(nmk112, offset + 1, (data >> 4) & 0x0f);
@@ -934,7 +934,7 @@ static WRITE16_HANDLER( bgaregga_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 		soundlatch_w(space, offset, data & 0xff);
 		device_set_input_line(state->sub_cpu, 0, HOLD_LINE);
@@ -965,7 +965,7 @@ static READ16_HANDLER( batrider_z80_busack_r )
 	// These accesses are made when the 68K wants to read the Z80
 	// ROM code. Failure to return the correct status incurrs a Sound Error.
 
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 	return state->z80_busreq;	// Loop BUSRQ to BUSAK
 }
@@ -975,7 +975,7 @@ static WRITE16_HANDLER( batrider_z80_busreq_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 		state->z80_busreq = (data & 0x01);	// see batrider_z80_busack_r above
 	}
@@ -984,7 +984,7 @@ static WRITE16_HANDLER( batrider_z80_busreq_w )
 
 static READ16_HANDLER( batrider_z80rom_r )
 {
-	UINT8 *Z80 = space->machine->region("audiocpu")->base();
+	UINT8 *Z80 = space->machine().region("audiocpu")->base();
 
 	return Z80[offset];
 }
@@ -995,7 +995,7 @@ static WRITE16_HANDLER( batrider_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 		soundlatch_w(space, offset, data & 0xff);
 		device_set_input_line(state->sub_cpu, INPUT_LINE_NMI, ASSERT_LINE);
@@ -1007,7 +1007,7 @@ static WRITE16_HANDLER( batrider_soundlatch2_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 		soundlatch2_w(space, offset, data & 0xff);
 		device_set_input_line(state->sub_cpu, INPUT_LINE_NMI, ASSERT_LINE);
@@ -1024,7 +1024,7 @@ static WRITE16_HANDLER( batrider_unknown_sound_w )
 
 static WRITE16_HANDLER( batrider_clear_sndirq_w )
 {
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
@@ -1034,7 +1034,7 @@ static WRITE16_HANDLER( batrider_clear_sndirq_w )
 
 static WRITE8_HANDLER( batrider_sndirq_w )
 {
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 	// if batrider_clear_sndirq_w() is correct, should this be ASSERT_LINE?
 	device_set_input_line(state->main_cpu, state->sndirq_line, HOLD_LINE);
@@ -1043,7 +1043,7 @@ static WRITE8_HANDLER( batrider_sndirq_w )
 
 static WRITE8_HANDLER( batrider_clear_nmi_w )
 {
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 	device_set_input_line(state->sub_cpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -1068,8 +1068,8 @@ static const eeprom_interface bbakraid_93C66_intf =
 
 static READ16_HANDLER( bbakraid_eeprom_r )
 {
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-	eeprom_device *eeprom = space->machine->device<eeprom_device>("eeprom");
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
+	eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
 
 	// Bit 0x01 returns the status of BUSAK from the Z80.
 	// BUSRQ is activated via bit 0x10 on the EEPROM write port.
@@ -1086,13 +1086,13 @@ static READ16_HANDLER( bbakraid_eeprom_r )
 
 static WRITE16_HANDLER( bbakraid_eeprom_w )
 {
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 	if (data & ~0x001f)
 		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",cpu_get_pc(space->cpu),data);
 
 	if ( ACCESSING_BITS_0_7 )
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 
 	state->z80_busreq = data & 0x10;	// see bbakraid_eeprom_r above
 }
@@ -3083,7 +3083,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int linestate)
 {
-	toaplan2_state *state = device->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = device->machine().driver_data<toaplan2_state>();
 
 	if (state->sub_cpu != NULL)		// wouldn't tekipaki have problem without this? "mcu" is not generally added
 		device_set_input_line(state->sub_cpu, 0, linestate);

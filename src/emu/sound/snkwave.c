@@ -119,7 +119,7 @@ static DEVICE_START( snkwave )
 	chip->sample_rate = chip->external_clock >> CLOCK_SHIFT;
 
 	/* get stream channels */
-	chip->stream = device->machine->sound().stream_alloc(*device, 0, 1, chip->sample_rate, chip, snkwave_update);
+	chip->stream = device->machine().sound().stream_alloc(*device, 0, 1, chip->sample_rate, chip, snkwave_update);
 
 	/* reset all the voices */
 	chip->frequency = 0;

@@ -164,7 +164,7 @@ static TIMER_CALLBACK( clear_irq_cb )
 
 static INTERRUPT_GEN( assert_irq )
 {
-	mustache_state *state = device->machine->driver_data<mustache_state>();
+	mustache_state *state = device->machine().driver_data<mustache_state>();
 	device_set_input_line(device, 0, ASSERT_LINE);
     state->clear_irq_timer->adjust(downcast<cpu_device *>(device)->cycles_to_attotime(14288));
        /* Timing here is an educated GUESS, Z80 /INT must stay high so the irq
@@ -180,8 +180,8 @@ static INTERRUPT_GEN( assert_irq )
 
 static MACHINE_START( mustache )
 {
-	mustache_state *state = machine->driver_data<mustache_state>();
-	state->clear_irq_timer = machine->scheduler().timer_alloc(FUNC(clear_irq_cb));
+	mustache_state *state = machine.driver_data<mustache_state>();
+	state->clear_irq_timer = machine.scheduler().timer_alloc(FUNC(clear_irq_cb));
 }
 
 static MACHINE_CONFIG_START( mustache, mustache_state )
@@ -253,10 +253,10 @@ static DRIVER_INIT( mustache )
 {
 	int i;
 
-	int G1 = machine->region("gfx1")->bytes()/3;
-	int G2 = machine->region("gfx2")->bytes()/2;
-	UINT8 *gfx1 = machine->region("gfx1")->base();
-	UINT8 *gfx2 = machine->region("gfx2")->base();
+	int G1 = machine.region("gfx1")->bytes()/3;
+	int G2 = machine.region("gfx2")->bytes()/2;
+	UINT8 *gfx1 = machine.region("gfx1")->base();
+	UINT8 *gfx2 = machine.region("gfx2")->base();
 	UINT8 *buf=auto_alloc_array(machine, UINT8, G2*2);
 
 	/* BG data lines */

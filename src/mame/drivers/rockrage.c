@@ -58,7 +58,7 @@ Notes:
 
 static INTERRUPT_GEN( rockrage_interrupt )
 {
-	rockrage_state *state = device->machine->driver_data<rockrage_state>();
+	rockrage_state *state = device->machine().driver_data<rockrage_state>();
 	if (k007342_is_int_enabled(state->k007342))
 		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
@@ -66,18 +66,18 @@ static INTERRUPT_GEN( rockrage_interrupt )
 static WRITE8_HANDLER( rockrage_bankswitch_w )
 {
 	/* bits 4-6 = bank number */
-	memory_set_bank(space->machine, "bank1", (data & 0x70) >> 4);
+	memory_set_bank(space->machine(), "bank1", (data & 0x70) >> 4);
 
 	/* bits 0 & 1 = coin counters */
-	coin_counter_w(space->machine, 0,data & 0x01);
-	coin_counter_w(space->machine, 1,data & 0x02);
+	coin_counter_w(space->machine(), 0,data & 0x01);
+	coin_counter_w(space->machine(), 1,data & 0x02);
 
 	/* other bits unknown */
 }
 
 static WRITE8_HANDLER( rockrage_sh_irqtrigger_w )
 {
-	rockrage_state *state = space->machine->driver_data<rockrage_state>();
+	rockrage_state *state = space->machine().driver_data<rockrage_state>();
 	soundlatch_w(space, offset, data);
 	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
@@ -273,14 +273,14 @@ static const k007420_interface rockrage_k007420_intf =
 
 static MACHINE_START( rockrage )
 {
-	rockrage_state *state = machine->driver_data<rockrage_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	rockrage_state *state = machine.driver_data<rockrage_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x2000);
 
-	state->audiocpu = machine->device("audiocpu");
-	state->k007342 = machine->device("k007342");
-	state->k007420 = machine->device("k007420");
+	state->audiocpu = machine.device("audiocpu");
+	state->k007342 = machine.device("k007342");
+	state->k007420 = machine.device("k007420");
 
 	state->save_item(NAME(state->vreg));
 	state->save_item(NAME(state->layer_colorbase));
@@ -288,7 +288,7 @@ static MACHINE_START( rockrage )
 
 static MACHINE_RESET( rockrage )
 {
-	rockrage_state *state = machine->driver_data<rockrage_state>();
+	rockrage_state *state = machine.driver_data<rockrage_state>();
 
 	state->vreg = 0;
 	state->layer_colorbase[0] = 0x00;

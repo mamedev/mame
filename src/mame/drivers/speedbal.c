@@ -59,9 +59,9 @@ c1  ??
 
 static WRITE8_HANDLER( speedbal_coincounter_w )
 {
-	coin_counter_w(space->machine, 0, data & 0x80);
-	coin_counter_w(space->machine, 1, data & 0x40);
-	flip_screen_set(space->machine, data & 8); // also changes data & 0x10 at the same time too (flipx and flipy?)
+	coin_counter_w(space->machine(), 0, data & 0x80);
+	coin_counter_w(space->machine(), 1, data & 0x40);
+	flip_screen_set(space->machine(), data & 8); // also changes data & 0x10 at the same time too (flipx and flipy?)
 	/* unknown: (data & 0x10) and (data & 4) */
 }
 

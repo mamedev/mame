@@ -353,19 +353,19 @@ static WRITE8_HANDLER( systeme_bank_w )
 
 	segae_set_vram_banks(data);
 
-	//memcpy(sms_rom+0x8000, space->machine->region("user1")->base()+0x10000+rombank*0x4000, 0x4000);
-	memory_set_bank(space->machine, "bank1", rombank);
+	//memcpy(sms_rom+0x8000, space->machine().region("user1")->base()+0x10000+rombank*0x4000, 0x4000);
+	memory_set_bank(space->machine(), "bank1", rombank);
 
 }
 
 
-static void init_ports_systeme(running_machine *machine)
+static void init_ports_systeme(running_machine &machine)
 {
 	/* INIT THE PORTS *********************************************************************************************/
 
-	address_space *io = machine->device("maincpu")->memory().space(AS_IO);
-	device_t *sn1 = machine->device("sn1");
-	device_t *sn2 = machine->device("sn2");
+	address_space *io = machine.device("maincpu")->memory().space(AS_IO);
+	device_t *sn1 = machine.device("sn1");
+	device_t *sn2 = machine.device("sn2");
 
 	io->install_legacy_write_handler(*sn2, 0x7b, 0x7b, FUNC(sn76496_w));
 	io->install_legacy_write_handler(*sn1, 0x7e, 0x7f, FUNC(sn76496_w));
@@ -388,15 +388,15 @@ static void init_ports_systeme(running_machine *machine)
 
 
 
-static void init_systeme_map(running_machine *machine)
+static void init_systeme_map(running_machine &machine)
 {
-	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* alternate way of accessing video ram */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xbfff, FUNC(segasyse_videoram_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xbfff, FUNC(segasyse_videoram_w));
 
 	/* main ram area */
-	sms_mainram = (UINT8 *)machine->device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xc000, 0xffff);
+	sms_mainram = (UINT8 *)machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xc000, 0xffff);
 	memset(sms_mainram,0x00,0x4000);
 
 	init_ports_systeme(machine);
@@ -909,10 +909,10 @@ static READ8_HANDLER (segae_hangonjr_port_f8_r)
 	temp = 0;
 
 	if (port_fa_last == 0x08)  /* 0000 1000 */ /* Angle */
-		temp = input_port_read(space->machine, "IN2");
+		temp = input_port_read(space->machine(), "IN2");
 
 	if (port_fa_last == 0x09)  /* 0000 1001 */ /* Accel */
-		temp = input_port_read(space->machine, "IN3");
+		temp = input_port_read(space->machine(), "IN3");
 
 	return temp;
 }
@@ -948,13 +948,13 @@ static WRITE8_HANDLER (segae_ridleofp_port_fa_w)
 
 	if (data & 1)
 	{
-		int curr = input_port_read(space->machine, "IN2");
+		int curr = input_port_read(space->machine(), "IN2");
 		diff1 = ((curr - last1) & 0x0fff) | (curr & 0xf000);
 		last1 = curr;
 	}
 	if (data & 2)
 	{
-		int curr = input_port_read(space->machine, "IN3") & 0x0fff;
+		int curr = input_port_read(space->machine(), "IN3") & 0x0fff;
 		diff2 = ((curr - last2) & 0x0fff) | (curr & 0xf000);
 		last2 = curr;
 	}
@@ -964,8 +964,8 @@ static DRIVER_INIT( ridleofp )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0xf8, 0xf8, FUNC(segae_ridleofp_port_f8_r));
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xfa, 0xfa, FUNC(segae_ridleofp_port_fa_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0xf8, 0xf8, FUNC(segae_ridleofp_port_f8_r));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xfa, 0xfa, FUNC(segae_ridleofp_port_fa_w));
 }
 
 
@@ -973,8 +973,8 @@ static DRIVER_INIT( hangonjr )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0xf8, 0xf8, FUNC(segae_hangonjr_port_f8_r));
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xfa, 0xfa, FUNC(segae_hangonjr_port_fa_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0xf8, 0xf8, FUNC(segae_hangonjr_port_f8_r));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xfa, 0xfa, FUNC(segae_hangonjr_port_fa_w));
 }
 
 static DRIVER_INIT( opaopa )

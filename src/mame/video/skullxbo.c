@@ -17,7 +17,7 @@
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	skullxbo_state *state = machine->driver_data<skullxbo_state>();
+	skullxbo_state *state = machine.driver_data<skullxbo_state>();
 	UINT16 data = state->alpha[tile_index];
 	int code = (data ^ 0x400) & 0x7ff;
 	int color = (data >> 11) & 0x0f;
@@ -28,7 +28,7 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	skullxbo_state *state = machine->driver_data<skullxbo_state>();
+	skullxbo_state *state = machine.driver_data<skullxbo_state>();
 	UINT16 data1 = state->playfield[tile_index];
 	UINT16 data2 = state->playfield_upper[tile_index] & 0xff;
 	int code = data1 & 0x7fff;
@@ -82,7 +82,7 @@ VIDEO_START( skullxbo )
 		0,					/* resulting value to indicate "special" */
 		0,					/* callback routine for special entries */
 	};
-	skullxbo_state *state = machine->driver_data<skullxbo_state>();
+	skullxbo_state *state = machine.driver_data<skullxbo_state>();
 
 	/* initialize the playfield */
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  16,8, 64,64);
@@ -105,7 +105,7 @@ VIDEO_START( skullxbo )
 
 WRITE16_HANDLER( skullxbo_xscroll_w )
 {
-	skullxbo_state *state = space->machine->driver_data<skullxbo_state>();
+	skullxbo_state *state = space->machine().driver_data<skullxbo_state>();
 
 	/* combine data */
 	UINT16 oldscroll = *state->xscroll;
@@ -114,7 +114,7 @@ WRITE16_HANDLER( skullxbo_xscroll_w )
 
 	/* if something changed, force an update */
 	if (oldscroll != newscroll)
-		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 
 	/* adjust the actual scrolls */
 	tilemap_set_scrollx(state->playfield_tilemap, 0, 2 * (newscroll >> 7));
@@ -127,10 +127,10 @@ WRITE16_HANDLER( skullxbo_xscroll_w )
 
 WRITE16_HANDLER( skullxbo_yscroll_w )
 {
-	skullxbo_state *state = space->machine->driver_data<skullxbo_state>();
+	skullxbo_state *state = space->machine().driver_data<skullxbo_state>();
 
 	/* combine data */
-	int scanline = space->machine->primary_screen->vpos();
+	int scanline = space->machine().primary_screen->vpos();
 	UINT16 oldscroll = *state->yscroll;
 	UINT16 newscroll = oldscroll;
 	UINT16 effscroll;
@@ -138,10 +138,10 @@ WRITE16_HANDLER( skullxbo_yscroll_w )
 
 	/* if something changed, force an update */
 	if (oldscroll != newscroll)
-		space->machine->primary_screen->update_partial(scanline);
+		space->machine().primary_screen->update_partial(scanline);
 
 	/* adjust the effective scroll for the current scanline */
-	if (scanline > space->machine->primary_screen->visible_area().max_y)
+	if (scanline > space->machine().primary_screen->visible_area().max_y)
 		scanline = 0;
 	effscroll = (newscroll >> 7) - scanline;
 
@@ -163,7 +163,7 @@ WRITE16_HANDLER( skullxbo_yscroll_w )
 
 WRITE16_HANDLER( skullxbo_mobmsb_w )
 {
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 	atarimo_set_bank(0, (offset >> 9) & 1);
 }
 
@@ -177,7 +177,7 @@ WRITE16_HANDLER( skullxbo_mobmsb_w )
 
 WRITE16_HANDLER( skullxbo_playfieldlatch_w )
 {
-	skullxbo_state *state = space->machine->driver_data<skullxbo_state>();
+	skullxbo_state *state = space->machine().driver_data<skullxbo_state>();
 	atarigen_set_playfield_latch(state, data);
 }
 
@@ -189,9 +189,9 @@ WRITE16_HANDLER( skullxbo_playfieldlatch_w )
  *
  *************************************/
 
-void skullxbo_scanline_update(running_machine *machine, int scanline)
+void skullxbo_scanline_update(running_machine &machine, int scanline)
 {
-	skullxbo_state *state = machine->driver_data<skullxbo_state>();
+	skullxbo_state *state = machine.driver_data<skullxbo_state>();
 	UINT16 *base = &state->alpha[(scanline / 8) * 64 + 42];
 	int x;
 
@@ -221,7 +221,7 @@ void skullxbo_scanline_update(running_machine *machine, int scanline)
 
 			/* force a partial update with the previous scroll */
 			if (scanline > 0)
-				machine->primary_screen->update_partial(scanline - 1);
+				machine.primary_screen->update_partial(scanline - 1);
 
 			/* update the new scroll */
 			tilemap_set_scrolly(state->playfield_tilemap, 0, newscroll);
@@ -244,7 +244,7 @@ void skullxbo_scanline_update(running_machine *machine, int scanline)
 
 SCREEN_UPDATE( skullxbo )
 {
-	skullxbo_state *state = screen->machine->driver_data<skullxbo_state>();
+	skullxbo_state *state = screen->machine().driver_data<skullxbo_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

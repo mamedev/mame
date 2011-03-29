@@ -37,7 +37,7 @@ public:
 
 
 
-#define DRAW_TILE(machine, offset, transparency) drawgfx_transpen(bitmap, cliprect, machine->gfx[0],\
+#define DRAW_TILE(machine, offset, transparency) drawgfx_transpen(bitmap, cliprect, (machine).gfx[0],\
 					(state->videoram[index+offset] | (state->colorram[index+offset]<<8))&0x3fff,\
 					(state->colorram[index+offset]&0x80)>>7,\
 					0,0,\
@@ -46,7 +46,7 @@ public:
 
 static SCREEN_UPDATE( cardline )
 {
-	cardline_state *state = screen->machine->driver_data<cardline_state>();
+	cardline_state *state = screen->machine().driver_data<cardline_state>();
 	int x,y;
 	bitmap_fill(bitmap,cliprect,0);
 	for(y=0;y<32;y++)
@@ -56,14 +56,14 @@ static SCREEN_UPDATE( cardline )
 			int index=y*64+x;
 			if(state->video&1)
 			{
-				DRAW_TILE(screen->machine,0,0);
-				DRAW_TILE(screen->machine,0x800,1);
+				DRAW_TILE(screen->machine(),0,0);
+				DRAW_TILE(screen->machine(),0x800,1);
 			}
 
 			if(state->video&2)
 			{
-				DRAW_TILE(screen->machine,0x1000,0);
-				DRAW_TILE(screen->machine,0x1800,1);
+				DRAW_TILE(screen->machine(),0x1000,0);
+				DRAW_TILE(screen->machine(),0x1800,1);
 			}
 		}
 	}
@@ -72,27 +72,27 @@ static SCREEN_UPDATE( cardline )
 
 static WRITE8_HANDLER(vram_w)
 {
-	cardline_state *state = space->machine->driver_data<cardline_state>();
+	cardline_state *state = space->machine().driver_data<cardline_state>();
 	offset+=0x1000*((state->video&2)>>1);
 	state->videoram[offset]=data;
 }
 
 static WRITE8_HANDLER(attr_w)
 {
-	cardline_state *state = space->machine->driver_data<cardline_state>();
+	cardline_state *state = space->machine().driver_data<cardline_state>();
 	offset+=0x1000*((state->video&2)>>1);
 	state->colorram[offset]=data;
 }
 
 static WRITE8_HANDLER(video_w)
 {
-	cardline_state *state = space->machine->driver_data<cardline_state>();
+	cardline_state *state = space->machine().driver_data<cardline_state>();
 	state->video=data;
 }
 
 static READ8_HANDLER(unk_r)
 {
-	cardline_state *state = space->machine->driver_data<cardline_state>();
+	cardline_state *state = space->machine().driver_data<cardline_state>();
 	state->var^=0x10;
 	//printf("var %d\n",state->var);
 	return state->var;
@@ -185,7 +185,7 @@ static PALETTE_INIT(cardline)
 {
 	int i,r,g,b,data;
 	int bit0,bit1,bit2;
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		data=color_prom[i];
 

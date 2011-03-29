@@ -39,7 +39,7 @@ public:
 
 /*----------- defined in video/rungun.c -----------*/
 
-extern void rng_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
+extern void rng_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
 
 READ16_HANDLER( rng_ttl_ram_r );
 WRITE16_HANDLER( rng_ttl_ram_w );

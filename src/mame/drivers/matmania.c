@@ -47,14 +47,14 @@ The driver has been updated accordingly.
 
 static WRITE8_HANDLER( matmania_sh_command_w )
 {
-	matmania_state *state = space->machine->driver_data<matmania_state>();
+	matmania_state *state = space->machine().driver_data<matmania_state>();
 	soundlatch_w(space, offset, data);
 	device_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( maniach_sh_command_w )
 {
-	matmania_state *state = space->machine->driver_data<matmania_state>();
+	matmania_state *state = space->machine().driver_data<matmania_state>();
 	soundlatch_w(space, offset, data);
 	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
@@ -301,11 +301,11 @@ GFXDECODE_END
 
 static MACHINE_START( matmania )
 {
-	matmania_state *state = machine->driver_data<matmania_state>();
+	matmania_state *state = machine.driver_data<matmania_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->mcu = machine->device("mcu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->mcu = machine.device("mcu");
 }
 
 static MACHINE_CONFIG_START( matmania, matmania_state )
@@ -356,7 +356,7 @@ MACHINE_CONFIG_END
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
 static void irqhandler(device_t *device, int linestate)
 {
-	matmania_state *state = device->machine->driver_data<matmania_state>();
+	matmania_state *state = device->machine().driver_data<matmania_state>();
 	device_set_input_line(state->audiocpu, 1, linestate);
 }
 
@@ -368,7 +368,7 @@ static const ym3526_interface ym3526_config =
 
 static MACHINE_START( maniach )
 {
-	matmania_state *state = machine->driver_data<matmania_state>();
+	matmania_state *state = machine.driver_data<matmania_state>();
 
 	MACHINE_START_CALL(matmania);
 
@@ -389,7 +389,7 @@ static MACHINE_START( maniach )
 
 static MACHINE_RESET( maniach )
 {
-	matmania_state *state = machine->driver_data<matmania_state>();
+	matmania_state *state = machine.driver_data<matmania_state>();
 
 	state->port_a_in = 0;
 	state->port_a_out = 0;

@@ -256,7 +256,7 @@ public:
 
 static WRITE32_HANDLER( twinkle_unknown_w )
 {
-	twinkle_state *state = space->machine->driver_data<twinkle_state>();
+	twinkle_state *state = space->machine().driver_data<twinkle_state>();
 
 /*  printf( "set unknown data=%08x\n", data ); */
 
@@ -265,7 +265,7 @@ static WRITE32_HANDLER( twinkle_unknown_w )
 
 static READ32_HANDLER( twinkle_unknown_r )
 {
-	twinkle_state *state = space->machine->driver_data<twinkle_state>();
+	twinkle_state *state = space->machine().driver_data<twinkle_state>();
 	UINT32 data = state->unknown;
 
 /*  printf( "get unknown data=%08x\n", data ); */
@@ -435,7 +435,7 @@ static const UINT16 asciicharset[]=
 
 static WRITE32_HANDLER( twinkle_io_w )
 {
-	twinkle_state *state = space->machine->driver_data<twinkle_state>();
+	twinkle_state *state = space->machine().driver_data<twinkle_state>();
 
 	if( ACCESSING_BITS_16_23 )
 	{
@@ -501,7 +501,7 @@ static WRITE32_HANDLER( twinkle_io_w )
 
 static READ32_HANDLER(twinkle_io_r)
 {
-	twinkle_state *state = space->machine->driver_data<twinkle_state>();
+	twinkle_state *state = space->machine().driver_data<twinkle_state>();
 	UINT32 data = 0;
 
 	if( ACCESSING_BITS_0_7 )
@@ -509,27 +509,27 @@ static READ32_HANDLER(twinkle_io_r)
 		switch( state->io_offset )
 		{
 			case 0x07:
-				data |= input_port_read( space->machine, "IN0" );
+				data |= input_port_read( space->machine(), "IN0" );
 				break;
 
 			case 0x0f:
-				data |= input_port_read( space->machine, "IN1" );
+				data |= input_port_read( space->machine(), "IN1" );
 				break;
 
 			case 0x17:
-				data |= input_port_read( space->machine, "IN2" );
+				data |= input_port_read( space->machine(), "IN2" );
 				break;
 
 			case 0x1f:
-				data |= input_port_read( space->machine, "IN3" );
+				data |= input_port_read( space->machine(), "IN3" );
 				break;
 
 			case 0x27:
-				data |= input_port_read( space->machine, "IN4" );
+				data |= input_port_read( space->machine(), "IN4" );
 				break;
 
 			case 0x2f:
-				data |= input_port_read( space->machine, "IN5" );
+				data |= input_port_read( space->machine(), "IN5" );
 				break;
 
 			default:
@@ -593,7 +593,7 @@ static WRITE32_HANDLER(serial_w)
 
 static WRITE32_HANDLER(shared_psx_w)
 {
-	twinkle_state *state = space->machine->driver_data<twinkle_state>();
+	twinkle_state *state = space->machine().driver_data<twinkle_state>();
 
 	if (mem_mask == 0xff)
 	{
@@ -613,7 +613,7 @@ static WRITE32_HANDLER(shared_psx_w)
 
 static READ32_HANDLER(shared_psx_r)
 {
-	twinkle_state *state = space->machine->driver_data<twinkle_state>();
+	twinkle_state *state = space->machine().driver_data<twinkle_state>();
 	UINT32 result;
 
 	result = state->spu_shared[offset*2] | state->spu_shared[(offset*2)+1]<<16;
@@ -674,11 +674,11 @@ ADDRESS_MAP_END
 
 static void ide_interrupt(device_t *device, int state_)
 {
-	twinkle_state *state = device->machine->driver_data<twinkle_state>();
+	twinkle_state *state = device->machine().driver_data<twinkle_state>();
 
 	if ((state_) && (state->spu_ctrl & 0x0400))
 	{
-		cputag_set_input_line(device->machine, "audiocpu", M68K_IRQ_6, ASSERT_LINE);
+		cputag_set_input_line(device->machine(), "audiocpu", M68K_IRQ_6, ASSERT_LINE);
 	}
 }
 
@@ -712,7 +712,7 @@ static WRITE16_DEVICE_HANDLER( twinkle_ide_w )
 */
 static WRITE16_HANDLER( twinkle_spu_ctrl_w )
 {
-	twinkle_state *state = space->machine->driver_data<twinkle_state>();
+	twinkle_state *state = space->machine().driver_data<twinkle_state>();
 
 	if ((!(data & 0x0080)) && (state->spu_ctrl & 0x0080))
 	{
@@ -736,21 +736,21 @@ static WRITE16_HANDLER( twinkle_spu_ctrl_w )
 
 static READ16_HANDLER( twinkle_waveram_r )
 {
-	UINT16 *waveram = (UINT16 *)space->machine->region("rfsnd")->base();
+	UINT16 *waveram = (UINT16 *)space->machine().region("rfsnd")->base();
 
 	return waveram[offset];
 }
 
 static WRITE16_HANDLER( twinkle_waveram_w )
 {
-	UINT16 *waveram = (UINT16 *)space->machine->region("rfsnd")->base();
+	UINT16 *waveram = (UINT16 *)space->machine().region("rfsnd")->base();
 
 	COMBINE_DATA(&waveram[offset]);
 }
 
 static READ16_HANDLER( shared_68k_r )
 {
-	twinkle_state *state = space->machine->driver_data<twinkle_state>();
+	twinkle_state *state = space->machine().driver_data<twinkle_state>();
 
 //  printf("shared_68k_r: @ %x, mask %x\n", offset, mem_mask);
 
@@ -759,7 +759,7 @@ static READ16_HANDLER( shared_68k_r )
 
 static WRITE16_HANDLER( shared_68k_w )
 {
-	twinkle_state *state = space->machine->driver_data<twinkle_state>();
+	twinkle_state *state = space->machine().driver_data<twinkle_state>();
 
 //  printf("shared_68k_w: %x to %x, mask %x\n", data, offset, mem_mask);
 
@@ -783,9 +783,9 @@ ADDRESS_MAP_END
 
 /* SCSI */
 
-static void scsi_dma_read( running_machine *machine, UINT32 n_address, INT32 n_size )
+static void scsi_dma_read( running_machine &machine, UINT32 n_address, INT32 n_size )
 {
-	twinkle_state *state = machine->driver_data<twinkle_state>();
+	twinkle_state *state = machine.driver_data<twinkle_state>();
 	UINT32 *p_n_psxram = state->p_n_psxram;
 	int i;
 	int n_this;
@@ -828,9 +828,9 @@ static void scsi_dma_read( running_machine *machine, UINT32 n_address, INT32 n_s
 	}
 }
 
-static void scsi_dma_write( running_machine *machine, UINT32 n_address, INT32 n_size )
+static void scsi_dma_write( running_machine &machine, UINT32 n_address, INT32 n_size )
 {
-	twinkle_state *state = machine->driver_data<twinkle_state>();
+	twinkle_state *state = machine.driver_data<twinkle_state>();
 	UINT32 *p_n_psxram = state->p_n_psxram;
 	int i;
 	int n_this;
@@ -863,7 +863,7 @@ static void scsi_dma_write( running_machine *machine, UINT32 n_address, INT32 n_
 	}
 }
 
-static void scsi_irq(running_machine *machine)
+static void scsi_irq(running_machine &machine)
 {
 	psx_irq_set(machine, 0x400);
 }
@@ -889,7 +889,7 @@ static DRIVER_INIT( twinkle )
 	psx_dma_install_read_handler(machine, 5, scsi_dma_read);
 	psx_dma_install_write_handler(machine, 5, scsi_dma_write);
 
-	device_t *i2cmem = machine->device("security");
+	device_t *i2cmem = machine.device("security");
 	i2cmem_e0_write( i2cmem, 0 );
 	i2cmem_e1_write( i2cmem, 0 );
 	i2cmem_e2_write( i2cmem, 0 );
@@ -901,14 +901,14 @@ static MACHINE_RESET( twinkle )
 	psx_machine_init(machine);
 
 	/* also hook up CDDA audio to the CD-ROM drive */
-	cdda_set_cdrom(machine->device("cdda"), am53cf96_get_device(SCSI_ID_4));
+	cdda_set_cdrom(machine.device("cdda"), am53cf96_get_device(SCSI_ID_4));
 }
 
 static void spu_irq(device_t *device, UINT32 data)
 {
 	if (data)
 	{
-		psx_irq_set(device->machine, 1<<9);
+		psx_irq_set(device->machine(), 1<<9);
 	}
 }
 

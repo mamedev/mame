@@ -206,14 +206,14 @@ DIP locations verified from manuals for:
 
 static WRITE16_HANDLER( tnextspc_coin_counters_w )
 {
-	coin_counter_w(space->machine, offset, data & 0x01);
+	coin_counter_w(space->machine(), offset, data & 0x01);
 }
 
 static WRITE16_HANDLER( tnextspc_unknown_w )
 {
 	logerror("tnextspc_unknown_w : PC = %04x - offset = %04x - data = %04x\n", cpu_get_pc(space->cpu), offset, data);
 	if (offset == 0)
-		alpha68k_flipscreen_w(space->machine, data & 0x100);
+		alpha68k_flipscreen_w(space->machine(), data & 0x100);
 }
 
 static WRITE16_HANDLER( alpha_microcontroller_w )
@@ -221,72 +221,72 @@ static WRITE16_HANDLER( alpha_microcontroller_w )
 	logerror("%04x:  Alpha write trigger at %04x (%04x)\n", cpu_get_pc(space->cpu), offset, data);
 	/* 0x44 = coin clear signal to microcontroller? */
 	if (offset == 0x2d && ACCESSING_BITS_0_7)
-		alpha68k_flipscreen_w(space->machine, data & 1);
+		alpha68k_flipscreen_w(space->machine(), data & 1);
 }
 
 /******************************************************************************/
 
 static READ16_HANDLER( kyros_dip_r )
 {
-	return input_port_read(space->machine, "IN1") << 8;
+	return input_port_read(space->machine(), "IN1") << 8;
 }
 
 static READ16_HANDLER( control_1_r )
 {
-	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = space->machine().driver_data<alpha68k_state>();
 
 	if (state->invert_controls)
-		return ~(input_port_read(space->machine, "IN0") + (input_port_read(space->machine, "IN1") << 8));
+		return ~(input_port_read(space->machine(), "IN0") + (input_port_read(space->machine(), "IN1") << 8));
 
-	return (input_port_read(space->machine, "IN0") + (input_port_read(space->machine, "IN1") << 8));
+	return (input_port_read(space->machine(), "IN0") + (input_port_read(space->machine(), "IN1") << 8));
 }
 
 static READ16_HANDLER( control_2_r )
 {
-	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = space->machine().driver_data<alpha68k_state>();
 
 	if (state->invert_controls)
-		return ~(input_port_read(space->machine, "IN3") + ((~(1 << input_port_read(space->machine, "IN5"))) << 8));
+		return ~(input_port_read(space->machine(), "IN3") + ((~(1 << input_port_read(space->machine(), "IN5"))) << 8));
 
-	return input_port_read(space->machine, "IN3") + /* Low byte of CN1 */
-		((~(1 << input_port_read(space->machine, "IN5"))) << 8);
+	return input_port_read(space->machine(), "IN3") + /* Low byte of CN1 */
+		((~(1 << input_port_read(space->machine(), "IN5"))) << 8);
 }
 
 static READ16_HANDLER( control_2_V_r )
 {
-	return input_port_read(space->machine, "IN3");
+	return input_port_read(space->machine(), "IN3");
 }
 
 static READ16_HANDLER( control_3_r )
 {
-	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = space->machine().driver_data<alpha68k_state>();
 
 	if (state->invert_controls)
-		return ~(((~(1 << input_port_read(space->machine, "IN6"))) << 8) & 0xff00);
+		return ~(((~(1 << input_port_read(space->machine(), "IN6"))) << 8) & 0xff00);
 
-	return ((~(1 << input_port_read(space->machine, "IN6"))) << 8) & 0xff00;
+	return ((~(1 << input_port_read(space->machine(), "IN6"))) << 8) & 0xff00;
 }
 
 /* High 4 bits of CN1 & CN2 */
 static READ16_HANDLER( control_4_r )
 {
-	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = space->machine().driver_data<alpha68k_state>();
 
 	if (state->invert_controls)
-		return ~((((~(1 << input_port_read(space->machine, "IN6"))) << 4) & 0xf000)
-		 + (((~(1 << input_port_read(space->machine, "IN5")))) & 0x0f00));
+		return ~((((~(1 << input_port_read(space->machine(), "IN6"))) << 4) & 0xf000)
+		 + (((~(1 << input_port_read(space->machine(), "IN5")))) & 0x0f00));
 
-	return (((~(1 << input_port_read(space->machine, "IN6"))) << 4) & 0xf000)
-		 + (((~(1 << input_port_read(space->machine, "IN5")))) & 0x0f00);
+	return (((~(1 << input_port_read(space->machine(), "IN6"))) << 4) & 0xf000)
+		 + (((~(1 << input_port_read(space->machine(), "IN5")))) & 0x0f00);
 }
 
 static READ16_HANDLER( jongbou_inputs_r )
 {
-	UINT8 inp1 = input_port_read(space->machine, "IN3");
-	UINT8 inp2 = input_port_read(space->machine, "IN4");
+	UINT8 inp1 = input_port_read(space->machine(), "IN3");
+	UINT8 inp2 = input_port_read(space->machine(), "IN4");
 	inp1 = ((inp1 & 0x01) << 3) + ((inp1 & 0x02) << 1) + ((inp1 & 0x04) >> 1) + ((inp1 & 0x08) >> 3);
 	inp2 = ((inp2 & 0x01) << 3) + ((inp2 & 0x02) << 1) + ((inp2 & 0x04) >> 1) + ((inp2 & 0x08) >> 3);
-	return input_port_read(space->machine, "IN0") | inp1 | inp2 << 4;
+	return input_port_read(space->machine(), "IN0") | inp1 | inp2 << 4;
 }
 
 
@@ -310,12 +310,12 @@ static WRITE16_HANDLER( alpha68k_V_sound_w )
 	if(ACCESSING_BITS_0_7)
 		soundlatch_w(space, 0, data & 0xff);
 	if(ACCESSING_BITS_8_15)
-		alpha68k_V_video_bank_w(space->machine, (data >> 8) & 0xff);
+		alpha68k_V_video_bank_w(space->machine(), (data >> 8) & 0xff);
 }
 //AT
 static WRITE16_HANDLER( paddlema_soundlatch_w )
 {
-	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = space->machine().driver_data<alpha68k_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -326,7 +326,7 @@ static WRITE16_HANDLER( paddlema_soundlatch_w )
 
 static WRITE16_HANDLER( tnextspc_soundlatch_w )
 {
-	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = space->machine().driver_data<alpha68k_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -345,7 +345,7 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
     */
 	static const UINT8 coinage1[8][2]={{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
 	static const UINT8 coinage2[8][2]={{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
-	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = space->machine().driver_data<alpha68k_state>();
 	int source = state->shared_ram[offset];
 
 	switch (offset)
@@ -355,15 +355,15 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
 		return 0;
 	case 0x29: /* Query microcontroller for coin insert */
 		state->trigstate++;
-		if ((input_port_read(space->machine, "IN2") & 0x3) == 3)
+		if ((input_port_read(space->machine(), "IN2") & 0x3) == 3)
 			state->latch = 0;
-		if ((input_port_read(space->machine, "IN2") & 0x1) == 0 && !state->latch)
+		if ((input_port_read(space->machine(), "IN2") & 0x1) == 0 && !state->latch)
 		{
 			state->shared_ram[0x29] = (source & 0xff00) | (state->coin_id & 0xff);	// coinA
 			state->shared_ram[0x22] = (source & 0xff00) | 0x0;
 			state->latch = 1;
 
-			state->coinvalue = (~input_port_read(space->machine, "IN1") >> 1) & 7;
+			state->coinvalue = (~input_port_read(space->machine(), "IN1") >> 1) & 7;
 			state->deposits1++;
 			if (state->deposits1 == coinage1[state->coinvalue][0])
 			{
@@ -373,13 +373,13 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
 			else
 				state->credits = 0;
 		}
-		else if ((input_port_read(space->machine, "IN2") & 0x2) == 0 && !state->latch)
+		else if ((input_port_read(space->machine(), "IN2") & 0x2) == 0 && !state->latch)
 		{
 			state->shared_ram[0x29] = (source & 0xff00) | (state->coin_id >> 8);	// coinB
 			state->shared_ram[0x22] = (source & 0xff00) | 0x0;
 			state->latch = 1;
 
-			state->coinvalue = (~input_port_read(space->machine, "IN1") >>1 ) & 7;
+			state->coinvalue = (~input_port_read(space->machine(), "IN1") >>1 ) & 7;
 			state->deposits2++;
 			if (state->deposits2 == coinage2[state->coinvalue][0])
 			{
@@ -427,13 +427,13 @@ static READ16_HANDLER( alpha_II_trigger_r )
     */
 	static const UINT8 coinage1[8][2] = {{1,1}, {1,2}, {1,3}, {1,4}, {1,5}, {1,6}, {2,3}, {3,2}};
 	static const UINT8 coinage2[8][2] = {{1,1}, {2,1}, {3,1}, {4,1}, {5,1}, {6,1}, {7,1}, {8,1}};
-	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = space->machine().driver_data<alpha68k_state>();
 	int source = state->shared_ram[offset];
 
 	switch (offset)
 	{
 		case 0: /* Dipswitch 2 */
-			state->shared_ram[0] = (source & 0xff00) | input_port_read(space->machine, "IN4");
+			state->shared_ram[0] = (source & 0xff00) | input_port_read(space->machine(), "IN4");
 			return 0;
 
 		case 0x22: /* Coin value */
@@ -441,9 +441,9 @@ static READ16_HANDLER( alpha_II_trigger_r )
 			return 0;
 
 		case 0x29: /* Query microcontroller for coin insert */
-			if ((input_port_read(space->machine, "IN2") & 0x3) == 3)
+			if ((input_port_read(space->machine(), "IN2") & 0x3) == 3)
 				state->latch = 0;
-			if ((input_port_read(space->machine, "IN2") & 0x1) == 0 && !state->latch)
+			if ((input_port_read(space->machine(), "IN2") & 0x1) == 0 && !state->latch)
 			{
 				state->shared_ram[0x29] = (source & 0xff00) | (state->coin_id & 0xff);	// coinA
 				state->shared_ram[0x22] = (source & 0xff00) | 0x0;
@@ -452,9 +452,9 @@ static READ16_HANDLER( alpha_II_trigger_r )
 				if ((state->coin_id & 0xff) == 0x22)
 				{
 					if (state->game_id == ALPHA68K_BTLFIELDB)
-						state->coinvalue = (input_port_read(space->machine, "IN4") >> 0) & 7;
+						state->coinvalue = (input_port_read(space->machine(), "IN4") >> 0) & 7;
 					else
-						state->coinvalue = (~input_port_read(space->machine, "IN4") >> 0) & 7;
+						state->coinvalue = (~input_port_read(space->machine(), "IN4") >> 0) & 7;
 
 					state->deposits1++;
 					if (state->deposits1 == coinage1[state->coinvalue][0])
@@ -466,7 +466,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 						state->credits = 0;
 				}
 			}
-			else if ((input_port_read(space->machine, "IN2") & 0x2) == 0 && !state->latch)
+			else if ((input_port_read(space->machine(), "IN2") & 0x2) == 0 && !state->latch)
 			{
 				state->shared_ram[0x29] = (source & 0xff00) | (state->coin_id >> 8);	// coinB
 				state->shared_ram[0x22] = (source & 0xff00) | 0x0;
@@ -475,9 +475,9 @@ static READ16_HANDLER( alpha_II_trigger_r )
 				if ((state->coin_id >> 8) == 0x22)
 				{
 					if (state->game_id == ALPHA68K_BTLFIELDB)
-						state->coinvalue = (input_port_read(space->machine, "IN4") >> 0) & 7;
+						state->coinvalue = (input_port_read(space->machine(), "IN4") >> 0) & 7;
 					else
-						state->coinvalue = (~input_port_read(space->machine, "IN4") >> 0) & 7;
+						state->coinvalue = (~input_port_read(space->machine(), "IN4") >> 0) & 7;
 
 					state->deposits2++;
 					if (state->deposits2 == coinage2[state->coinvalue][0])
@@ -522,21 +522,21 @@ static READ16_HANDLER( alpha_V_trigger_r )
     */
 	static const UINT8 coinage1[8][2] = {{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
 	static const UINT8 coinage2[8][2] = {{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
-	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = space->machine().driver_data<alpha68k_state>();
 	int source = state->shared_ram[offset];
 
 	switch (offset)
 	{
 		case 0: /* Dipswitch 1 */
-			state->shared_ram[0] = (source & 0xff00) | input_port_read(space->machine, "IN4");
+			state->shared_ram[0] = (source & 0xff00) | input_port_read(space->machine(), "IN4");
 			return 0;
 		case 0x22: /* Coin value */
 			state->shared_ram[0x22] = (source & 0xff00) | (state->credits & 0x00ff);
 			return 0;
 		case 0x29: /* Query microcontroller for coin insert */
-			if ((input_port_read(space->machine, "IN2") & 0x3) == 3)
+			if ((input_port_read(space->machine(), "IN2") & 0x3) == 3)
 				state->latch = 0;
-			if ((input_port_read(space->machine, "IN2") & 0x1) == 0 && !state->latch)
+			if ((input_port_read(space->machine(), "IN2") & 0x1) == 0 && !state->latch)
 			{
 				state->shared_ram[0x29] = (source & 0xff00) | (state->coin_id & 0xff);	// coinA
 				state->shared_ram[0x22] = (source & 0xff00) | 0x0;
@@ -544,7 +544,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 
 				if ((state->coin_id & 0xff) == 0x22)
 				{
-					state->coinvalue = (~input_port_read(space->machine, "IN4") >> 1) & 7;
+					state->coinvalue = (~input_port_read(space->machine(), "IN4") >> 1) & 7;
 					state->deposits1++;
 					if (state->deposits1 == coinage1[state->coinvalue][0])
 					{
@@ -555,7 +555,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 						state->credits = 0;
 				}
 			}
-			else if ((input_port_read(space->machine, "IN2") & 0x2) == 0 && !state->latch)
+			else if ((input_port_read(space->machine(), "IN2") & 0x2) == 0 && !state->latch)
 			{
 				state->shared_ram[0x29] = (source & 0xff00) | (state->coin_id>>8);	// coinB
 				state->shared_ram[0x22] = (source & 0xff00) | 0x0;
@@ -563,7 +563,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 
 				if ((state->coin_id >> 8) == 0x22)
 				{
-					state->coinvalue = (~input_port_read(space->machine, "IN4") >> 1) & 7;
+					state->coinvalue = (~input_port_read(space->machine(), "IN4") >> 1) & 7;
 					state->deposits2++;
 					if (state->deposits2 == coinage2[state->coinvalue][0])
 					{
@@ -589,12 +589,12 @@ static READ16_HANDLER( alpha_V_trigger_r )
 			break;
 
 		case 0x1f00: /* Dipswitch 1 */
-			state->shared_ram[0x1f00] = (source & 0xff00) | input_port_read(space->machine, "IN4");
+			state->shared_ram[0x1f00] = (source & 0xff00) | input_port_read(space->machine(), "IN4");
 			return 0;
 		case 0x1f29: /* Query microcontroller for coin insert */
-			if ((input_port_read(space->machine, "IN2") & 0x3) == 3)
+			if ((input_port_read(space->machine(), "IN2") & 0x3) == 3)
 				state->latch = 0;
-			if ((input_port_read(space->machine, "IN2") & 0x1) == 0 && !state->latch)
+			if ((input_port_read(space->machine(), "IN2") & 0x1) == 0 && !state->latch)
 			{
 				state->shared_ram[0x1f29] = (source & 0xff00) | (state->coin_id & 0xff);	// coinA
 				state->shared_ram[0x1f22] = (source & 0xff00) | 0x0;
@@ -602,7 +602,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 
 				if ((state->coin_id & 0xff) == 0x22)
 				{
-					state->coinvalue = (~input_port_read(space->machine, "IN4") >> 1) & 7;
+					state->coinvalue = (~input_port_read(space->machine(), "IN4") >> 1) & 7;
 					state->deposits1++;
 					if (state->deposits1 == coinage1[state->coinvalue][0])
 					{
@@ -613,7 +613,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 						state->credits = 0;
 				}
 			}
-			else if ((input_port_read(space->machine, "IN2") & 0x2) == 0 && !state->latch)
+			else if ((input_port_read(space->machine(), "IN2") & 0x2) == 0 && !state->latch)
 			{
 				state->shared_ram[0x1f29] = (source & 0xff00) | (state->coin_id >> 8);	// coinB
 				state->shared_ram[0x1f22] = (source & 0xff00) | 0x0;
@@ -621,7 +621,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 
 				if ((state->coin_id >> 8) == 0x22)
 				{
-					state->coinvalue = (~input_port_read(space->machine, "IN4") >> 1) & 7;
+					state->coinvalue = (~input_port_read(space->machine(), "IN4") >> 1) & 7;
 					state->deposits2++;
 					if (state->deposits2 == coinage2[state->coinvalue][0])
 					{
@@ -642,7 +642,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
                the microcontroller supplies it (it does for all the other games,
                but usually to 0x0 in RAM) when 0x21 is read (code at 0x009332) */
 			source = state->shared_ram[0x0163];
-			state->shared_ram[0x0163] = (source & 0x00ff) | (input_port_read(space->machine, "IN4") << 8);
+			state->shared_ram[0x0163] = (source & 0x00ff) | (input_port_read(space->machine(), "IN4") << 8);
 
 			return 0;
 		case 0x1ffe:  /* Custom ID check */
@@ -742,7 +742,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sound_bank_w )
 {
-	memory_set_bank(space->machine, "bank7", data);
+	memory_set_bank(space->machine(), "bank7", data);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
@@ -1841,7 +1841,7 @@ static const ym2203_interface ym2203_config =
 
 static void YM3812_irq( device_t *device, int param )
 {
-	alpha68k_state *state = device->machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = device->machine().driver_data<alpha68k_state>();
 	device_set_input_line(state->audiocpu, 0, (param) ? HOLD_LINE : CLEAR_LINE);
 }
 
@@ -1864,9 +1864,9 @@ static INTERRUPT_GEN( alpha68k_interrupt )
 
 static MACHINE_START( common )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->trigstate));
 	state->save_item(NAME(state->deposits1));
@@ -1880,7 +1880,7 @@ static MACHINE_START( common )
 
 static MACHINE_RESET( common )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 
 	state->trigstate = 0;
 	state->deposits1 = 0;
@@ -1894,8 +1894,8 @@ static MACHINE_RESET( common )
 
 static MACHINE_START( alpha68k_V )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	UINT8 *ROM = machine->region("audiocpu")->base();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
+	UINT8 *ROM = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank7", 0, 32, &ROM[0x10000], 0x4000);
 
@@ -1907,7 +1907,7 @@ static MACHINE_START( alpha68k_V )
 
 static MACHINE_RESET( alpha68k_V )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 
 	MACHINE_RESET_CALL(common);
 
@@ -1917,7 +1917,7 @@ static MACHINE_RESET( alpha68k_V )
 
 static MACHINE_RESET( alpha68k_II )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 
 	MACHINE_RESET_CALL(common);
 
@@ -1930,8 +1930,8 @@ static MACHINE_RESET( alpha68k_II )
 
 static MACHINE_START( alpha68k_II )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	UINT8 *ROM = machine->region("audiocpu")->base();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
+	UINT8 *ROM = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank7", 0, 28, &ROM[0x10000], 0x4000);
 
@@ -3089,7 +3089,7 @@ ROM_END
 
 static DRIVER_INIT( sstingry )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x00ff;
 	state->coin_id = 0x22 | (0x22 << 8);
@@ -3098,7 +3098,7 @@ static DRIVER_INIT( sstingry )
 
 static DRIVER_INIT( kyros )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x0012;
 	state->coin_id = 0x22 | (0x22 << 8);
@@ -3107,8 +3107,8 @@ static DRIVER_INIT( kyros )
 
 static DRIVER_INIT( jongbou )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0c0000, 0x0c0001, FUNC(jongbou_inputs_r));
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0c0000, 0x0c0001, FUNC(jongbou_inputs_r));
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x00ff;
 	state->coin_id = 0x23 | (0x24 << 8);
@@ -3117,7 +3117,7 @@ static DRIVER_INIT( jongbou )
 
 static DRIVER_INIT( paddlema )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	state->microcontroller_id = 0;
 	state->coin_id = 0;				// Not needed !
 	state->game_id = 0;
@@ -3125,7 +3125,7 @@ static DRIVER_INIT( paddlema )
 
 static DRIVER_INIT( timesold )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	state->invert_controls = 0;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
@@ -3134,7 +3134,7 @@ static DRIVER_INIT( timesold )
 
 static DRIVER_INIT( timesold1 )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	state->invert_controls = 1;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
@@ -3143,7 +3143,7 @@ static DRIVER_INIT( timesold1 )
 
 static DRIVER_INIT( btlfield )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	state->invert_controls = 1;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
@@ -3152,7 +3152,7 @@ static DRIVER_INIT( btlfield )
 
 static DRIVER_INIT( btlfieldb )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	state->invert_controls = 1;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8); //not checked
@@ -3161,8 +3161,8 @@ static DRIVER_INIT( btlfieldb )
 
 static DRIVER_INIT( skysoldr )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", (machine->region("user1")->base()) + 0x40000);
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
+	memory_set_bankptr(machine, "bank8", (machine.region("user1")->base()) + 0x40000);
 	state->invert_controls = 0;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
@@ -3171,7 +3171,7 @@ static DRIVER_INIT( skysoldr )
 
 static DRIVER_INIT( goldmedl )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8803; //AT
 	state->coin_id = 0x23 | (0x24 << 8);
@@ -3180,8 +3180,8 @@ static DRIVER_INIT( goldmedl )
 
 static DRIVER_INIT( goldmedla )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", machine->region("maincpu")->base() + 0x20000);
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
+	memory_set_bankptr(machine, "bank8", machine.region("maincpu")->base() + 0x20000);
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8803; //Guess - routine to handle coinage is the same as in 'goldmedl'
 	state->coin_id = 0x23 | (0x24 << 8);
@@ -3190,7 +3190,7 @@ static DRIVER_INIT( goldmedla )
 
 static DRIVER_INIT( skyadvnt )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8814;
 	state->coin_id = 0x22 | (0x22 << 8);
@@ -3199,7 +3199,7 @@ static DRIVER_INIT( skyadvnt )
 
 static DRIVER_INIT( skyadvntu )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8814;
 	state->coin_id = 0x23 | (0x24 << 8);
@@ -3208,8 +3208,8 @@ static DRIVER_INIT( skyadvntu )
 
 static DRIVER_INIT( gangwarsu )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", machine->region("user1")->base());
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
+	memory_set_bankptr(machine, "bank8", machine.region("user1")->base());
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8512;
 	state->coin_id = 0x23 | (0x24 << 8);
@@ -3218,8 +3218,8 @@ static DRIVER_INIT( gangwarsu )
 
 static DRIVER_INIT( gangwars )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", machine->region("user1")->base());
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
+	memory_set_bankptr(machine, "bank8", machine.region("user1")->base());
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8512;
 	state->coin_id = 0x23 | (0x24 << 8);
@@ -3228,8 +3228,8 @@ static DRIVER_INIT( gangwars )
 
 static DRIVER_INIT( sbasebal )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 
 	/* Patch protection check, it does a divide by zero because the MCU is trying to
        calculate the ball speed when a strike is scored, notice that current emulation
@@ -3258,7 +3258,7 @@ static DRIVER_INIT( sbasebal )
 
 static DRIVER_INIT( tnextspc )
 {
-	alpha68k_state *state = machine->driver_data<alpha68k_state>();
+	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x890a;
 	state->coin_id = 0;				// Not needed !

@@ -16,7 +16,7 @@
 
 static TILE_GET_INFO( get_tile_info_A )
 {
-	flkatck_state *state = machine->driver_data<flkatck_state>();
+	flkatck_state *state = machine.driver_data<flkatck_state>();
 	UINT8 ctrl_0 = k007121_ctrlram_r(state->k007121, 0);
 	UINT8 ctrl_2 = k007121_ctrlram_r(state->k007121, 2);
 	UINT8 ctrl_3 = k007121_ctrlram_r(state->k007121, 3);
@@ -51,7 +51,7 @@ static TILE_GET_INFO( get_tile_info_A )
 
 static TILE_GET_INFO( get_tile_info_B )
 {
-	flkatck_state *state = machine->driver_data<flkatck_state>();
+	flkatck_state *state = machine.driver_data<flkatck_state>();
 	int attr = state->k007121_ram[tile_index + 0x800];
 	int code = state->k007121_ram[tile_index + 0xc00];
 
@@ -71,7 +71,7 @@ static TILE_GET_INFO( get_tile_info_B )
 
 VIDEO_START( flkatck )
 {
-	flkatck_state *state = machine->driver_data<flkatck_state>();
+	flkatck_state *state = machine.driver_data<flkatck_state>();
 	state->k007121_tilemap[0] = tilemap_create(machine, get_tile_info_A, tilemap_scan_rows, 8, 8, 32, 32);
 	state->k007121_tilemap[1] = tilemap_create(machine, get_tile_info_B, tilemap_scan_rows, 8, 8, 32, 32);
 }
@@ -85,7 +85,7 @@ VIDEO_START( flkatck )
 
 WRITE8_HANDLER( flkatck_k007121_w )
 {
-	flkatck_state *state = space->machine->driver_data<flkatck_state>();
+	flkatck_state *state = space->machine().driver_data<flkatck_state>();
 
 	state->k007121_ram[offset] = data;
 	if (offset < 0x1000)	/* tiles */
@@ -99,18 +99,18 @@ WRITE8_HANDLER( flkatck_k007121_w )
 
 WRITE8_HANDLER( flkatck_k007121_regs_w )
 {
-	flkatck_state *state = space->machine->driver_data<flkatck_state>();
+	flkatck_state *state = space->machine().driver_data<flkatck_state>();
 
 	switch (offset)
 	{
 		case 0x04:	/* ROM bank select */
 			if (data != k007121_ctrlram_r(state->k007121, 4))
-				tilemap_mark_all_tiles_dirty_all(space->machine);
+				tilemap_mark_all_tiles_dirty_all(space->machine());
 			break;
 
 		case 0x07:	/* flip screen + IRQ control */
 			state->flipscreen = data & 0x08;
-			tilemap_set_flip_all(space->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			tilemap_set_flip_all(space->machine(), state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			state->irq_enabled = data & 0x02;
 			break;
 	}
@@ -134,7 +134,7 @@ WRITE8_HANDLER( flkatck_k007121_regs_w )
 
 SCREEN_UPDATE( flkatck )
 {
-	flkatck_state *state = screen->machine->driver_data<flkatck_state>();
+	flkatck_state *state = screen->machine().driver_data<flkatck_state>();
 	rectangle clip[2];
 	const rectangle &visarea = screen->visible_area();
 
@@ -170,7 +170,7 @@ SCREEN_UPDATE( flkatck )
 
 	/* draw the graphics */
 	tilemap_draw(bitmap, &clip[0], state->k007121_tilemap[0], 0, 0);
-	k007121_sprites_draw(state->k007121, bitmap, cliprect, screen->machine->gfx[0], NULL, &state->k007121_ram[0x1000], 0, 40, 0, (UINT32)-1);
+	k007121_sprites_draw(state->k007121, bitmap, cliprect, screen->machine().gfx[0], NULL, &state->k007121_ram[0x1000], 0, 40, 0, (UINT32)-1);
 	tilemap_draw(bitmap, &clip[1], state->k007121_tilemap[1], 0, 0);
 	return 0;
 }

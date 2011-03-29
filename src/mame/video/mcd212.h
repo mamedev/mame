@@ -62,12 +62,14 @@ typedef struct
 
 typedef struct
 {
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
     mcd212_channel_t channel[2];
     emu_timer *scan_timer;
     UINT8 region_flag_0[768];
     UINT8 region_flag_1[768];
 
-    running_machine *machine;
+    running_machine *m_machine;
 } mcd212_regs_t;
 
 #define MCD212_CURCNT_COLOR         0x00000f    // Cursor color

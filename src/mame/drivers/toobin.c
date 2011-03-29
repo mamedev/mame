@@ -33,9 +33,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	toobin_state *state = machine->driver_data<toobin_state>();
+	toobin_state *state = machine.driver_data<toobin_state>();
 	cputag_set_input_line(machine, "maincpu", 1, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 2, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 3, state->scanline_int_state && state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
@@ -50,7 +50,7 @@ static MACHINE_START( toobin )
 
 static MACHINE_RESET( toobin )
 {
-	toobin_state *state = machine->driver_data<toobin_state>();
+	toobin_state *state = machine.driver_data<toobin_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
@@ -67,7 +67,7 @@ static MACHINE_RESET( toobin )
 
 static WRITE16_HANDLER( interrupt_scan_w )
 {
-	toobin_state *state = space->machine->driver_data<toobin_state>();
+	toobin_state *state = space->machine().driver_data<toobin_state>();
 	int oldword = state->interrupt_scan[offset];
 	int newword = oldword;
 	COMBINE_DATA(&newword);
@@ -76,7 +76,7 @@ static WRITE16_HANDLER( interrupt_scan_w )
 	if (oldword != newword)
 	{
 		state->interrupt_scan[offset] = newword;
-		atarigen_scanline_int_set(*space->machine->primary_screen, newword & 0x1ff);
+		atarigen_scanline_int_set(*space->machine().primary_screen, newword & 0x1ff);
 	}
 }
 
@@ -90,9 +90,9 @@ static WRITE16_HANDLER( interrupt_scan_w )
 
 static READ16_HANDLER( special_port1_r )
 {
-	toobin_state *state = space->machine->driver_data<toobin_state>();
-	int result = input_port_read(space->machine, "FF9000");
-	if (atarigen_get_hblank(*space->machine->primary_screen)) result ^= 0x8000;
+	toobin_state *state = space->machine().driver_data<toobin_state>();
+	int result = input_port_read(space->machine(), "FF9000");
+	if (atarigen_get_hblank(*space->machine().primary_screen)) result ^= 0x8000;
 	if (state->cpu_to_sound_ready) result ^= 0x2000;
 	return result;
 }

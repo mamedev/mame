@@ -44,9 +44,9 @@ public:
 };
 
 /* VIDEO GOODS */
-static void astron_draw_characters(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void astron_draw_characters(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	segald_state *state = machine->driver_data<segald_state>();
+	segald_state *state = machine.driver_data<segald_state>();
 	UINT8 characterX, characterY;
 
 	for (characterX = 0; characterX < 32; characterX++)
@@ -54,13 +54,13 @@ static void astron_draw_characters(running_machine *machine, bitmap_t *bitmap,co
 		for (characterY = 0; characterY < 32; characterY++)
 		{
 			int current_screen_character = (characterY*32) + characterX;
-			drawgfx_transpen(bitmap, cliprect, machine->gfx[0], state->fix_RAM[current_screen_character],
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->fix_RAM[current_screen_character],
 					1, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
 }
 
-static void astron_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void astron_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* Heisted from Daphne */
 	const UINT8 SPR_Y_TOP     = 0;
@@ -72,7 +72,7 @@ static void astron_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 /*  const UINT8 SPR_GFXOFS_LO = 6;*/
 /*  const UINT8 SPR_GFXOFS_HI = 7;*/
 
-	segald_state *state = machine->driver_data<segald_state>();
+	segald_state *state = machine.driver_data<segald_state>();
 	int sx,sy;
 	int spr_number;
 	int spr_base;
@@ -93,8 +93,8 @@ static SCREEN_UPDATE( astron )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 
-	astron_draw_characters(screen->machine, bitmap, cliprect);
-	astron_draw_sprites(screen->machine, bitmap, cliprect);
+	astron_draw_characters(screen->machine(), bitmap, cliprect);
+	astron_draw_sprites(screen->machine(), bitmap, cliprect);
 
 	return 0;
 }
@@ -105,7 +105,7 @@ static SCREEN_UPDATE( astron )
 /* READS */
 static READ8_HANDLER( astron_DISC_read )
 {
-	segald_state *state = space->machine->driver_data<segald_state>();
+	segald_state *state = space->machine().driver_data<segald_state>();
 
 	if (state->nmi_enable)
 		state->ldv1000_input_latch = laserdisc_data_r(state->laserdisc);
@@ -117,7 +117,7 @@ static READ8_HANDLER( astron_DISC_read )
 
 static READ8_HANDLER( astron_OUT_read )
 {
-	segald_state *state = space->machine->driver_data<segald_state>();
+	segald_state *state = space->machine().driver_data<segald_state>();
 
 	logerror("OUT read   (0x%04x) @ 0x%04x [0x%x]\n", state->out_RAM[offset], offset, cpu_get_pc(space->cpu));
 	return state->out_RAM[offset];
@@ -125,7 +125,7 @@ static READ8_HANDLER( astron_OUT_read )
 
 static READ8_HANDLER( astron_OBJ_read )
 {
-	segald_state *state = space->machine->driver_data<segald_state>();
+	segald_state *state = space->machine().driver_data<segald_state>();
 
 	logerror("OBJ read   (0x%04x) @ 0x%04x [0x%x]\n", state->obj_RAM[offset], offset, cpu_get_pc(space->cpu));
 	return state->obj_RAM[offset];
@@ -133,7 +133,7 @@ static READ8_HANDLER( astron_OBJ_read )
 
 static READ8_HANDLER( astron_COLOR_read )
 {
-	segald_state *state = space->machine->driver_data<segald_state>();
+	segald_state *state = space->machine().driver_data<segald_state>();
 
 	logerror("COLOR read   (0x%04x) @ 0x%04x [0x%x]\n", state->color_RAM[offset], offset, cpu_get_pc(space->cpu));
 	return state->color_RAM[offset];
@@ -143,7 +143,7 @@ static READ8_HANDLER( astron_COLOR_read )
 /* WRITES */
 static WRITE8_HANDLER( astron_DISC_write )
 {
-	segald_state *state = space->machine->driver_data<segald_state>();
+	segald_state *state = space->machine().driver_data<segald_state>();
 
 	logerror("DISC write : 0x%04x @  0x%04x [0x%x]\n", data, offset, cpu_get_pc(space->cpu));
 
@@ -155,7 +155,7 @@ static WRITE8_HANDLER( astron_DISC_write )
 
 static WRITE8_HANDLER( astron_OUT_write )
 {
-	segald_state *state = space->machine->driver_data<segald_state>();
+	segald_state *state = space->machine().driver_data<segald_state>();
 
 	logerror("OUT write : 0x%04x @  0x%04x [0x%x]\n", data, offset, cpu_get_pc(space->cpu));
 
@@ -193,7 +193,7 @@ static WRITE8_HANDLER( astron_OUT_write )
 
 static WRITE8_HANDLER( astron_OBJ_write )
 {
-	segald_state *state = space->machine->driver_data<segald_state>();
+	segald_state *state = space->machine().driver_data<segald_state>();
 
 	state->obj_RAM[offset] = data;
 	logerror("OBJ write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, cpu_get_pc(space->cpu));
@@ -201,7 +201,7 @@ static WRITE8_HANDLER( astron_OBJ_write )
 
 static WRITE8_HANDLER( astron_COLOR_write )
 {
-	segald_state *state = space->machine->driver_data<segald_state>();
+	segald_state *state = space->machine().driver_data<segald_state>();
 	UINT8 r, g, b, a;
 	UINT8 highBits, lowBits;
 	const UINT8 palIndex = offset >> 1;
@@ -219,13 +219,13 @@ static WRITE8_HANDLER( astron_COLOR_write )
 	b = (highBits & 0x0f);
 	a = (highBits & 0x80) ? 0 : 255;
 
-	palette_set_color(space->machine, palIndex, MAKE_ARGB(a, r, g, b));
+	palette_set_color(space->machine(), palIndex, MAKE_ARGB(a, r, g, b));
 	logerror("COLOR write : 0x%04x @   0x%04x [0x%x]\n", data, offset, cpu_get_pc(space->cpu));
 }
 
 static WRITE8_HANDLER( astron_FIX_write )
 {
-	segald_state *state = space->machine->driver_data<segald_state>();
+	segald_state *state = space->machine().driver_data<segald_state>();
 
 	state->fix_RAM[offset] = data;
 	/* logerror("FIX write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, cpu_get_pc(space->cpu)); */
@@ -234,7 +234,7 @@ static WRITE8_HANDLER( astron_FIX_write )
 static WRITE8_HANDLER( astron_io_bankswitch_w )
 {
 	logerror("Banking 0x%x\n", data);
-	memory_set_bank(space->machine, "bank1", data & 0xff);
+	memory_set_bank(space->machine(), "bank1", data & 0xff);
 }
 
 
@@ -356,9 +356,9 @@ GFXDECODE_END
 
 static MACHINE_START( astron )
 {
-	segald_state *state = machine->driver_data<segald_state>();
+	segald_state *state = machine.driver_data<segald_state>();
 
-	state->laserdisc = machine->device("laserdisc");
+	state->laserdisc = machine.device("laserdisc");
 }
 
 
@@ -596,7 +596,7 @@ ROM_END
 
 static DRIVER_INIT( astron )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x8000], 0x4000);
 }
 

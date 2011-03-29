@@ -256,21 +256,21 @@ public:
 
 static WRITE16_HANDLER( fg_videoram_w )
 {
-	nmg5_state *state = space->machine->driver_data<nmg5_state>();
+	nmg5_state *state = space->machine().driver_data<nmg5_state>();
 	COMBINE_DATA(&state->fg_videoram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 static WRITE16_HANDLER( bg_videoram_w )
 {
-	nmg5_state *state = space->machine->driver_data<nmg5_state>();
+	nmg5_state *state = space->machine().driver_data<nmg5_state>();
 	COMBINE_DATA(&state->bg_videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE16_HANDLER( nmg5_soundlatch_w )
 {
-	nmg5_state *state = space->machine->driver_data<nmg5_state>();
+	nmg5_state *state = space->machine().driver_data<nmg5_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -281,30 +281,30 @@ static WRITE16_HANDLER( nmg5_soundlatch_w )
 
 static READ16_HANDLER( prot_r )
 {
-	nmg5_state *state = space->machine->driver_data<nmg5_state>();
+	nmg5_state *state = space->machine().driver_data<nmg5_state>();
 	return state->prot_val | state->input_data;
 }
 
 static WRITE16_HANDLER( prot_w )
 {
-	nmg5_state *state = space->machine->driver_data<nmg5_state>();
+	nmg5_state *state = space->machine().driver_data<nmg5_state>();
 	state->input_data = data & 0x0f;
 }
 
 static WRITE16_HANDLER( gfx_bank_w )
 {
-	nmg5_state *state = space->machine->driver_data<nmg5_state>();
+	nmg5_state *state = space->machine().driver_data<nmg5_state>();
 
 	if (state->gfx_bank != (data & 3))
 	{
 		state->gfx_bank = data & 3;
-		tilemap_mark_all_tiles_dirty_all(space->machine);
+		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 }
 
 static WRITE16_HANDLER( priority_reg_w )
 {
-	nmg5_state *state = space->machine->driver_data<nmg5_state>();
+	nmg5_state *state = space->machine().driver_data<nmg5_state>();
 
 	state->priority_reg = data & 7;
 
@@ -823,27 +823,27 @@ static INPUT_PORTS_START( wondstck )
 INPUT_PORTS_END
 
 
-INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, UINT16 *vram, int color )
+INLINE void get_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, UINT16 *vram, int color )
 {
-	nmg5_state *state = machine->driver_data<nmg5_state>();
+	nmg5_state *state = machine.driver_data<nmg5_state>();
 	SET_TILE_INFO(0, vram[tile_index] | (state->gfx_bank << 16), color, 0);
 }
 
-static TILE_GET_INFO( fg_get_tile_info ) { nmg5_state *state = machine->driver_data<nmg5_state>();	get_tile_info(machine, tileinfo, tile_index, state->fg_videoram, 0); }
-static TILE_GET_INFO( bg_get_tile_info ) { nmg5_state *state = machine->driver_data<nmg5_state>();	get_tile_info(machine, tileinfo, tile_index, state->bg_videoram, 1); }
+static TILE_GET_INFO( fg_get_tile_info ) { nmg5_state *state = machine.driver_data<nmg5_state>();	get_tile_info(machine, tileinfo, tile_index, state->fg_videoram, 0); }
+static TILE_GET_INFO( bg_get_tile_info ) { nmg5_state *state = machine.driver_data<nmg5_state>();	get_tile_info(machine, tileinfo, tile_index, state->bg_videoram, 1); }
 
 static VIDEO_START( nmg5 )
 {
-	nmg5_state *state = machine->driver_data<nmg5_state>();
+	nmg5_state *state = machine.driver_data<nmg5_state>();
 
 	state->bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 	state->fg_tilemap = tilemap_create(machine, fg_get_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	nmg5_state *state = machine->driver_data<nmg5_state>();
+	nmg5_state *state = machine.driver_data<nmg5_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 
@@ -861,14 +861,14 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 		for (y = 0; y < height; y++)
 		{
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 					code + (flipy ? height-1 - y : y),
 					color,
 					flipx,flipy,
 					sx & 0x1ff,248 - ((sy + 0x10 * (height - y)) & 0x1ff),0);
 
 			/* wrap around */
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 					code + (flipy ? height-1 - y : y),
 					color,
 					flipx,flipy,
@@ -877,9 +877,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static void draw_bitmap( running_machine *machine, bitmap_t *bitmap )
+static void draw_bitmap( running_machine &machine, bitmap_t *bitmap )
 {
-	nmg5_state *state = machine->driver_data<nmg5_state>();
+	nmg5_state *state = machine.driver_data<nmg5_state>();
 	int yyy = 256;
 	int xxx = 512 / 4;
 	UINT16 x, y, count;
@@ -909,7 +909,7 @@ static void draw_bitmap( running_machine *machine, bitmap_t *bitmap )
 
 static SCREEN_UPDATE( nmg5 )
 {
-	nmg5_state *state = screen->machine->driver_data<nmg5_state>();
+	nmg5_state *state = screen->machine().driver_data<nmg5_state>();
 
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->scroll_ram[3] + 9);
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll_ram[2] + 3);
@@ -920,33 +920,33 @@ static SCREEN_UPDATE( nmg5 )
 
 	if (state->priority_reg == 0)
 	{
-		draw_sprites(screen->machine, bitmap, cliprect);
+		draw_sprites(screen->machine(), bitmap, cliprect);
 		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
-		draw_bitmap(screen->machine, bitmap);
+		draw_bitmap(screen->machine(), bitmap);
 	}
 	else if (state->priority_reg == 1)
 	{
-		draw_bitmap(screen->machine, bitmap);
-		draw_sprites(screen->machine, bitmap, cliprect);
+		draw_bitmap(screen->machine(), bitmap);
+		draw_sprites(screen->machine(), bitmap, cliprect);
 		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	}
 	else if (state->priority_reg == 2)
 	{
-		draw_sprites(screen->machine, bitmap, cliprect);
-		draw_bitmap(screen->machine, bitmap);
+		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_bitmap(screen->machine(), bitmap);
 		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	}
 	else if (state->priority_reg == 3)
 	{
 		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
-		draw_sprites(screen->machine, bitmap, cliprect);
-		draw_bitmap(screen->machine, bitmap);
+		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_bitmap(screen->machine(), bitmap);
 	}
 	else if (state->priority_reg == 7)
 	{
 		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
-		draw_bitmap(screen->machine, bitmap);
-		draw_sprites(screen->machine, bitmap, cliprect);
+		draw_bitmap(screen->machine(), bitmap);
+		draw_sprites(screen->machine(), bitmap, cliprect);
 	}
 	return 0;
 }
@@ -998,7 +998,7 @@ GFXDECODE_END
 
 static void soundirq( device_t *device, int state )
 {
-	nmg5_state *driver_state = device->machine->driver_data<nmg5_state>();
+	nmg5_state *driver_state = device->machine().driver_data<nmg5_state>();
 	device_set_input_line(driver_state->soundcpu, 0, state);
 }
 
@@ -1009,10 +1009,10 @@ static const ym3812_interface ym3812_intf =
 
 static MACHINE_START( nmg5 )
 {
-	nmg5_state *state = machine->driver_data<nmg5_state>();
+	nmg5_state *state = machine.driver_data<nmg5_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->soundcpu = machine->device("soundcpu");
+	state->maincpu = machine.device("maincpu");
+	state->soundcpu = machine.device("soundcpu");
 
 	state->save_item(NAME(state->gfx_bank));
 	state->save_item(NAME(state->priority_reg));
@@ -1021,7 +1021,7 @@ static MACHINE_START( nmg5 )
 
 static MACHINE_RESET( nmg5 )
 {
-	nmg5_state *state = machine->driver_data<nmg5_state>();
+	nmg5_state *state = machine.driver_data<nmg5_state>();
 
 	/* some games don't set the priority register so it should be hard-coded to a normal layout */
 	state->priority_reg = 7;
@@ -1523,25 +1523,25 @@ ROM_END
 
 static DRIVER_INIT( prot_val_00 )
 {
-	nmg5_state *state = machine->driver_data<nmg5_state>();
+	nmg5_state *state = machine.driver_data<nmg5_state>();
 	state->prot_val = 0x00;
 }
 
 static DRIVER_INIT( prot_val_10 )
 {
-	nmg5_state *state = machine->driver_data<nmg5_state>();
+	nmg5_state *state = machine.driver_data<nmg5_state>();
 	state->prot_val = 0x10;
 }
 
 static DRIVER_INIT( prot_val_20 )
 {
-	nmg5_state *state = machine->driver_data<nmg5_state>();
+	nmg5_state *state = machine.driver_data<nmg5_state>();
 	state->prot_val = 0x20;
 }
 
 static DRIVER_INIT( prot_val_40 )
 {
-	nmg5_state *state = machine->driver_data<nmg5_state>();
+	nmg5_state *state = machine.driver_data<nmg5_state>();
 	state->prot_val = 0x40;
 }
 

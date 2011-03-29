@@ -143,7 +143,7 @@ emu_timer &emu_timer::init(running_machine &machine, timer_expired_func callback
 emu_timer &emu_timer::init(device_t &device, device_timer_id id, void *ptr, bool temporary)
 {
 	// ensure the entire timer state is clean
-	m_machine = device.machine;
+	m_machine = &device.machine();
 	m_next = NULL;
 	m_prev = NULL;
 	m_callback = NULL;
@@ -875,7 +875,7 @@ void device_scheduler::execute_timers()
 			if (timer.m_device != NULL)
 				timer.m_device->timer_expired(timer, timer.m_id, timer.m_param, timer.m_ptr);
 			else if (timer.m_callback != NULL)
-				(*timer.m_callback)(&m_machine, timer.m_ptr, timer.m_param);
+				(*timer.m_callback)(m_machine, timer.m_ptr, timer.m_param);
 
 			g_profiler.stop();
 		}

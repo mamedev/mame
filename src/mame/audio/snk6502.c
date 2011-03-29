@@ -618,9 +618,9 @@ static void build_waveform(snk6502_sound_state *state, int channel, int mask)
 		tone_channels[channel].form[i] *= 65535 / 160;
 }
 
-void snk6502_set_music_freq(running_machine *machine, int freq)
+void snk6502_set_music_freq(running_machine &machine, int freq)
 {
-	device_t *device = machine->device("snk6502");
+	device_t *device = machine.device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
 	TONE *tone_channels = state->tone_channels;
 
@@ -640,9 +640,9 @@ void snk6502_set_music_freq(running_machine *machine, int freq)
 	}
 }
 
-void snk6502_set_music_clock(running_machine *machine, double clock_time)
+void snk6502_set_music_clock(running_machine &machine, double clock_time)
 {
-	device_t *device = machine->device("snk6502");
+	device_t *device = machine.device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
 
 	state->tone_clock_expire = clock_time * SAMPLE_RATE * FRAC_ONE;
@@ -653,16 +653,16 @@ static DEVICE_START( snk6502_sound )
 {
 	snk6502_sound_state *state = get_safe_token(device);
 
-	state->samples = device->machine->device("samples");
-	state->ROM = device->machine->region("snk6502")->base();
+	state->samples = device->machine().device("samples");
+	state->ROM = device->machine().region("snk6502")->base();
 
 	// adjusted
-	snk6502_set_music_freq(device->machine, 43000);
+	snk6502_set_music_freq(device->machine(), 43000);
 
 	// 38.99 Hz update (according to schematic)
-	snk6502_set_music_clock(device->machine, M_LN2 * (RES_K(18) * 2 + RES_K(1)) * CAP_U(1));
+	snk6502_set_music_clock(device->machine(), M_LN2 * (RES_K(18) * 2 + RES_K(1)) * CAP_U(1));
 
-	state->tone_stream = device->machine->sound().stream_alloc(*device, 0, 1, SAMPLE_RATE, NULL, snk6502_tone_update);
+	state->tone_stream = device->machine().sound().stream_alloc(*device, 0, 1, SAMPLE_RATE, NULL, snk6502_tone_update);
 }
 
 DEVICE_GET_INFO( snk6502_sound )
@@ -681,9 +681,9 @@ DEVICE_GET_INFO( snk6502_sound )
 	}
 }
 
-int snk6502_music0_playing(running_machine *machine)
+int snk6502_music0_playing(running_machine &machine)
 {
-	device_t *device = machine->device("snk6502");
+	device_t *device = machine.device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
 	TONE *tone_channels = state->tone_channels;
 
@@ -693,7 +693,7 @@ int snk6502_music0_playing(running_machine *machine)
 
 WRITE8_HANDLER( sasuke_sound_w )
 {
-	device_t *device = space->machine->device("snk6502");
+	device_t *device = space->machine().device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
 	device_t *samples = state->samples;
 	TONE *tone_channels = state->tone_channels;
@@ -763,7 +763,7 @@ WRITE8_HANDLER( sasuke_sound_w )
 
 WRITE8_HANDLER( satansat_sound_w )
 {
-	device_t *device = space->machine->device("snk6502");
+	device_t *device = space->machine().device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
 	device_t *samples = state->samples;
 	TONE *tone_channels = state->tone_channels;
@@ -830,7 +830,7 @@ WRITE8_HANDLER( satansat_sound_w )
 
 WRITE8_HANDLER( vanguard_sound_w )
 {
-	device_t *device = space->machine->device("snk6502");
+	device_t *device = space->machine().device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
 	device_t *samples = state->samples;
 	TONE *tone_channels = state->tone_channels;
@@ -880,7 +880,7 @@ WRITE8_HANDLER( vanguard_sound_w )
 		}
 
 		/* SHOT B */
-		sn76477_enable_w(space->machine->device("sn76477.2"), (data & 0x40) ? 0 : 1);
+		sn76477_enable_w(space->machine().device("sn76477.2"), (data & 0x40) ? 0 : 1);
 
 		state->LastPort1 = data;
 		break;
@@ -931,7 +931,7 @@ WRITE8_HANDLER( vanguard_sound_w )
 
 WRITE8_HANDLER( fantasy_sound_w )
 {
-	device_t *device = space->machine->device("snk6502");
+	device_t *device = space->machine().device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
 	TONE *tone_channels = state->tone_channels;
 
@@ -974,7 +974,7 @@ WRITE8_HANDLER( fantasy_sound_w )
 		}
 
 		/* BOMB */
-		discrete_sound_w(space->machine->device("discrete"), FANTASY_BOMB_EN, data & 0x80);
+		discrete_sound_w(space->machine().device("discrete"), FANTASY_BOMB_EN, data & 0x80);
 
 		state->LastPort1 = data;
 		break;
@@ -1070,7 +1070,7 @@ WRITE8_HANDLER( fantasy_sound_w )
 #define HD68880_SYBS	0x0f
 
 
-static void snk6502_speech_w(running_machine *machine, UINT8 data, const UINT16 *table, int start)
+static void snk6502_speech_w(running_machine &machine, UINT8 data, const UINT16 *table, int start)
 {
 	/*
         bit description
@@ -1084,7 +1084,7 @@ static void snk6502_speech_w(running_machine *machine, UINT8 data, const UINT16 
         7
     */
 
-	device_t *device = machine->device("snk6502");
+	device_t *device = machine.device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
 	device_t *samples = state->samples;
 
@@ -1237,7 +1237,7 @@ WRITE8_HANDLER( vanguard_speech_w )
 		0x054ce
 	};
 
-	snk6502_speech_w(space->machine, data, vanguard_table, 2);
+	snk6502_speech_w(space->machine(), data, vanguard_table, 2);
 }
 
 WRITE8_HANDLER( fantasy_speech_w )
@@ -1262,7 +1262,7 @@ WRITE8_HANDLER( fantasy_speech_w )
 		0
 	};
 
-	snk6502_speech_w(space->machine, data, fantasy_table, 0);
+	snk6502_speech_w(space->machine(), data, fantasy_table, 0);
 }
 
 

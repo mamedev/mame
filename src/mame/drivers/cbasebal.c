@@ -29,11 +29,11 @@
 
 static WRITE8_HANDLER( cbasebal_bankswitch_w )
 {
-	cbasebal_state *state = space->machine->driver_data<cbasebal_state>();
+	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 
 	/* bits 0-4 select ROM bank */
 	//logerror("%04x: bankswitch %02x\n", cpu_get_pc(space->cpu), data);
-	memory_set_bank(space->machine, "bank1", data & 0x1f);
+	memory_set_bank(space->machine(), "bank1", data & 0x1f);
 
 	/* bit 5 used but unknown */
 
@@ -44,7 +44,7 @@ static WRITE8_HANDLER( cbasebal_bankswitch_w )
 
 static READ8_HANDLER( bankedram_r )
 {
-	cbasebal_state *state = space->machine->driver_data<cbasebal_state>();
+	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 
 	switch (state->rambank)
 	{
@@ -52,7 +52,7 @@ static READ8_HANDLER( bankedram_r )
 		return cbasebal_textram_r(space, offset);	/* VRAM */
 	case 1:
 		if (offset < 0x800)
-			return space->machine->generic.paletteram.u8[offset];
+			return space->machine().generic.paletteram.u8[offset];
 		else
 			return 0;
 		break;
@@ -63,7 +63,7 @@ static READ8_HANDLER( bankedram_r )
 
 static WRITE8_HANDLER( bankedram_w )
 {
-	cbasebal_state *state = space->machine->driver_data<cbasebal_state>();
+	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 
 	switch (state->rambank)
 	{
@@ -82,10 +82,10 @@ static WRITE8_HANDLER( bankedram_w )
 
 static WRITE8_HANDLER( cbasebal_coinctrl_w )
 {
-	coin_lockout_w(space->machine, 0, ~data & 0x04);
-	coin_lockout_w(space->machine, 1, ~data & 0x08);
-	coin_counter_w(space->machine, 0, data & 0x01);
-	coin_counter_w(space->machine, 1, data & 0x02);
+	coin_lockout_w(space->machine(), 0, ~data & 0x04);
+	coin_lockout_w(space->machine(), 1, ~data & 0x08);
+	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(space->machine(), 1, data & 0x02);
 }
 
 
@@ -244,9 +244,9 @@ GFXDECODE_END
 
 static MACHINE_START( cbasebal )
 {
-	cbasebal_state *state = machine->driver_data<cbasebal_state>();
+	cbasebal_state *state = machine.driver_data<cbasebal_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 32, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 32, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	state->save_item(NAME(state->rambank));
 	state->save_item(NAME(state->tilebank));
@@ -261,7 +261,7 @@ static MACHINE_START( cbasebal )
 
 static MACHINE_RESET( cbasebal )
 {
-	cbasebal_state *state = machine->driver_data<cbasebal_state>();
+	cbasebal_state *state = machine.driver_data<cbasebal_state>();
 
 	state->rambank = 0;
 	state->tilebank = 0;

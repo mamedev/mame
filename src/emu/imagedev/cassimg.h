@@ -87,6 +87,8 @@ struct CassetteInfo
 
 struct _cassette_image
 {
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
 	const struct CassetteFormat *format;
 	struct io_generic io;
 	object_pool *pool;
@@ -99,7 +101,7 @@ struct _cassette_image
 	size_t block_count;
 	size_t sample_count;
 
-	running_machine *machine;
+	running_machine *m_machine;
 };
 
 typedef struct _cassette_image cassette_image;
@@ -163,11 +165,11 @@ CASSETTE_FORMATLIST_EXTERN(cassette_default_formats);
 
 ***************************************************************************/
 
-casserr_t cassette_open(running_machine *machine,void *file, const struct io_procs *procs,
+casserr_t cassette_open(running_machine &machine,void *file, const struct io_procs *procs,
 	const struct CassetteFormat *format, int flags, cassette_image **outcassette);
-casserr_t cassette_open_choices(running_machine *machine,void *file, const struct io_procs *procs, const char *extension,
+casserr_t cassette_open_choices(running_machine &machine,void *file, const struct io_procs *procs, const char *extension,
 	const struct CassetteFormat *const *formats, int flags, cassette_image **outcassette);
-casserr_t cassette_create(running_machine *machine,void *file, const struct io_procs *procs, const struct CassetteFormat *format,
+casserr_t cassette_create(running_machine &machine,void *file, const struct io_procs *procs, const struct CassetteFormat *format,
 	const struct CassetteOptions *opts, int flags, cassette_image **outcassette);
 casserr_t cassette_save(cassette_image *cassette);
 void cassette_close(cassette_image *cassette);

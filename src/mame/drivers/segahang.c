@@ -90,19 +90,19 @@ static const ppi8255_interface hangon_ppi_intf[2] =
  *
  *************************************/
 
-static void hangon_generic_init( running_machine *machine )
+static void hangon_generic_init( running_machine &machine )
 {
-	segas1x_state *state = machine->driver_data<segas1x_state>();
+	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	/* reset the custom handlers and other pointers */
 	state->i8751_vblank_hook = NULL;
 
-	state->maincpu = machine->device("maincpu");
-	state->soundcpu = machine->device("soundcpu");
-	state->subcpu = machine->device("sub");
-	state->mcu = machine->device("mcu");
-	state->ppi8255_1 = machine->device("ppi8255_1");
-	state->ppi8255_2 = machine->device("ppi8255_2");
+	state->maincpu = machine.device("maincpu");
+	state->soundcpu = machine.device("soundcpu");
+	state->subcpu = machine.device("sub");
+	state->mcu = machine.device("mcu");
+	state->ppi8255_1 = machine.device("ppi8255_1");
+	state->ppi8255_2 = machine.device("ppi8255_2");
 
 	state->save_item(NAME(state->adc_select));
 }
@@ -110,7 +110,7 @@ static void hangon_generic_init( running_machine *machine )
 
 static TIMER_CALLBACK( suspend_i8751 )
 {
-	segas1x_state *state = machine->driver_data<segas1x_state>();
+	segas1x_state *state = machine.driver_data<segas1x_state>();
 	device_suspend(state->mcu, SUSPEND_REASON_DISABLE, 1);
 }
 
@@ -124,16 +124,16 @@ static TIMER_CALLBACK( suspend_i8751 )
 
 static MACHINE_RESET( hangon )
 {
-	segas1x_state *state = machine->driver_data<segas1x_state>();
+	segas1x_state *state = machine.driver_data<segas1x_state>();
 
-	fd1094_machine_init(machine->device("sub"));
+	fd1094_machine_init(machine.device("sub"));
 
 	/* reset misc components */
 	segaic16_tilemap_reset(machine, 0);
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (state->i8751_vblank_hook != NULL)
-		machine->scheduler().synchronize(FUNC(suspend_i8751));
+		machine.scheduler().synchronize(FUNC(suspend_i8751));
 
 	/* reset global state */
 	state->adc_select = 0;
@@ -159,14 +159,14 @@ static INTERRUPT_GEN( hangon_irq )
 
 static TIMER_CALLBACK( delayed_ppi8255_w )
 {
-	segas1x_state *state = machine->driver_data<segas1x_state>();
+	segas1x_state *state = machine.driver_data<segas1x_state>();
 	ppi8255_w(state->ppi8255_1, param >> 8, param & 0xff);
 }
 
 
 static READ16_HANDLER( hangon_io_r )
 {
-	segas1x_state *state = space->machine->driver_data<segas1x_state>();
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 
 	switch (offset & 0x3020/2)
 	{
@@ -176,7 +176,7 @@ static READ16_HANDLER( hangon_io_r )
 		case 0x1000/2: /* Input ports and DIP switches */
 		{
 			static const char *const sysports[] = { "SERVICE", "COINAGE", "DSW", "UNKNOWN" };
-			return input_port_read(space->machine, sysports[offset & 3]);
+			return input_port_read(space->machine(), sysports[offset & 3]);
 		}
 
 		case 0x3000/2: /* PPI @ 4C */
@@ -185,7 +185,7 @@ static READ16_HANDLER( hangon_io_r )
 		case 0x3020/2: /* ADC0804 data output */
 		{
 			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return input_port_read_safe(space->machine, adcports[state->adc_select], 0);
+			return input_port_read_safe(space->machine(), adcports[state->adc_select], 0);
 		}
 	}
 
@@ -196,7 +196,7 @@ static READ16_HANDLER( hangon_io_r )
 
 static WRITE16_HANDLER( hangon_io_w )
 {
-	segas1x_state *state = space->machine->driver_data<segas1x_state>();
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 
 	if (ACCESSING_BITS_0_7)
 		switch (offset & 0x3020/2)
@@ -204,7 +204,7 @@ static WRITE16_HANDLER( hangon_io_w )
 			case 0x0000/2: /* PPI @ 4B */
 				/* the port C handshaking signals control the Z80 NMI, */
 				/* so we have to sync whenever we access this PPI */
-				space->machine->scheduler().synchronize(FUNC(delayed_ppi8255_w), ((offset & 3) << 8) | (data & 0xff));
+				space->machine().scheduler().synchronize(FUNC(delayed_ppi8255_w), ((offset & 3) << 8) | (data & 0xff));
 				return;
 
 			case 0x3000/2: /* PPI @ 4C */
@@ -221,7 +221,7 @@ static WRITE16_HANDLER( hangon_io_w )
 
 static READ16_HANDLER( sharrier_io_r )
 {
-	segas1x_state *state = space->machine->driver_data<segas1x_state>();
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 
 	switch (offset & 0x0030/2)
 	{
@@ -231,7 +231,7 @@ static READ16_HANDLER( sharrier_io_r )
 		case 0x0010/2: /* Input ports and DIP switches */
 		{
 			static const char *const sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
-			return input_port_read(space->machine, sysports[offset & 3]);
+			return input_port_read(space->machine(), sysports[offset & 3]);
 		}
 
 		case 0x0020/2: /* PPI @ 4C */
@@ -241,7 +241,7 @@ static READ16_HANDLER( sharrier_io_r )
 		case 0x0030/2: /* ADC0804 data output */
 		{
 			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return input_port_read_safe(space->machine, adcports[state->adc_select], 0);
+			return input_port_read_safe(space->machine(), adcports[state->adc_select], 0);
 		}
 	}
 
@@ -252,7 +252,7 @@ static READ16_HANDLER( sharrier_io_r )
 
 static WRITE16_HANDLER( sharrier_io_w )
 {
-	segas1x_state *state = space->machine->driver_data<segas1x_state>();
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 
 	if (ACCESSING_BITS_0_7)
 		switch (offset & 0x0030/2)
@@ -260,7 +260,7 @@ static WRITE16_HANDLER( sharrier_io_w )
 			case 0x0000/2:
 				/* the port C handshaking signals control the Z80 NMI, */
 				/* so we have to sync whenever we access this PPI */
-				space->machine->scheduler().synchronize(FUNC(delayed_ppi8255_w), ((offset & 3) << 8) | (data & 0xff));
+				space->machine().scheduler().synchronize(FUNC(delayed_ppi8255_w), ((offset & 3) << 8) | (data & 0xff));
 				return;
 
 			case 0x0020/2: /* PPI @ 4C */
@@ -284,7 +284,7 @@ static WRITE16_HANDLER( sharrier_io_w )
 
 static WRITE8_DEVICE_HANDLER( sound_latch_w )
 {
-	segas1x_state *state = device->machine->driver_data<segas1x_state>();
+	segas1x_state *state = device->machine().driver_data<segas1x_state>();
 	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 	soundlatch_w(space, offset, data);
 }
@@ -300,20 +300,20 @@ static WRITE8_DEVICE_HANDLER( video_lamps_w )
 	/* D2 : LAMP1 */
 	/* D1 : COIN2 */
 	/* D0 : COIN1 */
-	segaic16_tilemap_set_flip(device->machine, 0, data & 0x80);
-	segaic16_sprites_set_flip(device->machine, 0, data & 0x80);
-	segaic16_sprites_set_shadow(device->machine, 0, ~data & 0x40);
-	segaic16_set_display_enable(device->machine, data & 0x10);
-	set_led_status(device->machine, 1, data & 0x08);
-	set_led_status(device->machine, 0, data & 0x04);
-	coin_counter_w(device->machine, 1, data & 0x02);
-	coin_counter_w(device->machine, 0, data & 0x01);
+	segaic16_tilemap_set_flip(device->machine(), 0, data & 0x80);
+	segaic16_sprites_set_flip(device->machine(), 0, data & 0x80);
+	segaic16_sprites_set_shadow(device->machine(), 0, ~data & 0x40);
+	segaic16_set_display_enable(device->machine(), data & 0x10);
+	set_led_status(device->machine(), 1, data & 0x08);
+	set_led_status(device->machine(), 0, data & 0x04);
+	coin_counter_w(device->machine(), 1, data & 0x02);
+	coin_counter_w(device->machine(), 0, data & 0x01);
 }
 
 
 static WRITE8_DEVICE_HANDLER( tilemap_sound_w )
 {
-	segas1x_state *state = device->machine->driver_data<segas1x_state>();
+	segas1x_state *state = device->machine().driver_data<segas1x_state>();
 
 	/* Port C : Tilemap origin and audio mute */
 	/* D7 : Port A handshaking signal /OBF */
@@ -325,15 +325,15 @@ static WRITE8_DEVICE_HANDLER( tilemap_sound_w )
 	/* D1 : SCONT0 - Tilemap origin bit 0 */
 	/* D0 : MUTE (1= audio on, 0= audio off) */
 	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-	segaic16_tilemap_set_colscroll(device->machine, 0, ~data & 0x04);
-	segaic16_tilemap_set_rowscroll(device->machine, 0, ~data & 0x02);
-	device->machine->sound().system_enable(data & 0x01);
+	segaic16_tilemap_set_colscroll(device->machine(), 0, ~data & 0x04);
+	segaic16_tilemap_set_rowscroll(device->machine(), 0, ~data & 0x02);
+	device->machine().sound().system_enable(data & 0x01);
 }
 
 
 static WRITE8_DEVICE_HANDLER( sub_control_adc_w )
 {
-	segas1x_state *state = device->machine->driver_data<segas1x_state>();
+	segas1x_state *state = device->machine().driver_data<segas1x_state>();
 
 	/* Port A : S.CPU control and ADC channel select */
 	/* D6 : INTR line on second CPU */
@@ -371,11 +371,11 @@ static READ8_DEVICE_HANDLER( adc_status_r )
 
 static INTERRUPT_GEN( i8751_main_cpu_vblank )
 {
-	segas1x_state *state = device->machine->driver_data<segas1x_state>();
+	segas1x_state *state = device->machine().driver_data<segas1x_state>();
 
 	/* if we have a fake 8751 handler, call it on VBLANK */
 	if (state->i8751_vblank_hook != NULL)
-		(*state->i8751_vblank_hook)(device->machine);
+		(*state->i8751_vblank_hook)(device->machine());
 	irq4_line_hold(device);
 }
 
@@ -387,7 +387,7 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
  *
  *************************************/
 
-static void sharrier_i8751_sim(running_machine *machine)
+static void sharrier_i8751_sim(running_machine &machine)
 {
 	workram[0x492/2] = (input_port_read(machine, "ADC0") << 8) | input_port_read(machine, "ADC1");
 }
@@ -402,14 +402,14 @@ static void sharrier_i8751_sim(running_machine *machine)
 
 static void sound_irq(device_t *device, int irq)
 {
-	segas1x_state *state = device->machine->driver_data<segas1x_state>();
+	segas1x_state *state = device->machine().driver_data<segas1x_state>();
 	device_set_input_line(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static READ8_HANDLER( sound_data_r )
 {
-	segas1x_state *state = space->machine->driver_data<segas1x_state>();
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 
 	/* assert ACK */
 	ppi8255_set_port_c(state->ppi8255_1, 0x00);
@@ -1840,7 +1840,7 @@ static DRIVER_INIT( hangon )
 
 static DRIVER_INIT( sharrier )
 {
-	segas1x_state *state = machine->driver_data<segas1x_state>();
+	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	hangon_generic_init(machine);
 	state->i8751_vblank_hook = sharrier_i8751_sim;
@@ -1856,8 +1856,8 @@ static DRIVER_INIT( enduror )
 
 static DRIVER_INIT( endurobl )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 	UINT16 *decrypt = auto_alloc_array(machine, UINT16, 0x40000/2);
 
 	hangon_generic_init(machine);
@@ -1870,8 +1870,8 @@ static DRIVER_INIT( endurobl )
 
 static DRIVER_INIT( endurob2 )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 	UINT16 *decrypt = auto_alloc_array(machine, UINT16, 0x40000/2);
 
 	hangon_generic_init(machine);

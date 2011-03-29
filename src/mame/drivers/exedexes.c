@@ -194,7 +194,7 @@ GFXDECODE_END
 
 static MACHINE_START( exedexes )
 {
-	exedexes_state *state = machine->driver_data<exedexes_state>();
+	exedexes_state *state = machine.driver_data<exedexes_state>();
 
 	state->save_item(NAME(state->chon));
 	state->save_item(NAME(state->objon));
@@ -204,7 +204,7 @@ static MACHINE_START( exedexes )
 
 static MACHINE_RESET( exedexes )
 {
-	exedexes_state *state = machine->driver_data<exedexes_state>();
+	exedexes_state *state = machine.driver_data<exedexes_state>();
 
 	state->chon = 0;
 	state->objon = 0;

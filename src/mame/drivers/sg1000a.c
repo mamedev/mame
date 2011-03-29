@@ -236,10 +236,10 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( sg1000a_interrupt )
 {
-	TMS9928A_interrupt(device->machine);
+	TMS9928A_interrupt(device->machine());
 }
 
-static void vdp_interrupt(running_machine *machine, int state)
+static void vdp_interrupt(running_machine &machine, int state)
 {
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, state);
 }
@@ -254,7 +254,7 @@ static const TMS9928a_interface tms9928a_interface =
 
 static WRITE8_DEVICE_HANDLER( sg1000a_coin_counter_w )
 {
-	coin_counter_w(device->machine, 0, data & 0x01);
+	coin_counter_w(device->machine(), 0, data & 0x01);
 }
 
 static I8255A_INTERFACE( ppi8255_intf )

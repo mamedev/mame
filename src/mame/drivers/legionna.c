@@ -128,7 +128,7 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w )
 {
 	offset^=1;
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 	paletteram16_xBBBBBGGGGGRRRRR_word_w(space,offset,data,mem_mask);
 }
 
@@ -897,7 +897,7 @@ static const gfx_layout legionna_new_charlayout =
 };
 
 
-static void descramble_legionnaire_gfx(running_machine *machine, UINT8* src)
+static void descramble_legionnaire_gfx(running_machine &machine, UINT8* src)
 {
 	UINT8 *buffer;
 	int len = 0x10000;
@@ -2169,7 +2169,7 @@ ROM_END
 static DRIVER_INIT( cupsoc )
 {
 	#if CUPSOC_DEBUG_MODE
-	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
 
 	/*Press p1 button 3 to enter into debug mode during gameplay*/
 	ROM[0xffffb/2] = 0x0000;
@@ -2181,13 +2181,13 @@ static DRIVER_INIT( cupsoc )
 static DRIVER_INIT( denjinmk )
 {
 	/* problem with audio comms? */
-	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
 	ROM[0x5fe4/2] = 0x4e71;
 }
 
 static DRIVER_INIT( legiongfx )
 {
-	descramble_legionnaire_gfx( machine, machine->region("gfx5")->base() );
+	descramble_legionnaire_gfx( machine, machine.region("gfx5")->base() );
 }
 
 

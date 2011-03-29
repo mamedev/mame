@@ -98,9 +98,10 @@ static sdl_draw_info draw;
 
 typedef struct _worker_param worker_param;
 struct _worker_param {
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 	sdl_window_info *window;
 	render_primitive_list *list;
-	running_machine *machine;
+	running_machine *m_machine;
 	int resize_new_width;
 	int resize_new_height;
 };
@@ -111,19 +112,19 @@ struct _worker_param {
 //============================================================
 
 static void sdlwindow_exit(running_machine &machine);
-static void sdlwindow_video_window_destroy(running_machine *machine, sdl_window_info *window);
+static void sdlwindow_video_window_destroy(running_machine &machine, sdl_window_info *window);
 static OSDWORK_CALLBACK( draw_video_contents_wt );
 static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt );
 static OSDWORK_CALLBACK( sdlwindow_resize_wt );
 static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt );
-static void sdlwindow_update_cursor_state(running_machine *machine, sdl_window_info *window);
+static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_info *window);
 static void sdlwindow_sync(void);
 
 static void get_min_bounds(sdl_window_info *window, int *window_width, int *window_height, int constrain);
 static void get_max_bounds(sdl_window_info *window, int *window_width, int *window_height, int constrain);
 
 static void *complete_create_wt(void *param, int threadid);
-static void set_starting_view(running_machine *machine, int index, sdl_window_info *window, const char *defview, const char *view);
+static void set_starting_view(running_machine &machine, int index, sdl_window_info *window, const char *defview, const char *view);
 
 //============================================================
 //  clear the worker_param structure, inline - faster than memset
@@ -133,7 +134,7 @@ INLINE void clear_worker_param(worker_param *wp)
 {
 	wp->window=NULL;
 	wp->list=NULL;
-	wp->machine=NULL;
+	wp->m_machine=NULL;
 	wp->resize_new_width=0;
 	wp->resize_new_height=0;
 }
@@ -202,17 +203,17 @@ static OSDWORK_CALLBACK(sdlwindow_thread_id)
 //  (main thread)
 //============================================================
 
-int sdlwindow_init(running_machine *machine)
+int sdlwindow_init(running_machine &machine)
 {
 	mame_printf_verbose("Enter sdlwindow_init\n");
 	// determine if we are using multithreading or not
-	multithreading_enabled = downcast<sdl_options &>(machine->options()).multithreading();
+	multithreading_enabled = downcast<sdl_options &>(machine.options()).multithreading();
 
 	// get the main thread ID before anything else
 	main_threadid = SDL_ThreadID();
 
 	// ensure we get called on the way out
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, sdlwindow_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, sdlwindow_exit);
 
 	// if multithreading, create a thread to run the windows
 	if (multithreading_enabled)
@@ -234,14 +235,14 @@ int sdlwindow_init(running_machine *machine)
 #if USE_OPENGL
 	if (video_config.mode == VIDEO_MODE_OPENGL)
 	{
-		if (drawogl_init(*machine, &draw))
+		if (drawogl_init(machine, &draw))
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
 #endif
 #if	SDL_VERSION_ATLEAST(1,3,0)
 	if (video_config.mode == VIDEO_MODE_SDL13)
 	{
-		if (draw13_init(*machine, &draw))
+		if (draw13_init(machine, &draw))
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
 #endif
@@ -303,7 +304,7 @@ static void sdlwindow_exit(running_machine &machine)
 	{
 		sdl_window_info *temp = sdl_window_list;
 		sdl_window_list = temp->next;
-		sdlwindow_video_window_destroy(&machine, temp);
+		sdlwindow_video_window_destroy(machine, temp);
 	}
 
 	// if we're multithreaded, clean up the window thread
@@ -506,7 +507,7 @@ static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt )
 	ASSERT_WINDOW_THREAD();
 
 	// if we are in debug mode, never go full screen
-	if (window->machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
+	if (window->machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		return NULL;
 
 	// If we are going fullscreen (leaving windowed) remember our windowed size
@@ -517,7 +518,7 @@ static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt )
 	}
 
 	window->destroy(window);
-	sdlinput_release_keys(wp->machine);
+	sdlinput_release_keys(wp->machine());
 
 	// toggle the window mode
 	window->fullscreen = !window->fullscreen;
@@ -527,7 +528,7 @@ static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt )
 	return NULL;
 }
 
-void sdlwindow_toggle_full_screen(running_machine *machine, sdl_window_info *window)
+void sdlwindow_toggle_full_screen(running_machine &machine, sdl_window_info *window)
 {
 	worker_param wp;
 
@@ -535,7 +536,7 @@ void sdlwindow_toggle_full_screen(running_machine *machine, sdl_window_info *win
 
 	clear_worker_param(&wp);
 	wp.window = window;
-	wp.machine = machine;
+	wp.m_machine = &machine;
 
 	execute_async_wait(&sdlwindow_toggle_full_screen_wt, &wp);
 }
@@ -552,7 +553,7 @@ static OSDWORK_CALLBACK( destroy_all_textures_wt )
 	return NULL;
 }
 
-void sdlwindow_modify_prescale(running_machine *machine, sdl_window_info *window, int dir)
+void sdlwindow_modify_prescale(running_machine &machine, sdl_window_info *window, int dir)
 {
 	worker_param wp;
 	int new_prescale = window->prescale;
@@ -560,7 +561,7 @@ void sdlwindow_modify_prescale(running_machine *machine, sdl_window_info *window
 	clear_worker_param(&wp);
 
 	wp.window = window;
-	wp.machine = machine;
+	wp.m_machine = &machine;
 
 	if (dir > 0 && window->prescale < 3)
 		new_prescale = window->prescale + 1;
@@ -592,12 +593,12 @@ void sdlwindow_modify_prescale(running_machine *machine, sdl_window_info *window
 //  (main or window thread)
 //============================================================
 
-static void sdlwindow_update_cursor_state(running_machine *machine, sdl_window_info *window)
+static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_info *window)
 {
 #if (SDL_VERSION_ATLEAST(1,3,0))
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
-	if (!(machine->debug_flags & DEBUG_FLAG_OSD_ENABLED))
+	if (!(machine.debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
 		//FIXME: SDL1.3: really broken: the whole SDL code
 		//       will only work correct with relative mouse movements ...
@@ -620,7 +621,7 @@ static void sdlwindow_update_cursor_state(running_machine *machine, sdl_window_i
 #else
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
-	if (!(machine->debug_flags & DEBUG_FLAG_OSD_ENABLED))
+	if (!(machine.debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
 		if ( window->fullscreen || sdlinput_should_hide_mouse(machine) )
 		{
@@ -648,7 +649,7 @@ static void sdlwindow_update_cursor_state(running_machine *machine, sdl_window_i
 //  (main thread)
 //============================================================
 
-int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monitor_info *monitor, const sdl_window_config *config)
+int sdlwindow_video_window_create(running_machine &machine, int index, sdl_monitor_info *monitor, const sdl_window_config *config)
 {
 	sdl_window_info *window;
 	worker_param *wp = (worker_param *) osd_malloc(sizeof(worker_param));
@@ -665,7 +666,7 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 	window->depth = config->depth;
 	window->refresh = config->refresh;
 	window->monitor = monitor;
-	window->machine = machine;
+	window->m_machine = &machine;
 	window->index = index;
 
 	//FIXME: these should be per_window in config-> or even better a bit set
@@ -675,7 +676,7 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 
 	// set the initial maximized state
 	// FIXME: Does not belong here
-	sdl_options &options = downcast<sdl_options &>(machine->options());
+	sdl_options &options = downcast<sdl_options &>(machine.options());
 	window->startmaximized = options.maximize();
 
 	if (!window->fullscreen)
@@ -695,16 +696,16 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 	window->rendered_event = osd_event_alloc(FALSE, TRUE);
 
 	// load the layout
-	window->target = machine->render().target_alloc();
+	window->target = machine.render().target_alloc();
 
 	// set the specific view
 	set_starting_view(machine, index, window, options.view(), options.view(index));
 
 	// make the window title
 	if (video_config.numscreens == 1)
-		sprintf(window->title, APPNAME ": %s [%s]", machine->system().description, machine->system().name);
+		sprintf(window->title, APPNAME ": %s [%s]", machine.system().description, machine.system().name);
 	else
-		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", machine->system().description, machine->system().name, index);
+		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", machine.system().description, machine.system().name, index);
 
 	wp->window = window;
 
@@ -748,14 +749,14 @@ static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt )
 	window->destroy(window);
 
 	// release all keys ...
-	sdlinput_release_keys(wp->machine);
+	sdlinput_release_keys(wp->machine());
 
 
 	osd_free(wp);
 	return NULL;
 }
 
-static void sdlwindow_video_window_destroy(running_machine *machine, sdl_window_info *window)
+static void sdlwindow_video_window_destroy(running_machine &machine, sdl_window_info *window)
 {
 	sdl_window_info **prevptr;
 	worker_param wp;
@@ -779,11 +780,11 @@ static void sdlwindow_video_window_destroy(running_machine *machine, sdl_window_
 	// free the textures etc
 	clear_worker_param(&wp);
 	wp.window = window;
-	wp.machine = machine;
+	wp.m_machine = &machine;
 	execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
 
 	// free the render target, after the textures!
-	window->machine->render().target_free(window->target);
+	window->machine().render().target_free(window->target);
 
 	// free the event
 	osd_event_free(window->rendered_event);
@@ -945,7 +946,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 //  (main thread)
 //============================================================
 
-void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *window)
+void sdlwindow_video_window_update(running_machine &machine, sdl_window_info *window)
 {
 
 	osd_ticks_t		event_wait_ticks;
@@ -996,7 +997,7 @@ void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *wi
 
 			wp.list = primlist;
 			wp.window = window;
-			wp.machine = machine;
+			wp.m_machine = &machine;
 
 			execute_async(&draw_video_contents_wt, &wp);
 		}
@@ -1009,7 +1010,7 @@ void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *wi
 //  (main thread)
 //============================================================
 
-static void set_starting_view(running_machine *machine, int index, sdl_window_info *window, const char *defview, const char *view)
+static void set_starting_view(running_machine &machine, int index, sdl_window_info *window, const char *defview, const char *view)
 {
 	int viewindex;
 
@@ -1149,7 +1150,7 @@ static OSDWORK_CALLBACK( draw_video_contents_wt )
 	ASSERT_REDRAW_THREAD();
 
 	// Some configurations require events to be polled in the worker thread
-	sdlinput_process_events_buf(wp->machine);
+	sdlinput_process_events_buf(wp->machine());
 
 	window->primlist = wp->list;
 

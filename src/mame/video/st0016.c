@@ -100,8 +100,8 @@ WRITE8_HANDLER (st0016_palette_ram_w)
 	st0016_paletteram[ST0016_PAL_BANK_SIZE*st0016_pal_bank+offset]=data;
 	val=st0016_paletteram[color*2]+(st0016_paletteram[color*2+1]<<8);
 	if(!color)
-		palette_set_color_rgb(space->machine,UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
-	palette_set_color_rgb(space->machine,color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
+		palette_set_color_rgb(space->machine(),UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
+	palette_set_color_rgb(space->machine(),color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
 }
 
 READ8_HANDLER(st0016_character_ram_r)
@@ -112,7 +112,7 @@ READ8_HANDLER(st0016_character_ram_r)
 WRITE8_HANDLER(st0016_character_ram_w)
 {
 	st0016_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset]=data;
-	gfx_element_mark_dirty(space->machine->gfx[st0016_ramgfx], st0016_char_bank);
+	gfx_element_mark_dirty(space->machine().gfx[st0016_ramgfx], st0016_char_bank);
 }
 
 READ8_HANDLER(st0016_vregs_r)
@@ -139,7 +139,7 @@ READ8_HANDLER(st0016_vregs_r)
 	{
 		case 0:
 		case 1:
-			return space->machine->rand();
+			return space->machine().rand();
 	}
 
 	return st0016_vregs[offset];
@@ -186,8 +186,8 @@ WRITE8_HANDLER(st0016_vregs_w)
 		UINT32 srcadr=(st0016_vregs[0xa0]|(st0016_vregs[0xa1]<<8)|(st0016_vregs[0xa2]<<16))<<1;
 		UINT32 dstadr=(st0016_vregs[0xa3]|(st0016_vregs[0xa4]<<8)|(st0016_vregs[0xa5]<<16))<<1;
 		UINT32 length=((st0016_vregs[0xa6]|(st0016_vregs[0xa7]<<8)|((st0016_vregs[0xa8]&0x1f)<<16))+1)<<1;
-		UINT32 srclen = (space->machine->region("maincpu")->bytes()-0x10000);
-		UINT8 *mem = space->machine->region("maincpu")->base();
+		UINT32 srclen = (space->machine().region("maincpu")->bytes()-0x10000);
+		UINT8 *mem = space->machine().region("maincpu")->base();
 
 		srcadr += macs_cart_slot*0x400000;
 
@@ -212,7 +212,7 @@ WRITE8_HANDLER(st0016_vregs_w)
 	}
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/*
     object ram :
@@ -257,7 +257,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
     */
 
-	gfx_element *gfx = machine->gfx[st0016_ramgfx];
+	gfx_element *gfx = machine.gfx[st0016_ramgfx];
 	int i,j,lx,ly,x,y,code,offset,length,sx,sy,color,flipx,flipy,scrollx,scrolly/*,plx,ply*/;
 
 
@@ -419,7 +419,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-static void st0016_save_init(running_machine *machine)
+static void st0016_save_init(running_machine &machine)
 {
 	state_save_register_global(machine, st0016_spr_bank);
 	state_save_register_global(machine, st0016_spr2_bank);
@@ -444,13 +444,13 @@ VIDEO_START( st0016 )
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
+		if (machine.gfx[gfx_index] == 0)
 			break;
 
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[gfx_index] = gfx_element_alloc(machine, &charlayout, (UINT8 *) st0016_charram, 0x40, 0);
+	machine.gfx[gfx_index] = gfx_element_alloc(machine, &charlayout, (UINT8 *) st0016_charram, 0x40, 0);
 	st0016_ramgfx = gfx_index;
 
 	spr_dx=0;
@@ -459,27 +459,27 @@ VIDEO_START( st0016 )
 	switch(st0016_game&0x3f)
 	{
 		case 0: //renju kizoku
-			machine->primary_screen->set_visible_area(0, 40*8-1, 0, 30*8-1);
+			machine.primary_screen->set_visible_area(0, 40*8-1, 0, 30*8-1);
 			spr_dx=0;
 			spr_dy=0;
 		break;
 
 		case 1: //neratte chu!
-			machine->primary_screen->set_visible_area(8,41*8-1,0,30*8-1);
+			machine.primary_screen->set_visible_area(8,41*8-1,0,30*8-1);
 			spr_dx=0;
 			spr_dy=8;
 		break;
 
 		case 4: //mayjinsen 1&2
-			machine->primary_screen->set_visible_area(0,32*8-1,0,28*8-1);
+			machine.primary_screen->set_visible_area(0,32*8-1,0,28*8-1);
 		break;
 
 		case 10:
-			machine->primary_screen->set_visible_area(0,383,0,255);
+			machine.primary_screen->set_visible_area(0,383,0,255);
 		break;
 
 		case 11:
-			machine->primary_screen->set_visible_area(0,383,0,383);
+			machine.primary_screen->set_visible_area(0,383,0,383);
 		break;
 
 	}
@@ -488,9 +488,9 @@ VIDEO_START( st0016 )
 }
 
 
-static void draw_bgmap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int priority)
+static void draw_bgmap(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect, int priority)
 {
-	gfx_element *gfx = machine->gfx[st0016_ramgfx];
+	gfx_element *gfx = machine.gfx[st0016_ramgfx];
 	int j;
 	//for(j=0x40-8;j>=0;j-=8)
 	for(j=0;j<0x40;j+=8)
@@ -586,16 +586,16 @@ static void draw_bgmap(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 void st0016_draw_screen(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	draw_bgmap(screen->machine, bitmap,cliprect,0);
-	draw_sprites(screen->machine, bitmap,cliprect);
-	draw_bgmap(screen->machine, bitmap,cliprect,1);
+	draw_bgmap(screen->machine(), bitmap,cliprect,0);
+	draw_sprites(screen->machine(), bitmap,cliprect);
+	draw_bgmap(screen->machine(), bitmap,cliprect,1);
 }
 
 SCREEN_UPDATE( st0016 )
 {
 
 #ifdef MAME_DEBUG
-	if(input_code_pressed_once(screen->machine, KEYCODE_Z))
+	if(input_code_pressed_once(screen->machine(), KEYCODE_Z))
 	{
 		int h,j;
 		FILE *p=fopen("vram.bin","wb");

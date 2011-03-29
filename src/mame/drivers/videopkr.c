@@ -383,7 +383,7 @@ static PALETTE_INIT( videopkr )
 {
 	int j;
 
-	for (j = 0; j < machine->total_colors(); j++)
+	for (j = 0; j < machine.total_colors(); j++)
 	{
 		int r, g, b, tr, tg, tb, i;
 
@@ -409,7 +409,7 @@ static PALETTE_INIT( babypkr )
 {
 	int j;
 
-	for (j = 0; j < machine->total_colors(); j++)
+	for (j = 0; j < machine.total_colors(); j++)
 	{
 		int r, g, b, tr, tg, tb, i, top;
 
@@ -439,7 +439,7 @@ static PALETTE_INIT( fortune1 )
 {
 	int j;
 
-	for (j = 0; j < machine->total_colors(); j++)
+	for (j = 0; j < machine.total_colors(); j++)
 	{
 		int r, g, b, tr, tg, tb, i, c;
 
@@ -469,7 +469,7 @@ static PALETTE_INIT( fortune1 )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	videopkr_state *state = machine->driver_data<videopkr_state>();
+	videopkr_state *state = machine.driver_data<videopkr_state>();
 	int offs = tile_index;
 	int attr = state->color_ram[offs] + input_port_read(machine, "IN2"); /* Color Switch Action */
 	int code = state->video_ram[offs];
@@ -480,20 +480,20 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( videopkr )
 {
-	videopkr_state *state = machine->driver_data<videopkr_state>();
+	videopkr_state *state = machine.driver_data<videopkr_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static VIDEO_START( vidadcba )
 {
-	videopkr_state *state = machine->driver_data<videopkr_state>();
+	videopkr_state *state = machine.driver_data<videopkr_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 8, 32, 32);
 }
 
 
 static SCREEN_UPDATE( videopkr )
 {
-	videopkr_state *state = screen->machine->driver_data<videopkr_state>();
+	videopkr_state *state = screen->machine().driver_data<videopkr_state>();
 	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
@@ -506,7 +506,7 @@ static SCREEN_UPDATE( videopkr )
 
 static READ8_HANDLER( videopkr_io_r )
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	UINT8 valor = 0, hf, co;
 
 	UINT16 kbdin;
@@ -515,9 +515,9 @@ static READ8_HANDLER( videopkr_io_r )
 	{
 		case 0xef:	/* inputs are multiplexed through a diode matrix */
 		{
-			hf = ((input_port_read(space->machine, "IN1") & 0x10 ) >> 4) & 1;			/* Hopper full detection */
-			co = 0x10 * ((input_port_read(space->machine, "IN1") & 0x20 ) >> 5);		/* Coin Out detection */
-			kbdin = ((input_port_read(space->machine, "IN1") & 0xaf ) << 8) + input_port_read(space->machine, "IN0");
+			hf = ((input_port_read(space->machine(), "IN1") & 0x10 ) >> 4) & 1;			/* Hopper full detection */
+			co = 0x10 * ((input_port_read(space->machine(), "IN1") & 0x20 ) >> 5);		/* Coin Out detection */
+			kbdin = ((input_port_read(space->machine(), "IN1") & 0xaf ) << 8) + input_port_read(space->machine(), "IN0");
 
 			switch (kbdin)
 			{
@@ -587,7 +587,7 @@ static READ8_HANDLER( videopkr_io_r )
 
 static WRITE8_HANDLER( videopkr_io_w )
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	switch (state->p2)
 	{
 		case 0x3c:
@@ -657,19 +657,19 @@ static WRITE8_HANDLER( videopkr_io_w )
 
 static READ8_HANDLER( videopkr_p1_data_r )
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	return state->p1;
 }
 
 static READ8_HANDLER( videopkr_p2_data_r )
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	return state->p2;
 }
 
 static WRITE8_HANDLER( videopkr_p1_data_w )
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	state->p1 = data;
 
 	output_set_lamp_value(8, (data & 1));			/* Aux_0 - Jackpot mech. counter (Baby Games)*/
@@ -712,20 +712,20 @@ static WRITE8_HANDLER( videopkr_p1_data_w )
 
 static WRITE8_HANDLER( videopkr_p2_data_w )
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	state->p2 = data;
 }
 
 static READ8_HANDLER( videopkr_t0_latch )
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	return state->t0_latch;
 }
 
 static WRITE8_HANDLER( prog_w )
 {
 	if (!data)
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);	/* clear interrupt FF */
+		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);	/* clear interrupt FF */
 }
 
 /*************************
@@ -766,7 +766,7 @@ static WRITE8_HANDLER( prog_w )
 
 static READ8_HANDLER(sound_io_r)
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	switch (state->vp_sound_p2)
 	{
 		case 0xbf:
@@ -789,7 +789,7 @@ static READ8_HANDLER(sound_io_r)
 
 static WRITE8_HANDLER(sound_io_w)
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	if (state->vp_sound_p2 == 0x5f || state->vp_sound_p2 == 0xdf)
 	{
 		state->dc_40103 = data;
@@ -799,13 +799,13 @@ static WRITE8_HANDLER(sound_io_w)
 
 static READ8_HANDLER(sound_p2_r)
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	return state->vp_sound_p2;
 }
 
 static WRITE8_HANDLER(sound_p2_w)
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	state->vp_sound_p2 = data;
 
 	switch (data)
@@ -838,19 +838,19 @@ static WRITE8_HANDLER(sound_p2_w)
 
 static READ8_HANDLER(baby_sound_p0_r)
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	return state->sbp0;
 }
 
 static WRITE8_HANDLER(baby_sound_p0_w)
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	state->sbp0 = data;
 }
 
 static READ8_HANDLER(baby_sound_p1_r)
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	state->c_io = (state->p1 >> 5) & 1;
 	state->hp_1 = (~state->p24_data >> 6) & 1;
 	state->hp_2 = (~state->p24_data >> 5) & 1;
@@ -862,32 +862,32 @@ static READ8_HANDLER(baby_sound_p1_r)
 
 static WRITE8_HANDLER(baby_sound_p1_w)
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	state->baby_latch = state->baby_latch | data;
 }
 
 static READ8_HANDLER(baby_sound_p2_r)
 {
-	videopkr_state *state = space->machine->driver_data<videopkr_state>();
+	videopkr_state *state = space->machine().driver_data<videopkr_state>();
 	return state->sbp2;
 }
 
 static WRITE8_DEVICE_HANDLER(baby_sound_p2_w)
 {
-	videopkr_state *state = device->machine->driver_data<videopkr_state>();
+	videopkr_state *state = device->machine().driver_data<videopkr_state>();
 	state->sbp2 = data;
 	dac_data_w(device, data);
 }
 
 static READ8_DEVICE_HANDLER(baby_sound_p3_r)
 {
-	videopkr_state *state = device->machine->driver_data<videopkr_state>();
+	videopkr_state *state = device->machine().driver_data<videopkr_state>();
 	return state->sbp3;
 }
 
 static WRITE8_DEVICE_HANDLER(baby_sound_p3_w)
 {
-	videopkr_state *state = device->machine->driver_data<videopkr_state>();
+	videopkr_state *state = device->machine().driver_data<videopkr_state>();
 	UINT8 lmp_ports, ay_intf;
 	state->sbp3 = data;
 	lmp_ports = state->sbp3 >> 1 & 0x07;
@@ -920,14 +920,14 @@ static WRITE8_DEVICE_HANDLER(baby_sound_p3_w)
 
 static TIMER_DEVICE_CALLBACK(sound_t1_callback)
 {
-	videopkr_state *state = timer.machine->driver_data<videopkr_state>();
+	videopkr_state *state = timer.machine().driver_data<videopkr_state>();
 	if (state->te_40103 == 1)
 	{
 		state->dc_40103++;
 
 		if (state->dc_40103 == 0)
 		{
-			cputag_set_input_line(timer.machine, "soundcpu", 0, ASSERT_LINE);
+			cputag_set_input_line(timer.machine(), "soundcpu", 0, ASSERT_LINE);
 		}
 	}
 }
@@ -1193,7 +1193,7 @@ GFXDECODE_END
 
 static MACHINE_START(videopkr)
 {
-	videopkr_state *state = machine->driver_data<videopkr_state>();
+	videopkr_state *state = machine.driver_data<videopkr_state>();
 	state->vp_sound_p2 = 0xff;	/* default P2 latch value */
 	state->sound_latch = 0xff;	/* default sound data latch value */
 	state->p24_data = 0xff;
@@ -1201,7 +1201,7 @@ static MACHINE_START(videopkr)
 	state->ant_cio = 0;
 	state->count0 = 0;
 
-	machine->device<nvram_device>("nvram")->set_base(state->data_ram, sizeof(state->data_ram));
+	machine.device<nvram_device>("nvram")->set_base(state->data_ram, sizeof(state->data_ram));
 }
 
 static const ay8910_interface ay8910_config =

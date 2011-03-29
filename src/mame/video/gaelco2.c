@@ -103,7 +103,7 @@ Multi monitor notes:
 
 static TILE_GET_INFO( get_tile_info_gaelco2_screen0 )
 {
-	gaelco2_state *state = machine->driver_data<gaelco2_state>();
+	gaelco2_state *state = machine.driver_data<gaelco2_state>();
 	int data = state->videoram[(((state->vregs[0] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
 	int data2 = state->videoram[(((state->vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
 	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
@@ -113,7 +113,7 @@ static TILE_GET_INFO( get_tile_info_gaelco2_screen0 )
 
 static TILE_GET_INFO( get_tile_info_gaelco2_screen1 )
 {
-	gaelco2_state *state = machine->driver_data<gaelco2_state>();
+	gaelco2_state *state = machine.driver_data<gaelco2_state>();
 	int data = state->videoram[(((state->vregs[1] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
 	int data2 = state->videoram[(((state->vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
 	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
@@ -146,7 +146,7 @@ static TILE_GET_INFO( get_tile_info_gaelco2_screen1 )
 
 static TILE_GET_INFO( get_tile_info_gaelco2_screen0_dual )
 {
-	gaelco2_state *state = machine->driver_data<gaelco2_state>();
+	gaelco2_state *state = machine.driver_data<gaelco2_state>();
 	int data = state->videoram[(((state->vregs[0] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
 	int data2 = state->videoram[(((state->vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
 	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
@@ -156,7 +156,7 @@ static TILE_GET_INFO( get_tile_info_gaelco2_screen0_dual )
 
 static TILE_GET_INFO( get_tile_info_gaelco2_screen1_dual )
 {
-	gaelco2_state *state = machine->driver_data<gaelco2_state>();
+	gaelco2_state *state = machine.driver_data<gaelco2_state>();
 	int data = state->videoram[(((state->vregs[1] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
 	int data2 = state->videoram[(((state->vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
 	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
@@ -173,7 +173,7 @@ static TILE_GET_INFO( get_tile_info_gaelco2_screen1_dual )
 
 WRITE16_HANDLER( gaelco2_vram_w )
 {
-	gaelco2_state *state = space->machine->driver_data<gaelco2_state>();
+	gaelco2_state *state = space->machine().driver_data<gaelco2_state>();
 	int pant0_start = ((state->vregs[0] >> 9) & 0x07)*0x1000;
 	int pant0_end = pant0_start + 0x1000;
 	int pant1_start = ((state->vregs[1] >> 9) & 0x07)*0x1000;
@@ -226,8 +226,8 @@ WRITE16_HANDLER( gaelco2_palette_w )
 {
 	int i, color, r, g, b, auxr, auxg, auxb;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	color = space->machine->generic.paletteram.u16[offset];
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	color = space->machine().generic.paletteram.u16[offset];
 
 	/* extract RGB components */
 	r = (color >> 10) & 0x1f;
@@ -239,7 +239,7 @@ WRITE16_HANDLER( gaelco2_palette_w )
 	b = pal5bit(b);
 
 	/* update game palette */
-	palette_set_color(space->machine, 4096*0 + offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), 4096*0 + offset, MAKE_RGB(r, g, b));
 
 	/* update shadow/highligh palettes */
 	for (i = 1; i < 16; i++){
@@ -251,7 +251,7 @@ WRITE16_HANDLER( gaelco2_palette_w )
 		auxg = ADJUST_COLOR(g + pen_color_adjust[i]);
 		auxb = ADJUST_COLOR(b + pen_color_adjust[i]);
 
-		palette_set_color(space->machine, 4096*i + offset, MAKE_RGB(auxr, auxg, auxb));
+		palette_set_color(space->machine(), 4096*i + offset, MAKE_RGB(auxr, auxg, auxb));
 	}
 }
 
@@ -263,8 +263,8 @@ WRITE16_HANDLER( gaelco2_palette_w )
 
 VIDEO_START( gaelco2 )
 {
-	gaelco2_state *state = machine->driver_data<gaelco2_state>();
-	state->videoram = machine->generic.spriteram.u16;
+	gaelco2_state *state = machine.driver_data<gaelco2_state>();
+	state->videoram = machine.generic.spriteram.u16;
 
 	/* create tilemaps */
 	state->pant[0] = tilemap_create(machine, get_tile_info_gaelco2_screen0,tilemap_scan_rows,16,16,64,32);
@@ -284,8 +284,8 @@ VIDEO_START( gaelco2 )
 
 VIDEO_START( gaelco2_dual )
 {
-	gaelco2_state *state = machine->driver_data<gaelco2_state>();
-	state->videoram = machine->generic.spriteram.u16;
+	gaelco2_state *state = machine.driver_data<gaelco2_state>();
+	state->videoram = machine.generic.spriteram.u16;
 
 	/* create tilemaps */
 	state->pant[0] = tilemap_create(machine, get_tile_info_gaelco2_screen0_dual,tilemap_scan_rows,16,16,64,32);
@@ -341,10 +341,10 @@ VIDEO_START( gaelco2_dual )
 
 static void draw_sprites(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int mask, int xoffs)
 {
-	gaelco2_state *state = screen->machine->driver_data<gaelco2_state>();
-	UINT16 *buffered_spriteram16 = screen->machine->generic.buffered_spriteram.u16;
+	gaelco2_state *state = screen->machine().driver_data<gaelco2_state>();
+	UINT16 *buffered_spriteram16 = screen->machine().generic.buffered_spriteram.u16;
 	int j, x, y, ex, ey, px, py;
-	const gfx_element *gfx = screen->machine->gfx[0];
+	const gfx_element *gfx = screen->machine().gfx[0];
 
 	/* get sprite ram start and end offsets */
 	int start_offset = (state->vregs[1] & 0x10)*0x100;
@@ -438,7 +438,7 @@ static void draw_sprites(screen_device *screen, bitmap_t *bitmap, const rectangl
 
 SCREEN_UPDATE( gaelco2 )
 {
-	gaelco2_state *state = screen->machine->driver_data<gaelco2_state>();
+	gaelco2_state *state = screen->machine().driver_data<gaelco2_state>();
 	int i;
 
 	/* read scroll values */
@@ -468,11 +468,11 @@ SCREEN_UPDATE( gaelco2 )
 
 SCREEN_UPDATE( gaelco2_dual )
 {
-	gaelco2_state *state = screen->machine->driver_data<gaelco2_state>();
+	gaelco2_state *state = screen->machine().driver_data<gaelco2_state>();
 	int i;
 
-	device_t *left_screen  = screen->machine->device("lscreen");
-	device_t *right_screen = screen->machine->device("rscreen");
+	device_t *left_screen  = screen->machine().device("lscreen");
+	device_t *right_screen = screen->machine().device("rscreen");
 
 	/* read scroll values */
 	int scroll0x = state->videoram[0x2802/2] + 0x14;
@@ -512,7 +512,7 @@ SCREEN_UPDATE( gaelco2_dual )
 
 SCREEN_EOF( gaelco2 )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* sprites are one frame ahead */
 	buffer_spriteram16_w(space, 0, 0, 0xffff);

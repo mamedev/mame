@@ -696,7 +696,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 	return (int) (v * 255 / vcc + 0.4);
 }
 
-rgb_t *compute_res_net_all(running_machine *machine, const UINT8 *prom, const res_net_decode_info *rdi, const res_net_info *di)
+rgb_t *compute_res_net_all(running_machine &machine, const UINT8 *prom, const res_net_decode_info *rdi, const res_net_info *di)
 {
 	UINT8 r,g,b;
 	int i,j,k;

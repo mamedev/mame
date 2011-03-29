@@ -1,15 +1,15 @@
 #ifdef UNUSED_FUNCTION
 /* helper function to join two 16-bit ROMs and form a 32-bit data stream */
-void konami_rom_deinterleave_2(running_machine *machine, const char *mem_region);
-void konami_rom_deinterleave_2_half(running_machine *machine, const char *mem_region);
+void konami_rom_deinterleave_2(running_machine &machine, const char *mem_region);
+void konami_rom_deinterleave_2_half(running_machine &machine, const char *mem_region);
 /* helper function to join four 16-bit ROMs and form a 64-bit data stream */
-void konami_rom_deinterleave_4(running_machine *machine, const char *mem_region);
+void konami_rom_deinterleave_4(running_machine &machine, const char *mem_region);
 
 
 #define MAX_K007121 2
 extern UINT8 K007121_ctrlram[MAX_K007121][8];
 
-void K007121_ctrl_w(running_machine *machine, int chip,int offset,int data);
+void K007121_ctrl_w(running_machine &machine, int chip,int offset,int data);
 WRITE8_HANDLER( K007121_ctrl_0_w );
 WRITE8_HANDLER( K007121_ctrl_1_w );
 void K007121_sprites_draw(int chip,bitmap_t *bitmap,const rectangle *cliprect, gfx_element **gfxs, colortable_t *ctable,
@@ -17,7 +17,7 @@ void K007121_sprites_draw(int chip,bitmap_t *bitmap,const rectangle *cliprect, g
 						  int global_x_offset,int bank_base, UINT32 pri_mask);
 
 
-void K007342_vh_start(running_machine *machine, int gfx_index, void (*callback)(int layer,int bank,int *code,int *color,int *flags));
+void K007342_vh_start(running_machine &machine, int gfx_index, void (*callback)(int layer,int bank,int *code,int *color,int *flags));
 READ8_HANDLER( K007342_r );
 WRITE8_HANDLER( K007342_w );
 READ8_HANDLER( K007342_scroll_r );
@@ -29,7 +29,7 @@ void K007342_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,int num,int
 int K007342_is_INT_enabled(void);
 
 
-void K007420_vh_start(running_machine *machine, int gfxnum, void (*callback)(int *code,int *color));
+void K007420_vh_start(running_machine &machine, int gfxnum, void (*callback)(int *code,int *color));
 READ8_HANDLER( K007420_r );
 WRITE8_HANDLER( K007420_w );
 void K007420_sprites_draw(bitmap_t *bitmap,const rectangle *cliprect);
@@ -68,7 +68,7 @@ The callback must put:
 */
 extern tilemap_t *K052109_tilemap[3];
 
-void K052109_vh_start(running_machine *machine,const char *gfx_memory_region,int plane_order,
+void K052109_vh_start(running_machine &machine,const char *gfx_memory_region,int plane_order,
 		void (*callback)(int layer,int bank,int *code,int *color,int *flags,int *priority));
 /* plain 8-bit access */
 READ8_HANDLER( K052109_r );
@@ -97,7 +97,7 @@ The callback must put:
   shadow is preloaded with color & 0x80 so it doesn't need to be changed unless
   the game has special treatment (Aliens)
 */
-void K051960_vh_start(running_machine *machine,const char *gfx_memory_region,int plane_order,
+void K051960_vh_start(running_machine &machine,const char *gfx_memory_region,int plane_order,
 		void (*callback)(int *code,int *color,int *priority,int *shadow));
 READ8_HANDLER( K051960_r );
 WRITE8_HANDLER( K051960_w );
@@ -107,7 +107,7 @@ READ8_HANDLER( K051937_r );
 WRITE8_HANDLER( K051937_w );
 READ16_HANDLER( K051937_word_r );
 WRITE16_HANDLER( K051937_word_w );
-void K051960_sprites_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int min_priority,int max_priority);
+void K051960_sprites_draw(running_machine &machine,bitmap_t *bitmap,const rectangle *cliprect,int min_priority,int max_priority);
 int K051960_is_IRQ_enabled(void);
 int K051960_is_NMI_enabled(void);
 void K051960_set_sprite_offsets(int dx, int dy);
@@ -117,7 +117,7 @@ READ8_HANDLER( K052109_051960_r );
 WRITE8_HANDLER( K052109_051960_w );
 
 
-void K053245_vh_start(running_machine *machine,int chip, const char *gfx_memory_region,int plane_order,
+void K053245_vh_start(running_machine &machine,int chip, const char *gfx_memory_region,int plane_order,
 		void (*callback)(int *code,int *color,int *priority_mask));
 READ16_HANDLER( K053245_word_r );
 WRITE16_HANDLER( K053245_word_w );
@@ -132,8 +132,8 @@ WRITE16_HANDLER( K053244_lsb_w );
 READ16_HANDLER( K053244_word_r );
 WRITE16_HANDLER( K053244_word_w );
 void K053244_bankselect(int chip, int bank);	/* used by TMNT2, Asterix and Premier Soccer for ROM testing */
-void K053245_sprites_draw(running_machine *machine, int chip, bitmap_t *bitmap,const rectangle *cliprect);
-void K053245_sprites_draw_lethal(running_machine *machine, int chip, bitmap_t *bitmap,const rectangle *cliprect); /* for lethal enforcers */
+void K053245_sprites_draw(running_machine &machine, int chip, bitmap_t *bitmap,const rectangle *cliprect);
+void K053245_sprites_draw_lethal(running_machine &machine, int chip, bitmap_t *bitmap,const rectangle *cliprect); /* for lethal enforcers */
 void K053245_clear_buffer(int chip);
 void K053245_set_SpriteOffset(int chip,int offsx, int offsy);
 #endif
@@ -143,8 +143,8 @@ void K053245_set_SpriteOffset(int chip,int offsx, int offsy);
 #define K055673_LAYOUT_LE2 2
 #define K055673_LAYOUT_GX6 3
 
-void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, int alt_layout, int dx, int dy,
-		void (*callback)(running_machine *machine, int *code,int *color,int *priority));
+void K055673_vh_start(running_machine &machine, const char *gfx_memory_region, int alt_layout, int dx, int dy,
+		void (*callback)(running_machine &machine, int *code,int *color,int *priority));
 READ16_HANDLER( K055673_rom_word_r );
 READ16_HANDLER( K055673_GX6bpp_rom_word_r );
 
@@ -159,7 +159,7 @@ Callback procedures for non-standard shadows:
 #define K053247_SHDSHIFT		20
 
 #ifdef UNUSED_FUNCTION
-void K053247_vh_start(running_machine *machine, const char *gfx_memory_region,int dx,int dy,int plane_order,
+void K053247_vh_start(running_machine &machine, const char *gfx_memory_region,int dx,int dy,int plane_order,
 		void (*callback)(int *code,int *color,int *priority_mask));
 READ8_HANDLER( K053247_r );
 WRITE8_HANDLER( K053247_w );
@@ -171,7 +171,7 @@ WRITE32_HANDLER( K053247_long_w );
 WRITE16_HANDLER( K053247_reg_word_w ); // "OBJSET2" registers
 WRITE32_HANDLER( K053247_reg_long_w );
 #ifdef UNUSED_FUNCTION
-void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect);
+void K053247_sprites_draw(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect);
 #endif
 int K053247_read_register(int regnum);
 void K053247_set_SpriteOffset(int offsx, int offsy);
@@ -179,7 +179,7 @@ void K053247_set_SpriteOffset(int offsx, int offsy);
 void K053247_wraparound_enable(int status);
 void K05324x_set_z_rejection(int zcode); // common to K053245/6/7
 #endif
-void K053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(running_machine *, int *, int *, int *), int *dx, int *dy);
+void K053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(running_machine &, int *, int *, int *), int *dx, int *dy);
 
 #ifdef UNUSED_FUNCTION
 READ8_HANDLER( K053246_r );
@@ -208,13 +208,13 @@ The callback must put:
   structure (e.g. TILE_FLIPX)
 */
 #ifdef UNUSED_FUNCTION
-void K051316_vh_start_0(running_machine *machine,const char *gfx_memory_region,int bpp,
+void K051316_vh_start_0(running_machine &machine,const char *gfx_memory_region,int bpp,
 		int tilemap_type,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags));
-void K051316_vh_start_1(running_machine *machine,const char *gfx_memory_region,int bpp,
+void K051316_vh_start_1(running_machine &machine,const char *gfx_memory_region,int bpp,
 		int tilemap_type,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags));
-void K051316_vh_start_2(running_machine *machine,const char *gfx_memory_region,int bpp,
+void K051316_vh_start_2(running_machine &machine,const char *gfx_memory_region,int bpp,
 		int tilemap_type,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags));
 READ8_HANDLER( K051316_0_r );
@@ -259,7 +259,7 @@ enum { K053251_CI0=0,K053251_CI1,K053251_CI2,K053251_CI3,K053251_CI4 };
 int K053251_get_priority(int ci);
 int K053251_get_palette_index(int ci);
 void K053251_set_tilemaps(tilemap_t *ci0,tilemap_t *ci1,tilemap_t *ci2,tilemap_t *ci3,tilemap_t *ci4);
-void K053251_vh_start(running_machine *machine);
+void K053251_vh_start(running_machine &machine);
 
 
 #ifdef UNUSED_FUNCTION
@@ -278,9 +278,9 @@ void K056832_SetExtLinescroll(void);	/* Lethal Enforcers */
 
 #define K056382_DRAW_FLAG_FORCE_XYSCROLL		0x00800000
 
-void K056832_vh_start(running_machine *machine, const char *gfx_memory_region, int bpp, int big,
+void K056832_vh_start(running_machine &machine, const char *gfx_memory_region, int bpp, int big,
 			int (*scrolld)[4][2],
-			void (*callback)(running_machine *machine, int layer, int *code, int *color, int *flags),
+			void (*callback)(running_machine &machine, int layer, int *code, int *color, int *flags),
 			int djmain_hack);
 READ16_HANDLER( K056832_ram_word_r );
 WRITE16_HANDLER( K056832_ram_word_w );
@@ -316,9 +316,9 @@ WRITE8_HANDLER( K056832_b_w );
 #endif
 void K056832_mark_plane_dirty(int num);
 void K056832_MarkAllTilemapsDirty(void);
-void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int num, UINT32 flags, UINT32 priority);
+void K056832_tilemap_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int num, UINT32 flags, UINT32 priority);
 #ifdef UNUSED_FUNCTION
-void K056832_tilemap_draw_dj(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, UINT32 flags, UINT32 priority);
+void K056832_tilemap_draw_dj(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, UINT32 flags, UINT32 priority);
 void K056832_set_LayerAssociation(int status);
 #endif
 int  K056832_get_LayerAssociation(void);
@@ -354,7 +354,7 @@ WRITE32_HANDLER( K056832_b_long_w );
 #define K056832_BPP_8LE	5
 #define K056832_BPP_8TASMAN 6
 
-void K055555_vh_start(running_machine *machine); // "PCU2"
+void K055555_vh_start(running_machine &machine); // "PCU2"
 void K055555_write_reg(UINT8 regnum, UINT8 regdat);
 WRITE16_HANDLER( K055555_word_w );
 WRITE32_HANDLER( K055555_long_w );
@@ -427,13 +427,13 @@ int K055555_get_palette_index(int idx);
 #define K55_INP_SUB3		0x80
 
 /* K054338 mixer/alpha blender */
-void K054338_vh_start(running_machine *machine);
+void K054338_vh_start(running_machine &machine);
 WRITE16_HANDLER( K054338_word_w ); // "CLCT" registers
 WRITE32_HANDLER( K054338_long_w );
 int K054338_read_register(int reg);
-void K054338_update_all_shadows(running_machine *machine, int rushingheroes_hack);			// called at the beginning of SCREEN_UPDATE()
+void K054338_update_all_shadows(running_machine &machine, int rushingheroes_hack);			// called at the beginning of SCREEN_UPDATE()
 void K054338_fill_solid_bg(bitmap_t *bitmap);				// solid backcolor fill
-void K054338_fill_backcolor(running_machine *machine, bitmap_t *bitmap, int mode);	// unified fill, 0=solid, 1=gradient
+void K054338_fill_backcolor(running_machine &machine, bitmap_t *bitmap, int mode);	// unified fill, 0=solid, 1=gradient
 int  K054338_set_alpha_level(int pblend);							// blend style 0-2
 void K054338_invert_alpha(int invert);								// 0=0x00(invis)-0x1f(solid), 1=0x1f(invis)-0x00(solod)
 void K054338_export_config(int **shdRGB);
@@ -452,7 +452,7 @@ void K054338_export_config(int **shdRGB);
 #define K338_CTL_WAILSL		0x10
 #define K338_CTL_CLIPSL		0x20
 
-void K053250_vh_start(running_machine *machine, int chips, const char **region);
+void K053250_vh_start(running_machine &machine, int chips, const char **region);
 WRITE16_HANDLER( K053250_0_w );
 READ16_HANDLER( K053250_0_r );
 WRITE16_HANDLER( K053250_0_ram_w );
@@ -470,11 +470,11 @@ READ16_HANDLER( K053250_1_rom_r );
 #define K053250_WRAP500		0x01
 #define K053250_OVERDRIVE	0x02
 
-void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int colorbase, int flags, int pri);
+void K053250_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int colorbase, int flags, int pri);
 void K053250_set_LayerOffset(int chip, int offsx, int offsy);
-void K053250_unpack_pixels(running_machine *machine, const char *region);
+void K053250_unpack_pixels(running_machine &machine, const char *region);
 #ifdef UNUSED_FUNCTION
-void K053250_dma(running_machine *machine, int chip, int limiter);
+void K053250_dma(running_machine &machine, int chip, int limiter);
 #endif
 
 

@@ -24,19 +24,19 @@
 
 static WRITE8_DEVICE_HANDLER( compgolf_scrollx_lo_w )
 {
-	compgolf_state *state = device->machine->driver_data<compgolf_state>();
+	compgolf_state *state = device->machine().driver_data<compgolf_state>();
 	state->scrollx_lo = data;
 }
 
 static WRITE8_DEVICE_HANDLER( compgolf_scrolly_lo_w )
 {
-	compgolf_state *state = device->machine->driver_data<compgolf_state>();
+	compgolf_state *state = device->machine().driver_data<compgolf_state>();
 	state->scrolly_lo = data;
 }
 
 static WRITE8_HANDLER( compgolf_ctrl_w )
 {
-	compgolf_state *state = space->machine->driver_data<compgolf_state>();
+	compgolf_state *state = space->machine().driver_data<compgolf_state>();
 
 	/* bit 4 and 6 are always set */
 
@@ -45,7 +45,7 @@ static WRITE8_HANDLER( compgolf_ctrl_w )
 	if (state->bank != new_bank)
 	{
 		state->bank = new_bank;
-		memory_set_bank(space->machine, "bank1", state->bank);
+		memory_set_bank(space->machine(), "bank1", state->bank);
 	}
 
 	state->scrollx_hi = (data & 1) << 8;
@@ -203,7 +203,7 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, linestate);
+	cputag_set_input_line(device->machine(), "maincpu", 0, linestate);
 }
 
 static const ym2203_interface ym2203_config =
@@ -228,7 +228,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( compgolf )
 {
-	compgolf_state *state = machine->driver_data<compgolf_state>();
+	compgolf_state *state = machine.driver_data<compgolf_state>();
 
 	state->save_item(NAME(state->bank));
 	state->save_item(NAME(state->scrollx_lo));
@@ -239,7 +239,7 @@ static MACHINE_START( compgolf )
 
 static MACHINE_RESET( compgolf )
 {
-	compgolf_state *state = machine->driver_data<compgolf_state>();
+	compgolf_state *state = machine.driver_data<compgolf_state>();
 
 	state->bank = -1;
 	state->scrollx_lo = 0;
@@ -346,10 +346,10 @@ ROM_END
  *
  *************************************/
 
-static void compgolf_expand_bg(running_machine *machine)
+static void compgolf_expand_bg(running_machine &machine)
 {
-	UINT8 *GFXDST = machine->region("gfx2")->base();
-	UINT8 *GFXSRC = machine->region("gfx4")->base();
+	UINT8 *GFXDST = machine.region("gfx2")->base();
+	UINT8 *GFXSRC = machine.region("gfx4")->base();
 
 	int x;
 
@@ -362,7 +362,7 @@ static void compgolf_expand_bg(running_machine *machine)
 
 static DRIVER_INIT( compgolf )
 {
-	memory_configure_bank(machine, "bank1", 0, 2, machine->region("user1")->base(), 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine.region("user1")->base(), 0x4000);
 	compgolf_expand_bg(machine);
 }
 

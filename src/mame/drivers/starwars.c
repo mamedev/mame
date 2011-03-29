@@ -45,11 +45,11 @@
 
 static MACHINE_RESET( starwars )
 {
-	starwars_state *state = machine->driver_data<starwars_state>();
+	starwars_state *state = machine.driver_data<starwars_state>();
 	/* ESB-specific */
 	if (state->is_esb)
 	{
-		address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 		/* reset the slapstic */
 		slapstic_reset();
@@ -74,7 +74,7 @@ static MACHINE_RESET( starwars )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -87,7 +87,7 @@ static WRITE8_HANDLER( irq_ack_w )
 
 static void esb_slapstic_tweak(address_space *space, offs_t offset)
 {
-	starwars_state *state = space->machine->driver_data<starwars_state>();
+	starwars_state *state = space->machine().driver_data<starwars_state>();
 	int new_bank = slapstic_tweak(space, offset);
 
 	/* update for the new bank */
@@ -101,7 +101,7 @@ static void esb_slapstic_tweak(address_space *space, offs_t offset)
 
 static READ8_HANDLER( esb_slapstic_r )
 {
-	starwars_state *state = space->machine->driver_data<starwars_state>();
+	starwars_state *state = space->machine().driver_data<starwars_state>();
 	int result = state->slapstic_base[offset];
 	esb_slapstic_tweak(space, offset);
 	return result;
@@ -498,21 +498,21 @@ ROM_END
 
 static DRIVER_INIT( starwars )
 {
-	starwars_state *state = machine->driver_data<starwars_state>();
+	starwars_state *state = machine.driver_data<starwars_state>();
 	/* prepare the mathbox */
 	state->is_esb = 0;
 	starwars_mproc_init(machine);
 
 	/* initialize banking */
-	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x6000, 0x10000 - 0x6000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0x6000, 0x10000 - 0x6000);
 	memory_set_bank(machine, "bank1", 0);
 }
 
 
 static DRIVER_INIT( esb )
 {
-	starwars_state *state = machine->driver_data<starwars_state>();
-	UINT8 *rom = machine->region("maincpu")->base();
+	starwars_state *state = machine.driver_data<starwars_state>();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	/* init the slapstic */
 	slapstic_init(machine, 101);
@@ -520,14 +520,14 @@ static DRIVER_INIT( esb )
 	state->slapstic_base = &rom[0x08000];
 
 	/* install an opcode base handler */
-	address_space *space = machine->device<m6809_device>("maincpu")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate_create_static(esb_setdirect, *machine));
+	address_space *space = machine.device<m6809_device>("maincpu")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate_create_static(esb_setdirect, machine));
 
 	/* install read/write handlers for it */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8000, 0x9fff, FUNC(esb_slapstic_r), FUNC(esb_slapstic_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8000, 0x9fff, FUNC(esb_slapstic_r), FUNC(esb_slapstic_w));
 
 	/* install additional banking */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xa000, 0xffff, "bank2");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xa000, 0xffff, "bank2");
 
 	/* prepare the matrix processor */
 	state->is_esb = 1;

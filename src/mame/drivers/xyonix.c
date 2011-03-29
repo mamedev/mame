@@ -27,16 +27,16 @@ TODO:
 
 static WRITE8_HANDLER( xyonix_irqack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
 /* Inputs ********************************************************************/
 
-static void handle_coins(running_machine *machine, int coin)
+static void handle_coins(running_machine &machine, int coin)
 {
 	static const int coinage_table[4][2] = {{2,3},{2,1},{1,2},{1,1}};
-	xyonix_state *state = machine->driver_data<xyonix_state>();
+	xyonix_state *state = machine.driver_data<xyonix_state>();
 	int tmp = 0;
 
 	//popmessage("Coin %d", state->coin);
@@ -74,7 +74,7 @@ static void handle_coins(running_machine *machine, int coin)
 
 static READ8_HANDLER ( xyonix_io_r )
 {
-	xyonix_state *state = space->machine->driver_data<xyonix_state>();
+	xyonix_state *state = space->machine().driver_data<xyonix_state>();
 	int regPC = cpu_get_pc(space->cpu);
 
 	if (regPC == 0x27ba)
@@ -90,20 +90,20 @@ static READ8_HANDLER ( xyonix_io_r )
 		switch (state->e0_data)
 		{
 			case 0x81 :
-				return input_port_read(space->machine, "P1") & 0x7f;
+				return input_port_read(space->machine(), "P1") & 0x7f;
 			case 0x82 :
-				return input_port_read(space->machine, "P2") & 0x7f;
+				return input_port_read(space->machine(), "P2") & 0x7f;
 			case 0x91:
 				/* check coin inputs */
-				coin = ((input_port_read(space->machine, "P1") & 0x80) >> 7) | ((input_port_read(space->machine, "P2") & 0x80) >> 6);
+				coin = ((input_port_read(space->machine(), "P1") & 0x80) >> 7) | ((input_port_read(space->machine(), "P2") & 0x80) >> 6);
 				if (coin ^ state->prev_coin && coin != 3)
 				{
-					if (state->credits < 9) handle_coins(space->machine, coin);
+					if (state->credits < 9) handle_coins(space->machine(), coin);
 				}
 				state->prev_coin = coin;
 				return state->credits;
 			case 0x92:
-				return ((input_port_read(space->machine, "P1") & 0x80) >> 7) | ((input_port_read(space->machine, "P2") & 0x80) >> 6);
+				return ((input_port_read(space->machine(), "P1") & 0x80) >> 7) | ((input_port_read(space->machine(), "P2") & 0x80) >> 6);
 			case 0xe0:	/* reset? */
 				state->coins = 0;
 				state->credits = 0;
@@ -112,9 +112,9 @@ static READ8_HANDLER ( xyonix_io_r )
 				state->credits--;
 				return 0xff;
 			case 0xfe:	/* Dip Switches 1 to 4 */
-				return input_port_read(space->machine, "DSW") & 0x0f;
+				return input_port_read(space->machine(), "DSW") & 0x0f;
 			case 0xff:	/* Dip Switches 5 to 8 */
-				return input_port_read(space->machine, "DSW") >> 4;
+				return input_port_read(space->machine(), "DSW") >> 4;
 		}
 	}
 
@@ -126,7 +126,7 @@ static READ8_HANDLER ( xyonix_io_r )
 
 static WRITE8_HANDLER ( xyonix_io_w )
 {
-	xyonix_state *state = space->machine->driver_data<xyonix_state>();
+	xyonix_state *state = space->machine().driver_data<xyonix_state>();
 
 	//logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, cpu_get_pc(space->cpu));
 	state->e0_data = data;

@@ -222,7 +222,7 @@ public:
 
 static TILE_GET_INFO( get_gfx0b_tile_info )
 {
-	witch_state *state = machine->driver_data<witch_state>();
+	witch_state *state = machine.driver_data<witch_state>();
 	int code  = state->gfx0_vram[tile_index];
 	int color = state->gfx0_cram[tile_index];
 
@@ -242,7 +242,7 @@ static TILE_GET_INFO( get_gfx0b_tile_info )
 
 static TILE_GET_INFO( get_gfx0a_tile_info )
 {
-	witch_state *state = machine->driver_data<witch_state>();
+	witch_state *state = machine.driver_data<witch_state>();
 	int code  = state->gfx0_vram[tile_index];
 	int color = state->gfx0_cram[tile_index];
 
@@ -262,7 +262,7 @@ static TILE_GET_INFO( get_gfx0a_tile_info )
 
 static TILE_GET_INFO( get_gfx1_tile_info )
 {
-	witch_state *state = machine->driver_data<witch_state>();
+	witch_state *state = machine.driver_data<witch_state>();
 	int code  = state->gfx1_vram[tile_index];
 	int color = state->gfx1_cram[tile_index];
 
@@ -275,7 +275,7 @@ static TILE_GET_INFO( get_gfx1_tile_info )
 
 static WRITE8_HANDLER( gfx0_vram_w )
 {
-	witch_state *state = space->machine->driver_data<witch_state>();
+	witch_state *state = space->machine().driver_data<witch_state>();
 	state->gfx0_vram[offset] = data;
 	tilemap_mark_tile_dirty(state->gfx0a_tilemap,offset);
 	tilemap_mark_tile_dirty(state->gfx0b_tilemap,offset);
@@ -283,20 +283,20 @@ static WRITE8_HANDLER( gfx0_vram_w )
 
 static WRITE8_HANDLER( gfx0_cram_w )
 {
-	witch_state *state = space->machine->driver_data<witch_state>();
+	witch_state *state = space->machine().driver_data<witch_state>();
 	state->gfx0_cram[offset] = data;
 	tilemap_mark_tile_dirty(state->gfx0a_tilemap,offset);
 	tilemap_mark_tile_dirty(state->gfx0b_tilemap,offset);
 }
 static READ8_HANDLER( gfx0_vram_r )
 {
-	witch_state *state = space->machine->driver_data<witch_state>();
+	witch_state *state = space->machine().driver_data<witch_state>();
 	return state->gfx0_vram[offset];
 }
 
 static READ8_HANDLER( gfx0_cram_r )
 {
-	witch_state *state = space->machine->driver_data<witch_state>();
+	witch_state *state = space->machine().driver_data<witch_state>();
 	return state->gfx0_cram[offset];
 }
 
@@ -305,7 +305,7 @@ static READ8_HANDLER( gfx0_cram_r )
 
 static WRITE8_HANDLER( gfx1_vram_w )
 {
-	witch_state *state = space->machine->driver_data<witch_state>();
+	witch_state *state = space->machine().driver_data<witch_state>();
 	FIX_OFFSET();
 	state->gfx1_vram[offset] = data;
 	tilemap_mark_tile_dirty(state->gfx1_tilemap,offset);
@@ -313,35 +313,35 @@ static WRITE8_HANDLER( gfx1_vram_w )
 
 static WRITE8_HANDLER( gfx1_cram_w )
 {
-	witch_state *state = space->machine->driver_data<witch_state>();
+	witch_state *state = space->machine().driver_data<witch_state>();
 	FIX_OFFSET();
 	state->gfx1_cram[offset] = data;
 	tilemap_mark_tile_dirty(state->gfx1_tilemap,offset);
 }
 static READ8_HANDLER( gfx1_vram_r )
 {
-	witch_state *state = space->machine->driver_data<witch_state>();
+	witch_state *state = space->machine().driver_data<witch_state>();
 	FIX_OFFSET();
 	return state->gfx1_vram[offset];
 }
 
 static READ8_HANDLER( gfx1_cram_r )
 {
-	witch_state *state = space->machine->driver_data<witch_state>();
+	witch_state *state = space->machine().driver_data<witch_state>();
 	FIX_OFFSET();
 	return state->gfx1_cram[offset];
 }
 
 static READ8_HANDLER(read_a00x)
 {
-	witch_state *state = space->machine->driver_data<witch_state>();
+	witch_state *state = space->machine().driver_data<witch_state>();
 	switch(offset)
 	{
 		case 0x02: return state->reg_a002;
-		case 0x04: return input_port_read(space->machine, "A004");
-		case 0x05: return input_port_read(space->machine, "A005");
-		case 0x0c: return input_port_read(space->machine, "SERVICE");	// stats / reset
-		case 0x0e: return input_port_read(space->machine, "A00E");		// coin/reset
+		case 0x04: return input_port_read(space->machine(), "A004");
+		case 0x05: return input_port_read(space->machine(), "A005");
+		case 0x0c: return input_port_read(space->machine(), "SERVICE");	// stats / reset
+		case 0x0e: return input_port_read(space->machine(), "A00E");		// coin/reset
 	}
 
 	if(offset == 0x00) //muxed with A002?
@@ -349,11 +349,11 @@ static READ8_HANDLER(read_a00x)
 		switch(state->reg_a002 & 0x3f)
 		{
 		case 0x3b:
-			return input_port_read(space->machine, "UNK");	//bet10 / pay out
+			return input_port_read(space->machine(), "UNK");	//bet10 / pay out
 		case 0x3e:
-			return input_port_read(space->machine, "INPUTS");	//TODO : trace f564
+			return input_port_read(space->machine(), "INPUTS");	//TODO : trace f564
 		case 0x3d:
-			return input_port_read(space->machine, "A005");
+			return input_port_read(space->machine(), "A005");
 		default:
 			logerror("A000 read with mux=0x%02x\n", state->reg_a002 & 0x3f);
 		}
@@ -363,7 +363,7 @@ static READ8_HANDLER(read_a00x)
 
 static WRITE8_HANDLER(write_a00x)
 {
-	witch_state *state = space->machine->driver_data<witch_state>();
+	witch_state *state = space->machine().driver_data<witch_state>();
 	switch(offset)
 	{
 		case 0x02: //A002 bit 7&6 = state->bank ????
@@ -374,10 +374,10 @@ static WRITE8_HANDLER(write_a00x)
 
 			if(newbank != state->bank)
 			{
-				UINT8 *ROM = space->machine->region("maincpu")->base();
+				UINT8 *ROM = space->machine().region("maincpu")->base();
 				state->bank = newbank;
 				ROM = &ROM[0x10000+0x8000 * newbank + UNBANKED_SIZE];
-				memory_set_bankptr(space->machine, "bank1",ROM);
+				memory_set_bankptr(space->machine(), "bank1",ROM);
 			}
 		}
 		break;
@@ -413,7 +413,7 @@ static READ8_HANDLER(prot_read_700x)
 	case 0x25e:
 		return offset;//enough to pass...
   }
-  return space->machine->region("sub")->base()[0x7000+offset];
+  return space->machine().region("sub")->base()[0x7000+offset];
 }
 
 /*
@@ -424,12 +424,12 @@ static READ8_DEVICE_HANDLER(read_8010) {	return 0x00; }
 
 static WRITE8_DEVICE_HANDLER(xscroll_w)
 {
-	witch_state *state = device->machine->driver_data<witch_state>();
+	witch_state *state = device->machine().driver_data<witch_state>();
 	state->scrollx=data;
 }
 static WRITE8_DEVICE_HANDLER(yscroll_w)
 {
-	witch_state *state = device->machine->driver_data<witch_state>();
+	witch_state *state = device->machine().driver_data<witch_state>();
 	state->scrolly=data;
 }
 
@@ -696,7 +696,7 @@ GFXDECODE_END
 
 static VIDEO_START(witch)
 {
-	witch_state *state = machine->driver_data<witch_state>();
+	witch_state *state = machine.driver_data<witch_state>();
 	state->gfx0a_tilemap = tilemap_create(machine, get_gfx0a_tile_info,tilemap_scan_rows,8,8,32,32);
 	state->gfx0b_tilemap = tilemap_create(machine, get_gfx0b_tile_info,tilemap_scan_rows,8,8,32,32);
 	state->gfx1_tilemap = tilemap_create(machine, get_gfx1_tile_info,tilemap_scan_rows,8,8,32,32);
@@ -708,9 +708,9 @@ static VIDEO_START(witch)
 	tilemap_set_palette_offset(state->gfx1_tilemap,0x200);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	witch_state *state = machine->driver_data<witch_state>();
+	witch_state *state = machine.driver_data<witch_state>();
 	int i,sx,sy,tileno,flags,color;
 	int flipx=0;
 	int flipy=0;
@@ -731,22 +731,22 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			color  =  flags & 0x0f;
 
 
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 				tileno, color,
 				flipx, flipy,
 				sx+8*flipx,sy+8*flipy,0);
 
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 				tileno+1, color,
 				flipx, flipy,
 				sx+8-8*flipx,sy+8*flipy,0);
 
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 				tileno+2, color,
 				flipx, flipy,
 				sx+8*flipx,sy+8-8*flipy,0);
 
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 				tileno+3, color,
 				flipx, flipy,
 				sx+8-8*flipx,sy+8-8*flipy,0);
@@ -758,7 +758,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static SCREEN_UPDATE(witch)
 {
-	witch_state *state = screen->machine->driver_data<witch_state>();
+	witch_state *state = screen->machine().driver_data<witch_state>();
 	tilemap_set_scrollx( state->gfx1_tilemap, 0, state->scrollx-7 ); //offset to have it aligned with the sprites
 	tilemap_set_scrolly( state->gfx1_tilemap, 0, state->scrolly+8 );
 
@@ -766,7 +766,7 @@ static SCREEN_UPDATE(witch)
 
 	tilemap_draw(bitmap,cliprect,state->gfx1_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->gfx0a_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,state->gfx0b_tilemap,0,0);
 	return 0;
 }
@@ -864,11 +864,11 @@ ROM_END
 
 static DRIVER_INIT(witch)
 {
-	witch_state *state = machine->driver_data<witch_state>();
-	UINT8 *ROM = (UINT8 *)machine->region("maincpu")->base();
+	witch_state *state = machine.driver_data<witch_state>();
+	UINT8 *ROM = (UINT8 *)machine.region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1", &ROM[0x10000+UNBANKED_SIZE]);
 
-	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7000, 0x700f, FUNC(prot_read_700x));
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7000, 0x700f, FUNC(prot_read_700x));
 	state->bank = -1;
 }
 

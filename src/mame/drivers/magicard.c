@@ -380,11 +380,11 @@ static VIDEO_START(magicard)
 
 static SCREEN_UPDATE(magicard)
 {
-	magicard_state *state = screen->machine->driver_data<magicard_state>();
+	magicard_state *state = screen->machine().driver_data<magicard_state>();
 	int x,y;
 	UINT32 count;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine)); //TODO
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine())); //TODO
 
 	if(!(SCC_DE_VREG)) //display enable
 		return 0;
@@ -402,22 +402,22 @@ static SCREEN_UPDATE(magicard)
 				color = ((state->magicram[count]) & 0x000f)>>0;
 
 				if(((x*4)+3)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, (x*4)+3) = screen->machine->pens[color];
+					*BITMAP_ADDR32(bitmap, y, (x*4)+3) = screen->machine().pens[color];
 
 				color = ((state->magicram[count]) & 0x00f0)>>4;
 
 				if(((x*4)+2)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, (x*4)+2) = screen->machine->pens[color];
+					*BITMAP_ADDR32(bitmap, y, (x*4)+2) = screen->machine().pens[color];
 
 				color = ((state->magicram[count]) & 0x0f00)>>8;
 
 				if(((x*4)+1)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, (x*4)+1) = screen->machine->pens[color];
+					*BITMAP_ADDR32(bitmap, y, (x*4)+1) = screen->machine().pens[color];
 
 				color = ((state->magicram[count]) & 0xf000)>>12;
 
 				if(((x*4)+0)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, (x*4)+0) = screen->machine->pens[color];
+					*BITMAP_ADDR32(bitmap, y, (x*4)+0) = screen->machine().pens[color];
 
 				count++;
 			}
@@ -434,12 +434,12 @@ static SCREEN_UPDATE(magicard)
 				color = ((state->magicram[count]) & 0x00ff)>>0;
 
 				if(((x*2)+1)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine->pens[color];
+					*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine().pens[color];
 
 				color = ((state->magicram[count]) & 0xff00)>>8;
 
 				if(((x*2)+0)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine->pens[color];
+					*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine().pens[color];
 
 				count++;
 			}
@@ -456,12 +456,12 @@ static SCREEN_UPDATE(magicard)
 
 static READ16_HANDLER( test_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static WRITE16_HANDLER( paletteram_io_w )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	switch(offset*2)
 	{
 		case 0:
@@ -483,7 +483,7 @@ static WRITE16_HANDLER( paletteram_io_w )
 					break;
 				case 2:
 					state->pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					palette_set_color(space->machine, state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
+					palette_set_color(space->machine(), state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
 					state->pal.offs_internal = 0;
 					state->pal.offs++;
 					break;
@@ -495,11 +495,11 @@ static WRITE16_HANDLER( paletteram_io_w )
 
 static READ16_HANDLER( philips_66470_r )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	switch(offset)
 	{
 //      case 0/2:
-//          return space->machine->rand(); //TODO
+//          return space->machine().rand(); //TODO
 	}
 
 	//printf("[%04x]\n",offset*2);
@@ -510,7 +510,7 @@ static READ16_HANDLER( philips_66470_r )
 
 static WRITE16_HANDLER( philips_66470_w )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	COMBINE_DATA(&state->pcab_vregs[offset]);
 
 //  if(offset == 0x10/2)
@@ -524,19 +524,19 @@ static WRITE16_HANDLER( philips_66470_w )
 
 static READ16_HANDLER( scc68070_ext_irqc_r )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	return state->scc68070_ext_irqc_regs[offset];
 }
 
 static WRITE16_HANDLER( scc68070_ext_irqc_w )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	state->scc68070_ext_irqc_regs[offset] = data;
 }
 
 static READ16_HANDLER( scc68070_iic_r )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	//printf("%04x\n",offset*2);
 
 	switch(offset)
@@ -549,18 +549,18 @@ static READ16_HANDLER( scc68070_iic_r )
 
 static WRITE16_HANDLER( scc68070_iic_w )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	state->scc68070_iic_regs[offset] = data;
 }
 
 static READ16_HANDLER( scc68070_uart_r )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	//printf("%02x\n",offset*2);
 
 	switch(offset)
 	{
-		case 0x02/2: return space->machine->rand(); //uart mode register
+		case 0x02/2: return space->machine().rand(); //uart mode register
 	}
 
 	return state->scc68070_uart_regs[offset];
@@ -568,67 +568,67 @@ static READ16_HANDLER( scc68070_uart_r )
 
 static WRITE16_HANDLER( scc68070_uart_w )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	state->scc68070_uart_regs[offset] = data;
 }
 
 static READ16_HANDLER( scc68070_timer_r )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	return state->scc68070_timer_regs[offset];
 }
 
 static WRITE16_HANDLER( scc68070_timer_w )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	state->scc68070_timer_regs[offset] = data;
 }
 
 static READ16_HANDLER( scc68070_int_irqc_r )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	return state->scc68070_int_irqc_regs[offset];
 }
 
 static WRITE16_HANDLER( scc68070_int_irqc_w )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	state->scc68070_int_irqc_regs[offset] = data;
 }
 
 static READ16_HANDLER( scc68070_dma_ch1_r )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	return state->scc68070_dma_ch1_regs[offset];
 }
 
 static WRITE16_HANDLER( scc68070_dma_ch1_w )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	state->scc68070_dma_ch1_regs[offset] = data;
 }
 
 static READ16_HANDLER( scc68070_dma_ch2_r )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	return state->scc68070_dma_ch2_regs[offset];
 }
 
 static WRITE16_HANDLER( scc68070_dma_ch2_w )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	state->scc68070_dma_ch2_regs[offset] = data;
 }
 
 static READ16_HANDLER( scc68070_mmu_r )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	return state->scc68070_mmu_regs[offset];
 }
 
 static WRITE16_HANDLER( scc68070_mmu_w )
 {
-	magicard_state *state = space->machine->driver_data<magicard_state>();
+	magicard_state *state = space->machine().driver_data<magicard_state>();
 	state->scc68070_mmu_regs[offset] = data;
 
 	switch(offset)
@@ -680,11 +680,11 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( magicard )
 {
-	magicard_state *state = machine->driver_data<magicard_state>();
-	UINT16 *src    = (UINT16*)machine->region("maincpu" )->base();
+	magicard_state *state = machine.driver_data<magicard_state>();
+	UINT16 *src    = (UINT16*)machine.region("maincpu" )->base();
 	UINT16 *dst    = state->magicram;
 	memcpy (dst, src, 0x80000);
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 }
 
 
@@ -695,9 +695,9 @@ static MACHINE_RESET( magicard )
 /*Probably there's a mask somewhere if it REALLY uses irqs at all...irq vectors dynamically changes after some time.*/
 static INTERRUPT_GEN( magicard_irq )
 {
-	if(input_code_pressed(device->machine, KEYCODE_Z)) //vblank?
+	if(input_code_pressed(device->machine(), KEYCODE_Z)) //vblank?
 		device_set_input_line_and_vector(device, 1, HOLD_LINE,0xe4/4);
-	if(input_code_pressed(device->machine, KEYCODE_X)) //uart irq
+	if(input_code_pressed(device->machine(), KEYCODE_X)) //uart irq
 		device_set_input_line_and_vector(device, 1, HOLD_LINE,0xf0/4);
 }
 

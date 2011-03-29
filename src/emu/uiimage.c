@@ -196,7 +196,7 @@ static void extra_text_draw_box(render_container &ui_container, float origx1, fl
     and footer text
 -------------------------------------------------*/
 
-static void extra_text_render(running_machine *machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom,
+static void extra_text_render(running_machine &machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom,
 	float origx1, float origy1, float origx2, float origy2,
 	const char *header, const char *footer)
 {
@@ -204,9 +204,9 @@ static void extra_text_render(running_machine *machine, ui_menu *menu, void *sta
 	footer = ((footer != NULL) && (footer[0] != '\0')) ? footer : NULL;
 
 	if (header != NULL)
-		extra_text_draw_box(machine->render().ui_container(), origx1, origx2, origy1, top, header, -1);
+		extra_text_draw_box(machine.render().ui_container(), origx1, origx2, origy1, top, header, -1);
 	if (footer != NULL)
-		extra_text_draw_box(machine->render().ui_container(), origx1, origx2, origy2, bottom, footer, +1);
+		extra_text_draw_box(machine.render().ui_container(), origx1, origx2, origy2, bottom, footer, +1);
 }
 
 
@@ -220,7 +220,7 @@ static void extra_text_render(running_machine *machine, ui_menu *menu, void *sta
     confirm save as menu
 -------------------------------------------------*/
 
-static void menu_confirm_save_as_populate(running_machine *machine, ui_menu *menu, void *state)
+static void menu_confirm_save_as_populate(running_machine &machine, ui_menu *menu, void *state)
 {
 	ui_menu_item_append(menu, "File Already Exists - Overide?", NULL, MENU_FLAG_DISABLE, NULL);
 	ui_menu_item_append(menu, MENU_SEPARATOR_ITEM, NULL, MENU_FLAG_DISABLE, NULL);
@@ -234,7 +234,7 @@ static void menu_confirm_save_as_populate(running_machine *machine, ui_menu *men
     menu_confirm_save_as - confirm save as menu
 -------------------------------------------------*/
 
-static void menu_confirm_save_as(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+static void menu_confirm_save_as(running_machine &machine, ui_menu *menu, void *parameter, void *state)
 {
 	const ui_menu_event *event;
 	confirm_save_as_menu_state *menustate = (confirm_save_as_menu_state *) state;
@@ -292,7 +292,7 @@ static int is_valid_filename_char(unicode_char unichar)
     special rendering
 -------------------------------------------------*/
 
-static void file_create_render_extra(running_machine *machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+static void file_create_render_extra(running_machine &machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	file_create_menu_state *menustate = (file_create_menu_state *) state;
 
@@ -308,7 +308,7 @@ static void file_create_render_extra(running_machine *machine, ui_menu *menu, vo
     creator menu
 -------------------------------------------------*/
 
-static void menu_file_create_populate(running_machine *machine, ui_menu *menu, void *state, void *selection)
+static void menu_file_create_populate(running_machine &machine, ui_menu *menu, void *state, void *selection)
 {
 	astring buffer;
 	file_create_menu_state *menustate = (file_create_menu_state *) state;
@@ -341,7 +341,7 @@ static void menu_file_create_populate(running_machine *machine, ui_menu *menu, v
 	ui_menu_item_append(menu, "Create", NULL, 0, ITEMREF_CREATE);
 
 	/* set up custom render proc */
-	ui_menu_set_custom_render(menu, file_create_render_extra, ui_get_line_height(*machine) + 3.0f * UI_BOX_TB_BORDER, 0);
+	ui_menu_set_custom_render(menu, file_create_render_extra, ui_get_line_height(machine) + 3.0f * UI_BOX_TB_BORDER, 0);
 }
 
 
@@ -382,7 +382,7 @@ static int create_new_image(device_image_interface *image, const char *directory
 
 		case ENTTYPE_FILE:
 			/* a file exists here - ask for permission from the user */
-			child_menu = ui_menu_alloc(image->device().machine, &image->device().machine->render().ui_container(), menu_confirm_save_as, NULL);
+			child_menu = ui_menu_alloc(image->device().machine(), &image->device().machine().render().ui_container(), menu_confirm_save_as, NULL);
 			child_menustate = (confirm_save_as_menu_state*)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
 			child_menustate->yes = yes;
 			ui_menu_stack_push(child_menu);
@@ -423,7 +423,7 @@ static int create_new_image(device_image_interface *image, const char *directory
     menu_file_create - file creator menu
 -------------------------------------------------*/
 
-static void menu_file_create(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+static void menu_file_create(running_machine &machine, ui_menu *menu, void *parameter, void *state)
 {
 	void *selection;
 	const ui_menu_event *event;
@@ -498,7 +498,7 @@ static void menu_file_create(running_machine *machine, ui_menu *menu, void *para
     special rendering
 -------------------------------------------------*/
 
-static void file_selector_render_extra(running_machine *machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+static void file_selector_render_extra(running_machine &machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	file_selector_menu_state *menustate = (file_selector_menu_state *) state;
 
@@ -676,7 +676,7 @@ static void append_file_selector_entry_menu_item(ui_menu *menu, const file_selec
     allocates all menu items for a directory
 -------------------------------------------------*/
 
-static file_error menu_file_selector_populate(running_machine *machine, ui_menu *menu, file_selector_menu_state *menustate)
+static file_error menu_file_selector_populate(running_machine &machine, ui_menu *menu, file_selector_menu_state *menustate)
 {
 	zippath_directory *directory = NULL;
 	file_error err = FILERR_NONE;
@@ -744,7 +744,7 @@ static file_error menu_file_selector_populate(running_machine *machine, ui_menu 
 		ui_menu_set_selection(menu, (void *) selected_entry);
 
 	/* set up custom render proc */
-	ui_menu_set_custom_render(menu, file_selector_render_extra, ui_get_line_height(*machine) + 3.0f * UI_BOX_TB_BORDER, 0);
+	ui_menu_set_custom_render(menu, file_selector_render_extra, ui_get_line_height(machine) + 3.0f * UI_BOX_TB_BORDER, 0);
 
 done:
 	if (directory != NULL)
@@ -770,7 +770,7 @@ static file_error check_path(const char *path)
     menu_file_selector - file selector menu
 -------------------------------------------------*/
 
-static void menu_file_selector(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+static void menu_file_selector(running_machine &machine, ui_menu *menu, void *parameter, void *state)
 {
 	file_error err;
 	const ui_menu_event *event;
@@ -815,13 +815,13 @@ static void menu_file_selector(running_machine *machine, ui_menu *menu, void *pa
 
 				case SELECTOR_ENTRY_TYPE_CREATE:
 					/* create */
-					child_menu = ui_menu_alloc(machine, &machine->render().ui_container(), menu_file_create, NULL);
+					child_menu = ui_menu_alloc(machine, &machine.render().ui_container(), menu_file_create, NULL);
 					child_menustate = (file_create_menu_state*)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
 					child_menustate->manager_menustate = menustate->manager_menustate;
 					ui_menu_stack_push(child_menu);
 					break;
 				case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
-					child_menu = ui_menu_alloc(machine, &machine->render().ui_container(), ui_image_menu_software, menustate->manager_menustate->selected_device);
+					child_menu = ui_menu_alloc(machine, &machine.render().ui_container(), ui_image_menu_software, menustate->manager_menustate->selected_device);
 					ui_menu_stack_push(child_menu);
 					break;
 				case SELECTOR_ENTRY_TYPE_DRIVE:
@@ -956,7 +956,7 @@ static void fix_working_directory(device_image_interface *image)
     special rendering
 -------------------------------------------------*/
 
-static void file_manager_render_extra(running_machine *machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+static void file_manager_render_extra(running_machine &machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	file_manager_menu_state *menustate = (file_manager_menu_state *) state;
 	const char *path;
@@ -974,14 +974,14 @@ static void file_manager_render_extra(running_machine *machine, ui_menu *menu, v
     file manager menu
 -------------------------------------------------*/
 
-static void menu_file_manager_populate(running_machine *machine, ui_menu *menu, void *state)
+static void menu_file_manager_populate(running_machine &machine, ui_menu *menu, void *state)
 {
 	char buffer[2048];
 	device_image_interface *image = NULL;
 	astring tmp_name;
 
 	/* cycle through all devices for this system */
-	for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
+	for (bool gotone = machine.m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		/* get the image type/id */
 		snprintf(buffer, ARRAY_LENGTH(buffer),
@@ -1019,7 +1019,7 @@ static void menu_file_manager_populate(running_machine *machine, ui_menu *menu, 
 	}
 
 	/* set up custom render proc */
-	ui_menu_set_custom_render(menu, file_manager_render_extra, 0, ui_get_line_height(*machine) + 3.0f * UI_BOX_TB_BORDER);
+	ui_menu_set_custom_render(menu, file_manager_render_extra, 0, ui_get_line_height(machine) + 3.0f * UI_BOX_TB_BORDER);
 }
 
 
@@ -1045,7 +1045,7 @@ static void file_manager_destroy_state(ui_menu *menu, void *state)
     menu_file_manager - main file manager menu
 -------------------------------------------------*/
 
-void ui_image_menu_file_manager(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+void ui_image_menu_file_manager(running_machine &machine, ui_menu *menu, void *parameter, void *state)
 {
 	const ui_menu_event *event;
 	file_manager_menu_state *menustate;
@@ -1088,7 +1088,7 @@ void ui_image_menu_file_manager(running_machine *machine, ui_menu *menu, void *p
 			ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
 
 			/* push the menu */
-			child_menu = ui_menu_alloc(machine, &machine->render().ui_container(), menu_file_selector, NULL);
+			child_menu = ui_menu_alloc(machine, &machine.render().ui_container(), menu_file_selector, NULL);
 			child_menustate = (file_selector_menu_state *)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
 			child_menustate->manager_menustate = menustate;
 			ui_menu_stack_push(child_menu);
@@ -1101,7 +1101,7 @@ void ui_image_menu_file_manager(running_machine *machine, ui_menu *menu, void *p
     on all loaded images
 -------------------------------------------------*/
 
-void ui_image_menu_image_info(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+void ui_image_menu_image_info(running_machine &machine, ui_menu *menu, void *parameter, void *state)
 {
 	/* if the menu isn't built, populate now */
 	if (!ui_menu_populated(menu))
@@ -1160,10 +1160,10 @@ struct _bitbanger_control_menu_state
     devices in the machine
 -------------------------------------------------*/
 
-INLINE int cassette_count( running_machine *machine )
+INLINE int cassette_count( running_machine &machine )
 {
 	int count = 0;
-	device_t *device = machine->m_devicelist.first(CASSETTE);
+	device_t *device = machine.m_devicelist.first(CASSETTE);
 
 	while ( device )
 	{
@@ -1178,10 +1178,10 @@ INLINE int cassette_count( running_machine *machine )
     devices in the machine
 -------------------------------------------------*/
 
-INLINE int bitbanger_count( running_machine *machine )
+INLINE int bitbanger_count( running_machine &machine )
 {
 	int count = 0;
-	device_t *device = machine->m_devicelist.first(BITBANGER);
+	device_t *device = machine.m_devicelist.first(BITBANGER);
 
 	while ( device )
 	{
@@ -1223,7 +1223,7 @@ astring *tapecontrol_gettime(astring *dest, device_t *device, int *curpos, int *
     main tape control menu
 -------------------------------------------------*/
 
-static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, tape_control_menu_state *menustate)
+static void menu_tape_control_populate(running_machine &machine, ui_menu *menu, tape_control_menu_state *menustate)
 {
 	astring timepos;
 	cassette_state state;
@@ -1300,7 +1300,7 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
     main bitbanger control menu
 -------------------------------------------------*/
 
-static void menu_bitbanger_control_populate(running_machine *machine, ui_menu *menu, bitbanger_control_menu_state *menustate)
+static void menu_bitbanger_control_populate(running_machine &machine, ui_menu *menu, bitbanger_control_menu_state *menustate)
 {
 	int count = bitbanger_count(machine);
 	UINT32 flags = 0, mode_flags = 0, baud_flags = 0, tune_flags = 0;
@@ -1353,7 +1353,7 @@ static void menu_bitbanger_control_populate(running_machine *machine, ui_menu *m
     menu_tape_control - main tape control menu
 -------------------------------------------------*/
 
-void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+void ui_mess_menu_tape_control(running_machine &machine, ui_menu *menu, void *parameter, void *state)
 {
 	tape_control_menu_state *menustate;
 	const ui_menu_event *event;
@@ -1368,7 +1368,7 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 	{
 		int index = menustate->index;
 		device_image_interface *device = NULL;
-		for (bool gotone = machine->m_devicelist.first(device); gotone; gotone = device->next(device))
+		for (bool gotone = machine.m_devicelist.first(device); gotone; gotone = device->next(device))
 		{
 			if(device->device().type() == CASSETTE) {
 				if (index==0) break;
@@ -1450,7 +1450,7 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
     control menu
 -------------------------------------------------*/
 
-void ui_mess_menu_bitbanger_control(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+void ui_mess_menu_bitbanger_control(running_machine &machine, ui_menu *menu, void *parameter, void *state)
 {
 	bitbanger_control_menu_state *menustate;
 	const ui_menu_event *event;
@@ -1465,7 +1465,7 @@ void ui_mess_menu_bitbanger_control(running_machine *machine, ui_menu *menu, voi
 	{
 		int index = menustate->index;
 		device_image_interface *device = NULL;
-		for (bool gotone = machine->m_devicelist.first(device); gotone; gotone = device->next(device))
+		for (bool gotone = machine.m_devicelist.first(device); gotone; gotone = device->next(device))
 		{
 			if(device->device().type() == BITBANGER) {
 				if (index==0) break;

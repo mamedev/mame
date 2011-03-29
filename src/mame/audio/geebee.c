@@ -129,7 +129,7 @@ static STREAM_UPDATE( geebee_sound_update )
 static DEVICE_START( geebee_sound )
 {
 	geebee_sound_state *state = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	int i;
 
 	state->decay = auto_alloc_array(machine, UINT16, 32768);
@@ -138,10 +138,10 @@ static DEVICE_START( geebee_sound )
 		state->decay[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 
 	/* 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz */
-	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, 18432000 / 3 / 2 / 384, NULL, geebee_sound_update);
+	state->channel = device->machine().sound().stream_alloc(*device, 0, 1, 18432000 / 3 / 2 / 384, NULL, geebee_sound_update);
 	state->vcount = 0;
 
-	state->volume_timer = machine->scheduler().timer_alloc(FUNC(volume_decay), state);
+	state->volume_timer = machine.scheduler().timer_alloc(FUNC(volume_decay), state);
 }
 
 DEVICE_GET_INFO( geebee_sound )

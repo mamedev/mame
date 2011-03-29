@@ -521,9 +521,9 @@ static void AICA_Init(device_t *device, aica_state *AICA, const aica_interface *
 		}
 	}
 
-	AICA->timerA = device->machine->scheduler().timer_alloc(FUNC(timerA_cb), AICA);
-	AICA->timerB = device->machine->scheduler().timer_alloc(FUNC(timerB_cb), AICA);
-	AICA->timerC = device->machine->scheduler().timer_alloc(FUNC(timerC_cb), AICA);
+	AICA->timerA = device->machine().scheduler().timer_alloc(FUNC(timerA_cb), AICA);
+	AICA->timerB = device->machine().scheduler().timer_alloc(FUNC(timerB_cb), AICA);
+	AICA->timerC = device->machine().scheduler().timer_alloc(FUNC(timerC_cb), AICA);
 
 	for(i=0;i<0x400;++i)
 	{
@@ -614,9 +614,9 @@ static void AICA_Init(device_t *device, aica_state *AICA, const aica_interface *
 		AICA->Slots[i].lpend=1;
 	}
 
-	AICALFO_Init(device->machine);
-	AICA->buffertmpl=auto_alloc_array_clear(device->machine, signed int, 44100);
-	AICA->buffertmpr=auto_alloc_array_clear(device->machine, signed int, 44100);
+	AICALFO_Init(device->machine());
+	AICA->buffertmpl=auto_alloc_array_clear(device->machine(), signed int, 44100);
+	AICA->buffertmpr=auto_alloc_array_clear(device->machine(), signed int, 44100);
 
 	// no "pend"
 	AICA[0].udata.data[0xa0/2] = 0;
@@ -1283,7 +1283,7 @@ static DEVICE_START( aica )
 	{
 		AICA->IntARMCB = intf->irq_callback;
 
-		AICA->stream = device->machine->sound().stream_alloc(*device, 0, 2, 44100, AICA, AICA_Update);
+		AICA->stream = device->machine().sound().stream_alloc(*device, 0, 2, 44100, AICA, AICA_Update);
 	}
 }
 

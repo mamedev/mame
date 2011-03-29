@@ -71,18 +71,18 @@ WRITE8_HANDLER( irobot_paletteram_w )
 	g = 12 * bits * intensity;
 	bits = (color >> 7) & 0x03;
 	r = 12 * bits * intensity;
-	palette_set_color(space->machine,(offset >> 1) & 0x3F,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine(),(offset >> 1) & 0x3F,MAKE_RGB(r,g,b));
 }
 
 
-static void _irobot_poly_clear(running_machine *machine, UINT8 *bitmap_base)
+static void _irobot_poly_clear(running_machine &machine, UINT8 *bitmap_base)
 {
-	memset(bitmap_base, 0, BITMAP_WIDTH * machine->primary_screen->height());
+	memset(bitmap_base, 0, BITMAP_WIDTH * machine.primary_screen->height());
 }
 
-void irobot_poly_clear(running_machine *machine)
+void irobot_poly_clear(running_machine &machine)
 {
-	irobot_state *state = machine->driver_data<irobot_state>();
+	irobot_state *state = machine.driver_data<irobot_state>();
 	UINT8 *bitmap_base = state->bufsel ? state->polybitmap2 : state->polybitmap1;
 	_irobot_poly_clear(machine, bitmap_base);
 }
@@ -95,9 +95,9 @@ void irobot_poly_clear(running_machine *machine)
 ***************************************************************************/
 VIDEO_START( irobot )
 {
-	irobot_state *state = machine->driver_data<irobot_state>();
+	irobot_state *state = machine.driver_data<irobot_state>();
 	/* Setup 2 bitmaps for the polygon generator */
-	int height = machine->primary_screen->height();
+	int height = machine.primary_screen->height();
 	state->polybitmap1 = auto_alloc_array(machine, UINT8, BITMAP_WIDTH * height);
 	state->polybitmap2 = auto_alloc_array(machine, UINT8, BITMAP_WIDTH * height);
 
@@ -107,8 +107,8 @@ VIDEO_START( irobot )
 
 	/* Set clipping */
 	state->ir_xmin = state->ir_ymin = 0;
-	state->ir_xmax = machine->primary_screen->width();
-	state->ir_ymax = machine->primary_screen->height();
+	state->ir_xmax = machine.primary_screen->width();
+	state->ir_ymax = machine.primary_screen->height();
 }
 
 
@@ -162,9 +162,9 @@ VIDEO_START( irobot )
      modified from a routine written by Andrew Caldwell
  */
 
-static void draw_line(running_machine *machine, UINT8 *polybitmap, int x1, int y1, int x2, int y2, int col)
+static void draw_line(running_machine &machine, UINT8 *polybitmap, int x1, int y1, int x2, int y2, int col)
 {
-	irobot_state *state = machine->driver_data<irobot_state>();
+	irobot_state *state = machine.driver_data<irobot_state>();
     int dx,dy,sx,sy,cx,cy;
 
     dx = abs(x1-x2);
@@ -211,9 +211,9 @@ static void draw_line(running_machine *machine, UINT8 *polybitmap, int x1, int y
 
 #define ROUND_TO_PIXEL(x)	((x >> 7) - 128)
 
-void irobot_run_video(running_machine *machine)
+void irobot_run_video(running_machine &machine)
 {
-	irobot_state *state = machine->driver_data<irobot_state>();
+	irobot_state *state = machine.driver_data<irobot_state>();
 	UINT8 *polybitmap;
 	UINT16 *combase16 = (UINT16 *)state->combase;
 	int sx,sy,ex,ey,sx2,ey2;
@@ -348,7 +348,7 @@ void irobot_run_video(running_machine *machine)
 
 SCREEN_UPDATE( irobot )
 {
-	irobot_state *state = screen->machine->driver_data<irobot_state>();
+	irobot_state *state = screen->machine().driver_data<irobot_state>();
 	UINT8 *videoram = state->videoram;
 	UINT8 *bitmap_base = state->bufsel ? state->polybitmap1 : state->polybitmap2;
 	int x, y, offs;
@@ -364,7 +364,7 @@ SCREEN_UPDATE( irobot )
 			int code = videoram[offs] & 0x3f;
 			int color = ((videoram[offs] & 0xc0) >> 6) | (state->alphamap >> 3);
 
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
 					code, color,
 					0,0,
 					8*x,8*y,0);

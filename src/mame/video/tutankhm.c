@@ -21,14 +21,14 @@
 
 WRITE8_HANDLER( tutankhm_flip_screen_x_w )
 {
-	tutankhm_state *state = space->machine->driver_data<tutankhm_state>();
+	tutankhm_state *state = space->machine().driver_data<tutankhm_state>();
 	state->flip_x = data & 0x01;
 }
 
 
 WRITE8_HANDLER( tutankhm_flip_screen_y_w )
 {
-	tutankhm_state *state = space->machine->driver_data<tutankhm_state>();
+	tutankhm_state *state = space->machine().driver_data<tutankhm_state>();
 	state->flip_y = data & 0x01;
 }
 
@@ -39,9 +39,9 @@ WRITE8_HANDLER( tutankhm_flip_screen_y_w )
  *
  *************************************/
 
-static void get_pens( running_machine *machine, pen_t *pens )
+static void get_pens( running_machine &machine, pen_t *pens )
 {
-	tutankhm_state *state = machine->driver_data<tutankhm_state>();
+	tutankhm_state *state = machine.driver_data<tutankhm_state>();
 	offs_t i;
 
 	for (i = 0; i < NUM_PENS; i++)
@@ -61,13 +61,13 @@ static void get_pens( running_machine *machine, pen_t *pens )
 
 SCREEN_UPDATE( tutankhm )
 {
-	tutankhm_state *state = screen->machine->driver_data<tutankhm_state>();
+	tutankhm_state *state = screen->machine().driver_data<tutankhm_state>();
 	int xorx = state->flip_x ? 255 : 0;
 	int xory = state->flip_y ? 255 : 0;
 	pen_t pens[NUM_PENS];
 	int x, y;
 
-	get_pens(screen->machine, pens);
+	get_pens(screen->machine(), pens);
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{

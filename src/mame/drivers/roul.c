@@ -116,12 +116,12 @@ bit 6 -> ??? (after unknown blitter command : [80][80][08][02])
 */
 //  return 0x80; // blitter ready
 //  logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(space->cpu));
-	return space->machine->rand() & 0x00c0;
+	return space->machine().rand() & 0x00c0;
 }
 
 static WRITE8_HANDLER( blitter_cmd_w )
 {
-	roul_state *state = space->machine->driver_data<roul_state>();
+	roul_state *state = space->machine().driver_data<roul_state>();
 	state->reg[offset] = data;
 	if (offset==2)
 	{
@@ -164,12 +164,12 @@ static WRITE8_HANDLER( blitter_cmd_w )
 static WRITE8_HANDLER( sound_latch_w )
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "soundcpu", 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( ball_w )
 {
-	roul_state *state = space->machine->driver_data<roul_state>();
+	roul_state *state = space->machine().driver_data<roul_state>();
 	int lamp = data;
 
 	output_set_lamp_value(data, 1);
@@ -206,13 +206,13 @@ ADDRESS_MAP_END
 
 static VIDEO_START(roul)
 {
-	roul_state *state = machine->driver_data<roul_state>();
+	roul_state *state = machine.driver_data<roul_state>();
 	state->videobuf = auto_alloc_array_clear(machine, UINT8, VIDEOBUF_SIZE);
 }
 
 static SCREEN_UPDATE(roul)
 {
-	roul_state *state = screen->machine->driver_data<roul_state>();
+	roul_state *state = screen->machine().driver_data<roul_state>();
 	int i,j;
 	for (i = 0; i < 256; i++)
 		for (j = 0; j < 256; j++)

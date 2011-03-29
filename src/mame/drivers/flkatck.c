@@ -22,7 +22,7 @@
 
 static INTERRUPT_GEN( flkatck_interrupt )
 {
-	flkatck_state *state = device->machine->driver_data<flkatck_state>();
+	flkatck_state *state = device->machine().driver_data<flkatck_state>();
 
 	if (state->irq_enabled)
 		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
@@ -31,12 +31,12 @@ static INTERRUPT_GEN( flkatck_interrupt )
 static WRITE8_HANDLER( flkatck_bankswitch_w )
 {
 	/* bits 3-4: coin counters */
-	coin_counter_w(space->machine, 0, data & 0x08);
-	coin_counter_w(space->machine, 1, data & 0x10);
+	coin_counter_w(space->machine(), 0, data & 0x08);
+	coin_counter_w(space->machine(), 1, data & 0x10);
 
 	/* bits 0-1: bank # */
 	if ((data & 0x03) != 0x03)	/* for safety */
-		memory_set_bank(space->machine, "bank1", data & 0x03);
+		memory_set_bank(space->machine(), "bank1", data & 0x03);
 }
 
 static READ8_HANDLER( flkatck_ls138_r )
@@ -47,13 +47,13 @@ static READ8_HANDLER( flkatck_ls138_r )
 	{
 		case 0x00:
 			if (offset & 0x02)
-				data = input_port_read(space->machine, (offset & 0x01) ? "COIN" : "DSW3");
+				data = input_port_read(space->machine(), (offset & 0x01) ? "COIN" : "DSW3");
 			else
-				data = input_port_read(space->machine, (offset & 0x01) ? "P2" : "P1");
+				data = input_port_read(space->machine(), (offset & 0x01) ? "P2" : "P1");
 			break;
 		case 0x01:
 			if (offset & 0x02)
-				data = input_port_read(space->machine, (offset & 0x01) ? "DSW1" : "DSW2");
+				data = input_port_read(space->machine(), (offset & 0x01) ? "DSW1" : "DSW2");
 			break;
 	}
 
@@ -62,7 +62,7 @@ static READ8_HANDLER( flkatck_ls138_r )
 
 static WRITE8_HANDLER( flkatck_ls138_w )
 {
-	flkatck_state *state = space->machine->driver_data<flkatck_state>();
+	flkatck_state *state = space->machine().driver_data<flkatck_state>();
 
 	switch ((offset & 0x1c) >> 2)
 	{
@@ -84,13 +84,13 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 /* Protection - an external multiplyer connected to the sound CPU */
 static READ8_HANDLER( multiply_r )
 {
-	flkatck_state *state = space->machine->driver_data<flkatck_state>();
+	flkatck_state *state = space->machine().driver_data<flkatck_state>();
 	return (state->multiply_reg[0] * state->multiply_reg[1]) & 0xff;
 }
 
 static WRITE8_HANDLER( multiply_w )
 {
-	flkatck_state *state = space->machine->driver_data<flkatck_state>();
+	flkatck_state *state = space->machine().driver_data<flkatck_state>();
 	state->multiply_reg[offset] = data;
 }
 
@@ -197,13 +197,13 @@ static const k007232_interface k007232_config =
 
 static MACHINE_START( flkatck )
 {
-	flkatck_state *state = machine->driver_data<flkatck_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	flkatck_state *state = machine.driver_data<flkatck_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x10000], 0x2000);
 
-	state->audiocpu = machine->device("audiocpu");
-	state->k007121 = machine->device("k007121");
+	state->audiocpu = machine.device("audiocpu");
+	state->k007121 = machine.device("k007121");
 
 	state->save_item(NAME(state->irq_enabled));
 	state->save_item(NAME(state->multiply_reg));
@@ -212,9 +212,9 @@ static MACHINE_START( flkatck )
 
 static MACHINE_RESET( flkatck )
 {
-	flkatck_state *state = machine->driver_data<flkatck_state>();
+	flkatck_state *state = machine.driver_data<flkatck_state>();
 
-	k007232_set_bank(machine->device("konami"), 0, 1);
+	k007232_set_bank(machine.device("konami"), 0, 1);
 
 	state->irq_enabled = 0;
 	state->multiply_reg[0] = 0;

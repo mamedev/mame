@@ -141,7 +141,7 @@ static WRITE8_HANDLER( angelkds_sub_sound_w );
 
 static WRITE8_HANDLER( angelkds_cpu_bank_write )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x0f);	// shall we check (data & 0x0f) < # of available banks (8 or 10 resp.)?
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);	// shall we check (data & 0x0f) < # of available banks (8 or 10 resp.)?
 }
 
 
@@ -161,9 +161,9 @@ static READ8_HANDLER( angelkds_input_r )
 	static const char *const portnames[] = { "I81", "I82" };
 	static const char *const fakenames[] = { "FAKE1", "FAKE2" };
 
-	fake = input_port_read(space->machine, fakenames[offset]);
+	fake = input_port_read(space->machine(), fakenames[offset]);
 
-	return ((fake & 0x01) ? fake  : input_port_read(space->machine, portnames[offset]));
+	return ((fake & 0x01) ? fake  : input_port_read(space->machine(), portnames[offset]));
 }
 
 #else
@@ -172,7 +172,7 @@ static READ8_HANDLER( angelkds_input_r )
 {
 	static const char *const portnames[] = { "I81", "I82" };
 
-	return input_port_read(space->machine, portnames[offset]);
+	return input_port_read(space->machine(), portnames[offset]);
 }
 
 #endif
@@ -489,32 +489,32 @@ sound related ?
 
 static WRITE8_HANDLER( angelkds_main_sound_w )
 {
-	angelkds_state *state = space->machine->driver_data<angelkds_state>();
+	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 	state->sound[offset] = data;
 }
 
 static READ8_HANDLER( angelkds_main_sound_r )
 {
-	angelkds_state *state = space->machine->driver_data<angelkds_state>();
+	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 	return state->sound2[offset];
 }
 
 static WRITE8_HANDLER( angelkds_sub_sound_w )
 {
-	angelkds_state *state = space->machine->driver_data<angelkds_state>();
+	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 	state->sound2[offset] = data;
 }
 
 static READ8_HANDLER( angelkds_sub_sound_r )
 {
-	angelkds_state *state = space->machine->driver_data<angelkds_state>();
+	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 	return state->sound[offset];
 }
 
 
 static void irqhandler( device_t *device, int irq )
 {
-	angelkds_state *state = device->machine->driver_data<angelkds_state>();
+	angelkds_state *state = device->machine().driver_data<angelkds_state>();
 	device_set_input_line(state->subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -575,9 +575,9 @@ GFXDECODE_END
 
 static MACHINE_START( angelkds )
 {
-	angelkds_state *state = machine->driver_data<angelkds_state>();
+	angelkds_state *state = machine.driver_data<angelkds_state>();
 
-	state->subcpu = machine->device("sub");
+	state->subcpu = machine.device("sub");
 
 	state->save_item(NAME(state->layer_ctrl));
 	state->save_item(NAME(state->txbank));
@@ -589,7 +589,7 @@ static MACHINE_START( angelkds )
 
 static MACHINE_RESET( angelkds )
 {
-	angelkds_state *state = machine->driver_data<angelkds_state>();
+	angelkds_state *state = machine.driver_data<angelkds_state>();
 	int i;
 
 	for (i = 0; i < 4; i++)
@@ -750,13 +750,13 @@ ROM_END
 
 static DRIVER_INIT( angelkds )
 {
-	UINT8 *RAM = machine->region("user1")->base();
+	UINT8 *RAM = machine.region("user1")->base();
 	memory_configure_bank(machine, "bank1", 0, 8, &RAM[0x0000], 0x4000);
 }
 
 static DRIVER_INIT( spcpostn )
 {
-	UINT8 *RAM = machine->region("user1")->base();
+	UINT8 *RAM = machine.region("user1")->base();
 
 	sega_317_0005_decode(machine, "maincpu");
 	memory_configure_bank(machine, "bank1", 0, 10, &RAM[0x0000], 0x4000);

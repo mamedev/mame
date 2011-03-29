@@ -201,7 +201,7 @@ static DEVICE_START( okim6258 )
 	info->output_bits = intf->output_12bits ? 12 : 10;
 	info->divider = dividers[intf->divider];
 
-	info->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock()/info->divider, info, okim6258_update);
+	info->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock()/info->divider, info, okim6258_update);
 
 	info->signal = -2;
 	info->step = 0;

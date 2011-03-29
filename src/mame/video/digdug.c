@@ -25,7 +25,7 @@ PALETTE_INIT( digdug )
 {
 	int i;
 
-	machine->colortable = colortable_alloc(machine, 32);
+	machine.colortable = colortable_alloc(machine, 32);
 
 	for (i = 0;i < 32;i++)
 	{
@@ -43,24 +43,24 @@ PALETTE_INIT( digdug )
 		bit1 = (*color_prom >> 6) & 0x01;
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine.colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
 	/* characters - direct mapping */
 	for (i = 0; i < 16; i++)
 	{
-		colortable_entry_set_value(machine->colortable, i*2+0, 0);
-		colortable_entry_set_value(machine->colortable, i*2+1, i);
+		colortable_entry_set_value(machine.colortable, i*2+0, 0);
+		colortable_entry_set_value(machine.colortable, i*2+1, i);
 	}
 
 	/* sprites */
 	for (i = 0;i < 0x100;i++)
-		colortable_entry_set_value(machine->colortable, 16*2+i, (*color_prom++ & 0x0f) + 0x10);
+		colortable_entry_set_value(machine.colortable, 16*2+i, (*color_prom++ & 0x0f) + 0x10);
 
 	/* bg_select */
 	for (i = 0;i < 0x100;i++)
-		colortable_entry_set_value(machine->colortable, 16*2+256+i, *color_prom++ & 0x0f);
+		colortable_entry_set_value(machine.colortable, 16*2+256+i, *color_prom++ & 0x0f);
 }
 
 
@@ -89,8 +89,8 @@ static TILEMAP_MAPPER( tilemap_scan )
 
 static TILE_GET_INFO( bg_get_tile_info )
 {
-	UINT8 *rom = machine->region("gfx4")->base();
-	digdug_state *state =  machine->driver_data<digdug_state>();
+	UINT8 *rom = machine.region("gfx4")->base();
+	digdug_state *state =  machine.driver_data<digdug_state>();
 
 	int code = rom[tile_index | (state->bg_select << 10)];
 	/* when the background is "disabled", it is actually still drawn, but using
@@ -108,7 +108,7 @@ static TILE_GET_INFO( bg_get_tile_info )
 
 static TILE_GET_INFO( tx_get_tile_info )
 {
-	digdug_state *state =  machine->driver_data<digdug_state>();
+	digdug_state *state =  machine.driver_data<digdug_state>();
 	UINT8 code = state->videoram[tile_index];
 	int color;
 
@@ -144,7 +144,7 @@ static TILE_GET_INFO( tx_get_tile_info )
 
 VIDEO_START( digdug )
 {
-	digdug_state *state =  machine->driver_data<digdug_state>();
+	digdug_state *state =  machine.driver_data<digdug_state>();
 
 	state->bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan,     8,8,36,28);
 	state->fg_tilemap = tilemap_create(machine, tx_get_tile_info,tilemap_scan,8,8,36,28);
@@ -167,7 +167,7 @@ VIDEO_START( digdug )
 
 WRITE8_HANDLER( digdug_videoram_w )
 {
-	digdug_state *state =  space->machine->driver_data<digdug_state>();
+	digdug_state *state =  space->machine().driver_data<digdug_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset & 0x3ff);
@@ -175,7 +175,7 @@ WRITE8_HANDLER( digdug_videoram_w )
 
 WRITE8_HANDLER( digdug_PORT_w )
 {
-	digdug_state *state =  space->machine->driver_data<digdug_state>();
+	digdug_state *state =  space->machine().driver_data<digdug_state>();
 
 	switch (offset)
 	{
@@ -227,7 +227,7 @@ WRITE8_HANDLER( digdug_PORT_w )
 			break;
 
 		case 7:	/* FLIP */
-			flip_screen_set(space->machine, data & 1);
+			flip_screen_set(space->machine(), data & 1);
 			break;
 	}
 }
@@ -246,9 +246,9 @@ static const rectangle spritevisiblearea =
 	0*8, 28*8-1
 };
 
-static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine& machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	digdug_state *state =  machine->driver_data<digdug_state>();
+	digdug_state *state =  machine.driver_data<digdug_state>();
 	UINT8 *spriteram = state->digdug_objram + 0x380;
 	UINT8 *spriteram_2 = state->digdug_posram + 0x380;
 	UINT8 *spriteram_3 = state->digdug_flpram + 0x380;
@@ -287,14 +287,14 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 		{
 			for (x = 0;x <= size;x++)
 			{
-				UINT32 transmask = colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0x1f);
-				drawgfx_transmask(bitmap,&spritevisiblearea,machine->gfx[1],
+				UINT32 transmask = colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0x1f);
+				drawgfx_transmask(bitmap,&spritevisiblearea,machine.gfx[1],
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,
 					((sx + 16*x) & 0xff), sy + 16*y,transmask);
 				/* wraparound */
-				drawgfx_transmask(bitmap,&spritevisiblearea,machine->gfx[1],
+				drawgfx_transmask(bitmap,&spritevisiblearea,machine.gfx[1],
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,
@@ -307,10 +307,10 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( digdug )
 {
-	digdug_state *state =  screen->machine->driver_data<digdug_state>();
+	digdug_state *state =  screen->machine().driver_data<digdug_state>();
 
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	draw_sprites(screen->machine(),bitmap,cliprect);
 	return 0;
 }

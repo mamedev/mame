@@ -107,10 +107,10 @@ public:
 
 static SCREEN_UPDATE( vcombat )
 {
-	vcombat_state *state = screen->machine->driver_data<vcombat_state>();
+	vcombat_state *state = screen->machine().driver_data<vcombat_state>();
 	int y;
-	const rgb_t *const pens = tlc34076_get_pens(screen->machine->device("tlc34076"));
-	device_t *aux = screen->machine->device("aux");
+	const rgb_t *const pens = tlc34076_get_pens(screen->machine().device("tlc34076"));
+	device_t *aux = screen->machine().device("aux");
 
 	UINT16 *m68k_buf = state->m68k_framebuffer[(*state->framebuffer_ctrl & 0x20) ? 1 : 0];
 	UINT16 *i860_buf = state->i860_framebuffer[(screen == aux) ? 1 : 0][0];
@@ -158,7 +158,7 @@ static SCREEN_UPDATE( vcombat )
 
 static WRITE16_HANDLER( main_video_write )
 {
-	vcombat_state *state = space->machine->driver_data<vcombat_state>();
+	vcombat_state *state = space->machine().driver_data<vcombat_state>();
 	int fb = (*state->framebuffer_ctrl & 0x20) ? 0 : 1;
 	UINT16 old_data = state->m68k_framebuffer[fb][offset];
 
@@ -183,17 +183,17 @@ static WRITE16_HANDLER( main_video_write )
 
 static READ16_HANDLER( control_1_r )
 {
-	return (input_port_read(space->machine, "IN0") << 8);
+	return (input_port_read(space->machine(), "IN0") << 8);
 }
 
 static READ16_HANDLER( control_2_r )
 {
-	return (input_port_read(space->machine, "IN1") << 8);
+	return (input_port_read(space->machine(), "IN1") << 8);
 }
 
 static READ16_HANDLER( control_3_r )
 {
-	return (input_port_read(space->machine, "IN2") << 8);
+	return (input_port_read(space->machine(), "IN2") << 8);
 }
 
 static void wiggle_i860_common(device_t *device, UINT16 data)
@@ -225,32 +225,32 @@ static void wiggle_i860_common(device_t *device, UINT16 data)
 
 static WRITE16_HANDLER( wiggle_i860p0_pins_w )
 {
-	wiggle_i860_common(space->machine->device("vid_0"), data);
+	wiggle_i860_common(space->machine().device("vid_0"), data);
 }
 
 static WRITE16_HANDLER( wiggle_i860p1_pins_w )
 {
-	wiggle_i860_common(space->machine->device("vid_1"), data);
+	wiggle_i860_common(space->machine().device("vid_1"), data);
 }
 
 static READ16_HANDLER( main_irqiack_r )
 {
 	//fprintf(stderr, "M0: irq iack\n");
-	device_set_input_line(space->machine->device("maincpu"), M68K_IRQ_1, CLEAR_LINE);
-	//device_set_input_line(space->machine->device("maincpu"), INPUT_LINE_RESET, CLEAR_LINE);
+	device_set_input_line(space->machine().device("maincpu"), M68K_IRQ_1, CLEAR_LINE);
+	//device_set_input_line(space->machine().device("maincpu"), INPUT_LINE_RESET, CLEAR_LINE);
 	return 0;
 }
 
 static READ16_HANDLER( sound_resetmain_r )
 {
 	//fprintf(stderr, "M1: reset line to M0\n");
-	//device_set_input_line(space->machine->device("maincpu"), INPUT_LINE_RESET, PULSE_LINE);
+	//device_set_input_line(space->machine().device("maincpu"), INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
 static WRITE64_HANDLER( v0_fb_w )
 {
-	vcombat_state *state = space->machine->driver_data<vcombat_state>();
+	vcombat_state *state = space->machine().driver_data<vcombat_state>();
 	/* The frame buffer seems to sit on a 32-bit data bus, while the
        i860 uses a 64-bit data bus.  Adjust accordingly.  */
 	char *p = (char *)(state->i860_framebuffer[0][0]);
@@ -274,7 +274,7 @@ static WRITE64_HANDLER( v0_fb_w )
    framebuffer.  */
 static WRITE64_HANDLER( v1_fb_w )
 {
-	vcombat_state *state = space->machine->driver_data<vcombat_state>();
+	vcombat_state *state = space->machine().driver_data<vcombat_state>();
 	/* The frame buffer seems to sit on a 32-bit data bus, while the
        i860 uses a 64-bit data bus.  Adjust accordingly.  */
 	char *p = (char *)(state->i860_framebuffer[1][0]);
@@ -296,8 +296,8 @@ static WRITE64_HANDLER( v1_fb_w )
 
 static WRITE16_HANDLER( crtc_w )
 {
-	vcombat_state *state = space->machine->driver_data<vcombat_state>();
-	device_t *crtc = space->machine->device("crtc");
+	vcombat_state *state = space->machine().driver_data<vcombat_state>();
+	device_t *crtc = space->machine().device("crtc");
 
 	if (crtc == NULL)
 		return;
@@ -386,17 +386,17 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( vcombat )
 {
-	vcombat_state *state = machine->driver_data<vcombat_state>();
-	i860_set_pin(machine->device("vid_0"), DEC_PIN_BUS_HOLD, 1);
-	i860_set_pin(machine->device("vid_1"), DEC_PIN_BUS_HOLD, 1);
+	vcombat_state *state = machine.driver_data<vcombat_state>();
+	i860_set_pin(machine.device("vid_0"), DEC_PIN_BUS_HOLD, 1);
+	i860_set_pin(machine.device("vid_1"), DEC_PIN_BUS_HOLD, 1);
 
 	state->crtc_select = 0;
 }
 
 static MACHINE_RESET( shadfgtr )
 {
-	vcombat_state *state = machine->driver_data<vcombat_state>();
-	i860_set_pin(machine->device("vid_0"), DEC_PIN_BUS_HOLD, 1);
+	vcombat_state *state = machine.driver_data<vcombat_state>();
+	i860_set_pin(machine.device("vid_0"), DEC_PIN_BUS_HOLD, 1);
 
 	state->crtc_select = 0;
 }
@@ -427,15 +427,15 @@ DIRECT_UPDATE_HANDLER( vcombat_vid_1_direct_handler )
 
 static DRIVER_INIT( vcombat )
 {
-	vcombat_state *state = machine->driver_data<vcombat_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	vcombat_state *state = machine.driver_data<vcombat_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	/* The two i860s execute out of RAM */
-	address_space *space = machine->device<i860_device>("vid_0")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate_create_static(vcombat_vid_0_direct_handler, *machine));
+	address_space *space = machine.device<i860_device>("vid_0")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate_create_static(vcombat_vid_0_direct_handler, machine));
 
-	space = machine->device<i860_device>("vid_1")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate_create_static(vcombat_vid_1_direct_handler, *machine));
+	space = machine.device<i860_device>("vid_1")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate_create_static(vcombat_vid_1_direct_handler, machine));
 
 	/* Allocate the 68000 framebuffers */
 	state->m68k_framebuffer[0] = auto_alloc_array(machine, UINT16, 0x8000);
@@ -467,7 +467,7 @@ static DRIVER_INIT( vcombat )
 
 static DRIVER_INIT( shadfgtr )
 {
-	vcombat_state *state = machine->driver_data<vcombat_state>();
+	vcombat_state *state = machine.driver_data<vcombat_state>();
 	/* Allocate th 68000 frame buffers */
 	state->m68k_framebuffer[0] = auto_alloc_array(machine, UINT16, 0x8000);
 	state->m68k_framebuffer[1] = auto_alloc_array(machine, UINT16, 0x8000);
@@ -479,8 +479,8 @@ static DRIVER_INIT( shadfgtr )
 	state->i860_framebuffer[1][1] = NULL;
 
 	/* The i860 executes out of RAM */
-	address_space *space = machine->device<i860_device>("vid_0")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate_create_static(vcombat_vid_0_direct_handler, *machine));
+	address_space *space = machine.device<i860_device>("vid_0")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate_create_static(vcombat_vid_0_direct_handler, machine));
 }
 
 
@@ -545,7 +545,7 @@ INPUT_PORTS_END
 static WRITE_LINE_DEVICE_HANDLER(sound_update)
 {
 	/* Seems reasonable */
-	device_set_input_line(device->machine->device("soundcpu"), M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(device->machine().device("soundcpu"), M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =

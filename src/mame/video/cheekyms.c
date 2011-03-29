@@ -41,7 +41,7 @@ PALETTE_INIT( cheekyms )
 
 WRITE8_HANDLER( cheekyms_port_40_w )
 {
-	cheekyms_state *state = space->machine->driver_data<cheekyms_state>();
+	cheekyms_state *state = space->machine().driver_data<cheekyms_state>();
 
 	/* the lower bits probably trigger sound samples */
 	dac_data_w(state->dac, data ? 0x80 : 0);
@@ -50,7 +50,7 @@ WRITE8_HANDLER( cheekyms_port_40_w )
 
 WRITE8_HANDLER( cheekyms_port_80_w )
 {
-	cheekyms_state *state = space->machine->driver_data<cheekyms_state>();
+	cheekyms_state *state = space->machine().driver_data<cheekyms_state>();
 
 	/* d0-d1 - sound enables, not sure which bit is which */
 	/* d3-d5 - man scroll amount */
@@ -66,7 +66,7 @@ WRITE8_HANDLER( cheekyms_port_80_w )
 
 static TILE_GET_INFO( cheekyms_get_tile_info )
 {
-	cheekyms_state *state = machine->driver_data<cheekyms_state>();
+	cheekyms_state *state = machine.driver_data<cheekyms_state>();
 	int color;
 
 	int x = tile_index & 0x1f;
@@ -96,11 +96,11 @@ static TILE_GET_INFO( cheekyms_get_tile_info )
 
 VIDEO_START( cheekyms )
 {
-	cheekyms_state *state = machine->driver_data<cheekyms_state>();
+	cheekyms_state *state = machine.driver_data<cheekyms_state>();
 	int width, height;
 
-	width = machine->primary_screen->width();
-	height = machine->primary_screen->height();
+	width = machine.primary_screen->width();
+	height = machine.primary_screen->height();
 	state->bitmap_buffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	state->cm_tilemap = tilemap_create(machine, cheekyms_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -108,9 +108,9 @@ VIDEO_START( cheekyms )
 }
 
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int flip )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int flip )
 {
-	cheekyms_state *state = machine->driver_data<cheekyms_state>();
+	cheekyms_state *state = machine.driver_data<cheekyms_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x20; offs += 4)
@@ -150,19 +150,19 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( cheekyms )
 {
-	cheekyms_state *state = screen->machine->driver_data<cheekyms_state>();
+	cheekyms_state *state = screen->machine().driver_data<cheekyms_state>();
 	int y, x;
 	int scrolly = ((*state->port_80 >> 3) & 0x07);
 	int flip = *state->port_80 & 0x80;
 
-	tilemap_mark_all_tiles_dirty_all(screen->machine);
-	tilemap_set_flip_all(screen->machine, flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_mark_all_tiles_dirty_all(screen->machine());
+	tilemap_set_flip_all(screen->machine(), flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	bitmap_fill(bitmap, cliprect, 0);
 	bitmap_fill(state->bitmap_buffer, cliprect, 0);
 
 	/* sprites go under the playfield */
-	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->gfx[1], flip);
+	draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().gfx[1], flip);
 
 	/* draw the tilemap to a temp bitmap */
 	tilemap_draw(state->bitmap_buffer, cliprect, state->cm_tilemap, 0, 0);

@@ -143,19 +143,19 @@ static READ8_HANDLER( sauro_sound_command_r )
 
 static WRITE8_HANDLER( sauro_coin1_w )
 {
-	coin_counter_w(space->machine, 0, data);
-	coin_counter_w(space->machine, 0, 0); // to get the coin counter working in sauro, as it doesn't write 0
+	coin_counter_w(space->machine(), 0, data);
+	coin_counter_w(space->machine(), 0, 0); // to get the coin counter working in sauro, as it doesn't write 0
 }
 
 static WRITE8_HANDLER( sauro_coin2_w )
 {
-	coin_counter_w(space->machine, 1, data);
-	coin_counter_w(space->machine, 1, 0); // to get the coin counter working in sauro, as it doesn't write 0
+	coin_counter_w(space->machine(), 1, data);
+	coin_counter_w(space->machine(), 1, 0); // to get the coin counter working in sauro, as it doesn't write 0
 }
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(space->machine, data);
+	flip_screen_set(space->machine(), data);
 }
 
 static WRITE8_DEVICE_HANDLER( adpcm_w )
@@ -523,7 +523,7 @@ static DRIVER_INIT( tecfri )
 	/* This game doesn't like all memory to be initialized to zero, it won't
        initialize the high scores */
 
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 
 	memset(&RAM[0xe000], 0, 0x100);
 	RAM[0xe000] = 1;

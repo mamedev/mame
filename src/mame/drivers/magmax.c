@@ -32,29 +32,29 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 static WRITE16_HANDLER( magmax_sound_w )
 {
-	magmax_state *state = space->machine->driver_data<magmax_state>();
+	magmax_state *state = space->machine().driver_data<magmax_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->sound_latch = (data & 0xff) << 1;
-		cputag_set_input_line(space->machine, "audiocpu", 0, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", 0, ASSERT_LINE);
 	}
 }
 
 static READ8_HANDLER( magmax_sound_irq_ack )
 {
-	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
 	return 0;
 }
 
 static READ8_HANDLER( magmax_sound_r )
 {
-	magmax_state *state = space->machine->driver_data<magmax_state>();
+	magmax_state *state = space->machine().driver_data<magmax_state>();
 	return (state->sound_latch | state->LS74_q);
 }
 
 static WRITE8_DEVICE_HANDLER( ay8910_portB_0_w )
 {
-	magmax_state *state = device->machine->driver_data<magmax_state>();
+	magmax_state *state = device->machine().driver_data<magmax_state>();
 	/*bit 0 is input to CLR line of the LS74*/
 	state->LS74_clr = data & 1;
 	if (state->LS74_clr == 0)
@@ -63,7 +63,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_portB_0_w )
 
 static TIMER_CALLBACK( scanline_callback )
 {
-	magmax_state *state = machine->driver_data<magmax_state>();
+	magmax_state *state = machine.driver_data<magmax_state>();
 	int scanline = param;
 
 	/* bit 0 goes hi whenever line V6 from video part goes lo->hi */
@@ -74,14 +74,14 @@ static TIMER_CALLBACK( scanline_callback )
 	scanline += 128;
 	scanline &= 255;
 
-	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
+	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
 static MACHINE_START( magmax )
 {
-	magmax_state *state = machine->driver_data<magmax_state>();
+	magmax_state *state = machine.driver_data<magmax_state>();
 	/* Create interrupt timer */
-	state->interrupt_timer = machine->scheduler().timer_alloc(FUNC(scanline_callback));
+	state->interrupt_timer = machine.scheduler().timer_alloc(FUNC(scanline_callback));
 
 	/* Set up save state */
 	state_save_register_global(machine, state->sound_latch);
@@ -92,8 +92,8 @@ static MACHINE_START( magmax )
 
 static MACHINE_RESET( magmax )
 {
-	magmax_state *state = machine->driver_data<magmax_state>();
-	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(64), 64);
+	magmax_state *state = machine.driver_data<magmax_state>();
+	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(64), 64);
 
 #if 0
 	{
@@ -108,10 +108,10 @@ static MACHINE_RESET( magmax )
 
 static WRITE8_DEVICE_HANDLER( ay8910_portA_0_w )
 {
-	magmax_state *state = device->machine->driver_data<magmax_state>();
-ay8910_device *ay1 = device->machine->device<ay8910_device>("ay1");
-ay8910_device *ay2 = device->machine->device<ay8910_device>("ay2");
-ay8910_device *ay3 = device->machine->device<ay8910_device>("ay3");
+	magmax_state *state = device->machine().driver_data<magmax_state>();
+ay8910_device *ay1 = device->machine().device<ay8910_device>("ay1");
+ay8910_device *ay2 = device->machine().device<ay8910_device>("ay2");
+ay8910_device *ay3 = device->machine().device<ay8910_device>("ay3");
 float percent;
 
 /*There are three AY8910 chips and four(!) separate amplifiers on the board
@@ -190,7 +190,7 @@ bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 
 static WRITE16_HANDLER( magmax_vreg_w )
 {
-	magmax_state *state = space->machine->driver_data<magmax_state>();
+	magmax_state *state = space->machine().driver_data<magmax_state>();
 	/* VRAM CONTROL REGISTER */
 	/* bit0 - coin counter 1    */
 	/* bit1 - coin counter 2    */

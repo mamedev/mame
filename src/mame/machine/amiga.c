@@ -138,8 +138,8 @@ const char *const amiga_custom_names[0x100] =
  *
  *************************************/
 
-static void custom_reset(running_machine *machine);
-static void autoconfig_reset(running_machine *machine);
+static void custom_reset(running_machine &machine);
+static void autoconfig_reset(running_machine &machine);
 static TIMER_CALLBACK( amiga_irq_proc );
 static TIMER_CALLBACK( amiga_blitter_proc );
 static TIMER_CALLBACK( scanline_callback );
@@ -233,9 +233,9 @@ void amiga_chip_ram_w8(amiga_state *state, offs_t offset, UINT8 data)
  *
  *************************************/
 
-void amiga_machine_config(running_machine *machine, const amiga_machine_interface *intf)
+void amiga_machine_config(running_machine &machine, const amiga_machine_interface *intf)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	state->intf = intf;
 
 	/* setup chipmem handlers */
@@ -251,25 +251,25 @@ void amiga_machine_config(running_machine *machine, const amiga_machine_interfac
 	}
 
 	/* setup the timers */
-	state->irq_timer = machine->scheduler().timer_alloc(FUNC(amiga_irq_proc));
-	state->blitter_timer = machine->scheduler().timer_alloc(FUNC(amiga_blitter_proc));
+	state->irq_timer = machine.scheduler().timer_alloc(FUNC(amiga_irq_proc));
+	state->blitter_timer = machine.scheduler().timer_alloc(FUNC(amiga_blitter_proc));
 
-	state->sound_device = machine->device("amiga");
+	state->sound_device = machine.device("amiga");
 }
 
 
 static void amiga_m68k_reset(device_t *device)
 {
-	amiga_state *state = device->machine->driver_data<amiga_state>();
+	amiga_state *state = device->machine().driver_data<amiga_state>();
 	address_space *space = device->memory().space(AS_PROGRAM);
 
 	logerror("Executed RESET at PC=%06x\n", cpu_get_pc(space->cpu));
 
 	/* Initialize the various chips */
-	devtag_reset(device->machine, "cia_0");
-	devtag_reset(device->machine, "cia_1");
-	custom_reset(device->machine);
-	autoconfig_reset(device->machine);
+	devtag_reset(device->machine(), "cia_0");
+	devtag_reset(device->machine(), "cia_1");
+	custom_reset(device->machine());
+	autoconfig_reset(device->machine());
 
 	/* set the overlay bit */
 	if ( IS_AGA(state->intf) )
@@ -285,19 +285,19 @@ static void amiga_m68k_reset(device_t *device)
 
 MACHINE_RESET( amiga )
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 
 	/* set m68k reset  function */
-	m68k_set_reset_callback(machine->device("maincpu"), amiga_m68k_reset);
+	m68k_set_reset_callback(machine.device("maincpu"), amiga_m68k_reset);
 
-	amiga_m68k_reset(machine->device("maincpu"));
+	amiga_m68k_reset(machine.device("maincpu"));
 
 	/* call the system-specific callback */
 	if (state->intf->reset_callback)
 		(*state->intf->reset_callback)(machine);
 
 	/* start the scanline timer */
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(scanline_callback));
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(scanline_callback));
 }
 
 
@@ -310,16 +310,16 @@ MACHINE_RESET( amiga )
 
 static TIMER_CALLBACK( scanline_callback )
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	int scanline = param;
-	device_t *cia_0 = machine->device("cia_0");
-	device_t *cia_1 = machine->device("cia_1");
+	device_t *cia_0 = machine.device("cia_0");
+	device_t *cia_1 = machine.device("cia_1");
 
 	/* on the first scanline, we do some extra bookkeeping */
 	if (scanline == 0)
 	{
 		/* signal VBLANK IRQ */
-		amiga_custom_w(machine->device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_VERTB, 0xffff);
+		amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_VERTB, 0xffff);
 
 		/* clock the first CIA TOD */
 		mos6526_tod_w(cia_0, 1);
@@ -333,7 +333,7 @@ static TIMER_CALLBACK( scanline_callback )
 	mos6526_tod_w(cia_1, 1);
 
 	/* render up to this scanline */
-	if (!machine->primary_screen->update_partial(scanline))
+	if (!machine.primary_screen->update_partial(scanline))
 	{
 		if (IS_AGA(state->intf))
 			amiga_aga_render_scanline(machine, NULL, scanline);
@@ -345,8 +345,8 @@ static TIMER_CALLBACK( scanline_callback )
 	amiga_audio_update(state->sound_device);
 
 	/* set timer for next line */
-	scanline = (scanline + 1) % machine->primary_screen->height();
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(scanline_callback), scanline);
+	scanline = (scanline + 1) % machine.primary_screen->height();
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(scanline_callback), scanline);
 }
 
 
@@ -357,9 +357,9 @@ static TIMER_CALLBACK( scanline_callback )
  *
  *************************************/
 
-static void update_irqs(running_machine *machine)
+static void update_irqs(running_machine &machine)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	int ints = CUSTOM_REG(REG_INTENA) & CUSTOM_REG(REG_INTREQ);
 
 	/* Master interrupt switch */
@@ -397,7 +397,7 @@ static void update_irqs(running_machine *machine)
 
 static TIMER_CALLBACK( amiga_irq_proc )
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 
 	update_irqs(machine);
 	state->irq_timer->reset( );
@@ -413,7 +413,7 @@ static TIMER_CALLBACK( amiga_irq_proc )
 
 CUSTOM_INPUT( amiga_joystick_convert )
 {
-	UINT8 bits = input_port_read(field->port->machine, (const char *)param);
+	UINT8 bits = input_port_read(field->port->machine(), (const char *)param);
 	int up = (bits >> 0) & 1;
 	int down = (bits >> 1) & 1;
 	int left = (bits >> 2) & 1;
@@ -888,7 +888,7 @@ static UINT32 blit_line(amiga_state *state)
 
 static TIMER_CALLBACK( amiga_blitter_proc )
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	UINT32 blitsum = 0;
 
 	/* logging */
@@ -934,7 +934,7 @@ static TIMER_CALLBACK( amiga_blitter_proc )
 	CUSTOM_REG(REG_DMACON) &= ~0x4000;
 
 	/* signal an interrupt */
-	amiga_custom_w(machine->device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_BLIT, 0xffff);
+	amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_BLIT, 0xffff);
 
 	/* reset the blitter timer */
 	state->blitter_timer->reset( );
@@ -950,13 +950,13 @@ static TIMER_CALLBACK( amiga_blitter_proc )
 
 static void blitter_setup(address_space *space)
 {
-	amiga_state *state = space->machine->driver_data<amiga_state>();
+	amiga_state *state = space->machine().driver_data<amiga_state>();
 	int ticks, width, height, blittime;
 
 	/* is there another blitting in progress? */
 	if (CUSTOM_REG(REG_DMACON) & 0x4000)
 	{
-		logerror("%s - This program is playing tricks with the blitter\n", space->machine->describe_context() );
+		logerror("%s - This program is playing tricks with the blitter\n", space->machine().describe_context() );
 		return;
 	}
 
@@ -1022,14 +1022,14 @@ READ16_HANDLER( amiga_cia_r )
 	/* offsets 0000-07ff reference CIA B, and are accessed via the MSB */
 	if ((offset & 0x0800) == 0)
 	{
-		cia = space->machine->device("cia_1");
+		cia = space->machine().device("cia_1");
 		shift = 8;
 	}
 
 	/* offsets 0800-0fff reference CIA A, and are accessed via the LSB */
 	else
 	{
-		cia = space->machine->device("cia_0");
+		cia = space->machine().device("cia_0");
 		shift = 0;
 	}
 
@@ -1062,7 +1062,7 @@ WRITE16_HANDLER( amiga_cia_w )
 	{
 		if (!ACCESSING_BITS_8_15)
 			return;
-		cia = space->machine->device("cia_1");
+		cia = space->machine().device("cia_1");
 		data >>= 8;
 	}
 
@@ -1071,7 +1071,7 @@ WRITE16_HANDLER( amiga_cia_w )
 	{
 		if (!ACCESSING_BITS_0_7)
 			return;
-		cia = space->machine->device("cia_0");
+		cia = space->machine().device("cia_0");
 		data &= 0xff;
 	}
 
@@ -1089,13 +1089,13 @@ WRITE16_HANDLER( amiga_cia_w )
 
 void amiga_cia_0_irq(device_t *device, int state)
 {
-	amiga_custom_w(device->machine->device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
+	amiga_custom_w(device->machine().device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
 }
 
 
 void amiga_cia_1_irq(device_t *device, int state)
 {
-	amiga_custom_w(device->machine->device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
+	amiga_custom_w(device->machine().device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
 }
 
 
@@ -1106,10 +1106,10 @@ void amiga_cia_1_irq(device_t *device, int state)
  *
  *************************************/
 
-static void custom_reset(running_machine *machine)
+static void custom_reset(running_machine &machine)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
-	int clock = machine->device("maincpu")->unscaled_clock();
+	amiga_state *state = machine.driver_data<amiga_state>();
+	int clock = machine.device("maincpu")->unscaled_clock();
 	UINT16	vidmode = (clock == AMIGA_68000_NTSC_CLOCK || clock == AMIGA_68EC020_NTSC_CLOCK ) ? 0x1000 : 0x0000; /* NTSC or PAL? */
 
 	CUSTOM_REG(REG_DDFSTRT) = 0x18;
@@ -1147,7 +1147,7 @@ static void custom_reset(running_machine *machine)
 
 READ16_HANDLER( amiga_custom_r )
 {
-	amiga_state *state = space->machine->driver_data<amiga_state>();
+	amiga_state *state = space->machine().driver_data<amiga_state>();
 	UINT16 temp;
 
 	switch (offset & 0xff)
@@ -1160,11 +1160,11 @@ READ16_HANDLER( amiga_custom_r )
 
 		case REG_VPOSR:
 			CUSTOM_REG(REG_VPOSR) &= 0xff00;
-			CUSTOM_REG(REG_VPOSR) |= amiga_gethvpos(*space->machine->primary_screen) >> 16;
+			CUSTOM_REG(REG_VPOSR) |= amiga_gethvpos(*space->machine().primary_screen) >> 16;
 			return CUSTOM_REG(REG_VPOSR);
 
 		case REG_VHPOSR:
-			return amiga_gethvpos(*space->machine->primary_screen) & 0xffff;
+			return amiga_gethvpos(*space->machine().primary_screen) & 0xffff;
 
 		case REG_SERDATR:
 			CUSTOM_REG(REG_SERDATR) &= ~0x4000;
@@ -1173,29 +1173,29 @@ READ16_HANDLER( amiga_custom_r )
 
 		case REG_JOY0DAT:
 			if (state->intf->joy0dat_r != NULL)
-				return (*state->intf->joy0dat_r)(space->machine);
-			return input_port_read_safe(space->machine, "JOY0DAT", 0xffff);
+				return (*state->intf->joy0dat_r)(space->machine());
+			return input_port_read_safe(space->machine(), "JOY0DAT", 0xffff);
 
 		case REG_JOY1DAT:
 			if (state->intf->joy1dat_r != NULL)
-				return (*state->intf->joy1dat_r)(space->machine);
-			return input_port_read_safe(space->machine, "JOY1DAT", 0xffff);
+				return (*state->intf->joy1dat_r)(space->machine());
+			return input_port_read_safe(space->machine(), "JOY1DAT", 0xffff);
 
 		case REG_ADKCONR:
 			return CUSTOM_REG(REG_ADKCON);
 
 		case REG_POTGOR:
-			return input_port_read_safe(space->machine, "POTGO", 0x5500);
+			return input_port_read_safe(space->machine(), "POTGO", 0x5500);
 
 		case REG_POT0DAT:
-			return input_port_read_safe(space->machine, "POT0DAT", 0x0000);
+			return input_port_read_safe(space->machine(), "POT0DAT", 0x0000);
 
 		case REG_POT1DAT:
-			return input_port_read_safe(space->machine, "POT1DAT", 0x0000);
+			return input_port_read_safe(space->machine(), "POT1DAT", 0x0000);
 
 		case REG_DSKBYTR:
 			if (state->intf->dskbytr_r != NULL)
-				return (*state->intf->dskbytr_r)(space->machine);
+				return (*state->intf->dskbytr_r)(space->machine());
 			return 0x0000;
 
 		case REG_INTENAR:
@@ -1205,11 +1205,11 @@ READ16_HANDLER( amiga_custom_r )
 			return CUSTOM_REG(REG_INTREQ);
 
 		case REG_COPJMP1:
-			amiga_copper_setpc(space->machine, CUSTOM_REG_LONG(REG_COP1LCH));
+			amiga_copper_setpc(space->machine(), CUSTOM_REG_LONG(REG_COP1LCH));
 			break;
 
 		case REG_COPJMP2:
-			amiga_copper_setpc(space->machine, CUSTOM_REG_LONG(REG_COP2LCH));
+			amiga_copper_setpc(space->machine(), CUSTOM_REG_LONG(REG_COP2LCH));
 			break;
 
 		case REG_CLXDAT:
@@ -1237,19 +1237,19 @@ READ16_HANDLER( amiga_custom_r )
 
 static TIMER_CALLBACK( finish_serial_write )
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 
 	/* mark the transfer buffer empty */
 	CUSTOM_REG(REG_SERDATR) |= 0x3000;
 
 	/* signal an interrupt */
-	amiga_custom_w(machine->device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_TBE, 0xffff);
+	amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_TBE, 0xffff);
 }
 
 
 WRITE16_HANDLER( amiga_custom_w )
 {
-	amiga_state *state = space->machine->driver_data<amiga_state>();
+	amiga_state *state = space->machine().driver_data<amiga_state>();
 	device_t *cia_0;
 	device_t *cia_1;
 	UINT16 temp;
@@ -1269,19 +1269,19 @@ WRITE16_HANDLER( amiga_custom_w )
 
 		case REG_DSKLEN:
 			if (state->intf->dsklen_w != NULL)
-				(*state->intf->dsklen_w)(space->machine, data);
+				(*state->intf->dsklen_w)(space->machine(), data);
 			break;
 
 		case REG_POTGO:
 			if (state->intf->potgo_w != NULL)
-				(*state->intf->potgo_w)(space->machine, data);
+				(*state->intf->potgo_w)(space->machine(), data);
 			break;
 
 		case REG_SERDAT:
 			if (state->intf->serdat_w != NULL)
-				(*state->intf->serdat_w)(space->machine, data);
+				(*state->intf->serdat_w)(space->machine(), data);
 			CUSTOM_REG(REG_SERDATR) &= ~0x3000;
-			space->machine->scheduler().timer_set(amiga_get_serial_char_period(space->machine), FUNC(finish_serial_write));
+			space->machine().scheduler().timer_set(amiga_get_serial_char_period(space->machine()), FUNC(finish_serial_write));
 			break;
 
 		case REG_BLTSIZE:
@@ -1325,19 +1325,19 @@ WRITE16_HANDLER( amiga_custom_w )
 
 		case REG_SPR0PTL:	case REG_SPR1PTL:	case REG_SPR2PTL:	case REG_SPR3PTL:
 		case REG_SPR4PTL:	case REG_SPR5PTL:	case REG_SPR6PTL:	case REG_SPR7PTL:
-			amiga_sprite_dma_reset(space->machine, (offset - REG_SPR0PTL) / 2);
+			amiga_sprite_dma_reset(space->machine(), (offset - REG_SPR0PTL) / 2);
 			break;
 
 		case REG_SPR0CTL:	case REG_SPR1CTL:	case REG_SPR2CTL:	case REG_SPR3CTL:
 		case REG_SPR4CTL:	case REG_SPR5CTL:	case REG_SPR6CTL:	case REG_SPR7CTL:
 			/* disable comparitor on writes here */
-			amiga_sprite_enable_comparitor(space->machine, (offset - REG_SPR0CTL) / 4, FALSE);
+			amiga_sprite_enable_comparitor(space->machine(), (offset - REG_SPR0CTL) / 4, FALSE);
 			break;
 
 		case REG_SPR0DATA:	case REG_SPR1DATA:	case REG_SPR2DATA:	case REG_SPR3DATA:
 		case REG_SPR4DATA:	case REG_SPR5DATA:	case REG_SPR6DATA:	case REG_SPR7DATA:
 			/* enable comparitor on writes here */
-			amiga_sprite_enable_comparitor(space->machine, (offset - REG_SPR0DATA) / 4, TRUE);
+			amiga_sprite_enable_comparitor(space->machine(), (offset - REG_SPR0DATA) / 4, TRUE);
 			break;
 
 		case REG_COP1LCH:	case REG_COP2LCH:
@@ -1345,11 +1345,11 @@ WRITE16_HANDLER( amiga_custom_w )
 			break;
 
 		case REG_COPJMP1:
-			amiga_copper_setpc(space->machine, CUSTOM_REG_LONG(REG_COP1LCH));
+			amiga_copper_setpc(space->machine(), CUSTOM_REG_LONG(REG_COP1LCH));
 			break;
 
 		case REG_COPJMP2:
-			amiga_copper_setpc(space->machine, CUSTOM_REG_LONG(REG_COP2LCH));
+			amiga_copper_setpc(space->machine(), CUSTOM_REG_LONG(REG_COP2LCH));
 			break;
 
 		case REG_DDFSTRT:
@@ -1388,7 +1388,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			if ( temp & 0x8000  ) /* if we're enabling irq's, delay a bit */
 				state->irq_timer->adjust( downcast<cpu_device *>(space->cpu)->cycles_to_attotime( AMIGA_IRQ_DELAY_CYCLES ));
 			else /* if we're disabling irq's, process right away */
-				update_irqs(space->machine);
+				update_irqs(space->machine());
 			break;
 
 		case REG_INTREQ:
@@ -1398,16 +1398,16 @@ WRITE16_HANDLER( amiga_custom_w )
 				CUSTOM_REG(REG_SERDATR) &= ~0x8000;
 
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
-			cia_0 = space->machine->device("cia_0");
-			cia_1 = space->machine->device("cia_1");
+			cia_0 = space->machine().device("cia_0");
+			cia_1 = space->machine().device("cia_1");
 			if ( mos6526_irq_r( cia_0 ) ) data |= INTENA_PORTS;
 			if ( mos6526_irq_r( cia_1 ) ) data |= INTENA_EXTER;
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're generating irq's, delay a bit */
-				state->irq_timer->adjust( space->machine->device<cpu_device>("maincpu")->cycles_to_attotime( AMIGA_IRQ_DELAY_CYCLES ));
+				state->irq_timer->adjust( space->machine().device<cpu_device>("maincpu")->cycles_to_attotime( AMIGA_IRQ_DELAY_CYCLES ));
 			else /* if we're clearing irq's, process right away */
-				update_irqs(space->machine);
+				update_irqs(space->machine());
 			break;
 
 		case REG_ADKCON:
@@ -1450,7 +1450,7 @@ WRITE16_HANDLER( amiga_custom_w )
 		case REG_COLOR28:	case REG_COLOR29:	case REG_COLOR30:	case REG_COLOR31:
 			if (IS_AGA(state->intf))
 			{
-				amiga_aga_palette_write(space->machine, offset - REG_COLOR00, data);
+				amiga_aga_palette_write(space->machine(), offset - REG_COLOR00, data);
 			}
 			else
 			{
@@ -1461,11 +1461,11 @@ WRITE16_HANDLER( amiga_custom_w )
 		case REG_DIWSTRT:
 		case REG_DIWSTOP:
 			if (IS_AGA(state->intf))
-				amiga_aga_diwhigh_written(space->machine, 0);
+				amiga_aga_diwhigh_written(space->machine(), 0);
 			break;
 		case REG_DIWHIGH:
 			if (IS_AGA(state->intf))
-				amiga_aga_diwhigh_written(space->machine, 1);
+				amiga_aga_diwhigh_written(space->machine(), 1);
 			break;
 
 		default:
@@ -1487,10 +1487,10 @@ WRITE16_HANDLER( amiga_custom_w )
  *
  *************************************/
 
-void amiga_serial_in_w(running_machine *machine, UINT16 data)
+void amiga_serial_in_w(running_machine &machine, UINT16 data)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	amiga_state *state = machine.driver_data<amiga_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int mask = (CUSTOM_REG(REG_SERPER) & 0x8000) ? 0x1ff : 0xff;
 
 	/* copy the data to the low 8 bits of SERDATR and set RBF */
@@ -1509,11 +1509,11 @@ void amiga_serial_in_w(running_machine *machine, UINT16 data)
 }
 
 
-attotime amiga_get_serial_char_period(running_machine *machine)
+attotime amiga_get_serial_char_period(running_machine &machine)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	UINT32 divisor = (CUSTOM_REG(REG_SERPER) & 0x7fff) + 1;
-	UINT32 baud = machine->device("maincpu")->unscaled_clock() / 2 / divisor;
+	UINT32 baud = machine.device("maincpu")->unscaled_clock() / 2 / divisor;
 	UINT32 numbits = 2 + ((CUSTOM_REG(REG_SERPER) & 0x8000) ? 9 : 8);
 	return attotime::from_hz(baud) * numbits;
 }
@@ -1526,13 +1526,13 @@ attotime amiga_get_serial_char_period(running_machine *machine)
  *
  *************************************/
 
-void amiga_add_autoconfig(running_machine *machine, const amiga_autoconfig_device *device)
+void amiga_add_autoconfig(running_machine &machine, const amiga_autoconfig_device *device)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	autoconfig_device *dev, **d;
 
 	/* validate the data */
-	assert_always(machine->phase() == MACHINE_PHASE_INIT, "Can only call amiga_add_autoconfig at init time!");
+	assert_always(machine.phase() == MACHINE_PHASE_INIT, "Can only call amiga_add_autoconfig at init time!");
 	assert_always((device->size & (device->size - 1)) == 0, "device->size must be power of 2!");
 
 	/* allocate memory and link it in at the end of the list */
@@ -1554,9 +1554,9 @@ void amiga_add_autoconfig(running_machine *machine, const amiga_autoconfig_devic
  *
  *************************************/
 
-static void autoconfig_reset(running_machine *machine)
+static void autoconfig_reset(running_machine &machine)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	autoconfig_device *dev;
 
 	/* uninstall any installed devices */
@@ -1581,7 +1581,7 @@ static void autoconfig_reset(running_machine *machine)
 
 READ16_HANDLER( amiga_autoconfig_r )
 {
-	amiga_state *state = space->machine->driver_data<amiga_state>();
+	amiga_state *state = space->machine().driver_data<amiga_state>();
 	autoconfig_device *cur_autoconfig = state->cur_autoconfig;
 	UINT8 byte;
 	int i;
@@ -1697,7 +1697,7 @@ READ16_HANDLER( amiga_autoconfig_r )
 		case 0x40/4:
 			byte = 0x00;
 			if (cur_autoconfig->device.int_control_r)
-				byte = (*cur_autoconfig->device.int_control_r)(space->machine);
+				byte = (*cur_autoconfig->device.int_control_r)(space->machine());
 			break;
 
 		default:
@@ -1720,7 +1720,7 @@ READ16_HANDLER( amiga_autoconfig_r )
 
 WRITE16_HANDLER( amiga_autoconfig_w )
 {
-	amiga_state *state = space->machine->driver_data<amiga_state>();
+	amiga_state *state = space->machine().driver_data<amiga_state>();
 	autoconfig_device *cur_autoconfig = state->cur_autoconfig;
 	int move_to_next = FALSE;
 
@@ -1758,7 +1758,7 @@ WRITE16_HANDLER( amiga_autoconfig_w )
 	{
 		logerror("Install to %06X\n", cur_autoconfig->base);
 		if (cur_autoconfig->base && cur_autoconfig->device.install)
-			(*cur_autoconfig->device.install)(space->machine, cur_autoconfig->base);
+			(*cur_autoconfig->device.install)(space->machine(), cur_autoconfig->base);
 		state->cur_autoconfig = cur_autoconfig->next;
 	}
 }
@@ -1771,7 +1771,7 @@ WRITE16_HANDLER( amiga_autoconfig_w )
  *
  *************************************/
 
-const amiga_machine_interface *amiga_get_interface(running_machine *machine)
+const amiga_machine_interface *amiga_get_interface(running_machine &machine)
 {
-	return machine->driver_data<amiga_state>()->intf;
+	return machine.driver_data<amiga_state>()->intf;
 }

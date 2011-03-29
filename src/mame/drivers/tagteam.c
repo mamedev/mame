@@ -34,7 +34,7 @@ TODO:
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -66,10 +66,10 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( tagteam_interrupt )
 {
-	tagteam_state *state = device->machine->driver_data<tagteam_state>();
+	tagteam_state *state = device->machine().driver_data<tagteam_state>();
 	int port;
 
-	port = input_port_read(device->machine, "P1") & 0xc0;
+	port = input_port_read(device->machine(), "P1") & 0xc0;
 
 	if (port != 0xc0)    /* Coin */
 	{

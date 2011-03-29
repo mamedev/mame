@@ -136,11 +136,11 @@ READ8_DEVICE_HANDLER( namco_06xx_data_r )
 	UINT8 result = 0xff;
 	int devnum;
 
-	LOG(("%s: 06XX '%s' read offset %d\n",device->machine->describe_context(),device->tag(),offset));
+	LOG(("%s: 06XX '%s' read offset %d\n",device->machine().describe_context(),device->tag(),offset));
 
 	if (!(state->control & 0x10))
 	{
-		logerror("%s: 06XX '%s' read in write mode %02x\n",device->machine->describe_context(),device->tag(),state->control);
+		logerror("%s: 06XX '%s' read in write mode %02x\n",device->machine().describe_context(),device->tag(),state->control);
 		return 0;
 	}
 
@@ -157,11 +157,11 @@ WRITE8_DEVICE_HANDLER( namco_06xx_data_w )
 	namco_06xx_state *state = get_safe_token(device);
 	int devnum;
 
-	LOG(("%s: 06XX '%s' write offset %d = %02x\n",device->machine->describe_context(),device->tag(),offset,data));
+	LOG(("%s: 06XX '%s' write offset %d = %02x\n",device->machine().describe_context(),device->tag(),offset,data));
 
 	if (state->control & 0x10)
 	{
-		logerror("%s: 06XX '%s' write in read mode %02x\n",device->machine->describe_context(),device->tag(),state->control);
+		logerror("%s: 06XX '%s' write in read mode %02x\n",device->machine().describe_context(),device->tag(),state->control);
 		return;
 	}
 
@@ -174,7 +174,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_data_w )
 READ8_DEVICE_HANDLER( namco_06xx_ctrl_r )
 {
 	namco_06xx_state *state = get_safe_token(device);
-	LOG(("%s: 06XX '%s' ctrl_r\n",device->machine->describe_context(),device->tag()));
+	LOG(("%s: 06XX '%s' ctrl_r\n",device->machine().describe_context(),device->tag()));
 	return state->control;
 }
 
@@ -183,7 +183,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 	namco_06xx_state *state = get_safe_token(device);
 	int devnum;
 
-	LOG(("%s: 06XX '%s' control %02x\n",device->machine->describe_context(),device->tag(),data));
+	LOG(("%s: 06XX '%s' control %02x\n",device->machine().describe_context(),device->tag(),data));
 
 	state->control = data;
 
@@ -227,17 +227,17 @@ static DEVICE_START( namco_06xx )
 	assert(config != NULL);
 
 	/* resolve our CPU */
-	state->nmicpu = device->machine->device<cpu_device>(config->nmicpu);
+	state->nmicpu = device->machine().device<cpu_device>(config->nmicpu);
 	assert(state->nmicpu != NULL);
 
 	/* resolve our devices */
-	state->device[0] = (config->chip0 != NULL) ? device->machine->device(config->chip0) : NULL;
+	state->device[0] = (config->chip0 != NULL) ? device->machine().device(config->chip0) : NULL;
 	assert(state->device[0] != NULL || config->chip0 == NULL);
-	state->device[1] = (config->chip1 != NULL) ? device->machine->device(config->chip1) : NULL;
+	state->device[1] = (config->chip1 != NULL) ? device->machine().device(config->chip1) : NULL;
 	assert(state->device[1] != NULL || config->chip1 == NULL);
-	state->device[2] = (config->chip2 != NULL) ? device->machine->device(config->chip2) : NULL;
+	state->device[2] = (config->chip2 != NULL) ? device->machine().device(config->chip2) : NULL;
 	assert(state->device[2] != NULL || config->chip2 == NULL);
-	state->device[3] = (config->chip3 != NULL) ? device->machine->device(config->chip3) : NULL;
+	state->device[3] = (config->chip3 != NULL) ? device->machine().device(config->chip3) : NULL;
 	assert(state->device[3] != NULL || config->chip3 == NULL);
 
 	/* loop over devices and set their read/write handlers */
@@ -271,7 +271,7 @@ static DEVICE_START( namco_06xx )
 		}
 
 	/* allocate a timer */
-	state->nmi_timer = device->machine->scheduler().timer_alloc(FUNC(nmi_generate), (void *)device);
+	state->nmi_timer = device->machine().scheduler().timer_alloc(FUNC(nmi_generate), (void *)device);
 
 	device->save_item(NAME(state->control));
 }

@@ -57,7 +57,7 @@ Notes:
 static DRIVER_INIT( lordgun )
 {
 	int i;
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 
 	// Decryption
 
@@ -82,7 +82,7 @@ static DRIVER_INIT( lordgun )
 // From XingXing:
 static DRIVER_INIT( aliencha )
 {
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 
 	// Protection
 
@@ -106,7 +106,7 @@ static DRIVER_INIT( aliencha )
 
 static DRIVER_INIT( alienchac )
 {
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 
 	// Protection
 
@@ -144,22 +144,22 @@ static WRITE8_DEVICE_HANDLER(fake2_w)
 
 static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 {
-	lordgun_state *state = device->machine->driver_data<lordgun_state>();
-	device_t *eeprom = device->machine->device("eeprom");
+	lordgun_state *state = device->machine().driver_data<lordgun_state>();
+	device_t *eeprom = device->machine().device("eeprom");
 	int i;
 
 	if (data & ~0xfd)
 	{
 //      popmessage("EE: %02x", data);
-		logerror("%s: Unknown EEPROM bit written %02X\n",device->machine->describe_context(),data);
+		logerror("%s: Unknown EEPROM bit written %02X\n",device->machine().describe_context(),data);
 	}
 
-	coin_counter_w(device->machine, 0, data & 0x01);
+	coin_counter_w(device->machine(), 0, data & 0x01);
 
 	// Update light guns positions
 	for (i = 0; i < 2; i++)
 		if ( (data & (0x04 << i)) && !(state->old & (0x04 << i)) )
-			lordgun_update_gun(device->machine, i);
+			lordgun_update_gun(device->machine(), i);
 
 	// latch the bit
 	eeprom_write_bit(eeprom, data & 0x40);
@@ -177,20 +177,20 @@ static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 
 static WRITE8_DEVICE_HANDLER( aliencha_eeprom_w )
 {
-	lordgun_state *state = device->machine->driver_data<lordgun_state>();
-	device_t *eeprom = device->machine->device("eeprom");
+	lordgun_state *state = device->machine().driver_data<lordgun_state>();
+	device_t *eeprom = device->machine().device("eeprom");
 
 	if (~data & ~0xf8)
 	{
 //      popmessage("EE: %02x", data);
-		logerror("%s: Unknown EEPROM bit written %02X\n",device->machine->describe_context(),data);
+		logerror("%s: Unknown EEPROM bit written %02X\n",device->machine().describe_context(),data);
 	}
 
 	// bit 1? cleared during screen transitions
 	state->whitescreen = !(data & 0x02);
 
-	coin_counter_w(device->machine, 0, data & 0x08);
-	coin_counter_w(device->machine, 1, data & 0x10);
+	coin_counter_w(device->machine(), 0, data & 0x08);
+	coin_counter_w(device->machine(), 1, data & 0x10);
 
 	// latch the bit
 	eeprom_write_bit(eeprom, data & 0x80);
@@ -205,22 +205,22 @@ static WRITE8_DEVICE_HANDLER( aliencha_eeprom_w )
 
 static READ8_DEVICE_HANDLER( aliencha_dip_r )
 {
-	lordgun_state *state = device->machine->driver_data<lordgun_state>();
+	lordgun_state *state = device->machine().driver_data<lordgun_state>();
 	switch (state->aliencha_dip_sel & 0x70)
 	{
-		case 0x30:	return input_port_read(device->machine, "DIP1");
-		case 0x60:	return input_port_read(device->machine, "DIP2");
-		case 0x50:	return input_port_read(device->machine, "DIP3");
+		case 0x30:	return input_port_read(device->machine(), "DIP1");
+		case 0x60:	return input_port_read(device->machine(), "DIP2");
+		case 0x50:	return input_port_read(device->machine(), "DIP3");
 
 		default:
-			logerror("%s: dip_r with unknown dip_sel = %02X\n",device->machine->describe_context(),state->aliencha_dip_sel);
+			logerror("%s: dip_r with unknown dip_sel = %02X\n",device->machine().describe_context(),state->aliencha_dip_sel);
 			return 0xff;
 	}
 }
 
 static WRITE8_DEVICE_HANDLER( aliencha_dip_w )
 {
-	lordgun_state *state = device->machine->driver_data<lordgun_state>();
+	lordgun_state *state = device->machine().driver_data<lordgun_state>();
 	state->aliencha_dip_sel = data;
 }
 
@@ -228,7 +228,7 @@ static WRITE8_DEVICE_HANDLER( aliencha_dip_w )
 // Unknown, always equal to 7 in lordgun, aliencha.
 static WRITE16_HANDLER( lordgun_priority_w )
 {
-	lordgun_state *state = space->machine->driver_data<lordgun_state>();
+	lordgun_state *state = space->machine().driver_data<lordgun_state>();
 	COMBINE_DATA(&state->priority);
 //  popmessage("PR: %04x", data);
 }
@@ -236,25 +236,25 @@ static WRITE16_HANDLER( lordgun_priority_w )
 
 static READ16_HANDLER( lordgun_gun_0_x_r )
 {
-	lordgun_state *state = space->machine->driver_data<lordgun_state>();
+	lordgun_state *state = space->machine().driver_data<lordgun_state>();
 	return state->gun[0].hw_x;
 }
 
 static READ16_HANDLER( lordgun_gun_0_y_r )
 {
-	lordgun_state *state = space->machine->driver_data<lordgun_state>();
+	lordgun_state *state = space->machine().driver_data<lordgun_state>();
 	return state->gun[0].hw_y;
 }
 
 static READ16_HANDLER( lordgun_gun_1_x_r )
 {
-	lordgun_state *state = space->machine->driver_data<lordgun_state>();
+	lordgun_state *state = space->machine().driver_data<lordgun_state>();
 	return state->gun[1].hw_x;
 }
 
 static READ16_HANDLER( lordgun_gun_1_y_r )
 {
-	lordgun_state *state = space->machine->driver_data<lordgun_state>();
+	lordgun_state *state = space->machine().driver_data<lordgun_state>();
 	return state->gun[1].hw_y;
 }
 
@@ -264,7 +264,7 @@ static WRITE16_HANDLER( lordgun_soundlatch_w )
 	if (ACCESSING_BITS_0_7)		soundlatch_w (space, 0, (data >> 0) & 0xff);
 	if (ACCESSING_BITS_8_15)	soundlatch2_w(space, 0, (data >> 8) & 0xff);
 
-	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( lordgun_map, AS_PROGRAM, 16 )
@@ -341,7 +341,7 @@ ADDRESS_MAP_END
 static WRITE8_DEVICE_HANDLER( lordgun_okibank_w )
 {
 	downcast<okim6295_device *>(device)->set_bank_base((data & 2) ? 0x40000 : 0);
-	if (data & ~3)	logerror("%s: unknown okibank bits %02x\n", device->machine->describe_context(), data);
+	if (data & ~3)	logerror("%s: unknown okibank bits %02x\n", device->machine().describe_context(), data);
 //  popmessage("OKI %x", data);
 }
 
@@ -664,7 +664,7 @@ static const ppi8255_interface aliencha_ppi8255_intf[2] =
 
 static void soundirq(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_IRQ0, state);
+	cputag_set_input_line(device->machine(), "soundcpu", INPUT_LINE_IRQ0, state);
 }
 
 static const ym3812_interface lordgun_ym3812_interface =

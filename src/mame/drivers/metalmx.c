@@ -281,7 +281,7 @@ static VIDEO_START( metalmx )
 static SCREEN_UPDATE( metalmx )
 {
 	/* TODO: TMS34020 should take care of this */
-	metalmx_state *state = screen->machine->driver_data<metalmx_state>();
+	metalmx_state *state = screen->machine().driver_data<metalmx_state>();
 
 //  UINT32 *src_base = &gsp_vram[(vreg_base[0x40/4] & 0x40) ? 0x20000 : 0];
 	UINT16 *src_base = state->gsp_vram;
@@ -309,7 +309,7 @@ static SCREEN_UPDATE( metalmx )
 
 static READ32_HANDLER( unk_r )
 {
-	return 0;//space->machine->rand();
+	return 0;//space->machine().rand();
 }
 
 static READ32_HANDLER( watchdog_r )
@@ -329,7 +329,7 @@ static WRITE32_HANDLER( motor_w )
 
 static WRITE32_HANDLER( reset_w )
 {
-	metalmx_state *state = space->machine->driver_data<metalmx_state>();
+	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -360,12 +360,12 @@ static READ32_HANDLER( sound_data_r )
 static WRITE32_HANDLER( sound_data_w )
 {
 	if (ACCESSING_BITS_0_15)
-		cage_control_w(space->machine, data);
+		cage_control_w(space->machine(), data);
 	if (ACCESSING_BITS_16_31)
 		main_to_cage_w(data >> 16);
 }
 
-static void cage_irq_callback(running_machine *machine, int reason)
+static void cage_irq_callback(running_machine &machine, int reason)
 {
 	/* TODO */
 }
@@ -378,7 +378,7 @@ static void cage_irq_callback(running_machine *machine, int reason)
 
 static WRITE32_HANDLER( dsp32c_1_w )
 {
-	metalmx_state *state = space->machine->driver_data<metalmx_state>();
+	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
 	offset <<= 1;
 
@@ -392,7 +392,7 @@ static WRITE32_HANDLER( dsp32c_1_w )
 
 static READ32_HANDLER( dsp32c_1_r )
 {
-	metalmx_state *state = space->machine->driver_data<metalmx_state>();
+	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 	UINT32 data;
 
 	offset <<= 1;
@@ -410,7 +410,7 @@ static READ32_HANDLER( dsp32c_1_r )
 
 static WRITE32_HANDLER( dsp32c_2_w )
 {
-	metalmx_state *state = space->machine->driver_data<metalmx_state>();
+	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
 	offset <<= 1;
 
@@ -424,7 +424,7 @@ static WRITE32_HANDLER( dsp32c_2_w )
 
 static READ32_HANDLER( dsp32c_2_r )
 {
-	metalmx_state *state = space->machine->driver_data<metalmx_state>();
+	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 	UINT32 data;
 
 	offset <<= 1;
@@ -449,7 +449,7 @@ static READ32_HANDLER( dsp32c_2_r )
 
 static WRITE32_HANDLER( host_gsp_w )
 {
-	address_space *gsp_space = space->machine->device("gsp")->memory().space(AS_PROGRAM);
+	address_space *gsp_space = space->machine().device("gsp")->memory().space(AS_PROGRAM);
 
 	gsp_space->write_word((0xc0000000 + (offset << 5) + 0x10) / 8, data);
 	gsp_space->write_word((0xc0000000 + (offset << 5))/ 8 , data >> 16);
@@ -457,7 +457,7 @@ static WRITE32_HANDLER( host_gsp_w )
 
 static READ32_HANDLER( host_gsp_r )
 {
-	address_space *gsp_space = space->machine->device("gsp")->memory().space(AS_PROGRAM);
+	address_space *gsp_space = space->machine().device("gsp")->memory().space(AS_PROGRAM);
 	UINT32 val;
 
 	val  = gsp_space->read_word((0xc0000000 + (offset << 5) + 0x10) / 8);
@@ -468,14 +468,14 @@ static READ32_HANDLER( host_gsp_r )
 
 static READ32_HANDLER( host_dram_r )
 {
-	metalmx_state *state = space->machine->driver_data<metalmx_state>();
+	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
 	return (state->gsp_dram[offset * 2] << 16) | state->gsp_dram[offset * 2 + 1];
 }
 
 static WRITE32_HANDLER( host_dram_w )
 {
-	metalmx_state *state = space->machine->driver_data<metalmx_state>();
+	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
 	COMBINE_DATA(state->gsp_dram + offset * 2 + 1);
 	data >>= 16;
@@ -485,14 +485,14 @@ static WRITE32_HANDLER( host_dram_w )
 
 static READ32_HANDLER( host_vram_r )
 {
-	metalmx_state *state = space->machine->driver_data<metalmx_state>();
+	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
 	return (state->gsp_vram[offset * 2] << 16) | state->gsp_vram[offset * 2 + 1];
 }
 
 static WRITE32_HANDLER( host_vram_w )
 {
-	metalmx_state *state = space->machine->driver_data<metalmx_state>();
+	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
 	COMBINE_DATA(state->gsp_vram + offset * 2 + 1);
 	data >>= 16;
@@ -502,7 +502,7 @@ static WRITE32_HANDLER( host_vram_w )
 
 static void tms_interrupt(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine, "maincpu", 4, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 4, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -779,8 +779,8 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( metalmx )
 {
-	UINT8 *adsp_boot = (UINT8*)machine->region("adsp")->base();
-	metalmx_state *state = machine->driver_data<metalmx_state>();
+	UINT8 *adsp_boot = (UINT8*)machine.region("adsp")->base();
+	metalmx_state *state = machine.driver_data<metalmx_state>();
 
 	state->adsp->load_boot_data(adsp_boot, state->adsp_internal_program_ram);
 
@@ -790,7 +790,7 @@ static DRIVER_INIT( metalmx )
 
 static MACHINE_RESET( metalmx )
 {
-	metalmx_state *state = machine->driver_data<metalmx_state>();
+	metalmx_state *state = machine.driver_data<metalmx_state>();
 
 	device_set_input_line(state->dsp32c_1, INPUT_LINE_RESET, ASSERT_LINE);
 	device_set_input_line(state->dsp32c_2, INPUT_LINE_RESET, ASSERT_LINE);

@@ -78,7 +78,7 @@ INLINE amiga_audio *get_safe_token( device_t *device )
 
 static TIMER_CALLBACK( signal_irq )
 {
-	amiga_custom_w(machine->device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | (0x80 << param), 0xffff);
+	amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | (0x80 << param), 0xffff);
 }
 
 
@@ -124,7 +124,7 @@ void amiga_audio_update(device_t *device)
 
 static STREAM_UPDATE( amiga_stream_update )
 {
-	amiga_state *state = device->machine->driver_data<amiga_state>();
+	amiga_state *state = device->machine().driver_data<amiga_state>();
 	amiga_audio *audio = (amiga_audio *)param;
 	int channum, sampoffs = 0;
 
@@ -242,7 +242,7 @@ static STREAM_UPDATE( amiga_stream_update )
 				/* if we're in manual mode, signal an interrupt once we latch the low byte */
 				if (!chan->dmaenabled && chan->manualmode && (chan->curlocation & 1))
 				{
-					signal_irq(device->machine, NULL, channum);
+					signal_irq(device->machine(), NULL, channum);
 					chan->manualmode = FALSE;
 				}
 			}
@@ -270,11 +270,11 @@ static DEVICE_START( amiga_sound )
 	for (i = 0; i < 4; i++)
 	{
 		audio_state->channel[i].index = i;
-		audio_state->channel[i].irq_timer = device->machine->scheduler().timer_alloc(FUNC(signal_irq));
+		audio_state->channel[i].irq_timer = device->machine().scheduler().timer_alloc(FUNC(signal_irq));
 	}
 
 	/* create the stream */
-	audio_state->stream = device->machine->sound().stream_alloc(*device, 0, 4, device->clock() / CLOCK_DIVIDER, audio_state, amiga_stream_update);
+	audio_state->stream = device->machine().sound().stream_alloc(*device, 0, 4, device->clock() / CLOCK_DIVIDER, audio_state, amiga_stream_update);
 }
 
 

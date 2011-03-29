@@ -88,39 +88,39 @@ static READ_LINE_DEVICE_HANDLER( b_via_0_ca2_r )
 
 static READ8_DEVICE_HANDLER( b_via_0_pa_r )
 {
-	beezer_state *state = device->machine->driver_data<beezer_state>();
+	beezer_state *state = device->machine().driver_data<beezer_state>();
 	return (state->banklatch&0x38)<<2; // return X,Y,Z bits TODO: the Z bit connects somewhere else... where?
 }
 
 static READ8_DEVICE_HANDLER( b_via_0_pb_r )
 {
-	beezer_state *state = device->machine->driver_data<beezer_state>();
+	beezer_state *state = device->machine().driver_data<beezer_state>();
 	return state->pbus;
 }
 
 static WRITE8_DEVICE_HANDLER( b_via_0_pa_w )
 {
-	beezer_state *state = device->machine->driver_data<beezer_state>();
+	beezer_state *state = device->machine().driver_data<beezer_state>();
 	if ((data & 0x08) == 0)
-		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 
 	if ((data & 0x04) == 0)
 	{
 		switch (data & 0x03)
 		{
 		case 0:
-			state->pbus = input_port_read(device->machine, "IN0");
+			state->pbus = input_port_read(device->machine(), "IN0");
 			break;
 		case 1:
-			state->pbus = input_port_read(device->machine, "IN1") | (input_port_read(device->machine, "IN2") << 4);
+			state->pbus = input_port_read(device->machine(), "IN1") | (input_port_read(device->machine(), "IN2") << 4);
 			break;
 		case 2:
-			state->pbus = input_port_read(device->machine, "DSWB");
+			state->pbus = input_port_read(device->machine(), "DSWB");
 			break;
 		case 3:
-			state->pbus = input_port_read(device->machine, "DSWA"); // Technically DSWA isn't populated on the board and is pulled to 0xFF with resistor pack, but there IS a DSWA port in the driver so we may as well use it.
+			state->pbus = input_port_read(device->machine(), "DSWA"); // Technically DSWA isn't populated on the board and is pulled to 0xFF with resistor pack, but there IS a DSWA port in the driver so we may as well use it.
 			break;
 		}
 	}
@@ -128,48 +128,48 @@ static WRITE8_DEVICE_HANDLER( b_via_0_pa_w )
 
 static WRITE8_DEVICE_HANDLER( b_via_0_pb_w )
 {
-	beezer_state *state = device->machine->driver_data<beezer_state>();
+	beezer_state *state = device->machine().driver_data<beezer_state>();
 	state->pbus = data;
 }
 
 static READ8_DEVICE_HANDLER( b_via_1_pa_r )
 {
-	beezer_state *state = device->machine->driver_data<beezer_state>();
+	beezer_state *state = device->machine().driver_data<beezer_state>();
 	return state->pbus;
 }
 
 static READ8_DEVICE_HANDLER( b_via_1_pb_r )
 {
-	return 0x1F | (beezer_noise_r(device->machine->device("custom"), 0)?0x40:0);
+	return 0x1F | (beezer_noise_r(device->machine().device("custom"), 0)?0x40:0);
 }
 
 static WRITE8_DEVICE_HANDLER( b_via_1_pa_w )
 {
-	beezer_state *state = device->machine->driver_data<beezer_state>();
+	beezer_state *state = device->machine().driver_data<beezer_state>();
 	state->pbus = data;
 }
 
 static WRITE8_DEVICE_HANDLER( b_via_1_pb_w )
 {
-	beezer_timer1_w(device->machine->device("custom"), 0, data&0x80);
+	beezer_timer1_w(device->machine().device("custom"), 0, data&0x80);
 	//if ((data&0x1f) != 0x01)
 	//  popmessage("via1 pb low write of 0x%02x is not supported! contact mamedev!", data&0x1f);
 }
 
 DRIVER_INIT( beezer )
 {
-	beezer_state *state = machine->driver_data<beezer_state>();
+	beezer_state *state = machine.driver_data<beezer_state>();
 	state->pbus = 0;
 	state->banklatch = 0;
 }
 
 WRITE8_HANDLER( beezer_bankswitch_w )
 {
-	beezer_state *state = space->machine->driver_data<beezer_state>();
+	beezer_state *state = space->machine().driver_data<beezer_state>();
 	state->banklatch = data&0x3f; // latched 'x,y,z' plus bank bits in ls174 @ 4H
 	if ((data & 0x07) == 0)
 	{
-		via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");
+		via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
 		space->install_legacy_write_handler(0xc600, 0xc7ff, FUNC(watchdog_reset_w));
 		space->install_legacy_write_handler(0xc800, 0xc9ff, FUNC(beezer_map_w));
 		space->install_legacy_read_handler(0xca00, 0xcbff, FUNC(beezer_line_r));
@@ -177,7 +177,7 @@ WRITE8_HANDLER( beezer_bankswitch_w )
 	}
 	else
 	{
-		UINT8 *rom = space->machine->region("maincpu")->base() + 0x10000;
+		UINT8 *rom = space->machine().region("maincpu")->base() + 0x10000;
 		space->install_ram(0xc000, 0xcfff, rom + (data & 0x07) * 0x2000 + ((data & 0x08) ? 0x1000: 0));
 	}
 }

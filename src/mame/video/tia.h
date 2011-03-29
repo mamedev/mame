@@ -21,6 +21,6 @@ SCREEN_UPDATE( tia );
 READ8_HANDLER( tia_r );
 WRITE8_HANDLER( tia_w );
 
-void tia_init(running_machine *machine, const struct tia_interface* ti);
+void tia_init(running_machine &machine, const struct tia_interface* ti);
 
 #endif /* _VIDEO_TIA_H_ */

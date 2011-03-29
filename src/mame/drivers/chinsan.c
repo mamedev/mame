@@ -72,7 +72,7 @@ public:
 
 static PALETTE_INIT( chinsan )
 {
-	UINT8 *src = machine->region( "color_proms" )->base();
+	UINT8 *src = machine.region( "color_proms" )->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
@@ -85,7 +85,7 @@ static VIDEO_START( chinsan )
 
 static SCREEN_UPDATE( chinsan )
 {
-	chinsan_state *state = screen->machine->driver_data<chinsan_state>();
+	chinsan_state *state = screen->machine().driver_data<chinsan_state>();
 	int y, x, count;
 	count = 0;
 	for (y = 0; y < 32; y++)
@@ -95,7 +95,7 @@ static SCREEN_UPDATE( chinsan )
 			int tileno, colour;
 			tileno = state->video[count] | (state->video[count + 0x800] << 8);
 			colour = state->video[count + 0x1000] >> 3;
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tileno,colour,0,0,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tileno,colour,0,0,x*8,y*8);
 			count++;
 		}
 	}
@@ -113,7 +113,7 @@ static SCREEN_UPDATE( chinsan )
 
 static WRITE8_HANDLER( ctrl_w )
 {
-	memory_set_bank(space->machine, "bank1", data >> 6);
+	memory_set_bank(space->machine(), "bank1", data >> 6);
 }
 
 static WRITE8_DEVICE_HANDLER( ym_port_w1 )
@@ -142,7 +142,7 @@ static const ym2203_interface ym2203_config =
 
 static WRITE8_HANDLER( chinsan_port00_w )
 {
-	chinsan_state *state = space->machine->driver_data<chinsan_state>();
+	chinsan_state *state = space->machine().driver_data<chinsan_state>();
 
 	state->port_select = data;
 
@@ -160,7 +160,7 @@ static WRITE8_HANDLER( chinsan_port00_w )
 
 static READ8_HANDLER( chinsan_input_port_0_r )
 {
-	chinsan_state *state = space->machine->driver_data<chinsan_state>();
+	chinsan_state *state = space->machine().driver_data<chinsan_state>();
 
 	//return 0xff; // the inputs don't seem to work, so just return ff for now
 
@@ -169,62 +169,62 @@ static READ8_HANDLER( chinsan_input_port_0_r )
 		/* i doubt these are both really the same.. */
 		case 0x40:
 		case 0x4f:
-			return input_port_read(space->machine, "MAHJONG_P2_1");
+			return input_port_read(space->machine(), "MAHJONG_P2_1");
 
 		case 0x53:
-			return input_port_read(space->machine, "MAHJONG_P2_2");
+			return input_port_read(space->machine(), "MAHJONG_P2_2");
 
 		case 0x57:
-			return input_port_read(space->machine, "MAHJONG_P2_3");
+			return input_port_read(space->machine(), "MAHJONG_P2_3");
 
 		case 0x5b:
-			return input_port_read(space->machine, "MAHJONG_P2_4");
+			return input_port_read(space->machine(), "MAHJONG_P2_4");
 
 		case 0x5d:
-			return input_port_read(space->machine, "MAHJONG_P2_5");
+			return input_port_read(space->machine(), "MAHJONG_P2_5");
 
 		case 0x5e:
-			return input_port_read(space->machine, "MAHJONG_P2_6");
+			return input_port_read(space->machine(), "MAHJONG_P2_6");
 	}
 
 	printf("chinsan_input_port_0_r unk_r %02x\n", state->port_select);
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static READ8_HANDLER( chinsan_input_port_1_r )
 {
-	chinsan_state *state = space->machine->driver_data<chinsan_state>();
+	chinsan_state *state = space->machine().driver_data<chinsan_state>();
 
 	switch (state->port_select)
 	{
 		/* i doubt these are both really the same.. */
 		case 0x40:
 		case 0x4f:
-			return input_port_read(space->machine, "MAHJONG_P1_1");
+			return input_port_read(space->machine(), "MAHJONG_P1_1");
 
 		case 0x53:
-			return input_port_read(space->machine, "MAHJONG_P1_2");
+			return input_port_read(space->machine(), "MAHJONG_P1_2");
 
 		case 0x57:
-			return input_port_read(space->machine, "MAHJONG_P1_3");
+			return input_port_read(space->machine(), "MAHJONG_P1_3");
 
 		case 0x5b:
-			return input_port_read(space->machine, "MAHJONG_P1_4");
+			return input_port_read(space->machine(), "MAHJONG_P1_4");
 
 		case 0x5d:
-			return input_port_read(space->machine, "MAHJONG_P1_5");
+			return input_port_read(space->machine(), "MAHJONG_P1_5");
 
 		case 0x5e:
-			return input_port_read(space->machine, "MAHJONG_P1_6");
+			return input_port_read(space->machine(), "MAHJONG_P1_6");
 	}
 
 	printf("chinsan_input_port_1_r unk_r %02x\n", state->port_select);
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static WRITE8_DEVICE_HANDLER( chin_adpcm_w )
 {
-	chinsan_state *state = device->machine->driver_data<chinsan_state>();
+	chinsan_state *state = device->machine().driver_data<chinsan_state>();
 	state->adpcm_pos = (data & 0xff) * 0x100;
 	state->adpcm_idle = 0;
 	msm5205_reset_w(device, 0);
@@ -528,7 +528,7 @@ GFXDECODE_END
 
 static void chin_adpcm_int( device_t *device )
 {
-	chinsan_state *state = device->machine->driver_data<chinsan_state>();
+	chinsan_state *state = device->machine().driver_data<chinsan_state>();
 
 	if (state->adpcm_pos >= 0x10000 || state->adpcm_idle)
 	{
@@ -538,7 +538,7 @@ static void chin_adpcm_int( device_t *device )
 	}
 	else
 	{
-		UINT8 *ROM = device->machine->region("adpcm")->base();
+		UINT8 *ROM = device->machine().region("adpcm")->base();
 
 		state->adpcm_data = ((state->trigger ? (ROM[state->adpcm_pos] & 0x0f) : (ROM[state->adpcm_pos] & 0xf0) >> 4));
 		msm5205_data_w(device, state->adpcm_data & 0xf);
@@ -566,9 +566,9 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( chinsan )
 {
-	chinsan_state *state = machine->driver_data<chinsan_state>();
+	chinsan_state *state = machine.driver_data<chinsan_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 4, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	state->save_item(NAME(state->adpcm_idle));
 	state->save_item(NAME(state->port_select));
@@ -579,7 +579,7 @@ static MACHINE_START( chinsan )
 
 static MACHINE_RESET( chinsan )
 {
-	chinsan_state *state = machine->driver_data<chinsan_state>();
+	chinsan_state *state = machine.driver_data<chinsan_state>();
 
 	state->adpcm_idle = 1;
 	state->port_select = 0;

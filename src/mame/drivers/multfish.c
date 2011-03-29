@@ -201,7 +201,7 @@ public:
 
 static TILE_GET_INFO( get_multfish_tile_info )
 {
-	multfish_state *state = machine->driver_data<multfish_state>();
+	multfish_state *state = machine.driver_data<multfish_state>();
 	int code = state->vid[tile_index*2+0x0000] | (state->vid[tile_index*2+0x0001] << 8);
 	int attr = state->vid[tile_index*2+0x1000] | (state->vid[tile_index*2+0x1001] << 8);
 
@@ -216,7 +216,7 @@ static TILE_GET_INFO( get_multfish_tile_info )
 
 static TILE_GET_INFO( get_multfish_reel_tile_info )
 {
-	multfish_state *state = machine->driver_data<multfish_state>();
+	multfish_state *state = machine.driver_data<multfish_state>();
 	int code = state->vid[tile_index*2+0x2000] | (state->vid[tile_index*2+0x2001] << 8);
 
 	SET_TILE_INFO(
@@ -228,7 +228,7 @@ static TILE_GET_INFO( get_multfish_reel_tile_info )
 
 static VIDEO_START(multfish)
 {
-	multfish_state *state = machine->driver_data<multfish_state>();
+	multfish_state *state = machine.driver_data<multfish_state>();
 
 	memset(state->vid,0x00,sizeof(state->vid));
 	state->save_item(NAME(state->vid));
@@ -243,10 +243,10 @@ static VIDEO_START(multfish)
 
 static SCREEN_UPDATE(multfish)
 {
-	multfish_state *state = screen->machine->driver_data<multfish_state>();
+	multfish_state *state = screen->machine().driver_data<multfish_state>();
 	int i;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	if (!state->disp_enable) return 0;
 
@@ -269,7 +269,7 @@ static SCREEN_UPDATE(multfish)
 
 static WRITE8_HANDLER( multfish_vid_w )
 {
-	multfish_state *state = space->machine->driver_data<multfish_state>();
+	multfish_state *state = space->machine().driver_data<multfish_state>();
 
 	state->vid[offset]=data;
 
@@ -309,7 +309,7 @@ static WRITE8_HANDLER( multfish_vid_w )
 		b = ( (coldat &0x00e0)>> (5));
 		b|= ( (coldat &0xe000)>> (8+5-3));
 
-		palette_set_color_rgb(space->machine, (offset-0x4000)/2, r<<3, g<<3, b<<2);
+		palette_set_color_rgb(space->machine(), (offset-0x4000)/2, r<<3, g<<3, b<<2);
 	}
 	else
 	{
@@ -319,7 +319,7 @@ static WRITE8_HANDLER( multfish_vid_w )
 
 static WRITE8_HANDLER( multfish_bank_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 }
 
 static READ8_DEVICE_HANDLER( multfish_timekeeper_r )
@@ -334,11 +334,11 @@ static WRITE8_DEVICE_HANDLER( multfish_timekeeper_w )
 
 static READ8_HANDLER( bankedram_r )
 {
-	multfish_state *state = space->machine->driver_data<multfish_state>();
+	multfish_state *state = space->machine().driver_data<multfish_state>();
 
 	if ((state->rambk & 0x80) == 0x00)
 	{
-		return timekeeper_r(space->machine->device("m48t35"), offset + 0x2000*(state->rambk & 0x03));
+		return timekeeper_r(space->machine().device("m48t35"), offset + 0x2000*(state->rambk & 0x03));
 	}
 	else
 	{
@@ -349,11 +349,11 @@ static READ8_HANDLER( bankedram_r )
 
 static WRITE8_HANDLER( bankedram_w )
 {
-	multfish_state *state = space->machine->driver_data<multfish_state>();
+	multfish_state *state = space->machine().driver_data<multfish_state>();
 
 	if ((state->rambk & 0x80) == 0x00)
 	{
-		timekeeper_w(space->machine->device("m48t35"), offset + 0x2000*(state->rambk & 0x03), data);
+		timekeeper_w(space->machine().device("m48t35"), offset + 0x2000*(state->rambk & 0x03), data);
 	}
 	else
 	{
@@ -363,7 +363,7 @@ static WRITE8_HANDLER( bankedram_w )
 
 static WRITE8_HANDLER( multfish_rambank_w )
 {
-	multfish_state *state = space->machine->driver_data<multfish_state>();
+	multfish_state *state = space->machine().driver_data<multfish_state>();
 
 	state->rambk = data;
 }
@@ -373,12 +373,12 @@ static READ8_HANDLER( ray_r )
 {
 	// the games read the raster beam position as part of the hardware checks..
 	// with a 6mhz clock and 640x480 resolution this seems to give the right results.
-	return space->machine->primary_screen->vpos();
+	return space->machine().primary_screen->vpos();
 }
 
 static CUSTOM_INPUT( multfish_hopper_r )
 {
-	multfish_state *state = field->port->machine->driver_data<multfish_state>();
+	multfish_state *state = field->port->machine().driver_data<multfish_state>();
 
 	if ( state->hopper_motor != 0 )
 	{
@@ -400,17 +400,17 @@ static WRITE8_HANDLER( multfish_hopper_w )
     ---- -X-- Bill Acceptor Lock 24B
     ---X ---- Hopper Motor 33B
 */
-	multfish_state *state = space->machine->driver_data<multfish_state>();
+	multfish_state *state = space->machine().driver_data<multfish_state>();
 
 	state->hopper_motor = data & 0x10;
-        coin_lockout_w(space->machine, 0, data & 0x01);
-        coin_lockout_w(space->machine, 1, data & 0x01);
-        coin_lockout_w(space->machine, 2, data & 0x01);
-        coin_lockout_w(space->machine, 3, data & 0x01);
-        coin_lockout_w(space->machine, 4, data & 0x04);
-        coin_lockout_w(space->machine, 5, data & 0x04);
-        coin_lockout_w(space->machine, 6, data & 0x04);
-        coin_lockout_w(space->machine, 7, data & 0x04);
+        coin_lockout_w(space->machine(), 0, data & 0x01);
+        coin_lockout_w(space->machine(), 1, data & 0x01);
+        coin_lockout_w(space->machine(), 2, data & 0x01);
+        coin_lockout_w(space->machine(), 3, data & 0x01);
+        coin_lockout_w(space->machine(), 4, data & 0x04);
+        coin_lockout_w(space->machine(), 5, data & 0x04);
+        coin_lockout_w(space->machine(), 6, data & 0x04);
+        coin_lockout_w(space->machine(), 7, data & 0x04);
 }
 
 static WRITE8_HANDLER( rollfr_hopper_w )
@@ -418,17 +418,17 @@ static WRITE8_HANDLER( rollfr_hopper_w )
 /*
     By default RollFruit use inverted coinlock bit.
 */
-	multfish_state *state = space->machine->driver_data<multfish_state>();
+	multfish_state *state = space->machine().driver_data<multfish_state>();
 
 	state->hopper_motor = data & 0x10;
-        coin_lockout_w(space->machine, 0, !data & 0x01);
-        coin_lockout_w(space->machine, 1, !data & 0x01);
-        coin_lockout_w(space->machine, 2, !data & 0x01);
-        coin_lockout_w(space->machine, 3, !data & 0x01);
-        coin_lockout_w(space->machine, 4, data & 0x04);
-        coin_lockout_w(space->machine, 5, data & 0x04);
-        coin_lockout_w(space->machine, 6, data & 0x04);
-        coin_lockout_w(space->machine, 7, data & 0x04);
+        coin_lockout_w(space->machine(), 0, !data & 0x01);
+        coin_lockout_w(space->machine(), 1, !data & 0x01);
+        coin_lockout_w(space->machine(), 2, !data & 0x01);
+        coin_lockout_w(space->machine(), 3, !data & 0x01);
+        coin_lockout_w(space->machine(), 4, data & 0x04);
+        coin_lockout_w(space->machine(), 5, data & 0x04);
+        coin_lockout_w(space->machine(), 6, data & 0x04);
+        coin_lockout_w(space->machine(), 7, data & 0x04);
 }
 
 DRIVER_INIT( customl )
@@ -461,7 +461,7 @@ A12 <-> A13
 */
 
 	UINT32 i,j,jscr,romoffset;
-	UINT8 *multfish_gfx = machine->region("gfx")->base();
+	UINT8 *multfish_gfx = machine.region("gfx")->base();
 	UINT8 *temprom = auto_alloc_array(machine, UINT8, multfish_ROM_SIZE);
 
 
@@ -531,9 +531,9 @@ INLINE void rom_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor
 	memcpy(romptr,tmprom,multfish_ROM_SIZE);
 }
 
-static void lottery_decode(running_machine *machine, UINT8 xor12, UINT8 xor34, UINT8 xor56, UINT8 xor78, UINT32 xor_addr)
+static void lottery_decode(running_machine &machine, UINT8 xor12, UINT8 xor34, UINT8 xor56, UINT8 xor78, UINT32 xor_addr)
 {
-	UINT8 *multfish_gfx = machine->region("gfx")->base();
+	UINT8 *multfish_gfx = machine.region("gfx")->base();
 	UINT8 *temprom = auto_alloc_array(machine, UINT8, multfish_ROM_SIZE);
 
 	/* ROMs decode */
@@ -572,9 +572,9 @@ INLINE void roment_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 
 	memcpy(romptr,tmprom,multfish_ROM_SIZE);
 }
 
-static void ent_decode(running_machine *machine, UINT8 xor12, UINT8 xor34, UINT8 xor56, UINT8 xor78, UINT32 xor_addr)
+static void ent_decode(running_machine &machine, UINT8 xor12, UINT8 xor34, UINT8 xor56, UINT8 xor78, UINT32 xor_addr)
 {
-	UINT8 *multfish_gfx = machine->region("gfx")->base();
+	UINT8 *multfish_gfx = machine.region("gfx")->base();
 	UINT8 *temprom = auto_alloc_array(machine, UINT8, multfish_ROM_SIZE);
 
 	/* ROMs decode */
@@ -592,7 +592,7 @@ static void ent_decode(running_machine *machine, UINT8 xor12, UINT8 xor34, UINT8
 
 DRIVER_INIT( island2l )
 {
-	multfish_state *state = machine->driver_data<multfish_state>();
+	multfish_state *state = machine.driver_data<multfish_state>();
 
         state->xor_palette = 0x8bf7;
         state->xor_paltype = 1;
@@ -600,7 +600,7 @@ DRIVER_INIT( island2l )
 }
 DRIVER_INIT( keksl )
 {
-	multfish_state *state = machine->driver_data<multfish_state>();
+	multfish_state *state = machine.driver_data<multfish_state>();
 
         state->xor_palette = 0x41f3;
         state->xor_paltype = 1;
@@ -608,7 +608,7 @@ DRIVER_INIT( keksl )
 }
 DRIVER_INIT( pirate2l )
 {
-	multfish_state *state = machine->driver_data<multfish_state>();
+	multfish_state *state = machine.driver_data<multfish_state>();
 
         state->xor_palette = 0x8bfb;
         state->xor_paltype = 1;
@@ -616,7 +616,7 @@ DRIVER_INIT( pirate2l )
 }
 DRIVER_INIT( fcockt2l )
 {
-	multfish_state *state = machine->driver_data<multfish_state>();
+	multfish_state *state = machine.driver_data<multfish_state>();
 
         state->xor_palette = 0xedfb;
         state->xor_paltype = 1;
@@ -624,7 +624,7 @@ DRIVER_INIT( fcockt2l )
 }
 DRIVER_INIT( sweetl2l )
 {
-	multfish_state *state = machine->driver_data<multfish_state>();
+	multfish_state *state = machine.driver_data<multfish_state>();
 
         state->xor_palette = 0x4bf7;
         state->xor_paltype = 1;
@@ -632,7 +632,7 @@ DRIVER_INIT( sweetl2l )
 }
 DRIVER_INIT( gnomel )
 {
-	multfish_state *state = machine->driver_data<multfish_state>();
+	multfish_state *state = machine.driver_data<multfish_state>();
 
         state->xor_palette = 0x49ff;
         state->xor_paltype = 1;
@@ -640,28 +640,28 @@ DRIVER_INIT( gnomel )
 }
 DRIVER_INIT( crzmonent )
 {
-	multfish_state *state = machine->driver_data<multfish_state>();
+	multfish_state *state = machine.driver_data<multfish_state>();
 
         state->xor_palette = 0x1cdb;
         state->xor_paltype = 2;
 }
 DRIVER_INIT( resdntent )
 {
-	multfish_state *state = machine->driver_data<multfish_state>();
+	multfish_state *state = machine.driver_data<multfish_state>();
 
         state->xor_palette = 0x6edb;
         state->xor_paltype = 2;
 }
 DRIVER_INIT( gnomeent )
 {
-	multfish_state *state = machine->driver_data<multfish_state>();
+	multfish_state *state = machine.driver_data<multfish_state>();
 
         state->xor_palette = 0x9edb;
         state->xor_paltype = 2;
 }
 DRIVER_INIT( lhauntent )
 {
-	multfish_state *state = machine->driver_data<multfish_state>();
+	multfish_state *state = machine.driver_data<multfish_state>();
 
         state->xor_palette = 0x1adb;
         state->xor_paltype = 2;
@@ -882,12 +882,12 @@ static WRITE8_HANDLER( multfish_counters_w )
     -X-- ---- Key Out Counter 27A
     X--- ---- Total Bet Counter 28B
 */
-        coin_counter_w(space->machine, 0, data & 0x01);
-        coin_counter_w(space->machine, 1, data & 0x02);
-        coin_counter_w(space->machine, 2, data & 0x04);
-        coin_counter_w(space->machine, 3, data & 0x10);
-        coin_counter_w(space->machine, 4, data & 0x40);
-        coin_counter_w(space->machine, 5, data & 0x80);
+        coin_counter_w(space->machine(), 0, data & 0x01);
+        coin_counter_w(space->machine(), 1, data & 0x02);
+        coin_counter_w(space->machine(), 2, data & 0x04);
+        coin_counter_w(space->machine(), 3, data & 0x10);
+        coin_counter_w(space->machine(), 4, data & 0x40);
+        coin_counter_w(space->machine(), 5, data & 0x80);
 }
 
 static WRITE8_HANDLER( multfish_f3_w )
@@ -897,7 +897,7 @@ static WRITE8_HANDLER( multfish_f3_w )
 
 static WRITE8_HANDLER( multfish_dispenable_w )
 {
-	multfish_state *state = space->machine->driver_data<multfish_state>();
+	multfish_state *state = space->machine().driver_data<multfish_state>();
 	//popmessage("multfish_f4_w %02x",data); // display enable?
 	state->disp_enable = data;
 }
@@ -987,7 +987,7 @@ GFXDECODE_END
 
 static MACHINE_START( multfish )
 {
-	multfish_state *state = machine->driver_data<multfish_state>();
+	multfish_state *state = machine.driver_data<multfish_state>();
 
 	state->save_item(NAME(state->disp_enable));
 	state->save_item(NAME(state->rambk));
@@ -997,9 +997,9 @@ static MACHINE_START( multfish )
 
 static MACHINE_RESET( multfish )
 {
-	multfish_state *state = machine->driver_data<multfish_state>();
+	multfish_state *state = machine.driver_data<multfish_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base(), 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base(), 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 
 	state->disp_enable = 0;
@@ -1060,8 +1060,8 @@ static MACHINE_RESET( island2a )
 	MACHINE_RESET_CALL(multfish);
 
 	// this set needs preprogrammed data in timekeeper
-	timekeeper_w(machine->device("m48t35"), 0x2003 , 0x01);
-	timekeeper_w(machine->device("m48t35"), 0x4003 , 0x02);
+	timekeeper_w(machine.device("m48t35"), 0x2003 , 0x01);
+	timekeeper_w(machine.device("m48t35"), 0x4003 , 0x02);
 }
 static MACHINE_CONFIG_DERIVED( island2a, multfish )
 

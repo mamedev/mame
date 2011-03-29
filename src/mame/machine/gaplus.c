@@ -20,8 +20,8 @@
 
 WRITE8_HANDLER( gaplus_customio_3_w )
 {
-	gaplus_state *state = space->machine->driver_data<gaplus_state>();
-	device_t *samples = space->machine->device("samples");
+	gaplus_state *state = space->machine().driver_data<gaplus_state>();
+	device_t *samples = space->machine().device("samples");
 	if ((offset == 0x09) && (data >= 0x0f))
 		sample_start(samples,0,0,0);
 
@@ -31,13 +31,13 @@ WRITE8_HANDLER( gaplus_customio_3_w )
 
 READ8_HANDLER( gaplus_customio_3_r )
 {
-	gaplus_state *state = space->machine->driver_data<gaplus_state>();
+	gaplus_state *state = space->machine().driver_data<gaplus_state>();
 	int mode = state->customio_3[8];
 
 	switch (offset)
 	{
 		case 0:
-			return input_port_read(space->machine, "IN2");		/* cabinet & test mode */
+			return input_port_read(space->machine(), "IN2");		/* cabinet & test mode */
 		case 1:
 			return (mode == 2) ? state->customio_3[offset] : 0x0f;
 		case 2:

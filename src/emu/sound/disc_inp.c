@@ -23,14 +23,14 @@
 READ8_DEVICE_HANDLER(discrete_sound_r)
 {
 	discrete_device *disc_device = downcast<discrete_device *>(device);
-	return	disc_device->read( *disc_device->machine->firstcpu->space(), offset, 0xff);
+	return	disc_device->read( *disc_device->machine().firstcpu->space(), offset, 0xff);
 }
 
 
 WRITE8_DEVICE_HANDLER(discrete_sound_w)
 {
 	discrete_device *disc_device = downcast<discrete_device *>(device);
-	disc_device->write(*disc_device->machine->firstcpu->space(), offset, data, 0xff);
+	disc_device->write(*disc_device->machine().firstcpu->space(), offset, data, 0xff);
 }
 
 /************************************************************************
@@ -75,7 +75,7 @@ DISCRETE_RESET(dss_adjustment)
 {
 	double min, max;
 
-	m_port = m_device->machine->m_portlist.find((const char *)this->custom_data());
+	m_port = m_device->machine().m_portlist.find((const char *)this->custom_data());
 	if (m_port == NULL)
 		fatalerror("DISCRETE_ADJUSTMENT - NODE_%d has invalid tag", this->index());
 
@@ -334,7 +334,7 @@ void DISCRETE_CLASS_NAME(dss_input_stream)::stream_start(void)
 		discrete_sound_device *snd_device = downcast<discrete_sound_device *>(m_device);
 		//assert(DSS_INPUT_STREAM__STREAM < snd_device->m_input_stream_list.count());
 
-		m_buffer_stream = m_device->machine->sound().stream_alloc(*snd_device, 0, 1, this->sample_rate(), this, static_stream_generate);
+		m_buffer_stream = m_device->machine().sound().stream_alloc(*snd_device, 0, 1, this->sample_rate(), this, static_stream_generate);
 
 		snd_device->get_stream()->set_input(m_stream_in_number, m_buffer_stream);
 	}

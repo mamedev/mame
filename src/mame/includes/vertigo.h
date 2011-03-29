@@ -23,7 +23,9 @@ typedef struct _am2901
 
 typedef struct _vector_generator
 {
-	running_machine *machine;
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
+	running_machine *m_machine;
 	UINT32 sreg;	  /* shift register */
 	UINT32 l1;		  /* latch 1 adder operand only */
 	UINT32 l2;		  /* latch 2 adder operand only */
@@ -114,7 +116,7 @@ MACHINE_RESET( vertigo );
 
 /*----------- defined in video/vertigo.c -----------*/
 
-void vertigo_vproc_init(running_machine *machine);
-void vertigo_vproc_reset(running_machine *machine);
-void vertigo_vproc(running_machine *machine, int cycles, int irq4);
+void vertigo_vproc_init(running_machine &machine);
+void vertigo_vproc_reset(running_machine &machine);
+void vertigo_vproc(running_machine &machine, int cycles, int irq4);
 

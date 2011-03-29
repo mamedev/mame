@@ -92,7 +92,7 @@ static MACHINE_RESET( grchamp )
 
 static INTERRUPT_GEN( grchamp_cpu0_interrupt )
 {
-	grchamp_state *state = device->machine->driver_data<grchamp_state>();
+	grchamp_state *state = device->machine().driver_data<grchamp_state>();
 
 	if (state->cpu0_out[0] & 0x01)
 		device_set_input_line(device, 0, ASSERT_LINE);
@@ -101,7 +101,7 @@ static INTERRUPT_GEN( grchamp_cpu0_interrupt )
 
 static INTERRUPT_GEN( grchamp_cpu1_interrupt )
 {
-	grchamp_state *state = device->machine->driver_data<grchamp_state>();
+	grchamp_state *state = device->machine().driver_data<grchamp_state>();
 
 	if (state->cpu1_out[4] & 0x01)
 		device_set_input_line(device, 0, ASSERT_LINE);
@@ -117,7 +117,7 @@ static INTERRUPT_GEN( grchamp_cpu1_interrupt )
 
 static WRITE8_HANDLER( cpu0_outputs_w )
 {
-	grchamp_state *state = space->machine->driver_data<grchamp_state>();
+	grchamp_state *state = space->machine().driver_data<grchamp_state>();
 	UINT8 diff = data ^ state->cpu0_out[offset];
 	state->cpu0_out[offset] = data;
 
@@ -132,7 +132,7 @@ static WRITE8_HANDLER( cpu0_outputs_w )
 			/* bit 6: FOG OUT */
 			/* bit 7: RADARON */
 			if ((diff & 0x01) && !(data & 0x01))
-				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 			if ((diff & 0x02) && !(data & 0x02))
 				state->collide = state->collmode = 0;
 			break;
@@ -168,7 +168,7 @@ static WRITE8_HANDLER( cpu0_outputs_w )
 			/* bit 4:   coin lockout */
 			/* bit 5:   Game Over lamp */
 			/* bit 6-7: n/c */
-			coin_lockout_global_w(space->machine, (data >> 4) & 1);
+			coin_lockout_global_w(space->machine(), (data >> 4) & 1);
 			output_set_value("led0", (~data >> 5) & 1);
 			break;
 
@@ -185,13 +185,13 @@ static WRITE8_HANDLER( cpu0_outputs_w )
 			break;
 
 		case 0x0d:	/* OUT13 */
-			watchdog_reset(space->machine);
+			watchdog_reset(space->machine());
 			break;
 
 		case 0x0e:	/* OUT14 */
 			/* O-21 connector */
 			soundlatch_w(space, 0, data);
-			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			break;
 	}
 }
@@ -201,7 +201,7 @@ static WRITE8_HANDLER( led_board_w )
 {
 	static const UINT8 ls247_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x58,0x4c,0x62,0x69,0x78,0x00 };
-	grchamp_state *state = space->machine->driver_data<grchamp_state>();
+	grchamp_state *state = space->machine().driver_data<grchamp_state>();
 
 	switch (offset)
 	{
@@ -244,8 +244,8 @@ static WRITE8_HANDLER( led_board_w )
 
 static WRITE8_HANDLER( cpu1_outputs_w )
 {
-	device_t *discrete = space->machine->device("discrete");
-	grchamp_state *state = space->machine->driver_data<grchamp_state>();
+	device_t *discrete = space->machine().device("discrete");
+	grchamp_state *state = space->machine().driver_data<grchamp_state>();
 	UINT8 diff = data ^ state->cpu1_out[offset];
 	state->cpu1_out[offset] = data;
 
@@ -272,7 +272,7 @@ static WRITE8_HANDLER( cpu1_outputs_w )
 		case 0x04:	/* OUT4 */
 			/* bit 0:   interrupt enable for CPU 1 */
 			if ((diff & 0x01) && !(data & 0x01))
-				cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
+				cputag_set_input_line(space->machine(), "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x05:	/* OUT5 - unused */
@@ -337,12 +337,12 @@ static WRITE8_HANDLER( cpu1_outputs_w )
  *
  *************************************/
 
-INLINE UINT8 get_pc3259_bits(running_machine *machine, grchamp_state *state, int offs)
+INLINE UINT8 get_pc3259_bits(running_machine &machine, grchamp_state *state, int offs)
 {
 	int bits;
 
 	/* force a partial update to the current position */
-	machine->primary_screen->update_partial(machine->primary_screen->vpos());
+	machine.primary_screen->update_partial(machine.primary_screen->vpos());
 
 	/* get the relevant 4 bits */
 	bits = (state->collide >> (offs*4)) & 0x0f;
@@ -354,29 +354,29 @@ INLINE UINT8 get_pc3259_bits(running_machine *machine, grchamp_state *state, int
 
 static READ8_HANDLER( pc3259_0_r )
 {
-	grchamp_state *state = space->machine->driver_data<grchamp_state>();
-	return get_pc3259_bits(space->machine, state, 0);
+	grchamp_state *state = space->machine().driver_data<grchamp_state>();
+	return get_pc3259_bits(space->machine(), state, 0);
 }
 
 
 static READ8_HANDLER( pc3259_1_r )
 {
-	grchamp_state *state = space->machine->driver_data<grchamp_state>();
-	return get_pc3259_bits(space->machine, state, 1);
+	grchamp_state *state = space->machine().driver_data<grchamp_state>();
+	return get_pc3259_bits(space->machine(), state, 1);
 }
 
 
 static READ8_HANDLER( pc3259_2_r )
 {
-	grchamp_state *state = space->machine->driver_data<grchamp_state>();
-	return get_pc3259_bits(space->machine, state, 2);
+	grchamp_state *state = space->machine().driver_data<grchamp_state>();
+	return get_pc3259_bits(space->machine(), state, 2);
 }
 
 
 static READ8_HANDLER( pc3259_3_r )
 {
-	grchamp_state *state = space->machine->driver_data<grchamp_state>();
-	return get_pc3259_bits(space->machine, state, 3);
+	grchamp_state *state = space->machine().driver_data<grchamp_state>();
+	return get_pc3259_bits(space->machine(), state, 3);
 }
 
 
@@ -389,14 +389,14 @@ static READ8_HANDLER( pc3259_3_r )
 
 static READ8_HANDLER( sub_to_main_comm_r )
 {
-	grchamp_state *state = space->machine->driver_data<grchamp_state>();
+	grchamp_state *state = space->machine().driver_data<grchamp_state>();
 	return state->comm_latch;
 }
 
 
 static TIMER_CALLBACK( main_to_sub_comm_sync_w )
 {
-	grchamp_state *state = machine->driver_data<grchamp_state>();
+	grchamp_state *state = machine.driver_data<grchamp_state>();
 	int offset = param >> 8;
 	state->comm_latch2[offset & 3] = param;
 }
@@ -404,13 +404,13 @@ static TIMER_CALLBACK( main_to_sub_comm_sync_w )
 
 static WRITE8_HANDLER( main_to_sub_comm_w )
 {
-	space->machine->scheduler().synchronize(FUNC(main_to_sub_comm_sync_w), data | (offset << 8));
+	space->machine().scheduler().synchronize(FUNC(main_to_sub_comm_sync_w), data | (offset << 8));
 }
 
 
 static READ8_HANDLER( main_to_sub_comm_r )
 {
-	grchamp_state *state = space->machine->driver_data<grchamp_state>();
+	grchamp_state *state = space->machine().driver_data<grchamp_state>();
 	return state->comm_latch2[offset];
 }
 

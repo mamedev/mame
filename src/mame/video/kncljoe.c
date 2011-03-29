@@ -19,7 +19,7 @@ PALETTE_INIT( kncljoe )
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x90);
+	machine.colortable = colortable_alloc(machine, 0x90);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x80; i++)
@@ -28,7 +28,7 @@ PALETTE_INIT( kncljoe )
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	for (i = 0x80; i < 0x90; i++)
@@ -54,7 +54,7 @@ PALETTE_INIT( kncljoe )
 		bit2 = (color_prom[(i - 0x80) + 0x300] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -62,13 +62,13 @@ PALETTE_INIT( kncljoe )
 
 	/* chars */
 	for (i = 0; i < 0x80; i++)
-		colortable_entry_set_value(machine->colortable, i, i);
+		colortable_entry_set_value(machine.colortable, i, i);
 
 	/* sprite lookup table */
 	for (i = 0x80; i < 0x100; i++)
 	{
 		UINT8 ctabentry = (color_prom[i - 0x80] & 0x0f) | 0x80;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 }
 
@@ -82,7 +82,7 @@ PALETTE_INIT( kncljoe )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	kncljoe_state *state = machine->driver_data<kncljoe_state>();
+	kncljoe_state *state = machine.driver_data<kncljoe_state>();
 	int attr = state->videoram[2 * tile_index + 1];
 	int code = state->videoram[2 * tile_index] + ((attr & 0xc0) << 2) + (state->tile_bank << 10);
 
@@ -103,7 +103,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( kncljoe )
 {
-	kncljoe_state *state = machine->driver_data<kncljoe_state>();
+	kncljoe_state *state = machine.driver_data<kncljoe_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
 	tilemap_set_scroll_rows(state->bg_tilemap, 4);
@@ -119,14 +119,14 @@ VIDEO_START( kncljoe )
 
 WRITE8_HANDLER( kncljoe_videoram_w )
 {
-	kncljoe_state *state = space->machine->driver_data<kncljoe_state>();
+	kncljoe_state *state = space->machine().driver_data<kncljoe_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( kncljoe_control_w )
 {
-	kncljoe_state *state = space->machine->driver_data<kncljoe_state>();
+	kncljoe_state *state = space->machine().driver_data<kncljoe_state>();
 	int i;
 	/*
             0x01    screen flip
@@ -139,10 +139,10 @@ WRITE8_HANDLER( kncljoe_control_w )
             set after IN0 - Coin 1 goes high AND the credit has been added
    */
 	state->flipscreen = data & 0x01;
-	tilemap_set_flip_all(space->machine, state->flipscreen ? TILEMAP_FLIPX : TILEMAP_FLIPY);
+	tilemap_set_flip_all(space->machine(), state->flipscreen ? TILEMAP_FLIPX : TILEMAP_FLIPY);
 
-	coin_counter_w(space->machine, 0, data & 0x02);
-	coin_counter_w(space->machine, 1, data & 0x20);
+	coin_counter_w(space->machine(), 0, data & 0x02);
+	coin_counter_w(space->machine(), 1, data & 0x20);
 
 	i = (data & 0x10) >> 4;
 	if (state->tile_bank != i)
@@ -155,13 +155,13 @@ WRITE8_HANDLER( kncljoe_control_w )
 	if (state->sprite_bank != i)
 	{
 		state->sprite_bank = i;
-		memset(space->machine->region("maincpu")->base() + 0xf100, 0, 0x180);
+		memset(space->machine().region("maincpu")->base() + 0xf100, 0, 0x180);
 	}
 }
 
 WRITE8_HANDLER( kncljoe_scroll_w )
 {
-	kncljoe_state *state = space->machine->driver_data<kncljoe_state>();
+	kncljoe_state *state = space->machine().driver_data<kncljoe_state>();
 	int scrollx;
 
 	state->scrollregs[offset] = data;
@@ -180,15 +180,15 @@ WRITE8_HANDLER( kncljoe_scroll_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	kncljoe_state *state = machine->driver_data<kncljoe_state>();
+	kncljoe_state *state = machine.driver_data<kncljoe_state>();
 	UINT8 *spriteram = state->spriteram;
 	rectangle clip = *cliprect;
-	const gfx_element *gfx = machine->gfx[1 + state->sprite_bank];
+	const gfx_element *gfx = machine.gfx[1 + state->sprite_bank];
 	int i, j;
 	static const int pribase[4]={0x0180, 0x0080, 0x0100, 0x0000};
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	/* score covers sprites */
 	if (state->flipscreen)
@@ -240,9 +240,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( kncljoe )
 {
-	kncljoe_state *state = screen->machine->driver_data<kncljoe_state>();
+	kncljoe_state *state = screen->machine().driver_data<kncljoe_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

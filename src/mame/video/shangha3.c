@@ -66,10 +66,10 @@ Word | Bit(s)           | Use
 
 VIDEO_START( shangha3 )
 {
-	shangha3_state *state = machine->driver_data<shangha3_state>();
+	shangha3_state *state = machine.driver_data<shangha3_state>();
 	int i;
 
-	state->rawbitmap = machine->primary_screen->alloc_compatible_bitmap();
+	state->rawbitmap = machine.primary_screen->alloc_compatible_bitmap();
 
 	for (i = 0;i < 14;i++)
 		state->drawmode_table[i] = DRAWMODE_SOURCE;
@@ -80,7 +80,7 @@ VIDEO_START( shangha3 )
 	{
 		/* Prepare the shadow table */
 		for (i = 0;i < 128;i++)
-			machine->shadow_table[i] = i+128;
+			machine.shadow_table[i] = i+128;
 	}
 }
 
@@ -91,7 +91,7 @@ WRITE16_HANDLER( shangha3_flipscreen_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 7 flips screen, the rest seems to always be set to 0x7e */
-		flip_screen_set(space->machine, data & 0x80);
+		flip_screen_set(space->machine(), data & 0x80);
 
 		if ((data & 0x7f) != 0x7e) popmessage("flipscreen_w %02x",data);
 	}
@@ -99,7 +99,7 @@ WRITE16_HANDLER( shangha3_flipscreen_w )
 
 WRITE16_HANDLER( shangha3_gfxlist_addr_w )
 {
-	shangha3_state *state = space->machine->driver_data<shangha3_state>();
+	shangha3_state *state = space->machine().driver_data<shangha3_state>();
 
 	COMBINE_DATA(&state->gfxlist_addr);
 }
@@ -107,7 +107,7 @@ WRITE16_HANDLER( shangha3_gfxlist_addr_w )
 
 WRITE16_HANDLER( shangha3_blitter_go_w )
 {
-	shangha3_state *state = space->machine->driver_data<shangha3_state>();
+	shangha3_state *state = space->machine().driver_data<shangha3_state>();
 	UINT16 *shangha3_ram = state->ram;
 	bitmap_t *rawbitmap = state->rawbitmap;
 	UINT8 *drawmode_table = state->drawmode_table;
@@ -134,7 +134,7 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 		zoomx = shangha3_ram[offs+10];
 		zoomy = shangha3_ram[offs+13];
 
-		if (flip_screen_get(space->machine))
+		if (flip_screen_get(space->machine()))
 		{
 			sx = 383 - sx - sizex;
 			sy = 255 - sy - sizey;
@@ -213,7 +213,7 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 						if (flipy) dy = sy + sizey-15 - dy;
 						else dy = sy + dy;
 
-						drawgfx_transpen(rawbitmap,&myclip,space->machine->gfx[0],
+						drawgfx_transpen(rawbitmap,&myclip,space->machine().gfx[0],
 								(tile & 0x0fff) | (code & 0xf000),
 								(tile >> 12) | (color & 0x70),
 								flipx,flipy,
@@ -226,26 +226,26 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 				int w;
 
 if (zoomx <= 1 && zoomy <= 1)
-	drawgfxzoom_transtable(rawbitmap,&myclip,space->machine->gfx[0],
+	drawgfxzoom_transtable(rawbitmap,&myclip,space->machine().gfx[0],
 			code,
 			color,
 			flipx,flipy,
 			sx,sy,
 			0x1000000,0x1000000,
-			drawmode_table,space->machine->shadow_table);
+			drawmode_table,space->machine().shadow_table);
 else
 {
 				w = (sizex+15)/16;
 
 				for (x = 0;x < w;x++)
 				{
-					drawgfxzoom_transtable(rawbitmap,&myclip,space->machine->gfx[0],
+					drawgfxzoom_transtable(rawbitmap,&myclip,space->machine().gfx[0],
 							code,
 							color,
 							flipx,flipy,
 							sx + 16*x,sy,
 							(0x200-zoomx)*0x100,(0x200-zoomy)*0x100,
-							drawmode_table,space->machine->shadow_table);
+							drawmode_table,space->machine().shadow_table);
 
 					if ((code & 0x000f) == 0x0f)
 						code = (code + 0x100) & 0xfff0;
@@ -263,7 +263,7 @@ else
 
 SCREEN_UPDATE( shangha3 )
 {
-	shangha3_state *state = screen->machine->driver_data<shangha3_state>();
+	shangha3_state *state = screen->machine().driver_data<shangha3_state>();
 
 	copybitmap(bitmap, state->rawbitmap, 0, 0, 0, 0, cliprect);
 	return 0;

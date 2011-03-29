@@ -20,7 +20,7 @@ public:
 	UINT8 prot_output_bit;
 	UINT8 prot_bit_index;
 	UINT16 prot_save;
-	void (*protection_handler)(running_machine *);
+	void (*protection_handler)(running_machine &);
 	UINT16 *vram0;
 	UINT16 *vram1;
 	int _xor[16];

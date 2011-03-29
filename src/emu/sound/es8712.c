@@ -227,7 +227,7 @@ static DEVICE_START( es8712 )
 	chip->region_base = *device->region();
 
 	/* generate the name and create the stream */
-	chip->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock(), chip, es8712_update);
+	chip->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), chip, es8712_update);
 
 	/* initialize the rest of the structure */
 	chip->signal = -2;

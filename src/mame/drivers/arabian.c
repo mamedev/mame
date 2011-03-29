@@ -60,7 +60,7 @@
 
 static WRITE8_DEVICE_HANDLER( ay8910_porta_w )
 {
-	arabian_state *state = device->machine->driver_data<arabian_state>();
+	arabian_state *state = device->machine().driver_data<arabian_state>();
 
 	/*
         bit 7 = ENA
@@ -82,12 +82,12 @@ static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
         bit 0 = coin 1 counter
     */
 
-	cputag_set_input_line(device->machine, "mcu", MB88_IRQ_LINE, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(device->machine, "mcu", INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine(), "mcu", MB88_IRQ_LINE, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine(), "mcu", INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 
 	/* clock the coin counters */
-	coin_counter_w(device->machine, 1, ~data & 0x02);
-	coin_counter_w(device->machine, 0, ~data & 0x01);
+	coin_counter_w(device->machine(), 1, ~data & 0x02);
+	coin_counter_w(device->machine(), 0, ~data & 0x01);
 }
 
 
@@ -100,7 +100,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
 
 static READ8_HANDLER( mcu_port_r_r )
 {
-	arabian_state *state = space->machine->driver_data<arabian_state>();
+	arabian_state *state = space->machine().driver_data<arabian_state>();
 
 	UINT8 val = state->mcu_port_r[offset];
 
@@ -113,7 +113,7 @@ static READ8_HANDLER( mcu_port_r_r )
 
 static WRITE8_HANDLER( mcu_port_r_w )
 {
-	arabian_state *state = space->machine->driver_data<arabian_state>();
+	arabian_state *state = space->machine().driver_data<arabian_state>();
 
 	if (offset == 0)
 	{
@@ -130,7 +130,7 @@ static WRITE8_HANDLER( mcu_port_r_w )
 
 static READ8_HANDLER( mcu_portk_r )
 {
-	arabian_state *state = space->machine->driver_data<arabian_state>();
+	arabian_state *state = space->machine().driver_data<arabian_state>();
 	UINT8 val = 0xf;
 
 	if (~state->mcu_port_r[0] & 1)
@@ -148,7 +148,7 @@ static READ8_HANDLER( mcu_portk_r )
 		{
 			if (~sel & (1 << i))
 			{
-				val = input_port_read(space->machine, comnames[i]);
+				val = input_port_read(space->machine(), comnames[i]);
 				break;
 			}
 		}
@@ -159,7 +159,7 @@ static READ8_HANDLER( mcu_portk_r )
 
 static WRITE8_HANDLER( mcu_port_o_w )
 {
-	arabian_state *state = space->machine->driver_data<arabian_state>();
+	arabian_state *state = space->machine().driver_data<arabian_state>();
 	UINT8 out = data & 0x0f;
 
 	if (data & 0x10)
@@ -170,7 +170,7 @@ static WRITE8_HANDLER( mcu_port_o_w )
 
 static WRITE8_HANDLER( mcu_port_p_w )
 {
-	arabian_state *state = space->machine->driver_data<arabian_state>();
+	arabian_state *state = space->machine().driver_data<arabian_state>();
 	state->mcu_port_p = data & 0x0f;
 }
 
@@ -348,7 +348,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( arabian )
 {
-	arabian_state *state = machine->driver_data<arabian_state>();
+	arabian_state *state = machine.driver_data<arabian_state>();
 
 	state->save_item(NAME(state->mcu_port_o));
 	state->save_item(NAME(state->mcu_port_p));
@@ -357,7 +357,7 @@ static MACHINE_START( arabian )
 
 static MACHINE_RESET( arabian )
 {
-	arabian_state *state = machine->driver_data<arabian_state>();
+	arabian_state *state = machine.driver_data<arabian_state>();
 
 	state->video_control = 0;
 }

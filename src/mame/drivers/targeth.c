@@ -47,7 +47,7 @@ static INTERRUPT_GEN(targeth_interrupt )
 
 static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 {
-	UINT8 *RAM = space->machine->region("oki")->base();
+	UINT8 *RAM = space->machine().region("oki")->base();
 
 	if (ACCESSING_BITS_0_7){
 		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f)*0x10000], 0x10000);
@@ -56,7 +56,7 @@ static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 
 static WRITE16_HANDLER( targeth_coin_counter_w )
 {
-	coin_counter_w( space->machine, (offset >> 3) & 0x01, data & 0x01);
+	coin_counter_w( space->machine(), (offset >> 3) & 0x01, data & 0x01);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )

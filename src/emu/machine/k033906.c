@@ -65,8 +65,8 @@ void k033906_device::device_start()
 {
 	m_voodoo = m_machine.device(m_config.m_voodoo_tag);
 
-	m_reg = auto_alloc_array(&m_machine, UINT32, 256);
-	m_ram = auto_alloc_array(&m_machine, UINT32, 32768);
+	m_reg = auto_alloc_array(m_machine, UINT32, 256);
+	m_ram = auto_alloc_array(m_machine, UINT32, 32768);
 
 	m_reg_set = 0;
 

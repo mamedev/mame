@@ -99,7 +99,7 @@ device_config *speaker_device_config::static_alloc_device_config(const machine_c
 
 device_t *speaker_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, speaker_device(machine, *this));
+	return auto_alloc(machine, speaker_device(machine, *this));
 }
 
 
@@ -170,7 +170,7 @@ void speaker_device::device_start()
 	}
 
 	// allocate the mixer stream
-	m_mixer_stream = m_machine.sound().stream_alloc(*this, m_auto_allocated_inputs, 1, machine->sample_rate());
+	m_mixer_stream = m_machine.sound().stream_alloc(*this, m_auto_allocated_inputs, 1, m_machine.sample_rate());
 }
 
 

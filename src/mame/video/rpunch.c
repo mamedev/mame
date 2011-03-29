@@ -23,7 +23,7 @@
 
 static TILE_GET_INFO( get_bg0_tile_info )
 {
-	rpunch_state *state = machine->driver_data<rpunch_state>();
+	rpunch_state *state = machine.driver_data<rpunch_state>();
 	UINT16 *videoram = state->videoram;
 	int data = videoram[tile_index];
 	int code;
@@ -39,7 +39,7 @@ static TILE_GET_INFO( get_bg0_tile_info )
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	rpunch_state *state = machine->driver_data<rpunch_state>();
+	rpunch_state *state = machine.driver_data<rpunch_state>();
 	UINT16 *videoram = state->videoram;
 	int data = videoram[0x2000 / 2 + tile_index];
 	int code;
@@ -62,16 +62,16 @@ static TILE_GET_INFO( get_bg1_tile_info )
 
 static TIMER_CALLBACK( crtc_interrupt_gen )
 {
-	rpunch_state *state = machine->driver_data<rpunch_state>();
+	rpunch_state *state = machine.driver_data<rpunch_state>();
 	cputag_set_input_line(machine, "maincpu", 1, HOLD_LINE);
 	if (param != 0)
-		state->crtc_timer->adjust(machine->primary_screen->frame_period() / param, 0, machine->primary_screen->frame_period() / param);
+		state->crtc_timer->adjust(machine.primary_screen->frame_period() / param, 0, machine.primary_screen->frame_period() / param);
 }
 
 
 VIDEO_START( rpunch )
 {
-	rpunch_state *state = machine->driver_data<rpunch_state>();
+	rpunch_state *state = machine.driver_data<rpunch_state>();
 	/* allocate tilemaps for the backgrounds */
 	state->background[0] = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_cols,8,8,64,64);
 	state->background[1] = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_cols,8,8,64,64);
@@ -83,7 +83,7 @@ VIDEO_START( rpunch )
 		memset(state->bitmapram, 0xff, state->bitmapram_size);
 
 	/* reset the timer */
-	state->crtc_timer = machine->scheduler().timer_alloc(FUNC(crtc_interrupt_gen));
+	state->crtc_timer = machine.scheduler().timer_alloc(FUNC(crtc_interrupt_gen));
 }
 
 
@@ -96,7 +96,7 @@ VIDEO_START( rpunch )
 
 WRITE16_HANDLER( rpunch_videoram_w )
 {
-	rpunch_state *state = space->machine->driver_data<rpunch_state>();
+	rpunch_state *state = space->machine().driver_data<rpunch_state>();
 	UINT16 *videoram = state->videoram;
 	int tmap = offset >> 12;
 	int tile_index = offset & 0xfff;
@@ -107,7 +107,7 @@ WRITE16_HANDLER( rpunch_videoram_w )
 
 WRITE16_HANDLER( rpunch_videoreg_w )
 {
-	rpunch_state *state = space->machine->driver_data<rpunch_state>();
+	rpunch_state *state = space->machine().driver_data<rpunch_state>();
 	int oldword = state->videoflags;
 	COMBINE_DATA(&state->videoflags);
 
@@ -124,7 +124,7 @@ WRITE16_HANDLER( rpunch_videoreg_w )
 
 WRITE16_HANDLER( rpunch_scrollreg_w )
 {
-	rpunch_state *state = space->machine->driver_data<rpunch_state>();
+	rpunch_state *state = space->machine().driver_data<rpunch_state>();
 	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
 		switch (offset)
 		{
@@ -149,7 +149,7 @@ WRITE16_HANDLER( rpunch_scrollreg_w )
 
 WRITE16_HANDLER( rpunch_crtc_data_w )
 {
-	rpunch_state *state = space->machine->driver_data<rpunch_state>();
+	rpunch_state *state = space->machine().driver_data<rpunch_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
@@ -157,7 +157,7 @@ WRITE16_HANDLER( rpunch_crtc_data_w )
 		{
 			/* only register we know about.... */
 			case 0x0b:
-				state->crtc_timer->adjust(space->machine->primary_screen->time_until_vblank_start(), (data == 0xc0) ? 2 : 1);
+				state->crtc_timer->adjust(space->machine().primary_screen->time_until_vblank_start(), (data == 0xc0) ? 2 : 1);
 				break;
 
 			default:
@@ -170,7 +170,7 @@ WRITE16_HANDLER( rpunch_crtc_data_w )
 
 WRITE16_HANDLER( rpunch_crtc_register_w )
 {
-	rpunch_state *state = space->machine->driver_data<rpunch_state>();
+	rpunch_state *state = space->machine().driver_data<rpunch_state>();
 	if (ACCESSING_BITS_0_7)
 		state->crtc_register = data & 0xff;
 }
@@ -178,7 +178,7 @@ WRITE16_HANDLER( rpunch_crtc_register_w )
 
 WRITE16_HANDLER( rpunch_ins_w )
 {
-	rpunch_state *state = space->machine->driver_data<rpunch_state>();
+	rpunch_state *state = space->machine().driver_data<rpunch_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		if (offset == 0)
@@ -201,9 +201,9 @@ WRITE16_HANDLER( rpunch_ins_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int start, int stop)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int start, int stop)
 {
-	rpunch_state *state = machine->driver_data<rpunch_state>();
+	rpunch_state *state = machine.driver_data<rpunch_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
@@ -227,7 +227,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (x >= BITMAP_WIDTH) x -= 512;
 		if (y >= BITMAP_HEIGHT) y -= 512;
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[2],
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[2],
 				code, color + (state->sprite_palette / 16), xflip, yflip, x, y, 15);
 	}
 }
@@ -239,9 +239,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
  *
  *************************************/
 
-static void draw_bitmap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_bitmap(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	rpunch_state *state = machine->driver_data<rpunch_state>();
+	rpunch_state *state = machine.driver_data<rpunch_state>();
 	int colourbase;
 	int xxx=512/4;
 	int yyy=256;
@@ -274,17 +274,17 @@ static void draw_bitmap(running_machine *machine, bitmap_t *bitmap, const rectan
 
 SCREEN_UPDATE( rpunch )
 {
-	rpunch_state *state = screen->machine->driver_data<rpunch_state>();
+	rpunch_state *state = screen->machine().driver_data<rpunch_state>();
 	int effbins;
 
 	/* this seems like the most plausible explanation */
 	effbins = (state->bins > state->gins) ? state->gins : state->bins;
 
 	tilemap_draw(bitmap, cliprect, state->background[0], 0,0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0, effbins);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0, effbins);
 	tilemap_draw(bitmap, cliprect, state->background[1], 0,0);
-	draw_sprites(screen->machine, bitmap, cliprect, effbins, state->gins);
+	draw_sprites(screen->machine(), bitmap, cliprect, effbins, state->gins);
 	if (state->bitmapram)
-		draw_bitmap(screen->machine, bitmap, cliprect);
+		draw_bitmap(screen->machine(), bitmap, cliprect);
 	return 0;
 }

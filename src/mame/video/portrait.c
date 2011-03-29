@@ -11,19 +11,19 @@
 
 WRITE8_HANDLER( portrait_bgvideo_write )
 {
-	portrait_state *state = space->machine->driver_data<portrait_state>();
+	portrait_state *state = space->machine().driver_data<portrait_state>();
 	tilemap_mark_tile_dirty(state->background,offset/2);
 	state->bgvideoram[offset] = data;
 }
 
 WRITE8_HANDLER( portrait_fgvideo_write )
 {
-	portrait_state *state = space->machine->driver_data<portrait_state>();
+	portrait_state *state = space->machine().driver_data<portrait_state>();
 	tilemap_mark_tile_dirty(state->foreground,offset/2);
 	state->fgvideoram[offset] = data;
 }
 
-INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, const UINT8 *source )
+INLINE void get_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, const UINT8 *source )
 {
 	int attr    = source[tile_index*2+0];
 	int tilenum = source[tile_index*2+1];
@@ -56,19 +56,19 @@ INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int ti
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	portrait_state *state = machine->driver_data<portrait_state>();
+	portrait_state *state = machine.driver_data<portrait_state>();
 	get_tile_info( machine, tileinfo, tile_index, state->bgvideoram );
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	portrait_state *state = machine->driver_data<portrait_state>();
+	portrait_state *state = machine.driver_data<portrait_state>();
 	get_tile_info( machine, tileinfo, tile_index, state->fgvideoram );
 }
 
 VIDEO_START( portrait )
 {
-	portrait_state *state = machine->driver_data<portrait_state>();
+	portrait_state *state = machine.driver_data<portrait_state>();
 	state->background = tilemap_create( machine, get_bg_tile_info, tilemap_scan_rows,       16, 16, 32, 32 );
 	state->foreground = tilemap_create( machine, get_fg_tile_info, tilemap_scan_rows,  16, 16, 32, 32 );
 
@@ -80,10 +80,10 @@ VIDEO_START( portrait )
 PALETTE_INIT( portrait )
 {
 	int i;
-	UINT8* lookup = machine->region("tileattr")->base();
+	UINT8* lookup = machine.region("tileattr")->base();
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x40);
+	machine.colortable = colortable_alloc(machine, 0x40);
 
 /*
     for (i = 0;i < 0x40;i++)
@@ -96,7 +96,7 @@ PALETTE_INIT( portrait )
         g = (data >> 3) & 0x3;
         b = (data >> 5) & 0x7;
 
-        colortable_palette_set_color(machine->colortable, i, MAKE_RGB(pal3bit(r), pal2bit(g), pal3bit(b)));
+        colortable_palette_set_color(machine.colortable, i, MAKE_RGB(pal3bit(r), pal2bit(g), pal3bit(b)));
 
         color_prom++;
     }
@@ -111,10 +111,10 @@ PALETTE_INIT( portrait )
 		g = (data >> 5) & 0x1f;
 		b = (data >> 10) & 0x1f;
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b)));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b)));
 
 		// ?? the lookup seems to reference 0x3f colours, unless 1 bit is priority or similar?
-		colortable_palette_set_color(machine->colortable, i+0x20, MAKE_RGB(pal5bit(r>>1), pal5bit(g>>1), pal5bit(b>>1)));
+		colortable_palette_set_color(machine.colortable, i+0x20, MAKE_RGB(pal5bit(r>>1), pal5bit(g>>1), pal5bit(b>>1)));
 
 		color_prom++;
 	}
@@ -124,14 +124,14 @@ PALETTE_INIT( portrait )
 	for (i = 0;i < 0x800;i++)
 	{
 		UINT8 ctabentry = lookup[i]&0x3f;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 }
 
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	portrait_state *state = machine->driver_data<portrait_state>();
+	portrait_state *state = machine.driver_data<portrait_state>();
 	UINT8 *source = state->spriteram;
 	UINT8 *finish = source + 0x200;
 
@@ -179,7 +179,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				tilenum,color,
 				0,fy,
 				sx,sy,7);
@@ -190,7 +190,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( portrait )
 {
-	portrait_state *state = screen->machine->driver_data<portrait_state>();
+	portrait_state *state = screen->machine().driver_data<portrait_state>();
 	rectangle cliprect_scroll, cliprect_no_scroll;
 
 	cliprect_scroll = cliprect_no_scroll = *cliprect;
@@ -208,6 +208,6 @@ SCREEN_UPDATE( portrait )
 	tilemap_draw(bitmap, &cliprect_scroll, state->background, 0, 0);
 	tilemap_draw(bitmap, &cliprect_scroll, state->foreground, 0, 0);
 
-	draw_sprites(screen->machine, bitmap,cliprect);
+	draw_sprites(screen->machine(), bitmap,cliprect);
 	return 0;
 }

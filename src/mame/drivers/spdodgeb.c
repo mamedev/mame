@@ -33,14 +33,14 @@ Notes:
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( spd_adpcm_w )
 {
-	spdodgeb_state *state = space->machine->driver_data<spdodgeb_state>();
+	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
 	int chip = offset & 1;
-	device_t *adpcm = space->machine->device((chip == 0) ? "msm1" : "msm2");
+	device_t *adpcm = space->machine().device((chip == 0) ? "msm1" : "msm2");
 
 	switch (offset/2)
 	{
@@ -66,7 +66,7 @@ static WRITE8_HANDLER( spd_adpcm_w )
 
 static void spd_adpcm_int(device_t *device)
 {
-	spdodgeb_state *state = device->machine->driver_data<spdodgeb_state>();
+	spdodgeb_state *state = device->machine().driver_data<spdodgeb_state>();
 	int chip = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
 	if (state->adpcm_pos[chip] >= state->adpcm_end[chip] || state->adpcm_pos[chip] >= 0x10000)
 	{
@@ -80,7 +80,7 @@ static void spd_adpcm_int(device_t *device)
 	}
 	else
 	{
-		UINT8 *ROM = device->machine->region("adpcm")->base() + 0x10000 * chip;
+		UINT8 *ROM = device->machine().region("adpcm")->base() + 0x10000 * chip;
 
 		state->adpcm_data[chip] = ROM[state->adpcm_pos[chip]++];
 		msm5205_data_w(device,state->adpcm_data[chip] >> 4);
@@ -89,9 +89,9 @@ static void spd_adpcm_int(device_t *device)
 
 
 #if 0	// default - more sensitive (state change and timing measured on real board?)
-static void mcu63705_update_inputs(running_machine *machine)
+static void mcu63705_update_inputs(running_machine &machine)
 {
-	spdodgeb_state *state = machine->driver_data<spdodgeb_state>();
+	spdodgeb_state *state = machine.driver_data<spdodgeb_state>();
 	int buttons[2];
 	int p,j;
 
@@ -152,9 +152,9 @@ static void mcu63705_update_inputs(running_machine *machine)
 	state->inputs[3] = state->running[1] | buttons[1];
 }
 #else	// alternate - less sensitive
-static void mcu63705_update_inputs(running_machine *machine)
+static void mcu63705_update_inputs(running_machine &machine)
 {
-	spdodgeb_state *state = machine->driver_data<spdodgeb_state>();
+	spdodgeb_state *state = machine.driver_data<spdodgeb_state>();
 #define DBLTAP_TOLERANCE 5
 
 #define R 0x01
@@ -213,7 +213,7 @@ static void mcu63705_update_inputs(running_machine *machine)
 
 static READ8_HANDLER( mcu63701_r )
 {
-	spdodgeb_state *state = space->machine->driver_data<spdodgeb_state>();
+	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
 //  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",cpu_get_pc(space->cpu),offset);
 
 	if (state->mcu63701_command == 0) return 0x6a;
@@ -224,23 +224,23 @@ static READ8_HANDLER( mcu63701_r )
 		case 1: return state->inputs[1];
 		case 2: return state->inputs[2];
 		case 3: return state->inputs[3];
-		case 4: return input_port_read(space->machine, "IN1");
+		case 4: return input_port_read(space->machine(), "IN1");
 	}
 }
 
 static WRITE8_HANDLER( mcu63701_w )
 {
-	spdodgeb_state *state = space->machine->driver_data<spdodgeb_state>();
+	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
 //  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",cpu_get_pc(space->cpu),data);
 	state->mcu63701_command = data;
-	mcu63705_update_inputs(space->machine);
+	mcu63705_update_inputs(space->machine());
 }
 
 
 static READ8_HANDLER( port_0_r )
 {
-	spdodgeb_state *state = space->machine->driver_data<spdodgeb_state>();
-	int port = input_port_read(space->machine, "IN0");
+	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
+	int port = input_port_read(space->machine(), "IN0");
 
 	state->toggle^=0x02;	/* mcu63701_busy flag */
 
@@ -384,7 +384,7 @@ GFXDECODE_END
 
 static void irq_handler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =
@@ -401,7 +401,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_RESET( spdodgeb )
 {
-	spdodgeb_state *state = machine->driver_data<spdodgeb_state>();
+	spdodgeb_state *state = machine.driver_data<spdodgeb_state>();
 	state->toggle = 0;
 	state->adpcm_pos[0] = state->adpcm_pos[1] = 0;
 	state->adpcm_end[0] = state->adpcm_end[1] = 0;

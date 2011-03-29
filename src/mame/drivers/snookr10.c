@@ -390,7 +390,7 @@ static READ8_HANDLER( dsw_port_1_r )
     BIT 7 = Complement of DS1, bit 7
    ---------------------------------
 */
-return input_port_read(space->machine, "SW1");
+return input_port_read(space->machine(), "SW1");
 }
 
 
@@ -416,7 +416,7 @@ return input_port_read(space->machine, "SW1");
 
 static WRITE8_HANDLER( output_port_0_w )
 {
-	snookr10_state *state = space->machine->driver_data<snookr10_state>();
+	snookr10_state *state = space->machine().driver_data<snookr10_state>();
 /*
    ----------------------------
     PORT 0x5000 ;OUTPUT PORT A
@@ -448,9 +448,9 @@ static WRITE8_HANDLER( output_port_0_w )
 	output_set_lamp_value(5, state->bit3);	/* Lamp 5 - STOP4  */
 	output_set_lamp_value(6, state->bit4);	/* Lamp 6 - STOP5  */
 
-	coin_counter_w(space->machine, 0, data & 0x01);	/* Coin in */
-	coin_counter_w(space->machine, 1, data & 0x10);	/* Key in */
-	coin_counter_w(space->machine, 2, data & 0x04);	/* Payout x10 */
+	coin_counter_w(space->machine(), 0, data & 0x01);	/* Coin in */
+	coin_counter_w(space->machine(), 1, data & 0x10);	/* Key in */
+	coin_counter_w(space->machine(), 2, data & 0x04);	/* Payout x10 */
 
 //  logerror("high: %04x - low: %X \n", state->outporth, state->outportl);
 //  popmessage("written : %02X", data);
@@ -458,7 +458,7 @@ static WRITE8_HANDLER( output_port_0_w )
 
 static WRITE8_HANDLER( output_port_1_w )
 {
-	snookr10_state *state = space->machine->driver_data<snookr10_state>();
+	snookr10_state *state = space->machine().driver_data<snookr10_state>();
 /*
    ----------------------------
     PORT 0x5001 ;OUTPUT PORT B

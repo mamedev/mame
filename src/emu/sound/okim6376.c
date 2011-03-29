@@ -306,7 +306,7 @@ static DEVICE_START( okim6376 )
 	info->master_clock = device->clock();
 
 	/* generate the name and create the stream */
-	info->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock()/divisor, info, okim6376_update);
+	info->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock()/divisor, info, okim6376_update);
 
 	/* initialize the voices */
 	for (voice = 0; voice < OKIM6376_VOICES; voice++)

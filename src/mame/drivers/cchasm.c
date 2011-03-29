@@ -69,7 +69,7 @@ ADDRESS_MAP_END
 
 static WRITE_LINE_DEVICE_HANDLER( cchasm_6840_irq )
 {
-	cputag_set_input_line(device->machine, "maincpu", 4, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface cchasm_6840_intf =

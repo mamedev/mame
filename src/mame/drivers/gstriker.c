@@ -182,7 +182,7 @@ Frequencies: 68k is XTAL_32MHZ/2
 
 static READ16_HANDLER(dmmy_8f)
 {
-	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	state->dmmy_8f_ret = ~state->dmmy_8f_ret;
 	return state->dmmy_8f_ret;
 }
@@ -192,36 +192,36 @@ static READ16_HANDLER(dmmy_8f)
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->pending_command = 1;
 		soundlatch_w(space, offset, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 #if 0
 static READ16_HANDLER( pending_command_r )
 {
-	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	return state->pending_command;
 }
 #endif
 
 static WRITE8_HANDLER( gs_sh_pending_command_clear_w )
 {
-	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	state->pending_command = 0;
 }
 
 static WRITE8_HANDLER( gs_sh_bankswitch_w )
 {
-	UINT8 *RAM = space->machine->region("audiocpu")->base();
+	UINT8 *RAM = space->machine().region("audiocpu")->base();
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x8000;
-	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);
 }
 
 /*** GFX DECODE **************************************************************/
@@ -266,9 +266,9 @@ GFXDECODE_END
 static void gs_ym2610_irq(device_t *device, int irq)
 {
 	if (irq)
-		cputag_set_input_line(device->machine, "audiocpu", 0, ASSERT_LINE);
+		cputag_set_input_line(device->machine(), "audiocpu", 0, ASSERT_LINE);
 	else
-		cputag_set_input_line(device->machine, "audiocpu", 0, CLEAR_LINE);
+		cputag_set_input_line(device->machine(), "audiocpu", 0, CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -833,19 +833,19 @@ state->work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
 
 static WRITE16_HANDLER( twrldc94_mcu_w )
 {
-	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	state->mcu_data = data;
 }
 
 static READ16_HANDLER( twrldc94_mcu_r )
 {
-	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	return state->mcu_data;
 }
 
 static WRITE16_HANDLER( twrldc94_prot_reg_w )
 {
-	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	state->prot_reg[1] = state->prot_reg[0];
 	state->prot_reg[0] = data;
 
@@ -958,7 +958,7 @@ static WRITE16_HANDLER( twrldc94_prot_reg_w )
 
 static READ16_HANDLER( twrldc94_prot_reg_r )
 {
-	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	// bit 0 is for debugging vgoalsoc?
 	// Setting it results in a hang with a digit displayed on screen
 	// For twrldc94, it just disables sound.
@@ -993,7 +993,7 @@ static READ16_HANDLER( vbl_toggle_r )
 
 static WRITE16_HANDLER( vbl_toggle_w )
 {
-	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	if( COUNTER1_ENABLE == 1 )
 	{
 		TICK_1 = (TICK_1 - 1) & 0xff;	// 8bit
@@ -1015,42 +1015,42 @@ static WRITE16_HANDLER( vbl_toggle_w )
 	}
 }
 
-static void mcu_init( running_machine *machine )
+static void mcu_init( running_machine &machine )
 {
-	gstriker_state *state = machine->driver_data<gstriker_state>();
+	gstriker_state *state = machine.driver_data<gstriker_state>();
 	state->dmmy_8f_ret = 0xFFFF;
 	state->pending_command = 0;
 	state->mcu_data = 0;
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x20008a, 0x20008b, FUNC(twrldc94_mcu_w));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x20008a, 0x20008b, FUNC(twrldc94_mcu_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x20008a, 0x20008b, FUNC(twrldc94_mcu_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x20008a, 0x20008b, FUNC(twrldc94_mcu_r));
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x20008e, 0x20008f, FUNC(twrldc94_prot_reg_w));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x20008e, 0x20008f, FUNC(twrldc94_prot_reg_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x20008e, 0x20008f, FUNC(twrldc94_prot_reg_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x20008e, 0x20008f, FUNC(twrldc94_prot_reg_r));
 }
 
 static DRIVER_INIT( twrldc94 )
 {
-	gstriker_state *state = machine->driver_data<gstriker_state>();
+	gstriker_state *state = machine.driver_data<gstriker_state>();
 	state->gametype = 1;
 	mcu_init( machine );
 }
 
 static DRIVER_INIT( twrldc94a )
 {
-	gstriker_state *state = machine->driver_data<gstriker_state>();
+	gstriker_state *state = machine.driver_data<gstriker_state>();
 	state->gametype = 2;
 	mcu_init( machine );
 }
 
 static DRIVER_INIT( vgoalsoc )
 {
-	gstriker_state *state = machine->driver_data<gstriker_state>();
+	gstriker_state *state = machine.driver_data<gstriker_state>();
 	state->gametype = 3;
 	mcu_init( machine );
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x200090, 0x200091, FUNC(vbl_toggle_w)); // vblank toggle
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200090, 0x200091, FUNC(vbl_toggle_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x200090, 0x200091, FUNC(vbl_toggle_w)); // vblank toggle
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200090, 0x200091, FUNC(vbl_toggle_r));
 }
 
 /*** GAME DRIVERS ************************************************************/

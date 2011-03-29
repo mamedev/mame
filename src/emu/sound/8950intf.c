@@ -129,7 +129,7 @@ static DEVICE_START( y8950 )
 	/* ADPCM ROM data */
 	y8950_set_delta_t_memory(info->chip, *device->region(), device->region()->bytes());
 
-	info->stream = device->machine->sound().stream_alloc(*device,0,1,rate,info,y8950_stream_update);
+	info->stream = device->machine().sound().stream_alloc(*device,0,1,rate,info,y8950_stream_update);
 	/* port and keyboard handler */
 	y8950_set_port_handler(info->chip, Y8950PortHandler_w, Y8950PortHandler_r, info);
 	y8950_set_keyboard_handler(info->chip, Y8950KeyboardHandler_w, Y8950KeyboardHandler_r, info);
@@ -139,8 +139,8 @@ static DEVICE_START( y8950 )
 	y8950_set_irq_handler   (info->chip, IRQHandler, info);
 	y8950_set_update_handler(info->chip, _stream_update, info);
 
-	info->timer[0] = device->machine->scheduler().timer_alloc(FUNC(timer_callback_0), info);
-	info->timer[1] = device->machine->scheduler().timer_alloc(FUNC(timer_callback_1), info);
+	info->timer[0] = device->machine().scheduler().timer_alloc(FUNC(timer_callback_0), info);
+	info->timer[1] = device->machine().scheduler().timer_alloc(FUNC(timer_callback_1), info);
 }
 
 static DEVICE_STOP( y8950 )

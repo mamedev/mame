@@ -60,9 +60,9 @@ static VIDEO_START( cmmb )
 
 static SCREEN_UPDATE( cmmb )
 {
-	cmmb_state *state = screen->machine->driver_data<cmmb_state>();
+	cmmb_state *state = screen->machine().driver_data<cmmb_state>();
 	UINT8 *videoram = state->videoram;
-	const gfx_element *gfx = screen->machine->gfx[0];
+	const gfx_element *gfx = screen->machine().gfx[0];
 	int count = 0x00000;
 
 	int y,x;
@@ -85,22 +85,22 @@ static SCREEN_UPDATE( cmmb )
 
 static READ8_HANDLER( cmmb_charram_r )
 {
-	UINT8 *GFX = space->machine->region("gfx")->base();
+	UINT8 *GFX = space->machine().region("gfx")->base();
 
 	return GFX[offset];
 }
 
 static WRITE8_HANDLER( cmmb_charram_w )
 {
-	UINT8 *GFX = space->machine->region("gfx")->base();
+	UINT8 *GFX = space->machine().region("gfx")->base();
 
 	GFX[offset] = data;
 
 	offset&=0xfff;
 
 	/* dirty char */
-	gfx_element_mark_dirty(space->machine->gfx[0], offset >> 4);
-    gfx_element_mark_dirty(space->machine->gfx[1], offset >> 5);
+	gfx_element_mark_dirty(space->machine().gfx[0], offset >> 4);
+    gfx_element_mark_dirty(space->machine().gfx[1], offset >> 5);
 }
 
 
@@ -115,10 +115,10 @@ static READ8_HANDLER( cmmb_input_r )
 	//printf("%02x R\n",offset);
 	switch(offset)
 	{
-		case 0x00: return input_port_read(space->machine, "IN2");
+		case 0x00: return input_port_read(space->machine(), "IN2");
 		case 0x03: return 4; //eeprom?
-		case 0x0e: return input_port_read(space->machine, "IN0");
-		case 0x0f: return input_port_read(space->machine, "IN1");
+		case 0x0e: return input_port_read(space->machine(), "IN0");
+		case 0x0f: return input_port_read(space->machine(), "IN1");
 	}
 
 	return 0xff;
@@ -127,27 +127,27 @@ static READ8_HANDLER( cmmb_input_r )
 
 /*
     {
-        UINT8 *ROM = space->machine->region("maincpu")->base();
+        UINT8 *ROM = space->machine().region("maincpu")->base();
         UINT32 bankaddress;
 
         bankaddress = 0x10000 + (0x10000 * (data & 0x03));
-        memory_set_bankptr(space->machine, "bank1", &ROM[bankaddress]);
+        memory_set_bankptr(space->machine(), "bank1", &ROM[bankaddress]);
     }
 */
 
 static WRITE8_HANDLER( cmmb_output_w )
 {
-	cmmb_state *state = space->machine->driver_data<cmmb_state>();
+	cmmb_state *state = space->machine().driver_data<cmmb_state>();
 	//printf("%02x -> [%02x] W\n",data,offset);
 	switch(offset)
 	{
 		case 0x01:
 			{
-				UINT8 *ROM = space->machine->region("maincpu")->base();
+				UINT8 *ROM = space->machine().region("maincpu")->base();
 				UINT32 bankaddress;
 
 				bankaddress = 0x1c000 + (0x10000 * (data & 0x03));
-				memory_set_bankptr(space->machine, "bank1", &ROM[bankaddress]);
+				memory_set_bankptr(space->machine(), "bank1", &ROM[bankaddress]);
 			}
 			break;
 		case 0x03:
@@ -160,7 +160,7 @@ static WRITE8_HANDLER( cmmb_output_w )
 
 static READ8_HANDLER( kludge_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 /* overlap empty addresses */
@@ -288,7 +288,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( cmmb_irq )
 {
-	//if(input_code_pressed_once(device->machine, KEYCODE_Z))
+	//if(input_code_pressed_once(device->machine(), KEYCODE_Z))
 	//  device_set_input_line(device, 0, HOLD_LINE);
 }
 

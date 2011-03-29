@@ -151,11 +151,11 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int
 	: m_device(device),
 	  m_cache(cache),
 	  m_beintf((flags & DRCUML_OPTION_USE_C) ?
-			*static_cast<drcbe_interface *>(auto_alloc(device.machine, drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits))) :
-			*static_cast<drcbe_interface *>(auto_alloc(device.machine, drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits)))),
+			*static_cast<drcbe_interface *>(auto_alloc(device.machine(), drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits))) :
+			*static_cast<drcbe_interface *>(auto_alloc(device.machine(), drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits)))),
 	  m_umllog(NULL),
-	  m_blocklist(device.machine->respool()),
-	  m_symlist(device.machine->respool())
+	  m_blocklist(device.machine().respool()),
+	  m_symlist(device.machine().respool())
 {
 	// if we're to log, create the logfile
 	if (flags & DRCUML_OPTION_LOG_UML)
@@ -170,7 +170,7 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int
 drcuml_state::~drcuml_state()
 {
 	// free the back-end
-	auto_free(m_device.machine, &m_beintf);
+	auto_free(m_device.machine(), &m_beintf);
 
 	// close any files
 	if (m_umllog != NULL)
@@ -230,7 +230,7 @@ drcuml_block *drcuml_state::begin_block(UINT32 maxinst)
 
 	// if we failed to find one, allocate a new one
 	if (bestblock == NULL)
-		bestblock = &m_blocklist.append(*auto_alloc(m_device.machine, drcuml_block(*this, maxinst * 3/2)));
+		bestblock = &m_blocklist.append(*auto_alloc(m_device.machine(), drcuml_block(*this, maxinst * 3/2)));
 
 	// start the block
 	bestblock->begin();
@@ -245,7 +245,7 @@ drcuml_block *drcuml_state::begin_block(UINT32 maxinst)
 code_handle *drcuml_state::handle_alloc(const char *name)
 {
 	// allocate the handle, add it to our list, and return it
-	return &m_handlelist.append(*auto_alloc(m_device.machine, code_handle(*this, name)));
+	return &m_handlelist.append(*auto_alloc(m_device.machine(), code_handle(*this, name)));
 }
 
 
@@ -256,7 +256,7 @@ code_handle *drcuml_state::handle_alloc(const char *name)
 
 void drcuml_state::symbol_add(void *base, UINT32 length, const char *name)
 {
-	m_symlist.append(*auto_alloc(m_device.machine, symbol(base, length, name)));
+	m_symlist.append(*auto_alloc(m_device.machine(), symbol(base, length, name)));
 }
 
 
@@ -323,7 +323,7 @@ drcuml_block::drcuml_block(drcuml_state &drcuml, UINT32 maxinst)
 	  m_next(NULL),
 	  m_nextinst(0),
 	  m_maxinst(maxinst * 3/2),
-	  m_inst(auto_alloc_array(drcuml.device().machine, instruction, m_maxinst)),
+	  m_inst(auto_alloc_array(drcuml.device().machine(), instruction, m_maxinst)),
 	  m_inuse(false)
 {
 }
@@ -336,7 +336,7 @@ drcuml_block::drcuml_block(drcuml_state &drcuml, UINT32 maxinst)
 drcuml_block::~drcuml_block()
 {
 	// free the instruction list
-	auto_free(m_drcuml.device().machine, m_inst);
+	auto_free(m_drcuml.device().machine(), m_inst);
 }
 
 
@@ -951,31 +951,31 @@ static void bevalidate_execute(drcuml_state *drcuml, code_handle **handles, cons
 
 static void bevalidate_initialize_random_state(drcuml_state *drcuml, drcuml_block *block, drcuml_machine_state *state)
 {
-	running_machine *machine = drcuml->device->machine;
+	running_machine &machine = drcuml->device->machine();
 	int regnum;
 
 	// initialize core state to random values
-	state->fmod = machine->rand() & 0x03;
-	state->flags = machine->rand() & 0x1f;
-	state->exp = machine->rand();
+	state->fmod = machine.rand() & 0x03;
+	state->flags = machine.rand() & 0x1f;
+	state->exp = machine.rand();
 
 	// initialize integer registers to random values
 	for (regnum = 0; regnum < ARRAY_LENGTH(state->r); regnum++)
 	{
-		state->r[regnum].w.h = machine->rand();
-		state->r[regnum].w.l = machine->rand();
+		state->r[regnum].w.h = machine.rand();
+		state->r[regnum].w.l = machine.rand();
 	}
 
 	// initialize float registers to random values
 	for (regnum = 0; regnum < ARRAY_LENGTH(state->f); regnum++)
 	{
-		*(UINT32 *)&state->f[regnum].s.h = machine->rand();
-		*(UINT32 *)&state->f[regnum].s.l = machine->rand();
+		*(UINT32 *)&state->f[regnum].s.h = machine.rand();
+		*(UINT32 *)&state->f[regnum].s.l = machine.rand();
 	}
 
 	// initialize map variables to random values
 	for (regnum = 0; regnum < MAPVAR_COUNT; regnum++)
-		UML_MAPVAR(block, MVAR(regnum), machine->rand());
+		UML_MAPVAR(block, MVAR(regnum), machine.rand());
 }
 
 

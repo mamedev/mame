@@ -24,7 +24,7 @@ TO DO:
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	msisaac_state *state = machine->driver_data<msisaac_state>();
+	msisaac_state *state = machine.driver_data<msisaac_state>();
 	if (state->sound_nmi_enable)
 		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
@@ -34,18 +34,18 @@ static TIMER_CALLBACK( nmi_callback )
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(space, 0, data);
-	space->machine->scheduler().synchronize(FUNC(nmi_callback), data);
+	space->machine().scheduler().synchronize(FUNC(nmi_callback), data);
 }
 
 static WRITE8_HANDLER( nmi_disable_w )
 {
-	msisaac_state *state = space->machine->driver_data<msisaac_state>();
+	msisaac_state *state = space->machine().driver_data<msisaac_state>();
 	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	msisaac_state *state = space->machine->driver_data<msisaac_state>();
+	msisaac_state *state = space->machine().driver_data<msisaac_state>();
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
 	{
@@ -57,12 +57,12 @@ static WRITE8_HANDLER( nmi_enable_w )
 #if 0
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(space->machine, data);
+	flip_screen_set(space->machine(), data);
 }
 
 static WRITE8_HANDLER( msisaac_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset,data);
+	coin_counter_w(space->machine(), offset,data);
 }
 #endif
 
@@ -92,7 +92,7 @@ MCU simulation TODO:
 \-Fix some graphics imperfections(*not* confirmed if they are caused by unhandled
   commands or imperfect video emulation).
 */
-	msisaac_state *state = space->machine->driver_data<msisaac_state>();
+	msisaac_state *state = space->machine().driver_data<msisaac_state>();
 
 	switch (state->mcu_val)
 	{
@@ -119,7 +119,7 @@ MCU simulation TODO:
 			//6-down
 			//7-leftdwn
 
-			UINT8 val= (input_port_read(space->machine, "IN1") >> 2) & 0x0f;
+			UINT8 val= (input_port_read(space->machine(), "IN1") >> 2) & 0x0f;
 			/* bit0 = left
                bit1 = right
                bit2 = down
@@ -168,7 +168,7 @@ static WRITE8_HANDLER( msisaac_mcu_w )
 #ifdef USE_MCU
 	buggychl_mcu_w(offset,data);
 #else
-	msisaac_state *state = space->machine->driver_data<msisaac_state>();
+	msisaac_state *state = space->machine().driver_data<msisaac_state>();
 	//if(data != 0x0a && data != 0x42 && data != 0x02)
 	//  popmessage("PC = %04x %02x", cpu_get_pc(space->cpu), data);
 	state->mcu_val = data;
@@ -216,7 +216,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( ta7630 )
 {
-	msisaac_state *state = machine->driver_data<msisaac_state>();
+	msisaac_state *state = machine.driver_data<msisaac_state>();
 	int i;
 
 	double db			= 0.0;
@@ -242,7 +242,7 @@ static MACHINE_RESET( ta7630 )
 
 static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 {
-	msisaac_state *state = device->machine->driver_data<msisaac_state>();
+	msisaac_state *state = device->machine().driver_data<msisaac_state>();
 	state->snd_ctrl0 = data & 0xff;
 	//popmessage("SND0 0=%2x 1=%2x", state->snd_ctrl0, state->snd_ctrl1);
 
@@ -259,7 +259,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 }
 static WRITE8_HANDLER( sound_control_1_w )
 {
-	msisaac_state *state = space->machine->driver_data<msisaac_state>();
+	msisaac_state *state = space->machine().driver_data<msisaac_state>();
 	state->snd_ctrl1 = data & 0xff;
 	//popmessage("SND1 0=%2x 1=%2x", state->snd_ctrl0, state->snd_ctrl1);
 }
@@ -438,9 +438,9 @@ static const msm5232_interface msm5232_config =
 
 static MACHINE_START( msisaac )
 {
-	msisaac_state *state = machine->driver_data<msisaac_state>();
+	msisaac_state *state = machine.driver_data<msisaac_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	/* video */
 	state->save_item(NAME(state->bg2_textbank));
@@ -460,7 +460,7 @@ static MACHINE_START( msisaac )
 
 static MACHINE_RESET( msisaac )
 {
-	msisaac_state *state = machine->driver_data<msisaac_state>();
+	msisaac_state *state = machine.driver_data<msisaac_state>();
 
 	MACHINE_RESET_CALL(ta7630);
 

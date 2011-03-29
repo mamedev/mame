@@ -73,4 +73,4 @@ public:
 VIDEO_START(model2);
 SCREEN_UPDATE(model2);
 
-void model2_3d_set_zclip( running_machine *machine, UINT8 clip );
+void model2_3d_set_zclip( running_machine &machine, UINT8 clip );

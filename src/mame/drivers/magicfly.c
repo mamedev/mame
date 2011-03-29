@@ -422,21 +422,21 @@ public:
 
 static WRITE8_HANDLER( magicfly_videoram_w )
 {
-	magicfly_state *state = space->machine->driver_data<magicfly_state>();
+	magicfly_state *state = space->machine().driver_data<magicfly_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( magicfly_colorram_w )
 {
-	magicfly_state *state = space->machine->driver_data<magicfly_state>();
+	magicfly_state *state = space->machine().driver_data<magicfly_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_magicfly_tile_info )
 {
-	magicfly_state *state = machine->driver_data<magicfly_state>();
+	magicfly_state *state = machine.driver_data<magicfly_state>();
 /*  - bits -
     7654 3210
     ---- -xxx   Tiles color.
@@ -462,13 +462,13 @@ static TILE_GET_INFO( get_magicfly_tile_info )
 
 static VIDEO_START(magicfly)
 {
-	magicfly_state *state = machine->driver_data<magicfly_state>();
+	magicfly_state *state = machine.driver_data<magicfly_state>();
 	state->bg_tilemap = tilemap_create(machine, get_magicfly_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
 }
 
 static TILE_GET_INFO( get_7mezzo_tile_info )
 {
-	magicfly_state *state = machine->driver_data<magicfly_state>();
+	magicfly_state *state = machine.driver_data<magicfly_state>();
 /*  - bits -
     7654 3210
     ---- -xxx   Tiles color.
@@ -494,13 +494,13 @@ static TILE_GET_INFO( get_7mezzo_tile_info )
 
 static VIDEO_START( 7mezzo )
 {
-	magicfly_state *state = machine->driver_data<magicfly_state>();
+	magicfly_state *state = machine.driver_data<magicfly_state>();
 	state->bg_tilemap = tilemap_create(machine, get_7mezzo_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
 }
 
 static SCREEN_UPDATE( magicfly )
 {
-	magicfly_state *state = screen->machine->driver_data<magicfly_state>();
+	magicfly_state *state = screen->machine().driver_data<magicfly_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
@@ -535,21 +535,21 @@ static PALETTE_INIT( magicfly )
 
 static READ8_HANDLER( mux_port_r )
 {
-	magicfly_state *state = space->machine->driver_data<magicfly_state>();
+	magicfly_state *state = space->machine().driver_data<magicfly_state>();
 	switch( state->input_selector )
 	{
-		case 0x01: return input_port_read(space->machine, "IN0-0");
-		case 0x02: return input_port_read(space->machine, "IN0-1");
-		case 0x04: return input_port_read(space->machine, "IN0-2");
-		case 0x08: return input_port_read(space->machine, "IN0-3");
-		case 0x00: return input_port_read(space->machine, "DSW0");
+		case 0x01: return input_port_read(space->machine(), "IN0-0");
+		case 0x02: return input_port_read(space->machine(), "IN0-1");
+		case 0x04: return input_port_read(space->machine(), "IN0-2");
+		case 0x08: return input_port_read(space->machine(), "IN0-3");
+		case 0x00: return input_port_read(space->machine(), "DSW0");
 	}
 	return 0xff;
 }
 
 static WRITE8_HANDLER( mux_port_w )
 {
-	magicfly_state *state = space->machine->driver_data<magicfly_state>();
+	magicfly_state *state = space->machine().driver_data<magicfly_state>();
 /*  - bits -
     7654 3210
     ---- xxxx   Input selector.
@@ -561,11 +561,11 @@ static WRITE8_HANDLER( mux_port_w )
 */
 	state->input_selector = data & 0x0f;	/* Input Selector */
 
-	dac_data_w(space->machine->device("dac"), data & 0x80);		/* Sound DAC */
+	dac_data_w(space->machine().device("dac"), data & 0x80);		/* Sound DAC */
 
-	coin_counter_w(space->machine, 0, data & 0x40);	/* Coin1 */
-	coin_counter_w(space->machine, 1, data & 0x10);	/* Coin2 */
-	coin_counter_w(space->machine, 2, data & 0x20);	/* Payout */
+	coin_counter_w(space->machine(), 0, data & 0x40);	/* Coin1 */
+	coin_counter_w(space->machine(), 1, data & 0x10);	/* Coin2 */
+	coin_counter_w(space->machine(), 2, data & 0x20);	/* Payout */
 }
 
 

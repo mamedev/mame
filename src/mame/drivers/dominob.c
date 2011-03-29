@@ -84,12 +84,12 @@ public:
 
 static VIDEO_START( dominob )
 {
-	machine->gfx[0]->color_granularity = 8;
+	machine.gfx[0]->color_granularity = 8;
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	dominob_state *state = machine->driver_data<dominob_state>();
+	dominob_state *state = machine.driver_data<dominob_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -103,12 +103,12 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 		code = state->spriteram[offs + 3] + ((state->spriteram[offs + 2] & 0x03) << 8)  ;
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				2 * code,
 				((state->spriteram[offs + 2] & 0xf8) >> 3)  ,
 				flip_screen_x_get(machine),flip_screen_y_get(machine),
 				sx,sy + (flip_screen_y_get(machine) ? 8 : -8),0);
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				2 * code + 1,
 				((state->spriteram[offs + 2] & 0xf8) >> 3)  ,
 				flip_screen_x_get(machine),flip_screen_y_get(machine),
@@ -119,7 +119,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static SCREEN_UPDATE( dominob )
 {
-	dominob_state *state = screen->machine->driver_data<dominob_state>();
+	dominob_state *state = screen->machine().driver_data<dominob_state>();
 	int x,y;
 	int index = 0;
 
@@ -130,7 +130,7 @@ static SCREEN_UPDATE( dominob )
 		{
 			drawgfx_opaque(bitmap,
 					cliprect,
-					screen->machine->gfx[1],
+					screen->machine().gfx[1],
 					state->bgram[index] + 256 * (state->bgram[index + 1] & 0xf),
 					state->bgram[index + 1] >> 4,
 					0, 0,
@@ -145,7 +145,7 @@ static SCREEN_UPDATE( dominob )
 		{
 			drawgfx_transpen(	bitmap,
 					cliprect,
-					screen->machine->gfx[0],
+					screen->machine().gfx[0],
 					state->videoram[(y * 32 + x) * 2 + 1] + (state->videoram[(y * 32 + x) * 2] & 7) * 256,
 					(state->videoram[(y * 32 + x) * 2] >> 3),
 					0, 0,
@@ -153,7 +153,7 @@ static SCREEN_UPDATE( dominob )
 		}
 	}
 
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 
 	return 0;
 }

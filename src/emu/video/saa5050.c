@@ -154,18 +154,18 @@ PALETTE_INIT( saa5050 )
 {
 	UINT8 i, r, g, b;
 
-	machine->colortable = colortable_alloc(machine, 8);
+	machine.colortable = colortable_alloc(machine, 8);
 
 	for ( i = 0; i < 8; i++ )
 	{
 		r = saa5050_colors[i * 3];
 		g = saa5050_colors[i * 3 + 1];
 		b = saa5050_colors[i * 3 + 2];
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	for (i = 0; i < 128; i++)
-		colortable_entry_set_value(machine->colortable, i, saa5050_palette[i]);
+		colortable_entry_set_value(machine.colortable, i, saa5050_palette[i]);
 }
 
 /*************************************
@@ -317,12 +317,12 @@ void saa5050_update( device_t *device, bitmap_t *bitmap, const rectangle *clipre
 			{
 				if (saa5050->flags & SAA5050_DBLHI)
 				{
-					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine->gfx[saa5050->gfxnum + 1], code, colour, 0, 0, sx * 12, ssy * 20, 0x20000, 0x20000);
-					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine->gfx[saa5050->gfxnum + 2], code, colour, 0, 0, sx * 12, (ssy + 1) * 20, 0x20000, 0x20000);
+					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine().gfx[saa5050->gfxnum + 1], code, colour, 0, 0, sx * 12, ssy * 20, 0x20000, 0x20000);
+					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine().gfx[saa5050->gfxnum + 2], code, colour, 0, 0, sx * 12, (ssy + 1) * 20, 0x20000, 0x20000);
 				}
 				else
 				{
-					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine->gfx[saa5050->gfxnum + 0], code, colour, 0, 0, sx * 12, ssy * 20, 0x20000, 0x20000);
+					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine().gfx[saa5050->gfxnum + 0], code, colour, 0, 0, sx * 12, ssy * 20, 0x20000, 0x20000);
 				}
 			}
 		}
@@ -344,14 +344,14 @@ static DEVICE_START( saa5050 )
 	saa5050_state *saa5050 = get_safe_token(device);
 	const saa5050_interface *intf = get_interface(device);
 
-	saa5050->screen = device->machine->device(intf->screen);
+	saa5050->screen = device->machine().device(intf->screen);
 	saa5050->gfxnum = intf->gfxnum;
 	saa5050->x = intf->x;
 	saa5050->y = intf->y;
 	saa5050->size = intf->size;
 	saa5050->rev = intf->rev;
 
-	saa5050->videoram = auto_alloc_array(device->machine, UINT8, 0x800);
+	saa5050->videoram = auto_alloc_array(device->machine(), UINT8, 0x800);
 
 	device->save_pointer(NAME(saa5050->videoram), 0x800);
 	device->save_item(NAME(saa5050->flags));

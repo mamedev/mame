@@ -30,18 +30,18 @@ static WRITE16_HANDLER( sf_coin_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0, data & 0x01);
-		coin_counter_w(space->machine, 1,  data & 0x02);
-		coin_lockout_w(space->machine, 0, ~data & 0x10);
-		coin_lockout_w(space->machine, 1, ~data & 0x20);
-		coin_lockout_w(space->machine, 2, ~data & 0x40);	/* is there a third coin input? */
+		coin_counter_w(space->machine(), 0, data & 0x01);
+		coin_counter_w(space->machine(), 1,  data & 0x02);
+		coin_lockout_w(space->machine(), 0, ~data & 0x10);
+		coin_lockout_w(space->machine(), 1, ~data & 0x20);
+		coin_lockout_w(space->machine(), 2, ~data & 0x40);	/* is there a third coin input? */
 	}
 }
 
 
 static WRITE16_HANDLER( soundcmd_w )
 {
-	sf_state *state = space->machine->driver_data<sf_state>();
+	sf_state *state = space->machine().driver_data<sf_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -163,18 +163,18 @@ static const int scale[8] = { 0x00, 0x40, 0xe0, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe };
 
 static READ16_HANDLER( button1_r )
 {
-	return (scale[input_port_read(space->machine, "IN3")] << 8) | scale[input_port_read(space->machine, "IN1")];
+	return (scale[input_port_read(space->machine(), "IN3")] << 8) | scale[input_port_read(space->machine(), "IN1")];
 }
 
 static READ16_HANDLER( button2_r )
 {
-	return (scale[input_port_read(space->machine, "IN4")] << 8) | scale[input_port_read(space->machine, "IN2")];
+	return (scale[input_port_read(space->machine(), "IN4")] << 8) | scale[input_port_read(space->machine(), "IN2")];
 }
 
 
 static WRITE8_HANDLER( sound2_bank_w )
 {
-	memory_set_bankptr(space->machine, "bank1", space->machine->region("audio2")->base() + 0x8000 * (data + 1));
+	memory_set_bankptr(space->machine(), "bank1", space->machine().region("audio2")->base() + 0x8000 * (data + 1));
 }
 
 
@@ -789,7 +789,7 @@ GFXDECODE_END
 
 static void irq_handler( device_t *device, int irq )
 {
-	sf_state *state = device->machine->driver_data<sf_state>();
+	sf_state *state = device->machine().driver_data<sf_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -806,11 +806,11 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( sf )
 {
-	sf_state *state = machine->driver_data<sf_state>();
+	sf_state *state = machine.driver_data<sf_state>();
 
 	/* devices */
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->sf_active));
 	state->save_item(NAME(state->bgscroll));
@@ -819,7 +819,7 @@ static MACHINE_START( sf )
 
 static MACHINE_RESET( sf )
 {
-	sf_state *state = machine->driver_data<sf_state>();
+	sf_state *state = machine.driver_data<sf_state>();
 
 	state->sf_active = 0;
 	state->bgscroll = 0;

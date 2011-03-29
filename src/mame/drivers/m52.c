@@ -382,7 +382,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( m52 )
 {
-	m52_state *state = machine->driver_data<m52_state>();
+	m52_state *state = machine.driver_data<m52_state>();
 
 	state->bg1xpos = 0;
 	state->bg1ypos = 0;

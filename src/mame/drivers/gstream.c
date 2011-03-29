@@ -161,7 +161,7 @@ static CUSTOM_INPUT( gstream_mirror_service_r )
 	int result;
 
 	/* PORT_SERVICE_NO_TOGGLE */
-	result = (input_port_read(field->port->machine, "IN0") & 0x8000) >> 15;
+	result = (input_port_read(field->port->machine(), "IN0") & 0x8000) >> 15;
 
 	return ~result;
 }
@@ -171,15 +171,15 @@ static CUSTOM_INPUT( gstream_mirror_r )
 	int result;
 
 	/* IPT_COIN1 */
-	result  = ((input_port_read(field->port->machine, "IN0") & 0x200) >>  9) << 0;
+	result  = ((input_port_read(field->port->machine(), "IN0") & 0x200) >>  9) << 0;
 	/* IPT_COIN2 */
-	result |= ((input_port_read(field->port->machine, "IN1") & 0x200) >>  9) << 1;
+	result |= ((input_port_read(field->port->machine(), "IN1") & 0x200) >>  9) << 1;
 	/* IPT_START1 */
-	result |= ((input_port_read(field->port->machine, "IN0") & 0x400) >> 10) << 2;
+	result |= ((input_port_read(field->port->machine(), "IN0") & 0x400) >> 10) << 2;
 	/* IPT_START2 */
-	result |= ((input_port_read(field->port->machine, "IN1") & 0x400) >> 10) << 3;
+	result |= ((input_port_read(field->port->machine(), "IN1") & 0x400) >> 10) << 3;
 	/* PORT_SERVICE_NO_TOGGLE */
-	result |= ((input_port_read(field->port->machine, "IN0") & 0x8000) >> 15) << 6;
+	result |= ((input_port_read(field->port->machine(), "IN0") & 0x8000) >> 15) << 6;
 
 	return ~result;
 }
@@ -187,22 +187,22 @@ static CUSTOM_INPUT( gstream_mirror_r )
 
 static WRITE32_HANDLER( gstream_palette_w )
 {
-	gstream_state *state = space->machine->driver_data<gstream_state>();
+	gstream_state *state = space->machine().driver_data<gstream_state>();
 	COMBINE_DATA(&state->paletteram[offset]);
 
-	palette_set_color_rgb(space->machine, offset * 2, pal5bit(state->paletteram[offset] >> (0 + 16)),
+	palette_set_color_rgb(space->machine(), offset * 2, pal5bit(state->paletteram[offset] >> (0 + 16)),
 									pal5bit(state->paletteram[offset] >> (6 + 16)),
 									pal5bit(state->paletteram[offset] >> (11 + 16)));
 
 
-	palette_set_color_rgb(space->machine,offset * 2 + 1,pal5bit(state->paletteram[offset] >> (0)),
+	palette_set_color_rgb(space->machine(),offset * 2 + 1,pal5bit(state->paletteram[offset] >> (0)),
 									pal5bit(state->paletteram[offset] >> (6)),
 									pal5bit(state->paletteram[offset] >> (11)));
 }
 
 static WRITE32_HANDLER( gstream_vram_w )
 {
-	gstream_state *state = space->machine->driver_data<gstream_state>();
+	gstream_state *state = space->machine().driver_data<gstream_state>();
 	COMBINE_DATA(&state->vram[offset]);
 
 	if (ACCESSING_BITS_24_31)
@@ -224,37 +224,37 @@ static WRITE32_HANDLER( gstream_vram_w )
 
 static WRITE32_HANDLER( gstream_tilemap1_scrollx_w )
 {
-	gstream_state *state = space->machine->driver_data<gstream_state>();
+	gstream_state *state = space->machine().driver_data<gstream_state>();
 	state->tmap1_scrollx = data;
 }
 
 static WRITE32_HANDLER( gstream_tilemap1_scrolly_w )
 {
-	gstream_state *state = space->machine->driver_data<gstream_state>();
+	gstream_state *state = space->machine().driver_data<gstream_state>();
 	state->tmap1_scrolly = data;
 }
 
 static WRITE32_HANDLER( gstream_tilemap2_scrollx_w )
 {
-	gstream_state *state = space->machine->driver_data<gstream_state>();
+	gstream_state *state = space->machine().driver_data<gstream_state>();
 	state->tmap2_scrollx = data;
 }
 
 static WRITE32_HANDLER( gstream_tilemap2_scrolly_w )
 {
-	gstream_state *state = space->machine->driver_data<gstream_state>();
+	gstream_state *state = space->machine().driver_data<gstream_state>();
 	state->tmap2_scrolly = data;
 }
 
 static WRITE32_HANDLER( gstream_tilemap3_scrollx_w )
 {
-	gstream_state *state = space->machine->driver_data<gstream_state>();
+	gstream_state *state = space->machine().driver_data<gstream_state>();
 	state->tmap3_scrollx = data;
 }
 
 static WRITE32_HANDLER( gstream_tilemap3_scrolly_w )
 {
-	gstream_state *state = space->machine->driver_data<gstream_state>();
+	gstream_state *state = space->machine().driver_data<gstream_state>();
 	state->tmap3_scrolly = data;
 }
 
@@ -307,7 +307,7 @@ static WRITE32_HANDLER( gstream_oki_banking_w )
 
     Musics order is completely guessed but close to what the original PCB game should be */
 
-	gstream_state *state = space->machine->driver_data<gstream_state>();
+	gstream_state *state = space->machine().driver_data<gstream_state>();
 	static const int bank_table_0[16] = { -1, -1, -1, -1, -1, -1, 0, 0, -1, 6, 0, 5, -1, 0, 0, 0 };
 	static const int bank_table_1[16] = { -1, -1, -1, -1, -1, -1, 2, 2, -1, 0, 0, 4, -1, 1, 1, 1 };
 
@@ -431,7 +431,7 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_gs1_tile_info )
 {
-	gstream_state *state = machine->driver_data<gstream_state>();
+	gstream_state *state = machine.driver_data<gstream_state>();
 	int tileno = (state->vram[tile_index + 0x000 / 4] & 0x0fff0000) >> 16;
 	int palette = (state->vram[tile_index + 0x000 / 4] & 0xc0000000) >> 30;
 	SET_TILE_INFO(0, tileno, palette + 0x10, 0);
@@ -439,7 +439,7 @@ static TILE_GET_INFO( get_gs1_tile_info )
 
 static TILE_GET_INFO( get_gs2_tile_info )
 {
-	gstream_state *state = machine->driver_data<gstream_state>();
+	gstream_state *state = machine.driver_data<gstream_state>();
 	int tileno = (state->vram[tile_index + 0x400 / 4] & 0x0fff0000) >> 16;
 	int palette = (state->vram[tile_index + 0x400 / 4] & 0xc0000000) >> 30;
 	SET_TILE_INFO(0, tileno + 0x1000, palette + 0x14, 0);
@@ -448,7 +448,7 @@ static TILE_GET_INFO( get_gs2_tile_info )
 
 static TILE_GET_INFO( get_gs3_tile_info )
 {
-	gstream_state *state = machine->driver_data<gstream_state>();
+	gstream_state *state = machine.driver_data<gstream_state>();
 	int tileno = (state->vram[tile_index + 0x800 / 4] & 0x0fff0000) >> 16;
 	int palette = (state->vram[tile_index + 0x800 / 4] & 0xc0000000) >> 30;
 	SET_TILE_INFO(0, tileno + 0x2000, palette + 0x18, 0);
@@ -457,7 +457,7 @@ static TILE_GET_INFO( get_gs3_tile_info )
 
 static VIDEO_START(gstream)
 {
-	gstream_state *state = machine->driver_data<gstream_state>();
+	gstream_state *state = machine.driver_data<gstream_state>();
 	state->tilemap1 = tilemap_create(machine, get_gs1_tile_info, tilemap_scan_rows, 32, 32, 16, 16);
 	state->tilemap2 = tilemap_create(machine, get_gs2_tile_info, tilemap_scan_rows, 32, 32, 16, 16);
 	state->tilemap3 = tilemap_create(machine, get_gs3_tile_info, tilemap_scan_rows, 32, 32, 16, 16);
@@ -482,7 +482,7 @@ static SCREEN_UPDATE(gstream)
        are being set ?!
    */
 
-	gstream_state *state = screen->machine->driver_data<gstream_state>();
+	gstream_state *state = screen->machine().driver_data<gstream_state>();
 	int i;
 
 	//popmessage("(1) %08x %08x (2) %08x %08x (3) %08x %08x", state->tmap1_scrollx, state->tmap1_scrolly, state->tmap2_scrollx, state->tmap2_scrolly, state->tmap3_scrollx, state->tmap3_scrolly );
@@ -512,7 +512,7 @@ static SCREEN_UPDATE(gstream)
 		if (x & 0x8000) x -= 0x10000;
 		if (y & 0x8000) y -= 0x10000;
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],code,col,0,0,x-2,y,0);
+		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],code,col,0,0,x-2,y,0);
 	}
 
 	return 0;
@@ -521,7 +521,7 @@ static SCREEN_UPDATE(gstream)
 
 static MACHINE_START( gstream )
 {
-	gstream_state *state = machine->driver_data<gstream_state>();
+	gstream_state *state = machine.driver_data<gstream_state>();
 
 	state->save_item(NAME(state->tmap1_scrollx));
 	state->save_item(NAME(state->tmap2_scrollx));
@@ -535,7 +535,7 @@ static MACHINE_START( gstream )
 
 static MACHINE_RESET( gstream )
 {
-	gstream_state *state = machine->driver_data<gstream_state>();
+	gstream_state *state = machine.driver_data<gstream_state>();
 
 	state->tmap1_scrollx = 0;
 	state->tmap2_scrollx = 0;
@@ -623,7 +623,7 @@ ROM_END
 
 static READ32_HANDLER( gstream_speedup_r )
 {
-	gstream_state *state = space->machine->driver_data<gstream_state>();
+	gstream_state *state = space->machine().driver_data<gstream_state>();
 	if (state->maincpu->state(STATE_GENPC) == 0xc0001592)
 	{
 		state->maincpu->eat_cycles(50);
@@ -634,7 +634,7 @@ static READ32_HANDLER( gstream_speedup_r )
 
 static DRIVER_INIT( gstream )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd1ee0, 0xd1ee3, FUNC(gstream_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd1ee0, 0xd1ee3, FUNC(gstream_speedup_r) );
 }
 
 

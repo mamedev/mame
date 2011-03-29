@@ -446,16 +446,16 @@ static TIMER_DEVICE_CALLBACK( generate_interrupt )
 
 	/* IRQ is clocked on the rising edge of 16V, equal to the previous 32V */
 	if (scanline & 16)
-		cputag_set_input_line(timer.machine, "maincpu", 0, ((scanline - 1) & 32) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(timer.machine(), "maincpu", 0, ((scanline - 1) & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* do a partial update now to handle sprite multiplexing (Maze Invaders) */
-	timer.machine->primary_screen->update_partial(scanline);
+	timer.machine().primary_screen->update_partial(scanline);
 }
 
 
 static MACHINE_START( centiped )
 {
-	centiped_state *state = machine->driver_data<centiped_state>();
+	centiped_state *state = machine.driver_data<centiped_state>();
 
 	state->save_item(NAME(state->oldpos));
 	state->save_item(NAME(state->sign));
@@ -465,7 +465,7 @@ static MACHINE_START( centiped )
 
 static MACHINE_RESET( centiped )
 {
-	centiped_state *state = machine->driver_data<centiped_state>();
+	centiped_state *state = machine.driver_data<centiped_state>();
 
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	state->dsw_select = 0;
@@ -475,7 +475,7 @@ static MACHINE_RESET( centiped )
 
 static MACHINE_RESET( magworm )
 {
-	centiped_state *state = machine->driver_data<centiped_state>();
+	centiped_state *state = machine.driver_data<centiped_state>();
 
 	MACHINE_RESET_CALL(centiped);
 
@@ -486,7 +486,7 @@ static MACHINE_RESET( magworm )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -515,9 +515,9 @@ static WRITE8_HANDLER( irq_ack_w )
  * to prevent the counter from wrapping around between reads.
  */
 
-INLINE int read_trackball(running_machine *machine, int idx, int switch_port)
+INLINE int read_trackball(running_machine &machine, int idx, int switch_port)
 {
-	centiped_state *state = machine->driver_data<centiped_state>();
+	centiped_state *state = machine.driver_data<centiped_state>();
 	UINT8 newpos;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 	static const char *const tracknames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
@@ -545,25 +545,25 @@ INLINE int read_trackball(running_machine *machine, int idx, int switch_port)
 
 static READ8_HANDLER( centiped_IN0_r )
 {
-	return read_trackball(space->machine, 0, 0);
+	return read_trackball(space->machine(), 0, 0);
 }
 
 
 static READ8_HANDLER( centiped_IN2_r )
 {
-	return read_trackball(space->machine, 1, 2);
+	return read_trackball(space->machine(), 1, 2);
 }
 
 
 static READ8_HANDLER( milliped_IN1_r )
 {
-	return read_trackball(space->machine, 1, 1);
+	return read_trackball(space->machine(), 1, 1);
 }
 
 static READ8_HANDLER( milliped_IN2_r )
 {
-	centiped_state *state = space->machine->driver_data<centiped_state>();
-	UINT8 data = input_port_read(space->machine, "IN2");
+	centiped_state *state = space->machine().driver_data<centiped_state>();
+	UINT8 data = input_port_read(space->machine(), "IN2");
 
 	/* MSH - 15 Feb, 2007
      * The P2 X Joystick inputs are not properly handled in
@@ -574,7 +574,7 @@ static READ8_HANDLER( milliped_IN2_r )
      */
 	if (0 != state->control_select) {
 		/* Bottom 4 bits is our joystick inputs */
-		UINT8 joy2data = input_port_read(space->machine, "IN3") & 0x0f;
+		UINT8 joy2data = input_port_read(space->machine(), "IN3") & 0x0f;
 		data = data & 0xf0; /* Keep the top 4 bits */
 		data |= (joy2data & 0x0a) >> 1; /* flip left and up */
 		data |= (joy2data & 0x05) << 1; /* flip right and down */
@@ -584,7 +584,7 @@ static READ8_HANDLER( milliped_IN2_r )
 
 static WRITE8_HANDLER( input_select_w )
 {
-	centiped_state *state = space->machine->driver_data<centiped_state>();
+	centiped_state *state = space->machine().driver_data<centiped_state>();
 
 	state->dsw_select = (~data >> 7) & 1;
 }
@@ -592,7 +592,7 @@ static WRITE8_HANDLER( input_select_w )
 /* used P2 controls if 1, P1 controls if 0 */
 static WRITE8_HANDLER( control_select_w )
 {
-	centiped_state *state = space->machine->driver_data<centiped_state>();
+	centiped_state *state = space->machine().driver_data<centiped_state>();
 
 	state->control_select = (data >> 7) & 1;
 }
@@ -600,16 +600,16 @@ static WRITE8_HANDLER( control_select_w )
 
 static READ8_HANDLER( mazeinv_input_r )
 {
-	centiped_state *state = space->machine->driver_data<centiped_state>();
+	centiped_state *state = space->machine().driver_data<centiped_state>();
 	static const char *const sticknames[] = { "STICK0", "STICK1", "STICK2", "STICK3" };
 
-	return input_port_read(space->machine, sticknames[state->control_select]);
+	return input_port_read(space->machine(), sticknames[state->control_select]);
 }
 
 
 static WRITE8_HANDLER( mazeinv_input_select_w )
 {
-	centiped_state *state = space->machine->driver_data<centiped_state>();
+	centiped_state *state = space->machine().driver_data<centiped_state>();
 
 	state->control_select = offset & 3;
 }
@@ -636,25 +636,25 @@ static READ8_HANDLER( bullsdrt_data_port_r )
 
 static WRITE8_HANDLER( led_w )
 {
-	set_led_status(space->machine, offset, ~data & 0x80);
+	set_led_status(space->machine(), offset, ~data & 0x80);
 }
 
 
 static READ8_DEVICE_HANDLER( caterplr_rand_r )
 {
-	return device->machine->rand() % 0xff;
+	return device->machine().rand() % 0xff;
 }
 
 
 static WRITE8_HANDLER( coin_count_w )
 {
-	coin_counter_w(space->machine, offset, data);
+	coin_counter_w(space->machine(), offset, data);
 }
 
 
 static WRITE8_HANDLER( bullsdrt_coin_count_w )
 {
-	coin_counter_w(space->machine, 0, data);
+	coin_counter_w(space->machine(), 0, data);
 }
 
 
@@ -1985,8 +1985,8 @@ ROM_END
 
 static DRIVER_INIT( caterplr )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *device = machine->device("pokey");
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	device_t *device = machine.device("pokey");
 	space->install_legacy_readwrite_handler(*device, 0x1000, 0x100f, FUNC(caterplr_AY8910_r), FUNC(caterplr_AY8910_w));
 	space->install_legacy_read_handler(*device, 0x1780, 0x1780, FUNC(caterplr_rand_r));
 }
@@ -1994,8 +1994,8 @@ static DRIVER_INIT( caterplr )
 
 static DRIVER_INIT( magworm )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *device = machine->device("pokey");
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	device_t *device = machine.device("pokey");
 	space->install_legacy_write_handler(*device, 0x1001, 0x1001, FUNC(ay8910_address_w));
 	space->install_legacy_readwrite_handler(*device, 0x1003, 0x1003, FUNC(ay8910_r), FUNC(ay8910_data_w));
 }
@@ -2003,7 +2003,7 @@ static DRIVER_INIT( magworm )
 
 static DRIVER_INIT( bullsdrt )
 {
-	centiped_state *state = machine->driver_data<centiped_state>();
+	centiped_state *state = machine.driver_data<centiped_state>();
 
 	state->dsw_select = 0;
 }

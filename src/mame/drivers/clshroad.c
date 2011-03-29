@@ -30,10 +30,10 @@ static MACHINE_RESET( clshroad )
 
 static READ8_HANDLER( clshroad_input_r )
 {
-	return	((~input_port_read(space->machine, "P1") & (1 << offset)) ? 1 : 0) |
-			((~input_port_read(space->machine, "P2") & (1 << offset)) ? 2 : 0) |
-			((~input_port_read(space->machine, "DSW1") & (1 << offset)) ? 4 : 0) |
-			((~input_port_read(space->machine, "DSW2") & (1 << offset)) ? 8 : 0) ;
+	return	((~input_port_read(space->machine(), "P1") & (1 << offset)) ? 1 : 0) |
+			((~input_port_read(space->machine(), "P2") & (1 << offset)) ? 2 : 0) |
+			((~input_port_read(space->machine(), "DSW1") & (1 << offset)) ? 4 : 0) |
+			((~input_port_read(space->machine(), "DSW2") & (1 << offset)) ? 8 : 0) ;
 }
 
 
@@ -473,7 +473,7 @@ without this the death sequence never ends so the game is unplayable after you
 die once, it would be nice to avoid the hack however
 
 */
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	ROM[0x05C6] = 0xc3;
 	ROM[0x05C7] = 0x8d;

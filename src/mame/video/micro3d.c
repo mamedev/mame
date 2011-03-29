@@ -37,7 +37,7 @@ enum
 
 VIDEO_START( micro3d )
 {
-	micro3d_state *state = machine->driver_data<micro3d_state>();
+	micro3d_state *state = machine.driver_data<micro3d_state>();
 
 	/* Allocate 512x12 x 2 3D frame buffers */
 	state->frame_buffers[0] = auto_alloc_array(machine, UINT16, 1024 * 512);
@@ -48,7 +48,7 @@ VIDEO_START( micro3d )
 
 VIDEO_RESET( micro3d )
 {
-	micro3d_state *state = machine->driver_data<micro3d_state>();
+	micro3d_state *state = machine.driver_data<micro3d_state>();
 
 	state->pipeline_state  = 0;
 	state->creg = 0;
@@ -66,7 +66,7 @@ VIDEO_RESET( micro3d )
 
 void micro3d_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	micro3d_state *state = screen.machine->driver_data<micro3d_state>();
+	micro3d_state *state = screen.machine().driver_data<micro3d_state>();
 
 	UINT16 *src = &state->micro3d_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
@@ -111,31 +111,31 @@ WRITE16_HANDLER( micro3d_clut_w )
 {
 	UINT16 word;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	word = space->machine->generic.paletteram.u16[offset];
-	palette_set_color_rgb(space->machine, offset, pal5bit(word >> 6), pal5bit(word >> 1), pal5bit(word >> 11));
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	word = space->machine().generic.paletteram.u16[offset];
+	palette_set_color_rgb(space->machine(), offset, pal5bit(word >> 6), pal5bit(word >> 1), pal5bit(word >> 11));
 }
 
 WRITE16_HANDLER( micro3d_creg_w )
 {
-	micro3d_state *state = space->machine->driver_data<micro3d_state>();
+	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
 	if (~data & 0x80)
-		cputag_set_input_line(space->machine, "vgb", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "vgb", 0, CLEAR_LINE);
 
 	state->creg = data;
 }
 
 WRITE16_HANDLER( micro3d_xfer3dk_w )
 {
-	micro3d_state *state = space->machine->driver_data<micro3d_state>();
+	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
 	state->xfer3dk = data;
 }
 
 void micro3d_tms_interrupt(device_t *device, int state)
 {
-//  mc68901_int_gen(device->machine, GPIP4);
+//  mc68901_int_gen(device->machine(), GPIP4);
 }
 
 
@@ -648,7 +648,7 @@ bc000000-1fc DPRAM address for read access
 
 WRITE32_HANDLER( micro3d_fifo_w )
 {
-	micro3d_state *state = space->machine->driver_data<micro3d_state>();
+	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 	UINT32 opcode = data >> 24;
 
 	switch (state->draw_state)
@@ -674,7 +674,7 @@ WRITE32_HANDLER( micro3d_fifo_w )
 				{
 					UINT32 dpram_r_addr = (((data & 0x01ff) << 1) | state->dpram_bank);
 					state->pipe_data = state->draw_dpram[dpram_r_addr];
-					cputag_set_input_line(space->machine, "drmath", AM29000_INTR1, ASSERT_LINE);
+					cputag_set_input_line(space->machine(), "drmath", AM29000_INTR1, ASSERT_LINE);
 					break;
 				}
 				case 0x80:
@@ -702,7 +702,7 @@ WRITE32_HANDLER( micro3d_fifo_w )
 					/* TODO: We shouldn't need this extra buffer - is there some sort of sync missing? */
 					memcpy(state->frame_buffers[state->drawing_buffer], state->tmp_buffer, 512*1024*2);
 					state->drawing_buffer ^= 1;
-					cputag_set_input_line(space->machine, "vgb", 0, ASSERT_LINE);
+					cputag_set_input_line(space->machine(), "vgb", 0, ASSERT_LINE);
 					break;
 				}
 				default:
@@ -749,23 +749,23 @@ WRITE32_HANDLER( micro3d_fifo_w )
 
 WRITE32_HANDLER( micro3d_alt_fifo_w )
 {
-	micro3d_state *state = space->machine->driver_data<micro3d_state>();
+	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
 	state->vtx_fifo[state->fifo_idx++] = VTX_SEX(data);
 }
 
 READ32_HANDLER( micro3d_pipe_r )
 {
-	micro3d_state *state = space->machine->driver_data<micro3d_state>();
+	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
-	cputag_set_input_line(space->machine, "drmath", AM29000_INTR1, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "drmath", AM29000_INTR1, CLEAR_LINE);
 	return state->pipe_data;
 }
 
 INTERRUPT_GEN( micro3d_vblank )
 {
-//  mc68901_int_gen(device->machine, GPIP7);
-	micro3d_state *state = device->machine->driver_data<micro3d_state>();
+//  mc68901_int_gen(device->machine(), GPIP7);
+	micro3d_state *state = device->machine().driver_data<micro3d_state>();
 
 	state->display_buffer = state->drawing_buffer ^ 1;
 }

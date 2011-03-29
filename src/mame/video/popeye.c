@@ -49,9 +49,9 @@ enum { TYPE_SKYSKIPR, TYPE_POPEYE };
   The bootleg is the same, but the outputs are not inverted.
 
 ***************************************************************************/
-static void convert_color_prom(running_machine *machine,const UINT8 *color_prom)
+static void convert_color_prom(running_machine &machine,const UINT8 *color_prom)
 {
-	popeye_state *state = machine->driver_data<popeye_state>();
+	popeye_state *state = machine.driver_data<popeye_state>();
 	int i;
 
 
@@ -115,7 +115,7 @@ static void convert_color_prom(running_machine *machine,const UINT8 *color_prom)
 
 PALETTE_INIT( popeye )
 {
-	popeye_state *state = machine->driver_data<popeye_state>();
+	popeye_state *state = machine.driver_data<popeye_state>();
 	state->invertmask = 0xff;
 
 	convert_color_prom(machine,color_prom);
@@ -123,17 +123,17 @@ PALETTE_INIT( popeye )
 
 PALETTE_INIT( popeyebl )
 {
-	popeye_state *state = machine->driver_data<popeye_state>();
+	popeye_state *state = machine.driver_data<popeye_state>();
 	state->invertmask = 0x00;
 
 	convert_color_prom(machine,color_prom);
 }
 
-static void set_background_palette(running_machine *machine,int bank)
+static void set_background_palette(running_machine &machine,int bank)
 {
-	popeye_state *state = machine->driver_data<popeye_state>();
+	popeye_state *state = machine.driver_data<popeye_state>();
 	int i;
-	UINT8 *color_prom = machine->region("proms")->base() + 16 * bank;
+	UINT8 *color_prom = machine.region("proms")->base() + 16 * bank;
 
 	for (i = 0;i < 16;i++)
 	{
@@ -170,21 +170,21 @@ static void set_background_palette(running_machine *machine,int bank)
 
 WRITE8_HANDLER( popeye_videoram_w )
 {
-	popeye_state *state = space->machine->driver_data<popeye_state>();
+	popeye_state *state = space->machine().driver_data<popeye_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( popeye_colorram_w )
 {
-	popeye_state *state = space->machine->driver_data<popeye_state>();
+	popeye_state *state = space->machine().driver_data<popeye_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( popeye_bitmap_w )
 {
-	popeye_state *state = space->machine->driver_data<popeye_state>();
+	popeye_state *state = space->machine().driver_data<popeye_state>();
 	int sx,sy,x,y,colour;
 
 	state->bitmapram[offset] = data;
@@ -194,7 +194,7 @@ WRITE8_HANDLER( popeye_bitmap_w )
 		sx = 8 * (offset % 128);
 		sy = 8 * (offset / 128);
 
-		if (flip_screen_get(space->machine))
+		if (flip_screen_get(space->machine()))
 			sy = 512-8 - sy;
 
 		colour = data & 0x0f;
@@ -211,7 +211,7 @@ WRITE8_HANDLER( popeye_bitmap_w )
 		sx = 8 * (offset % 64);
 		sy = 4 * (offset / 64);
 
-		if (flip_screen_get(space->machine))
+		if (flip_screen_get(space->machine()))
 			sy = 512-4 - sy;
 
 		colour = data & 0x0f;
@@ -236,7 +236,7 @@ WRITE8_HANDLER( skyskipr_bitmap_w )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	popeye_state *state = machine->driver_data<popeye_state>();
+	popeye_state *state = machine.driver_data<popeye_state>();
 	int code = state->videoram[tile_index];
 	int color = state->colorram[tile_index] & 0x0f;
 
@@ -245,9 +245,9 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( skyskipr )
 {
-	popeye_state *state = machine->driver_data<popeye_state>();
+	popeye_state *state = machine.driver_data<popeye_state>();
 	state->bitmapram = auto_alloc_array(machine, UINT8, popeye_bitmapram_size);
-	state->tmpbitmap2 = auto_bitmap_alloc(machine,1024,1024,machine->primary_screen->format());	/* actually 1024x512 but not rolling over vertically? */
+	state->tmpbitmap2 = auto_bitmap_alloc(machine,1024,1024,machine.primary_screen->format());	/* actually 1024x512 but not rolling over vertically? */
 
 	state->bitmap_type = TYPE_SKYSKIPR;
 
@@ -263,9 +263,9 @@ VIDEO_START( skyskipr )
 
 VIDEO_START( popeye )
 {
-	popeye_state *state = machine->driver_data<popeye_state>();
+	popeye_state *state = machine.driver_data<popeye_state>();
 	state->bitmapram = auto_alloc_array(machine, UINT8, popeye_bitmapram_size);
-	state->tmpbitmap2 = auto_bitmap_alloc(machine,512,512,machine->primary_screen->format());
+	state->tmpbitmap2 = auto_bitmap_alloc(machine,512,512,machine.primary_screen->format());
 
 	state->bitmap_type = TYPE_POPEYE;
 
@@ -279,11 +279,11 @@ VIDEO_START( popeye )
     state_save_register_global_pointer(machine, state->bitmapram, popeye_bitmapram_size);
 }
 
-static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	popeye_state *state = machine->driver_data<popeye_state>();
+	popeye_state *state = machine.driver_data<popeye_state>();
 	int offs;
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state->lastflip != flip_screen_get(machine))
 	{
@@ -317,9 +317,9 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 	}
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	popeye_state *state = machine->driver_data<popeye_state>();
+	popeye_state *state = machine.driver_data<popeye_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -363,7 +363,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		}
 
 		if (spriteram[offs] != 0)
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 					code ^ 0x1ff,
 					color,
 					flipx,flipy,
@@ -373,9 +373,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( popeye )
 {
-	popeye_state *state = screen->machine->driver_data<popeye_state>();
-	draw_background(screen->machine, bitmap, cliprect);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	popeye_state *state = screen->machine().driver_data<popeye_state>();
+	draw_background(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
 }

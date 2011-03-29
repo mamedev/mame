@@ -73,7 +73,7 @@
 
 static WRITE16_HANDLER( hacked_controls_w )
 {
-	bionicc_state *state = space->machine->driver_data<bionicc_state>();
+	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
 	logerror("%06x: hacked_controls_w %04x %02x\n", cpu_get_pc(space->cpu), offset, data);
 	COMBINE_DATA(&state->inp[offset]);
@@ -81,7 +81,7 @@ static WRITE16_HANDLER( hacked_controls_w )
 
 static READ16_HANDLER( hacked_controls_r )
 {
-	bionicc_state *state = space->machine->driver_data<bionicc_state>();
+	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
 	logerror("%06x: hacked_controls_r %04x %04x\n", cpu_get_pc(space->cpu), offset, state->inp[offset]);
 	return state->inp[offset];
@@ -89,22 +89,22 @@ static READ16_HANDLER( hacked_controls_r )
 
 static WRITE16_HANDLER( bionicc_mpu_trigger_w )
 {
-	bionicc_state *state = space->machine->driver_data<bionicc_state>();
+	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
-	data = input_port_read(space->machine, "SYSTEM") >> 12;
+	data = input_port_read(space->machine(), "SYSTEM") >> 12;
 	state->inp[0] = data ^ 0x0f;
 
-	data = input_port_read(space->machine, "P2");
+	data = input_port_read(space->machine(), "P2");
 	state->inp[1] = data ^ 0xff;
 
-	data = input_port_read(space->machine, "P1");
+	data = input_port_read(space->machine(), "P1");
 	state->inp[2] = data ^ 0xff;
 }
 
 
 static WRITE16_HANDLER( hacked_soundcommand_w )
 {
-	bionicc_state *state = space->machine->driver_data<bionicc_state>();
+	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
 	COMBINE_DATA(&state->soundcommand);
 	soundlatch_w(space, 0, state->soundcommand & 0xff);
@@ -112,7 +112,7 @@ static WRITE16_HANDLER( hacked_soundcommand_w )
 
 static READ16_HANDLER( hacked_soundcommand_r )
 {
-	bionicc_state *state = space->machine->driver_data<bionicc_state>();
+	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
 	return state->soundcommand;
 }
@@ -335,7 +335,7 @@ GFXDECODE_END
 
 static MACHINE_START( bionicc )
 {
-	bionicc_state *state = machine->driver_data<bionicc_state>();
+	bionicc_state *state = machine.driver_data<bionicc_state>();
 
 	state->save_item(NAME(state->soundcommand));
 	state->save_item(NAME(state->inp));
@@ -344,7 +344,7 @@ static MACHINE_START( bionicc )
 
 static MACHINE_RESET( bionicc )
 {
-	bionicc_state *state = machine->driver_data<bionicc_state>();
+	bionicc_state *state = machine.driver_data<bionicc_state>();
 
 	state->inp[0] = 0;
 	state->inp[1] = 0;

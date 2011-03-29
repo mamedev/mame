@@ -24,7 +24,7 @@ static TILEMAP_MAPPER( citycon_scan )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	citycon_state *state = machine->driver_data<citycon_state>();
+	citycon_state *state = machine.driver_data<citycon_state>();
 	SET_TILE_INFO(
 			0,
 			state->videoram[tile_index],
@@ -34,8 +34,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	citycon_state *state = machine->driver_data<citycon_state>();
-	UINT8 *rom = machine->region("gfx4")->base();
+	citycon_state *state = machine.driver_data<citycon_state>();
+	UINT8 *rom = machine.region("gfx4")->base();
 	int code = rom[0x1000 * state->bg_image + tile_index];
 	SET_TILE_INFO(
 			3 + state->bg_image,
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( citycon )
 {
-	citycon_state *state = machine->driver_data<citycon_state>();
+	citycon_state *state = machine.driver_data<citycon_state>();
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, citycon_scan, 8, 8, 128, 32);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, citycon_scan, 8, 8, 128, 32);
 
@@ -72,7 +72,7 @@ VIDEO_START( citycon )
 
 WRITE8_HANDLER( citycon_videoram_w )
 {
-	citycon_state *state = space->machine->driver_data<citycon_state>();
+	citycon_state *state = space->machine().driver_data<citycon_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
@@ -80,14 +80,14 @@ WRITE8_HANDLER( citycon_videoram_w )
 
 WRITE8_HANDLER( citycon_linecolor_w )
 {
-	citycon_state *state = space->machine->driver_data<citycon_state>();
+	citycon_state *state = space->machine().driver_data<citycon_state>();
 	state->linecolor[offset] = data;
 }
 
 
 WRITE8_HANDLER( citycon_background_w )
 {
-	citycon_state *state = space->machine->driver_data<citycon_state>();
+	citycon_state *state = space->machine().driver_data<citycon_state>();
 
 	/* bits 4-7 control the background image */
 	if (state->bg_image != (data >> 4))
@@ -98,7 +98,7 @@ WRITE8_HANDLER( citycon_background_w )
 
 	/* bit 0 flips screen */
 	/* it is also used to multiplex player 1 and player 2 controls */
-	flip_screen_set(space->machine, data & 0x01);
+	flip_screen_set(space->machine(), data & 0x01);
 
 	/* bits 1-3 are unknown */
 //  if ((data & 0x0e) != 0) logerror("background register = %02x\n", data);
@@ -106,9 +106,9 @@ WRITE8_HANDLER( citycon_background_w )
 
 
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	citycon_state *state = machine->driver_data<citycon_state>();
+	citycon_state *state = machine.driver_data<citycon_state>();
 	int offs;
 
 	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
@@ -125,7 +125,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			flipx = !flipx;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[state->spriteram[offs + 1] & 0x80 ? 2 : 1],
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[state->spriteram[offs + 1] & 0x80 ? 2 : 1],
 				state->spriteram[offs + 1] & 0x7f,
 				state->spriteram[offs + 2] & 0x0f,
 				flipx,flip_screen_get(machine),
@@ -134,15 +134,15 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 
-INLINE void changecolor_RRRRGGGGBBBBxxxx( running_machine *machine, int color, int indx )
+INLINE void changecolor_RRRRGGGGBBBBxxxx( running_machine &machine, int color, int indx )
 {
-	int data = machine->generic.paletteram.u8[2 * indx | 1] | (machine->generic.paletteram.u8[2 * indx] << 8);
+	int data = machine.generic.paletteram.u8[2 * indx | 1] | (machine.generic.paletteram.u8[2 * indx] << 8);
 	palette_set_color_rgb(machine, color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
 SCREEN_UPDATE( citycon )
 {
-	citycon_state *state = screen->machine->driver_data<citycon_state>();
+	citycon_state *state = screen->machine().driver_data<citycon_state>();
 	int offs, scroll;
 
 	/* Update the virtual palette to support text color code changing on every scanline. */
@@ -152,7 +152,7 @@ SCREEN_UPDATE( citycon )
 		int i;
 
 		for (i = 0; i < 4; i++)
-			changecolor_RRRRGGGGBBBBxxxx(screen->machine, 640 + 4 * offs + i, 512 + 4 * indx + i);
+			changecolor_RRRRGGGGBBBBxxxx(screen->machine(), 640 + 4 * offs + i, 512 + 4 * indx + i);
 	}
 
 
@@ -163,6 +163,6 @@ SCREEN_UPDATE( citycon )
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

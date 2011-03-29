@@ -73,7 +73,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 static WRITE8_HANDLER( pbaction_sh_command_w )
 {
-	pbaction_state *state = space->machine->driver_data<pbaction_state>();
+	pbaction_state *state = space->machine().driver_data<pbaction_state>();
 	soundlatch_w(space, offset, data);
 	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0x00);
 }
@@ -254,17 +254,17 @@ static INTERRUPT_GEN( pbaction_interrupt )
 
 static MACHINE_START( pbaction )
 {
-	pbaction_state *state = machine->driver_data<pbaction_state>();
+	pbaction_state *state = machine.driver_data<pbaction_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->scroll));
 }
 
 static MACHINE_RESET( pbaction )
 {
-	pbaction_state *state = machine->driver_data<pbaction_state>();
+	pbaction_state *state = machine.driver_data<pbaction_state>();
 
 	state->scroll = 0;
 }
@@ -460,7 +460,7 @@ ROM_END
 
 static READ8_HANDLER( pbactio3_prot_kludge_r )
 {
-	pbaction_state *state = space->machine->driver_data<pbaction_state>();
+	pbaction_state *state = space->machine().driver_data<pbaction_state>();
 
 	/* on startup, the game expect this location to NOT act as RAM */
 	if (cpu_get_pc(space->cpu) == 0xab80)
@@ -472,7 +472,7 @@ static READ8_HANDLER( pbactio3_prot_kludge_r )
 static DRIVER_INIT( pbactio3 )
 {
 	int i;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	/* first of all, do a simple bitswap */
 	for (i = 0; i < 0xc000; i++)
@@ -484,7 +484,7 @@ static DRIVER_INIT( pbactio3 )
 	pbaction_decode(machine, "maincpu");
 
 	/* install a protection (?) workaround */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc000, 0xc000, FUNC(pbactio3_prot_kludge_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc000, 0xc000, FUNC(pbactio3_prot_kludge_r) );
 }
 
 static DRIVER_INIT( pbactio4 )

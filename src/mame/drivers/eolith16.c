@@ -43,11 +43,11 @@ static const eeprom_interface eeprom_interface_93C66 =
 
 static WRITE16_HANDLER( eeprom_w )
 {
-	eolith16_state *state = space->machine->driver_data<eolith16_state>();
+	eolith16_state *state = space->machine().driver_data<eolith16_state>();
 	state->vbuffer = (data & 0x80) >> 7;
-	coin_counter_w(space->machine, 0, data & 1);
+	coin_counter_w(space->machine(), 0, data & 1);
 
-	input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+	input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 
 	//data & 0x100 and data & 0x004 always set
 }
@@ -55,20 +55,20 @@ static WRITE16_HANDLER( eeprom_w )
 static READ16_HANDLER( eolith16_custom_r )
 {
 	eolith_speedup_read(space);
-	return input_port_read(space->machine, "SPECIAL");
+	return input_port_read(space->machine(), "SPECIAL");
 }
 
 
 
 static WRITE16_HANDLER( vram_w )
 {
-	eolith16_state *state = space->machine->driver_data<eolith16_state>();
+	eolith16_state *state = space->machine().driver_data<eolith16_state>();
 	COMBINE_DATA(&state->vram[offset + (0x10000/2) * state->vbuffer]);
 }
 
 static READ16_HANDLER( vram_r )
 {
-	eolith16_state *state = space->machine->driver_data<eolith16_state>();
+	eolith16_state *state = space->machine().driver_data<eolith16_state>();
 	return state->vram[offset + (0x10000/2) * state->vbuffer];
 }
 
@@ -118,13 +118,13 @@ INPUT_PORTS_END
 
 static VIDEO_START( eolith16 )
 {
-	eolith16_state *state = machine->driver_data<eolith16_state>();
+	eolith16_state *state = machine.driver_data<eolith16_state>();
 	state->vram = auto_alloc_array(machine, UINT16, 0x10000);
 }
 
 static SCREEN_UPDATE( eolith16 )
 {
-	eolith16_state *state = screen->machine->driver_data<eolith16_state>();
+	eolith16_state *state = screen->machine().driver_data<eolith16_state>();
 	int x,y,count;
 	int color;
 

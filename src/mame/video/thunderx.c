@@ -8,9 +8,9 @@
 
 ***************************************************************************/
 
-void thunderx_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+void thunderx_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	thunderx_state *state = machine->driver_data<thunderx_state>();
+	thunderx_state *state = machine.driver_data<thunderx_state>();
 	*code |= ((*color & 0x1f) << 8) | (bank << 13);
 	*color = state->layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
@@ -22,9 +22,9 @@ void thunderx_tile_callback( running_machine *machine, int layer, int bank, int 
 
 ***************************************************************************/
 
-void thunderx_sprite_callback( running_machine *machine, int *code,int *color, int *priority_mask, int *shadow )
+void thunderx_sprite_callback( running_machine &machine, int *code,int *color, int *priority_mask, int *shadow )
 {
-	thunderx_state *state = machine->driver_data<thunderx_state>();
+	thunderx_state *state = machine.driver_data<thunderx_state>();
 
 	/* Sprite priority 1 means appear behind background, used only to mask sprites */
 	/* in the foreground */
@@ -50,7 +50,7 @@ void thunderx_sprite_callback( running_machine *machine, int *code,int *color, i
 
 VIDEO_START( scontra )
 {
-	thunderx_state *state = machine->driver_data<thunderx_state>();
+	thunderx_state *state = machine.driver_data<thunderx_state>();
 	state->layer_colorbase[0] = 48;
 	state->layer_colorbase[1] = 0;
 	state->layer_colorbase[2] = 16;
@@ -68,11 +68,11 @@ VIDEO_START( scontra )
 
 SCREEN_UPDATE( scontra )
 {
-	thunderx_state *state = screen->machine->driver_data<thunderx_state>();
+	thunderx_state *state = screen->machine().driver_data<thunderx_state>();
 
 	k052109_tilemap_update(state->k052109);
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	/* The background color is always from layer 1 - but it's always black anyway */
 //  bitmap_fill(bitmap,cliprect,16 * state->layer_colorbase[1]);

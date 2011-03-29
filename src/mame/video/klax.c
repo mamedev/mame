@@ -17,7 +17,7 @@
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	klax_state *state = machine->driver_data<klax_state>();
+	klax_state *state = machine.driver_data<klax_state>();
 	UINT16 data1 = state->playfield[tile_index];
 	UINT16 data2 = state->playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x1fff;
@@ -71,7 +71,7 @@ VIDEO_START( klax )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	klax_state *state = machine->driver_data<klax_state>();
+	klax_state *state = machine.driver_data<klax_state>();
 
 	/* initialize the playfield */
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,32);
@@ -102,7 +102,7 @@ WRITE16_HANDLER( klax_latch_w )
 
 SCREEN_UPDATE( klax )
 {
-	klax_state *state = screen->machine->driver_data<klax_state>();
+	klax_state *state = screen->machine().driver_data<klax_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

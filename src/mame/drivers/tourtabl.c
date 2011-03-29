@@ -27,12 +27,12 @@ public:
 
 static WRITE8_DEVICE_HANDLER( tourtabl_led_w )
 {
-	set_led_status(device->machine, 0, data & 0x40); /* start 1 */
-	set_led_status(device->machine, 1, data & 0x20); /* start 2 */
-	set_led_status(device->machine, 2, data & 0x10); /* start 4 */
-	set_led_status(device->machine, 3, data & 0x80); /* select game */
+	set_led_status(device->machine(), 0, data & 0x40); /* start 1 */
+	set_led_status(device->machine(), 1, data & 0x20); /* start 2 */
+	set_led_status(device->machine(), 2, data & 0x10); /* start 4 */
+	set_led_status(device->machine(), 3, data & 0x80); /* select game */
 
-	coin_lockout_global_w(device->machine, !(data & 0x80));
+	coin_lockout_global_w(device->machine(), !(data & 0x80));
 }
 
 
@@ -40,7 +40,7 @@ static READ16_HANDLER( tourtabl_read_input_port )
 {
 	static const char *const tianames[] = { "PADDLE4", "PADDLE3", "PADDLE2", "PADDLE1", "TIA_IN4", "TIA_IN5" };
 
-	return input_port_read(space->machine, tianames[offset]);
+	return input_port_read(space->machine(), tianames[offset]);
 }
 
 static READ8_HANDLER( tourtabl_get_databus_contents )
@@ -62,7 +62,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( watchdog_w )
 {
-	watchdog_reset(device->machine);
+	watchdog_reset(device->machine());
 }
 
 static const riot6532_interface r6532_interface_0 =

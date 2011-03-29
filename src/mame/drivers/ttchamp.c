@@ -62,12 +62,12 @@ static VIDEO_START(ttchamp)
 
 static SCREEN_UPDATE(ttchamp)
 {
-	ttchamp_state *state = screen->machine->driver_data<ttchamp_state>();
+	ttchamp_state *state = screen->machine().driver_data<ttchamp_state>();
 	int y,x,count;
 //  int i;
 	static const int xxx=320,yyy=204;
 
-	bitmap_fill(bitmap, 0, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, 0, get_black_pen(screen->machine()));
 
 //  for (i=0;i<256;i++)
 //  {
@@ -95,7 +95,7 @@ static SCREEN_UPDATE(ttchamp)
 
 static WRITE16_HANDLER( paloff_w )
 {
-	ttchamp_state *state = space->machine->driver_data<ttchamp_state>();
+	ttchamp_state *state = space->machine().driver_data<ttchamp_state>();
     COMBINE_DATA(&state->paloff);
 }
 
@@ -103,31 +103,31 @@ static WRITE16_HANDLER( paloff_w )
 static WRITE16_HANDLER( pcup_prgbank_w )
 {
     int bank;
-    UINT8 *ROM1 = space->machine->region("user1")->base();
+    UINT8 *ROM1 = space->machine().region("user1")->base();
 
     if (ACCESSING_BITS_0_7)
     {
         bank = (data>>4) &0x07;
-        memory_set_bankptr(space->machine, "bank2",&ROM1[0x80000*(bank)]);
+        memory_set_bankptr(space->machine(), "bank2",&ROM1[0x80000*(bank)]);
     }
 }
 #endif
 
 static WRITE16_HANDLER( paldat_w )
 {
-	ttchamp_state *state = space->machine->driver_data<ttchamp_state>();
-    palette_set_color_rgb(space->machine,state->paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
+	ttchamp_state *state = space->machine().driver_data<ttchamp_state>();
+    palette_set_color_rgb(space->machine(),state->paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
 }
 
 static READ16_HANDLER( peno_rand )
 {
-    return 0xffff;// space->machine->rand();
+    return 0xffff;// space->machine().rand();
 }
 
 #ifdef UNUSED_FUNCTION
 static READ16_HANDLER( peno_rand2 )
 {
-    return space->machine->rand();
+    return space->machine().rand();
 }
 #endif
 
@@ -333,7 +333,7 @@ ROM_END
 
 static DRIVER_INIT (ttchamp)
 {
-	UINT8 *ROM1 = machine->region("user1")->base();
+	UINT8 *ROM1 = machine.region("user1")->base();
 	memory_set_bankptr(machine, "bank1",&ROM1[0x120000]);
 	memory_set_bankptr(machine, "bank2",&ROM1[0x180000]);
 }

@@ -22,7 +22,7 @@ priority should be given to
 
 static TILE_GET_INFO( get_ms32_tx_tile_info )
 {
-	ms32_state *state = machine->driver_data<ms32_state>();
+	ms32_state *state = machine.driver_data<ms32_state>();
 	int tileno, colour;
 
 	tileno = state->txram_16[tile_index *2]   & 0xffff;
@@ -33,7 +33,7 @@ static TILE_GET_INFO( get_ms32_tx_tile_info )
 
 static TILE_GET_INFO( get_ms32_roz_tile_info )
 {
-	ms32_state *state = machine->driver_data<ms32_state>();
+	ms32_state *state = machine.driver_data<ms32_state>();
 	int tileno,colour;
 
 	tileno = state->rozram_16[tile_index *2]   & 0xffff;
@@ -44,7 +44,7 @@ static TILE_GET_INFO( get_ms32_roz_tile_info )
 
 static TILE_GET_INFO( get_ms32_bg_tile_info )
 {
-	ms32_state *state = machine->driver_data<ms32_state>();
+	ms32_state *state = machine.driver_data<ms32_state>();
 	int tileno,colour;
 
 	tileno = state->bgram_16[tile_index *2]   & 0xffff;
@@ -55,7 +55,7 @@ static TILE_GET_INFO( get_ms32_bg_tile_info )
 
 static TILE_GET_INFO( get_ms32_extra_tile_info )
 {
-	ms32_state *state = machine->driver_data<ms32_state>();
+	ms32_state *state = machine.driver_data<ms32_state>();
 	int tileno,colour;
 
 	tileno = state->f1superb_extraram_16[tile_index *2]   & 0xffff;
@@ -68,9 +68,9 @@ static TILE_GET_INFO( get_ms32_extra_tile_info )
 
 VIDEO_START( ms32 )
 {
-	ms32_state *state = machine->driver_data<ms32_state>();
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	ms32_state *state = machine.driver_data<ms32_state>();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	state->priram_8   = auto_alloc_array_clear(machine, UINT8, 0x2000);
 	state->palram_16  = auto_alloc_array_clear(machine, UINT16, 0x20000);
@@ -103,13 +103,13 @@ VIDEO_START( ms32 )
 	state->reverse_sprite_order = 1;
 
 	/* i hate per game patches...how should priority really work? tetrisp2.c ? i can't follow it */
-	if (!strcmp(machine->system().name,"kirarast"))	state->reverse_sprite_order = 0;
-	if (!strcmp(machine->system().name,"tp2m32"))	state->reverse_sprite_order = 0;
-	if (!strcmp(machine->system().name,"47pie2"))	state->reverse_sprite_order = 0;
-	if (!strcmp(machine->system().name,"47pie2o"))	state->reverse_sprite_order = 0;
-	if (!strcmp(machine->system().name,"hayaosi3"))	state->reverse_sprite_order = 0;
-	if (!strcmp(machine->system().name,"bnstars"))	state->reverse_sprite_order = 0;
-	if (!strcmp(machine->system().name,"wpksocv2"))	state->reverse_sprite_order = 0;
+	if (!strcmp(machine.system().name,"kirarast"))	state->reverse_sprite_order = 0;
+	if (!strcmp(machine.system().name,"tp2m32"))	state->reverse_sprite_order = 0;
+	if (!strcmp(machine.system().name,"47pie2"))	state->reverse_sprite_order = 0;
+	if (!strcmp(machine.system().name,"47pie2o"))	state->reverse_sprite_order = 0;
+	if (!strcmp(machine.system().name,"hayaosi3"))	state->reverse_sprite_order = 0;
+	if (!strcmp(machine.system().name,"bnstars"))	state->reverse_sprite_order = 0;
+	if (!strcmp(machine.system().name,"wpksocv2"))	state->reverse_sprite_order = 0;
 
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
 	state->brt[0] = state->brt[1] = 0xffff;
@@ -117,7 +117,7 @@ VIDEO_START( ms32 )
 
 VIDEO_START( f1superb )
 {
-	ms32_state *state = machine->driver_data<ms32_state>();
+	ms32_state *state = machine.driver_data<ms32_state>();
 	VIDEO_START_CALL( ms32 );
 
 	state->f1superb_extraram_16  = auto_alloc_array_clear(machine, UINT16, 0x10000);
@@ -128,9 +128,9 @@ VIDEO_START( f1superb )
 /********** PALETTE WRITES **********/
 
 
-static void update_color(running_machine *machine, int color)
+static void update_color(running_machine &machine, int color)
 {
-	ms32_state *state = machine->driver_data<ms32_state>();
+	ms32_state *state = machine.driver_data<ms32_state>();
 	int r,g,b;
 
 	/* I'm not sure how the brightness should be applied, currently I'm only
@@ -155,7 +155,7 @@ static void update_color(running_machine *machine, int color)
 
 WRITE32_HANDLER( ms32_brightness_w )
 {
-	ms32_state *state = space->machine->driver_data<ms32_state>();
+	ms32_state *state = space->machine().driver_data<ms32_state>();
 	int oldword = state->brt[offset];
 	COMBINE_DATA(&state->brt[offset]);
 
@@ -171,7 +171,7 @@ WRITE32_HANDLER( ms32_brightness_w )
 			state->brt_b = 0x100 - ((state->brt[1] & 0x00ff) >> 0);
 
 		//  for (i = 0;i < 0x3000;i++)  // colors 0x3000-0x3fff are not used
-		//      update_color(space->machine, i);
+		//      update_color(space->machine(), i);
 		}
 	}
 
@@ -185,7 +185,7 @@ WRITE32_HANDLER( ms32_brightness_w )
 
 WRITE32_HANDLER( ms32_gfxctrl_w )
 {
-	ms32_state *state = space->machine->driver_data<ms32_state>();
+	ms32_state *state = space->machine().driver_data<ms32_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 1 = flip screen */
@@ -205,14 +205,14 @@ WRITE32_HANDLER( ms32_gfxctrl_w )
 
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle *cliprect, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle *cliprect, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder)
 {
 	int tx, ty, sx, sy, flipx, flipy;
 	int xsize, ysize;
 	int code, attr, color, size;
 	int pri;
 	int xzoom, yzoom;
-	gfx_element *gfx = machine->gfx[gfxnum];
+	gfx_element *gfx = machine.gfx[gfxnum];
 
 	UINT16		*source	=	sprram_top;
 	UINT16	*finish	=	sprram_top + (sprram_size - 0x10) / 2;
@@ -275,9 +275,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t *b
 }
 
 
-static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,int priority)
+static void draw_roz(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect,int priority)
 {
-	ms32_state *state = machine->driver_data<ms32_state>();
+	ms32_state *state = machine.driver_data<ms32_state>();
 	/* TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown */
 
 	if (state->roz_ctrl[0x5c/4] & 1)	/* "super" mode */
@@ -360,7 +360,7 @@ static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle
 
 SCREEN_UPDATE( ms32 )
 {
-	ms32_state *state = screen->machine->driver_data<ms32_state>();
+	ms32_state *state = screen->machine().driver_data<ms32_state>();
 	int scrollx,scrolly;
 	int asc_pri;
 	int scr_pri;
@@ -377,7 +377,7 @@ SCREEN_UPDATE( ms32 )
 	int i;
 
 	for (i = 0;i < 0x10000;i++)	// colors 0x3000-0x3fff are not used
-		update_color(screen->machine, i);
+		update_color(screen->machine(), i);
 
 	scrollx = state->tx_scroll[0x00/4] + state->tx_scroll[0x08/4] + 0x18;
 	scrolly = state->tx_scroll[0x0c/4] + state->tx_scroll[0x14/4];
@@ -392,7 +392,7 @@ SCREEN_UPDATE( ms32 )
 	tilemap_set_scrolly(state->bg_tilemap_alt, 0, scrolly);
 
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
 
 
 
@@ -404,7 +404,7 @@ SCREEN_UPDATE( ms32 )
 	bitmap_fill(state->temp_bitmap_sprites,cliprect,0);
 	bitmap_fill(state->temp_bitmap_sprites_pri,cliprect,0);
 
-	draw_sprites(screen->machine, state->temp_bitmap_sprites, state->temp_bitmap_sprites_pri, cliprect, state->sprram_16, 0x20000, 0, state->reverse_sprite_order);
+	draw_sprites(screen->machine(), state->temp_bitmap_sprites, state->temp_bitmap_sprites_pri, cliprect, state->sprram_16, 0x20000, 0, state->reverse_sprite_order);
 
 
 
@@ -427,7 +427,7 @@ SCREEN_UPDATE( ms32 )
 		rot_pri++;
 
 	if (rot_pri == 0)
-		draw_roz(screen->machine, state->temp_bitmap_tilemaps, cliprect, 1 << 1);
+		draw_roz(screen->machine(), state->temp_bitmap_tilemaps, cliprect, 1 << 1);
 	else if (scr_pri == 0)
 		if (state->tilemaplayoutcontrol&1)
 		{
@@ -441,7 +441,7 @@ SCREEN_UPDATE( ms32 )
 		tilemap_draw(state->temp_bitmap_tilemaps,cliprect, state->tx_tilemap,  0, 1 << 2);
 
 	if (rot_pri == 1)
-		draw_roz(screen->machine, state->temp_bitmap_tilemaps, cliprect, 1 << 1);
+		draw_roz(screen->machine(), state->temp_bitmap_tilemaps, cliprect, 1 << 1);
 	else if (scr_pri == 1)
 		if (state->tilemaplayoutcontrol&1)
 		{
@@ -455,7 +455,7 @@ SCREEN_UPDATE( ms32 )
 		tilemap_draw(state->temp_bitmap_tilemaps,cliprect, state->tx_tilemap,  0, 1 << 2);
 
 	if (rot_pri == 2)
-		draw_roz(screen->machine, state->temp_bitmap_tilemaps, cliprect, 1 << 1);
+		draw_roz(screen->machine(), state->temp_bitmap_tilemaps, cliprect, 1 << 1);
 	else if (scr_pri == 2)
 		if (state->tilemaplayoutcontrol&1)
 		{
@@ -476,7 +476,7 @@ SCREEN_UPDATE( ms32 )
 		int xx, yy;
 		int width = screen->width();
 		int height = screen->height();
-		const pen_t *paldata = screen->machine->pens;
+		const pen_t *paldata = screen->machine().pens;
 
 		UINT16* srcptr_tile;
 		UINT8* srcptr_tilepri;
@@ -490,7 +490,7 @@ SCREEN_UPDATE( ms32 )
 		for (yy=0;yy<height;yy++)
 		{
 			srcptr_tile =     BITMAP_ADDR16(state->temp_bitmap_tilemaps, yy, 0);
-			srcptr_tilepri =  BITMAP_ADDR8(screen->machine->priority_bitmap, yy, 0);
+			srcptr_tilepri =  BITMAP_ADDR8(screen->machine().priority_bitmap, yy, 0);
 			srcptr_spri =     BITMAP_ADDR16(state->temp_bitmap_sprites, yy, 0);
 			//srcptr_spripri =  BITMAP_ADDR8(state->temp_bitmap_sprites_pri, yy, 0);
 			dstptr_bitmap  =  BITMAP_ADDR32(bitmap, yy, 0);
@@ -579,7 +579,7 @@ SCREEN_UPDATE( ms32 )
 				}
 				else if (primask == 0xc0)
 				{
-					dstptr_bitmap[xx] = paldata[screen->machine->rand()&0xfff];
+					dstptr_bitmap[xx] = paldata[screen->machine().rand()&0xfff];
 				}
 				else if (primask == 0xf0)
 				{
@@ -663,12 +663,12 @@ SCREEN_UPDATE( ms32 )
 					}
 					else if (src_tilepri==0x06)
 					{
-						//dstptr_bitmap[xx] = paldata[screen->machine->rand()&0xfff];
+						//dstptr_bitmap[xx] = paldata[screen->machine().rand()&0xfff];
 						dstptr_bitmap[xx] = paldata[src_tile]; // assumed
 					}
 					else if (src_tilepri==0x07)
 					{
-						//dstptr_bitmap[xx] = paldata[screen->machine->rand()&0xfff];
+						//dstptr_bitmap[xx] = paldata[screen->machine().rand()&0xfff];
 						dstptr_bitmap[xx] = paldata[src_tile]; // assumed
 					}
 				}

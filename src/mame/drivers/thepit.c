@@ -137,13 +137,13 @@ HT-01B
 
 static READ8_HANDLER( thepit_colorram_r )
 {
-	thepit_state *state = space->machine->driver_data<thepit_state>();
+	thepit_state *state = space->machine().driver_data<thepit_state>();
 	return state->colorram[offset];
 }
 
 static WRITE8_HANDLER( thepit_sound_enable_w )
 {
-	space->machine->sound().system_enable(data);
+	space->machine().sound().system_enable(data);
 }
 
 
@@ -1035,7 +1035,7 @@ ROM_END
 
 static READ8_HANDLER( rtriv_question_r )
 {
-	thepit_state *state = space->machine->driver_data<thepit_state>();
+	thepit_state *state = space->machine().driver_data<thepit_state>();
 	// Set-up the remap table for every 16 bytes
 	if((offset & 0xc00) == 0x800)
 	{
@@ -1050,7 +1050,7 @@ static READ8_HANDLER( rtriv_question_r )
 	// Read the actual byte from question roms
 	else if((offset & 0xc00) == 0xc00)
 	{
-		UINT8 *ROM = space->machine->region("user1")->base();
+		UINT8 *ROM = space->machine().region("user1")->base();
 		int real_address;
 
 		real_address = (0x8000 * state->question_rom) | state->question_address | (offset & 0x3f0) | state->remap_address[offset & 0x0f];
@@ -1064,7 +1064,7 @@ static READ8_HANDLER( rtriv_question_r )
 static DRIVER_INIT( rtriv )
 {
 	// Set-up the weirdest questions read ever done
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4000, 0x4fff, FUNC(rtriv_question_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4000, 0x4fff, FUNC(rtriv_question_r));
 }
 
 

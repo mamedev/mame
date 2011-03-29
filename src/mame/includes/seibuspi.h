@@ -63,7 +63,7 @@ READ32_HANDLER( spi_layer_bank_r );
 WRITE32_HANDLER( spi_layer_bank_w );
 WRITE32_HANDLER( spi_layer_enable_w );
 
-void rf2_set_layer_banks(running_machine *machine, int banks);
+void rf2_set_layer_banks(running_machine &machine, int banks);
 
 WRITE32_HANDLER( tilemap_dma_start_w );
 WRITE32_HANDLER( palette_dma_start_w );

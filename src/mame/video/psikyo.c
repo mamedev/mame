@@ -73,7 +73,7 @@ Offset:
 
 static TILE_GET_INFO( get_tile_info_0 )
 {
-	psikyo_state *state = machine->driver_data<psikyo_state>();
+	psikyo_state *state = machine.driver_data<psikyo_state>();
 	UINT16 code = ((UINT16 *)state->vram_0)[BYTE_XOR_BE(tile_index)];
 	SET_TILE_INFO(
 			1,
@@ -84,7 +84,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
-	psikyo_state *state = machine->driver_data<psikyo_state>();
+	psikyo_state *state = machine.driver_data<psikyo_state>();
 	UINT16 code = ((UINT16 *)state->vram_1)[BYTE_XOR_BE(tile_index)];
 	SET_TILE_INFO(
 			1,
@@ -96,7 +96,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 WRITE32_HANDLER( psikyo_vram_0_w )
 {
-	psikyo_state *state = space->machine->driver_data<psikyo_state>();
+	psikyo_state *state = space->machine().driver_data<psikyo_state>();
 
 	COMBINE_DATA(&state->vram_0[offset]);
 	if (ACCESSING_BITS_16_31)
@@ -118,7 +118,7 @@ WRITE32_HANDLER( psikyo_vram_0_w )
 
 WRITE32_HANDLER( psikyo_vram_1_w )
 {
-	psikyo_state *state = space->machine->driver_data<psikyo_state>();
+	psikyo_state *state = space->machine().driver_data<psikyo_state>();
 
 	COMBINE_DATA(&state->vram_1[offset]);
 	if (ACCESSING_BITS_16_31)
@@ -138,9 +138,9 @@ WRITE32_HANDLER( psikyo_vram_1_w )
 	}
 }
 
-void psikyo_switch_banks( running_machine *machine, int tmap, int bank )
+void psikyo_switch_banks( running_machine &machine, int tmap, int bank )
 {
-	psikyo_state *state = machine->driver_data<psikyo_state>();
+	psikyo_state *state = machine.driver_data<psikyo_state>();
 
 	if ((tmap == 0) && (bank != state->tilemap_0_bank))
 	{
@@ -163,7 +163,7 @@ void psikyo_switch_banks( running_machine *machine, int tmap, int bank )
 
 VIDEO_START( psikyo )
 {
-	psikyo_state *state = machine->driver_data<psikyo_state>();
+	psikyo_state *state = machine.driver_data<psikyo_state>();
 
 	/* The Hardware is Capable of Changing the Dimensions of the Tilemaps, its safer to create
        the various sized tilemaps now as opposed to later */
@@ -263,19 +263,19 @@ Note:   Not all sprites are displayed: in the top part of spriteram
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int trans_pen )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int trans_pen )
 {
-	psikyo_state *state = machine->driver_data<psikyo_state>();
+	psikyo_state *state = machine.driver_data<psikyo_state>();
 
 	/* tile layers 0 & 1 have priorities 1 & 2 */
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;
 	UINT16 *spritelist = (UINT16 *)(state->spritebuf2 + 0x1800 / 4);
-	UINT8 *TILES = machine->region("spritelut")->base();	// Sprites LUT
-	int TILES_LEN = machine->region("spritelut")->bytes();
+	UINT8 *TILES = machine.region("spritelut")->base();	// Sprites LUT
+	int TILES_LEN = machine.region("spritelut")->bytes();
 
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	/* Exit if sprites are disabled */
 	if (spritelist[BYTE_XOR_BE((0x800 - 2) / 2)] & 1)	return;
@@ -355,21 +355,21 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 				int addr = (code * 2) & (TILES_LEN - 1);
 
 				if (zoomx == 32 && zoomy == 32)
-					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 							TILES[addr+1] * 256 + TILES[addr],
 							attr >> 8,
 							flipx, flipy,
 							x + dx * 16, y + dy * 16,
-							machine->priority_bitmap,
+							machine.priority_bitmap,
 							pri[(attr & 0xc0) >> 6],trans_pen);
 				else
-					pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
+					pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[0],
 								TILES[addr+1] * 256 + TILES[addr],
 								attr >> 8,
 								flipx, flipy,
 								x + (dx * zoomx) / 2, y + (dy * zoomy) / 2,
 								zoomx << 11,zoomy << 11,
-								machine->priority_bitmap,pri[(attr & 0xc0) >> 6],trans_pen);
+								machine.priority_bitmap,pri[(attr & 0xc0) >> 6],trans_pen);
 
 				code++;
 			}
@@ -382,9 +382,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 // until I work out why it makes a partial copy of the sprite list, and how best to apply it
 // sprite placement of the explosion graphic seems incorrect compared to the original sets? (no / different zoom support?)
 // it might be a problem with the actual bootleg
-static void draw_sprites_bootleg( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int trans_pen )
+static void draw_sprites_bootleg( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int trans_pen )
 {
-	psikyo_state *state = machine->driver_data<psikyo_state>();
+	psikyo_state *state = machine.driver_data<psikyo_state>();
 
 	/* tile layers 0 & 1 have priorities 1 & 2 */
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
@@ -393,11 +393,11 @@ static void draw_sprites_bootleg( running_machine *machine, bitmap_t *bitmap, co
 //  UINT16 *spritelist  =   (UINT16 *)(state->spriteram + 0x1800/4);
 	UINT16 *spritelist = (UINT16 *)(state->spritebuf2 + 0x1800 / 4);
 
-	UINT8 *TILES = machine->region("spritelut")->base();	// Sprites LUT
-	int TILES_LEN = machine->region("spritelut")->bytes();
+	UINT8 *TILES = machine.region("spritelut")->base();	// Sprites LUT
+	int TILES_LEN = machine.region("spritelut")->bytes();
 
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	/* Exit if sprites are disabled */
 	if (spritelist[BYTE_XOR_BE((0x800 - 2) / 2)] & 1)
@@ -480,21 +480,21 @@ static void draw_sprites_bootleg( running_machine *machine, bitmap_t *bitmap, co
 				int addr = (code * 2) & (TILES_LEN-1);
 
 				if (zoomx == 32 && zoomy == 32)
-					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 							TILES[addr+1] * 256 + TILES[addr],
 							attr >> 8,
 							flipx, flipy,
 							x + dx * 16, y + dy * 16,
-							machine->priority_bitmap,
+							machine.priority_bitmap,
 							pri[(attr & 0xc0) >> 6],trans_pen);
 				else
-					pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
+					pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[0],
 								TILES[addr+1] * 256 + TILES[addr],
 								attr >> 8,
 								flipx, flipy,
 								x + (dx * zoomx) / 2, y + (dy * zoomy) / 2,
 								zoomx << 11,zoomy << 11,
-								machine->priority_bitmap,pri[(attr & 0xc0) >> 6],trans_pen);
+								machine.priority_bitmap,pri[(attr & 0xc0) >> 6],trans_pen);
 
 				code++;
 			}
@@ -526,7 +526,7 @@ static int tilemap_width( int size )
 
 SCREEN_UPDATE( psikyo )
 {
-	psikyo_state *state = screen->machine->driver_data<psikyo_state>();
+	psikyo_state *state = screen->machine().driver_data<psikyo_state>();
 	int i, layers_ctrl = -1;
 
 	UINT32 tm0size, tm1size;
@@ -539,7 +539,7 @@ SCREEN_UPDATE( psikyo )
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(screen->machine, ~input_port_read(screen->machine, "DSW") & 0x00010000);		// hardwired to a DSW bit
+	flip_screen_set(screen->machine(), ~input_port_read(screen->machine(), "DSW") & 0x00010000);		// hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 
@@ -574,8 +574,8 @@ SCREEN_UPDATE( psikyo )
 	/* For gfx banking for s1945jn/gunbird/btlkroad */
 	if (state->ka302c_banking)
 	{
-		psikyo_switch_banks(screen->machine, 0, (layer0_ctrl & 0x400) >> 10);
-		psikyo_switch_banks(screen->machine, 1, (layer1_ctrl & 0x400) >> 10);
+		psikyo_switch_banks(screen->machine(), 0, (layer0_ctrl & 0x400) >> 10);
+		psikyo_switch_banks(screen->machine(), 1, (layer1_ctrl & 0x400) >> 10);
 	}
 
 	switch ((layer0_ctrl & 0x00c0) >> 6)
@@ -674,9 +674,9 @@ SCREEN_UPDATE( psikyo )
 	tilemap_set_transparent_pen(state->tilemap_1_size2, (layer1_ctrl & 8 ? 0 : 15));
 	tilemap_set_transparent_pen(state->tilemap_1_size3, (layer1_ctrl & 8 ? 0 : 15));
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	if (layers_ctrl & 1)
 		tilemap_draw(bitmap, cliprect, tmptilemap0, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
@@ -685,7 +685,7 @@ SCREEN_UPDATE( psikyo )
 		tilemap_draw(bitmap, cliprect, tmptilemap1, layer1_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
 
 	if (layers_ctrl & 4)
-		draw_sprites(screen->machine, bitmap, cliprect, (spr_ctrl & 4 ? 0 : 15));
+		draw_sprites(screen->machine(), bitmap, cliprect, (spr_ctrl & 4 ? 0 : 15));
 
 	return 0;
 }
@@ -700,7 +700,7 @@ SCREEN_UPDATE( psikyo )
 
 SCREEN_UPDATE( psikyo_bootleg )
 {
-	psikyo_state *state = screen->machine->driver_data<psikyo_state>();
+	psikyo_state *state = screen->machine().driver_data<psikyo_state>();
 	int i, layers_ctrl = -1;
 
 	UINT32 tm0size, tm1size;
@@ -713,7 +713,7 @@ SCREEN_UPDATE( psikyo_bootleg )
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(screen->machine, ~input_port_read(screen->machine, "DSW") & 0x00010000);		// hardwired to a DSW bit
+	flip_screen_set(screen->machine(), ~input_port_read(screen->machine(), "DSW") & 0x00010000);		// hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 
@@ -748,8 +748,8 @@ SCREEN_UPDATE( psikyo_bootleg )
 	/* For gfx banking for s1945jn/gunbird/btlkroad */
 	if (state->ka302c_banking)
 	{
-		psikyo_switch_banks(screen->machine, 0, (layer0_ctrl & 0x400) >> 10);
-		psikyo_switch_banks(screen->machine, 1, (layer1_ctrl & 0x400) >> 10);
+		psikyo_switch_banks(screen->machine(), 0, (layer0_ctrl & 0x400) >> 10);
+		psikyo_switch_banks(screen->machine(), 1, (layer1_ctrl & 0x400) >> 10);
 	}
 
 	switch ((layer0_ctrl & 0x00c0) >> 6)
@@ -848,9 +848,9 @@ SCREEN_UPDATE( psikyo_bootleg )
 	tilemap_set_transparent_pen(state->tilemap_1_size2, (layer1_ctrl & 8 ? 0 : 15));
 	tilemap_set_transparent_pen(state->tilemap_1_size3, (layer1_ctrl & 8 ? 0 : 15));
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	if (layers_ctrl & 1)
 		tilemap_draw(bitmap, cliprect, tmptilemap0, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
@@ -859,7 +859,7 @@ SCREEN_UPDATE( psikyo_bootleg )
 		tilemap_draw(bitmap, cliprect, tmptilemap1, layer1_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
 
 	if (layers_ctrl & 4)
-		draw_sprites_bootleg(screen->machine, bitmap, cliprect, (spr_ctrl & 4 ? 0 : 15));
+		draw_sprites_bootleg(screen->machine(), bitmap, cliprect, (spr_ctrl & 4 ? 0 : 15));
 
 	return 0;
 }
@@ -867,7 +867,7 @@ SCREEN_UPDATE( psikyo_bootleg )
 
 SCREEN_EOF( psikyo )
 {
-	psikyo_state *state = machine->driver_data<psikyo_state>();
+	psikyo_state *state = machine.driver_data<psikyo_state>();
 	memcpy(state->spritebuf2, state->spritebuf1, 0x2000);
 	memcpy(state->spritebuf1, state->spriteram, 0x2000);
 }

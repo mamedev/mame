@@ -46,7 +46,7 @@ for now. Even at 12 this slowdown still happens a little.
 static WRITE16_HANDLER( tokib_soundcommand16_w )
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( pip16_r )
@@ -58,32 +58,32 @@ static READ16_HANDLER( pip16_r )
 
 static void toki_adpcm_int (device_t *device)
 {
-	toki_state *state = device->machine->driver_data<toki_state>();
+	toki_state *state = device->machine().driver_data<toki_state>();
 
 	msm5205_data_w (device, state->msm5205next);
 	state->msm5205next >>= 4;
 
 	state->toggle ^= 1;
 	if (state->toggle)
-		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( toki_adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = device->machine->region("audiocpu")->base();
+	UINT8 *RAM = device->machine().region("audiocpu")->base();
 
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(device->machine, "bank1",&RAM[bankaddress]);
+	memory_set_bankptr(device->machine(), "bank1",&RAM[bankaddress]);
 
 	msm5205_reset_w(device,data & 0x08);
 }
 
 static WRITE8_HANDLER( toki_adpcm_data_w )
 {
-	toki_state *state = space->machine->driver_data<toki_state>();
+	toki_state *state = space->machine().driver_data<toki_state>();
 	state->msm5205next = data;
 }
 
@@ -741,7 +741,7 @@ ROM_END
 
 static DRIVER_INIT( toki )
 {
-	UINT8 *ROM = machine->region("oki")->base();
+	UINT8 *ROM = machine.region("oki")->base();
 	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x20000);
 	int i;
 
@@ -764,14 +764,14 @@ static DRIVER_INIT( tokib )
 	UINT8 *rom;
 
 	/* invert the sprite data in the ROMs */
-	len = machine->region("gfx2")->bytes();
-	rom = machine->region("gfx2")->base();
+	len = machine.region("gfx2")->bytes();
+	rom = machine.region("gfx2")->base();
 	for (i = 0; i < len; i++)
 		rom[i] ^= 0xff;
 
 	/* merge background tile graphics together */
-	len = machine->region("gfx3")->bytes();
-	rom = machine->region("gfx3")->base();
+	len = machine.region("gfx3")->bytes();
+	rom = machine.region("gfx3")->base();
 	for (offs = 0; offs < len; offs += 0x20000)
 	{
 		UINT8 *base = &rom[offs];
@@ -784,8 +784,8 @@ static DRIVER_INIT( tokib )
 			memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 		}
 	}
-	len = machine->region("gfx4")->bytes();
-	rom = machine->region("gfx4")->base();
+	len = machine.region("gfx4")->bytes();
+	rom = machine.region("gfx4")->base();
 	for (offs = 0; offs < len; offs += 0x20000)
 	{
 		UINT8 *base = &rom[offs];
@@ -807,7 +807,7 @@ static DRIVER_INIT(jujub)
 	/* Program ROMs are bitswapped */
 	{
 		int i;
-		UINT16 *prgrom = (UINT16*)machine->region("maincpu")->base();
+		UINT16 *prgrom = (UINT16*)machine.region("maincpu")->base();
 
 		for (i = 0; i < 0x60000/2; i++)
 		{
@@ -820,9 +820,9 @@ static DRIVER_INIT(jujub)
 
 	/* Decrypt data for z80 program */
 	{
-		address_space *space = machine->device("audiocpu")->memory().space(AS_PROGRAM);
+		address_space *space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
 		UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x20000);
-		UINT8 *rom = machine->region("audiocpu")->base();
+		UINT8 *rom = machine.region("audiocpu")->base();
 		int i;
 
 		memcpy(decrypt,rom,0x20000);
@@ -837,7 +837,7 @@ static DRIVER_INIT(jujub)
 	}
 
 	{
-		UINT8 *ROM = machine->region("oki")->base();
+		UINT8 *ROM = machine.region("oki")->base();
 		UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x20000);
 		int i;
 

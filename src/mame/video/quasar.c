@@ -24,13 +24,13 @@ PALETTE_INIT( quasar )
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x500);
+	machine.colortable = colortable_alloc(machine, 0x500);
 
 	/* standard 1 bit per color palette (background and sprites) */
 	for (i = 0; i < 8; i++)
 	{
 		rgb_t color = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
-		colortable_palette_set_color(machine->colortable, i, color);
+		colortable_palette_set_color(machine.colortable, i, color);
 	}
 
 	/* effects color map */
@@ -58,45 +58,45 @@ PALETTE_INIT( quasar )
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
 		/* intensity 0 */
-	    colortable_palette_set_color(machine->colortable, 0x100 + i, RGB_BLACK);
+	    colortable_palette_set_color(machine.colortable, 0x100 + i, RGB_BLACK);
 
 		/* intensity 1 */
 		color = MAKE_RGB(r >> 2, g >> 2, b >> 2);
-	    colortable_palette_set_color(machine->colortable, 0x200 + i, color);
+	    colortable_palette_set_color(machine.colortable, 0x200 + i, color);
 
 		/* intensity 2 */
 		color = MAKE_RGB((r >> 2) + (r >> 3), (g >> 2) + (g >> 3), (b >> 2) + (b >> 2));
-	    colortable_palette_set_color(machine->colortable, 0x300 + i, color);
+	    colortable_palette_set_color(machine.colortable, 0x300 + i, color);
 
 		/* intensity 3 */
 		color = MAKE_RGB(r >> 1, g >> 1, b >> 1);
-	    colortable_palette_set_color(machine->colortable, 0x400 + i, color);
+	    colortable_palette_set_color(machine.colortable, 0x400 + i, color);
 	}
 
 	// Address 0-2 from graphic rom
 	//         3-5 from color ram
 	//         6-8 from sprite chips (Used for priority)
 	for (i = 0; i < 0x200; i++)
-		colortable_entry_set_value(machine->colortable, i, color_prom[i] & 0x07);
+		colortable_entry_set_value(machine.colortable, i, color_prom[i] & 0x07);
 
 	/* background for collision */
 	for (i = 1; i < 8; i++)
-		colortable_entry_set_value(machine->colortable, 0x200 + i, 7);
-	colortable_entry_set_value(machine->colortable, 0x200, 0);
+		colortable_entry_set_value(machine.colortable, 0x200 + i, 7);
+	colortable_entry_set_value(machine.colortable, 0x200, 0);
 
 	/* effects */
 	for (i = 0; i < 0x400; i++)
-		colortable_entry_set_value(machine->colortable, 0x208 + i, 0x100 + i);
+		colortable_entry_set_value(machine.colortable, 0x208 + i, 0x100 + i);
 }
 
 
 VIDEO_START( quasar )
 {
-	quasar_state *state = machine->driver_data<quasar_state>();
+	quasar_state *state = machine.driver_data<quasar_state>();
 	state->effectram = auto_alloc_array(machine, UINT8, 0x400);
 
 	/* create helper bitmap */
-	state->collision_background = machine->primary_screen->alloc_compatible_bitmap();
+	state->collision_background = machine.primary_screen->alloc_compatible_bitmap();
 
 	/* register save */
 	state->save_item(NAME(*state->collision_background));
@@ -105,7 +105,7 @@ VIDEO_START( quasar )
 
 SCREEN_UPDATE( quasar )
 {
-	quasar_state *state = screen->machine->driver_data<quasar_state>();
+	quasar_state *state = screen->machine().driver_data<quasar_state>();
 	int offs;
 	bitmap_t *s2636_0_bitmap, *s2636_1_bitmap, *s2636_2_bitmap;
 
@@ -127,7 +127,7 @@ SCREEN_UPDATE( quasar )
 				*BITMAP_ADDR16(bitmap, y + oy, x + ox) = forecolor;
 
 		/* Main Screen */
-		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
 				code,
 				state->color_ram[offs] & 0x3f,
 				0,0,
@@ -137,7 +137,7 @@ SCREEN_UPDATE( quasar )
 		/* background for Collision Detection (it can only hit certain items) */
 		if((state->color_ram[offs] & 7) == 0)
 		{
-			drawgfx_opaque(state->collision_background,cliprect,screen->machine->gfx[0],
+			drawgfx_opaque(state->collision_background,cliprect,screen->machine().gfx[0],
 					code,
 					64,
 					0,0,
@@ -191,7 +191,7 @@ SCREEN_UPDATE( quasar )
 					*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel);
 
 					/* S2636 vs. background collision detection */
-					if (colortable_entry_get_value(screen->machine->colortable, *BITMAP_ADDR16(state->collision_background, y, x)))
+					if (colortable_entry_get_value(screen->machine().colortable, *BITMAP_ADDR16(state->collision_background, y, x)))
 					{
 						if (S2636_IS_PIXEL_DRAWN(pixel0)) state->collision_register |= 0x01;
 						if (S2636_IS_PIXEL_DRAWN(pixel2)) state->collision_register |= 0x02;

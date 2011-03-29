@@ -479,14 +479,14 @@ public:
 
 static WRITE8_HANDLER( fclown_videoram_w )
 {
-	_5clown_state *state = space->machine->driver_data<_5clown_state>();
+	_5clown_state *state = space->machine().driver_data<_5clown_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( fclown_colorram_w )
 {
-	_5clown_state *state = space->machine->driver_data<_5clown_state>();
+	_5clown_state *state = space->machine().driver_data<_5clown_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -494,7 +494,7 @@ static WRITE8_HANDLER( fclown_colorram_w )
 
 static TILE_GET_INFO( get_fclown_tile_info )
 {
-	_5clown_state *state = machine->driver_data<_5clown_state>();
+	_5clown_state *state = machine.driver_data<_5clown_state>();
 
 /*  - bits -
     7654 3210
@@ -516,14 +516,14 @@ static TILE_GET_INFO( get_fclown_tile_info )
 
 static VIDEO_START(fclown)
 {
-	_5clown_state *state = machine->driver_data<_5clown_state>();
+	_5clown_state *state = machine.driver_data<_5clown_state>();
 	state->bg_tilemap = tilemap_create(machine, get_fclown_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
 static SCREEN_UPDATE( fclown )
 {
-	_5clown_state *state = screen->machine->driver_data<_5clown_state>();
+	_5clown_state *state = screen->machine().driver_data<_5clown_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
@@ -544,7 +544,7 @@ static PALETTE_INIT( fclown )
 
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b, bk;
 
@@ -580,13 +580,13 @@ static PALETTE_INIT( fclown )
 */
 static READ8_DEVICE_HANDLER( mux_port_r )
 {
-	_5clown_state *state = device->machine->driver_data<_5clown_state>();
+	_5clown_state *state = device->machine().driver_data<_5clown_state>();
 	switch( state->mux_data & 0xf0 )		/* bits 4-7 */
 	{
-		case 0x10: return input_port_read(device->machine, "IN0-0");
-		case 0x20: return input_port_read(device->machine, "IN0-1");
-		case 0x40: return input_port_read(device->machine, "IN0-2");
-		case 0x80: return input_port_read(device->machine, "IN0-3");
+		case 0x10: return input_port_read(device->machine(), "IN0-0");
+		case 0x20: return input_port_read(device->machine(), "IN0-1");
+		case 0x40: return input_port_read(device->machine(), "IN0-2");
+		case 0x80: return input_port_read(device->machine(), "IN0-3");
 	}
 
 	return 0xff;
@@ -595,7 +595,7 @@ static READ8_DEVICE_HANDLER( mux_port_r )
 
 static WRITE8_DEVICE_HANDLER( mux_w )
 {
-	_5clown_state *state = device->machine->driver_data<_5clown_state>();
+	_5clown_state *state = device->machine().driver_data<_5clown_state>();
 	state->mux_data = data ^ 0xff;	/* Inverted */
 }
 
@@ -611,10 +611,10 @@ static WRITE8_DEVICE_HANDLER( counters_w )
     -x-- ----   Unknown (increments at start).
     x--- ----   Unknown (increments at start).
 */
-	coin_counter_w(device->machine, 0, data & 0x10);	/* Key In */
-	coin_counter_w(device->machine, 1, data & 0x20);	/* Payout */
-	coin_counter_w(device->machine, 2, data & 0x40);	/* unknown */
-	coin_counter_w(device->machine, 3, data & 0x80);	/* unknown */
+	coin_counter_w(device->machine(), 0, data & 0x10);	/* Key In */
+	coin_counter_w(device->machine(), 1, data & 0x20);	/* Payout */
+	coin_counter_w(device->machine(), 2, data & 0x40);	/* unknown */
+	coin_counter_w(device->machine(), 3, data & 0x80);	/* unknown */
 
 }
 
@@ -627,12 +627,12 @@ static WRITE8_DEVICE_HANDLER( trigsnd_w )
 
 	if ( (data & 0x0f) == 0x07 )
 	{
-		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE );
+		cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE );
 	}
 
 	else
 	{
-		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE );
+		cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE );
 	}
 
 }
@@ -660,7 +660,7 @@ static WRITE8_HANDLER( cpu_c048_w)
 
 static WRITE8_HANDLER( cpu_d800_w )
 {
-	_5clown_state *state = space->machine->driver_data<_5clown_state>();
+	_5clown_state *state = space->machine().driver_data<_5clown_state>();
 	logerror("Main: Write to $D800: %02x\n", data);
 	state->main_latch_d800 = data;
 }
@@ -683,14 +683,14 @@ static WRITE8_DEVICE_HANDLER( fclown_ay8910_w )
 
 static READ8_HANDLER( snd_e06_r )
 {
-	_5clown_state *state = space->machine->driver_data<_5clown_state>();
+	_5clown_state *state = space->machine().driver_data<_5clown_state>();
 	logerror("Sound: Read from $0E06 \n");
 	return state->main_latch_d800;
 }
 
 static WRITE8_HANDLER( snd_800_w )
 {
-	_5clown_state *state = space->machine->driver_data<_5clown_state>();
+	_5clown_state *state = space->machine().driver_data<_5clown_state>();
 	state->snd_latch_0800 = data;
 
 	if (state->snd_latch_0a02 == 0xc0)
@@ -706,7 +706,7 @@ static WRITE8_HANDLER( snd_800_w )
 
 static WRITE8_HANDLER( snd_a02_w )
 {
-	_5clown_state *state = space->machine->driver_data<_5clown_state>();
+	_5clown_state *state = space->machine().driver_data<_5clown_state>();
 	state->snd_latch_0a02 = data & 0xff;
 	logerror("Sound: Write to $0A02: %02x\n", state->snd_latch_0a02);
 }
@@ -1198,11 +1198,11 @@ ROM_END
 
 static DRIVER_INIT( fclown )
 {
-	_5clown_state *state = machine->driver_data<_5clown_state>();
+	_5clown_state *state = machine.driver_data<_5clown_state>();
     /* Decrypting main program */
 
 	int x;
-	UINT8 *src = machine->region( "maincpu" )->base();
+	UINT8 *src = machine.region( "maincpu" )->base();
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{
@@ -1212,8 +1212,8 @@ static DRIVER_INIT( fclown )
 
     /* Decrypting GFX by segments */
 
-	UINT8 *gfx1_src = machine->region( "gfx1" )->base();
-	UINT8 *gfx2_src = machine->region( "gfx2" )->base();
+	UINT8 *gfx1_src = machine.region( "gfx1" )->base();
+	UINT8 *gfx2_src = machine.region( "gfx2" )->base();
 
 	for (x = 0x2000; x < 0x3000; x++)
 	{
@@ -1233,7 +1233,7 @@ static DRIVER_INIT( fclown )
 
     /* Decrypting sound samples */
 
-	UINT8 *samples_src = machine->region( "oki6295" )->base();
+	UINT8 *samples_src = machine.region( "oki6295" )->base();
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{
@@ -1251,7 +1251,7 @@ static DRIVER_INIT( fclown )
 
 	/* Assigning AY-3-8910 sound device */
 
-	state->ay8910 = machine->device("ay8910");
+	state->ay8910 = machine.device("ay8910");
 }
 
 

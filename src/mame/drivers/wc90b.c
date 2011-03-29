@@ -99,42 +99,42 @@ Noted added by ClawGrip 28-Mar-2008:
 static WRITE8_HANDLER( wc90b_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *ROM = space->machine->region("maincpu")->base();
+	UINT8 *ROM = space->machine().region("maincpu")->base();
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	memory_set_bankptr(space->machine, "bank1",&ROM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank1",&ROM[bankaddress]);
 }
 
 static WRITE8_HANDLER( wc90b_bankswitch1_w )
 {
 	int bankaddress;
-	UINT8 *ROM = space->machine->region("sub")->base();
+	UINT8 *ROM = space->machine().region("sub")->base();
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	memory_set_bankptr(space->machine, "bank2",&ROM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank2",&ROM[bankaddress]);
 }
 
 static WRITE8_HANDLER( wc90b_sound_command_w )
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *ROM = device->machine->region("audiocpu")->base();
+	UINT8 *ROM = device->machine().region("audiocpu")->base();
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(device->machine, "bank3",&ROM[bankaddress]);
+	memory_set_bankptr(device->machine(), "bank3",&ROM[bankaddress]);
 
 	msm5205_reset_w(device,data & 0x08);
 }
 
 static WRITE8_HANDLER( adpcm_data_w )
 {
-	wc90b_state *state = space->machine->driver_data<wc90b_state>();
+	wc90b_state *state = space->machine().driver_data<wc90b_state>();
 	state->msm5205next = data;
 }
 
@@ -327,7 +327,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	/* NMI writes to MSM ports *only*! -AS */
-	//cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	//cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -342,13 +342,13 @@ static const ym2203_interface ym2203_config =
 
 static void adpcm_int(device_t *device)
 {
-	wc90b_state *state = device->machine->driver_data<wc90b_state>();
+	wc90b_state *state = device->machine().driver_data<wc90b_state>();
 
 	state->toggle ^= 1;
 	if(state->toggle)
 	{
 		msm5205_data_w(device, (state->msm5205next & 0xf0) >> 4);
-		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 		msm5205_data_w(device, (state->msm5205next & 0x0f) >> 0);

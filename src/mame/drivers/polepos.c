@@ -244,7 +244,7 @@ Todo:
 
 static READ16_HANDLER( polepos2_ic25_r )
 {
-	polepos_state *state = space->machine->driver_data<polepos_state>();
+	polepos_state *state = space->machine().driver_data<polepos_state>();
 	int result;
 	/* protection states */
 
@@ -273,15 +273,15 @@ static READ16_HANDLER( polepos2_ic25_r )
 
 static READ8_HANDLER( polepos_adc_r )
 {
-	polepos_state *state = space->machine->driver_data<polepos_state>();
-	return input_port_read(space->machine, state->adc_input ? "ACCEL" : "BRAKE");
+	polepos_state *state = space->machine().driver_data<polepos_state>();
+	return input_port_read(space->machine(), state->adc_input ? "ACCEL" : "BRAKE");
 }
 
 static READ8_HANDLER( polepos_ready_r )
 {
 	int ret = 0xff;
 
-	if (space->machine->primary_screen->vpos() >= 128)
+	if (space->machine().primary_screen->vpos() >= 128)
 		ret ^= 0x02;
 
 	ret ^= 0x08; /* ADC End Flag */
@@ -292,15 +292,15 @@ static READ8_HANDLER( polepos_ready_r )
 
 static WRITE8_HANDLER( polepos_latch_w )
 {
-	polepos_state *state = space->machine->driver_data<polepos_state>();
+	polepos_state *state = space->machine().driver_data<polepos_state>();
 	int bit = data & 1;
 
 	switch (offset)
 	{
 		case 0x00:	/* IRQON */
-			cpu_interrupt_enable(space->machine->device("maincpu"), bit);
+			cpu_interrupt_enable(space->machine().device("maincpu"), bit);
 			if (!bit)
-				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IOSEL */
@@ -308,11 +308,11 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x02:	/* CLSON */
-			polepos_sound_enable(space->machine->device("namco"),bit);
+			polepos_sound_enable(space->machine().device("namco"),bit);
 			if (!bit)
 			{
-				polepos_engine_sound_lsb_w(space->machine->device("polepos"), 0, 0);
-				polepos_engine_sound_msb_w(space->machine->device("polepos"), 0, 0);
+				polepos_engine_sound_lsb_w(space->machine().device("polepos"), 0, 0);
+				polepos_engine_sound_msb_w(space->machine().device("polepos"), 0, 0);
 			}
 			break;
 
@@ -321,11 +321,11 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x04:	/* RESB */
-			cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x05:	/* RESA */
-			cputag_set_input_line(space->machine, "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x06:	/* SB0 */
@@ -348,26 +348,26 @@ static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 }
 
 
-static CUSTOM_INPUT( high_port_r ) { return input_port_read(field->port->machine, (const char *)param) >> 4; }
-static CUSTOM_INPUT( low_port_r ) { return input_port_read(field->port->machine, (const char *)param) & 0x0f; }
+static CUSTOM_INPUT( high_port_r ) { return input_port_read(field->port->machine(), (const char *)param) >> 4; }
+static CUSTOM_INPUT( low_port_r ) { return input_port_read(field->port->machine(), (const char *)param) & 0x0f; }
 static CUSTOM_INPUT( auto_start_r )
 {
-	polepos_state *state = field->port->machine->driver_data<polepos_state>();
+	polepos_state *state = field->port->machine().driver_data<polepos_state>();
 	return state->auto_start_mask;
 }
 
 static WRITE8_DEVICE_HANDLER( out_0 )
 {
 // no start lamps in pole position
-//  set_led_status(device->machine, 1,data & 1);
-//  set_led_status(device->machine, 0,data & 2);
-	coin_counter_w(device->machine, 1,~data & 4);
-	coin_counter_w(device->machine, 0,~data & 8);
+//  set_led_status(device->machine(), 1,data & 1);
+//  set_led_status(device->machine(), 0,data & 2);
+	coin_counter_w(device->machine(), 1,~data & 4);
+	coin_counter_w(device->machine(), 0,~data & 8);
 }
 
 static WRITE8_DEVICE_HANDLER( out_1 )
 {
-	coin_lockout_global_w(device->machine, data & 1);
+	coin_lockout_global_w(device->machine(), data & 1);
 }
 
 static const namco_51xx_interface namco_51xx_intf =
@@ -387,9 +387,9 @@ static const namco_51xx_interface namco_51xx_intf =
 
 static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
 {
-	UINT32 length = device->machine->region("52xx")->bytes();
+	UINT32 length = device->machine().region("52xx")->bytes();
 logerror("ROM @ %04X\n", offset);
-	return (offset < length) ? device->machine->region("52xx")->base()[offset] : 0xff;
+	return (offset < length) ? device->machine().region("52xx")->base()[offset] : 0xff;
 }
 
 static READ8_DEVICE_HANDLER( namco_52xx_si_r )
@@ -416,9 +416,9 @@ static READ8_DEVICE_HANDLER( namco_53xx_k_r )
 
 static READ8_DEVICE_HANDLER( steering_changed_r )
 {
-	polepos_state *state = device->machine->driver_data<polepos_state>();
+	polepos_state *state = device->machine().driver_data<polepos_state>();
 	/* read the current steering value and update our delta */
-	UINT8 steer_new = input_port_read(device->machine, "STEER");
+	UINT8 steer_new = input_port_read(device->machine(), "STEER");
 	state->steer_accum += (INT8)(steer_new - state->steer_last) * 2;
 	state->steer_last = steer_new;
 
@@ -439,7 +439,7 @@ static READ8_DEVICE_HANDLER( steering_changed_r )
 
 static READ8_DEVICE_HANDLER( steering_delta_r )
 {
-	polepos_state *state = device->machine->driver_data<polepos_state>();
+	polepos_state *state = device->machine().driver_data<polepos_state>();
 	return state->steer_delta;
 }
 
@@ -458,7 +458,7 @@ static const namco_53xx_interface namco_53xx_intf =
 
 static MACHINE_RESET( polepos )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -466,8 +466,8 @@ static MACHINE_RESET( polepos )
 		polepos_latch_w(space, i, 0);
 
 	/* set the interrupt vectors (this shouldn't be needed) */
-	device_set_input_line_vector(machine->device("sub"), 0, Z8000_NVI);
-	device_set_input_line_vector(machine->device("sub2"), 0, Z8000_NVI);
+	device_set_input_line_vector(machine.device("sub"), 0, Z8000_NVI);
+	device_set_input_line_vector(machine.device("sub2"), 0, Z8000_NVI);
 }
 
 
@@ -1986,15 +1986,15 @@ ROM_END
 static DRIVER_INIT( topracern )
 {
 	/* extra direct mapped inputs read */
-	machine->device("maincpu")->memory().space(AS_IO)->install_read_port(0x02, 0x02, "STEER");
-	machine->device("maincpu")->memory().space(AS_IO)->install_read_port(0x03, 0x03, "IN0");
-	machine->device("maincpu")->memory().space(AS_IO)->install_read_port(0x04, 0x04, "DSWA");
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_port(0x02, 0x02, "STEER");
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_port(0x03, 0x03, "IN0");
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_port(0x04, 0x04, "DSWA");
 }
 
 static DRIVER_INIT( polepos2 )
 {
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4000, 0x5fff, FUNC(polepos2_ic25_r));
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4000, 0x5fff, FUNC(polepos2_ic25_r));
 }
 
 

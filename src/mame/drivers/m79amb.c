@@ -76,13 +76,13 @@ public:
 
 static WRITE8_HANDLER( ramtek_videoram_w )
 {
-	m79amb_state *state = space->machine->driver_data<m79amb_state>();
+	m79amb_state *state = space->machine().driver_data<m79amb_state>();
 	state->videoram[offset] = data & ~*state->mask;
 }
 
 static SCREEN_UPDATE( ramtek )
 {
-	m79amb_state *state = screen->machine->driver_data<m79amb_state>();
+	m79amb_state *state = screen->machine().driver_data<m79amb_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x2000; offs++)
@@ -109,18 +109,18 @@ static SCREEN_UPDATE( ramtek )
 
 static READ8_HANDLER( gray5bit_controller0_r )
 {
-	m79amb_state *state = space->machine->driver_data<m79amb_state>();
-	UINT8 port_data = input_port_read(space->machine, "8004");
-	UINT8 gun_pos = input_port_read(space->machine, "GUN1");
+	m79amb_state *state = space->machine().driver_data<m79amb_state>();
+	UINT8 port_data = input_port_read(space->machine(), "8004");
+	UINT8 gun_pos = input_port_read(space->machine(), "GUN1");
 
 	return (port_data & 0xe0) | state->lut_gun1[gun_pos];
 }
 
 static READ8_HANDLER( gray5bit_controller1_r )
 {
-	m79amb_state *state = space->machine->driver_data<m79amb_state>();
-	UINT8 port_data = input_port_read(space->machine, "8005");
-	UINT8 gun_pos = input_port_read(space->machine, "GUN2");
+	m79amb_state *state = space->machine().driver_data<m79amb_state>();
+	UINT8 port_data = input_port_read(space->machine(), "8005");
+	UINT8 gun_pos = input_port_read(space->machine(), "GUN2");
 
 	return (port_data & 0xe0) | state->lut_gun2[gun_pos];
 }
@@ -287,8 +287,8 @@ static const UINT8 lut_pos[0x20] = {
 
 static DRIVER_INIT( m79amb )
 {
-	m79amb_state *state = machine->driver_data<m79amb_state>();
-	UINT8 *rom = machine->region("maincpu")->base();
+	m79amb_state *state = machine.driver_data<m79amb_state>();
+	UINT8 *rom = machine.region("maincpu")->base();
 	int i, j;
 
 	/* PROM data is active low */

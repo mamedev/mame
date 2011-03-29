@@ -21,7 +21,7 @@ TODO:
 static WRITE8_HANDLER( suprloco_soundport_w )
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	/* spin for a while to let the Z80 read the command (fixes hanging sound in Regulus) */
 	device_spin_until_time(space->cpu, attotime::from_usec(50));
 }
@@ -260,9 +260,9 @@ static DRIVER_INIT( suprloco )
 	int i, j, k, color_source, color_dest;
 	UINT8 *source, *dest, *lookup;
 
-	source = machine->region("gfx1")->base();
+	source = machine.region("gfx1")->base();
 	dest   = source + 0x6000;
-	lookup = machine->region("proms")->base() + 0x0200;
+	lookup = machine.region("proms")->base() + 0x0200;
 
 	for (i = 0; i < 0x80; i++, lookup += 8)
 	{

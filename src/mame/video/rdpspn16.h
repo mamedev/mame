@@ -35,7 +35,7 @@ class Span
 		Span() { }
 
 		void	Dump();
-		void	SetMachine(running_machine* machine);
+		void	SetMachine(running_machine& machine);
 
 		void	Draw1Cycle(int index, int tilenum, bool flip);
 		void	Draw2Cycle(int index, int tilenum, bool flip);

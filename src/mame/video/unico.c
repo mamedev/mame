@@ -54,10 +54,10 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 WRITE16_HANDLER( unico_palette_w )
 {
 	UINT16 data1, data2;
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	data1 = space->machine->generic.paletteram.u16[offset & ~1];
-	data2 = space->machine->generic.paletteram.u16[offset |  1];
-	palette_set_color_rgb( space->machine,offset/2,
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	data1 = space->machine().generic.paletteram.u16[offset & ~1];
+	data2 = space->machine().generic.paletteram.u16[offset |  1];
+	palette_set_color_rgb( space->machine(),offset/2,
 		 (data1 >> 8) & 0xFC,
 		 (data1 >> 0) & 0xFC,
 		 (data2 >> 8) & 0xFC	);
@@ -65,8 +65,8 @@ WRITE16_HANDLER( unico_palette_w )
 
 WRITE32_HANDLER( unico_palette32_w )
 {
-	UINT32 rgb0 = COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
-	palette_set_color_rgb( space->machine,offset,
+	UINT32 rgb0 = COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	palette_set_color_rgb( space->machine(),offset,
 		 (rgb0 >> 24) & 0xFC,
 		 (rgb0 >> 16) & 0xFC,
 		 (rgb0 >>  8) & 0xFC	);
@@ -106,7 +106,7 @@ static TILE_GET_INFO( get_tile_info32 )
 
 WRITE16_HANDLER( unico_vram_w )
 {
-	unico_state *state = space->machine->driver_data<unico_state>();
+	unico_state *state = space->machine().driver_data<unico_state>();
 	UINT16 *vram = state->vram;
 	int tile = ((offset / 0x2000) + 1) % 3;
 	COMBINE_DATA(&vram[offset]);
@@ -115,7 +115,7 @@ WRITE16_HANDLER( unico_vram_w )
 
 WRITE32_HANDLER( unico_vram32_w )
 {
-	unico_state *state = space->machine->driver_data<unico_state>();
+	unico_state *state = space->machine().driver_data<unico_state>();
 	UINT32 *vram = state->vram32;
 	int tile = ((offset / 0x1000) + 1) % 3;
 	COMBINE_DATA(&vram[offset]);
@@ -135,7 +135,7 @@ WRITE32_HANDLER( unico_vram32_w )
 
 VIDEO_START( unico )
 {
-	unico_state *state = machine->driver_data<unico_state>();
+	unico_state *state = machine.driver_data<unico_state>();
 	state->tilemap[0] = tilemap_create(	machine, get_tile_info,tilemap_scan_rows,
 									16,16,	0x40, 0x40);
 
@@ -167,7 +167,7 @@ VIDEO_START( unico )
 
 VIDEO_START( zeropnt2 )
 {
-	unico_state *state = machine->driver_data<unico_state>();
+	unico_state *state = machine.driver_data<unico_state>();
 	state->tilemap[0] = tilemap_create(	machine, get_tile_info32,tilemap_scan_rows,
 									16,16,	0x40, 0x40);
 
@@ -221,9 +221,9 @@ VIDEO_START( zeropnt2 )
 
 ***************************************************************************/
 
-static void unico_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void unico_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	unico_state *state = machine->driver_data<unico_state>();
+	unico_state *state = machine.driver_data<unico_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
@@ -265,20 +265,20 @@ static void unico_draw_sprites(running_machine *machine, bitmap_t *bitmap,const 
 
 		for (x = startx ; x != endx ; x += incx)
 		{
-			pdrawgfx_transpen(	bitmap, cliprect, machine->gfx[0],
+			pdrawgfx_transpen(	bitmap, cliprect, machine.gfx[0],
 						code++,
 						attr & 0x1f,
 						flipx, flipy,
 						x, sy,
-						machine->priority_bitmap,
+						machine.priority_bitmap,
 						pri_mask,0x00	);
 		}
 	}
 }
 
-static void zeropnt2_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void zeropnt2_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	unico_state *state = machine->driver_data<unico_state>();
+	unico_state *state = machine.driver_data<unico_state>();
 	UINT32 *spriteram32 = (UINT32 *)state->spriteram;
 	int offs;
 
@@ -320,12 +320,12 @@ static void zeropnt2_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 		for (x = startx ; x != endx ; x += incx)
 		{
-			pdrawgfx_transpen(	bitmap, cliprect, machine->gfx[0],
+			pdrawgfx_transpen(	bitmap, cliprect, machine.gfx[0],
 						code++,
 						attr & 0x1f,
 						flipx, flipy,
 						x, sy,
-						machine->priority_bitmap,
+						machine.priority_bitmap,
 						pri_mask,0x00	);
 		}
 	}
@@ -343,7 +343,7 @@ static void zeropnt2_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 SCREEN_UPDATE( unico )
 {
-	unico_state *state = screen->machine->driver_data<unico_state>();
+	unico_state *state = screen->machine().driver_data<unico_state>();
 	int layers_ctrl = -1;
 
 	tilemap_set_scrollx(state->tilemap[0], 0, state->scroll[0x00]);
@@ -356,34 +356,34 @@ SCREEN_UPDATE( unico )
 	tilemap_set_scrolly(state->tilemap[2], 0, state->scroll[0x02]);
 
 #ifdef MAME_DEBUG
-if ( input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen->machine, KEYCODE_X) )
+if ( input_code_pressed(screen->machine(), KEYCODE_Z) || input_code_pressed(screen->machine(), KEYCODE_X) )
 {
 	int msk = 0;
-	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
-	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
-	if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 4;
-	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 8;
+	if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1;
+	if (input_code_pressed(screen->machine(), KEYCODE_W))	msk |= 2;
+	if (input_code_pressed(screen->machine(), KEYCODE_E))	msk |= 4;
+	if (input_code_pressed(screen->machine(), KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
 	/* The background color is the first of the last palette */
 	bitmap_fill(bitmap,cliprect,0x1f00);
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,state->tilemap[0],0,1);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,state->tilemap[1],0,2);
 	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,state->tilemap[2],0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
-	if (layers_ctrl & 8)	unico_draw_sprites(screen->machine, bitmap,cliprect);
+	if (layers_ctrl & 8)	unico_draw_sprites(screen->machine(), bitmap,cliprect);
 
 	return 0;
 }
 
 SCREEN_UPDATE( zeropnt2 )
 {
-	unico_state *state = screen->machine->driver_data<unico_state>();
+	unico_state *state = screen->machine().driver_data<unico_state>();
 	int layers_ctrl = -1;
 
 	tilemap_set_scrollx(state->tilemap[0], 0, state->scroll32[0] >> 16);
@@ -396,27 +396,27 @@ SCREEN_UPDATE( zeropnt2 )
 	tilemap_set_scrolly(state->tilemap[2], 0, state->scroll32[1] >> 16);
 
 #ifdef MAME_DEBUG
-if ( input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen->machine, KEYCODE_X) )
+if ( input_code_pressed(screen->machine(), KEYCODE_Z) || input_code_pressed(screen->machine(), KEYCODE_X) )
 {
 	int msk = 0;
-	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
-	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
-	if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 4;
-	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 8;
+	if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1;
+	if (input_code_pressed(screen->machine(), KEYCODE_W))	msk |= 2;
+	if (input_code_pressed(screen->machine(), KEYCODE_E))	msk |= 4;
+	if (input_code_pressed(screen->machine(), KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
 	/* The background color is the first of the last palette */
 	bitmap_fill(bitmap,cliprect,0x1f00);
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,state->tilemap[0],0,1);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,state->tilemap[1],0,2);
 	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,state->tilemap[2],0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
-	if (layers_ctrl & 8)	zeropnt2_draw_sprites(screen->machine, bitmap,cliprect);
+	if (layers_ctrl & 8)	zeropnt2_draw_sprites(screen->machine(), bitmap,cliprect);
 
 	return 0;
 }

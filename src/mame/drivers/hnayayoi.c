@@ -42,7 +42,7 @@ TODO:
 
 static READ8_HANDLER( keyboard_0_r )
 {
-	hnayayoi_state *state = space->machine->driver_data<hnayayoi_state>();
+	hnayayoi_state *state = space->machine().driver_data<hnayayoi_state>();
 	int res = 0x3f;
 	int i;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
@@ -50,7 +50,7 @@ static READ8_HANDLER( keyboard_0_r )
 	for (i = 0; i < 5; i++)
 	{
 		if (~state->keyb & (1 << i))
-			res &= input_port_read(space->machine, keynames[i]);
+			res &= input_port_read(space->machine(), keynames[i]);
 	}
 
 	return res;
@@ -64,7 +64,7 @@ static READ8_HANDLER( keyboard_1_r )
 
 static WRITE8_HANDLER( keyboard_w )
 {
-	hnayayoi_state *state = space->machine->driver_data<hnayayoi_state>();
+	hnayayoi_state *state = space->machine().driver_data<hnayayoi_state>();
 	state->keyb = data;
 }
 
@@ -503,7 +503,7 @@ INPUT_PORTS_END
 static void irqhandler(device_t *device, int irq)
 {
 	popmessage("irq");
-//  cputag_set_input_line(device->machine, "maincpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+//  cputag_set_input_line(device->machine(), "maincpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -530,7 +530,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( hnayayoi )
 {
-	hnayayoi_state *state = machine->driver_data<hnayayoi_state>();
+	hnayayoi_state *state = machine.driver_data<hnayayoi_state>();
 
 	state->save_item(NAME(state->palbank));
 	state->save_item(NAME(state->blit_layer));
@@ -541,10 +541,10 @@ static MACHINE_START( hnayayoi )
 
 static MACHINE_RESET( hnayayoi )
 {
-	hnayayoi_state *state = machine->driver_data<hnayayoi_state>();
+	hnayayoi_state *state = machine.driver_data<hnayayoi_state>();
 
 	/* start with the MSM5205 reset */
-	msm5205_reset_w(machine->device("msm"), 1);
+	msm5205_reset_w(machine.device("msm"), 1);
 
 	state->palbank = 0;
 	state->blit_layer = 0;
@@ -677,8 +677,8 @@ ROM_END
 
 static DRIVER_INIT( hnfubuki )
 {
-	UINT8 *rom = machine->region("gfx1")->base();
-	int len = machine->region("gfx1")->bytes();
+	UINT8 *rom = machine.region("gfx1")->base();
+	int len = machine.region("gfx1")->bytes();
 	int i, j;
 
 	/* interestingly, the blitter data has a slight encryption */

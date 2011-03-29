@@ -128,8 +128,8 @@ public:
 static PALETTE_INIT( royalmah )
 {
 	offs_t i;
-	const UINT8 *prom = machine->region("proms")->base();
-	int len = machine->region("proms")->bytes();
+	const UINT8 *prom = machine.region("proms")->base();
+	int len = machine.region("proms")->bytes();
 
 	for (i = 0; i < len; i++)
 	{
@@ -163,8 +163,8 @@ static PALETTE_INIT( royalmah )
 static PALETTE_INIT( mjderngr )
 {
 	offs_t i;
-	const UINT8 *prom = machine->region("proms")->base();
-	int len = machine->region("proms")->bytes();
+	const UINT8 *prom = machine.region("proms")->base();
+	int len = machine.region("proms")->bytes();
 
 	for (i = 0; i < len / 2; i++)
 	{
@@ -182,9 +182,9 @@ static PALETTE_INIT( mjderngr )
 
 static WRITE8_HANDLER( royalmah_palbank_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	/* bit 1 = coin counter */
-	coin_counter_w(space->machine, 0,data & 2);
+	coin_counter_w(space->machine(), 0,data & 2);
 
 	/* bit 2 always set? */
 
@@ -196,7 +196,7 @@ static WRITE8_HANDLER( royalmah_palbank_w )
 static WRITE8_HANDLER( mjderngr_coin_w )
 {
 	/* bit 1 = coin counter */
-	coin_counter_w(space->machine, 0,data & 2);
+	coin_counter_w(space->machine(), 0,data & 2);
 
 	/* bit 2 always set? */
 }
@@ -204,14 +204,14 @@ static WRITE8_HANDLER( mjderngr_coin_w )
 
 static WRITE8_HANDLER( mjderngr_palbank_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->palette_base = data;
 }
 
 
 static SCREEN_UPDATE( royalmah )
 {
-	royalmah_state *state = screen->machine->driver_data<royalmah_state>();
+	royalmah_state *state = screen->machine().driver_data<royalmah_state>();
 	UINT8 *videoram = state->videoram;
 
 	offs_t offs;
@@ -254,34 +254,34 @@ static WRITE8_HANDLER( royalmah_rom_w )
 
 static WRITE8_HANDLER( input_port_select_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->input_port_select = data;
 }
 
 static READ8_DEVICE_HANDLER( royalmah_player_1_port_r )
 {
-	royalmah_state *state = device->machine->driver_data<royalmah_state>();
-	int ret = (input_port_read(device->machine, "KEY0") & 0xc0) | 0x3f;
+	royalmah_state *state = device->machine().driver_data<royalmah_state>();
+	int ret = (input_port_read(device->machine(), "KEY0") & 0xc0) | 0x3f;
 
-	if ((state->input_port_select & 0x01) == 0)  ret &= input_port_read(device->machine, "KEY0");
-	if ((state->input_port_select & 0x02) == 0)  ret &= input_port_read(device->machine, "KEY1");
-	if ((state->input_port_select & 0x04) == 0)  ret &= input_port_read(device->machine, "KEY2");
-	if ((state->input_port_select & 0x08) == 0)  ret &= input_port_read(device->machine, "KEY3");
-	if ((state->input_port_select & 0x10) == 0)  ret &= input_port_read(device->machine, "KEY4");
+	if ((state->input_port_select & 0x01) == 0)  ret &= input_port_read(device->machine(), "KEY0");
+	if ((state->input_port_select & 0x02) == 0)  ret &= input_port_read(device->machine(), "KEY1");
+	if ((state->input_port_select & 0x04) == 0)  ret &= input_port_read(device->machine(), "KEY2");
+	if ((state->input_port_select & 0x08) == 0)  ret &= input_port_read(device->machine(), "KEY3");
+	if ((state->input_port_select & 0x10) == 0)  ret &= input_port_read(device->machine(), "KEY4");
 
 	return ret;
 }
 
 static READ8_DEVICE_HANDLER( royalmah_player_2_port_r )
 {
-	royalmah_state *state = device->machine->driver_data<royalmah_state>();
-	int ret = (input_port_read(device->machine, "KEY5") & 0xc0) | 0x3f;
+	royalmah_state *state = device->machine().driver_data<royalmah_state>();
+	int ret = (input_port_read(device->machine(), "KEY5") & 0xc0) | 0x3f;
 
-	if ((state->input_port_select & 0x01) == 0)  ret &= input_port_read(device->machine, "KEY5");
-	if ((state->input_port_select & 0x02) == 0)  ret &= input_port_read(device->machine, "KEY6");
-	if ((state->input_port_select & 0x04) == 0)  ret &= input_port_read(device->machine, "KEY7");
-	if ((state->input_port_select & 0x08) == 0)  ret &= input_port_read(device->machine, "KEY8");
-	if ((state->input_port_select & 0x10) == 0)  ret &= input_port_read(device->machine, "KEY9");
+	if ((state->input_port_select & 0x01) == 0)  ret &= input_port_read(device->machine(), "KEY5");
+	if ((state->input_port_select & 0x02) == 0)  ret &= input_port_read(device->machine(), "KEY6");
+	if ((state->input_port_select & 0x04) == 0)  ret &= input_port_read(device->machine(), "KEY7");
+	if ((state->input_port_select & 0x08) == 0)  ret &= input_port_read(device->machine(), "KEY8");
+	if ((state->input_port_select & 0x10) == 0)  ret &= input_port_read(device->machine(), "KEY9");
 
 	return ret;
 }
@@ -290,12 +290,12 @@ static READ8_DEVICE_HANDLER( royalmah_player_2_port_r )
 
 static READ8_HANDLER ( majs101b_dsw_r )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	switch (state->dsw_select)
 	{
-		case 0x00: return input_port_read(space->machine, "DSW3");	/* DSW3 */
-		case 0x20: return input_port_read(space->machine, "DSW4");	/* DSW4 */
-		case 0x40: return input_port_read(space->machine, "DSW2");	/* DSW2 */
+		case 0x00: return input_port_read(space->machine(), "DSW3");	/* DSW3 */
+		case 0x20: return input_port_read(space->machine(), "DSW4");	/* DSW4 */
+		case 0x40: return input_port_read(space->machine(), "DSW2");	/* DSW2 */
 	}
 	return 0;
 }
@@ -304,7 +304,7 @@ static READ8_HANDLER ( majs101b_dsw_r )
 
 static READ8_HANDLER ( suzume_dsw_r )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	if (state->suzume_bank & 0x40)
 	{
 		return state->suzume_bank;
@@ -313,9 +313,9 @@ static READ8_HANDLER ( suzume_dsw_r )
 	{
 		switch (state->suzume_bank)
 		{
-			case 0x08: return input_port_read(space->machine, "DSW4");	/* DSW4 */
-			case 0x10: return input_port_read(space->machine, "DSW3");	/* DSW3 */
-			case 0x18: return input_port_read(space->machine, "DSW2");	/* DSW2 */
+			case 0x08: return input_port_read(space->machine(), "DSW4");	/* DSW4 */
+			case 0x10: return input_port_read(space->machine(), "DSW3");	/* DSW3 */
+			case 0x18: return input_port_read(space->machine(), "DSW2");	/* DSW2 */
 		}
 		return 0;
 	}
@@ -323,8 +323,8 @@ static READ8_HANDLER ( suzume_dsw_r )
 
 static WRITE8_HANDLER ( suzume_bank_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
-	UINT8 *rom = space->machine->region("maincpu")->base();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
+	UINT8 *rom = space->machine().region("maincpu")->base();
 	int address;
 
 	state->suzume_bank = data;
@@ -334,37 +334,37 @@ logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
 	/* bits 6, 4 and 3 used for something input related? */
 
 	address = 0x10000 + (data & 0x07) * 0x8000;
-	memory_set_bankptr(space->machine, "bank1",&rom[address]);
+	memory_set_bankptr(space->machine(), "bank1",&rom[address]);
 }
 
 
 static WRITE8_HANDLER ( mjapinky_bank_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
-	UINT8 *ROM = space->machine->region("maincpu")->base();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
+	UINT8 *ROM = space->machine().region("maincpu")->base();
 	state->rombank = data;
-	memory_set_bankptr(space->machine, "bank1",ROM + 0x10000 + 0x8000 * data);
+	memory_set_bankptr(space->machine(), "bank1",ROM + 0x10000 + 0x8000 * data);
 }
 
 static WRITE8_HANDLER( mjapinky_palbank_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
-	flip_screen_set(space->machine, ~data & 4);
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
+	flip_screen_set(space->machine(), ~data & 4);
 	state->palette_base = (data >> 3) & 0x01;
-	coin_counter_w(space->machine, 0,data & 2);	// in
-	coin_counter_w(space->machine, 1,data & 1);	// out
+	coin_counter_w(space->machine(), 0,data & 2);	// in
+	coin_counter_w(space->machine(), 1,data & 1);	// out
 }
 
 static READ8_HANDLER( mjapinky_dsw_r )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
-	if (state->rombank == 0x0e)	return input_port_read(space->machine, "DSW3");
-	else					return *(space->machine->region("maincpu")->base() + 0x10000 + 0x8000 * state->rombank);
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
+	if (state->rombank == 0x0e)	return input_port_read(space->machine(), "DSW3");
+	else					return *(space->machine().region("maincpu")->base() + 0x10000 + 0x8000 * state->rombank);
 }
 
 static WRITE8_HANDLER ( tontonb_bank_w )
 {
-	UINT8 *rom = space->machine->region("maincpu")->base();
+	UINT8 *rom = space->machine().region("maincpu")->base();
 	int address;
 
 logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
@@ -375,15 +375,15 @@ logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
 
 	address = 0x10000 + data * 0x8000;
 
-	memory_set_bankptr(space->machine, "bank1",&rom[address]);
+	memory_set_bankptr(space->machine(), "bank1",&rom[address]);
 }
 
 
 /* bits 5 and 6 seem to affect which Dip Switch to read in 'majs101b' */
 static WRITE8_HANDLER ( dynax_bank_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
-	UINT8 *rom = space->machine->region("maincpu")->base();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
+	UINT8 *rom = space->machine().region("maincpu")->base();
 	int address;
 
 //logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
@@ -394,18 +394,18 @@ static WRITE8_HANDLER ( dynax_bank_w )
 
 	address = 0x10000 + data * 0x8000;
 
-	memory_set_bankptr(space->machine, "bank1",&rom[address]);
+	memory_set_bankptr(space->machine(), "bank1",&rom[address]);
 }
 
 static READ8_HANDLER ( daisyari_dsw_r )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	switch (state->dsw_select)
 	{
-		case 0x00: return input_port_read(space->machine, "DSW4");
-		case 0x04: return input_port_read(space->machine, "DSW1");
-		case 0x08: return input_port_read(space->machine, "DSW2");
-		case 0x0c: return input_port_read(space->machine, "DSW3");
+		case 0x00: return input_port_read(space->machine(), "DSW4");
+		case 0x04: return input_port_read(space->machine(), "DSW1");
+		case 0x08: return input_port_read(space->machine(), "DSW2");
+		case 0x0c: return input_port_read(space->machine(), "DSW3");
 	}
 
 	return 0;
@@ -413,8 +413,8 @@ static READ8_HANDLER ( daisyari_dsw_r )
 
 static WRITE8_HANDLER ( daisyari_bank_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
-	UINT8 *rom = space->machine->region("maincpu")->base();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
+	UINT8 *rom = space->machine().region("maincpu")->base();
 	int address;
 
 	state->dsw_select = (data & 0xc);
@@ -422,20 +422,20 @@ static WRITE8_HANDLER ( daisyari_bank_w )
 	address = 0x10000 + ((data & 0x30)>>4) * 0x10000 + (data & 0x1) * 0x8000;
 //  printf("%08x %02x\n",address,data);
 
-	memory_set_bankptr(space->machine, "bank1",&rom[address]);
+	memory_set_bankptr(space->machine(), "bank1",&rom[address]);
 
 	/* bit 1 used too but unknown purpose. */
 }
 
 static READ8_HANDLER ( mjclub_dsw_r )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	switch (state->dsw_select)
 	{
-//      case 0x00: return input_port_read(space->machine, "DSW4");
-		case 0x40: return input_port_read(space->machine, "DSW2");
-		case 0x80: return input_port_read(space->machine, "DSW3");
-		case 0xc0: return input_port_read(space->machine, "DSW4");
+//      case 0x00: return input_port_read(space->machine(), "DSW4");
+		case 0x40: return input_port_read(space->machine(), "DSW2");
+		case 0x80: return input_port_read(space->machine(), "DSW3");
+		case 0xc0: return input_port_read(space->machine(), "DSW4");
 	}
 
 	return 0;
@@ -443,8 +443,8 @@ static READ8_HANDLER ( mjclub_dsw_r )
 
 static WRITE8_HANDLER ( mjclub_bank_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
-	UINT8 *rom = space->machine->region("maincpu")->base();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
+	UINT8 *rom = space->machine().region("maincpu")->base();
 	int address;
 
 	state->dsw_select = data & 0xc0;
@@ -454,7 +454,7 @@ static WRITE8_HANDLER ( mjclub_bank_w )
 	address = 0x10000 + data * 0x8000;
 //  printf("%08x\n",address);
 
-	memory_set_bankptr(space->machine, "bank1",&rom[address]);
+	memory_set_bankptr(space->machine(), "bank1",&rom[address]);
 
 	/* bit 5 used too but unknown purpose. */
 }
@@ -633,18 +633,18 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( jansou_dsw_sel_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->dsw_select = data;
 }
 
 static READ8_HANDLER( jansou_dsw_r )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	switch (state->dsw_select & 7)
 	{
-		case 1: return input_port_read(space->machine, "DSW1");
-		case 2: return input_port_read(space->machine, "DSW2");
-		case 4: return input_port_read(space->machine, "DSW3");
+		case 1: return input_port_read(space->machine(), "DSW1");
+		case 2: return input_port_read(space->machine(), "DSW2");
+		case 4: return input_port_read(space->machine(), "DSW3");
 	}
 
 	return 0xff;
@@ -652,35 +652,35 @@ static READ8_HANDLER( jansou_dsw_r )
 
 static WRITE8_HANDLER( jansou_colortable_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->jansou_colortable[offset] = data;
 }
 
 static WRITE8_HANDLER( jansou_6400_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->gfx_adr_l = data;
 	state->gfx_adr = state->gfx_adr_h*0x10000 + state->gfx_adr_m*0x100 + state->gfx_adr_l;
 }
 
 static WRITE8_HANDLER( jansou_6401_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->gfx_adr_m = data;
 	state->gfx_adr = state->gfx_adr_h*0x10000 + state->gfx_adr_m*0x100 + state->gfx_adr_l;
 }
 
 static WRITE8_HANDLER( jansou_6402_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->gfx_adr_h = data & 1;
 	state->gfx_adr = state->gfx_adr_h*0x10000 + state->gfx_adr_m*0x100 + state->gfx_adr_l;
 }
 
 static READ8_HANDLER( jansou_6403_r )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
-	UINT8 *GFXROM = space->machine->region("gfx1")->base();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
+	UINT8 *GFXROM = space->machine().region("gfx1")->base();
 	int d0 = GFXROM[state->gfx_adr];
 	int d1 = GFXROM[state->gfx_adr+1];
 	int c0 = state->jansou_colortable[d1 & 0x0f] & 0x0f;
@@ -700,20 +700,20 @@ static READ8_HANDLER( jansou_6403_r )
 
 static READ8_HANDLER( jansou_6404_r )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	return state->gfxdata0;
 }
 
 static READ8_HANDLER( jansou_6405_r )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	return state->gfxdata1;
 }
 
 static WRITE8_HANDLER( jansou_sound_w )
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -761,7 +761,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( janptr96_dswsel_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	// 0x20 = 0 -> hopper on
 	// 0x40 ?
 	state->dsw_select = data;
@@ -769,31 +769,31 @@ static WRITE8_HANDLER( janptr96_dswsel_w )
 
 static READ8_HANDLER( janptr96_dswsel_r )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	return state->dsw_select;
 }
 
 static READ8_HANDLER( janptr96_dsw_r )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
-	if (~state->dsw_select & 0x01) return input_port_read(space->machine, "DSW4");
-	if (~state->dsw_select & 0x02) return input_port_read(space->machine, "DSW3");
-	if (~state->dsw_select & 0x04) return input_port_read(space->machine, "DSW2");
-	if (~state->dsw_select & 0x08) return input_port_read(space->machine, "DSW1");
-	if (~state->dsw_select & 0x10) return input_port_read(space->machine, "DSWTOP");
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
+	if (~state->dsw_select & 0x01) return input_port_read(space->machine(), "DSW4");
+	if (~state->dsw_select & 0x02) return input_port_read(space->machine(), "DSW3");
+	if (~state->dsw_select & 0x04) return input_port_read(space->machine(), "DSW2");
+	if (~state->dsw_select & 0x08) return input_port_read(space->machine(), "DSW1");
+	if (~state->dsw_select & 0x10) return input_port_read(space->machine(), "DSWTOP");
 	return 0xff;
 }
 
 static WRITE8_HANDLER( janptr96_rombank_w )
 {
-	UINT8 *ROM = space->machine->region("maincpu")->base();
-	memory_set_bankptr(space->machine, "bank1",ROM + 0x10000 + 0x8000 * data);
+	UINT8 *ROM = space->machine().region("maincpu")->base();
+	memory_set_bankptr(space->machine(), "bank1",ROM + 0x10000 + 0x8000 * data);
 }
 
 static WRITE8_HANDLER( janptr96_rambank_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
-	memory_set_bankptr(space->machine, "bank2", state->janptr96_nvram + 0x1000 + 0x1000 * data);
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
+	memory_set_bankptr(space->machine(), "bank2", state->janptr96_nvram + 0x1000 + 0x1000 * data);
 }
 
 static READ8_HANDLER( janptr96_unknown_r )
@@ -804,9 +804,9 @@ static READ8_HANDLER( janptr96_unknown_r )
 
 static WRITE8_HANDLER( janptr96_coin_counter_w )
 {
-	flip_screen_set(space->machine, ~data & 4);
-	coin_counter_w(space->machine, 0,data & 2);	// in
-	coin_counter_w(space->machine, 1,data & 1);	// out
+	flip_screen_set(space->machine(), ~data & 4);
+	coin_counter_w(space->machine(), 0,data & 2);	// in
+	coin_counter_w(space->machine(), 1,data & 1);	// out
 }
 
 static ADDRESS_MAP_START( janptr96_iomap, AS_IO, 8 )
@@ -831,25 +831,25 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mjifb_coin_counter_w )
 {
-	flip_screen_set(space->machine,  data & 4);
-	coin_counter_w(space->machine, 0,data & 2);	// in
-	coin_counter_w(space->machine, 1,data & 1);	// out
+	flip_screen_set(space->machine(),  data & 4);
+	coin_counter_w(space->machine(), 0,data & 2);	// in
+	coin_counter_w(space->machine(), 1,data & 1);	// out
 }
 
 static READ8_HANDLER( mjifb_rom_io_r )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	if (state->mjifb_rom_enable)
-		return ((UINT8*)(space->machine->region("maincpu")->base() + 0x10000 + state->rombank * 0x4000))[offset];
+		return ((UINT8*)(space->machine().region("maincpu")->base() + 0x10000 + state->rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
 	switch(offset)
 	{
-		case 0x8000:	return input_port_read(space->machine, "DSW4");		// dsw 4
-		case 0x8200:	return input_port_read(space->machine, "DSW3");		// dsw 3
-		case 0x9001:	return ay8910_r(space->machine->device("aysnd"), 0);	// inputs
-		case 0x9011:	return input_port_read(space->machine, "SYSTEM");
+		case 0x8000:	return input_port_read(space->machine(), "DSW4");		// dsw 4
+		case 0x8200:	return input_port_read(space->machine(), "DSW3");		// dsw 3
+		case 0x9001:	return ay8910_r(space->machine().device("aysnd"), 0);	// inputs
+		case 0x9011:	return input_port_read(space->machine(), "SYSTEM");
 	}
 
 	logerror("%04X: unmapped input read at %04X\n", cpu_get_pc(space->cpu), offset);
@@ -858,7 +858,7 @@ static READ8_HANDLER( mjifb_rom_io_r )
 
 static WRITE8_HANDLER( mjifb_rom_io_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	UINT8 *videoram = state->videoram;
 	if (state->mjifb_rom_enable)
 	{
@@ -871,8 +871,8 @@ static WRITE8_HANDLER( mjifb_rom_io_w )
 	switch(offset)
 	{
 		case 0x8e00:	state->palette_base = data & 0x1f;	return;
-		case 0x9002:	ay8910_data_w(space->machine->device("aysnd"),0,data);			return;
-		case 0x9003:	ay8910_address_w(space->machine->device("aysnd"),0,data);		return;
+		case 0x9002:	ay8910_data_w(space->machine().device("aysnd"),0,data);			return;
+		case 0x9003:	ay8910_address_w(space->machine().device("aysnd"),0,data);		return;
 		case 0x9010:
 			mjifb_coin_counter_w(space,0,data);
 			return;
@@ -887,7 +887,7 @@ static WRITE8_HANDLER( mjifb_rom_io_w )
 
 static WRITE8_HANDLER( mjifb_videoram_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset + 0x4000] = data;
 }
@@ -902,19 +902,19 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( mjifb_p3_r )
 {
-	return input_port_read(space->machine, "PORT3_5") >> 6;
+	return input_port_read(space->machine(), "PORT3_5") >> 6;
 }
 static READ8_HANDLER( mjifb_p5_r )
 {
-	return input_port_read(space->machine, "PORT3_5");
+	return input_port_read(space->machine(), "PORT3_5");
 }
 static READ8_HANDLER( mjifb_p6_r )
 {
-	return input_port_read(space->machine, "PORT6_7");
+	return input_port_read(space->machine(), "PORT6_7");
 }
 static READ8_HANDLER( mjifb_p7_r )
 {
-	return input_port_read(space->machine, "PORT6_7") >> 4;
+	return input_port_read(space->machine(), "PORT6_7") >> 4;
 }
 static READ8_HANDLER( mjifb_p8_r )
 {
@@ -923,17 +923,17 @@ static READ8_HANDLER( mjifb_p8_r )
 
 static WRITE8_HANDLER( mjifb_p3_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->rombank = (state->rombank & 0x0f) | ((data & 0x0c) << 2);
 }
 static WRITE8_HANDLER( mjifb_p4_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->rombank = (state->rombank & 0xf0) | (data & 0x0f);
 }
 static WRITE8_HANDLER( mjifb_p8_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->mjifb_rom_enable = (data & 0x08);
 }
 
@@ -953,18 +953,18 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( mjdejavu_rom_io_r )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	if (state->mjifb_rom_enable)
-		return ((UINT8*)(space->machine->region("maincpu")->base() + 0x10000 + state->rombank * 0x4000))[offset];
+		return ((UINT8*)(space->machine().region("maincpu")->base() + 0x10000 + state->rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
 	switch(offset)
 	{
-		case 0x8000:	return input_port_read(space->machine, "DSW2");		// dsw 2
-		case 0x8001:	return input_port_read(space->machine, "DSW1");		// dsw 1
-		case 0x9001:	return ay8910_r(space->machine->device("aysnd"), 0);	// inputs
-		case 0x9011:	return input_port_read(space->machine, "SYSTEM");
+		case 0x8000:	return input_port_read(space->machine(), "DSW2");		// dsw 2
+		case 0x8001:	return input_port_read(space->machine(), "DSW1");		// dsw 1
+		case 0x9001:	return ay8910_r(space->machine().device("aysnd"), 0);	// inputs
+		case 0x9011:	return input_port_read(space->machine(), "SYSTEM");
 	}
 
 	logerror("%04X: unmapped input read at %04X\n", cpu_get_pc(space->cpu), offset);
@@ -973,7 +973,7 @@ static READ8_HANDLER( mjdejavu_rom_io_r )
 
 static WRITE8_HANDLER( mjdejavu_rom_io_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	UINT8 *videoram = state->videoram;
 	if (state->mjifb_rom_enable)
 	{
@@ -985,8 +985,8 @@ static WRITE8_HANDLER( mjdejavu_rom_io_w )
 	switch(offset)
 	{
 		case 0x8802:	state->palette_base = data & 0x1f;					return;
-		case 0x9002:	ay8910_data_w(space->machine->device("aysnd"),0,data);		return;
-		case 0x9003:	ay8910_address_w(space->machine->device("aysnd"),0,data);	return;
+		case 0x9002:	ay8910_data_w(space->machine().device("aysnd"),0,data);		return;
+		case 0x9003:	ay8910_address_w(space->machine().device("aysnd"),0,data);	return;
 		case 0x9010:	mjifb_coin_counter_w(space,0,data);		return;
 		case 0x9011:	input_port_select_w(space,0,data);		return;
 		case 0x9013:
@@ -1014,22 +1014,22 @@ static READ8_HANDLER( mjtensin_p3_r )
 	return 0xff;
 }
 
-static void mjtensin_update_rombank(running_machine *machine)
+static void mjtensin_update_rombank(running_machine &machine)
 {
-	royalmah_state *state = machine->driver_data<royalmah_state>();
-	memory_set_bankptr(machine,  "bank1", machine->region("maincpu")->base() + 0x10000 + state->rombank * 0x8000 );
+	royalmah_state *state = machine.driver_data<royalmah_state>();
+	memory_set_bankptr(machine,  "bank1", machine.region("maincpu")->base() + 0x10000 + state->rombank * 0x8000 );
 }
 static WRITE8_HANDLER( mjtensin_p4_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->rombank = (state->rombank & 0xf0) | (data & 0x0f);
-	mjtensin_update_rombank(space->machine);
+	mjtensin_update_rombank(space->machine());
 }
 static WRITE8_HANDLER( mjtensin_6ff3_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->rombank = (data << 4) | (state->rombank & 0x0f);
-	mjtensin_update_rombank(space->machine);
+	mjtensin_update_rombank(space->machine());
 }
 
 static ADDRESS_MAP_START( mjtensin_map, AS_PROGRAM, 8 )
@@ -1058,39 +1058,39 @@ ADDRESS_MAP_END
                                 Mahjong Cafe Time
 ****************************************************************************/
 
-static void cafetime_update_rombank(running_machine *machine)
+static void cafetime_update_rombank(running_machine &machine)
 {
-	royalmah_state *state = machine->driver_data<royalmah_state>();
-	memory_set_bankptr(machine,  "bank1", machine->region("maincpu")->base() + 0x10000 + state->rombank * 0x8000 );
+	royalmah_state *state = machine.driver_data<royalmah_state>();
+	memory_set_bankptr(machine,  "bank1", machine.region("maincpu")->base() + 0x10000 + state->rombank * 0x8000 );
 }
 static WRITE8_HANDLER( cafetime_p4_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->rombank = (state->rombank & 0xf0) | (data & 0x0f);
-	cafetime_update_rombank(space->machine);
+	cafetime_update_rombank(space->machine());
 }
 static WRITE8_HANDLER( cafetime_p3_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->rombank = (state->rombank & 0x0f) | ((data & 0x0c) << 2);
-	cafetime_update_rombank(space->machine);
+	cafetime_update_rombank(space->machine());
 }
 
 static WRITE8_HANDLER( cafetime_dsw_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->dsw_select = data;
 }
 static READ8_HANDLER( cafetime_dsw_r )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	switch( state->dsw_select )
 	{
-		case 0x00: return input_port_read(space->machine, "DSW1");
-		case 0x01: return input_port_read(space->machine, "DSW2");
-		case 0x02: return input_port_read(space->machine, "DSW3");
-		case 0x03: return input_port_read(space->machine, "DSW4");
-		case 0x04: return input_port_read(space->machine, "DSWTOP");
+		case 0x00: return input_port_read(space->machine(), "DSW1");
+		case 0x01: return input_port_read(space->machine(), "DSW2");
+		case 0x02: return input_port_read(space->machine(), "DSW3");
+		case 0x03: return input_port_read(space->machine(), "DSW4");
+		case 0x04: return input_port_read(space->machine(), "DSWTOP");
 	}
 	logerror("%04X: unmapped dsw read %02X\n", cpu_get_pc(space->cpu), state->dsw_select);
 	return 0xff;
@@ -1136,25 +1136,25 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mjvegasa_p4_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->rombank = (state->rombank & 0xf8) | ((data & 0x0e) >> 1);
 }
 static WRITE8_HANDLER( mjvegasa_p3_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->rombank = (state->rombank & 0xf7) | ((data & 0x04) << 1);
 }
 static WRITE8_HANDLER( mjvegasa_rombank_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	state->rombank = (state->rombank & 0x0f) | ((data & 0x0f) << 4);
 }
 
 static READ8_HANDLER( mjvegasa_rom_io_r )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	if ((state->rombank & 0x70) != 0x70)
-		return space->machine->region("maincpu")->base()[0x10000 + state->rombank * 0x8000 + offset];
+		return space->machine().region("maincpu")->base()[0x10000 + state->rombank * 0x8000 + offset];
 
 	offset += 0x8000;
 
@@ -1177,7 +1177,7 @@ static READ8_HANDLER( mjvegasa_rom_io_r )
 		case 0x800e:
 		case 0x800f:
 		{
-			device_t *rtc = space->machine->device("rtc");
+			device_t *rtc = space->machine().device("rtc");
 			return msm6242_r(rtc, offset-0x8000);
 		}
 	}
@@ -1187,7 +1187,7 @@ static READ8_HANDLER( mjvegasa_rom_io_r )
 
 static WRITE8_HANDLER( mjvegasa_rom_io_w )
 {
-	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	royalmah_state *state = space->machine().driver_data<royalmah_state>();
 	UINT8 *videoram = state->videoram;
 	if ((state->rombank & 0x70) != 0x70)
 	{
@@ -1216,7 +1216,7 @@ static WRITE8_HANDLER( mjvegasa_rom_io_w )
 		case 0x800e:
 		case 0x800f:
 		{
-			device_t *rtc = space->machine->device("rtc");
+			device_t *rtc = space->machine().device("rtc");
 			msm6242_w(rtc, offset-0x8000, data);
 			return;
 		}
@@ -1226,9 +1226,9 @@ static WRITE8_HANDLER( mjvegasa_rom_io_w )
 
 static WRITE8_HANDLER( mjvegasa_coin_counter_w )
 {
-	flip_screen_set(space->machine,  data & 4);
-	coin_counter_w(space->machine, 0,data & 2);	// in
-	coin_counter_w(space->machine, 1,data & 1);	// out
+	flip_screen_set(space->machine(),  data & 4);
+	coin_counter_w(space->machine(), 0,data & 2);	// in
+	coin_counter_w(space->machine(), 1,data & 1);	// out
 }
 
 // hopper?
@@ -3254,7 +3254,7 @@ MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( suzume_irq )
 {
-	royalmah_state *state = device->machine->driver_data<royalmah_state>();
+	royalmah_state *state = device->machine().driver_data<royalmah_state>();
 	if ( state->suzume_bank & 0x40 )
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -4693,14 +4693,14 @@ ROM_START( jansoua )
 ROM_END
 
 
-static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x8000 );	}
+static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x8000 );	}
 
 static DRIVER_INIT( janptr96 )
 {
-	royalmah_state *state = machine->driver_data<royalmah_state>();
+	royalmah_state *state = machine.driver_data<royalmah_state>();
 	state->janptr96_nvram = auto_alloc_array(machine, UINT8, 0x1000 * 9);
 	memory_set_bankptr(machine, "bank3", state->janptr96_nvram);
-	machine->device<nvram_device>("nvram")->set_base(state->janptr96_nvram, 0x1000 * 9);
+	machine.device<nvram_device>("nvram")->set_base(state->janptr96_nvram, 0x1000 * 9);
 }
 
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, 0,        ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )

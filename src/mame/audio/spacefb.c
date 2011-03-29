@@ -13,31 +13,31 @@
 
 READ8_HANDLER( spacefb_audio_p2_r )
 {
-	spacefb_state *state = space->machine->driver_data<spacefb_state>();
+	spacefb_state *state = space->machine().driver_data<spacefb_state>();
 	return (state->sound_latch & 0x18) << 1;
 }
 
 
 READ8_HANDLER( spacefb_audio_t0_r )
 {
-	spacefb_state *state = space->machine->driver_data<spacefb_state>();
+	spacefb_state *state = space->machine().driver_data<spacefb_state>();
 	return state->sound_latch & 0x20;
 }
 
 
 READ8_HANDLER( spacefb_audio_t1_r )
 {
-	spacefb_state *state = space->machine->driver_data<spacefb_state>();
+	spacefb_state *state = space->machine().driver_data<spacefb_state>();
 	return state->sound_latch & 0x04;
 }
 
 
 WRITE8_HANDLER( spacefb_port_1_w )
 {
-	spacefb_state *state = space->machine->driver_data<spacefb_state>();
-	device_t *samples = space->machine->device("samples");
+	spacefb_state *state = space->machine().driver_data<spacefb_state>();
+	device_t *samples = space->machine().device("samples");
 
-	cputag_set_input_line(space->machine, "audiocpu", 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* enemy killed */
 	if (!(data & 0x01) && (state->sound_latch & 0x01))  sample_start(samples, 0,0,0);

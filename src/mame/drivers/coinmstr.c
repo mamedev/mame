@@ -46,7 +46,7 @@ public:
 
 static WRITE8_HANDLER( quizmstr_bg_w )
 {
-	coinmstr_state *state = space->machine->driver_data<coinmstr_state>();
+	coinmstr_state *state = space->machine().driver_data<coinmstr_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
 
@@ -55,7 +55,7 @@ static WRITE8_HANDLER( quizmstr_bg_w )
 }
 
 
-static void coinmstr_set_pal(running_machine *machine, UINT32 paldat, int col)
+static void coinmstr_set_pal(running_machine &machine, UINT32 paldat, int col)
 {
 	col = col *4;
 
@@ -90,7 +90,7 @@ static void coinmstr_set_pal(running_machine *machine, UINT32 paldat, int col)
 
 static WRITE8_HANDLER( quizmstr_attr1_w )
 {
-	coinmstr_state *state = space->machine->driver_data<coinmstr_state>();
+	coinmstr_state *state = space->machine().driver_data<coinmstr_state>();
 	state->attr_ram1[offset] = data;
 
 	if(offset >= 0x0240)
@@ -99,14 +99,14 @@ static WRITE8_HANDLER( quizmstr_attr1_w )
 		UINT32	paldata = (state->attr_ram1[offset] & 0x7f) | ((state->attr_ram2[offset] & 0x7f) << 7);
 		tilemap_mark_tile_dirty(state->bg_tilemap, offset - 0x0240);
 
-		coinmstr_set_pal(space->machine, paldata, offset - 0x240);
+		coinmstr_set_pal(space->machine(), paldata, offset - 0x240);
 
 	}
 }
 
 static WRITE8_HANDLER( quizmstr_attr2_w )
 {
-	coinmstr_state *state = space->machine->driver_data<coinmstr_state>();
+	coinmstr_state *state = space->machine().driver_data<coinmstr_state>();
 	state->attr_ram2[offset] = data;
 
 	if(offset >= 0x0240)
@@ -115,14 +115,14 @@ static WRITE8_HANDLER( quizmstr_attr2_w )
 		UINT32	paldata = (state->attr_ram1[offset] & 0x7f) | ((state->attr_ram2[offset] & 0x7f) << 7);
 		tilemap_mark_tile_dirty(state->bg_tilemap, offset - 0x0240);
 
-		coinmstr_set_pal(space->machine, paldata, offset - 0x240);
+		coinmstr_set_pal(space->machine(), paldata, offset - 0x240);
 
 	}
 }
 
 static WRITE8_HANDLER( quizmstr_attr3_w )
 {
-	coinmstr_state *state = space->machine->driver_data<coinmstr_state>();
+	coinmstr_state *state = space->machine().driver_data<coinmstr_state>();
 	state->attr_ram3[offset] = data;
 
 	if(offset >= 0x0240)
@@ -133,9 +133,9 @@ static WRITE8_HANDLER( quizmstr_attr3_w )
 
 static READ8_HANDLER( question_r )
 {
-	coinmstr_state *state = space->machine->driver_data<coinmstr_state>();
+	coinmstr_state *state = space->machine().driver_data<coinmstr_state>();
 	int address;
-	UINT8 *questions = space->machine->region("user1")->base();
+	UINT8 *questions = space->machine().region("user1")->base();
 
 	switch(state->question_adr[2])
 	{
@@ -182,7 +182,7 @@ static READ8_HANDLER( question_r )
 
 static WRITE8_HANDLER( question_w )
 {
-	coinmstr_state *state = space->machine->driver_data<coinmstr_state>();
+	coinmstr_state *state = space->machine().driver_data<coinmstr_state>();
 	if(data != state->question_adr[offset])
 	{
 		logerror("offset = %d data = %02X\n",offset,data);
@@ -895,7 +895,7 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	coinmstr_state *state = machine->driver_data<coinmstr_state>();
+	coinmstr_state *state = machine.driver_data<coinmstr_state>();
 	UINT8 *videoram = state->videoram;
 	int tile = videoram[tile_index + 0x0240];
 	int color = tile_index;
@@ -910,13 +910,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( coinmstr )
 {
-	coinmstr_state *state = machine->driver_data<coinmstr_state>();
+	coinmstr_state *state = machine.driver_data<coinmstr_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 46, 32);
 }
 
 static SCREEN_UPDATE( coinmstr )
 {
-	coinmstr_state *state = screen->machine->driver_data<coinmstr_state>();
+	coinmstr_state *state = screen->machine().driver_data<coinmstr_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
@@ -1211,8 +1211,8 @@ ROM_END
 
 static DRIVER_INIT( coinmstr )
 {
-	UINT8 *rom = machine->region("user1")->base();
-	int length = machine->region("user1")->bytes();
+	UINT8 *rom = machine.region("user1")->base();
+	int length = machine.region("user1")->bytes();
 	UINT8 *buf = auto_alloc_array(machine, UINT8, length);
 	int i;
 

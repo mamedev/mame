@@ -93,7 +93,7 @@ static chd_file *get_disc(device_t *device)
 	chd_file *image_chd = NULL;
 
 	/* open a path to the ROMs and find the first CHD file */
-	file_enumerator path(device->machine->options().media_path());
+	file_enumerator path(device->machine().options().media_path());
 	const osd_directory_entry *dir;
 
 	/* iterate while we get new objects */
@@ -112,7 +112,7 @@ static chd_file *get_disc(device_t *device)
 			chd_error chderr;
 
 			/* open the file itself via our search path */
-			image_file = auto_alloc(device->machine, emu_file(device->machine->options().media_path(), OPEN_FLAG_READ));
+			image_file = auto_alloc(device->machine(), emu_file(device->machine().options().media_path(), OPEN_FLAG_READ));
 			filerr = image_file->open(dir->name);
 			if (filerr == FILERR_NONE)
 			{
@@ -120,15 +120,15 @@ static chd_file *get_disc(device_t *device)
 				chderr = chd_open_file(*image_file, CHD_OPEN_READ, NULL, &image_chd);
 				if (chderr == CHDERR_NONE)
 				{
-					set_disk_handle(*device->machine, "laserdisc", *image_file, *image_chd);
+					set_disk_handle(device->machine(), "laserdisc", *image_file, *image_chd);
 					filename.cpy(dir->name);
-					device->machine->add_notifier(MACHINE_NOTIFY_EXIT, free_string);
+					device->machine().add_notifier(MACHINE_NOTIFY_EXIT, free_string);
 					break;
 				}
 			}
 
 			/* close the file on failure */
-			auto_free(device->machine, image_file);
+			auto_free(device->machine(), image_file);
 			image_file = NULL;
 		}
 	}
@@ -137,7 +137,7 @@ static chd_file *get_disc(device_t *device)
 	if (image_file == NULL)
 		fatalerror("No valid image file found!\n");
 
-	return get_disk_handle(device->machine, "laserdisc");
+	return get_disk_handle(device->machine(), "laserdisc");
 }
 
 
@@ -150,7 +150,7 @@ static chd_file *get_disc(device_t *device)
 
 static void process_commands(device_t *laserdisc)
 {
-	input_port_value controls = input_port_read(laserdisc->machine, "controls");
+	input_port_value controls = input_port_read(laserdisc->machine(), "controls");
 	int number;
 
 	/* step backwards */
@@ -223,7 +223,7 @@ static void process_commands(device_t *laserdisc)
 
 static TIMER_CALLBACK( vsync_update )
 {
-	device_t *laserdisc = machine->m_devicelist.first(LASERDISC);
+	device_t *laserdisc = machine.m_devicelist.first(LASERDISC);
 	int vblank_scanline;
 	attotime target;
 
@@ -232,9 +232,9 @@ static TIMER_CALLBACK( vsync_update )
 		process_commands(laserdisc);
 
 	/* set a timer to go off on the next VBLANK */
-	vblank_scanline = machine->primary_screen->visible_area().max_y + 1;
-	target = machine->primary_screen->time_until_pos(vblank_scanline);
-	machine->scheduler().timer_set(target, FUNC(vsync_update));
+	vblank_scanline = machine.primary_screen->visible_area().max_y + 1;
+	target = machine.primary_screen->time_until_pos(vblank_scanline);
+	machine.scheduler().timer_set(target, FUNC(vsync_update));
 }
 
 
@@ -246,7 +246,7 @@ static MACHINE_START( ldplayer )
 
 static TIMER_CALLBACK( autoplay )
 {
-	device_t *laserdisc = machine->m_devicelist.first(LASERDISC);
+	device_t *laserdisc = machine.m_devicelist.first(LASERDISC);
 
 	/* start playing */
 	(*execute_command)(laserdisc, CMD_PLAY);
@@ -257,7 +257,7 @@ static TIMER_CALLBACK( autoplay )
 static MACHINE_RESET( ldplayer )
 {
 	/* set up a timer to start playing immediately */
-	machine->scheduler().timer_set(attotime::zero, FUNC(autoplay));
+	machine.scheduler().timer_set(attotime::zero, FUNC(autoplay));
 
 	/* indicate the name of the file we opened */
 	popmessage("Opened %s\n", filename.cstr());
@@ -299,7 +299,7 @@ static TIMER_CALLBACK( pr8210_bit_callback )
 	{
 		/* assert the line and set a timer for deassertion */
 		laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
-		machine->scheduler().timer_set(attotime::from_usec(250), FUNC(pr8210_bit_off_callback), 0, ptr);
+		machine.scheduler().timer_set(attotime::from_usec(250), FUNC(pr8210_bit_off_callback), 0, ptr);
 
 		/* space 0 bits apart by 1msec, and 1 bits by 2msec */
 		duration = attotime::from_msec((data & 0x80) ? 2 : 1);
@@ -319,9 +319,9 @@ static TIMER_CALLBACK( pr8210_bit_callback )
 
 static MACHINE_START( pr8210 )
 {
-	device_t *laserdisc = machine->m_devicelist.first(LASERDISC);
+	device_t *laserdisc = machine.m_devicelist.first(LASERDISC);
 	MACHINE_START_CALL(ldplayer);
-	pr8210_bit_timer = machine->scheduler().timer_alloc(FUNC(pr8210_bit_callback), (void *)laserdisc);
+	pr8210_bit_timer = machine.scheduler().timer_alloc(FUNC(pr8210_bit_callback), (void *)laserdisc);
 }
 
 

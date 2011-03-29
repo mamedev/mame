@@ -232,7 +232,7 @@ void psxcpu_device::set_biu( UINT32 data, UINT32 mem_mask )
 
 void psxcpu_device::stop()
 {
-	debugger_break( machine );
+	debugger_break( m_machine );
 	debugger_instruction_hook( this,  m_pc );
 }
 
@@ -1602,12 +1602,12 @@ device_config *cxd8661r_device_config::static_alloc_device_config(const machine_
 
 device_t *psxcpu_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, psxcpu_device(machine, *this));
+	return auto_alloc(machine, psxcpu_device(machine, *this));
 }
 
 device_t *cxd8661r_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, psxcpu_device(machine, *this));
+	return auto_alloc(machine, psxcpu_device(machine, *this));
 }
 
 

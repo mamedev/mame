@@ -54,18 +54,18 @@ struct _poly_extra_data
 
 
 /* forward declarations */
-static void real3d_traverse_display_list(running_machine *machine);
-static void draw_model(running_machine *machine, UINT32 addr);
-static void init_matrix_stack(running_machine *machine);
+static void real3d_traverse_display_list(running_machine &machine);
+static void draw_model(running_machine &machine, UINT32 addr);
+static void init_matrix_stack(running_machine &machine);
 static void get_top_matrix(model3_state *state, MATRIX *out);
 static void push_matrix_stack(model3_state *state);
 static void pop_matrix_stack(model3_state *state);
 static void multiply_matrix_stack(model3_state *state, MATRIX matrix);
 static void translate_matrix_stack(model3_state *state, float x, float y, float z);
-static void traverse_list(running_machine *machine, UINT32 address);
-static void draw_block(running_machine *machine, UINT32 address);
-static void draw_viewport(running_machine *machine, int pri, UINT32 address);
-static void invalidate_texture(running_machine *machine, int page, int texx, int texy, int texwidth, int texheight);
+static void traverse_list(running_machine &machine, UINT32 address);
+static void draw_block(running_machine &machine, UINT32 address);
+static void draw_viewport(running_machine &machine, int pri, UINT32 address);
+static void invalidate_texture(running_machine &machine, int page, int texx, int texy, int texwidth, int texheight);
 
 /*****************************************************************************/
 
@@ -109,22 +109,22 @@ static const int num_bits[16] = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4
 static void model3_exit(running_machine &machine)
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	invalidate_texture(&machine, 0, 0, 0, 6, 5);
-	invalidate_texture(&machine, 1, 0, 0, 6, 5);
+	invalidate_texture(machine, 0, 0, 0, 6, 5);
+	invalidate_texture(machine, 1, 0, 0, 6, 5);
 	poly_free(state->poly);
 }
 
 VIDEO_START( model3 )
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	int width, height;
 
 	state->poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, model3_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, model3_exit);
 
-	width = machine->primary_screen->width();
-	height = machine->primary_screen->height();
-	state->bitmap3d = machine->primary_screen->alloc_compatible_bitmap();
+	width = machine.primary_screen->width();
+	height = machine.primary_screen->height();
+	state->bitmap3d = machine.primary_screen->alloc_compatible_bitmap();
 	state->zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
 
 	state->m3_char_ram = auto_alloc_array_clear(machine, UINT64, 0x100000/8);
@@ -158,9 +158,9 @@ VIDEO_START( model3 )
 	init_matrix_stack(machine);
 }
 
-static void draw_tile_4bit(running_machine *machine, bitmap_t *bitmap, int tx, int ty, int tilenum)
+static void draw_tile_4bit(running_machine &machine, bitmap_t *bitmap, int tx, int ty, int tilenum)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	int x, y;
 	UINT8 *tile_base = (UINT8*)state->m3_char_ram;
 	UINT8 *tile;
@@ -194,9 +194,9 @@ static void draw_tile_4bit(running_machine *machine, bitmap_t *bitmap, int tx, i
 	}
 }
 
-static void draw_tile_8bit(running_machine *machine, bitmap_t *bitmap, int tx, int ty, int tilenum)
+static void draw_tile_8bit(running_machine &machine, bitmap_t *bitmap, int tx, int ty, int tilenum)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	int x, y;
 	UINT8 *tile_base = (UINT8*)state->m3_char_ram;
 	UINT8 *tile;
@@ -226,9 +226,9 @@ static void draw_tile_8bit(running_machine *machine, bitmap_t *bitmap, int tx, i
 	}
 }
 #ifdef UNUSED_FUNCTION
-static void draw_texture_sheet(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_texture_sheet(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	int x,y;
 	for(y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
@@ -245,9 +245,9 @@ static void draw_texture_sheet(running_machine *machine, bitmap_t *bitmap, const
 }
 #endif
 
-static void draw_layer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int bitdepth)
+static void draw_layer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int bitdepth)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	int x, y;
 	int tile_index = 0;
 	UINT16 *tiles = (UINT16*)&state->m3_tile_ram[layer * 0x400];
@@ -321,9 +321,9 @@ static void draw_layer(running_machine *machine, bitmap_t *bitmap, const rectang
 }
 
 #ifdef UNUSED_FUNCTION
-static void copy_screen(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void copy_screen(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	int x,y;
 	for(y=cliprect->min_y; y <= cliprect->max_y; y++) {
 		UINT16 *d = BITMAP_ADDR16(bitmap, y, 0);
@@ -340,7 +340,7 @@ static void copy_screen(running_machine *machine, bitmap_t *bitmap, const rectan
 
 SCREEN_UPDATE( model3 )
 {
-	model3_state *state = screen->machine->driver_data<model3_state>();
+	model3_state *state = screen->machine().driver_data<model3_state>();
 #if 0
 	int layer_scroll_x[4], layer_scroll_y[4];
 	UINT32 layer_data[4];
@@ -370,25 +370,25 @@ SCREEN_UPDATE( model3 )
 	if( state->tick >= 5 ) {
 		state->tick = 0;
 
-		if( input_code_pressed(screen->machine, KEYCODE_Y) )
+		if( input_code_pressed(screen->machine(), KEYCODE_Y) )
 			state->debug_layer_disable ^= 0x1;
-		if( input_code_pressed(screen->machine, KEYCODE_U) )
+		if( input_code_pressed(screen->machine(), KEYCODE_U) )
 			state->debug_layer_disable ^= 0x2;
-		if( input_code_pressed(screen->machine, KEYCODE_I) )
+		if( input_code_pressed(screen->machine(), KEYCODE_I) )
 			state->debug_layer_disable ^= 0x4;
-		if( input_code_pressed(screen->machine, KEYCODE_O) )
+		if( input_code_pressed(screen->machine(), KEYCODE_O) )
 			state->debug_layer_disable ^= 0x8;
-		if( input_code_pressed(screen->machine, KEYCODE_T) )
+		if( input_code_pressed(screen->machine(), KEYCODE_T) )
 			state->debug_layer_disable ^= 0x10;
 	}
 
 	bitmap_fill(bitmap, cliprect, 0);
 
 	if (!(state->debug_layer_disable & 0x8))
-		draw_layer(screen->machine, bitmap, cliprect, 3, (state->layer_enable >> 3) & 0x1);
+		draw_layer(screen->machine(), bitmap, cliprect, 3, (state->layer_enable >> 3) & 0x1);
 
 	if (!(state->debug_layer_disable & 0x4))
-		draw_layer(screen->machine, bitmap, cliprect, 2, (state->layer_enable >> 2) & 0x1);
+		draw_layer(screen->machine(), bitmap, cliprect, 2, (state->layer_enable >> 2) & 0x1);
 
 	if( !(state->debug_layer_disable & 0x10) )
 	{
@@ -396,17 +396,17 @@ SCREEN_UPDATE( model3 )
 		if(state->real3d_display_list) {
 			bitmap_fill(state->zbuffer, cliprect, 0);
 			bitmap_fill(state->bitmap3d, cliprect, 0x8000);
-			real3d_traverse_display_list(screen->machine);
+			real3d_traverse_display_list(screen->machine());
 		}
 #endif
 		copybitmap_trans(bitmap, state->bitmap3d, 0, 0, 0, 0, cliprect, 0x8000);
 	}
 
 	if (!(state->debug_layer_disable & 0x2))
-		draw_layer(screen->machine, bitmap, cliprect, 1, (state->layer_enable >> 1) & 0x1);
+		draw_layer(screen->machine(), bitmap, cliprect, 1, (state->layer_enable >> 1) & 0x1);
 
 	if (!(state->debug_layer_disable & 0x1))
-		draw_layer(screen->machine, bitmap, cliprect, 0, (state->layer_enable >> 0) & 0x1);
+		draw_layer(screen->machine(), bitmap, cliprect, 0, (state->layer_enable >> 0) & 0x1);
 
 	//copy_screen(bitmap, cliprect);
 
@@ -420,31 +420,31 @@ SCREEN_UPDATE( model3 )
 
 READ64_HANDLER(model3_char_r)
 {
-	model3_state *state = space->machine->driver_data<model3_state>();
+	model3_state *state = space->machine().driver_data<model3_state>();
 	return state->m3_char_ram[offset];
 }
 
 WRITE64_HANDLER(model3_char_w)
 {
-	model3_state *state = space->machine->driver_data<model3_state>();
+	model3_state *state = space->machine().driver_data<model3_state>();
 	COMBINE_DATA(&state->m3_char_ram[offset]);
 }
 
 READ64_HANDLER(model3_tile_r)
 {
-	model3_state *state = space->machine->driver_data<model3_state>();
+	model3_state *state = space->machine().driver_data<model3_state>();
 	return state->m3_tile_ram[offset];
 }
 
 WRITE64_HANDLER(model3_tile_w)
 {
-	model3_state *state = space->machine->driver_data<model3_state>();
+	model3_state *state = space->machine().driver_data<model3_state>();
 	COMBINE_DATA(&state->m3_tile_ram[offset]);
 }
 
 READ64_HANDLER(model3_vid_reg_r)
 {
-	model3_state *state = space->machine->driver_data<model3_state>();
+	model3_state *state = space->machine().driver_data<model3_state>();
 	switch(offset)
 	{
 		case 0x00/8:	return state->vid_reg0;
@@ -458,12 +458,12 @@ READ64_HANDLER(model3_vid_reg_r)
 
 WRITE64_HANDLER(model3_vid_reg_w)
 {
-	model3_state *state = space->machine->driver_data<model3_state>();
+	model3_state *state = space->machine().driver_data<model3_state>();
 	switch(offset)
 	{
 		case 0x00/8:	logerror("vid_reg0: %08X%08X\n", (UINT32)(data>>32),(UINT32)(data)); state->vid_reg0 = data; break;
 		case 0x08/8:	break;		/* ??? */
-		case 0x10/8:	model3_set_irq_line(space->machine, (data >> 56) & 0x0f, CLEAR_LINE); break;		/* VBL IRQ Ack */
+		case 0x10/8:	model3_set_irq_line(space->machine(), (data >> 56) & 0x0f, CLEAR_LINE); break;		/* VBL IRQ Ack */
 
 		case 0x20/8:	state->layer_enable = (data >> 52);	break;
 
@@ -478,7 +478,7 @@ WRITE64_HANDLER(model3_vid_reg_w)
 
 WRITE64_HANDLER( model3_palette_w )
 {
-	model3_state *state = space->machine->driver_data<model3_state>();
+	model3_state *state = space->machine().driver_data<model3_state>();
 	int r1,g1,b1,r2,g2,b2;
 	UINT32 data1,data2;
 
@@ -499,7 +499,7 @@ WRITE64_HANDLER( model3_palette_w )
 
 READ64_HANDLER( model3_palette_r )
 {
-	model3_state *state = space->machine->driver_data<model3_state>();
+	model3_state *state = space->machine().driver_data<model3_state>();
 	return state->paletteram64[offset];
 }
 
@@ -514,9 +514,9 @@ READ64_HANDLER( model3_palette_r )
         1024 pixels / 32 pixel resolution vertically
         2048 pixels / 32 pixel resolution horizontally
 */
-static void invalidate_texture(running_machine *machine, int page, int texx, int texy, int texwidth, int texheight)
+static void invalidate_texture(running_machine &machine, int page, int texx, int texy, int texwidth, int texheight)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	int wtiles = 1 << texwidth;
 	int htiles = 1 << texheight;
 	int x, y;
@@ -531,9 +531,9 @@ static void invalidate_texture(running_machine *machine, int page, int texx, int
 			}
 }
 
-static cached_texture *get_texture(running_machine *machine, int page, int texx, int texy, int texwidth, int texheight, int format)
+static cached_texture *get_texture(running_machine &machine, int page, int texx, int texy, int texwidth, int texheight, int format)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	cached_texture *tex = state->texcache[page][texy][texx];
 	int pixheight = 32 << texheight;
 	int pixwidth = 32 << texwidth;
@@ -649,7 +649,7 @@ static cached_texture *get_texture(running_machine *machine, int page, int texx,
 
 WRITE64_HANDLER( real3d_display_list_w )
 {
-	model3_state *state = space->machine->driver_data<model3_state>();
+	model3_state *state = space->machine().driver_data<model3_state>();
 	if(ACCESSING_BITS_32_63) {
 		state->display_list_ram[offset*2] = BYTE_REVERSE32((UINT32)(data >> 32));
 	}
@@ -660,7 +660,7 @@ WRITE64_HANDLER( real3d_display_list_w )
 
 WRITE64_HANDLER( real3d_polygon_ram_w )
 {
-	model3_state *state = space->machine->driver_data<model3_state>();
+	model3_state *state = space->machine().driver_data<model3_state>();
 	if(ACCESSING_BITS_32_63) {
 		state->polygon_ram[offset*2] = BYTE_REVERSE32((UINT32)(data >> 32));
 	}
@@ -726,9 +726,9 @@ INLINE void write_texture8(model3_state *state, int xpos, int ypos, int width, i
 }
 #endif
 
-static void real3d_upload_texture(running_machine *machine, UINT32 header, UINT32 *data)
+static void real3d_upload_texture(running_machine &machine, UINT32 header, UINT32 *data)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	int width	= 32 << ((header >> 14) & 0x7);
 	int height	= 32 << ((header >> 17) & 0x7);
 	int xpos	= (header & 0x3f) * 32;
@@ -768,9 +768,9 @@ static void real3d_upload_texture(running_machine *machine, UINT32 header, UINT3
 	}
 }
 
-void real3d_display_list_end(running_machine *machine)
+void real3d_display_list_end(running_machine &machine)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	/* upload textures if there are any in the FIFO */
 	if (state->texture_fifo_pos > 0)
 	{
@@ -792,7 +792,7 @@ void real3d_display_list_end(running_machine *machine)
 
 void real3d_display_list1_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	model3_state *state = space->machine->driver_data<model3_state>();
+	model3_state *state = space->machine().driver_data<model3_state>();
 	int i;
 	int d = (dst & 0xffffff) / 4;
 	for(i=0; i < length; i+=4) {
@@ -809,7 +809,7 @@ void real3d_display_list1_dma(address_space *space, UINT32 src, UINT32 dst, int 
 
 void real3d_display_list2_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	model3_state *state = space->machine->driver_data<model3_state>();
+	model3_state *state = space->machine().driver_data<model3_state>();
 	int i;
 	int d = (dst & 0xffffff) / 4;
 	for(i=0; i < length; i+=4) {
@@ -826,7 +826,7 @@ void real3d_display_list2_dma(address_space *space, UINT32 src, UINT32 dst, int 
 
 void real3d_vrom_texture_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	model3_state *state = space->machine->driver_data<model3_state>();
+	model3_state *state = space->machine().driver_data<model3_state>();
 	if((dst & 0xff) == 0) {
 
 		UINT32 address, header;
@@ -838,13 +838,13 @@ void real3d_vrom_texture_dma(address_space *space, UINT32 src, UINT32 dst, int l
 			address = space->read_dword((src+0));
 			header = space->read_dword((src+4));
 		}
-		real3d_upload_texture(space->machine, header, (UINT32*)&state->vrom[address]);
+		real3d_upload_texture(space->machine(), header, (UINT32*)&state->vrom[address]);
 	}
 }
 
 void real3d_texture_fifo_dma(address_space *space, UINT32 src, int length, int byteswap)
 {
-	model3_state *state = space->machine->driver_data<model3_state>();
+	model3_state *state = space->machine().driver_data<model3_state>();
 	int i;
 	for(i=0; i < length; i+=4) {
 		UINT32 w;
@@ -861,7 +861,7 @@ void real3d_texture_fifo_dma(address_space *space, UINT32 src, int length, int b
 
 void real3d_polygon_ram_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	model3_state *state = space->machine->driver_data<model3_state>();
+	model3_state *state = space->machine().driver_data<model3_state>();
 	int i;
 	int d = (dst & 0xffffff) / 4;
 	for(i=0; i < length; i+=4) {
@@ -878,7 +878,7 @@ void real3d_polygon_ram_dma(address_space *space, UINT32 src, UINT32 dst, int le
 
 WRITE64_HANDLER( real3d_cmd_w )
 {
-	real3d_display_list_end(space->machine);
+	real3d_display_list_end(space->machine());
 }
 
 
@@ -920,9 +920,9 @@ static void matrix_multiply(MATRIX a, MATRIX b, MATRIX *out)
 	memcpy(out, &tmp, sizeof(MATRIX));
 }
 
-static void init_matrix_stack(running_machine *machine)
+static void init_matrix_stack(running_machine &machine)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	MATRIX *matrix_stack;
 	matrix_stack = state->matrix_stack = auto_alloc_array_clear(machine, MATRIX, MATRIX_STACK_SIZE);
 
@@ -1060,9 +1060,9 @@ static int clip_polygon(const poly_vertex *v, int num_vertices, PLANE cp, poly_v
 	return clip_verts;
 }
 
-static void render_one(running_machine *machine, TRIANGLE *tri)
+static void render_one(running_machine &machine, TRIANGLE *tri)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->poly);
 	poly_draw_scanline_func callback = NULL;
 
@@ -1103,9 +1103,9 @@ static void render_one(running_machine *machine, TRIANGLE *tri)
 	}
 }
 
-static void draw_model(running_machine *machine, UINT32 addr)
+static void draw_model(running_machine &machine, UINT32 addr)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	UINT32 *model = (addr >= 0x100000) ? &state->vrom[addr] :  &state->polygon_ram[addr];
 	UINT32 header[7];
 	int index = 0;
@@ -1377,9 +1377,9 @@ static void load_matrix(model3_state *state, int matrix_num, MATRIX *out)
 	(*out)[3][0] = matrix[0];	(*out)[3][1] = matrix[1];	(*out)[3][2] = matrix[2];	(*out)[3][3] = 1.0f;
 }
 
-static void traverse_list4(running_machine *machine, int lod_num, UINT32 address)
+static void traverse_list4(running_machine &machine, int lod_num, UINT32 address)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 
 	/* does something with the LOD selection */
 	UINT32 *list = get_memory_pointer(state, address);
@@ -1388,9 +1388,9 @@ static void traverse_list4(running_machine *machine, int lod_num, UINT32 address
 	draw_model(machine, link & 0xffffff);
 }
 
-static void traverse_list(running_machine *machine, UINT32 address)
+static void traverse_list(running_machine &machine, UINT32 address)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	UINT32 *list = get_memory_pointer(state, address);
 	int list_ptr = 0;
 
@@ -1424,7 +1424,7 @@ static void traverse_list(running_machine *machine, UINT32 address)
 	state->list_depth--;
 }
 
-INLINE void process_link(running_machine *machine, UINT32 address, UINT32 link)
+INLINE void process_link(running_machine &machine, UINT32 address, UINT32 link)
 {
 	if (link != 0 && link != 0x0fffffff && link != 0x00800800 && link != 0x01000000)
 	{
@@ -1450,9 +1450,9 @@ INLINE void process_link(running_machine *machine, UINT32 address, UINT32 link)
 	}
 }
 
-static void draw_block(running_machine *machine, UINT32 address)
+static void draw_block(running_machine &machine, UINT32 address)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	const UINT32 *node = get_memory_pointer(state, address);
 	UINT32 link;
 	int node_matrix;
@@ -1492,9 +1492,9 @@ static void draw_block(running_machine *machine, UINT32 address)
 	process_link(machine, address, link);
 }
 
-static void draw_viewport(running_machine *machine, int pri, UINT32 address)
+static void draw_viewport(running_machine &machine, int pri, UINT32 address)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	const UINT32 *node = get_memory_pointer(state, address);
 	UINT32 link_address;
 	float /*viewport_left, viewport_right, */viewport_top, viewport_bottom;
@@ -1555,9 +1555,9 @@ static void draw_viewport(running_machine *machine, int pri, UINT32 address)
 }
 
 
-static void real3d_traverse_display_list(running_machine *machine)
+static void real3d_traverse_display_list(running_machine &machine)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	int pri;
 
 	init_matrix_stack(machine);

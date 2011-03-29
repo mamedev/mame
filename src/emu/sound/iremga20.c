@@ -247,7 +247,7 @@ static DEVICE_START( iremga20 )
 	for ( i = 0; i < 0x40; i++ )
 		chip->regs[i] = 0;
 
-	chip->stream = device->machine->sound().stream_alloc( *device, 0, 2, device->clock()/4, chip, IremGA20_update );
+	chip->stream = device->machine().sound().stream_alloc( *device, 0, 2, device->clock()/4, chip, IremGA20_update );
 
 	device->save_item(NAME(chip->regs));
 	for (i = 0; i < 4; i++)

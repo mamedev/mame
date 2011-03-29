@@ -43,23 +43,23 @@
 
 static WRITE8_HANDLER( shootout_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 }
 
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
 	soundlatch_w( space, offset, data );
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE8_HANDLER( shootout_flipscreen_w )
 {
-	flip_screen_set(space->machine, data & 0x01);
+	flip_screen_set(space->machine(), data & 0x01);
 }
 
 static WRITE8_HANDLER( shootout_coin_counter_w )
 {
-	coin_counter_w(space->machine, 0, data);
+	coin_counter_w(space->machine(), 0, data);
 }
 
 /*******************************************************************************/
@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( shootout )
@@ -229,12 +229,12 @@ GFXDECODE_END
 
 static void shootout_snd_irq(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, linestate);
 }
 
 static void shootout_snd2_irq(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, linestate);
+	cputag_set_input_line(device->machine(), "maincpu", 0, linestate);
 }
 
 static const ym2203_interface ym2203_config =
@@ -409,10 +409,10 @@ ROM_END
 
 static DRIVER_INIT( shootout )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	int length = machine->region("maincpu")->bytes();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	int length = machine.region("maincpu")->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length - 0x8000);
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	int A;
 
 	space->set_decrypted_region(0x8000, 0xffff, decrypt);
@@ -420,13 +420,13 @@ static DRIVER_INIT( shootout )
 	for (A = 0x8000;A < length;A++)
 		decrypt[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x40) >> 1) | ((rom[A] & 0x20) << 1);
 
-	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 	memory_configure_bank_decrypted(machine, "bank1", 0, 16, decrypt + 0x8000, 0x4000);
 }
 
 static DRIVER_INIT( shootouj )
 {
-	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 

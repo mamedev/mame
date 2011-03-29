@@ -766,20 +766,20 @@ void h8_3007_register1_write8(h83xx_state *h8, UINT32 address, UINT8 val)
 
 void h8_3007_itu_init(h83xx_state *h8)
 {
-	h8->timer[0] = h8->device->machine->scheduler().timer_alloc(FUNC(h8itu_3007_timer_0_cb), h8);
-	h8->timer[1] = h8->device->machine->scheduler().timer_alloc(FUNC(h8itu_3007_timer_1_cb), h8);
-	h8->timer[2] = h8->device->machine->scheduler().timer_alloc(FUNC(h8itu_3007_timer_2_cb), h8);
+	h8->timer[0] = h8->device->machine().scheduler().timer_alloc(FUNC(h8itu_3007_timer_0_cb), h8);
+	h8->timer[1] = h8->device->machine().scheduler().timer_alloc(FUNC(h8itu_3007_timer_1_cb), h8);
+	h8->timer[2] = h8->device->machine().scheduler().timer_alloc(FUNC(h8itu_3007_timer_2_cb), h8);
 
 	h8_itu_reset(h8);
 }
 
 void h8_itu_init(h83xx_state *h8)
 {
-	h8->timer[0] = h8->device->machine->scheduler().timer_alloc(FUNC(h8itu_timer_0_cb), h8);
-	h8->timer[1] = h8->device->machine->scheduler().timer_alloc(FUNC(h8itu_timer_1_cb), h8);
-	h8->timer[2] = h8->device->machine->scheduler().timer_alloc(FUNC(h8itu_timer_2_cb), h8);
-	h8->timer[3] = h8->device->machine->scheduler().timer_alloc(FUNC(h8itu_timer_3_cb), h8);
-	h8->timer[4] = h8->device->machine->scheduler().timer_alloc(FUNC(h8itu_timer_4_cb), h8);
+	h8->timer[0] = h8->device->machine().scheduler().timer_alloc(FUNC(h8itu_timer_0_cb), h8);
+	h8->timer[1] = h8->device->machine().scheduler().timer_alloc(FUNC(h8itu_timer_1_cb), h8);
+	h8->timer[2] = h8->device->machine().scheduler().timer_alloc(FUNC(h8itu_timer_2_cb), h8);
+	h8->timer[3] = h8->device->machine().scheduler().timer_alloc(FUNC(h8itu_timer_3_cb), h8);
+	h8->timer[4] = h8->device->machine().scheduler().timer_alloc(FUNC(h8itu_timer_4_cb), h8);
 
 	h8_itu_reset(h8);
 }

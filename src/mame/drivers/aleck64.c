@@ -174,9 +174,9 @@ Notes:
 static READ32_HANDLER( aleck_dips_r )
 {
 	if (offset == 0)
-		return (input_port_read(space->machine, "IN0"));	/* mtetrisc has regular inputs here */
+		return (input_port_read(space->machine(), "IN0"));	/* mtetrisc has regular inputs here */
 	else if (offset == 1)
-		return (input_port_read(space->machine, "IN1"));
+		return (input_port_read(space->machine(), "IN1"));
 
 	return 0;
 }
@@ -563,7 +563,7 @@ static const mips3_config vr4300_config =
 
 static INTERRUPT_GEN( n64_vblank )
 {
-	signal_rcp_interrupt(device->machine, VI_INTERRUPT);
+	signal_rcp_interrupt(device->machine(), VI_INTERRUPT);
 }
 
 static MACHINE_CONFIG_START( aleck64, _n64_state )
@@ -603,7 +603,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( aleck64 )
 {
-	UINT8 *rom = machine->region("user2")->base();
+	UINT8 *rom = machine.region("user2")->base();
 
 	rom[0x67c] = 0;
 	rom[0x67d] = 0;

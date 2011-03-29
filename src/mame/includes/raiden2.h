@@ -109,13 +109,13 @@ public:
 
 	UINT16 cop_hit_status;
 
-	void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect ,int pri_mask );
-	UINT8 cop_calculate_collsion_detection(running_machine *machine);
+	void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect ,int pri_mask );
+	UINT8 cop_calculate_collsion_detection(running_machine &machine);
 
 };
 
 
 /*----------- defined in machine/r2crypt.c -----------*/
 
-void raiden2_decrypt_sprites(running_machine *machine);
-void zeroteam_decrypt_sprites(running_machine *machine);
+void raiden2_decrypt_sprites(running_machine &machine);
+void zeroteam_decrypt_sprites(running_machine &machine);

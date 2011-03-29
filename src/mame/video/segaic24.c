@@ -26,7 +26,7 @@ System 24      68000x2  315-5292   315-5293  315-5294  315-5242        ym2151 da
 #include "segaic24.h"
 
 
-static void set_color(running_machine *machine, int color, UINT8 r, UINT8 g, UINT8 b, int highlight)
+static void set_color(running_machine &machine, int color, UINT8 r, UINT8 g, UINT8 b, int highlight)
 {
 	palette_set_color (machine, color, MAKE_RGB(r, g, b));
 
@@ -39,7 +39,7 @@ static void set_color(running_machine *machine, int color, UINT8 r, UINT8 g, UIN
 		g = 0.6*g;
 		b = 0.6*b;
 	}
-	palette_set_color(machine,color+machine->total_colors()/2, MAKE_RGB(r, g, b));
+	palette_set_color(machine,color+machine.total_colors()/2, MAKE_RGB(r, g, b));
 }
 
 // 315-5242
@@ -47,15 +47,15 @@ static void set_color(running_machine *machine, int color, UINT8 r, UINT8 g, UIN
 // qgh expects to be able to read the palette shared between CPUs
 READ16_HANDLER( system24temp_sys16_paletteram1_r )
 {
-	return space->machine->generic.paletteram.u16[offset];
+	return space->machine().generic.paletteram.u16[offset];
 }
 
 
 WRITE16_HANDLER (system24temp_sys16_paletteram1_w)
 {
 	int r, g, b;
-	COMBINE_DATA (space->machine->generic.paletteram.u16 + offset);
-	data = space->machine->generic.paletteram.u16[offset];
+	COMBINE_DATA (space->machine().generic.paletteram.u16 + offset);
+	data = space->machine().generic.paletteram.u16[offset];
 
 	r = (data & 0x00f) << 4;
 	if(data & 0x1000)
@@ -72,7 +72,7 @@ WRITE16_HANDLER (system24temp_sys16_paletteram1_w)
 	r |= r >> 5;
 	g |= g >> 5;
 	b |= b >> 5;
-	set_color(space->machine, offset, r, g, b, data & 0x8000);
+	set_color(space->machine(), offset, r, g, b, data & 0x8000);
 }
 
 // - System 24
@@ -124,12 +124,12 @@ static TILE_GET_INFO( sys24_tile_info_1w )
 	SET_TILE_INFO(sys24_char_gfx_index, val & sys24_tile_mask, (val >> 7) & 0xff, 0);
 }
 
-void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
+void sys24_tile_vh_start(running_machine &machine, UINT16 tile_mask)
 {
 	sys24_tile_mask = tile_mask;
 
 	for(sys24_char_gfx_index = 0; sys24_char_gfx_index < MAX_GFX_ELEMENTS; sys24_char_gfx_index++)
-		if (machine->gfx[sys24_char_gfx_index] == 0)
+		if (machine.gfx[sys24_char_gfx_index] == 0)
 			break;
 	assert(sys24_char_gfx_index != MAX_GFX_ELEMENTS);
 
@@ -150,25 +150,25 @@ void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 	memset(sys24_char_ram, 0, 0x80000);
 	memset(sys24_tile_ram, 0, 0x10000);
 
-	machine->gfx[sys24_char_gfx_index] = gfx_element_alloc(machine, &sys24_char_layout, (UINT8 *)sys24_char_ram, machine->total_colors() / 16, 0);
+	machine.gfx[sys24_char_gfx_index] = gfx_element_alloc(machine, &sys24_char_layout, (UINT8 *)sys24_char_ram, machine.total_colors() / 16, 0);
 
 	state_save_register_global_pointer(machine, sys24_tile_ram, 0x10000/2);
 	state_save_register_global_pointer(machine, sys24_char_ram, 0x80000/2);
 }
 
-static void sys24_tile_draw_rect(running_machine *machine, bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UINT16 *mask,
+static void sys24_tile_draw_rect(running_machine &machine, bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UINT16 *mask,
 								 UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
 {
 	int y;
 	const UINT16 *source  = ((UINT16 *)bm->base) + sx + sy*bm->rowpixels;
 	const UINT8  *trans = ((UINT8 *) tm->base) + sx + sy*tm->rowpixels;
-	UINT8        *prib = (UINT8 *)machine->priority_bitmap->base;
+	UINT8        *prib = (UINT8 *)machine.priority_bitmap->base;
 	UINT16       *dest = (UINT16 *)dm->base;
 
 	tpri |= TILEMAP_PIXEL_LAYER0;
 
 	dest += yy1*dm->rowpixels + xx1;
-	prib += yy1*machine->priority_bitmap->rowpixels + xx1;
+	prib += yy1*machine.priority_bitmap->rowpixels + xx1;
 	mask += yy1*4;
 	yy2 -= yy1;
 
@@ -280,7 +280,7 @@ static void sys24_tile_draw_rect(running_machine *machine, bitmap_t *bm, bitmap_
 		source += bm->rowpixels;
 		trans  += tm->rowpixels;
 		dest   += dm->rowpixels;
-		prib   += machine->priority_bitmap->rowpixels;
+		prib   += machine.priority_bitmap->rowpixels;
 		mask   += 4;
 	}
 }
@@ -288,16 +288,16 @@ static void sys24_tile_draw_rect(running_machine *machine, bitmap_t *bm, bitmap_
 
 // The rgb version is used by model 1 & 2 which do not need to care
 // about sprite priority hence the lack of support for the
-// machine->priority_bitmap
+// machine.priority_bitmap
 
-static void sys24_tile_draw_rect_rgb(running_machine *machine, bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UINT16 *mask,
+static void sys24_tile_draw_rect_rgb(running_machine &machine, bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UINT16 *mask,
 									 UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
 {
 	int y;
 	const UINT16 *source  = ((UINT16 *)bm->base) + sx + sy*bm->rowpixels;
 	const UINT8  *trans = ((UINT8 *) tm->base) + sx + sy*tm->rowpixels;
 	UINT16       *dest = (UINT16 *)dm->base;
-	const pen_t  *pens   = machine->pens;
+	const pen_t  *pens   = machine.pens;
 
 	tpri |= TILEMAP_PIXEL_LAYER0;
 
@@ -402,7 +402,7 @@ static void sys24_tile_draw_rect_rgb(running_machine *machine, bitmap_t *bm, bit
 	}
 }
 
-void sys24_tile_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int lpri, int flags)
+void sys24_tile_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int lpri, int flags)
 {
 	UINT16 hscr = sys24_tile_ram[0x5000+(layer >> 1)];
 	UINT16 vscr = sys24_tile_ram[0x5004+(layer >> 1)];
@@ -523,7 +523,7 @@ void sys24_tile_draw(running_machine *machine, bitmap_t *bitmap, const rectangle
 
 	} else {
 		bitmap_t *bm, *tm;
-		void (*draw)(running_machine *machine, bitmap_t *, bitmap_t *, bitmap_t *, const UINT16 *,
+		void (*draw)(running_machine &machine, bitmap_t *, bitmap_t *, bitmap_t *, const UINT16 *,
 					 UINT16, UINT8, int, int, int, int, int, int, int);
 		int win = layer & 1;
 
@@ -607,7 +607,7 @@ WRITE16_HANDLER(sys24_char_w)
 	UINT16 old = sys24_char_ram[offset];
 	COMBINE_DATA(sys24_char_ram + offset);
 	if(old != sys24_char_ram[offset]) {
-		gfx_element_mark_dirty(space->machine->gfx[sys24_char_gfx_index], offset / 16);
+		gfx_element_mark_dirty(space->machine().gfx[sys24_char_gfx_index], offset / 16);
 	}
 }
 
@@ -637,7 +637,7 @@ WRITE32_HANDLER(sys24_char32_w)
 
 static UINT16 *sys24_sprite_ram;
 
-void sys24_sprite_vh_start(running_machine *machine)
+void sys24_sprite_vh_start(running_machine &machine)
 {
 	sys24_sprite_ram = auto_alloc_array(machine, UINT16, 0x40000/2);
 
@@ -669,7 +669,7 @@ void sys24_sprite_vh_start(running_machine *machine)
     0   11------    --------
 */
 
-void sys24_sprite_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const int *spri)
+void sys24_sprite_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, const int *spri)
 {
 	UINT16 curspr = 0;
 	int countspr = 0;
@@ -831,7 +831,7 @@ void sys24_sprite_draw(running_machine *machine, bitmap_t *bitmap, const rectang
 										int zx1 = flipx ? 7-zx : zx;
 										UINT32 neweroffset = (newoffset+(zx1>>2))&0x1ffff; // crackdown sometimes attempts to use data past the end of spriteram
 										int c = (sys24_sprite_ram[neweroffset] >> (((~zx1) & 3) << 2)) & 0xf;
-										UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, ypos1, xpos2);
+										UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, ypos1, xpos2);
 										if(!(*pri & pm[c])) {
 											c = colors[c];
 											if(c) {
@@ -883,7 +883,7 @@ READ16_HANDLER(sys24_sprite_r)
 
 static UINT16 sys24_mixer_reg[0x10];
 
-void sys24_mixer_vh_start(running_machine *machine)
+void sys24_mixer_vh_start(running_machine &machine)
 {
 	memset(sys24_mixer_reg, 0, sizeof(sys24_mixer_reg));
 	state_save_register_global_array(machine, sys24_mixer_reg);

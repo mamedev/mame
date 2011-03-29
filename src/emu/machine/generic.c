@@ -19,8 +19,8 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void counters_load(running_machine *machine, int config_type, xml_data_node *parentnode);
-static void counters_save(running_machine *machine, int config_type, xml_data_node *parentnode);
+static void counters_load(running_machine &machine, int config_type, xml_data_node *parentnode);
+static void counters_save(running_machine &machine, int config_type, xml_data_node *parentnode);
 static void interrupt_reset(running_machine &machine);
 
 
@@ -58,7 +58,7 @@ struct _generic_machine_private
 
 INLINE int interrupt_enabled(device_t *device)
 {
-	generic_machine_private *state = device->machine->generic_machine_data;
+	generic_machine_private *state = device->machine().generic_machine_data;
 	for (int index = 0; index < ARRAY_LENGTH(state->interrupt_device); index++)
 		if (state->interrupt_device[index] == device)
 			return state->interrupt_enable[index];
@@ -76,14 +76,14 @@ INLINE int interrupt_enabled(device_t *device)
     register for save states
 -------------------------------------------------*/
 
-void generic_machine_init(running_machine *machine)
+void generic_machine_init(running_machine &machine)
 {
 	generic_machine_private *state;
 	int counternum;
 
 	/* allocate our state */
-	machine->generic_machine_data = auto_alloc_clear(machine, generic_machine_private);
-	state = machine->generic_machine_data;
+	machine.generic_machine_data = auto_alloc_clear(machine, generic_machine_private);
+	state = machine.generic_machine_data;
 
 	/* reset coin counters */
 	for (counternum = 0; counternum < COIN_COUNTERS; counternum++)
@@ -96,29 +96,29 @@ void generic_machine_init(running_machine *machine)
 	memset(state->interrupt_device, 0, sizeof(state->interrupt_device));
 	device_execute_interface *exec = NULL;
 	int index = 0;
-	for (bool gotone = machine->m_devicelist.first(exec); gotone && index < ARRAY_LENGTH(state->interrupt_device); gotone = exec->next(exec))
+	for (bool gotone = machine.m_devicelist.first(exec); gotone && index < ARRAY_LENGTH(state->interrupt_device); gotone = exec->next(exec))
 		state->interrupt_device[index++] = &exec->device();
 
 	/* register coin save state */
-	machine->state().save_item(NAME(state->coin_count));
-	machine->state().save_item(NAME(state->coinlockedout));
-	machine->state().save_item(NAME(state->lastcoin));
+	machine.state().save_item(NAME(state->coin_count));
+	machine.state().save_item(NAME(state->coinlockedout));
+	machine.state().save_item(NAME(state->lastcoin));
 
 	/* reset memory card info */
 	state->memcard_inserted = -1;
 
 	/* register a reset callback and save state for interrupt enable */
-	machine->add_notifier(MACHINE_NOTIFY_RESET, interrupt_reset);
-	machine->state().save_item(NAME(state->interrupt_enable));
+	machine.add_notifier(MACHINE_NOTIFY_RESET, interrupt_reset);
+	machine.state().save_item(NAME(state->interrupt_enable));
 
 	/* register for configuration */
 	config_register(machine, "counters", counters_load, counters_save);
 
 	/* for memory cards, request save state and an exit callback */
-	if (machine->config().m_memcard_handler != NULL)
+	if (machine.config().m_memcard_handler != NULL)
 	{
 		state_save_register_global(machine, state->memcard_inserted);
-		machine->add_notifier(MACHINE_NOTIFY_EXIT, memcard_eject);
+		machine.add_notifier(MACHINE_NOTIFY_EXIT, memcard_eject);
 	}
 }
 
@@ -133,9 +133,9 @@ void generic_machine_init(running_machine *machine)
     tickets dispensed
 -------------------------------------------------*/
 
-int get_dispensed_tickets(running_machine *machine)
+int get_dispensed_tickets(running_machine &machine)
 {
-	generic_machine_private *state = machine->generic_machine_data;
+	generic_machine_private *state = machine.generic_machine_data;
 	return state->dispensed_tickets;
 }
 
@@ -145,9 +145,9 @@ int get_dispensed_tickets(running_machine *machine)
     number of dispensed tickets
 -------------------------------------------------*/
 
-void increment_dispensed_tickets(running_machine *machine, int delta)
+void increment_dispensed_tickets(running_machine &machine, int delta)
 {
-	generic_machine_private *state = machine->generic_machine_data;
+	generic_machine_private *state = machine.generic_machine_data;
 	state->dispensed_tickets += delta;
 }
 
@@ -162,9 +162,9 @@ void increment_dispensed_tickets(running_machine *machine, int delta)
     and tickets
 -------------------------------------------------*/
 
-static void counters_load(running_machine *machine, int config_type, xml_data_node *parentnode)
+static void counters_load(running_machine &machine, int config_type, xml_data_node *parentnode)
 {
-	generic_machine_private *state = machine->generic_machine_data;
+	generic_machine_private *state = machine.generic_machine_data;
 	xml_data_node *coinnode, *ticketnode;
 
 	/* on init, reset the counters */
@@ -202,9 +202,9 @@ static void counters_load(running_machine *machine, int config_type, xml_data_no
     and tickets
 -------------------------------------------------*/
 
-static void counters_save(running_machine *machine, int config_type, xml_data_node *parentnode)
+static void counters_save(running_machine &machine, int config_type, xml_data_node *parentnode)
 {
-	generic_machine_private *state = machine->generic_machine_data;
+	generic_machine_private *state = machine.generic_machine_data;
 	int i;
 
 	/* only care about game-specific data */
@@ -237,9 +237,9 @@ static void counters_save(running_machine *machine, int config_type, xml_data_no
     coin_counter_w - sets input for coin counter
 -------------------------------------------------*/
 
-void coin_counter_w(running_machine *machine, int num, int on)
+void coin_counter_w(running_machine &machine, int num, int on)
 {
-	generic_machine_private *state = machine->generic_machine_data;
+	generic_machine_private *state = machine.generic_machine_data;
 	if (num >= ARRAY_LENGTH(state->coin_count))
 		return;
 
@@ -255,9 +255,9 @@ void coin_counter_w(running_machine *machine, int num, int on)
     for a given coin
 -------------------------------------------------*/
 
-int coin_counter_get_count(running_machine *machine, int num)
+int coin_counter_get_count(running_machine &machine, int num)
 {
-	generic_machine_private *state = machine->generic_machine_data;
+	generic_machine_private *state = machine.generic_machine_data;
 	if (num >= ARRAY_LENGTH(state->coin_count))
 		return 0;
 	return state->coin_count[num];
@@ -268,9 +268,9 @@ int coin_counter_get_count(running_machine *machine, int num)
     coin_lockout_w - locks out one coin input
 -------------------------------------------------*/
 
-void coin_lockout_w(running_machine *machine, int num,int on)
+void coin_lockout_w(running_machine &machine, int num,int on)
 {
-	generic_machine_private *state = machine->generic_machine_data;
+	generic_machine_private *state = machine.generic_machine_data;
 	if (num >= ARRAY_LENGTH(state->coinlockedout))
 		return;
 	state->coinlockedout[num] = on;
@@ -282,9 +282,9 @@ void coin_lockout_w(running_machine *machine, int num,int on)
     state for a particular coin
 -------------------------------------------------*/
 
-int coin_lockout_get_state(running_machine *machine, int num)
+int coin_lockout_get_state(running_machine &machine, int num)
 {
-	generic_machine_private *state = machine->generic_machine_data;
+	generic_machine_private *state = machine.generic_machine_data;
 	if (num >= ARRAY_LENGTH(state->coinlockedout))
 		return FALSE;
 	return state->coinlockedout[num];
@@ -296,9 +296,9 @@ int coin_lockout_get_state(running_machine *machine, int num)
     inputs
 -------------------------------------------------*/
 
-void coin_lockout_global_w(running_machine *machine, int on)
+void coin_lockout_global_w(running_machine &machine, int on)
 {
-	generic_machine_private *state = machine->generic_machine_data;
+	generic_machine_private *state = machine.generic_machine_data;
 	int i;
 
 	for (i = 0; i < ARRAY_LENGTH(state->coinlockedout); i++)
@@ -315,20 +315,20 @@ void coin_lockout_global_w(running_machine *machine, int on)
     nvram_load - load a system's NVRAM
 -------------------------------------------------*/
 
-void nvram_load(running_machine *machine)
+void nvram_load(running_machine &machine)
 {
 	// only need to do something if we have an NVRAM device or an nvram_handler
 	device_nvram_interface *nvram = NULL;
-	if (!machine->m_devicelist.first(nvram) && machine->config().m_nvram_handler == NULL)
+	if (!machine.m_devicelist.first(nvram) && machine.config().m_nvram_handler == NULL)
 		return;
 
 	// open the file; if it exists, call everyone to read from it
-	emu_file file(machine->options().nvram_directory(), OPEN_FLAG_READ);
-	if (file.open(machine->basename(), ".nv") == FILERR_NONE)
+	emu_file file(machine.options().nvram_directory(), OPEN_FLAG_READ);
+	if (file.open(machine.basename(), ".nv") == FILERR_NONE)
 	{
 		// read data from general NVRAM handler first
-		if (machine->config().m_nvram_handler != NULL)
-			(*machine->config().m_nvram_handler)(machine, &file, FALSE);
+		if (machine.config().m_nvram_handler != NULL)
+			(*machine.config().m_nvram_handler)(machine, &file, FALSE);
 
 		// find all devices with NVRAM handlers, and read from them next
 		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
@@ -339,8 +339,8 @@ void nvram_load(running_machine *machine)
 	else
 	{
 		// initialize via the general NVRAM handler first
-		if (machine->config().m_nvram_handler != NULL)
-			(*machine->config().m_nvram_handler)(machine, NULL, FALSE);
+		if (machine.config().m_nvram_handler != NULL)
+			(*machine.config().m_nvram_handler)(machine, NULL, FALSE);
 
 		// find all devices with NVRAM handlers, and read from them next
 		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
@@ -353,20 +353,20 @@ void nvram_load(running_machine *machine)
     nvram_save - save a system's NVRAM
 -------------------------------------------------*/
 
-void nvram_save(running_machine *machine)
+void nvram_save(running_machine &machine)
 {
 	// only need to do something if we have an NVRAM device or an nvram_handler
 	device_nvram_interface *nvram = NULL;
-	if (!machine->m_devicelist.first(nvram) && machine->config().m_nvram_handler == NULL)
+	if (!machine.m_devicelist.first(nvram) && machine.config().m_nvram_handler == NULL)
 		return;
 
 	// open the file; if it exists, call everyone to read from it
-	emu_file file(machine->options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file.open(machine->basename(), ".nv") == FILERR_NONE)
+	emu_file file(machine.options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	if (file.open(machine.basename(), ".nv") == FILERR_NONE)
 	{
 		// write data via general NVRAM handler first
-		if (machine->config().m_nvram_handler != NULL)
-			(*machine->config().m_nvram_handler)(machine, &file, TRUE);
+		if (machine.config().m_nvram_handler != NULL)
+			(*machine.config().m_nvram_handler)(machine, &file, TRUE);
 
 		// find all devices with NVRAM handlers, and tell them to write next
 		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
@@ -396,7 +396,7 @@ INLINE void memcard_name(int index, char *buffer)
     the given index
 -------------------------------------------------*/
 
-int memcard_create(running_machine *machine, int index, int overwrite)
+int memcard_create(running_machine &machine, int index, int overwrite)
 {
 	char name[16];
 
@@ -404,23 +404,23 @@ int memcard_create(running_machine *machine, int index, int overwrite)
 	memcard_name(index, name);
 
 	/* if we can't overwrite, fail if the file already exists */
-	astring fname(machine->basename(), PATH_SEPARATOR, name);
+	astring fname(machine.basename(), PATH_SEPARATOR, name);
 	if (!overwrite)
 	{
-		emu_file testfile(machine->options().memcard_directory(), OPEN_FLAG_READ);
+		emu_file testfile(machine.options().memcard_directory(), OPEN_FLAG_READ);
 		if (testfile.open(fname) == FILERR_NONE)
 			return 1;
 	}
 
 	/* create a new file */
-	emu_file file(machine->options().memcard_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine.options().memcard_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	file_error filerr = file.open(fname);
 	if (filerr != FILERR_NONE)
 		return 1;
 
 	/* initialize and then save the card */
-	if (machine->config().m_memcard_handler)
-		(*machine->config().m_memcard_handler)(machine, file, MEMCARD_CREATE);
+	if (machine.config().m_memcard_handler)
+		(*machine.config().m_memcard_handler)(machine, file, MEMCARD_CREATE);
 
 	/* close the file */
 	return 0;
@@ -432,28 +432,28 @@ int memcard_create(running_machine *machine, int index, int overwrite)
     with the given index
 -------------------------------------------------*/
 
-int memcard_insert(running_machine *machine, int index)
+int memcard_insert(running_machine &machine, int index)
 {
-	generic_machine_private *state = machine->generic_machine_data;
+	generic_machine_private *state = machine.generic_machine_data;
 	char name[16];
 
 	/* if a card is already inserted, eject it first */
 	if (state->memcard_inserted != -1)
-		memcard_eject(*machine);
+		memcard_eject(machine);
 	assert(state->memcard_inserted == -1);
 
 	/* create a name */
 	memcard_name(index, name);
 
 	/* open the file; if we can't, it's an error */
-	emu_file file(machine->options().memcard_directory(), OPEN_FLAG_READ);
-	file_error filerr = file.open(machine->basename(), PATH_SEPARATOR, name);
+	emu_file file(machine.options().memcard_directory(), OPEN_FLAG_READ);
+	file_error filerr = file.open(machine.basename(), PATH_SEPARATOR, name);
 	if (filerr != FILERR_NONE)
 		return 1;
 
 	/* initialize and then load the card */
-	if (machine->config().m_memcard_handler)
-		(*machine->config().m_memcard_handler)(machine, file, MEMCARD_INSERT);
+	if (machine.config().m_memcard_handler)
+		(*machine.config().m_memcard_handler)(machine, file, MEMCARD_INSERT);
 
 	/* close the file */
 	state->memcard_inserted = index;
@@ -486,7 +486,7 @@ void memcard_eject(running_machine &machine)
 
 	/* initialize and then load the card */
 	if (machine.config().m_memcard_handler)
-		(*machine.config().m_memcard_handler)(&machine, file, MEMCARD_EJECT);
+		(*machine.config().m_memcard_handler)(machine, file, MEMCARD_EJECT);
 
 	/* close the file */
 	state->memcard_inserted = -1;
@@ -498,9 +498,9 @@ void memcard_eject(running_machine &machine)
     card index, or -1 if none
 -------------------------------------------------*/
 
-int memcard_present(running_machine *machine)
+int memcard_present(running_machine &machine)
 {
-	generic_machine_private *state = machine->generic_machine_data;
+	generic_machine_private *state = machine.generic_machine_data;
 	return state->memcard_inserted;
 }
 
@@ -514,7 +514,7 @@ int memcard_present(running_machine *machine)
     set_led_status - set the state of a given LED
 -------------------------------------------------*/
 
-void set_led_status(running_machine *machine, int num, int on)
+void set_led_status(running_machine &machine, int num, int on)
 {
 	output_set_led_value(num, on);
 }
@@ -585,7 +585,7 @@ void generic_pulse_irq_line(device_t *device, int irqline)
 
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
 	attotime target_time = cpudevice->local_time() + cpudevice->cycles_to_attotime(cpudevice->min_cycles());
-	device->machine->scheduler().timer_set(target_time - device->machine->time(), FUNC(irq_pulse_clear), irqline, (void *)device);
+	device->machine().scheduler().timer_set(target_time - device->machine().time(), FUNC(irq_pulse_clear), irqline, (void *)device);
 }
 
 
@@ -602,7 +602,7 @@ void generic_pulse_irq_line_and_vector(device_t *device, int irqline, int vector
 
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
 	attotime target_time = cpudevice->local_time() + cpudevice->cycles_to_attotime(cpudevice->min_cycles());
-	device->machine->scheduler().timer_set(target_time - device->machine->time(), FUNC(irq_pulse_clear), irqline, (void *)device);
+	device->machine().scheduler().timer_set(target_time - device->machine().time(), FUNC(irq_pulse_clear), irqline, (void *)device);
 }
 
 
@@ -615,7 +615,7 @@ void cpu_interrupt_enable(device_t *device, int enabled)
 {
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
 
-	generic_machine_private *state = device->machine->generic_machine_data;
+	generic_machine_private *state = device->machine().generic_machine_data;
 	int index;
 	for (index = 0; index < ARRAY_LENGTH(state->interrupt_device); index++)
 		if (state->interrupt_device[index] == device)
@@ -628,7 +628,7 @@ void cpu_interrupt_enable(device_t *device, int enabled)
 
 	/* make sure there are no queued interrupts */
 	if (enabled == 0)
-		device->machine->scheduler().synchronize(FUNC(clear_all_lines), 0, (void *)cpudevice);
+		device->machine().scheduler().synchronize(FUNC(clear_all_lines), 0, (void *)cpudevice);
 }
 
 
@@ -713,24 +713,24 @@ INTERRUPT_GEN( irq7_line_assert )	{ if (interrupt_enabled(device)) device_set_in
     8-bit reset read/write handlers
 -------------------------------------------------*/
 
-WRITE8_HANDLER( watchdog_reset_w ) { watchdog_reset(space->machine); }
-READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(space->machine); return space->unmap(); }
+WRITE8_HANDLER( watchdog_reset_w ) { watchdog_reset(space->machine()); }
+READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(space->machine()); return space->unmap(); }
 
 
 /*-------------------------------------------------
     16-bit reset read/write handlers
 -------------------------------------------------*/
 
-WRITE16_HANDLER( watchdog_reset16_w ) {	watchdog_reset(space->machine); }
-READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(space->machine); return space->unmap(); }
+WRITE16_HANDLER( watchdog_reset16_w ) {	watchdog_reset(space->machine()); }
+READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(space->machine()); return space->unmap(); }
 
 
 /*-------------------------------------------------
     32-bit reset read/write handlers
 -------------------------------------------------*/
 
-WRITE32_HANDLER( watchdog_reset32_w ) {	watchdog_reset(space->machine); }
-READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(space->machine); return space->unmap(); }
+WRITE32_HANDLER( watchdog_reset32_w ) {	watchdog_reset(space->machine()); }
+READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(space->machine()); return space->unmap(); }
 
 
 
@@ -748,5 +748,5 @@ READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(space->machine); return sp
 CUSTOM_INPUT( custom_port_read )
 {
 	const char *tag = (const char *)param;
-	return input_port_read(field->port->machine, tag);
+	return input_port_read(field->port->machine(), tag);
 }

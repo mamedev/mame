@@ -69,9 +69,9 @@ public:
 };
 
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	egghunt_state *state = machine->driver_data<egghunt_state>();
+	egghunt_state *state = machine.driver_data<egghunt_state>();
 	int flipscreen = 0;
 	int offs, sx, sy;
 
@@ -100,7 +100,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 			sx = 496 - sx;
 			sy = 240 - sy;
 		}
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 				 code,
 				 color,
 				 flipscreen,flipscreen,
@@ -110,7 +110,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	egghunt_state *state = machine->driver_data<egghunt_state>();
+	egghunt_state *state = machine.driver_data<egghunt_state>();
 	int code = ((state->bgram[tile_index * 2 + 1] << 8) | state->bgram[tile_index * 2]) & 0x3fff;
 	int colour = state->atram[tile_index] & 0x3f;
 
@@ -129,7 +129,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static READ8_HANDLER( egghunt_bgram_r )
 {
-	egghunt_state *state = space->machine->driver_data<egghunt_state>();
+	egghunt_state *state = space->machine().driver_data<egghunt_state>();
 	if (state->vidram_bank)
 	{
 		return state->spram[offset];
@@ -142,7 +142,7 @@ static READ8_HANDLER( egghunt_bgram_r )
 
 static WRITE8_HANDLER( egghunt_bgram_w )
 {
-	egghunt_state *state = space->machine->driver_data<egghunt_state>();
+	egghunt_state *state = space->machine().driver_data<egghunt_state>();
 	if (state->vidram_bank)
 	{
 		state->spram[offset] = data;
@@ -156,7 +156,7 @@ static WRITE8_HANDLER( egghunt_bgram_w )
 
 static WRITE8_HANDLER( egghunt_atram_w )
 {
-	egghunt_state *state = space->machine->driver_data<egghunt_state>();
+	egghunt_state *state = space->machine().driver_data<egghunt_state>();
 	state->atram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -164,7 +164,7 @@ static WRITE8_HANDLER( egghunt_atram_w )
 
 static VIDEO_START(egghunt)
 {
-	egghunt_state *state = machine->driver_data<egghunt_state>();
+	egghunt_state *state = machine.driver_data<egghunt_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
@@ -174,15 +174,15 @@ static VIDEO_START(egghunt)
 
 static SCREEN_UPDATE(egghunt)
 {
-	egghunt_state *state = screen->machine->driver_data<egghunt_state>();
+	egghunt_state *state = screen->machine().driver_data<egghunt_state>();
 	tilemap_draw(bitmap,cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
 static WRITE8_HANDLER( egghunt_gfx_banking_w )
 {
-	egghunt_state *state = space->machine->driver_data<egghunt_state>();
+	egghunt_state *state = space->machine().driver_data<egghunt_state>();
 	// data & 0x03 is used for tile banking
 	// data & 0x30 is used for sprites banking
 	state->gfx_banking = data & 0x33;
@@ -192,26 +192,26 @@ static WRITE8_HANDLER( egghunt_gfx_banking_w )
 
 static WRITE8_HANDLER( egghunt_vidram_bank_w )
 {
-	egghunt_state *state = space->machine->driver_data<egghunt_state>();
+	egghunt_state *state = space->machine().driver_data<egghunt_state>();
 	state->vidram_bank = data & 1;
 }
 
 static WRITE8_HANDLER( egghunt_soundlatch_w )
 {
-	egghunt_state *state = space->machine->driver_data<egghunt_state>();
+	egghunt_state *state = space->machine().driver_data<egghunt_state>();
 	soundlatch_w(space, 0, data);
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static READ8_DEVICE_HANDLER( egghunt_okibanking_r )
 {
-	egghunt_state *state = device->machine->driver_data<egghunt_state>();
+	egghunt_state *state = device->machine().driver_data<egghunt_state>();
 	return state->okibanking;
 }
 
 static WRITE8_DEVICE_HANDLER( egghunt_okibanking_w )
 {
-	egghunt_state *state = device->machine->driver_data<egghunt_state>();
+	egghunt_state *state = device->machine().driver_data<egghunt_state>();
 	state->okibanking = data;
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
@@ -388,9 +388,9 @@ GFXDECODE_END
 
 static MACHINE_START( egghunt )
 {
-	egghunt_state *state = machine->driver_data<egghunt_state>();
+	egghunt_state *state = machine.driver_data<egghunt_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->gfx_banking));
 	state->save_item(NAME(state->okibanking));
@@ -399,7 +399,7 @@ static MACHINE_START( egghunt )
 
 static MACHINE_RESET( egghunt )
 {
-	egghunt_state *state = machine->driver_data<egghunt_state>();
+	egghunt_state *state = machine.driver_data<egghunt_state>();
 	state->gfx_banking = 0;
 	state->okibanking = 0;
 	state->vidram_bank = 0;

@@ -630,7 +630,7 @@ static CPU_INIT( tms34010 )
 	tms->device = device;
 	tms->program = device->space(AS_PROGRAM);
 	tms->direct = &tms->program->direct();
-	tms->screen = downcast<screen_device *>(device->machine->device(configdata->screen_tag));
+	tms->screen = downcast<screen_device *>(device->machine().device(configdata->screen_tag));
 
 	/* set up the state table */
 	{
@@ -652,11 +652,11 @@ static CPU_INIT( tms34010 )
 	}
 
 	/* allocate a scanline timer and set it to go off at the start */
-	tms->scantimer = device->machine->scheduler().timer_alloc(FUNC(scanline_callback), tms);
+	tms->scantimer = device->machine().scheduler().timer_alloc(FUNC(scanline_callback), tms);
 	tms->scantimer->adjust(attotime::zero);
 
 	/* allocate the shiftreg */
-	tms->shiftreg = auto_alloc_array(device->machine, UINT16, SHIFTREG_SIZE/2);
+	tms->shiftreg = auto_alloc_array(device->machine(), UINT16, SHIFTREG_SIZE/2);
 
 	device->save_item(NAME(tms->pc));
 	device->save_item(NAME(tms->st));
@@ -669,7 +669,7 @@ static CPU_INIT( tms34010 )
 	device->save_item(NAME(tms->pixelshift));
 	device->save_item(NAME(tms->gfxcycles));
 	device->save_pointer(NAME(&tms->regs[0].reg), ARRAY_LENGTH(tms->regs));
-	device->machine->state().register_postload(tms34010_state_postload, tms);
+	device->machine().state().register_postload(tms34010_state_postload, tms);
 }
 
 static CPU_RESET( tms34010 )
@@ -799,7 +799,7 @@ static CPU_EXECUTE( tms34010 )
 	/* check interrupts first */
 	tms->executing = TRUE;
 	check_interrupt(tms);
-	if ((tms->device->machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if ((tms->device->machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
 	{
 		do
 		{
@@ -1080,14 +1080,14 @@ void tms34010_get_display_params(device_t *cpu, tms34010_display_params *params)
 
 SCREEN_UPDATE( tms340x0 )
 {
-	pen_t blackpen = get_black_pen(screen->machine);
+	pen_t blackpen = get_black_pen(screen->machine());
 	tms34010_display_params params;
 	tms34010_state *tms = NULL;
 	device_t *cpu;
 	int x;
 
 	/* find the owning CPU */
-	for (cpu = screen->machine->m_devicelist.first(); cpu != NULL; cpu = cpu->next())
+	for (cpu = screen->machine().m_devicelist.first(); cpu != NULL; cpu = cpu->next())
 	{
 		device_type type = cpu->type();
 		if (type == TMS34010 || type == TMS34020)
@@ -1200,7 +1200,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 
 			/* NMI issued? */
 			if (data & 0x0100)
-				tms->device->machine->scheduler().synchronize(FUNC(internal_interrupt_callback), 0, tms);
+				tms->device->machine().scheduler().synchronize(FUNC(internal_interrupt_callback), 0, tms);
 			break;
 
 		case REG_HSTCTLL:
@@ -1235,7 +1235,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
 			if (!(oldreg & 0x0008) && (newreg & 0x0008))
-				tms->device->machine->scheduler().synchronize(FUNC(internal_interrupt_callback), TMS34010_HI, tms);
+				tms->device->machine().scheduler().synchronize(FUNC(internal_interrupt_callback), TMS34010_HI, tms);
 			else if ((oldreg & 0x0008) && !(newreg & 0x0008))
 				IOREG(tms, REG_INTPEND) &= ~TMS34010_HI;
 			break;
@@ -1270,7 +1270,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 	}
 
 //  if (LOG_CONTROL_REGS)
-//      logerror("%s: %s = %04X (%d)\n", tms->device->machine->describe_context(), ioreg_name[offset], IOREG(tms, offset), tms->screen->vpos());
+//      logerror("%s: %s = %04X (%d)\n", tms->device->machine().describe_context(), ioreg_name[offset], IOREG(tms, offset), tms->screen->vpos());
 }
 
 
@@ -1307,7 +1307,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 	IOREG(tms, offset) = data;
 
 //  if (LOG_CONTROL_REGS)
-//      logerror("%s: %s = %04X (%d)\n", device->machine->describe_context(), ioreg020_name[offset], IOREG(tms, offset), tms->screen->vpos());
+//      logerror("%s: %s = %04X (%d)\n", device->machine().describe_context(), ioreg020_name[offset], IOREG(tms, offset), tms->screen->vpos());
 
 	switch (offset)
 	{
@@ -1351,7 +1351,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 			/* NMI issued? */
 			if (data & 0x0100)
-				tms->device->machine->scheduler().synchronize(FUNC(internal_interrupt_callback), 0, tms);
+				tms->device->machine().scheduler().synchronize(FUNC(internal_interrupt_callback), 0, tms);
 			break;
 
 		case REG020_HSTCTLL:
@@ -1386,7 +1386,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
 			if (!(oldreg & 0x0008) && (newreg & 0x0008))
-				tms->device->machine->scheduler().synchronize(FUNC(internal_interrupt_callback), TMS34010_HI, tms);
+				tms->device->machine().scheduler().synchronize(FUNC(internal_interrupt_callback), TMS34010_HI, tms);
 			else if ((oldreg & 0x0008) && !(newreg & 0x0008))
 				IOREG(tms, REG020_INTPEND) &= ~TMS34010_HI;
 			break;
@@ -1466,7 +1466,7 @@ READ16_HANDLER( tms34010_io_register_r )
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)
-//      logerror("%s: read %s\n", device->machine->describe_context(), ioreg_name[offset]);
+//      logerror("%s: read %s\n", device->machine().describe_context(), ioreg_name[offset]);
 
 	switch (offset)
 	{
@@ -1509,7 +1509,7 @@ READ16_HANDLER( tms34020_io_register_r )
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)
-//      logerror("%s: read %s\n", device->machine->describe_context(), ioreg_name[offset]);
+//      logerror("%s: read %s\n", device->machine().describe_context(), ioreg_name[offset]);
 
 	switch (offset)
 	{

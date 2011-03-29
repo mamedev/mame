@@ -38,7 +38,7 @@ public:
 
 /*----------- defined in drivers/vicdual.c -----------*/
 
-int vicdual_is_cabinet_color(running_machine *machine);
+int vicdual_is_cabinet_color(running_machine &machine);
 
 
 /*----------- defined in video/vicdual.c -----------*/

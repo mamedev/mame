@@ -23,7 +23,7 @@
 
 static TILE_GET_INFO( get_tile_info )
 {
-	aeroboto_state *state = machine->driver_data<aeroboto_state>();
+	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 	UINT8 code = state->videoram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -42,7 +42,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( aeroboto )
 {
-	aeroboto_state *state = machine->driver_data<aeroboto_state>();
+	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 64);
 	tilemap_set_transparent_pen(state->bg_tilemap, 0);
@@ -81,15 +81,15 @@ VIDEO_START( aeroboto )
 
 READ8_HANDLER( aeroboto_in0_r )
 {
-	return input_port_read(space->machine, flip_screen_get(space->machine) ? "P2" : "P1");
+	return input_port_read(space->machine(), flip_screen_get(space->machine()) ? "P2" : "P1");
 }
 
 WRITE8_HANDLER( aeroboto_3000_w )
 {
-	aeroboto_state *state = space->machine->driver_data<aeroboto_state>();
+	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
 	/* bit 0 selects both flip screen and player1/player2 controls */
-	flip_screen_set(space->machine, data & 0x01);
+	flip_screen_set(space->machine(), data & 0x01);
 
 	/* bit 1 = char bank select */
 	if (state->charbank != ((data & 0x02) >> 1))
@@ -104,7 +104,7 @@ WRITE8_HANDLER( aeroboto_3000_w )
 
 WRITE8_HANDLER( aeroboto_videoram_w )
 {
-	aeroboto_state *state = space->machine->driver_data<aeroboto_state>();
+	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
@@ -112,7 +112,7 @@ WRITE8_HANDLER( aeroboto_videoram_w )
 
 WRITE8_HANDLER( aeroboto_tilecolor_w )
 {
-	aeroboto_state *state = space->machine->driver_data<aeroboto_state>();
+	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
 	if (state->tilecolor[offset] != data)
 	{
@@ -129,9 +129,9 @@ WRITE8_HANDLER( aeroboto_tilecolor_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	aeroboto_state *state = machine->driver_data<aeroboto_state>();
+	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -145,7 +145,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			y = 240 - y;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[1],
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[1],
 				state->spriteram[offs + 1],
 				state->spriteram[offs + 2] & 0x07,
 				flip_screen_get(machine), flip_screen_get(machine),
@@ -156,7 +156,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( aeroboto )
 {
-	aeroboto_state *state = screen->machine->driver_data<aeroboto_state>();
+	aeroboto_state *state = screen->machine().driver_data<aeroboto_state>();
 
 	static const rectangle splitrect1 = { 0, 255, 0, 39 };
 	static const rectangle splitrect2 = { 0, 255, 40, 255 };
@@ -220,7 +220,7 @@ SCREEN_UPDATE( aeroboto )
 	tilemap_set_scrolly(state->bg_tilemap, 0, *state->vscroll);
 	tilemap_draw(bitmap, &splitrect2, state->bg_tilemap, 0, 0);
 
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 
 	// the status display behaves more closely to a 40-line splitscreen than an overlay
 	tilemap_set_scrolly(state->bg_tilemap, 0, 0);

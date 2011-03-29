@@ -270,7 +270,7 @@ struct tempsprite
 	int pri;
 };
 
-static void get_sprite_info(running_machine *machine, const UINT32 *spriteram32_ptr);
+static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_ptr);
 
 struct f3_playfield_line_inf
 {
@@ -321,13 +321,13 @@ pri_alp_bitmap
 1111 1111    opaque pixel
 */
 
-static void init_alpha_blend_func(running_machine *machine);
+static void init_alpha_blend_func(running_machine &machine);
 
 /******************************************************************************/
 
-static void print_debug_info(running_machine *machine, bitmap_t *bitmap)
+static void print_debug_info(running_machine &machine, bitmap_t *bitmap)
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	UINT32 *f3_line_ram = state->f3_line_ram;
 	int l[16];
 	char buf[64*16];
@@ -396,12 +396,12 @@ static void print_debug_info(running_machine *machine, bitmap_t *bitmap)
 	l[3]=f3_line_ram[0x15e0]&0xffff;
 	bufptr += sprintf(bufptr,"5000: %04x %04x %04x %04x\n",l[0],l[1],l[2],l[3]);
 
-	ui_draw_text(&machine->render().ui_container(), buf, 60, 40);
+	ui_draw_text(&machine.render().ui_container(), buf, 60, 40);
 }
 
 /******************************************************************************/
 
-INLINE void get_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index, UINT32 *gfx_base)
+INLINE void get_tile_info(running_machine &machine, tile_data *tileinfo, int tile_index, UINT32 *gfx_base)
 {
 	UINT32 tile=gfx_base[tile_index];
 	UINT8 abtype=(tile>>(16+9)) & 1;
@@ -421,31 +421,31 @@ INLINE void get_tile_info(running_machine *machine, tile_data *tileinfo, int til
 
 static TILE_GET_INFO( get_tile_info1 )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	get_tile_info(machine,tileinfo,tile_index,state->f3_pf_data_1);
 }
 
 static TILE_GET_INFO( get_tile_info2 )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	get_tile_info(machine,tileinfo,tile_index,state->f3_pf_data_2);
 }
 
 static TILE_GET_INFO( get_tile_info3 )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	get_tile_info(machine,tileinfo,tile_index,state->f3_pf_data_3);
 }
 
 static TILE_GET_INFO( get_tile_info4 )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	get_tile_info(machine,tileinfo,tile_index,state->f3_pf_data_4);
 }
 
 static TILE_GET_INFO( get_tile_info_vram )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	UINT32 *videoram = state->videoram;
 	int vram_tile;
 	int flags=0;
@@ -467,7 +467,7 @@ static TILE_GET_INFO( get_tile_info_vram )
 
 static TILE_GET_INFO( get_tile_info_pixel )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	UINT32 *videoram = state->videoram;
 	int vram_tile,col_off;
 	int flags=0;
@@ -499,10 +499,10 @@ static TILE_GET_INFO( get_tile_info_pixel )
 
 SCREEN_EOF( f3 )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	if (state->sprite_lag==2)
 	{
-		if (machine->video().skip_this_frame() == 0)
+		if (machine.video().skip_this_frame() == 0)
 		{
 			get_sprite_info(machine, state->spriteram32_buffered);
 		}
@@ -510,7 +510,7 @@ SCREEN_EOF( f3 )
 	}
 	else if (state->sprite_lag==1)
 	{
-		if (machine->video().skip_this_frame() == 0)
+		if (machine.video().skip_this_frame() == 0)
 		{
 			get_sprite_info(machine, state->spriteram);
 		}
@@ -519,7 +519,7 @@ SCREEN_EOF( f3 )
 
 VIDEO_START( f3 )
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	const struct F3config *pCFG=&f3_config_table[0];
 	int width, height, i;
 
@@ -597,12 +597,12 @@ VIDEO_START( f3 )
 	state->pixel_layer = tilemap_create(machine, get_tile_info_pixel,tilemap_scan_cols,8,8,64,32);
 	state->pf_line_inf = auto_alloc_array(machine, struct f3_playfield_line_inf, 5);
 	state->sa_line_inf = auto_alloc_array(machine, struct f3_spritealpha_line_inf, 1);
-	width = machine->primary_screen->width();
-	height = machine->primary_screen->height();
+	width = machine.primary_screen->width();
+	height = machine.primary_screen->height();
 	state->pri_alp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8 );
-	state->tile_opaque_sp = auto_alloc_array(machine, UINT8, machine->gfx[2]->total_elements);
+	state->tile_opaque_sp = auto_alloc_array(machine, UINT8, machine.gfx[2]->total_elements);
 	for (i=0; i<4; i++)
-		state->tile_opaque_pf[i] = auto_alloc_array(machine, UINT8, machine->gfx[1]->total_elements);
+		state->tile_opaque_pf[i] = auto_alloc_array(machine, UINT8, machine.gfx[1]->total_elements);
 
 	tilemap_set_transparent_pen(state->pf1_tilemap,0);
 	tilemap_set_transparent_pen(state->pf2_tilemap,0);
@@ -613,8 +613,8 @@ VIDEO_START( f3 )
 
 	/* Palettes have 4 bpp indexes despite up to 6 bpp data. The unused */
 	/* top bits in the gfx data are cleared later.                      */
-	machine->gfx[1]->color_granularity=16;
-	machine->gfx[2]->color_granularity=16;
+	machine.gfx[1]->color_granularity=16;
+	machine.gfx[2]->color_granularity=16;
 
 	state->flipscreen = 0;
 	memset(state->spriteram32_buffered,0,state->spriteram_size);
@@ -623,8 +623,8 @@ VIDEO_START( f3 )
 	state_save_register_global_array(machine, state->f3_control_0);
 	state_save_register_global_array(machine, state->f3_control_1);
 
-	gfx_element_set_source(machine->gfx[0], (UINT8 *)state->f3_vram);
-	gfx_element_set_source(machine->gfx[3], (UINT8 *)state->f3_pivot_ram);
+	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->f3_vram);
+	gfx_element_set_source(machine.gfx[3], (UINT8 *)state->f3_pivot_ram);
 
 	state->f3_skip_this_frame=0;
 
@@ -633,7 +633,7 @@ VIDEO_START( f3 )
 	init_alpha_blend_func(machine);
 
 	{
-		const gfx_element *sprite_gfx = machine->gfx[2];
+		const gfx_element *sprite_gfx = machine.gfx[2];
 		int c;
 
 		for (c = 0;c < sprite_gfx->total_elements;c++)
@@ -657,7 +657,7 @@ VIDEO_START( f3 )
 
 
 	{
-		const gfx_element *pf_gfx = machine->gfx[1];
+		const gfx_element *pf_gfx = machine.gfx[1];
 		int c;
 
 		for (c = 0;c < pf_gfx->total_elements;c++)
@@ -692,7 +692,7 @@ VIDEO_START( f3 )
 
 WRITE32_HANDLER( f3_pf_data_w )
 {
-	taito_f3_state *state = space->machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	COMBINE_DATA(&state->f3_pf_data[offset]);
 
 	if (state->f3_game_config->extend) {
@@ -710,19 +710,19 @@ WRITE32_HANDLER( f3_pf_data_w )
 
 WRITE32_HANDLER( f3_control_0_w )
 {
-	taito_f3_state *state = space->machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	COMBINE_DATA(&state->f3_control_0[offset]);
 }
 
 WRITE32_HANDLER( f3_control_1_w )
 {
-	taito_f3_state *state = space->machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	COMBINE_DATA(&state->f3_control_1[offset]);
 }
 
 WRITE32_HANDLER( f3_videoram_w )
 {
-	taito_f3_state *state = space->machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	UINT32 *videoram = state->videoram;
 	int tile,col_off;
 	COMBINE_DATA(&videoram[offset]);
@@ -741,21 +741,21 @@ WRITE32_HANDLER( f3_videoram_w )
 
 WRITE32_HANDLER( f3_vram_w )
 {
-	taito_f3_state *state = space->machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	COMBINE_DATA(&state->f3_vram[offset]);
-	gfx_element_mark_dirty(space->machine->gfx[0], offset/8);
+	gfx_element_mark_dirty(space->machine().gfx[0], offset/8);
 }
 
 WRITE32_HANDLER( f3_pivot_w )
 {
-	taito_f3_state *state = space->machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	COMBINE_DATA(&state->f3_pivot_ram[offset]);
-	gfx_element_mark_dirty(space->machine->gfx[3], offset/8);
+	gfx_element_mark_dirty(space->machine().gfx[3], offset/8);
 }
 
 WRITE32_HANDLER( f3_lineram_w )
 {
-	taito_f3_state *state = space->machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	/* DariusGX has an interesting bug at the start of Round D - the clearing of lineram
     (0xa000->0x0xa7ff) overflows into priority RAM (0xb000) and creates garbage priority
     values.  I'm not sure what the real machine would do with these values, and this
@@ -776,52 +776,52 @@ WRITE32_HANDLER( f3_lineram_w )
 
 WRITE32_HANDLER( f3_palette_24bit_w )
 {
-	taito_f3_state *state = space->machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	int r,g,b;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
 
 	/* 12 bit palette games - there has to be a palette select bit somewhere */
 	if (state->f3_game==SPCINVDX || state->f3_game==RIDINGF || state->f3_game==ARABIANM || state->f3_game==RINGRAGE) {
-		b = 15 * ((space->machine->generic.paletteram.u32[offset] >> 4) & 0xf);
-		g = 15 * ((space->machine->generic.paletteram.u32[offset] >> 8) & 0xf);
-		r = 15 * ((space->machine->generic.paletteram.u32[offset] >> 12) & 0xf);
+		b = 15 * ((space->machine().generic.paletteram.u32[offset] >> 4) & 0xf);
+		g = 15 * ((space->machine().generic.paletteram.u32[offset] >> 8) & 0xf);
+		r = 15 * ((space->machine().generic.paletteram.u32[offset] >> 12) & 0xf);
 	}
 
 	/* This is weird - why are only the sprites and VRAM palettes 21 bit? */
 	else if (state->f3_game==CLEOPATR) {
 		if (offset<0x100 || offset>0x1000) {
-			r = ((space->machine->generic.paletteram.u32[offset] >>16) & 0x7f)<<1;
-			g = ((space->machine->generic.paletteram.u32[offset] >> 8) & 0x7f)<<1;
-			b = ((space->machine->generic.paletteram.u32[offset] >> 0) & 0x7f)<<1;
+			r = ((space->machine().generic.paletteram.u32[offset] >>16) & 0x7f)<<1;
+			g = ((space->machine().generic.paletteram.u32[offset] >> 8) & 0x7f)<<1;
+			b = ((space->machine().generic.paletteram.u32[offset] >> 0) & 0x7f)<<1;
 		} else {
-			r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
-			g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
-			b = (space->machine->generic.paletteram.u32[offset] >> 0) & 0xff;
+			r = (space->machine().generic.paletteram.u32[offset] >>16) & 0xff;
+			g = (space->machine().generic.paletteram.u32[offset] >> 8) & 0xff;
+			b = (space->machine().generic.paletteram.u32[offset] >> 0) & 0xff;
 		}
 	}
 
 	/* Another weird couple - perhaps this is alpha blending related? */
 	else if (state->f3_game==TWINQIX || state->f3_game==RECALH) {
 		if (offset>0x1c00) {
-			r = ((space->machine->generic.paletteram.u32[offset] >>16) & 0x7f)<<1;
-			g = ((space->machine->generic.paletteram.u32[offset] >> 8) & 0x7f)<<1;
-			b = ((space->machine->generic.paletteram.u32[offset] >> 0) & 0x7f)<<1;
+			r = ((space->machine().generic.paletteram.u32[offset] >>16) & 0x7f)<<1;
+			g = ((space->machine().generic.paletteram.u32[offset] >> 8) & 0x7f)<<1;
+			b = ((space->machine().generic.paletteram.u32[offset] >> 0) & 0x7f)<<1;
 		} else {
-			r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
-			g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
-			b = (space->machine->generic.paletteram.u32[offset] >> 0) & 0xff;
+			r = (space->machine().generic.paletteram.u32[offset] >>16) & 0xff;
+			g = (space->machine().generic.paletteram.u32[offset] >> 8) & 0xff;
+			b = (space->machine().generic.paletteram.u32[offset] >> 0) & 0xff;
 		}
 	}
 
 	/* All other games - standard 24 bit palette */
 	else {
-		r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
-		g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
-		b = (space->machine->generic.paletteram.u32[offset] >> 0) & 0xff;
+		r = (space->machine().generic.paletteram.u32[offset] >>16) & 0xff;
+		g = (space->machine().generic.paletteram.u32[offset] >> 8) & 0xff;
+		b = (space->machine().generic.paletteram.u32[offset] >> 0) & 0xff;
 	}
 
-	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
 }
 
 /******************************************************************************/
@@ -1141,9 +1141,9 @@ INLINE void dpix_bg(taito_f3_state *state, UINT32 bgcolor)
 
 /******************************************************************************/
 
-static void init_alpha_blend_func(running_machine *machine)
+static void init_alpha_blend_func(running_machine &machine)
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	int i,j;
 
 	state->dpix_n[0][0x0]=dpix_1_noalpha;
@@ -1344,15 +1344,15 @@ static void init_alpha_blend_func(running_machine *machine)
 
 /*============================================================================*/
 
-INLINE void draw_scanlines(running_machine *machine,
+INLINE void draw_scanlines(running_machine &machine,
 		bitmap_t *bitmap,int xsize,INT16 *draw_line_num,
 		const struct f3_playfield_line_inf **line_t,
 		const int *sprite,
 		UINT32 orient,
 		int skip_layer_num)
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
-	const pen_t *clut = &machine->pens[0];
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
+	const pen_t *clut = &machine.pens[0];
 	UINT32 bgcolor=clut[0];
 	int length;
 
@@ -1472,13 +1472,13 @@ INLINE void draw_scanlines(running_machine *machine,
 
 /******************************************************************************/
 
-static void visible_tile_check(running_machine *machine,
+static void visible_tile_check(running_machine &machine,
 							   struct f3_playfield_line_inf *line_t,
 								int line,
 								UINT32 x_index_fx,UINT32 y_index,
 								UINT32 *f3_pf_data_n)
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	UINT32 *pf_base;
 	int i,trans_all,tile_index,tile_num;
 	int alpha_type,alpha_mode;
@@ -1488,7 +1488,7 @@ static void visible_tile_check(running_machine *machine,
 	alpha_mode=line_t->alpha_mode[line];
 	if(!alpha_mode) return;
 
-	total_elements=machine->gfx[1]->total_elements;
+	total_elements=machine.gfx[1]->total_elements;
 
 	tile_index=x_index_fx>>16;
 	tile_num=(((line_t->x_zoom[line]*320+(x_index_fx & 0xffff)+0xffff)>>16)+(tile_index%16)+15)/16;
@@ -1768,9 +1768,9 @@ static void get_spritealphaclip_info(taito_f3_state *state)
 }
 
 /* sx and sy are 16.16 fixed point numbers */
-static void get_line_ram_info(running_machine *machine, tilemap_t *tmap, int sx, int sy, int pos, UINT32 *f3_pf_data_n)
+static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx, int sy, int pos, UINT32 *f3_pf_data_n)
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	struct f3_playfield_line_inf *line_t=&state->pf_line_inf[pos];
 	const bitmap_t *srcbitmap;
 	const bitmap_t *flagsbitmap;
@@ -1989,9 +1989,9 @@ static void get_line_ram_info(running_machine *machine, tilemap_t *tmap, int sx,
 	}
 }
 
-static void get_vram_info(running_machine *machine, tilemap_t *vram_tilemap, tilemap_t *pixel_tilemap, int sx, int sy)
+static void get_vram_info(running_machine &machine, tilemap_t *vram_tilemap, tilemap_t *pixel_tilemap, int sx, int sy)
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	const struct f3_spritealpha_line_inf *sprite_alpha_line_t=&state->sa_line_inf[0];
 	struct f3_playfield_line_inf *line_t=&state->pf_line_inf[4];
 	const bitmap_t *srcbitmap_pixel, *srcbitmap_vram;
@@ -2118,9 +2118,9 @@ static void get_vram_info(running_machine *machine, tilemap_t *vram_tilemap, til
 
 /******************************************************************************/
 
-static void scanline_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	int i,j,y,ys,ye;
 	int y_start,y_end,y_start_next,y_end_next;
 	UINT8 draw_line[256];
@@ -2554,7 +2554,7 @@ INLINE void f3_drawgfx(
 		int sx,int sy,
 		UINT8 pri_dst)
 {
-	taito_f3_state *state = gfx->machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = gfx->machine().driver_data<taito_f3_state>();
 	rectangle myclip;
 
 	pri_dst=1<<pri_dst;
@@ -2578,7 +2578,7 @@ INLINE void f3_drawgfx(
 
 	if( gfx )
 	{
-		const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 		{
@@ -2719,7 +2719,7 @@ INLINE void f3_drawgfxzoom(
 		int scalex, int scaley,
 		UINT8 pri_dst)
 {
-	taito_f3_state *state = gfx->machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = gfx->machine().driver_data<taito_f3_state>();
 	rectangle myclip;
 
 	pri_dst=1<<pri_dst;
@@ -2743,7 +2743,7 @@ INLINE void f3_drawgfxzoom(
 
 	if( gfx )
 	{
-		const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 		{
@@ -2846,10 +2846,10 @@ INLINE void f3_drawgfxzoom(
 	/*zoom##p = p##_addition << 12;*/							\
 }
 
-static void get_sprite_info(running_machine *machine, const UINT32 *spriteram32_ptr)
+static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_ptr)
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 	const int min_x=visarea.min_x,max_x=visarea.max_x;
 	const int min_y=visarea.min_y,max_y=visarea.max_y;
 	int offs,spritecont,flipx,flipy,/*old_x,*/color,x,y;
@@ -3114,11 +3114,11 @@ static void get_sprite_info(running_machine *machine, const UINT32 *spriteram32_
 #undef CALC_ZOOM
 
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	const struct tempsprite *sprite_ptr;
-	const gfx_element *sprite_gfx = machine->gfx[2];
+	const gfx_element *sprite_gfx = machine.gfx[2];
 
 	sprite_ptr = state->sprite_end;
 	state->sprite_pri_usage=0;
@@ -3158,11 +3158,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( f3 )
 {
-	taito_f3_state *state = screen->machine->driver_data<taito_f3_state>();
+	taito_f3_state *state = screen->machine().driver_data<taito_f3_state>();
 	UINT32 sy_fix[5],sx_fix[5];
 
 	state->f3_skip_this_frame=0;
-	tilemap_set_flip_all(screen->machine,state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine(),state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* Setup scroll */
 	sy_fix[0]=((state->f3_control_0[2]&0xffff0000)>> 7) + (1<<16);
@@ -3199,25 +3199,25 @@ SCREEN_UPDATE( f3 )
 
 	/* sprites */
 	if (state->sprite_lag==0)
-		get_sprite_info(screen->machine, state->spriteram);
+		get_sprite_info(screen->machine(), state->spriteram);
 
 	/* Update sprite buffer */
-	draw_sprites(screen->machine, bitmap,cliprect);
+	draw_sprites(screen->machine(), bitmap,cliprect);
 
 	/* Parse sprite, alpha & clipping parts of lineram */
 	get_spritealphaclip_info(state);
 
 	/* Parse playfield effects */
-	get_line_ram_info(screen->machine, state->pf1_tilemap,sx_fix[0],sy_fix[0],0,state->f3_pf_data_1);
-	get_line_ram_info(screen->machine, state->pf2_tilemap,sx_fix[1],sy_fix[1],1,state->f3_pf_data_2);
-	get_line_ram_info(screen->machine, state->pf3_tilemap,sx_fix[2],sy_fix[2],2,state->f3_pf_data_3);
-	get_line_ram_info(screen->machine, state->pf4_tilemap,sx_fix[3],sy_fix[3],3,state->f3_pf_data_4);
-	get_vram_info(screen->machine, state->vram_layer,state->pixel_layer,sx_fix[4],sy_fix[4]);
+	get_line_ram_info(screen->machine(), state->pf1_tilemap,sx_fix[0],sy_fix[0],0,state->f3_pf_data_1);
+	get_line_ram_info(screen->machine(), state->pf2_tilemap,sx_fix[1],sy_fix[1],1,state->f3_pf_data_2);
+	get_line_ram_info(screen->machine(), state->pf3_tilemap,sx_fix[2],sy_fix[2],2,state->f3_pf_data_3);
+	get_line_ram_info(screen->machine(), state->pf4_tilemap,sx_fix[3],sy_fix[3],3,state->f3_pf_data_4);
+	get_vram_info(screen->machine(), state->vram_layer,state->pixel_layer,sx_fix[4],sy_fix[4]);
 
 	/* Draw final framebuffer */
-	scanline_draw(screen->machine, bitmap,cliprect);
+	scanline_draw(screen->machine(), bitmap,cliprect);
 
 	if (VERBOSE)
-		print_debug_info(screen->machine, bitmap);
+		print_debug_info(screen->machine(), bitmap);
 	return 0;
 }

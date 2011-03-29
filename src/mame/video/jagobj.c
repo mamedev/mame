@@ -24,7 +24,7 @@ static UINT8 *blend_y, *blend_cc;
  *
  *************************************/
 
-void jagobj_init(running_machine *machine)
+void jagobj_init(running_machine &machine)
 {
 	int i;
 
@@ -567,7 +567,7 @@ INLINE UINT8 lookup_pixel(const UINT32 *src, int i, int pitch, int depth)
  *
  *************************************/
 
-static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc, int logit)
+static UINT32 *process_bitmap(running_machine &machine, UINT32 *objdata, int vc, int logit)
 {
 	/* extract minimal data */
 	UINT32 upper = objdata[0];
@@ -747,7 +747,7 @@ static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc,
  *
  *************************************/
 
-static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, int vc, int logit)
+static UINT32 *process_scaled_bitmap(running_machine &machine, UINT32 *objdata, int vc, int logit)
 {
 	/* extract data */
 	UINT32 upper = objdata[0];
@@ -963,7 +963,7 @@ static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, 
  *
  *************************************/
 
-static UINT32 *process_branch(running_machine *machine, UINT32 *objdata, int vc, int logit)
+static UINT32 *process_branch(running_machine &machine, UINT32 *objdata, int vc, int logit)
 {
 	UINT32 upper = objdata[0];
 	UINT32 lower = objdata[1];
@@ -1027,7 +1027,7 @@ static UINT32 *process_branch(running_machine *machine, UINT32 *objdata, int vc,
  *
  *************************************/
 
-static void process_object_list(running_machine *machine, int vc, UINT16 *_scanline)
+static void process_object_list(running_machine &machine, int vc, UINT16 *_scanline)
 {
 	int done = 0, count = 0;
 	UINT32 *objdata;

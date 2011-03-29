@@ -31,7 +31,7 @@ static SCREEN_UPDATE( neptunp2 )
 
 static READ8_HANDLER( test_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static ADDRESS_MAP_START( neptunp2_map, AS_PROGRAM, 8 )

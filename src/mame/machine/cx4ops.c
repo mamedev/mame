@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 //Sprite Functions
-static void CX4_op00(running_machine* machine)
+static void CX4_op00(running_machine& machine)
 {
 	switch(cx4.reg[0x4d])
 	{
@@ -24,14 +24,14 @@ static void CX4_op00(running_machine* machine)
 }
 
 //Draw Wireframe
-static void CX4_op01(running_machine* machine)
+static void CX4_op01(running_machine& machine)
 {
 	memset(cx4.ram + 0x300, 0, 2304);
 	CX4_C4DrawWireFrame(machine);
 }
 
 //Propulsion
-static void CX4_op05(running_machine *machine)
+static void CX4_op05(running_machine &machine)
 {
 	INT32 temp = 0x10000;
 	if(CX4_readw(0x1f83))
@@ -42,7 +42,7 @@ static void CX4_op05(running_machine *machine)
 }
 
 //Set Vector length
-static void CX4_op0d(running_machine *machine)
+static void CX4_op0d(running_machine &machine)
 {
 	cx4.C41FXVal    = CX4_readw(0x1f80);
 	cx4.C41FYVal    = CX4_readw(0x1f83);
@@ -108,7 +108,7 @@ static void CX4_op13(void)
 }
 
 //Pythagorean
-static void CX4_op15(running_machine *machine)
+static void CX4_op15(running_machine &machine)
 {
 	double temp = 0.0;
 	cx4.C41FXVal = CX4_readw(0x1f80);
@@ -119,7 +119,7 @@ static void CX4_op15(running_machine *machine)
 }
 
 //Calculate distance
-static void CX4_op1f(running_machine *machine)
+static void CX4_op1f(running_machine &machine)
 {
 	cx4.C41FXVal = CX4_readw(0x1f80);
 	cx4.C41FYVal = CX4_readw(0x1f83);
@@ -208,7 +208,7 @@ static void CX4_op25(void)
 }
 
 //Transform Coords
-static void CX4_op2d(running_machine *machine)
+static void CX4_op2d(running_machine &machine)
 {
 	cx4.C4WFXVal  = CX4_readw(0x1f81);
 	cx4.C4WFYVal  = CX4_readw(0x1f84);

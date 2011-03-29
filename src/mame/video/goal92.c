@@ -9,13 +9,13 @@
 
 READ16_HANDLER( goal92_fg_bank_r )
 {
-	goal92_state *state = space->machine->driver_data<goal92_state>();
+	goal92_state *state = space->machine().driver_data<goal92_state>();
 	return state->fg_bank;
 }
 
 WRITE16_HANDLER( goal92_fg_bank_w )
 {
-	goal92_state *state = space->machine->driver_data<goal92_state>();
+	goal92_state *state = space->machine().driver_data<goal92_state>();
 	COMBINE_DATA(&state->fg_bank);
 
 	if (ACCESSING_BITS_0_7)
@@ -26,28 +26,28 @@ WRITE16_HANDLER( goal92_fg_bank_w )
 
 WRITE16_HANDLER( goal92_text_w )
 {
-	goal92_state *state = space->machine->driver_data<goal92_state>();
+	goal92_state *state = space->machine().driver_data<goal92_state>();
 	COMBINE_DATA(&state->tx_data[offset]);
 	tilemap_mark_tile_dirty(state->tx_layer, offset);
 }
 
 WRITE16_HANDLER( goal92_background_w )
 {
-	goal92_state *state = space->machine->driver_data<goal92_state>();
+	goal92_state *state = space->machine().driver_data<goal92_state>();
 	COMBINE_DATA(&state->bg_data[offset]);
 	tilemap_mark_tile_dirty(state->bg_layer, offset);
 }
 
 WRITE16_HANDLER( goal92_foreground_w )
 {
-	goal92_state *state = space->machine->driver_data<goal92_state>();
+	goal92_state *state = space->machine().driver_data<goal92_state>();
 	COMBINE_DATA(&state->fg_data[offset]);
 	tilemap_mark_tile_dirty(state->fg_layer, offset);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	goal92_state *state = machine->driver_data<goal92_state>();
+	goal92_state *state = machine.driver_data<goal92_state>();
 	int tile = state->tx_data[tile_index];
 	int color = (tile >> 12) & 0xf;
 
@@ -60,7 +60,7 @@ static TILE_GET_INFO( get_text_tile_info )
 
 static TILE_GET_INFO( get_back_tile_info )
 {
-	goal92_state *state = machine->driver_data<goal92_state>();
+	goal92_state *state = machine.driver_data<goal92_state>();
 	int tile = state->bg_data[tile_index];
 	int color = (tile >> 12) & 0xf;
 
@@ -71,7 +71,7 @@ static TILE_GET_INFO( get_back_tile_info )
 
 static TILE_GET_INFO( get_fore_tile_info )
 {
-	goal92_state *state = machine->driver_data<goal92_state>();
+	goal92_state *state = machine.driver_data<goal92_state>();
 	int tile = state->fg_data[tile_index];
 	int color = (tile >> 12) & 0xf;
 	int region;
@@ -92,9 +92,9 @@ static TILE_GET_INFO( get_fore_tile_info )
 	SET_TILE_INFO(region, tile, color, 0);
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
-	goal92_state *state = machine->driver_data<goal92_state>();
+	goal92_state *state = machine.driver_data<goal92_state>();
 	UINT16 *buffered_spriteram16 = state->buffered_spriteram;
 	int offs, fx, fy, x, y, color, sprite;
 
@@ -130,7 +130,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 		y = 256 - (y + 7);
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				sprite,
 				color,fx,fy,x,y,15);
 	}
@@ -139,7 +139,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_START( goal92 )
 {
-	goal92_state *state = machine->driver_data<goal92_state>();
+	goal92_state *state = machine.driver_data<goal92_state>();
 	state->bg_layer = tilemap_create(machine, get_back_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->fg_layer = tilemap_create(machine, get_fore_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->tx_layer = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
@@ -154,7 +154,7 @@ VIDEO_START( goal92 )
 
 SCREEN_UPDATE( goal92 )
 {
-	goal92_state *state = screen->machine->driver_data<goal92_state>();
+	goal92_state *state = screen->machine().driver_data<goal92_state>();
 	tilemap_set_scrollx(state->bg_layer, 0, state->scrollram[0] + 60);
 	tilemap_set_scrolly(state->bg_layer, 0, state->scrollram[1] + 8);
 
@@ -169,27 +169,27 @@ SCREEN_UPDATE( goal92 )
 		tilemap_set_scrolly(state->fg_layer, 0, state->scrollram[3] + 8);
 	}
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	tilemap_draw(bitmap, cliprect, state->bg_layer, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 2);
+	draw_sprites(screen->machine(), bitmap, cliprect, 2);
 
 	if (!(state->fg_bank & 0xff))
-		draw_sprites(screen->machine, bitmap, cliprect, 1);
+		draw_sprites(screen->machine(), bitmap, cliprect, 1);
 
 	tilemap_draw(bitmap, cliprect, state->fg_layer, 0, 0);
 
 	if(state->fg_bank & 0xff)
-		draw_sprites(screen->machine, bitmap, cliprect, 1);
+		draw_sprites(screen->machine(), bitmap, cliprect, 1);
 
-	draw_sprites(screen->machine, bitmap, cliprect, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 3);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0);
+	draw_sprites(screen->machine(), bitmap, cliprect, 3);
 	tilemap_draw(bitmap, cliprect, state->tx_layer, 0, 0);
 	return 0;
 }
 
 SCREEN_EOF( goal92 )
 {
-	goal92_state *state = machine->driver_data<goal92_state>();
+	goal92_state *state = machine.driver_data<goal92_state>();
 	memcpy(state->buffered_spriteram, state->spriteram, 0x400 * 2);
 }

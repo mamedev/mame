@@ -14,7 +14,7 @@ PALETTE_INIT( tagteam )
 {
 	int i;
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -42,21 +42,21 @@ PALETTE_INIT( tagteam )
 
 WRITE8_HANDLER( tagteam_videoram_w )
 {
-	tagteam_state *state = space->machine->driver_data<tagteam_state>();
+	tagteam_state *state = space->machine().driver_data<tagteam_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( tagteam_colorram_w )
 {
-	tagteam_state *state = space->machine->driver_data<tagteam_state>();
+	tagteam_state *state = space->machine().driver_data<tagteam_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 READ8_HANDLER( tagteam_mirrorvideoram_r )
 {
-	tagteam_state *state = space->machine->driver_data<tagteam_state>();
+	tagteam_state *state = space->machine().driver_data<tagteam_state>();
 	int x,y;
 
 	/* swap x and y coordinates */
@@ -69,7 +69,7 @@ READ8_HANDLER( tagteam_mirrorvideoram_r )
 
 READ8_HANDLER( tagteam_mirrorcolorram_r )
 {
-	tagteam_state *state = space->machine->driver_data<tagteam_state>();
+	tagteam_state *state = space->machine().driver_data<tagteam_state>();
 	int x,y;
 
 	/* swap x and y coordinates */
@@ -106,7 +106,7 @@ WRITE8_HANDLER( tagteam_mirrorcolorram_w )
 
 WRITE8_HANDLER( tagteam_control_w )
 {
-	tagteam_state *state = space->machine->driver_data<tagteam_state>();
+	tagteam_state *state = space->machine().driver_data<tagteam_state>();
 logerror("%04x: control = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bit 7 is the palette bank */
@@ -115,16 +115,16 @@ logerror("%04x: control = %02x\n",cpu_get_pc(space->cpu),data);
 
 WRITE8_HANDLER( tagteam_flipscreen_w )
 {
-	if (flip_screen_get(space->machine) != (data &0x01))
+	if (flip_screen_get(space->machine()) != (data &0x01))
 	{
-		flip_screen_set(space->machine, data & 0x01);
-		tilemap_mark_all_tiles_dirty_all(space->machine);
+		flip_screen_set(space->machine(), data & 0x01);
+		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	tagteam_state *state = machine->driver_data<tagteam_state>();
+	tagteam_state *state = machine.driver_data<tagteam_state>();
 	int code = state->videoram[tile_index] + 256 * state->colorram[tile_index];
 	int color = state->palettebank * 2; // GUESS
 
@@ -133,14 +133,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( tagteam )
 {
-	tagteam_state *state = machine->driver_data<tagteam_state>();
+	tagteam_state *state = machine.driver_data<tagteam_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_flip_x,
 		 8, 8, 32, 32);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	tagteam_state *state = machine->driver_data<tagteam_state>();
+	tagteam_state *state = machine.driver_data<tagteam_state>();
 	int offs;
 
 	for (offs = 0; offs < 0x20; offs += 4)
@@ -164,7 +164,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		}
 
 		drawgfx_transpen(bitmap, cliprect,
-			machine->gfx[1],
+			machine.gfx[1],
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -176,7 +176,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sy += (flip_screen_get(machine) ? -256 : 256);
 
 		drawgfx_transpen(bitmap, cliprect,
-			machine->gfx[1],
+			machine.gfx[1],
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -185,8 +185,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( tagteam )
 {
-	tagteam_state *state = screen->machine->driver_data<tagteam_state>();
+	tagteam_state *state = screen->machine().driver_data<tagteam_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

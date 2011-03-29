@@ -17,7 +17,7 @@ struct pce_struct pce;
 static int joystick_port_select;        /* internal index of joystick ports */
 static int joystick_data_select;        /* which nibble of joystick data we want */
 
-static UINT8 (*pce_joystick_readinputport_callback)(running_machine *) = NULL;
+static UINT8 (*pce_joystick_readinputport_callback)(running_machine &) = NULL;
 
 DRIVER_INIT( pce ) {
 	pce.io_port_options = PCE_JOY_SIG | CONST_SIG;
@@ -53,11 +53,11 @@ READ8_HANDLER ( pce_joystick_r )
 
 	if ( pce_joystick_readinputport_callback != NULL )
 	{
-		data = pce_joystick_readinputport_callback(space->machine);
+		data = pce_joystick_readinputport_callback(space->machine());
 	}
 	else
 	{
-		data = input_port_read(space->machine, "JOY");
+		data = input_port_read(space->machine(), "JOY");
 	}
 	if(joystick_data_select) data >>= 4;
 	ret = (data & 0x0F) | pce.io_port_options;
@@ -67,7 +67,7 @@ READ8_HANDLER ( pce_joystick_r )
 	return (ret);
 }
 
-void pce_set_joystick_readinputport_callback( UINT8 (*joy_read)(running_machine *))
+void pce_set_joystick_readinputport_callback( UINT8 (*joy_read)(running_machine &))
 {
 	pce_joystick_readinputport_callback = joy_read;
 }

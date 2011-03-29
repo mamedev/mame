@@ -1067,7 +1067,7 @@ static WRITE32_HANDLER( namcos23_textram_w )
 static WRITE32_HANDLER( s23_txtchar_w )
 {
 	COMBINE_DATA(&namcos23_charram[offset]);
-	gfx_element_mark_dirty(space->machine->gfx[0], offset/32);
+	gfx_element_mark_dirty(space->machine().gfx[0], offset/32);
 }
 
 static UINT8 nthbyte( const UINT32 *pSource, int offs )
@@ -1076,16 +1076,16 @@ static UINT8 nthbyte( const UINT32 *pSource, int offs )
 	return (pSource[0]<<((offs&3)*8))>>24;
 }
 
-INLINE void UpdatePalette( running_machine *machine, int entry )
+INLINE void UpdatePalette( running_machine &machine, int entry )
 {
 	int j;
 
 	for( j=0; j<2; j++ )
 	{
 		int which = (entry*2)+(j*2);
-		int r = nthbyte(machine->generic.paletteram.u32, which+0x00001);
-		int g = nthbyte(machine->generic.paletteram.u32, which+0x10001);
-		int b = nthbyte(machine->generic.paletteram.u32, which+0x20001);
+		int r = nthbyte(machine.generic.paletteram.u32, which+0x00001);
+		int g = nthbyte(machine.generic.paletteram.u32, which+0x10001);
+		int b = nthbyte(machine.generic.paletteram.u32, which+0x20001);
 		palette_set_color( machine, which/2, MAKE_RGB(r,g,b) );
 	}
 }
@@ -1094,9 +1094,9 @@ INLINE void UpdatePalette( running_machine *machine, int entry )
 
 static WRITE32_HANDLER( namcos23_paletteram_w )
 {
-	COMBINE_DATA( &space->machine->generic.paletteram.u32[offset] );
+	COMBINE_DATA( &space->machine().generic.paletteram.u32[offset] );
 
-	UpdatePalette(space->machine, (offset % (0x10000/4))*2);
+	UpdatePalette(space->machine(), (offset % (0x10000/4))*2);
 }
 
 static READ16_HANDLER(s23_c417_r)
@@ -1116,7 +1116,7 @@ static READ16_HANDLER(s23_c417_r)
            1:  1st c435 busy (inverted)
            0:  xcpreq
          */
-	case 0: return 0x8e | (space->machine->primary_screen->vblank() ? 0x0000 : 0x8000);
+	case 0: return 0x8e | (space->machine().primary_screen->vblank() ? 0x0000 : 0x8000);
 	case 1: return c417_adr;
 	case 4:
 		//      logerror("c417_r %04x = %04x (%08x, %08x)\n", c417_adr, c417_ram[c417_adr], cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
@@ -1157,7 +1157,7 @@ static WRITE16_HANDLER(s23_c417_w)
         break;
     case 7:
     	logerror("c417_w: ack IRQ 2 (%x)\n", data);
-    	cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ2, CLEAR_LINE);
+    	cputag_set_input_line(space->machine(), "maincpu", MIPS3_IRQ2, CLEAR_LINE);
     	break;
     default:
         logerror("c417_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
@@ -1289,7 +1289,7 @@ static WRITE16_HANDLER(s23_ctl_w)
 
 	case 2: case 3:
 		// These may be coming from another CPU, in particular the I/O one
-		ctl_inp_buffer[offset-2] = input_port_read(space->machine, offset == 2 ? "P1" : "P2");
+		ctl_inp_buffer[offset-2] = input_port_read(space->machine(), offset == 2 ? "P1" : "P2");
 		break;
 	case 5:
 		if(ctl_vbl_active) {
@@ -1312,7 +1312,7 @@ static READ16_HANDLER(s23_ctl_r)
 {
 	switch(offset) {
 		// 0100 set freezes gorgon (polygon fifo flag)
-	case 1: return 0x0000 | input_port_read(space->machine, "DSW");
+	case 1: return 0x0000 | input_port_read(space->machine(), "DSW");
 	case 2: case 3: {
 		UINT16 res = ctl_inp_buffer[offset-2] & 0x800 ? 0xffff : 0x0000;
 		ctl_inp_buffer[offset-2] = (ctl_inp_buffer[offset-2] << 1) | 1;
@@ -1349,12 +1349,12 @@ static WRITE16_HANDLER(s23_c361_w)
 		c361_scanline = data;
 		if (data == 0x1ff)
 		{
-			cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ1, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "maincpu", MIPS3_IRQ1, CLEAR_LINE);
 			c361_timer->adjust(attotime::never);
 		}
 		else
 		{
-			c361_timer->adjust(space->machine->primary_screen->time_until_pos(c361_scanline));
+			c361_timer->adjust(space->machine().primary_screen->time_until_pos(c361_scanline));
 		}
 		break;
 
@@ -1366,8 +1366,8 @@ static WRITE16_HANDLER(s23_c361_w)
 static READ16_HANDLER(s23_c361_r)
 {
 	switch(offset) {
-	case 5: return space->machine->primary_screen->vpos()*2 | (space->machine->primary_screen->vblank() ? 1 : 0);
-	case 6: return space->machine->primary_screen->vblank();
+	case 5: return space->machine().primary_screen->vpos()*2 | (space->machine().primary_screen->vblank() ? 1 : 0);
+	case 6: return space->machine().primary_screen->vblank();
 	}
 	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 	return 0xffff;
@@ -1386,12 +1386,12 @@ static WRITE16_HANDLER(s23_c422_w)
 			if (data == 0xfffb)
 			{
 				logerror("c422_w: raise IRQ 3\n");
-				cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ3, ASSERT_LINE);
+				cputag_set_input_line(space->machine(), "maincpu", MIPS3_IRQ3, ASSERT_LINE);
 			}
 			else if (data == 0x000f)
 			{
 				logerror("c422_w: ack IRQ 3\n");
-				cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ3, CLEAR_LINE);
+				cputag_set_input_line(space->machine(), "maincpu", MIPS3_IRQ3, CLEAR_LINE);
 			}
 			break;
 
@@ -1417,16 +1417,16 @@ static WRITE32_HANDLER( s23_mcuen_w )
 			// Panic Park: writing 1 when it's already running means reboot?
 			if (s23_subcpu_running)
 			{
-				cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 			}
 
-			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 			s23_subcpu_running = 1;
 		}
 		else
 		{
 			logerror("S23: stopping H8/3002\n");
-			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 			s23_subcpu_running = 0;
 		}
 	}
@@ -1451,7 +1451,7 @@ static WRITE32_HANDLER( gorgon_sharedram_w )
 	if ((offset == 0x6000/4) && (data == 0) && (mem_mask == 0xff000000))
 	{
 		logerror("S23: Final Furlong hack stopping H8/3002\n");
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
@@ -1807,7 +1807,7 @@ static WRITE32_HANDLER( p3d_w)
 			p3d_dma(space, p3d_address, p3d_size);
 		return;
 	case 0x17:
-		cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ1, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", MIPS3_IRQ1, CLEAR_LINE);
 		c361_timer->adjust(attotime::never);
 		return;
 	}
@@ -1841,7 +1841,7 @@ static void render_project(poly_vertex &pv)
 	pv.p[0] = w;
 }
 
-static void render_one_model(running_machine *machine, const namcos23_render_entry *re)
+static void render_one_model(running_machine &machine, const namcos23_render_entry *re)
 {
 	UINT32 adr = ptrom[re->model.model];
 	if(adr >= ptrom_limit) {
@@ -1932,7 +1932,7 @@ static void render_one_model(running_machine *machine, const namcos23_render_ent
 			p->zkey = 0.5*(minz+maxz);
 			p->front = !(h & 0x00000001);
 			p->rd.texture_lookup = texture_lookup_nocache_point;
-			p->rd.pens = machine->pens + (color << 8);
+			p->rd.pens = machine.pens + (color << 8);
 			render_poly_count++;
 		}
 
@@ -1952,7 +1952,7 @@ static int render_poly_compare(const void *i1, const void *i2)
 	return p1->zkey < p2->zkey ? 1 : p1->zkey > p2->zkey ? -1 : 0;
 }
 
-static void render_flush(running_machine *machine, bitmap_t *bitmap)
+static void render_flush(running_machine &machine, bitmap_t *bitmap)
 {
 	if(!render_poly_count)
 		return;
@@ -1973,7 +1973,7 @@ static void render_flush(running_machine *machine, bitmap_t *bitmap)
 	render_poly_count = 0;
 }
 
-static void render_run(running_machine *machine, bitmap_t *bitmap)
+static void render_run(running_machine &machine, bitmap_t *bitmap)
 {
 	render_poly_count = 0;
 	const namcos23_render_entry *re = render_entries[!render_cur];
@@ -1996,14 +1996,14 @@ static void render_run(running_machine *machine, bitmap_t *bitmap)
 
 static VIDEO_START( ss23 )
 {
-	gfx_element_set_source(machine->gfx[0], (UINT8 *)namcos23_charram);
+	gfx_element_set_source(machine.gfx[0], (UINT8 *)namcos23_charram);
 	bgtilemap = tilemap_create(machine, TextTilemapGetInfo, tilemap_scan_rows, 16, 16, 64, 64);
 	tilemap_set_transparent_pen(bgtilemap, 0xf);
 
 	// Gorgon's tilemap offset is 0, S23/SS23's is 860
-	if ((!strcmp(machine->system().name, "rapidrvr")) ||
-	    (!strcmp(machine->system().name, "rapidrvr2")) ||
-	    (!strcmp(machine->system().name, "finlflng")))
+	if ((!strcmp(machine.system().name, "rapidrvr")) ||
+	    (!strcmp(machine.system().name, "rapidrvr2")) ||
+	    (!strcmp(machine.system().name, "finlflng")))
 	{
 		tilemap_set_scrolldx(bgtilemap, 0, 0);
 	}
@@ -2016,11 +2016,11 @@ static VIDEO_START( ss23 )
 
 static SCREEN_UPDATE( ss23 )
 {
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
-	render_run( screen->machine, bitmap );
+	render_run( screen->machine(), bitmap );
 
-	gfx_element *gfx = screen->machine->gfx[0];
+	gfx_element *gfx = screen->machine().gfx[0];
 	memset(gfx->dirty, 1, gfx->total_elements);
 
 	tilemap_draw( bitmap, cliprect, bgtilemap, 0/*flags*/, 0/*priority*/ ); /* opaque */
@@ -2040,7 +2040,7 @@ static INTERRUPT_GEN(s23_interrupt)
 
 static MACHINE_START( s23 )
 {
-	c361_timer = machine->scheduler().timer_alloc(FUNC(c361_timer_cb));
+	c361_timer = machine.scheduler().timer_alloc(FUNC(c361_timer_cb));
 	c361_timer->adjust(attotime::never);
 }
 
@@ -2104,7 +2104,7 @@ ADDRESS_MAP_END
 static READ32_HANDLER( gmen_trigger_sh2 )
 {
 	logerror("gmen_trigger_sh2: booting SH-2\n");
-	cputag_set_input_line(space->machine, "gmen", INPUT_LINE_RESET, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "gmen", INPUT_LINE_RESET, CLEAR_LINE);
 
 	return 0;
 }
@@ -2164,7 +2164,7 @@ static WRITE16_HANDLER( sub_interrupt_main_w )
 {
 	if  ((mem_mask == 0xffff) && (data == 0x3170))
 	{
-		cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ1, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", MIPS3_IRQ1, ASSERT_LINE);
 	}
 	else
 	{
@@ -2222,7 +2222,7 @@ static READ8_HANDLER( s23_mcu_rtc_r )
 	system_time systime;
 	static const int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
 
-	space->machine->current_datetime(systime);
+	space->machine().current_datetime(systime);
 
 	switch (s23_rtcstate)
 	{
@@ -2312,12 +2312,12 @@ static READ8_HANDLER( s23_mcu_iob_r )
 
 	if (im_rd == im_wr)
 	{
-		cputag_set_input_line(space->machine, "audiocpu", H8_SCI_0_RX, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", H8_SCI_0_RX, CLEAR_LINE);
 	}
 	else
 	{
-		cputag_set_input_line(space->machine, "audiocpu", H8_SCI_0_RX, CLEAR_LINE);
-		cputag_set_input_line(space->machine, "audiocpu", H8_SCI_0_RX, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", H8_SCI_0_RX, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", H8_SCI_0_RX, ASSERT_LINE);
 	}
 
 	return ret;
@@ -2328,7 +2328,7 @@ static WRITE8_HANDLER( s23_mcu_iob_w )
 	maintoio[mi_wr++] = data;
 	mi_wr &= 0x7f;
 
-	cputag_set_input_line(space->machine, "ioboard", H8_SCI_0_RX, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "ioboard", H8_SCI_0_RX, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( gorgon )
@@ -2551,7 +2551,7 @@ static READ8_HANDLER( s23_iob_mcu_r )
 
 	if (mi_rd == mi_wr)
 	{
-		cputag_set_input_line(space->machine, "ioboard", H8_SCI_0_RX, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "ioboard", H8_SCI_0_RX, CLEAR_LINE);
 	}
 
 	return ret;
@@ -2562,7 +2562,7 @@ static WRITE8_HANDLER( s23_iob_mcu_w )
 	iotomain[im_wr++] = data;
 	im_wr &= 0x7f;
 
-	cputag_set_input_line(space->machine, "audiocpu", H8_SCI_0_RX, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", H8_SCI_0_RX, ASSERT_LINE);
 }
 
 static UINT8 s23_tssio_port_4 = 0;
@@ -2581,7 +2581,7 @@ static WRITE8_HANDLER( s23_iob_p4_w )
 
 static READ8_HANDLER(iob_r)
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 /* H8/3334 (Namco C78) I/O board MCU */
@@ -2627,14 +2627,14 @@ ADDRESS_MAP_END
 
 static DRIVER_INIT(ss23)
 {
-	ptrom  = (const UINT32 *)machine->region("pointrom")->base();
-	tmlrom = (const UINT16 *)machine->region("textilemapl")->base();
-	tmhrom = machine->region("textilemaph")->base();
-	texrom = machine->region("textile")->base();
+	ptrom  = (const UINT32 *)machine.region("pointrom")->base();
+	tmlrom = (const UINT16 *)machine.region("textilemapl")->base();
+	tmhrom = machine.region("textilemaph")->base();
+	texrom = machine.region("textile")->base();
 
-	tileid_mask = (machine->region("textilemapl")->bytes()/2 - 1) & ~0xff; // Used for y masking
-	tile_mask = machine->region("textile")->bytes()/256 - 1;
-	ptrom_limit = machine->region("pointrom")->bytes()/4;
+	tileid_mask = (machine.region("textilemapl")->bytes()/2 - 1) & ~0xff; // Used for y masking
+	tile_mask = machine.region("textile")->bytes()/256 - 1;
+	ptrom_limit = machine.region("pointrom")->bytes()/4;
 
 	mi_rd = mi_wr = im_rd = im_wr = 0;
 	namcos23_jvssense = 1;
@@ -2649,21 +2649,21 @@ static DRIVER_INIT(ss23)
 	render_count[0] = render_count[1] = 0;
 	render_cur = 0;
 
-	if ((!strcmp(machine->system().name, "motoxgo")) ||
-	    (!strcmp(machine->system().name, "panicprk")) ||
-	    (!strcmp(machine->system().name, "rapidrvr")) ||
-	    (!strcmp(machine->system().name, "rapidrvr2")) ||
-	    (!strcmp(machine->system().name, "finlflng")) ||
-	    (!strcmp(machine->system().name, "gunwars")) ||
-	    (!strcmp(machine->system().name, "downhill")) ||
-	    (!strcmp(machine->system().name, "finfurl2")) ||
-	    (!strcmp(machine->system().name, "finfurl2j")) ||
-	    (!strcmp(machine->system().name, "raceon")) ||
-	    (!strcmp(machine->system().name, "crszone")) ||
-	    (!strcmp(machine->system().name, "crszonea")) ||
-	    (!strcmp(machine->system().name, "crszoneb")) ||
-	    (!strcmp(machine->system().name, "timecrs2b")) ||
-	    (!strcmp(machine->system().name, "timecrs2")))
+	if ((!strcmp(machine.system().name, "motoxgo")) ||
+	    (!strcmp(machine.system().name, "panicprk")) ||
+	    (!strcmp(machine.system().name, "rapidrvr")) ||
+	    (!strcmp(machine.system().name, "rapidrvr2")) ||
+	    (!strcmp(machine.system().name, "finlflng")) ||
+	    (!strcmp(machine.system().name, "gunwars")) ||
+	    (!strcmp(machine.system().name, "downhill")) ||
+	    (!strcmp(machine.system().name, "finfurl2")) ||
+	    (!strcmp(machine.system().name, "finfurl2j")) ||
+	    (!strcmp(machine.system().name, "raceon")) ||
+	    (!strcmp(machine.system().name, "crszone")) ||
+	    (!strcmp(machine.system().name, "crszonea")) ||
+	    (!strcmp(machine.system().name, "crszoneb")) ||
+	    (!strcmp(machine.system().name, "timecrs2b")) ||
+	    (!strcmp(machine.system().name, "timecrs2")))
 	{
 		has_jvsio = 1;
 	}

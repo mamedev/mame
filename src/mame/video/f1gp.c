@@ -14,7 +14,7 @@
 
 static TILE_GET_INFO( f1gp_get_roz_tile_info )
 {
-	f1gp_state *state = machine->driver_data<f1gp_state>();
+	f1gp_state *state = machine.driver_data<f1gp_state>();
 	int code = state->rozvideoram[tile_index];
 
 	SET_TILE_INFO(3, code & 0x7ff, code >> 12, 0);
@@ -22,7 +22,7 @@ static TILE_GET_INFO( f1gp_get_roz_tile_info )
 
 static TILE_GET_INFO( f1gp2_get_roz_tile_info )
 {
-	f1gp_state *state = machine->driver_data<f1gp_state>();
+	f1gp_state *state = machine.driver_data<f1gp_state>();
 	int code = state->rozvideoram[tile_index];
 
 	SET_TILE_INFO(2, (code & 0x7ff) + (state->roz_bank << 11), code >> 12, 0);
@@ -30,7 +30,7 @@ static TILE_GET_INFO( f1gp2_get_roz_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	f1gp_state *state = machine->driver_data<f1gp_state>();
+	f1gp_state *state = machine.driver_data<f1gp_state>();
 	int code = state->fgvideoram[tile_index];
 
 	SET_TILE_INFO(0, code & 0x7fff, 0, (code & 0x8000) ? TILE_FLIPY : 0);
@@ -45,38 +45,38 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( f1gp )
 {
-	f1gp_state *state = machine->driver_data<f1gp_state>();
+	f1gp_state *state = machine.driver_data<f1gp_state>();
 
 	state->roz_tilemap = tilemap_create(machine, f1gp_get_roz_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(state->fg_tilemap, 0xff);
 
-	state->zoomdata = (UINT16 *)machine->region("gfx4")->base();
-	gfx_element_set_source(machine->gfx[3], (UINT8 *)state->zoomdata);
+	state->zoomdata = (UINT16 *)machine.region("gfx4")->base();
+	gfx_element_set_source(machine.gfx[3], (UINT8 *)state->zoomdata);
 
-//  state->save_pointer(NAME(state->zoomdata), machine->region("gfx4")->bytes());
+//  state->save_pointer(NAME(state->zoomdata), machine.region("gfx4")->bytes());
 }
 
 
 VIDEO_START( f1gpb )
 {
-	f1gp_state *state = machine->driver_data<f1gp_state>();
+	f1gp_state *state = machine.driver_data<f1gp_state>();
 
 	state->roz_tilemap = tilemap_create(machine, f1gp_get_roz_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(state->fg_tilemap, 0xff);
 
-	state->zoomdata = (UINT16 *)machine->region("gfx4")->base();
-	gfx_element_set_source(machine->gfx[3], (UINT8 *)state->zoomdata);
+	state->zoomdata = (UINT16 *)machine.region("gfx4")->base();
+	gfx_element_set_source(machine.gfx[3], (UINT8 *)state->zoomdata);
 
-//  state->save_pointer(NAME(state->zoomdata), machine->region("gfx4")->bytes());
+//  state->save_pointer(NAME(state->zoomdata), machine.region("gfx4")->bytes());
 }
 
 VIDEO_START( f1gp2 )
 {
-	f1gp_state *state = machine->driver_data<f1gp_state>();
+	f1gp_state *state = machine.driver_data<f1gp_state>();
 
 	state->roz_tilemap = tilemap_create(machine, f1gp2_get_roz_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
@@ -97,40 +97,40 @@ VIDEO_START( f1gp2 )
 
 READ16_HANDLER( f1gp_zoomdata_r )
 {
-	f1gp_state *state = space->machine->driver_data<f1gp_state>();
+	f1gp_state *state = space->machine().driver_data<f1gp_state>();
 	return state->zoomdata[offset];
 }
 
 WRITE16_HANDLER( f1gp_zoomdata_w )
 {
-	f1gp_state *state = space->machine->driver_data<f1gp_state>();
+	f1gp_state *state = space->machine().driver_data<f1gp_state>();
 	COMBINE_DATA(&state->zoomdata[offset]);
-	gfx_element_mark_dirty(space->machine->gfx[3], offset / 64);
+	gfx_element_mark_dirty(space->machine().gfx[3], offset / 64);
 }
 
 READ16_HANDLER( f1gp_rozvideoram_r )
 {
-	f1gp_state *state = space->machine->driver_data<f1gp_state>();
+	f1gp_state *state = space->machine().driver_data<f1gp_state>();
 	return state->rozvideoram[offset];
 }
 
 WRITE16_HANDLER( f1gp_rozvideoram_w )
 {
-	f1gp_state *state = space->machine->driver_data<f1gp_state>();
+	f1gp_state *state = space->machine().driver_data<f1gp_state>();
 	COMBINE_DATA(&state->rozvideoram[offset]);
 	tilemap_mark_tile_dirty(state->roz_tilemap, offset);
 }
 
 WRITE16_HANDLER( f1gp_fgvideoram_w )
 {
-	f1gp_state *state = space->machine->driver_data<f1gp_state>();
+	f1gp_state *state = space->machine().driver_data<f1gp_state>();
 	COMBINE_DATA(&state->fgvideoram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE16_HANDLER( f1gp_fgscroll_w )
 {
-	f1gp_state *state = space->machine->driver_data<f1gp_state>();
+	f1gp_state *state = space->machine().driver_data<f1gp_state>();
 	COMBINE_DATA(&state->scroll[offset]);
 
 	tilemap_set_scrollx(state->fg_tilemap, 0, state->scroll[0]);
@@ -139,7 +139,7 @@ WRITE16_HANDLER( f1gp_fgscroll_w )
 
 WRITE16_HANDLER( f1gp_gfxctrl_w )
 {
-	f1gp_state *state = space->machine->driver_data<f1gp_state>();
+	f1gp_state *state = space->machine().driver_data<f1gp_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->flipscreen = data & 0x20;
@@ -149,7 +149,7 @@ WRITE16_HANDLER( f1gp_gfxctrl_w )
 
 WRITE16_HANDLER( f1gp2_gfxctrl_w )
 {
-	f1gp_state *state = space->machine->driver_data<f1gp_state>();
+	f1gp_state *state = space->machine().driver_data<f1gp_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->flipscreen = data & 0x20;
@@ -177,9 +177,9 @@ WRITE16_HANDLER( f1gp2_gfxctrl_w )
 
 ***************************************************************************/
 
-static void f1gp_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int primask )
+static void f1gp_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int primask )
 {
-	f1gp_state *state = machine->driver_data<f1gp_state>();
+	f1gp_state *state = machine.driver_data<f1gp_state>();
 	int attr_start, first;
 	UINT16 *spram = chip ? state->spr2vram : state->spr1vram;
 
@@ -229,13 +229,13 @@ static void f1gp_draw_sprites( running_machine *machine, bitmap_t *bitmap, const
 				else
 					code = state->spr2cgram[map_start % (state->spr2cgram_size / 2)];
 
-				pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[1 + chip],
+				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1 + chip],
 						code,
 						color,
 						flipx,flipy,
 						sx,sy,
 						0x1000 * zoomx,0x1000 * zoomy,
-						machine->priority_bitmap,
+						machine.priority_bitmap,
 //                      pri ? 0 : 0x2);
 						primask,15);
 				map_start++;
@@ -252,9 +252,9 @@ static void f1gp_draw_sprites( running_machine *machine, bitmap_t *bitmap, const
 
 SCREEN_UPDATE( f1gp )
 {
-	f1gp_state *state = screen->machine->driver_data<f1gp_state>();
+	f1gp_state *state = screen->machine().driver_data<f1gp_state>();
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	k053936_zoom_draw(state->k053936, bitmap, cliprect, state->roz_tilemap, 0, 0, 1);
 
@@ -263,21 +263,21 @@ SCREEN_UPDATE( f1gp )
 	/* quick kludge for "continue" screen priority */
 	if (state->gfxctrl == 0x00)
 	{
-		f1gp_draw_sprites(screen->machine, bitmap, cliprect, 0, 0x02);
-		f1gp_draw_sprites(screen->machine, bitmap, cliprect, 1, 0x02);
+		f1gp_draw_sprites(screen->machine(), bitmap, cliprect, 0, 0x02);
+		f1gp_draw_sprites(screen->machine(), bitmap, cliprect, 1, 0x02);
 	}
 	else
 	{
-		f1gp_draw_sprites(screen->machine, bitmap, cliprect, 0, 0x00);
-		f1gp_draw_sprites(screen->machine, bitmap, cliprect, 1, 0x02);
+		f1gp_draw_sprites(screen->machine(), bitmap, cliprect, 0, 0x00);
+		f1gp_draw_sprites(screen->machine(), bitmap, cliprect, 1, 0x02);
 	}
 	return 0;
 }
 
 
-static void f1gpb_draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
+static void f1gpb_draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	f1gp_state *state = machine->driver_data<f1gp_state>();
+	f1gp_state *state = machine.driver_data<f1gp_state>();
 	UINT16 *spriteram = state->spriteram;
 	int attr_start, start_offset = state->spriteram_size / 2 - 4;
 
@@ -307,7 +307,7 @@ static void f1gpb_draw_sprites( running_machine *machine, bitmap_t *bitmap,const
 		if((spriteram[attr_start + 1] & 0x00f0) && (spriteram[attr_start + 1] & 0x00f0) != 0xc0)
 		{
 			printf("attr %X\n",spriteram[attr_start + 1] & 0x00f0);
-			code = machine->rand();
+			code = machine.rand();
 		}
 
 /*
@@ -324,28 +324,28 @@ static void f1gpb_draw_sprites( running_machine *machine, bitmap_t *bitmap,const
 			gfx = 0;
 		}
 
-		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1 + gfx],
+		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1 + gfx],
 			code,
 			color,
 			flipx,flipy,
 			x,y,
-			machine->priority_bitmap,
+			machine.priority_bitmap,
 			pri ? 0 : 0x2,15);
 
 		// wrap around x
-		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1 + gfx],
+		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1 + gfx],
 			code,
 			color,
 			flipx,flipy,
 			x - 512,y,
-			machine->priority_bitmap,
+			machine.priority_bitmap,
 			pri ? 0 : 0x2,15);
 	}
 }
 
 SCREEN_UPDATE( f1gpb )
 {
-	f1gp_state *state = screen->machine->driver_data<f1gp_state>();
+	f1gp_state *state = screen->machine().driver_data<f1gp_state>();
 	UINT32 startx, starty;
 	int incxx, incxy, incyx, incyy;
 
@@ -357,7 +357,7 @@ SCREEN_UPDATE( f1gpb )
 
 	tilemap_set_scrolly(state->fg_tilemap, 0, state->fgregs[0] + 8);
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	tilemap_draw_roz(bitmap, cliprect, state->roz_tilemap,
 		startx << 13, starty << 13,
@@ -366,15 +366,15 @@ SCREEN_UPDATE( f1gpb )
 
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 1);
 
-	f1gpb_draw_sprites(screen->machine, bitmap, cliprect);
+	f1gpb_draw_sprites(screen->machine(), bitmap, cliprect);
 
 	return 0;
 }
 
 
-static void f1gp2_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void f1gp2_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	f1gp_state *state = machine->driver_data<f1gp_state>();
+	f1gp_state *state = machine.driver_data<f1gp_state>();
 	int offs;
 
 	offs = 0;
@@ -405,7 +405,7 @@ static void f1gp2_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 		zoomy = 32 - zoomy;
 
 		if (state->spritelist[attr_start + 2] & 0x20ff)
-			color = machine->rand();
+			color = machine.rand();
 
 		for (y = 0; y <= ysize; y++)
 		{
@@ -425,14 +425,14 @@ static void f1gp2_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 				map_start++;
 
 				if (state->flipscreen)
-					drawgfxzoom_transpen(bitmap,cliprect,machine->gfx[1],
+					drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1],
 							code,
 							color,
 							!flipx,!flipy,
 							304-sx,208-sy,
 							zoomx << 11,zoomy << 11,15);
 				else
-					drawgfxzoom_transpen(bitmap,cliprect,machine->gfx[1],
+					drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1],
 							code,
 							color,
 							flipx,flipy,
@@ -446,28 +446,28 @@ static void f1gp2_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 
 SCREEN_UPDATE( f1gp2 )
 {
-	f1gp_state *state = screen->machine->driver_data<f1gp_state>();
+	f1gp_state *state = screen->machine().driver_data<f1gp_state>();
 
 	if (state->gfxctrl & 4)	/* blank screen */
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	else
 	{
 		switch (state->gfxctrl & 3)
 		{
 			case 0:
 				k053936_zoom_draw(state->k053936, bitmap, cliprect, state->roz_tilemap, TILEMAP_DRAW_OPAQUE, 0, 1);
-				f1gp2_draw_sprites(screen->machine, bitmap, cliprect);
+				f1gp2_draw_sprites(screen->machine(), bitmap, cliprect);
 				tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 				break;
 			case 1:
 				k053936_zoom_draw(state->k053936, bitmap, cliprect, state->roz_tilemap, TILEMAP_DRAW_OPAQUE, 0, 1);
 				tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
-				f1gp2_draw_sprites(screen->machine, bitmap, cliprect);
+				f1gp2_draw_sprites(screen->machine(), bitmap, cliprect);
 				break;
 			case 2:
 				tilemap_draw(bitmap, cliprect, state->fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 				k053936_zoom_draw(state->k053936, bitmap, cliprect, state->roz_tilemap, 0, 0, 1);
-				f1gp2_draw_sprites(screen->machine, bitmap, cliprect);
+				f1gp2_draw_sprites(screen->machine(), bitmap, cliprect);
 				break;
 #ifdef MAME_DEBUG
 			case 3:

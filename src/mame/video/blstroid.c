@@ -18,7 +18,7 @@
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	blstroid_state *state = machine->driver_data<blstroid_state>();
+	blstroid_state *state = machine.driver_data<blstroid_state>();
 	UINT16 data = state->playfield[tile_index];
 	int code = data & 0x1fff;
 	int color = (data >> 13) & 0x07;
@@ -71,7 +71,7 @@ VIDEO_START( blstroid )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	blstroid_state *state = machine->driver_data<blstroid_state>();
+	blstroid_state *state = machine.driver_data<blstroid_state>();
 
 	/* initialize the playfield */
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  16,8, 64,64);
@@ -90,7 +90,7 @@ VIDEO_START( blstroid )
 
 static TIMER_CALLBACK( irq_off )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* clear the interrupt */
 	atarigen_scanline_int_ack_w(space, 0, 0, 0xffff);
@@ -100,14 +100,14 @@ static TIMER_CALLBACK( irq_off )
 static TIMER_CALLBACK( irq_on )
 {
 	/* generate the interrupt */
-	atarigen_scanline_int_gen(machine->device("maincpu"));
+	atarigen_scanline_int_gen(machine.device("maincpu"));
 	atarigen_update_interrupts(machine);
 }
 
 
 void blstroid_scanline_update(screen_device &screen, int scanline)
 {
-	blstroid_state *state = screen.machine->driver_data<blstroid_state>();
+	blstroid_state *state = screen.machine().driver_data<blstroid_state>();
 	int offset = (scanline / 8) * 64 + 40;
 
 	/* check for interrupts */
@@ -130,8 +130,8 @@ void blstroid_scanline_update(screen_device &screen, int scanline)
 			period_on  = screen.time_until_pos(vpos + 7, width * 0.9);
 			period_off = screen.time_until_pos(vpos + 8, width * 0.9);
 
-			screen.machine->scheduler().timer_set(period_on, FUNC(irq_on));
-			screen.machine->scheduler().timer_set(period_off, FUNC(irq_off));
+			screen.machine().scheduler().timer_set(period_on, FUNC(irq_on));
+			screen.machine().scheduler().timer_set(period_off, FUNC(irq_off));
 		}
 }
 
@@ -145,7 +145,7 @@ void blstroid_scanline_update(screen_device &screen, int scanline)
 
 SCREEN_UPDATE( blstroid )
 {
-	blstroid_state *state = screen->machine->driver_data<blstroid_state>();
+	blstroid_state *state = screen->machine().driver_data<blstroid_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

@@ -16,20 +16,20 @@ driver by Nicola Salmoria
 
 static READ8_HANDLER( sharedram_r )
 {
-	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
+	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 	return state->sharedram[offset];
 }
 
 static WRITE8_HANDLER( sharedram_w )
 {
-	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
+	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 	state->sharedram[offset] = data;
 }
 
 
 static WRITE8_HANDLER( subirqtrigger_w )
 {
-	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
+	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 	/* bit 0 used but unknown */
 	if (data & 0x04)
 		device_set_input_line(state->subcpu, 0, ASSERT_LINE);
@@ -37,27 +37,27 @@ static WRITE8_HANDLER( subirqtrigger_w )
 
 static WRITE8_HANDLER( sub_irqack_w )
 {
-	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
+	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 	device_set_input_line(state->subcpu, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( dogfgt_soundlatch_w )
 {
-	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
+	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 	state->soundlatch = data;
 }
 
 static WRITE8_HANDLER( dogfgt_soundcontrol_w )
 {
-	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
+	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 
 	/* bit 5 goes to 8910 #0 BDIR pin  */
 	if ((state->last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		ay8910_data_address_w(space->machine->device("ay1"), state->last_snd_ctrl >> 4, state->soundlatch);
+		ay8910_data_address_w(space->machine().device("ay1"), state->last_snd_ctrl >> 4, state->soundlatch);
 
 	/* bit 7 goes to 8910 #1 BDIR pin  */
 	if ((state->last_snd_ctrl & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		ay8910_data_address_w(space->machine->device("ay2"), state->last_snd_ctrl >> 6, state->soundlatch);
+		ay8910_data_address_w(space->machine().device("ay2"), state->last_snd_ctrl >> 6, state->soundlatch);
 
 	state->last_snd_ctrl = data;
 }
@@ -215,9 +215,9 @@ GFXDECODE_END
 
 static MACHINE_START( dogfgt )
 {
-	dogfgt_state *state = machine->driver_data<dogfgt_state>();
+	dogfgt_state *state = machine.driver_data<dogfgt_state>();
 
-	state->subcpu = machine->device("sub");
+	state->subcpu = machine.device("sub");
 
 	state->save_item(NAME(state->bm_plane));
 	state->save_item(NAME(state->lastflip));
@@ -231,7 +231,7 @@ static MACHINE_START( dogfgt )
 
 static MACHINE_RESET( dogfgt )
 {
-	dogfgt_state *state = machine->driver_data<dogfgt_state>();
+	dogfgt_state *state = machine.driver_data<dogfgt_state>();
 	int i;
 
 	state->bm_plane = 0;

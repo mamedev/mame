@@ -53,17 +53,17 @@ To Do:
 /* Read 4 ten bit dip switches */
 static READ16_HANDLER( realbrk_dsw_r )
 {
-	realbrk_state *state = space->machine->driver_data<realbrk_state>();
+	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	UINT16 sel = ~state->dsw_select[0];
-	if (sel & 0x01)	return	(input_port_read(space->machine, "SW1") & 0x00ff) << 8;		// DSW1 low bits
-	if (sel & 0x02)	return	(input_port_read(space->machine, "SW2") & 0x00ff) << 8;		// DSW2 low bits
-	if (sel & 0x04)	return	(input_port_read(space->machine, "SW3") & 0x00ff) << 8;		// DSW3 low bits
-	if (sel & 0x08)	return	(input_port_read(space->machine, "SW4") & 0x00ff) << 8;		// DSW4 low bits
+	if (sel & 0x01)	return	(input_port_read(space->machine(), "SW1") & 0x00ff) << 8;		// DSW1 low bits
+	if (sel & 0x02)	return	(input_port_read(space->machine(), "SW2") & 0x00ff) << 8;		// DSW2 low bits
+	if (sel & 0x04)	return	(input_port_read(space->machine(), "SW3") & 0x00ff) << 8;		// DSW3 low bits
+	if (sel & 0x08)	return	(input_port_read(space->machine(), "SW4") & 0x00ff) << 8;		// DSW4 low bits
 
-	if (sel & 0x10)	return	((input_port_read(space->machine, "SW1") & 0x0300) << 0) |	// DSWs high 2 bits
-							((input_port_read(space->machine, "SW2") & 0x0300) << 2) |
-							((input_port_read(space->machine, "SW3") & 0x0300) << 4) |
-							((input_port_read(space->machine, "SW4") & 0x0300) << 6) ;
+	if (sel & 0x10)	return	((input_port_read(space->machine(), "SW1") & 0x0300) << 0) |	// DSWs high 2 bits
+							((input_port_read(space->machine(), "SW2") & 0x0300) << 2) |
+							((input_port_read(space->machine(), "SW3") & 0x0300) << 4) |
+							((input_port_read(space->machine(), "SW4") & 0x0300) << 6) ;
 
 	logerror("CPU #0 PC %06X: read with unknown dsw_select = %02x\n",cpu_get_pc(space->cpu),state->dsw_select[0]);
 	return 0xffff;
@@ -75,42 +75,42 @@ static READ16_HANDLER( pkgnsh_input_r )
 	{
 		case 0x00/2: return 0xffff;
 		case 0x02/2: return 0xffff;
-		case 0x04/2: return input_port_read(space->machine, "IN0");		/*Service buttons*/
-		case 0x06/2: return input_port_read(space->machine, "SW1");		/*DIP 2*/
-		case 0x08/2: return input_port_read(space->machine, "SW2");		/*DIP 1*/
-		case 0x0a/2: return input_port_read(space->machine, "SW3");		/*DIP 1+2 Hi-Bits*/
-		case 0x0c/2: return input_port_read(space->machine, "PADDLE1");	/*Handle 1p*/
-		case 0x0e/2: return input_port_read(space->machine, "P1");			/*Buttons 1p*/
-		case 0x10/2: return input_port_read(space->machine, "PADDLE2");	/*Handle 2p*/
-		case 0x12/2: return input_port_read(space->machine, "P2");			/*Buttons 2p*/
+		case 0x04/2: return input_port_read(space->machine(), "IN0");		/*Service buttons*/
+		case 0x06/2: return input_port_read(space->machine(), "SW1");		/*DIP 2*/
+		case 0x08/2: return input_port_read(space->machine(), "SW2");		/*DIP 1*/
+		case 0x0a/2: return input_port_read(space->machine(), "SW3");		/*DIP 1+2 Hi-Bits*/
+		case 0x0c/2: return input_port_read(space->machine(), "PADDLE1");	/*Handle 1p*/
+		case 0x0e/2: return input_port_read(space->machine(), "P1");			/*Buttons 1p*/
+		case 0x10/2: return input_port_read(space->machine(), "PADDLE2");	/*Handle 2p*/
+		case 0x12/2: return input_port_read(space->machine(), "P2");			/*Buttons 2p*/
 	}
 	return 0xffff;
 }
 
 static READ16_HANDLER( pkgnshdx_input_r )
 {
-	realbrk_state *state = space->machine->driver_data<realbrk_state>();
+	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	UINT16 sel = ~state->dsw_select[0];
 
 	switch(offset)
 	{
 		case 0x00/2: return 0xffff;
-		case 0x02/2: return input_port_read(space->machine, "IN0");	/*Service buttons*/
+		case 0x02/2: return input_port_read(space->machine(), "IN0");	/*Service buttons*/
 		/*DSW,same handling as realbrk*/
 		case 0x04/2:
-			if (sel & 0x01)	return	(input_port_read(space->machine, "SW1") & 0x00ff) << 8;		// DSW1 low bits
-			if (sel & 0x02)	return	(input_port_read(space->machine, "SW2") & 0x00ff) << 8;		// DSW2 low bits
-			if (sel & 0x04)	return	(input_port_read(space->machine, "SW3") & 0x00ff) << 8;		// DSW3 low bits
-			if (sel & 0x08)	return	(input_port_read(space->machine, "SW4") & 0x00ff) << 8;		// DSW4 low bits
+			if (sel & 0x01)	return	(input_port_read(space->machine(), "SW1") & 0x00ff) << 8;		// DSW1 low bits
+			if (sel & 0x02)	return	(input_port_read(space->machine(), "SW2") & 0x00ff) << 8;		// DSW2 low bits
+			if (sel & 0x04)	return	(input_port_read(space->machine(), "SW3") & 0x00ff) << 8;		// DSW3 low bits
+			if (sel & 0x08)	return	(input_port_read(space->machine(), "SW4") & 0x00ff) << 8;		// DSW4 low bits
 
-			if (sel & 0x10)	return	((input_port_read(space->machine, "SW1") & 0x0300) << 0) |	// DSWs high 2 bits
-									((input_port_read(space->machine, "SW2") & 0x0300) << 2) |
-									((input_port_read(space->machine, "SW3") & 0x0300) << 4) |
-									((input_port_read(space->machine, "SW4") & 0x0300) << 6) ;
+			if (sel & 0x10)	return	((input_port_read(space->machine(), "SW1") & 0x0300) << 0) |	// DSWs high 2 bits
+									((input_port_read(space->machine(), "SW2") & 0x0300) << 2) |
+									((input_port_read(space->machine(), "SW3") & 0x0300) << 4) |
+									((input_port_read(space->machine(), "SW4") & 0x0300) << 6) ;
 
 			return 0xffff;
-		case 0x06/2: return input_port_read(space->machine, "P2");/*Buttons+Handle 2p*/
-		case 0x08/2: return input_port_read(space->machine, "P1");/*Buttons+Handle 1p*/
+		case 0x06/2: return input_port_read(space->machine(), "P2");/*Buttons+Handle 2p*/
+		case 0x08/2: return input_port_read(space->machine(), "P1");/*Buttons+Handle 1p*/
 		case 0x0a/2: return 0xffff;
 		case 0x0c/2: return 0xffff;
 		case 0x0e/2: return 0xffff;
@@ -124,7 +124,7 @@ static READ16_HANDLER( pkgnshdx_input_r )
 
 static READ16_HANDLER( backup_ram_r )
 {
-	realbrk_state *state = space->machine->driver_data<realbrk_state>();
+	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
             unemulated tmp68301 feature?*/
 	if(cpu_get_previouspc(space->cpu) == 0x02c08e)
@@ -136,7 +136,7 @@ static READ16_HANDLER( backup_ram_r )
 
 static READ16_HANDLER( backup_ram_dx_r )
 {
-	realbrk_state *state = space->machine->driver_data<realbrk_state>();
+	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
             unemulated tmp68301 feature?*/
 	if(cpu_get_previouspc(space->cpu) == 0x02f046)
@@ -147,7 +147,7 @@ static READ16_HANDLER( backup_ram_dx_r )
 
 static WRITE16_HANDLER( backup_ram_w )
 {
-	realbrk_state *state = space->machine->driver_data<realbrk_state>();
+	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	COMBINE_DATA(&state->backup_ram[offset]);
 }
 
@@ -671,7 +671,7 @@ static INTERRUPT_GEN( realbrk_interrupt )
 	{
 		case 0:
 			/* VBlank is connected to INT1 (external interrupts pin 1) */
-			tmp68301_external_interrupt_1(device->machine);
+			tmp68301_external_interrupt_1(device->machine());
 			break;
 	}
 }

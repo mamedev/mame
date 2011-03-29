@@ -108,10 +108,10 @@ static const int pstar_80[0x1a3]={
 
 READ16_HANDLER( pstars_protram_r )
 {
-	pgm_state *state = space->machine->driver_data<pgm_state>();
+	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (offset == 4)		//region
-		return input_port_read(space->machine, "Region");
+		return input_port_read(space->machine(), "Region");
 	else if (offset >= 0x10)  //timer
 	{
 		logerror("PSTARS ACCESS COUNTER %6X\n", state->pstar_ram[offset - 0x10]);
@@ -122,7 +122,7 @@ READ16_HANDLER( pstars_protram_r )
 
 READ16_HANDLER( pstars_r )
 {
-	pgm_state *state = space->machine->driver_data<pgm_state>();
+	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (offset == 0)
 	{
@@ -147,7 +147,7 @@ READ16_HANDLER( pstars_r )
 
 WRITE16_HANDLER( pstars_w )
 {
-	pgm_state *state = space->machine->driver_data<pgm_state>();
+	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (offset == 0)
 	{
@@ -274,9 +274,9 @@ WRITE16_HANDLER( pstars_w )
 
 /*** ASIC 3 (oriental legends protection) ****************************************/
 
-static void asic3_compute_hold(running_machine *machine)
+static void asic3_compute_hold(running_machine &machine)
 {
-	pgm_state *state = machine->driver_data<pgm_state>();
+	pgm_state *state = machine.driver_data<pgm_state>();
 
 	// The mode is dependent on the region
 	static const int modes[4] = { 1, 1, 3, 2 };
@@ -313,15 +313,15 @@ static void asic3_compute_hold(running_machine *machine)
 
 READ16_HANDLER( pgm_asic3_r )
 {
-	pgm_state *state = space->machine->driver_data<pgm_state>();
+	pgm_state *state = space->machine().driver_data<pgm_state>();
 	UINT8 res = 0;
 	/* region is supplied by the protection device */
 
 	switch (state->asic3_reg)
 	{
-	case 0x00: res = (state->asic3_latch[0] & 0xf7) | ((input_port_read(space->machine, "Region") << 3) & 0x08); break;
+	case 0x00: res = (state->asic3_latch[0] & 0xf7) | ((input_port_read(space->machine(), "Region") << 3) & 0x08); break;
 	case 0x01: res = state->asic3_latch[1]; break;
-	case 0x02: res = (state->asic3_latch[2] & 0x7f) | ((input_port_read(space->machine, "Region") << 6) & 0x80); break;
+	case 0x02: res = (state->asic3_latch[2] & 0x7f) | ((input_port_read(space->machine(), "Region") << 6) & 0x80); break;
 	case 0x03:
 		res = (BIT(state->asic3_hold, 15) << 0)
 			| (BIT(state->asic3_hold, 12) << 1)
@@ -357,7 +357,7 @@ READ16_HANDLER( pgm_asic3_r )
 
 WRITE16_HANDLER( pgm_asic3_w )
 {
-	pgm_state *state = space->machine->driver_data<pgm_state>();
+	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if(ACCESSING_BITS_0_7)
 	{
@@ -386,14 +386,14 @@ WRITE16_HANDLER( pgm_asic3_w )
 		{
 			state->asic3_y = state->asic3_reg & 7;
 			state->asic3_z = data;
-			asic3_compute_hold(space->machine);
+			asic3_compute_hold(space->machine());
 		}
 	}
 }
 
 WRITE16_HANDLER( pgm_asic3_reg_w )
 {
-	pgm_state *state = space->machine->driver_data<pgm_state>();
+	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if(ACCESSING_BITS_0_7)
 		state->asic3_reg = data & 0xff;
@@ -432,7 +432,7 @@ READ16_HANDLER( sango_protram_r )
 	// 5 = world
 
 	if (offset == 4)
-		return input_port_read(space->machine, "Region");
+		return input_port_read(space->machine(), "Region");
 
 	// otherwise it doesn't seem to use the ram for anything important, we return 0 to avoid test mode corruption
 	// kovplus reads from offset 000e a lot ... why?
@@ -457,7 +457,7 @@ READ16_HANDLER( sango_protram_r )
 
 READ16_HANDLER( asic28_r )
 {
-	pgm_state *state = space->machine->driver_data<pgm_state>();
+	pgm_state *state = space->machine().driver_data<pgm_state>();
 	UINT32 val = (state->asic28_regs[1] << 16) | (state->asic28_regs[0]);
 
 	//logerror("Asic28 Read PC = %06x Command = %02x ??\n", cpu_get_pc(space->cpu), state->asic28_regs[1]);
@@ -599,7 +599,7 @@ READ16_HANDLER( asic28_r )
 
 WRITE16_HANDLER( asic28_w )
 {
-	pgm_state *state = space->machine->driver_data<pgm_state>();
+	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (offset == 0)
 	{

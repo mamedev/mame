@@ -57,7 +57,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 static TILE_GET_INFO( metro_k053936_get_tile_info )
 {
-	metro_state *state = machine->driver_data<metro_state>();
+	metro_state *state = machine.driver_data<metro_state>();
 	int code = state->k053936_ram[tile_index];
 
 	SET_TILE_INFO(
@@ -69,7 +69,7 @@ static TILE_GET_INFO( metro_k053936_get_tile_info )
 
 static TILE_GET_INFO( metro_k053936_gstrik2_get_tile_info )
 {
-	metro_state *state = machine->driver_data<metro_state>();
+	metro_state *state = machine.driver_data<metro_state>();
 	int code = state->k053936_ram[tile_index];
 
 	SET_TILE_INFO(
@@ -81,7 +81,7 @@ static TILE_GET_INFO( metro_k053936_gstrik2_get_tile_info )
 
 WRITE16_HANDLER( metro_k053936_w )
 {
-	metro_state *state = space->machine->driver_data<metro_state>();
+	metro_state *state = space->machine().driver_data<metro_state>();
 	COMBINE_DATA(&state->k053936_ram[offset]);
 	tilemap_mark_tile_dirty(state->k053936_tilemap, offset);
 }
@@ -142,9 +142,9 @@ static TILEMAP_MAPPER( tilemap_scan_gstrik2 )
 // this looks up a single pixel in a tile, given the code
 // the metro hardware has an indirection table, which is used here
 // returns if to draw the pixel or not, pixel colour is placed in pix
-INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8 y, int big, UINT16* pix )
+INLINE UINT8 get_tile_pix( running_machine &machine, UINT16 code, UINT8 x, UINT8 y, int big, UINT16* pix )
 {
-	metro_state *state = machine->driver_data<metro_state>();
+	metro_state *state = machine.driver_data<metro_state>();
 	int table_index;
 	UINT32 tile;
 
@@ -164,7 +164,7 @@ INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8
 	}
 	else if (((tile & 0x00f00000) == 0x00f00000)	&& (state->support_8bpp)) /* draw tile as 8bpp */
 	{
-		const gfx_element *gfx1 = machine->gfx[big?3:1];
+		const gfx_element *gfx1 = machine.gfx[big?3:1];
 		UINT32 tile2 = big ? ((tile & 0xfffff) + 8*(code & 0xf)) :
 			                 ((tile & 0xfffff) + 2*(code & 0xf));
 		const UINT8* data;
@@ -197,7 +197,7 @@ INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8
 	}
 	else
 	{
-		const gfx_element *gfx1 = machine->gfx[big?2:0];
+		const gfx_element *gfx1 = machine.gfx[big?2:0];
 		UINT32 tile2 = big ? ((tile & 0xfffff) + 4*(code & 0xf)) :
 			                 ((tile & 0xfffff) +   (code & 0xf));
 		const UINT8* data;
@@ -245,21 +245,21 @@ INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8
 }
 
 
-INLINE void metro_vram_w( running_machine *machine, offs_t offset, UINT16 data, UINT16 mem_mask, int layer, UINT16 *vram )
+INLINE void metro_vram_w( running_machine &machine, offs_t offset, UINT16 data, UINT16 mem_mask, int layer, UINT16 *vram )
 {
 	COMBINE_DATA(&vram[offset]);
 }
 
-WRITE16_HANDLER( metro_vram_0_w ) { metro_state *state = space->machine->driver_data<metro_state>();  metro_vram_w(space->machine, offset, data, mem_mask, 0, state->vram_0); }
-WRITE16_HANDLER( metro_vram_1_w ) { metro_state *state = space->machine->driver_data<metro_state>();  metro_vram_w(space->machine, offset, data, mem_mask, 1, state->vram_1); }
-WRITE16_HANDLER( metro_vram_2_w ) { metro_state *state = space->machine->driver_data<metro_state>();  metro_vram_w(space->machine, offset, data, mem_mask, 2, state->vram_2); }
+WRITE16_HANDLER( metro_vram_0_w ) { metro_state *state = space->machine().driver_data<metro_state>();  metro_vram_w(space->machine(), offset, data, mem_mask, 0, state->vram_0); }
+WRITE16_HANDLER( metro_vram_1_w ) { metro_state *state = space->machine().driver_data<metro_state>();  metro_vram_w(space->machine(), offset, data, mem_mask, 1, state->vram_1); }
+WRITE16_HANDLER( metro_vram_2_w ) { metro_state *state = space->machine().driver_data<metro_state>();  metro_vram_w(space->machine(), offset, data, mem_mask, 2, state->vram_2); }
 
 
 
 /* Dirty the relevant tilemap when its window changes */
 WRITE16_HANDLER( metro_window_w )
 {
-	metro_state *state = space->machine->driver_data<metro_state>();
+	metro_state *state = space->machine().driver_data<metro_state>();
 	COMBINE_DATA(&state->window[offset]);
 
 }
@@ -286,7 +286,7 @@ WRITE16_HANDLER( metro_window_w )
 
 VIDEO_START( metro_14100 )
 {
-	metro_state *state = machine->driver_data<metro_state>();
+	metro_state *state = machine.driver_data<metro_state>();
 
 	state->support_8bpp = 0;
 	state->support_16x16 = 0;
@@ -307,7 +307,7 @@ VIDEO_START( metro_14100 )
 
 VIDEO_START( metro_14220 )
 {
-	metro_state *state = machine->driver_data<metro_state>();
+	metro_state *state = machine.driver_data<metro_state>();
 
 	state->support_8bpp = 1;
 	state->support_16x16 = 0;
@@ -328,7 +328,7 @@ VIDEO_START( metro_14220 )
 
 VIDEO_START( metro_14300 )
 {
-	metro_state *state = machine->driver_data<metro_state>();
+	metro_state *state = machine.driver_data<metro_state>();
 
 	state->support_8bpp = 1;
 	state->support_16x16 = 1;
@@ -349,7 +349,7 @@ VIDEO_START( metro_14300 )
 
 VIDEO_START( blzntrnd )
 {
-	metro_state *state = machine->driver_data<metro_state>();
+	metro_state *state = machine.driver_data<metro_state>();
 
 	VIDEO_START_CALL(metro_14220);
 
@@ -364,7 +364,7 @@ VIDEO_START( blzntrnd )
 
 VIDEO_START( gstrik2 )
 {
-	metro_state *state = machine->driver_data<metro_state>();
+	metro_state *state = machine.driver_data<metro_state>();
 
 	VIDEO_START_CALL(metro_14220);
 
@@ -439,14 +439,14 @@ VIDEO_START( gstrik2 )
 
 /* Draw sprites */
 
-void metro_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+void metro_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	metro_state *state = machine->driver_data<metro_state>();
-	UINT8 *base_gfx = machine->region("gfx1")->base();
-	UINT8 *gfx_max  = base_gfx + machine->region("gfx1")->bytes();
+	metro_state *state = machine.driver_data<metro_state>();
+	UINT8 *base_gfx = machine.region("gfx1")->base();
+	UINT8 *gfx_max  = base_gfx + machine.region("gfx1")->bytes();
 
-	int max_x = machine->primary_screen->width();
-	int max_y = machine->primary_screen->height();
+	int max_x = machine.primary_screen->width();
+	int max_y = machine.primary_screen->height();
 
 	int max_sprites = state->spriteram_size / 8;
 	int sprites     = state->videoregs[0x00/2] % max_sprites;
@@ -546,7 +546,7 @@ void metro_draw_sprites( running_machine *machine, bitmap_t *bitmap, const recta
 								flipx, flipy,
 								x, y,
 								zoom, zoom,
-								machine->priority_bitmap,primask[pri], 255);
+								machine.priority_bitmap,primask[pri], 255);
 			}
 			else
 			{
@@ -562,7 +562,7 @@ void metro_draw_sprites( running_machine *machine, bitmap_t *bitmap, const recta
 								flipx, flipy,
 								x, y,
 								zoom, zoom,
-								machine->priority_bitmap,primask[pri], 15);
+								machine.priority_bitmap,primask[pri], 15);
 			}
 #if 0
 {	/* Display priority + zoom on each sprite */
@@ -589,13 +589,13 @@ void metro_draw_sprites( running_machine *machine, bitmap_t *bitmap, const recta
 /* copy a 'window' from the large 2048x2048 (or 4096x4096 for 16x16 tiles) tilemap */
 
 
-static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 pcode,
+static void draw_tilemap( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 pcode,
 						 int sx, int sy, int wx, int wy, int big, UINT16* tilemapram, int layer )
 {
-	metro_state *state = machine->driver_data<metro_state>();
+	metro_state *state = machine.driver_data<metro_state>();
 	int y;
 
-	bitmap_t *priority_bitmap = machine->priority_bitmap;
+	bitmap_t *priority_bitmap = machine.priority_bitmap;
 
 	int width = big ? 4096 : 2048;//pixdata->width;
 	int height = big ? 4096 : 2048;//pixdata->height;
@@ -686,9 +686,9 @@ static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 /* Draw all the layers that match the given priority */
-static void draw_layers( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri, int layers_ctrl )
+static void draw_layers( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri, int layers_ctrl )
 {
-	metro_state *state = machine->driver_data<metro_state>();
+	metro_state *state = machine.driver_data<metro_state>();
 	UINT16 layers_pri = state->videoregs[0x10 / 2];
 	int layer;
 
@@ -722,7 +722,7 @@ static void draw_layers( running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( metro )
 {
-	metro_state *state = screen->machine->driver_data<metro_state>();
+	metro_state *state = screen->machine().driver_data<metro_state>();
 	int pri, layers_ctrl = -1;
 	UINT16 screenctrl = *state->screenctrl;
 
@@ -730,7 +730,7 @@ SCREEN_UPDATE( metro )
 	state->sprite_yoffs = state->videoregs[0x04 / 2] - screen->height() / 2;
 
 	/* The background color is selected by a register */
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, ((state->videoregs[0x12/2] & 0x0fff)) + 0x1000);
 
 	/*  Screen Control Register:
@@ -747,7 +747,7 @@ SCREEN_UPDATE( metro )
 	if (screenctrl & 2)
 		return 0;
 
-	//flip_screen_set(screen->machine, screenctrl & 1);
+	//flip_screen_set(screen->machine(), screenctrl & 1);
 	state->flip_screen = screenctrl & 1;
 
 	/* If the game supports 16x16 tiles, make sure that the
@@ -768,13 +768,13 @@ SCREEN_UPDATE( metro )
 
 
 #ifdef MAME_DEBUG
-if (input_code_pressed(screen->machine, KEYCODE_Z))
+if (input_code_pressed(screen->machine(), KEYCODE_Z))
 {
 	int msk = 0;
-	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
-	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
-	if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 4;
-	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 8;
+	if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1;
+	if (input_code_pressed(screen->machine(), KEYCODE_W))	msk |= 2;
+	if (input_code_pressed(screen->machine(), KEYCODE_E))	msk |= 4;
+	if (input_code_pressed(screen->machine(), KEYCODE_A))	msk |= 8;
 	if (msk != 0)
 	{
 		bitmap_fill(bitmap, cliprect, 0);
@@ -792,9 +792,9 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 		k053936_zoom_draw(state->k053936, bitmap, cliprect, state->k053936_tilemap, 0, 0, 1);
 
 	for (pri = 3; pri >= 0; pri--)
-		draw_layers(screen->machine, bitmap, cliprect, pri, layers_ctrl);
+		draw_layers(screen->machine(), bitmap, cliprect, pri, layers_ctrl);
 
 	if (layers_ctrl & 0x08)
-		metro_draw_sprites(screen->machine, bitmap, cliprect);
+		metro_draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

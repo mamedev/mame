@@ -79,9 +79,9 @@ INLINE INT32 normalize_yscroll(bitmap_t *bitmap, INT32 yscroll)
     elements referenced by a machine
 -------------------------------------------------*/
 
-void gfx_init(running_machine *machine)
+void gfx_init(running_machine &machine)
 {
-	const gfx_decode_entry *gfxdecodeinfo = machine->config().m_gfxdecodeinfo;
+	const gfx_decode_entry *gfxdecodeinfo = machine.config().m_gfxdecodeinfo;
 	int curgfx;
 
 	/* skip if nothing to do */
@@ -92,7 +92,7 @@ void gfx_init(running_machine *machine)
 	for (curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != NULL; curgfx++)
 	{
 		const gfx_decode_entry *gfxdecode = &gfxdecodeinfo[curgfx];
-		const memory_region *region = (gfxdecode->memory_region != NULL) ? machine->region(gfxdecode->memory_region) : NULL;
+		const memory_region *region = (gfxdecode->memory_region != NULL) ? machine.region(gfxdecode->memory_region) : NULL;
 		UINT32 region_length = (region != NULL) ? (8 * region->bytes()) : 0;
 		const UINT8 *region_base = (region != NULL) ? region->base() : NULL;
 		UINT32 xscale = (gfxdecode->xscale == 0) ? 1 : gfxdecode->xscale;
@@ -206,7 +206,7 @@ void gfx_init(running_machine *machine)
 		glcopy.total = total;
 
 		/* allocate the graphics */
-		machine->gfx[curgfx] = gfx_element_alloc(machine, &glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, gfxdecode->total_color_codes, gfxdecode->color_codes_start);
+		machine.gfx[curgfx] = gfx_element_alloc(machine, &glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, gfxdecode->total_color_codes, gfxdecode->color_codes_start);
 	}
 }
 
@@ -217,7 +217,7 @@ void gfx_init(running_machine *machine)
     based on a given layout
 -------------------------------------------------*/
 
-gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base)
+gfx_element *gfx_element_alloc(running_machine &machine, const gfx_layout *gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base)
 {
 	int israw = (gl->planeoffset[0] == GFX_RAW);
 	int planes = gl->planes;
@@ -243,7 +243,7 @@ gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, c
 	gfx->total_colors = total_colors;
 
 	gfx->srcdata = srcdata;
-	gfx->machine = machine;
+	gfx->m_machine = &machine;
 
 	/* copy the layout */
 	gfx->layout = *gl;
@@ -338,12 +338,12 @@ void gfx_element_free(gfx_element *gfx)
 		return;
 
 	/* free our data */
-	auto_free(gfx->machine, gfx->layout.extyoffs);
-	auto_free(gfx->machine, gfx->layout.extxoffs);
-	auto_free(gfx->machine, gfx->pen_usage);
-	auto_free(gfx->machine, gfx->dirty);
-	auto_free(gfx->machine, gfx->gfxdata);
-	auto_free(gfx->machine, gfx);
+	auto_free(gfx->machine(), gfx->layout.extyoffs);
+	auto_free(gfx->machine(), gfx->layout.extxoffs);
+	auto_free(gfx->machine(), gfx->pen_usage);
+	auto_free(gfx->machine(), gfx->dirty);
+	auto_free(gfx->machine(), gfx->gfxdata);
+	auto_free(gfx->machine(), gfx);
 }
 
 
@@ -352,7 +352,7 @@ void gfx_element_free(gfx_element *gfx)
     temporary one-off gfx_element
 -------------------------------------------------*/
 
-void gfx_element_build_temporary(gfx_element *gfx, running_machine *machine, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 color_base, UINT32 color_granularity, UINT32 flags)
+void gfx_element_build_temporary(gfx_element *gfx, running_machine &machine, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 color_base, UINT32 color_granularity, UINT32 flags)
 {
 	static UINT8 not_dirty = 0;
 
@@ -369,7 +369,7 @@ void gfx_element_build_temporary(gfx_element *gfx, running_machine *machine, UIN
 	gfx->color_base = color_base;
 	gfx->color_depth = color_granularity;
 	gfx->color_granularity = color_granularity;
-	gfx->total_colors = (machine->total_colors() - color_base) / color_granularity;
+	gfx->total_colors = (machine.total_colors() - color_base) / color_granularity;
 
 	gfx->pen_usage = NULL;
 
@@ -380,7 +380,7 @@ void gfx_element_build_temporary(gfx_element *gfx, running_machine *machine, UIN
 	gfx->dirty = &not_dirty;
 	gfx->dirtyseq = 0;
 
-	gfx->machine = machine;
+	gfx->m_machine = &machine;
 }
 
 
@@ -517,7 +517,7 @@ void drawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
@@ -553,7 +553,7 @@ void drawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_eleme
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
@@ -638,7 +638,7 @@ void drawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_elem
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
@@ -686,7 +686,7 @@ void drawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
@@ -723,7 +723,7 @@ void drawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element 
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* early out if completely transparent */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
@@ -768,7 +768,7 @@ void drawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
@@ -811,7 +811,7 @@ void drawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_e
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
@@ -910,7 +910,7 @@ void drawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
@@ -965,7 +965,7 @@ void drawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
@@ -1009,7 +1009,7 @@ void drawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_elem
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* early out if completely transparent */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
@@ -1047,7 +1047,7 @@ void pdrawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_elemen
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
@@ -1086,7 +1086,7 @@ void pdrawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_elem
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
@@ -1174,7 +1174,7 @@ void pdrawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
@@ -1225,7 +1225,7 @@ void pdrawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_el
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
@@ -1265,7 +1265,7 @@ void pdrawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* early out if completely transparent */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
@@ -1313,7 +1313,7 @@ void pdrawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_el
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
@@ -1360,7 +1360,7 @@ void pdrawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
@@ -1466,7 +1466,7 @@ void pdrawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
@@ -1525,7 +1525,7 @@ void pdrawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gf
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
@@ -1574,7 +1574,7 @@ void pdrawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
-	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 
 	/* early out if completely transparent */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)

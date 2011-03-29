@@ -205,7 +205,7 @@ static STATE_POSTLOAD( YMZ280B_state_save_update_step )
 		struct YMZ280BVoice *voice = &chip->voice[j];
 		update_step(chip, voice);
 		if(voice->irq_schedule)
-			machine->scheduler().timer_set(attotime::zero, FUNC(update_irq_state_cb[j]), 0, chip);
+			machine.scheduler().timer_set(attotime::zero, FUNC(update_irq_state_cb[j]), 0, chip);
 	}
 }
 
@@ -581,7 +581,7 @@ static STREAM_UPDATE( ymz280b_update )
 				voice->playing = 0;
 
 				/* set update_irq_state_timer. IRQ is signaled on next CPU execution. */
-				chip->device->machine->scheduler().timer_set(attotime::zero, FUNC(update_irq_state_cb[v]), 0, chip);
+				chip->device->machine().scheduler().timer_set(attotime::zero, FUNC(update_irq_state_cb[v]), 0, chip);
 				voice->irq_schedule = 1;
 			}
 		}
@@ -651,10 +651,10 @@ static DEVICE_START( ymz280b )
 	chip->irq_callback = intf->irq_callback;
 
 	/* create the stream */
-	chip->stream = device->machine->sound().stream_alloc(*device, 0, 2, INTERNAL_SAMPLE_RATE, chip, ymz280b_update);
+	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, INTERNAL_SAMPLE_RATE, chip, ymz280b_update);
 
 	/* allocate memory */
-	chip->scratch = auto_alloc_array(device->machine, INT16, MAX_SAMPLE_CHUNK);
+	chip->scratch = auto_alloc_array(device->machine(), INT16, MAX_SAMPLE_CHUNK);
 
 	/* state save */
 	{
@@ -694,7 +694,7 @@ static DEVICE_START( ymz280b )
 		}
 	}
 
-	device->machine->state().register_postload(YMZ280B_state_save_update_step, chip);
+	device->machine().state().register_postload(YMZ280B_state_save_update_step, chip);
 
 #if MAKE_WAVS
 	chip->wavresample = wav_open("resamp.wav", INTERNAL_SAMPLE_RATE, 2);

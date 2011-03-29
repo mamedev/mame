@@ -34,7 +34,7 @@ public:
 
 static WRITE32_HANDLER( vega_vram_w )
 {
-	vegaeo_state *state = space->machine->driver_data<vegaeo_state>();
+	vegaeo_state *state = space->machine().driver_data<vegaeo_state>();
 	switch(mem_mask)
 	{
 		case 0xffffffff:
@@ -65,7 +65,7 @@ static WRITE32_HANDLER( vega_vram_w )
 
 static READ32_HANDLER( vega_vram_r )
 {
-	vegaeo_state *state = space->machine->driver_data<vegaeo_state>();
+	vegaeo_state *state = space->machine().driver_data<vegaeo_state>();
 	return state->vega_vram[offset + (0x14000/4) * state->vega_vbuffer];
 }
 
@@ -73,15 +73,15 @@ static WRITE32_HANDLER( vega_palette_w )
 {
 	UINT16 paldata;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
 
-	paldata = space->machine->generic.paletteram.u32[offset] & 0x7fff;
-	palette_set_color_rgb(space->machine, offset, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	paldata = space->machine().generic.paletteram.u32[offset] & 0x7fff;
+	palette_set_color_rgb(space->machine(), offset, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 }
 
 static WRITE32_HANDLER( vega_misc_w )
 {
-	vegaeo_state *state = space->machine->driver_data<vegaeo_state>();
+	vegaeo_state *state = space->machine().driver_data<vegaeo_state>();
 	// other bits ???
 
 	state->vega_vbuffer = data & 1;
@@ -91,7 +91,7 @@ static WRITE32_HANDLER( vega_misc_w )
 static READ32_HANDLER( vegaeo_custom_read )
 {
 	eolith_speedup_read(space);
-	return input_port_read(space->machine, "SYSTEM");
+	return input_port_read(space->machine(), "SYSTEM");
 }
 
 static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 32 )
@@ -143,13 +143,13 @@ INPUT_PORTS_END
 
 static VIDEO_START( vega )
 {
-	vegaeo_state *state = machine->driver_data<vegaeo_state>();
+	vegaeo_state *state = machine.driver_data<vegaeo_state>();
 	state->vega_vram = auto_alloc_array(machine, UINT32, 0x14000*2/4);
 }
 
 static SCREEN_UPDATE( vega )
 {
-	vegaeo_state *state = screen->machine->driver_data<vegaeo_state>();
+	vegaeo_state *state = screen->machine().driver_data<vegaeo_state>();
 	int x,y,count;
 	int color;
 

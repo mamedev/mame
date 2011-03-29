@@ -46,7 +46,7 @@ nth_byte32( const UINT32 *pSource, int which )
 } /* nth_byte32 */
 #endif
 
-static void namcofl_install_palette(running_machine *machine)
+static void namcofl_install_palette(running_machine &machine)
 {
 	int pen, page, dword_offset, byte_offset;
 	UINT32 r,g,b;
@@ -58,7 +58,7 @@ static void namcofl_install_palette(running_machine *machine)
 	pen = 0;
 	for( page=0; page<4; page++ )
 	{
-		pSource = &machine->generic.paletteram.u32[page*0x2000/4];
+		pSource = &machine.generic.paletteram.u32[page*0x2000/4];
 		for( dword_offset=0; dword_offset<0x800/4; dword_offset++ )
 		{
 			r = pSource[dword_offset+0x0000/4];
@@ -73,7 +73,7 @@ static void namcofl_install_palette(running_machine *machine)
 		}
 	}
 }
-static void TilemapCB(running_machine *machine, UINT16 code, int *tile, int *mask )
+static void TilemapCB(running_machine &machine, UINT16 code, int *tile, int *mask )
 {
 	*tile = code;
 	*mask = code;
@@ -84,16 +84,16 @@ SCREEN_UPDATE( namcofl )
 {
 	int pri;
 
-	namcofl_install_palette(screen->machine);
+	namcofl_install_palette(screen->machine());
 
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine()));
 
 	for( pri=0; pri<16; pri++ )
 	{
 		namco_roz_draw( bitmap,cliprect,pri );
 		if((pri&1)==0)
 			namco_tilemap_draw( bitmap, cliprect, pri>>1 );
-		namco_obj_draw(screen->machine, bitmap, cliprect, pri );
+		namco_obj_draw(screen->machine(), bitmap, cliprect, pri );
 	}
 
 	return 0;
@@ -105,13 +105,13 @@ SCREEN_UPDATE( namcofl )
 
 WRITE32_HANDLER(namcofl_spritebank_w)
 {
-	namcofl_state *state = space->machine->driver_data<namcofl_state>();
+	namcofl_state *state = space->machine().driver_data<namcofl_state>();
 	COMBINE_DATA(&state->sprbank);
 }
 
-static int FLobjcode2tile( running_machine *machine, int code )
+static int FLobjcode2tile( running_machine &machine, int code )
 {
-	namcofl_state *state = machine->driver_data<namcofl_state>();
+	namcofl_state *state = machine.driver_data<namcofl_state>();
 	if ((code & 0x2000) && (state->sprbank & 2)) { code += 0x4000; }
 
 	return code;
@@ -119,7 +119,7 @@ static int FLobjcode2tile( running_machine *machine, int code )
 
 VIDEO_START( namcofl )
 {
-	namco_tilemap_init( machine, NAMCOFL_TILEGFX, machine->region(NAMCOFL_TILEMASKREGION)->base(), TilemapCB );
+	namco_tilemap_init( machine, NAMCOFL_TILEGFX, machine.region(NAMCOFL_TILEMASKREGION)->base(), TilemapCB );
 	namco_obj_init(machine,NAMCOFL_SPRITEGFX,0x0,FLobjcode2tile);
 	namco_roz_init(machine,NAMCOFL_ROTGFX,NAMCOFL_ROTMASKREGION);
 }

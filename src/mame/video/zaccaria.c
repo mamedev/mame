@@ -47,7 +47,7 @@ PALETTE_INIT( zaccaria )
 							 0, 0, 0, 0, 0);
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x200);
+	machine.colortable = colortable_alloc(machine, 0x200);
 
 	for (i = 0; i < 0x200; i++)
 	{
@@ -60,7 +60,7 @@ PALETTE_INIT( zaccaria )
           black anyway.
          */
 		if (((i % 64) / 8) == 0)
-			colortable_palette_set_color(machine->colortable, i, RGB_BLACK);
+			colortable_palette_set_color(machine.colortable, i, RGB_BLACK);
 		else
 		{
 			int bit0, bit1, bit2;
@@ -83,7 +83,7 @@ PALETTE_INIT( zaccaria )
 			bit1 = (color_prom[i + 0x200] >> 0) & 0x01;
 			b = combine_2_weights(weights_b, bit0, bit1);
 
-			colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+			colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 		}
 	}
 
@@ -95,13 +95,13 @@ PALETTE_INIT( zaccaria )
 		for (j = 0;j < 4;j++)
 			for (k = 0;k < 8;k++)
 				/* swap j and k to make the colors sequential */
-				colortable_entry_set_value(machine->colortable, 0 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2*j);
+				colortable_entry_set_value(machine.colortable, 0 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2*j);
 
 	for (i = 0;i < 8;i++)
 		for (j = 0;j < 4;j++)
 			for (k = 0;k < 8;k++)
 				/* swap j and k to make the colors sequential */
-				colortable_entry_set_value(machine->colortable, 256 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2*j+1);
+				colortable_entry_set_value(machine.colortable, 256 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2*j+1);
 }
 
 
@@ -114,7 +114,7 @@ PALETTE_INIT( zaccaria )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	zaccaria_state *state = machine->driver_data<zaccaria_state>();
+	zaccaria_state *state = machine.driver_data<zaccaria_state>();
 	UINT8 attr = state->videoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
@@ -133,7 +133,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( zaccaria )
 {
-	zaccaria_state *state = machine->driver_data<zaccaria_state>();
+	zaccaria_state *state = machine.driver_data<zaccaria_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_scroll_cols(state->bg_tilemap,32);
@@ -149,14 +149,14 @@ VIDEO_START( zaccaria )
 
 WRITE8_HANDLER( zaccaria_videoram_w )
 {
-	zaccaria_state *state = space->machine->driver_data<zaccaria_state>();
+	zaccaria_state *state = space->machine().driver_data<zaccaria_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( zaccaria_attributes_w )
 {
-	zaccaria_state *state = space->machine->driver_data<zaccaria_state>();
+	zaccaria_state *state = space->machine().driver_data<zaccaria_state>();
 	if (offset & 1)
 	{
 		if (state->attributesram[offset] != data)
@@ -175,12 +175,12 @@ WRITE8_HANDLER( zaccaria_attributes_w )
 
 WRITE8_HANDLER( zaccaria_flip_screen_x_w )
 {
-	flip_screen_x_set(space->machine, data & 1);
+	flip_screen_x_set(space->machine(), data & 1);
 }
 
 WRITE8_HANDLER( zaccaria_flip_screen_y_w )
 {
-	flip_screen_y_set(space->machine, data & 1);
+	flip_screen_y_set(space->machine(), data & 1);
 }
 
 
@@ -206,7 +206,7 @@ WRITE8_HANDLER( zaccaria_flip_screen_y_w )
 offsets 1 and 2 are swapped if accessed from spriteram2
 
 */
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT8 *spriteram,int color,int section)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,UINT8 *spriteram,int color,int section)
 {
 	int offs,o1 = 1,o2 = 2;
 
@@ -236,7 +236,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 				(spriteram[offs + o1] & 0x3f) + (spriteram[offs + o2] & 0xc0),
 				((spriteram[offs + o2] & 0x07) << 2) | color,
 				flipx,flipy,sx,sy,0);
@@ -245,14 +245,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( zaccaria )
 {
-	zaccaria_state *state = screen->machine->driver_data<zaccaria_state>();
+	zaccaria_state *state = screen->machine().driver_data<zaccaria_state>();
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 
 	// 3 layers of sprites, each with their own palette and priorities
 	// Not perfect yet, does spriteram(1) layer have a priority bit somewhere?
-	draw_sprites(screen->machine,bitmap,cliprect,state->spriteram2,2,1);
-	draw_sprites(screen->machine,bitmap,cliprect,state->spriteram,1,0);
-	draw_sprites(screen->machine,bitmap,cliprect,state->spriteram2+0x20,0,1);
+	draw_sprites(screen->machine(),bitmap,cliprect,state->spriteram2,2,1);
+	draw_sprites(screen->machine(),bitmap,cliprect,state->spriteram,1,0);
+	draw_sprites(screen->machine(),bitmap,cliprect,state->spriteram2+0x20,0,1);
 
 	return 0;
 }

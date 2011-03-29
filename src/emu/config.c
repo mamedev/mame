@@ -46,8 +46,8 @@ static config_type *typelist;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static int config_load_xml(running_machine *machine, emu_file &file, int type);
-static int config_save_xml(running_machine *machine, emu_file &file, int type);
+static int config_load_xml(running_machine &machine, emu_file &file, int type);
+static int config_save_xml(running_machine &machine, emu_file &file, int type);
 
 
 
@@ -61,7 +61,7 @@ static int config_save_xml(running_machine *machine, emu_file &file, int type);
  *
  *************************************/
 
-void config_init(running_machine *machine)
+void config_init(running_machine &machine)
 {
 	typelist = NULL;
 }
@@ -75,7 +75,7 @@ void config_init(running_machine *machine)
  *
  *************************************/
 
-void config_register(running_machine *machine, const char *nodename, config_callback_func load, config_callback_func save)
+void config_register(running_machine &machine, const char *nodename, config_callback_func load, config_callback_func save)
 {
 	config_type *newtype;
 	config_type **ptype;
@@ -100,9 +100,9 @@ void config_register(running_machine *machine, const char *nodename, config_call
  *
  *************************************/
 
-int config_load_settings(running_machine *machine)
+int config_load_settings(running_machine &machine)
 {
-	const char *controller = machine->options().ctrlr();
+	const char *controller = machine.options().ctrlr();
 	config_type *type;
 	int loaded = 0;
 
@@ -114,7 +114,7 @@ int config_load_settings(running_machine *machine)
 	if (controller[0] != 0)
 	{
 		/* open the config file */
-		emu_file file(machine->options().ctrlr_path(), OPEN_FLAG_READ);
+		emu_file file(machine.options().ctrlr_path(), OPEN_FLAG_READ);
 		file_error filerr = file.open(controller, ".cfg");
 
 		if (filerr != FILERR_NONE)
@@ -126,13 +126,13 @@ int config_load_settings(running_machine *machine)
 	}
 
 	/* next load the defaults file */
-	emu_file file(machine->options().cfg_directory(), OPEN_FLAG_READ);
+	emu_file file(machine.options().cfg_directory(), OPEN_FLAG_READ);
 	file_error filerr = file.open("default.cfg");
 	if (filerr == FILERR_NONE)
 		config_load_xml(machine, file, CONFIG_TYPE_DEFAULT);
 
 	/* finally, load the game-specific file */
-	filerr = file.open(machine->basename(), ".cfg");
+	filerr = file.open(machine.basename(), ".cfg");
 	if (filerr == FILERR_NONE)
 		loaded = config_load_xml(machine, file, CONFIG_TYPE_GAME);
 
@@ -146,7 +146,7 @@ int config_load_settings(running_machine *machine)
 }
 
 
-void config_save_settings(running_machine *machine)
+void config_save_settings(running_machine &machine)
 {
 	config_type *type;
 
@@ -155,13 +155,13 @@ void config_save_settings(running_machine *machine)
 		(*type->save)(machine, CONFIG_TYPE_INIT, NULL);
 
 	/* save the defaults file */
-	emu_file file(machine->options().cfg_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine.options().cfg_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	file_error filerr = file.open("default.cfg");
 	if (filerr == FILERR_NONE)
 		config_save_xml(machine, file, CONFIG_TYPE_DEFAULT);
 
 	/* finally, save the game-specific file */
-	filerr = file.open(machine->basename(), ".cfg");
+	filerr = file.open(machine.basename(), ".cfg");
 	if (filerr == FILERR_NONE)
 		config_save_xml(machine, file, CONFIG_TYPE_GAME);
 
@@ -178,7 +178,7 @@ void config_save_settings(running_machine *machine)
  *
  *************************************/
 
-static int config_load_xml(running_machine *machine, emu_file &file, int which_type)
+static int config_load_xml(running_machine &machine, emu_file &file, int which_type)
 {
 	xml_data_node *root, *confignode, *systemnode;
 	config_type *type;
@@ -201,13 +201,13 @@ static int config_load_xml(running_machine *machine, emu_file &file, int which_t
 		goto error;
 
 	/* strip off all the path crap from the source filename */
-	srcfile = strrchr(machine->system().source_file, '/');
+	srcfile = strrchr(machine.system().source_file, '/');
 	if (!srcfile)
-		srcfile = strrchr(machine->system().source_file, '\\');
+		srcfile = strrchr(machine.system().source_file, '\\');
 	if (!srcfile)
-		srcfile = strrchr(machine->system().source_file, ':');
+		srcfile = strrchr(machine.system().source_file, ':');
 	if (!srcfile)
-		srcfile = machine->system().source_file;
+		srcfile = machine.system().source_file;
 	else
 		srcfile++;
 
@@ -223,7 +223,7 @@ static int config_load_xml(running_machine *machine, emu_file &file, int which_t
 		{
 			case CONFIG_TYPE_GAME:
 				/* only match on the specific game name */
-				if (strcmp(name, machine->system().name) != 0)
+				if (strcmp(name, machine.system().name) != 0)
 					continue;
 				break;
 
@@ -238,9 +238,9 @@ static int config_load_xml(running_machine *machine, emu_file &file, int which_t
 				const game_driver *clone_of;
 				/* match on: default, game name, source file name, parent name, grandparent name */
 				if (strcmp(name, "default") != 0 &&
-					strcmp(name, machine->system().name) != 0 &&
+					strcmp(name, machine.system().name) != 0 &&
 					strcmp(name, srcfile) != 0 &&
-					((clone_of = driver_get_clone(&machine->system())) == NULL || strcmp(name, clone_of->name) != 0) &&
+					((clone_of = driver_get_clone(&machine.system())) == NULL || strcmp(name, clone_of->name) != 0) &&
 					(clone_of == NULL || ((clone_of = driver_get_clone(clone_of)) == NULL) || strcmp(name, clone_of->name) != 0))
 					continue;
 				break;
@@ -279,7 +279,7 @@ error:
  *
  *************************************/
 
-static int config_save_xml(running_machine *machine, emu_file &file, int which_type)
+static int config_save_xml(running_machine &machine, emu_file &file, int which_type)
 {
 	xml_data_node *root = xml_file_create();
 	xml_data_node *confignode, *systemnode;
@@ -299,7 +299,7 @@ static int config_save_xml(running_machine *machine, emu_file &file, int which_t
 	systemnode = xml_add_child(confignode, "system", NULL);
 	if (!systemnode)
 		goto error;
-	xml_set_attribute(systemnode, "name", (which_type == CONFIG_TYPE_DEFAULT) ? "default" : machine->system().name);
+	xml_set_attribute(systemnode, "name", (which_type == CONFIG_TYPE_DEFAULT) ? "default" : machine.system().name);
 
 	/* create the input node and write it out */
 	/* loop over all registrants and call their save function */

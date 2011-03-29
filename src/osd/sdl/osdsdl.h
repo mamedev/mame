@@ -272,7 +272,7 @@ private:
 //  sound.c
 //============================================================
 
-void sdlaudio_init(running_machine *machine);
+void sdlaudio_init(running_machine &machine);
 
 //============================================================
 //  sdlwork.c

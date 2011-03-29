@@ -114,7 +114,7 @@ static UINT8 char_offset; //helper to jump the decoding of the NULL chars.
 
 static READ32_HANDLER( twcup98_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine->region("user1")->base();
+	UINT32 *ROM = (UINT32 *)space->machine().region("user1")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -160,9 +160,9 @@ static WRITE32_HANDLER ( twcup98_prot_w )
 	//popmessage("%04x %04x",data,offset/4);
 }
 
-void install_twcup98_protection(running_machine *machine)
+void install_twcup98_protection(running_machine &machine)
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(twcup98_prot_r), FUNC(twcup98_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(twcup98_prot_r), FUNC(twcup98_prot_w));
 }
 
 /**************************
@@ -173,7 +173,7 @@ void install_twcup98_protection(running_machine *machine)
 
 static READ32_HANDLER( sss_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine->region("user1")->base();
+	UINT32 *ROM = (UINT32 *)space->machine().region("user1")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -225,9 +225,9 @@ static WRITE32_HANDLER ( sss_prot_w )
 	}
 }
 
-void install_sss_protection(running_machine *machine)
+void install_sss_protection(running_machine &machine)
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(sss_prot_r), FUNC(sss_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(sss_prot_r), FUNC(sss_prot_w));
 }
 
 /*************************************
@@ -238,7 +238,7 @@ void install_sss_protection(running_machine *machine)
 
 static READ32_HANDLER( rsgun_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine->region("user1")->base();
+	UINT32 *ROM = (UINT32 *)space->machine().region("user1")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -290,9 +290,9 @@ static WRITE32_HANDLER ( rsgun_prot_w )
 	//popmessage("%04x %04x",data,offset/4);
 }
 
-void install_rsgun_protection(running_machine *machine)
+void install_rsgun_protection(running_machine &machine)
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(rsgun_prot_r), FUNC(rsgun_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(rsgun_prot_r), FUNC(rsgun_prot_w));
 }
 
 /*************************
@@ -313,7 +313,7 @@ void install_rsgun_protection(running_machine *machine)
 
 static READ32_HANDLER( elandore_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine->region("user1")->base();
+	UINT32 *ROM = (UINT32 *)space->machine().region("user1")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -385,9 +385,9 @@ static WRITE32_HANDLER ( elandore_prot_w )
 	//popmessage("%04x %04x",data,offset/4);
 }
 
-void install_elandore_protection(running_machine *machine)
+void install_elandore_protection(running_machine &machine)
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(elandore_prot_r), FUNC(elandore_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(elandore_prot_r), FUNC(elandore_prot_w));
 }
 
 /*************************
@@ -420,7 +420,7 @@ static const UINT32 vector_prot[] = { 0x0603B1B2,0x234 };
 
 static READ32_HANDLER( ffreveng_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine->region("user1")->base();
+	UINT32 *ROM = (UINT32 *)space->machine().region("user1")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -469,9 +469,9 @@ static WRITE32_HANDLER ( ffreveng_prot_w )
 	//popmessage("%04x %04x",data,offset/4);
 }
 
-void install_ffreveng_protection(running_machine *machine)
+void install_ffreveng_protection(running_machine &machine)
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(ffreveng_prot_r), FUNC(ffreveng_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(ffreveng_prot_r), FUNC(ffreveng_prot_w));
 }
 
 /************************
@@ -485,11 +485,11 @@ static READ32_HANDLER(astrass_prot_r)
 	if ( offset == 3 && ctrl_index != -1 )
 	{
 		UINT32 data = 0;
-		UINT32 *prot_data = (UINT32 *)space->machine->region("user2")->base();
+		UINT32 *prot_data = (UINT32 *)space->machine().region("user2")->base();
 
 		data = prot_data[ctrl_index++];
 
-		if ( ctrl_index >= space->machine->region("user2")->bytes()/4 )
+		if ( ctrl_index >= space->machine().region("user2")->bytes()/4 )
 		{
 			ctrl_index = -1;
 		}
@@ -508,10 +508,10 @@ static WRITE32_HANDLER(astrass_prot_w)
 	}
 }
 
-void install_astrass_protection(running_machine *machine)
+void install_astrass_protection(running_machine &machine)
 {
 	ctrl_index = -1;
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(astrass_prot_r), FUNC(astrass_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(astrass_prot_r), FUNC(astrass_prot_w));
 }
 
 /**************************
@@ -531,7 +531,7 @@ static UINT16 decathlt_prottable2[128];
 
 static READ32_HANDLER( decathlt_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine->region("user1")->base();
+	UINT32 *ROM = (UINT32 *)space->machine().region("user1")->base();
 
 	if (offset==2)
 	{
@@ -654,7 +654,7 @@ static WRITE32_HANDLER( decathlt_prot_w )
 
 }
 
-void install_decathlt_protection(running_machine *machine)
+void install_decathlt_protection(running_machine &machine)
 {
 	/* It uploads 2 tables here, then performs what looks like a number of transfers, setting
        a source address of some kind (scrambled?) and then making many reads from a single address */
@@ -663,12 +663,12 @@ void install_decathlt_protection(running_machine *machine)
 	decathlt_prot_uploadmode = 0;
 	decathlt_prot_uploadoffset = 0;
 	decathlt_part = 1;
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x37FFFF0, 0x37FFFFF, FUNC(decathlt_prot_r), FUNC(decathlt_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x37FFFF0, 0x37FFFFF, FUNC(decathlt_prot_r), FUNC(decathlt_prot_w));
 	/* It uploads 2 tables here too, but nothing else, mirror? unused? */
-//  machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x27FFFF0, 0x27FFFFF, FUNC(decathlt_prot_r), FUNC(decathlt_prot_w));
+//  machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x27FFFF0, 0x27FFFFF, FUNC(decathlt_prot_r), FUNC(decathlt_prot_w));
 }
 
-void stv_register_protection_savestates(running_machine *machine)
+void stv_register_protection_savestates(running_machine &machine)
 {
 	state_save_register_global_array(machine, a_bus);
 	state_save_register_global(machine, ctrl_index);

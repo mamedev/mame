@@ -248,10 +248,10 @@ static UINT32 trans(UINT32 v, UINT32 x)
   return r;
 }
 
-void raiden2_decrypt_sprites(running_machine *machine)
+void raiden2_decrypt_sprites(running_machine &machine)
 {
   int i;
-  UINT32 *data = (UINT32 *)machine->region("gfx3")->base();
+  UINT32 *data = (UINT32 *)machine.region("gfx3")->base();
   for(i=0; i<0x800000/4; i++) {
     UINT32 x1, v1, y1;
 
@@ -277,7 +277,7 @@ void raiden2_decrypt_sprites(running_machine *machine)
   }
 }
 
-void zeroteam_decrypt_sprites(running_machine *machine)
+void zeroteam_decrypt_sprites(running_machine &machine)
 {
 	// TODO!
 }

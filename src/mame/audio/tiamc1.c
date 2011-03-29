@@ -300,13 +300,13 @@ static STREAM_UPDATE( tiamc1_sound_update )
 static DEVICE_START( tiamc1_sound )
 {
 	tiamc1_sound_state *state = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	int i, j;
 
 	timer8253_reset(&state->timer0);
 	timer8253_reset(&state->timer1);
 
-	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() / CLOCK_DIVIDER, 0, tiamc1_sound_update);
+	state->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() / CLOCK_DIVIDER, 0, tiamc1_sound_update);
 
 	state->timer1_divider = 0;
 

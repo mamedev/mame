@@ -37,7 +37,7 @@ public:
 
 static SCREEN_UPDATE( missb2 )
 {
-	missb2_state *state = screen->machine->driver_data<missb2_state>();
+	missb2_state *state = screen->machine().driver_data<missb2_state>();
 	int offs;
 	int sx, sy, xc, yc;
 	int gfx_num, gfx_attr, gfx_offs;
@@ -58,7 +58,7 @@ static SCREEN_UPDATE( missb2 )
 	//popmessage("%02x",(*state->bgvram) & 0x1f);
 	for (bg_offs = ((*state->bgvram) << 4); bg_offs < (((*state->bgvram) << 4) | 0xf); bg_offs++)
 	{
-		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[1],
+		drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[1],
 				bg_offs,
 				1,
 				0,0,
@@ -68,7 +68,7 @@ static SCREEN_UPDATE( missb2 )
 
 	sx = 0;
 
-	prom = screen->machine->region("proms")->base();
+	prom = screen->machine().region("proms")->base();
 	for (offs = 0; offs < state->objectram_size; offs += 4)
 	{
 		/* skip empty sprites */
@@ -110,7 +110,7 @@ static SCREEN_UPDATE( missb2 )
 				x = sx + xc * 8;
 				y = (sy + yc * 8) & 0xff;
 
-				if (flip_screen_get(screen->machine))
+				if (flip_screen_get(screen->machine()))
 				{
 					x = 248 - x;
 					y = 248 - y;
@@ -118,7 +118,7 @@ static SCREEN_UPDATE( missb2 )
 					flipy = !flipy;
 				}
 
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
 						code,
 						0,
 						flipx,flipy,
@@ -131,16 +131,16 @@ static SCREEN_UPDATE( missb2 )
 	return 0;
 }
 
-INLINE void bg_changecolor_RRRRGGGGBBBBxxxx( running_machine *machine, pen_t color, int data )
+INLINE void bg_changecolor_RRRRGGGGBBBBxxxx( running_machine &machine, pen_t color, int data )
 {
 	palette_set_color_rgb(machine, color + 256, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
 static WRITE8_HANDLER( bg_paletteram_RRRRGGGGBBBBxxxx_be_w )
 {
-	missb2_state *state = space->machine->driver_data<missb2_state>();
+	missb2_state *state = space->machine().driver_data<missb2_state>();
 	state->bg_paletteram[offset] = data;
-	bg_changecolor_RRRRGGGGBBBBxxxx(space->machine, offset / 2, state->bg_paletteram[offset | 1] | (state->bg_paletteram[offset & ~1] << 8));
+	bg_changecolor_RRRRGGGGBBBBxxxx(space->machine(), offset / 2, state->bg_paletteram[offset | 1] | (state->bg_paletteram[offset & ~1] << 8));
 }
 
 static WRITE8_HANDLER( missb2_bg_bank_w )
@@ -150,8 +150,8 @@ static WRITE8_HANDLER( missb2_bg_bank_w )
 	// I don't know how this is really connected, bit 1 is always high afaik...
 	bank = ((data & 2) ? 1 : 0) | ((data & 1) ? 4 : 0);
 
-	memory_set_bank(space->machine, "bank2", bank);
-	memory_set_bank(space->machine, "bank3", bank);
+	memory_set_bank(space->machine(), "bank2", bank);
+	memory_set_bank(space->machine(), "bank3", bank);
 }
 
 /* Memory Maps */
@@ -410,7 +410,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	logerror("YM3526 firing an IRQ\n");
-//  cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+//  cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3526_interface ym3526_config =
@@ -429,11 +429,11 @@ static INTERRUPT_GEN( missb2_interrupt )
 
 static MACHINE_START( missb2 )
 {
-	missb2_state *state = machine->driver_data<missb2_state>();
+	missb2_state *state = machine.driver_data<missb2_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->slave = machine->device("slave");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->slave = machine.device("slave");
 	state->mcu = NULL;
 
 	state->save_item(NAME(state->sound_nmi_enable));
@@ -444,7 +444,7 @@ static MACHINE_START( missb2 )
 
 static MACHINE_RESET( missb2 )
 {
-	missb2_state *state = machine->driver_data<missb2_state>();
+	missb2_state *state = machine.driver_data<missb2_state>();
 
 	state->sound_nmi_enable = 0;
 	state->pending_nmi = 0;
@@ -568,10 +568,10 @@ ROM_START( bublpong )
 ROM_END
 
 
-static void configure_banks( running_machine* machine )
+static void configure_banks( running_machine& machine )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
-	UINT8 *SLAVE = machine->region("slave")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *SLAVE = machine.region("slave")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 
@@ -582,7 +582,7 @@ static void configure_banks( running_machine* machine )
 
 static DRIVER_INIT( missb2 )
 {
-	missb2_state *state = machine->driver_data<missb2_state>();
+	missb2_state *state = machine.driver_data<missb2_state>();
 
 	configure_banks(machine);
 	state->video_enable = 0;

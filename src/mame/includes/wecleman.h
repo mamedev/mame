@@ -52,5 +52,5 @@ VIDEO_START( wecleman );
 SCREEN_UPDATE( hotchase );
 VIDEO_START( hotchase );
 
-void hotchase_zoom_callback_0(running_machine *machine, int *code,int *color,int *flags);
-void hotchase_zoom_callback_1(running_machine *machine, int *code,int *color,int *flags);
+void hotchase_zoom_callback_0(running_machine &machine, int *code,int *color,int *flags);
+void hotchase_zoom_callback_1(running_machine &machine, int *code,int *color,int *flags);

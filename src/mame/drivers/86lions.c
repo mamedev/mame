@@ -51,8 +51,8 @@ static VIDEO_START(lions)
 
 static SCREEN_UPDATE(lions)
 {
-	_86lions_state *state = screen->machine->driver_data<_86lions_state>();
-	const gfx_element *gfx = screen->machine->gfx[0];
+	_86lions_state *state = screen->machine().driver_data<_86lions_state>();
+	const gfx_element *gfx = screen->machine().gfx[0];
 	int count = 0;
 
 	int y,x;
@@ -81,7 +81,7 @@ static SCREEN_UPDATE(lions)
 
 static READ8_HANDLER( test_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 
@@ -226,39 +226,39 @@ static const ay8910_interface ay8910_config =
 //static READ8_DEVICE_HANDLER( input_a )
 //{
 //return input_port_read(machine, "IN0");
-//  return device->machine->rand();
+//  return device->machine().rand();
 //return 0xff;
 //}
 
 //static READ8_DEVICE_HANDLER( input_b )
 //{
 //return input_port_read(machine, "IN1");
-//      return device->machine->rand();
+//      return device->machine().rand();
 //return 0xff;
 //}
 
 static READ8_DEVICE_HANDLER( input_ca1 )
 {
-//      return device->machine->rand();
+//      return device->machine().rand();
 	return 0x00;
 }
 
 static READ8_DEVICE_HANDLER( input_cb1 )
 {
-//      return device->machine->rand();
+//      return device->machine().rand();
 	return 0x00;
 }
 
 static READ8_DEVICE_HANDLER( input_ca2 )
 {
-//      return device->machine->rand();
+//      return device->machine().rand();
 
 	return 0x00;
 }
 
 static READ8_DEVICE_HANDLER( input_cb2 )
 {
-//      return device->machine->rand();
+//      return device->machine().rand();
 
 	return 0x00;
 }
@@ -331,7 +331,7 @@ static PALETTE_INIT( lions )
 {
 	int i;
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 

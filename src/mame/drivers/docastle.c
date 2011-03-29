@@ -163,9 +163,9 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 /* Read/Write Handlers */
 static void idsoccer_adpcm_int( device_t *device )
 {
-	docastle_state *state = device->machine->driver_data<docastle_state>();
+	docastle_state *state = device->machine().driver_data<docastle_state>();
 
-	if (state->adpcm_pos >= device->machine->region("adpcm")->bytes())
+	if (state->adpcm_pos >= device->machine().region("adpcm")->bytes())
 	{
 		state->adpcm_idle = 1;
 		msm5205_reset_w(device, 1);
@@ -177,14 +177,14 @@ static void idsoccer_adpcm_int( device_t *device )
 	}
 	else
 	{
-		state->adpcm_data = device->machine->region("adpcm")->base()[state->adpcm_pos++];
+		state->adpcm_data = device->machine().region("adpcm")->base()[state->adpcm_pos++];
 		msm5205_data_w(device, state->adpcm_data >> 4);
 	}
 }
 
 static READ8_DEVICE_HANDLER( idsoccer_adpcm_status_r )
 {
-	docastle_state *state = device->machine->driver_data<docastle_state>();
+	docastle_state *state = device->machine().driver_data<docastle_state>();
 
 	// this is wrong, but the samples work anyway!!
 	state->adpcm_status ^= 0x80;
@@ -193,7 +193,7 @@ static READ8_DEVICE_HANDLER( idsoccer_adpcm_status_r )
 
 static WRITE8_DEVICE_HANDLER( idsoccer_adpcm_w )
 {
-	docastle_state *state = device->machine->driver_data<docastle_state>();
+	docastle_state *state = device->machine().driver_data<docastle_state>();
 
 	if (data & 0x80)
 	{
@@ -563,7 +563,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_RESET( docastle )
 {
-	docastle_state *state = machine->driver_data<docastle_state>();
+	docastle_state *state = machine.driver_data<docastle_state>();
 	int i;
 
 	for (i = 0; i < 9; i++)
@@ -579,10 +579,10 @@ static MACHINE_RESET( docastle )
 
 static MACHINE_START( docastle )
 {
-	docastle_state *state = machine->driver_data<docastle_state>();
+	docastle_state *state = machine.driver_data<docastle_state>();
 
-	state->maincpu = machine->device<cpu_device>("maincpu");
-	state->slave = machine->device<cpu_device>("slave");
+	state->maincpu = machine.device<cpu_device>("maincpu");
+	state->slave = machine.device<cpu_device>("slave");
 
 	state->save_item(NAME(state->adpcm_pos));
 	state->save_item(NAME(state->adpcm_data));

@@ -11,9 +11,9 @@ Atari Sprint 8 driver
 
 
 
-void sprint8_set_collision(running_machine *machine, int n)
+void sprint8_set_collision(running_machine &machine, int n)
 {
-	sprint8_state *state = machine->driver_data<sprint8_state>();
+	sprint8_state *state = machine.driver_data<sprint8_state>();
 	if (state->collision_reset == 0)
 	{
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
@@ -25,14 +25,14 @@ void sprint8_set_collision(running_machine *machine, int n)
 
 static TIMER_DEVICE_CALLBACK( input_callback )
 {
-	sprint8_state *state = timer.machine->driver_data<sprint8_state>();
+	sprint8_state *state = timer.machine().driver_data<sprint8_state>();
 	static const char *const dialnames[] = { "DIAL1", "DIAL2", "DIAL3", "DIAL4", "DIAL5", "DIAL6", "DIAL7", "DIAL8" };
 
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
-		UINT8 val = input_port_read(timer.machine, dialnames[i]) >> 4;
+		UINT8 val = input_port_read(timer.machine(), dialnames[i]) >> 4;
 
 		signed char delta = (val - state->dial[i]) & 15;
 
@@ -54,7 +54,7 @@ static TIMER_DEVICE_CALLBACK( input_callback )
 
 static MACHINE_RESET( sprint8 )
 {
-	sprint8_state *state = machine->driver_data<sprint8_state>();
+	sprint8_state *state = machine.driver_data<sprint8_state>();
 	state->collision_reset = 0;
 	state->collision_index = 0;
 }
@@ -62,16 +62,16 @@ static MACHINE_RESET( sprint8 )
 
 static READ8_HANDLER( sprint8_collision_r )
 {
-	sprint8_state *state = space->machine->driver_data<sprint8_state>();
+	sprint8_state *state = space->machine().driver_data<sprint8_state>();
 	return state->collision_index;
 }
 
 
 static READ8_HANDLER( sprint8_input_r )
 {
-	sprint8_state *state = space->machine->driver_data<sprint8_state>();
+	sprint8_state *state = space->machine().driver_data<sprint8_state>();
 	static const char *const portnames[] = { "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8" };
-	UINT8 val = input_port_read(space->machine, portnames[offset]);
+	UINT8 val = input_port_read(space->machine(), portnames[offset]);
 
 	if (state->steer_dir[offset])
 	{
@@ -88,17 +88,17 @@ static READ8_HANDLER( sprint8_input_r )
 
 static WRITE8_HANDLER( sprint8_lockout_w )
 {
-	coin_lockout_w(space->machine, offset, !(data & 1));
+	coin_lockout_w(space->machine(), offset, !(data & 1));
 }
 
 
 static WRITE8_HANDLER( sprint8_int_reset_w )
 {
-	sprint8_state *state = space->machine->driver_data<sprint8_state>();
+	sprint8_state *state = space->machine().driver_data<sprint8_state>();
 	state->collision_reset = !(data & 1);
 
 	if (state->collision_reset)
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 

@@ -14,7 +14,7 @@ PALETTE_INIT( ponttehk )
 {
 	int i;
 
-	for ( i = 0; i < machine->total_colors(); i++ )
+	for ( i = 0; i < machine.total_colors(); i++ )
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -26,17 +26,17 @@ PALETTE_INIT( ponttehk )
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* green component */
-		bit0 = (color_prom[machine->total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[machine->total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[machine->total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[machine->total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[machine.total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[machine.total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[machine.total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[machine.total_colors()] >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* blue component */
-		bit0 = (color_prom[2*machine->total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine->total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine->total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine->total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[2*machine.total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[2*machine.total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[2*machine.total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[2*machine.total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
@@ -49,7 +49,7 @@ PALETTE_INIT( lvcards ) //Ever so slightly different, but different enough.
 {
 	int i;
 
-	for ( i = 0; i < machine->total_colors(); i++ )
+	for ( i = 0; i < machine.total_colors(); i++ )
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -61,17 +61,17 @@ PALETTE_INIT( lvcards ) //Ever so slightly different, but different enough.
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* green component */
-		bit0 = (color_prom[machine->total_colors()] >> 0) & 0x11;
-		bit1 = (color_prom[machine->total_colors()] >> 1) & 0x11;
-		bit2 = (color_prom[machine->total_colors()] >> 2) & 0x11;
-		bit3 = (color_prom[machine->total_colors()] >> 3) & 0x11;
+		bit0 = (color_prom[machine.total_colors()] >> 0) & 0x11;
+		bit1 = (color_prom[machine.total_colors()] >> 1) & 0x11;
+		bit2 = (color_prom[machine.total_colors()] >> 2) & 0x11;
+		bit3 = (color_prom[machine.total_colors()] >> 3) & 0x11;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* blue component */
-		bit0 = (color_prom[2*machine->total_colors()] >> 0) & 0x11;
-		bit1 = (color_prom[2*machine->total_colors()] >> 1) & 0x11;
-		bit2 = (color_prom[2*machine->total_colors()] >> 2) & 0x11;
-		bit3 = (color_prom[2*machine->total_colors()] >> 3) & 0x11;
+		bit0 = (color_prom[2*machine.total_colors()] >> 0) & 0x11;
+		bit1 = (color_prom[2*machine.total_colors()] >> 1) & 0x11;
+		bit2 = (color_prom[2*machine.total_colors()] >> 2) & 0x11;
+		bit3 = (color_prom[2*machine.total_colors()] >> 3) & 0x11;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
@@ -82,21 +82,21 @@ PALETTE_INIT( lvcards ) //Ever so slightly different, but different enough.
 
 WRITE8_HANDLER( lvcards_videoram_w )
 {
-	lvcards_state *state = space->machine->driver_data<lvcards_state>();
+	lvcards_state *state = space->machine().driver_data<lvcards_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( lvcards_colorram_w )
 {
-	lvcards_state *state = space->machine->driver_data<lvcards_state>();
+	lvcards_state *state = space->machine().driver_data<lvcards_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	lvcards_state *state = machine->driver_data<lvcards_state>();
+	lvcards_state *state = machine.driver_data<lvcards_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + ((attr & 0x30) << 4) + ((attr & 0x80) << 3);
 	int color = attr & 0x0f;
@@ -107,14 +107,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( lvcards )
 {
-	lvcards_state *state = machine->driver_data<lvcards_state>();
+	lvcards_state *state = machine.driver_data<lvcards_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 }
 
 SCREEN_UPDATE( lvcards )
 {
-	lvcards_state *state = screen->machine->driver_data<lvcards_state>();
+	lvcards_state *state = screen->machine().driver_data<lvcards_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }

@@ -31,7 +31,7 @@ HgKairak: 86010000 1f201918 a0000000 Large Screen
 
 
 /* --- SPRITES --- */
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 scr )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 scr )
 {
 	/*- Sprite Format 0x0000 - 0x2bff -**
 
@@ -52,8 +52,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
     **- End Sprite Format -*/
 
-	psikyo4_state *state = machine->driver_data<psikyo4_state>();
-	const gfx_element *gfx = machine->gfx[0];
+	psikyo4_state *state = machine.driver_data<psikyo4_state>();
+	const gfx_element *gfx = machine.gfx[0];
 	UINT32 *source = state->spriteram;
 	UINT16 *list = (UINT16 *)state->spriteram + 0x2c00/2 + 0x04/2; /* 0x2c00/0x2c02 what are these for, pointers? one for each screen */
 	UINT16 listlen = (0xc00/2 - 0x04/2), listcntr = 0;
@@ -99,7 +99,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 			if ((!scr && flipscreen1) || (scr && flipscreen2))
 			{
-				ypos = machine->primary_screen->visible_area().max_y + 1 - ypos - high * 16; /* Screen Height depends on game */
+				ypos = machine.primary_screen->visible_area().max_y + 1 - ypos - high * 16; /* Screen Height depends on game */
 				xpos = 40 * 8 - xpos - wide * 16;
 				flipx = !flipx;
 				flipy = !flipy;
@@ -129,23 +129,23 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( psikyo4 )
 {
-	device_t *left_screen  = screen->machine->device("lscreen");
-	device_t *right_screen = screen->machine->device("rscreen");
+	device_t *left_screen  = screen->machine().device("lscreen");
+	device_t *right_screen = screen->machine().device("rscreen");
 
 	if (screen == left_screen)
 	{
 		bitmap_fill(bitmap, cliprect, 0x1000);
-		draw_sprites(screen->machine, bitmap, cliprect, 0x0000);
+		draw_sprites(screen->machine(), bitmap, cliprect, 0x0000);
 	}
 	if (screen == right_screen)
 	{
 		bitmap_fill(bitmap, cliprect, 0x1001);
-		draw_sprites(screen->machine, bitmap, cliprect, 0x2000);
+		draw_sprites(screen->machine(), bitmap, cliprect, 0x2000);
 	}
 	return 0;
 }
 
 VIDEO_START( psikyo4 )
 {
-	machine->gfx[0]->color_granularity = 32; /* 256 colour sprites with palette selectable on 32 colour boundaries */
+	machine.gfx[0]->color_granularity = 32; /* 256 colour sprites with palette selectable on 32 colour boundaries */
 }

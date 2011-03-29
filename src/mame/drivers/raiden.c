@@ -244,7 +244,7 @@ static INTERRUPT_GEN( raiden_interrupt )
 
 static SCREEN_EOF( raiden )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	buffer_spriteram16_w(space,0,0,0xffff); /* Could be a memory location instead */
 }
 
@@ -521,7 +521,7 @@ ROM_END
 #ifdef SYNC_HACK
 static READ16_HANDLER( sub_cpu_spin_r )
 {
-	raiden_state *state = space->machine->driver_data<raiden_state>();
+	raiden_state *state = space->machine().driver_data<raiden_state>();
 	int pc=cpu_get_pc(space->cpu);
 	int ret=state->shared_ram[0x4];
 
@@ -540,7 +540,7 @@ static READ16_HANDLER( sub_cpu_spin_r )
 static DRIVER_INIT( raiden )
 {
 #ifdef SYNC_HACK
-	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4008, 0x4009, FUNC(sub_cpu_spin_r));
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4008, 0x4009, FUNC(sub_cpu_spin_r));
 #endif
 }
 
@@ -553,10 +553,10 @@ static DRIVER_INIT( raidenu )
 /* This is based on code by Niclas Karlsson Mate, who figured out the
 encryption method! The technique is a combination of a XOR table plus
 bit-swapping */
-static void common_decrypt(running_machine *machine)
+static void common_decrypt(running_machine &machine)
 {
 
-	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x20000; i++)
@@ -568,7 +568,7 @@ static void common_decrypt(running_machine *machine)
 		RAM[0xc0000/2 + i] = data;
 	}
 
-	RAM = (UINT16 *)machine->region("sub")->base();
+	RAM = (UINT16 *)machine.region("sub")->base();
 
 	for (i = 0; i < 0x20000; i++)
 	{

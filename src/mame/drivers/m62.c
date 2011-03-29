@@ -84,21 +84,21 @@ other supported games as well.
 
 static READ8_HANDLER( ldrun2_bankswitch_r )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	if (state->ldrun2_bankswap)
 	{
 		state->ldrun2_bankswap--;
 
 		/* swap to bank #1 on second read */
 		if (state->ldrun2_bankswap == 0)
-			memory_set_bank(space->machine, "bank1", 1);
+			memory_set_bank(space->machine(), "bank1", 1);
 	}
 	return 0;
 }
 
 static WRITE8_HANDLER( ldrun2_bankswitch_w )
 {
-	m62_state *state = space->machine->driver_data<m62_state>();
+	m62_state *state = space->machine().driver_data<m62_state>();
 	static const int banks[30] =
 	{
 		0,0,0,0,0,1,0,1,0,0,
@@ -116,7 +116,7 @@ static WRITE8_HANDLER( ldrun2_bankswitch_w )
 			logerror("unknown bank select %02x\n",data);
 			return;
 		}
-		memory_set_bank(space->machine, "bank1", banks[data - 1]);
+		memory_set_bank(space->machine(), "bank1", banks[data - 1]);
 	}
 	else
 	{
@@ -145,30 +145,30 @@ static READ8_HANDLER( ldrun3_prot_7_r )
 
 static WRITE8_HANDLER( ldrun4_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x01);
+	memory_set_bank(space->machine(), "bank1", data & 0x01);
 }
 
 static WRITE8_HANDLER( kidniki_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 }
 
 #define battroad_bankswitch_w kidniki_bankswitch_w
 
 static WRITE8_HANDLER( spelunkr_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x03);
+	memory_set_bank(space->machine(), "bank1", data & 0x03);
 }
 
 static WRITE8_HANDLER( spelunk2_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", (data & 0xc0) >> 6);
-	memory_set_bank(space->machine, "bank2", (data & 0x3c) >> 2);
+	memory_set_bank(space->machine(), "bank1", (data & 0xc0) >> 6);
+	memory_set_bank(space->machine(), "bank2", (data & 0x3c) >> 2);
 }
 
 static WRITE8_HANDLER( youjyudn_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x01);
+	memory_set_bank(space->machine(), "bank1", data & 0x01);
 }
 
 
@@ -932,7 +932,7 @@ GFXDECODE_END
 
 static MACHINE_START( m62 )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 
 	state->save_item(NAME(state->ldrun2_bankswap));
 	state->save_item(NAME(state->bankcontrol));
@@ -940,7 +940,7 @@ static MACHINE_START( m62 )
 
 static MACHINE_RESET( m62 )
 {
-	m62_state *state = machine->driver_data<m62_state>();
+	m62_state *state = machine.driver_data<m62_state>();
 
 	state->flipscreen = 0;
 	state->m62_background_hscroll = 0;
@@ -2161,50 +2161,50 @@ ROM_END
 static DRIVER_INIT( battroad )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( ldrun2 )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( ldrun4 )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 static DRIVER_INIT( kidniki )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	/* in Kid Niki, bank 0 has code falling from 7fff to 8000, */
 	/* so I have to copy it there because bank switching wouldn't catch it */
 	memcpy(ROM + 0x08000, ROM + 0x10000, 0x2000);
 
 	/* configure memory banks */
-	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( spelunkr )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, "bank1", 0, 4, machine->region("maincpu")->base() + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine.region("maincpu")->base() + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( spelunk2 )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, "bank1", 0,  4, machine->region("maincpu")->base() + 0x20000, 0x1000);
-	memory_configure_bank(machine, "bank2", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x1000);
+	memory_configure_bank(machine, "bank1", 0,  4, machine.region("maincpu")->base() + 0x20000, 0x1000);
+	memory_configure_bank(machine, "bank2", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x1000);
 }
 
 static DRIVER_INIT( youjyudn )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 GAME( 1984, kungfum,  0,        kungfum,  kungfum,  0,        ROT0,   "Irem", "Kung-Fu Master", GAME_SUPPORTS_SAVE )

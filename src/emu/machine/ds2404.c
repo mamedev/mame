@@ -47,7 +47,7 @@ device_config *ds2404_device_config::static_alloc_device_config(const machine_co
 
 device_t *ds2404_device_config::alloc_device(running_machine &machine) const
 {
-    return auto_alloc(&machine, ds2404_device(machine, *this));
+    return auto_alloc(machine, ds2404_device(machine, *this));
 }
 
 

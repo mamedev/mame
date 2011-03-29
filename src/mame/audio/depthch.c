@@ -56,7 +56,7 @@ enum
 WRITE8_HANDLER( depthch_audio_w )
 {
 	static int port1State = 0;
-	device_t *samples = space->machine->device("samples");
+	device_t *samples = space->machine().device("samples");
 	int bitsChanged;
 	int bitsGoneHigh;
 	int bitsGoneLow;

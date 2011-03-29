@@ -27,7 +27,9 @@ struct _atarimo_mask
 typedef struct _atarimo_data atarimo_data;
 struct _atarimo_data
 {
-	running_machine *	machine;			/* pointer back to the machine */
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
+	running_machine *	m_machine;			/* pointer back to the machine */
 
 	UINT32				gfxchanged;			/* true if the gfx info has changed */
 	gfx_element			gfxelement[MAX_GFX_ELEMENTS]; /* local copy of graphics elements */
@@ -239,7 +241,7 @@ INLINE int convert_mask(const atarimo_entry *input, atarimo_mask *result)
 
 INLINE void init_gfxelement(atarimo_data *mo, int idx)
 {
-	mo->gfxelement[idx] = *mo->machine->gfx[idx];
+	mo->gfxelement[idx] = *mo->machine().gfx[idx];
 	mo->gfxgranularity[idx] = mo->gfxelement[idx].color_granularity;
 	mo->gfxelement[idx].color_granularity = 1;
 	mo->gfxelement[idx].color_base = 0;
@@ -251,7 +253,7 @@ INLINE void init_gfxelement(atarimo_data *mo, int idx)
     init_savestate: Initialize save states
 ---------------------------------------------------------------*/
 
-static void init_savestate(running_machine *machine, int index, atarimo_data *mo)
+static void init_savestate(running_machine &machine, int index, atarimo_data *mo)
 {
 	state_save_register_item(machine, "atarimo", NULL, index, mo->gfxchanged);
 	state_save_register_item(machine, "atarimo", NULL, index, mo->palettebase);
@@ -295,9 +297,9 @@ static void init_savestate(running_machine *machine, int index, atarimo_data *mo
 	state_save_register_item(machine, "atarimo", NULL, index, mo->dirtyheight);
 #endif
 
-	machine->state().save_item("atarimo", NULL, index, *mo->bitmap, "bitmap");
+	machine.state().save_item("atarimo", NULL, index, *mo->bitmap, "bitmap");
 
-	machine->state().save_memory("atarimo", NULL, index, "spriteram", mo->spriteram, sizeof(atarimo_entry), mo->spriteramsize);
+	machine.state().save_memory("atarimo", NULL, index, "spriteram", mo->spriteram, sizeof(atarimo_entry), mo->spriteramsize);
 
 	state_save_register_item_pointer(machine, "atarimo", NULL, index, mo->codelookup, round_to_powerof2(mo->codemask.mask));
 
@@ -318,12 +320,12 @@ static TIMER_CALLBACK( force_update )
 	int scanline = param;
 
 	if (scanline > 0)
-		machine->primary_screen->update_partial(scanline - 1);
+		machine.primary_screen->update_partial(scanline - 1);
 
 	scanline += 64;
-	if (scanline >= machine->primary_screen->visible_area().max_y)
+	if (scanline >= machine.primary_screen->visible_area().max_y)
 		scanline = 0;
-	force_update_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
+	force_update_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
 /*---------------------------------------------------------------
@@ -332,9 +334,9 @@ static TIMER_CALLBACK( force_update )
     the attribute lookup table.
 ---------------------------------------------------------------*/
 
-void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc)
+void atarimo_init(running_machine &machine, int map, const atarimo_desc *desc)
 {
-	gfx_element *gfx = machine->gfx[desc->gfxindex];
+	gfx_element *gfx = machine.gfx[desc->gfxindex];
 	atarimo_data *mo = &atarimo[map];
 	int i;
 
@@ -357,7 +359,7 @@ void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc)
 	convert_mask(&desc->absolutemask,  &mo->absolutemask);
 
 	/* copy in the basic data */
-	mo->machine       = machine;
+	mo->m_machine     = &machine;
 	mo->gfxchanged    = FALSE;
 
 	mo->linked        = desc->linked;
@@ -404,7 +406,7 @@ void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc)
 	mo->slipram       = (map == 0) ? &atarimo_0_slipram : &atarimo_1_slipram;
 
 	/* allocate the temp bitmap */
-	mo->bitmap        = auto_bitmap_alloc(machine, machine->primary_screen->width(), machine->primary_screen->height(), BITMAP_FORMAT_INDEXED16);
+	mo->bitmap        = auto_bitmap_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height(), BITMAP_FORMAT_INDEXED16);
 	bitmap_fill(mo->bitmap, NULL, desc->transpen);
 
 	/* allocate the spriteram */
@@ -425,8 +427,8 @@ void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc)
 		mo->colorlookup[i] = i;
 
 	/* allocate dirty grid */
-	mo->dirtywidth = (machine->primary_screen->width() >> mo->tilexshift) + 2;
-	mo->dirtyheight = (machine->primary_screen->height() >> mo->tileyshift) + 2;
+	mo->dirtywidth = (machine.primary_screen->width() >> mo->tilexshift) + 2;
+	mo->dirtyheight = (machine.primary_screen->height() >> mo->tileyshift) + 2;
 	mo->dirtygrid = auto_alloc_array(machine, UINT8, mo->dirtywidth * mo->dirtyheight);
 
 	/* allocate the gfx lookup */
@@ -440,8 +442,8 @@ void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc)
 	init_gfxelement(mo, desc->gfxindex);
 
 	/* start a timer to update a few times during refresh */
-	force_update_timer = machine->scheduler().timer_alloc(FUNC(force_update));
-	force_update_timer->adjust(machine->primary_screen->time_until_pos(0));
+	force_update_timer = machine.scheduler().timer_alloc(FUNC(force_update));
+	force_update_timer->adjust(machine.primary_screen->time_until_pos(0));
 
 	init_savestate(machine, map, mo);
 
@@ -689,7 +691,7 @@ bitmap_t *atarimo_render(int map, const rectangle *cliprect, atarimo_rect_list *
 
 			/* compute minimum Y and wrap around if necessary */
 			bandclip.min_y = ((band << mo->slipshift) - mo->yscroll + mo->slipoffset) & mo->bitmapymask;
-			if (bandclip.min_y > mo->machine->primary_screen->visible_area().max_y)
+			if (bandclip.min_y > mo->machine().primary_screen->visible_area().max_y)
 				bandclip.min_y -= mo->bitmapheight;
 
 			/* maximum Y is based on the minimum */
@@ -807,8 +809,8 @@ if ((temp & 0xff00) == 0xc800)
 	/* adjust the final coordinates */
 	xpos &= mo->bitmapxmask;
 	ypos &= mo->bitmapymask;
-	if (xpos > mo->machine->primary_screen->visible_area().max_x) xpos -= mo->bitmapwidth;
-	if (ypos > mo->machine->primary_screen->visible_area().max_y) ypos -= mo->bitmapheight;
+	if (xpos > mo->machine().primary_screen->visible_area().max_x) xpos -= mo->bitmapwidth;
+	if (ypos > mo->machine().primary_screen->visible_area().max_y) ypos -= mo->bitmapheight;
 
 	/* is this one special? */
 	if (mo->specialmask.mask != 0 && EXTRACT_DATA(entry, mo->specialmask) == mo->specialvalue)

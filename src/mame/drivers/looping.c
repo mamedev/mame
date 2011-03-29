@@ -171,7 +171,7 @@ static PALETTE_INIT( looping )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	looping_state *state = machine->driver_data<looping_state>();
+	looping_state *state = machine.driver_data<looping_state>();
 	int tile_number = state->videoram[tile_index];
 	int color = state->colorram[(tile_index & 0x1f) * 2 + 1] & 0x07;
 	SET_TILE_INFO(0, tile_number, color, 0);
@@ -180,7 +180,7 @@ static TILE_GET_INFO( get_tile_info )
 
 static VIDEO_START( looping )
 {
-	looping_state *state = machine->driver_data<looping_state>();
+	looping_state *state = machine.driver_data<looping_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8,8, 32,32);
 
@@ -197,23 +197,23 @@ static VIDEO_START( looping )
 
 static WRITE8_HANDLER( flip_screen_x_w )
 {
-	looping_state *state = space->machine->driver_data<looping_state>();
-	flip_screen_x_set(space->machine, ~data & 0x01);
-	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get(space->machine) ? 128 : 0);
+	looping_state *state = space->machine().driver_data<looping_state>();
+	flip_screen_x_set(space->machine(), ~data & 0x01);
+	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get(space->machine()) ? 128 : 0);
 }
 
 
 static WRITE8_HANDLER( flip_screen_y_w )
 {
-	looping_state *state = space->machine->driver_data<looping_state>();
-	flip_screen_y_set(space->machine, ~data & 0x01);
-	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get(space->machine) ? 128 : 0);
+	looping_state *state = space->machine().driver_data<looping_state>();
+	flip_screen_y_set(space->machine(), ~data & 0x01);
+	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get(space->machine()) ? 128 : 0);
 }
 
 
 static WRITE8_HANDLER( looping_videoram_w )
 {
-	looping_state *state = space->machine->driver_data<looping_state>();
+	looping_state *state = space->machine().driver_data<looping_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -221,7 +221,7 @@ static WRITE8_HANDLER( looping_videoram_w )
 
 static WRITE8_HANDLER( looping_colorram_w )
 {
-	looping_state *state = space->machine->driver_data<looping_state>();
+	looping_state *state = space->machine().driver_data<looping_state>();
 	int i;
 
 	state->colorram[offset] = data;
@@ -248,10 +248,10 @@ static WRITE8_HANDLER( looping_colorram_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const UINT8 *source;
-	looping_state *state = machine->driver_data<looping_state>();
+	looping_state *state = machine.driver_data<looping_state>();
 
 	for (source = state->spriteram; source < state->spriteram + 0x40; source += 4)
 	{
@@ -274,17 +274,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
 
 static SCREEN_UPDATE( looping )
 {
-	looping_state *state = screen->machine->driver_data<looping_state>();
+	looping_state *state = screen->machine().driver_data<looping_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -298,7 +298,7 @@ static SCREEN_UPDATE( looping )
 
 static MACHINE_START( looping )
 {
-	looping_state *state = machine->driver_data<looping_state>();
+	looping_state *state = machine.driver_data<looping_state>();
 	state->save_item(NAME(state->sound));
 }
 
@@ -319,34 +319,34 @@ static INTERRUPT_GEN( looping_interrupt )
 static WRITE8_HANDLER( level2_irq_set )
 {
 	if (!(data & 1))
-		cputag_set_input_line_and_vector(space->machine, "maincpu", 0, ASSERT_LINE, 4);
+		cputag_set_input_line_and_vector(space->machine(), "maincpu", 0, ASSERT_LINE, 4);
 }
 
 
 static WRITE8_HANDLER( main_irq_ack_w )
 {
 	if (data == 0)
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( looping_souint_clr )
 {
 	if (data == 0)
-		cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( looping_spcint )
 {
-	cputag_set_input_line_and_vector(device->machine, "audiocpu", 0, !state, 6);
+	cputag_set_input_line_and_vector(device->machine(), "audiocpu", 0, !state, 6);
 }
 
 
 static WRITE8_HANDLER( looping_soundlatch_w )
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, ASSERT_LINE, 4);
+	cputag_set_input_line_and_vector(space->machine(), "audiocpu", 0, ASSERT_LINE, 4);
 }
 
 
@@ -370,7 +370,7 @@ static WRITE8_DEVICE_HANDLER( looping_sound_sw )
         0007 = AFA
     */
 
-	looping_state *state = device->machine->driver_data<looping_state>();
+	looping_state *state = device->machine().driver_data<looping_state>();
 	state->sound[offset + 1] = data ^ 1;
 	dac_data_w(device, ((state->sound[2] << 7) + (state->sound[3] << 6)) * state->sound[7]);
 }
@@ -404,7 +404,7 @@ static WRITE8_DEVICE_HANDLER( speech_enable_w )
 
 static WRITE8_HANDLER( ballon_enable_w )
 {
-	looping_state *state = space->machine->driver_data<looping_state>();
+	looping_state *state = space->machine().driver_data<looping_state>();
 	if (state->last != data)
 		mame_printf_debug("ballon_enable_w = %d\n", data);
 	state->last = data;
@@ -440,21 +440,21 @@ static WRITE8_HANDLER( plr2_w )
 
 static READ8_HANDLER( cop_io_r )
 {
-	//looping_state *state = space->machine->driver_data<looping_state>();
-	// if (offset == 1) return space->machine->rand() & 0x01;
+	//looping_state *state = space->machine().driver_data<looping_state>();
+	// if (offset == 1) return space->machine().rand() & 0x01;
 	return 1; // state->cop_io[offset];
 }
 
 static WRITE8_HANDLER( cop_io_w )
 {
-	looping_state *state = space->machine->driver_data<looping_state>();
+	looping_state *state = space->machine().driver_data<looping_state>();
 	state->cop_io[offset] = data;
 if (offset == 0) logerror("%02x  ",data);
 }
 
 static READ8_HANDLER( protection_r )
 {
-	looping_state *state = space->machine->driver_data<looping_state>();
+	looping_state *state = space->machine().driver_data<looping_state>();
 //        The code reads ($7002) ($7004) alternately
 //        The result must change at least once every 10 reads
 //        A read from ($34b0 + result) must == $01
@@ -887,9 +887,9 @@ ROM_END
 
 static DRIVER_INIT( looping )
 {
-	looping_state *state = machine->driver_data<looping_state>();
-	int length = machine->region("maincpu")->bytes();
-	UINT8 *rom = machine->region("maincpu")->base();
+	looping_state *state = machine.driver_data<looping_state>();
+	int length = machine.region("maincpu")->bytes();
+	UINT8 *rom = machine.region("maincpu")->base();
 	int i;
 
 	state->cop_io = auto_alloc_array(machine, UINT8, 0x08);
@@ -899,7 +899,7 @@ static DRIVER_INIT( looping )
 		rom[i] = BITSWAP8(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7000, 0x7007, FUNC(protection_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7000, 0x7007, FUNC(protection_r));
 }
 
 

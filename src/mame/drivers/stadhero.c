@@ -25,13 +25,13 @@ static READ16_HANDLER( stadhero_control_r )
 	switch (offset<<1)
 	{
 		case 0:
-			return input_port_read(space->machine, "INPUTS");
+			return input_port_read(space->machine(), "INPUTS");
 
 		case 2:
-			return input_port_read(space->machine, "COIN");
+			return input_port_read(space->machine(), "COIN");
 
 		case 4:
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 	}
 
 	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",cpu_get_pc(space->cpu),0x30c000+offset);
@@ -46,7 +46,7 @@ static WRITE16_HANDLER( stadhero_control_w )
 			break;
 		case 6: /* 6502 sound cpu */
 			soundlatch_w(space, 0, data & 0xff);
-			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			break;
 		default:
 			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+offset);
@@ -202,7 +202,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

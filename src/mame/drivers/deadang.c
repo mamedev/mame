@@ -48,11 +48,11 @@ Dip locations and factory settings verified with US manual
 
 static READ16_HANDLER( ghunter_trackball_low_r )
 {
-	return (input_port_read(space->machine, "TRACKX") & 0xff) | ((input_port_read(space->machine, "TRACKY") & 0xff) << 8);
+	return (input_port_read(space->machine(), "TRACKX") & 0xff) | ((input_port_read(space->machine(), "TRACKY") & 0xff) << 8);
 }
 static READ16_HANDLER( ghunter_trackball_high_r )
 {
-	return ((input_port_read(space->machine, "TRACKX") & 0x0f00) >> 4) | (input_port_read(space->machine, "TRACKY") & 0x0f00);
+	return ((input_port_read(space->machine(), "TRACKX") & 0x0f00) >> 4) | (input_port_read(space->machine(), "TRACKY") & 0x0f00);
 }
 
 /* Memory Maps */
@@ -403,8 +403,8 @@ static DRIVER_INIT( ghunter )
 	seibu_sound_decrypt(machine, "audiocpu", 0x2000);
 	seibu_adpcm_decrypt(machine, "adpcm");
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80000, 0x80001, FUNC(ghunter_trackball_low_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xb0000, 0xb0001, FUNC(ghunter_trackball_high_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80000, 0x80001, FUNC(ghunter_trackball_low_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xb0000, 0xb0001, FUNC(ghunter_trackball_high_r));
 }
 
 /* Game Drivers */

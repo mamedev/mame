@@ -10,11 +10,11 @@
 
 WRITE8_HANDLER( n8080_video_control_w )
 {
-	n8080_state *state = space->machine->driver_data<n8080_state>();
+	n8080_state *state = space->machine().driver_data<n8080_state>();
 
 	state->sheriff_color_mode = (data >> 3) & 3;
 	state->sheriff_color_data = (data >> 0) & 7;
-	flip_screen_set_no_update(space->machine, data & 0x20);
+	flip_screen_set_no_update(space->machine(), data & 0x20);
 }
 
 
@@ -46,9 +46,9 @@ PALETTE_INIT( helifire )
 }
 
 
-void spacefev_start_red_cannon( running_machine *machine )
+void spacefev_start_red_cannon( running_machine &machine )
 {
-	n8080_state *state = machine->driver_data<n8080_state>();
+	n8080_state *state = machine.driver_data<n8080_state>();
 
 	state->spacefev_red_cannon = 1;
 	state->cannon_timer->adjust(attotime::from_usec(550 * 68 * 10));
@@ -57,16 +57,16 @@ void spacefev_start_red_cannon( running_machine *machine )
 
 static TIMER_CALLBACK( spacefev_stop_red_cannon )
 {
-	n8080_state *state = machine->driver_data<n8080_state>();
+	n8080_state *state = machine.driver_data<n8080_state>();
 
 	state->spacefev_red_cannon = 0;
 	state->cannon_timer->adjust(attotime::never);
 }
 
 
-static void helifire_next_line( running_machine *machine )
+static void helifire_next_line( running_machine &machine )
 {
-	n8080_state *state = machine->driver_data<n8080_state>();
+	n8080_state *state = machine.driver_data<n8080_state>();
 
 	state->helifire_mv++;
 
@@ -91,9 +91,9 @@ static void helifire_next_line( running_machine *machine )
 
 VIDEO_START( spacefev )
 {
-	n8080_state *state = machine->driver_data<n8080_state>();
+	n8080_state *state = machine.driver_data<n8080_state>();
 
-	state->cannon_timer = machine->scheduler().timer_alloc(FUNC(spacefev_stop_red_cannon));
+	state->cannon_timer = machine.scheduler().timer_alloc(FUNC(spacefev_stop_red_cannon));
 
 	flip_screen_set_no_update(machine, 0);
 
@@ -104,7 +104,7 @@ VIDEO_START( spacefev )
 
 VIDEO_START( sheriff )
 {
-	n8080_state *state = machine->driver_data<n8080_state>();
+	n8080_state *state = machine.driver_data<n8080_state>();
 
 	flip_screen_set_no_update(machine, 0);
 
@@ -115,7 +115,7 @@ VIDEO_START( sheriff )
 
 VIDEO_START( helifire )
 {
-	n8080_state *state = machine->driver_data<n8080_state>();
+	n8080_state *state = machine.driver_data<n8080_state>();
 	UINT8 data = 0;
 	int i;
 
@@ -141,14 +141,14 @@ VIDEO_START( helifire )
 
 SCREEN_UPDATE( spacefev )
 {
-	n8080_state *state = screen->machine->driver_data<n8080_state>();
-	UINT8 mask = flip_screen_get(screen->machine) ? 0xff : 0x00;
+	n8080_state *state = screen->machine().driver_data<n8080_state>();
+	UINT8 mask = flip_screen_get(screen->machine()) ? 0xff : 0x00;
 
 	int x;
 	int y;
 
 	const UINT8* pRAM = state->videoram;
-	const UINT8* pPROM = screen->machine->region("proms")->base();
+	const UINT8* pPROM = screen->machine().region("proms")->base();
 
 	for (y = 0; y < 256; y++)
 	{
@@ -211,10 +211,10 @@ SCREEN_UPDATE( spacefev )
 
 SCREEN_UPDATE( sheriff )
 {
-	n8080_state *state = screen->machine->driver_data<n8080_state>();
-	UINT8 mask = flip_screen_get(screen->machine) ? 0xff : 0x00;
+	n8080_state *state = screen->machine().driver_data<n8080_state>();
+	UINT8 mask = flip_screen_get(screen->machine()) ? 0xff : 0x00;
 
-	const UINT8* pPROM = screen->machine->region("proms")->base();
+	const UINT8* pPROM = screen->machine().region("proms")->base();
 
 	int x;
 	int y;
@@ -254,9 +254,9 @@ SCREEN_UPDATE( sheriff )
 
 SCREEN_UPDATE( helifire )
 {
-	n8080_state *state = screen->machine->driver_data<n8080_state>();
-	int SUN_BRIGHTNESS = input_port_read(screen->machine, "POT0");
-	int SEA_BRIGHTNESS = input_port_read(screen->machine, "POT1");
+	n8080_state *state = screen->machine().driver_data<n8080_state>();
+	int SUN_BRIGHTNESS = input_port_read(screen->machine(), "POT0");
+	int SEA_BRIGHTNESS = input_port_read(screen->machine(), "POT1");
 
 	static const int wave[8] = { 0, 1, 2, 2, 2, 1, 0, 0 };
 
@@ -324,7 +324,7 @@ SCREEN_UPDATE( helifire )
 
 			for (n = 0; n < 8; n++)
 			{
-				if (flip_screen_get(screen->machine))
+				if (flip_screen_get(screen->machine()))
 				{
 					if ((state->videoram[offset ^ 0x1fff] << n) & 0x80)
 					{
@@ -343,7 +343,7 @@ SCREEN_UPDATE( helifire )
 
 		/* next line */
 
-		helifire_next_line(screen->machine);
+		helifire_next_line(screen->machine());
 	}
 
 	state->helifire_mv = saved_mv;
@@ -354,8 +354,8 @@ SCREEN_UPDATE( helifire )
 
 SCREEN_EOF( helifire )
 {
-	n8080_state *state = machine->driver_data<n8080_state>();
-	int n = (machine->primary_screen->frame_number() >> 1) % sizeof state->helifire_LSFR;
+	n8080_state *state = machine.driver_data<n8080_state>();
+	int n = (machine.primary_screen->frame_number() >> 1) % sizeof state->helifire_LSFR;
 
 	int i;
 
@@ -372,7 +372,7 @@ SCREEN_EOF( helifire )
 				G |= B;
 			}
 
-			if (machine->primary_screen->frame_number() & 0x04)
+			if (machine.primary_screen->frame_number() & 0x04)
 			{
 				R |= G;
 			}

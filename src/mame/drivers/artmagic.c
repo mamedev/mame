@@ -42,9 +42,9 @@
  *
  *************************************/
 
-static void update_irq_state(running_machine *machine)
+static void update_irq_state(running_machine &machine)
 {
-	artmagic_state *state = machine->driver_data<artmagic_state>();
+	artmagic_state *state = machine.driver_data<artmagic_state>();
 	cputag_set_input_line(machine, "maincpu", 4, state->tms_irq  ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 5, state->hack_irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -52,9 +52,9 @@ static void update_irq_state(running_machine *machine)
 
 static void m68k_gen_int(device_t *device, int state)
 {
-	artmagic_state *drvstate = device->machine->driver_data<artmagic_state>();
+	artmagic_state *drvstate = device->machine().driver_data<artmagic_state>();
 	drvstate->tms_irq = state;
-	update_irq_state(device->machine);
+	update_irq_state(device->machine());
 }
 
 
@@ -67,7 +67,7 @@ static void m68k_gen_int(device_t *device, int state)
 
 static MACHINE_START( artmagic )
 {
-	artmagic_state *state = machine->driver_data<artmagic_state>();
+	artmagic_state *state = machine.driver_data<artmagic_state>();
 	state_save_register_global(machine, state->tms_irq);
 	state_save_register_global(machine, state->hack_irq);
 	state_save_register_global(machine, state->prot_input_index);
@@ -81,7 +81,7 @@ static MACHINE_START( artmagic )
 
 static MACHINE_RESET( artmagic )
 {
-	artmagic_state *state = machine->driver_data<artmagic_state>();
+	artmagic_state *state = machine.driver_data<artmagic_state>();
 	state->tms_irq = state->hack_irq = 0;
 	update_irq_state(machine);
 }
@@ -96,13 +96,13 @@ static MACHINE_RESET( artmagic )
 
 static READ16_HANDLER( tms_host_r )
 {
-	return tms34010_host_r(space->machine->device("tms"), offset);
+	return tms34010_host_r(space->machine().device("tms"), offset);
 }
 
 
 static WRITE16_HANDLER( tms_host_w )
 {
-	tms34010_host_w(space->machine->device("tms"), offset, data);
+	tms34010_host_w(space->machine().device("tms"), offset, data);
 }
 
 
@@ -115,13 +115,13 @@ static WRITE16_HANDLER( tms_host_w )
 
 static WRITE16_HANDLER( control_w )
 {
-	artmagic_state *state = space->machine->driver_data<artmagic_state>();
+	artmagic_state *state = space->machine().driver_data<artmagic_state>();
 	COMBINE_DATA(&state->control[offset]);
 
 	/* OKI banking here */
 	if (offset == 0)
 	{
-		okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+		okim6295_device *oki = space->machine().device<okim6295_device>("oki");
 		oki->set_bank_base((((data >> 4) & 1) * 0x40000) % oki->region()->bytes());
 	}
 
@@ -138,23 +138,23 @@ static WRITE16_HANDLER( control_w )
 
 static TIMER_CALLBACK( irq_off )
 {
-	artmagic_state *state = machine->driver_data<artmagic_state>();
+	artmagic_state *state = machine.driver_data<artmagic_state>();
 	state->hack_irq = 0;
 	update_irq_state(machine);
 }
 
 static READ16_HANDLER( ultennis_hack_r )
 {
-	artmagic_state *state = space->machine->driver_data<artmagic_state>();
+	artmagic_state *state = space->machine().driver_data<artmagic_state>();
 	/* IRQ5 points to: jsr (a5); rte */
 	UINT32 pc = cpu_get_pc(space->cpu);
 	if (pc == 0x18c2 || pc == 0x18e4)
 	{
 		state->hack_irq = 1;
-		update_irq_state(space->machine);
-		space->machine->scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off));
+		update_irq_state(space->machine());
+		space->machine().scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off));
 	}
-	return input_port_read(space->machine, "300000");
+	return input_port_read(space->machine(), "300000");
 }
 
 
@@ -165,15 +165,15 @@ static READ16_HANDLER( ultennis_hack_r )
  *
  *************************************/
 
-static void ultennis_protection(running_machine *machine)
+static void ultennis_protection(running_machine &machine)
 {
-	artmagic_state *state = machine->driver_data<artmagic_state>();
+	artmagic_state *state = machine.driver_data<artmagic_state>();
 	/* check the command byte */
 	switch (state->prot_input[0])
 	{
 		case 0x00:	/* reset */
 			state->prot_input_index = state->prot_output_index = 0;
-			state->prot_output[0] = machine->rand();
+			state->prot_output[0] = machine.rand();
 			break;
 
 		case 0x01:	/* 01 aaaa bbbb cccc dddd (xxxx) */
@@ -256,15 +256,15 @@ static void ultennis_protection(running_machine *machine)
 }
 
 
-static void cheesech_protection(running_machine *machine)
+static void cheesech_protection(running_machine &machine)
 {
-	artmagic_state *state = machine->driver_data<artmagic_state>();
+	artmagic_state *state = machine.driver_data<artmagic_state>();
 	/* check the command byte */
 	switch (state->prot_input[0])
 	{
 		case 0x00:	/* reset */
 			state->prot_input_index = state->prot_output_index = 0;
-			state->prot_output[0] = machine->rand();
+			state->prot_output[0] = machine.rand();
 			break;
 
 		case 0x01:	/* 01 aaaa bbbb (xxxx) */
@@ -317,9 +317,9 @@ static void cheesech_protection(running_machine *machine)
 }
 
 
-static void stonebal_protection(running_machine *machine)
+static void stonebal_protection(running_machine &machine)
 {
-	artmagic_state *state = machine->driver_data<artmagic_state>();
+	artmagic_state *state = machine.driver_data<artmagic_state>();
 	/* check the command byte */
 	switch (state->prot_input[0])
 	{
@@ -387,14 +387,14 @@ static void stonebal_protection(running_machine *machine)
 
 static CUSTOM_INPUT( prot_r )
 {
-	artmagic_state *state = field->port->machine->driver_data<artmagic_state>();
+	artmagic_state *state = field->port->machine().driver_data<artmagic_state>();
 	return state->prot_output_bit;
 }
 
 
 static WRITE16_HANDLER( protection_bit_w )
 {
-	artmagic_state *state = space->machine->driver_data<artmagic_state>();
+	artmagic_state *state = space->machine().driver_data<artmagic_state>();
 	/* shift in the new bit based on the offset */
 	state->prot_input[state->prot_input_index] <<= 1;
 	state->prot_input[state->prot_input_index] |= offset;
@@ -412,7 +412,7 @@ static WRITE16_HANDLER( protection_bit_w )
 		state->prot_bit_index = 0;
 
 		/* update the protection state */
-		(*state->protection_handler)(space->machine);
+		(*state->protection_handler)(space->machine());
 	}
 }
 
@@ -461,7 +461,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER(unk_r)
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static ADDRESS_MAP_START( shtstar_map, AS_PROGRAM, 16 )
@@ -1130,9 +1130,9 @@ ROM_END
  *
  *************************************/
 
-static void decrypt_ultennis(running_machine *machine)
+static void decrypt_ultennis(running_machine &machine)
 {
-	artmagic_state *state = machine->driver_data<artmagic_state>();
+	artmagic_state *state = machine.driver_data<artmagic_state>();
 	int i;
 
 	/* set up the parameters for the blitter data decryption which will happen at runtime */
@@ -1147,9 +1147,9 @@ static void decrypt_ultennis(running_machine *machine)
 }
 
 
-static void decrypt_cheesech(running_machine *machine)
+static void decrypt_cheesech(running_machine &machine)
 {
-	artmagic_state *state = machine->driver_data<artmagic_state>();
+	artmagic_state *state = machine.driver_data<artmagic_state>();
 	int i;
 
 	/* set up the parameters for the blitter data decryption which will happen at runtime */
@@ -1166,19 +1166,19 @@ static void decrypt_cheesech(running_machine *machine)
 
 static DRIVER_INIT( ultennis )
 {
-	artmagic_state *state = machine->driver_data<artmagic_state>();
+	artmagic_state *state = machine.driver_data<artmagic_state>();
 	decrypt_ultennis(machine);
 	state->is_stoneball = 0;
 	state->protection_handler = ultennis_protection;
 
 	/* additional (protection?) hack */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x300000, 0x300001, FUNC(ultennis_hack_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x300000, 0x300001, FUNC(ultennis_hack_r));
 }
 
 
 static DRIVER_INIT( cheesech )
 {
-	artmagic_state *state = machine->driver_data<artmagic_state>();
+	artmagic_state *state = machine.driver_data<artmagic_state>();
 	decrypt_cheesech(machine);
 	state->is_stoneball = 0;
 	state->protection_handler = cheesech_protection;
@@ -1187,7 +1187,7 @@ static DRIVER_INIT( cheesech )
 
 static DRIVER_INIT( stonebal )
 {
-	artmagic_state *state = machine->driver_data<artmagic_state>();
+	artmagic_state *state = machine.driver_data<artmagic_state>();
 	decrypt_ultennis(machine);
 	state->is_stoneball = 1;	/* blits 1 line high are NOT encrypted, also different first pixel decrypt */
 	state->protection_handler = stonebal_protection;
@@ -1195,7 +1195,7 @@ static DRIVER_INIT( stonebal )
 
 static DRIVER_INIT( shtstar )
 {
-	artmagic_state *state = machine->driver_data<artmagic_state>();
+	artmagic_state *state = machine.driver_data<artmagic_state>();
 	/* wrong */
 	decrypt_ultennis(machine);
 	state->is_stoneball =0;

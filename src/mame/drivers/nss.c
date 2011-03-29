@@ -381,16 +381,16 @@ static WRITE8_HANDLER( nss_eeprom_w )
 
 static READ8_HANDLER( m50458_r )
 {
-	nss_state *state = space->machine->driver_data<nss_state>();
+	nss_state *state = space->machine().driver_data<nss_state>();
 	if(state->m50458_rom_bank)
 	{
-		UINT8 *gfx_rom = space->machine->region("m50458_gfx")->base();
+		UINT8 *gfx_rom = space->machine().region("m50458_gfx")->base();
 
 		return gfx_rom[offset & 0xfff];
 	}
 	else
 	{
-		UINT8 *gfx_ram = space->machine->region("m50458_vram")->base();
+		UINT8 *gfx_ram = space->machine().region("m50458_vram")->base();
 
 		return gfx_ram[offset & 0xfff];
 	}
@@ -400,12 +400,12 @@ static READ8_HANDLER( m50458_r )
 
 static WRITE8_HANDLER( m50458_w )
 {
-	nss_state *state = space->machine->driver_data<nss_state>();
+	nss_state *state = space->machine().driver_data<nss_state>();
 	if(state->m50458_rom_bank)
 		logerror("Warning: write to M50458 GFX ROM!\n");
 	else
 	{
-		UINT8 *gfx_ram = space->machine->region("m50458_vram")->base();
+		UINT8 *gfx_ram = space->machine().region("m50458_vram")->base();
 
 		gfx_ram[offset & 0xfff] = data;
 	}
@@ -424,7 +424,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( port00_r )
 {
-	nss_state *state = space->machine->driver_data<nss_state>();
+	nss_state *state = space->machine().driver_data<nss_state>();
 	/*
     -x-- ---- almost certainly tied to the vblank signal
     */
@@ -464,14 +464,14 @@ static READ8_HANDLER( port03_r )
 
 static WRITE8_HANDLER( port80_w )
 {
-	nss_state *state = space->machine->driver_data<nss_state>();
+	nss_state *state = space->machine().driver_data<nss_state>();
 	/*
     ---- -x-- written when 0x9000-0x9fff is read, probably a bankswitch
     ---- --x- see port 0x02 note
     ---- ---x BIOS bankswitch
     */
 
-	memory_set_bank(space->machine, "bank1", data & 1);
+	memory_set_bank(space->machine(), "bank1", data & 1);
 	state->m50458_rom_bank = data & 4;
 }
 
@@ -499,8 +499,8 @@ ADDRESS_MAP_END
 
 static MACHINE_START( nss )
 {
-	nss_state *state = machine->driver_data<nss_state>();
-	UINT8 *ROM = machine->region("bios")->base();
+	nss_state *state = machine.driver_data<nss_state>();
+	UINT8 *ROM = machine.region("bios")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x8000);
 	memory_set_bank(machine, "bank1", 0);

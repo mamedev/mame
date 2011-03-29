@@ -159,7 +159,7 @@
 static void lfkp(int mask)
 {
 	int A;
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 
 
 	for (A = 0x0000;A < 0x8000-14;A++)
@@ -213,14 +213,14 @@ static void look_for_known_plaintext(void)
 }
 #endif
 
-static void sega_decode(running_machine *machine, const char *cputag, const UINT8 convtable[32][4])
+static void sega_decode(running_machine &machine, const char *cputag, const UINT8 convtable[32][4])
 {
 	int A;
 
-	address_space *space = machine->device(cputag)->memory().space(AS_PROGRAM);
-	int length = machine->region(cputag)->bytes();
+	address_space *space = machine.device(cputag)->memory().space(AS_PROGRAM);
+	int length = machine.region(cputag)->bytes();
 	int cryptlen = MIN(length, 0x8000);
-	UINT8 *rom = machine->region(cputag)->base();
+	UINT8 *rom = machine.region(cputag)->base();
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0xc000);
 
 	space->set_decrypted_region(0x0000, cryptlen - 1, decrypted);
@@ -266,7 +266,7 @@ static void sega_decode(running_machine *machine, const char *cputag, const UINT
 
 
 
-void buckrog_decode(running_machine *machine, const char *cputag)
+void buckrog_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -295,7 +295,7 @@ void buckrog_decode(running_machine *machine, const char *cputag)
 }
 
 
-void pengo_decode(running_machine *machine, const char *cputag)
+void pengo_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -324,7 +324,7 @@ void pengo_decode(running_machine *machine, const char *cputag)
 }
 
 
-void szaxxon_decode(running_machine *machine, const char *cputag)
+void szaxxon_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -353,7 +353,7 @@ void szaxxon_decode(running_machine *machine, const char *cputag)
 }
 
 
-void suprloco_decode(running_machine *machine, const char *cputag)
+void suprloco_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -382,7 +382,7 @@ void suprloco_decode(running_machine *machine, const char *cputag)
 }
 
 
-void yamato_decode(running_machine *machine, const char *cputag)
+void yamato_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -410,7 +410,7 @@ void yamato_decode(running_machine *machine, const char *cputag)
 	sega_decode(machine, cputag, convtable);
 }
 
-void toprollr_decode(running_machine *machine, const char *cputag, const char *regiontag)
+void toprollr_decode(running_machine &machine, const char *cputag, const char *regiontag)
 {
 	/* same tables as in Yamato, but encrypted ROM is banked */
 	UINT8 *decrypted;
@@ -439,8 +439,8 @@ void toprollr_decode(running_machine *machine, const char *cputag, const char *r
 
 	int A;
 
-	address_space *space = machine->device(cputag)->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine->region(regiontag)->base();
+	address_space *space = machine.device(cputag)->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine.region(regiontag)->base();
 	int bankstart;
 	decrypted = auto_alloc_array(machine, UINT8, 0x6000*3);
 
@@ -471,14 +471,14 @@ void toprollr_decode(running_machine *machine, const char *cputag, const char *r
 		rom[A+bankstart] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xorval);
 	}
 
-	memory_configure_bank(machine, "bank1",0,3, machine->region(regiontag)->base(),0x6000);
+	memory_configure_bank(machine, "bank1",0,3, machine.region(regiontag)->base(),0x6000);
 	memory_configure_bank_decrypted(machine, "bank1",0,3,decrypted,0x6000);
 	space->set_decrypted_region(0x0000, 0x5fff, decrypted);
-	memory_set_bank(space->machine, "bank1", 0);
+	memory_set_bank(space->machine(), "bank1", 0);
 }
 
 
-void sindbadm_decode(running_machine *machine, const char *cputag)
+void sindbadm_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -507,7 +507,7 @@ void sindbadm_decode(running_machine *machine, const char *cputag)
 }
 
 
-void regulus_decode(running_machine *machine, const char *cputag)
+void regulus_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -536,7 +536,7 @@ void regulus_decode(running_machine *machine, const char *cputag)
 }
 
 
-void mrviking_decode(running_machine *machine, const char *cputag)
+void mrviking_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -565,7 +565,7 @@ void mrviking_decode(running_machine *machine, const char *cputag)
 }
 
 
-void swat_decode(running_machine *machine, const char *cputag)
+void swat_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -594,7 +594,7 @@ void swat_decode(running_machine *machine, const char *cputag)
 }
 
 
-void flicky_decode(running_machine *machine, const char *cputag)
+void flicky_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -623,7 +623,7 @@ void flicky_decode(running_machine *machine, const char *cputag)
 }
 
 
-void futspy_decode(running_machine *machine, const char *cputag)
+void futspy_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -652,7 +652,7 @@ void futspy_decode(running_machine *machine, const char *cputag)
 }
 
 
-void wmatch_decode(running_machine *machine, const char *cputag)
+void wmatch_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -681,7 +681,7 @@ void wmatch_decode(running_machine *machine, const char *cputag)
 }
 
 
-void bullfgtj_decode(running_machine *machine, const char *cputag)
+void bullfgtj_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -710,7 +710,7 @@ void bullfgtj_decode(running_machine *machine, const char *cputag)
 }
 
 
-void pbaction_decode(running_machine *machine, const char *cputag)
+void pbaction_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -739,7 +739,7 @@ void pbaction_decode(running_machine *machine, const char *cputag)
 }
 
 
-void spatter_decode(running_machine *machine, const char *cputag)
+void spatter_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -768,7 +768,7 @@ void spatter_decode(running_machine *machine, const char *cputag)
 }
 
 
-void jongkyo_decode(running_machine *machine, const char *cputag)
+void jongkyo_decode(running_machine &machine, const char *cputag)
 {
 	/* encrypted ROM is banked */
 	UINT8 *decrypted;
@@ -797,8 +797,8 @@ void jongkyo_decode(running_machine *machine, const char *cputag)
 
 	int A;
 
-	address_space *space = machine->device(cputag)->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine->region(cputag)->base();
+	address_space *space = machine.device(cputag)->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine.region(cputag)->base();
 	decrypted = auto_alloc_array(machine, UINT8, 0x9000);
 
 	for (A = 0x0000;A < 0x9000;A++)
@@ -830,14 +830,14 @@ void jongkyo_decode(running_machine *machine, const char *cputag)
 		rom[A] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xorval);
 	}
 
-	memory_configure_bank(machine, "bank1",0,8, machine->region(cputag)->base()+0x7000,0x0400);
+	memory_configure_bank(machine, "bank1",0,8, machine.region(cputag)->base()+0x7000,0x0400);
 	memory_configure_bank_decrypted(machine, "bank1",0,8,decrypted+0x7000,0x0400);
 	space->set_decrypted_region(0x0000, 0x6bff, decrypted);
-	memory_set_bank(space->machine, "bank1", 0);
+	memory_set_bank(space->machine(), "bank1", 0);
 }
 
 
-void pitfall2_decode(running_machine *machine, const char *cputag)
+void pitfall2_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -866,7 +866,7 @@ void pitfall2_decode(running_machine *machine, const char *cputag)
 }
 
 
-void nprinces_decode(running_machine *machine, const char *cputag)
+void nprinces_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -895,7 +895,7 @@ void nprinces_decode(running_machine *machine, const char *cputag)
 }
 
 
-void seganinj_decode(running_machine *machine, const char *cputag)
+void seganinj_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -924,7 +924,7 @@ void seganinj_decode(running_machine *machine, const char *cputag)
 }
 
 
-void imsorry_decode(running_machine *machine, const char *cputag)
+void imsorry_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -953,7 +953,7 @@ void imsorry_decode(running_machine *machine, const char *cputag)
 }
 
 
-void teddybb_decode(running_machine *machine, const char *cputag)
+void teddybb_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -982,7 +982,7 @@ void teddybb_decode(running_machine *machine, const char *cputag)
 }
 
 
-void myheroj_decode(running_machine *machine, const char *cputag)
+void myheroj_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -1011,7 +1011,7 @@ void myheroj_decode(running_machine *machine, const char *cputag)
 }
 
 
-void hvymetal_decode(running_machine *machine, const char *cputag)
+void hvymetal_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -1040,7 +1040,7 @@ void hvymetal_decode(running_machine *machine, const char *cputag)
 }
 
 
-void lvcards_decode(running_machine *machine, const char *cputag)
+void lvcards_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 convtable[32][4] =
 	{

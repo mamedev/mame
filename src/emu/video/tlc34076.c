@@ -267,13 +267,13 @@ static DEVICE_START( tlc34076 )
 
 	state->dacbits = config->res_sel ? 8 : 6;
 
-	state_save_register_global_array(device->machine, state->local_paletteram);
-	state_save_register_global_array(device->machine, state->regs);
-	state_save_register_global_array(device->machine, state->pens);
+	state_save_register_global_array(device->machine(), state->local_paletteram);
+	state_save_register_global_array(device->machine(), state->regs);
+	state_save_register_global_array(device->machine(), state->pens);
 
-	state_save_register_global(device->machine, state->writeindex);
-	state_save_register_global(device->machine, state->readindex);
-	state_save_register_global(device->machine, state->dacbits);
+	state_save_register_global(device->machine(), state->writeindex);
+	state_save_register_global(device->machine(), state->readindex);
+	state_save_register_global(device->machine(), state->dacbits);
 }
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;

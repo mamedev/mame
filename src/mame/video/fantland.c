@@ -61,9 +61,9 @@
 #include "emu.h"
 #include "includes/fantland.h"
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	fantland_state *state = machine->driver_data<fantland_state>();
+	fantland_state *state = machine.driver_data<fantland_state>();
 	UINT8 *spriteram_2 = state->spriteram2;
 	UINT8	*indx_ram	=	state->spriteram + 0x2000,	// this ram contains indexes into offs_ram
 			*offs_ram	=	state->spriteram + 0x2400,	// this ram contains x,y offsets or indexes into spriteram_2
@@ -71,7 +71,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			*ram2		=	indx_ram;			// current sprite pointer in indx_ram
 
 	// wheelrun is the only game with a smaller visible area
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 	int special = (visarea.max_y - visarea.min_y + 1) < 0x100;
 
 	for ( ; ram < indx_ram; ram += 8,ram2++)
@@ -135,14 +135,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		if (x >= 0x180)		x -= 0x200;
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[0], code,color, flipx,flipy, x,y,0);
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[0], code,color, flipx,flipy, x,y,0);
 	}
 }
 
 SCREEN_UPDATE( fantland )
 {
 	bitmap_fill(bitmap,cliprect,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	draw_sprites(screen->machine(),bitmap,cliprect);
 
 	return 0;
 }

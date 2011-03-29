@@ -113,9 +113,9 @@ static MACHINE_RESET( sandscrp )
 
 
 /* Update the IRQ state based on all possible causes */
-static void update_irq_state(running_machine *machine)
+static void update_irq_state(running_machine &machine)
 {
-	sandscrp_state *state = machine->driver_data<sandscrp_state>();
+	sandscrp_state *state = machine.driver_data<sandscrp_state>();
 	if (state->vblank_irq || state->sprite_irq || state->unknown_irq)
 		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE);
 	else
@@ -127,16 +127,16 @@ static void update_irq_state(running_machine *machine)
 /* Called once/frame to generate the VBLANK interrupt */
 static INTERRUPT_GEN( sandscrp_interrupt )
 {
-	sandscrp_state *state = device->machine->driver_data<sandscrp_state>();
+	sandscrp_state *state = device->machine().driver_data<sandscrp_state>();
 	state->vblank_irq = 1;
-	update_irq_state(device->machine);
+	update_irq_state(device->machine());
 }
 
 
 static SCREEN_EOF( sandscrp )
 {
-	sandscrp_state *state = machine->driver_data<sandscrp_state>();
-	device_t *pandora = machine->device("pandora");
+	sandscrp_state *state = machine.driver_data<sandscrp_state>();
+	device_t *pandora = machine.device("pandora");
 	state->sprite_irq = 1;
 	update_irq_state(machine);
 	pandora_eof(pandora);
@@ -145,7 +145,7 @@ static SCREEN_EOF( sandscrp )
 /* Reads the cause of the interrupt */
 static READ16_HANDLER( sandscrp_irq_cause_r )
 {
-	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
+	sandscrp_state *state = space->machine().driver_data<sandscrp_state>();
 	return	( state->sprite_irq  ?  0x08  : 0 ) |
 			( state->unknown_irq ?  0x10  : 0 ) |
 			( state->vblank_irq  ?  0x20  : 0 ) ;
@@ -155,7 +155,7 @@ static READ16_HANDLER( sandscrp_irq_cause_r )
 /* Clear the cause of the interrupt */
 static WRITE16_HANDLER( sandscrp_irq_cause_w )
 {
-	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
+	sandscrp_state *state = space->machine().driver_data<sandscrp_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		kaneko16_sprite_flipx	=	data & 1;
@@ -166,7 +166,7 @@ static WRITE16_HANDLER( sandscrp_irq_cause_w )
 		if (data & 0x20)	state->vblank_irq  = 0;
 	}
 
-	update_irq_state(space->machine);
+	update_irq_state(space->machine());
 }
 
 
@@ -179,22 +179,22 @@ static WRITE16_HANDLER( sandscrp_coin_counter_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0,   data  & 0x0001);
-		coin_counter_w(space->machine, 1,   data  & 0x0002);
+		coin_counter_w(space->machine(), 0,   data  & 0x0001);
+		coin_counter_w(space->machine(), 1,   data  & 0x0002);
 	}
 }
 
 
 static READ16_HANDLER( sandscrp_latchstatus_word_r )
 {
-	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
+	sandscrp_state *state = space->machine().driver_data<sandscrp_state>();
 	return	(state->latch1_full ? 0x80 : 0) |
 			(state->latch2_full ? 0x40 : 0) ;
 }
 
 static WRITE16_HANDLER( sandscrp_latchstatus_word_w )
 {
-	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
+	sandscrp_state *state = space->machine().driver_data<sandscrp_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->latch1_full = data & 0x80;
@@ -204,19 +204,19 @@ static WRITE16_HANDLER( sandscrp_latchstatus_word_w )
 
 static READ16_HANDLER( sandscrp_soundlatch_word_r )
 {
-	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
+	sandscrp_state *state = space->machine().driver_data<sandscrp_state>();
 	state->latch2_full = 0;
 	return soundlatch2_r(space,0);
 }
 
 static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
 {
-	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
+	sandscrp_state *state = space->machine().driver_data<sandscrp_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->latch1_full = 1;
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 		device_spin_until_time(space->cpu, attotime::from_usec(100));	// Allow the other cpu to reply
 	}
 }
@@ -253,7 +253,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sandscrp_bankswitch_w )
 {
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 	int bank = data & 0x07;
 
 	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
@@ -261,26 +261,26 @@ static WRITE8_HANDLER( sandscrp_bankswitch_w )
 	if (bank < 3)	RAM = &RAM[0x4000 * bank];
 	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];
 
-	memory_set_bankptr(space->machine, "bank1", RAM);
+	memory_set_bankptr(space->machine(), "bank1", RAM);
 }
 
 static READ8_HANDLER( sandscrp_latchstatus_r )
 {
-	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
+	sandscrp_state *state = space->machine().driver_data<sandscrp_state>();
 	return	(state->latch2_full ? 0x80 : 0) |	// swapped!?
 			(state->latch1_full ? 0x40 : 0) ;
 }
 
 static READ8_HANDLER( sandscrp_soundlatch_r )
 {
-	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
+	sandscrp_state *state = space->machine().driver_data<sandscrp_state>();
 	state->latch1_full = 0;
 	return soundlatch_r(space,0);
 }
 
 static WRITE8_HANDLER( sandscrp_soundlatch_w )
 {
-	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
+	sandscrp_state *state = space->machine().driver_data<sandscrp_state>();
 	state->latch2_full = 1;
 	soundlatch2_w(space,0,data);
 }
@@ -436,7 +436,7 @@ GFXDECODE_END
 
 static void irq_handler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_intf_sandscrp =

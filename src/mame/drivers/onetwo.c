@@ -75,7 +75,7 @@ public:
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	onetwo_state *state = machine->driver_data<onetwo_state>();
+	onetwo_state *state = machine.driver_data<onetwo_state>();
 	int code = (state->fgram[tile_index * 2 + 1] << 8) | state->fgram[tile_index * 2];
 	int color = (state->fgram[tile_index * 2 + 1] & 0x80) >> 7;
 
@@ -86,13 +86,13 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static VIDEO_START( onetwo )
 {
-	onetwo_state *state = machine->driver_data<onetwo_state>();
+	onetwo_state *state = machine.driver_data<onetwo_state>();
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
 static SCREEN_UPDATE( onetwo )
 {
-	onetwo_state *state = screen->machine->driver_data<onetwo_state>();
+	onetwo_state *state = screen->machine().driver_data<onetwo_state>();
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
 }
@@ -105,33 +105,33 @@ static SCREEN_UPDATE( onetwo )
 
 static WRITE8_HANDLER( onetwo_fgram_w )
 {
-	onetwo_state *state = space->machine->driver_data<onetwo_state>();
+	onetwo_state *state = space->machine().driver_data<onetwo_state>();
 	state->fgram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset / 2);
 }
 
 static WRITE8_HANDLER( onetwo_cpubank_w )
 {
-	memory_set_bank(space->machine, "bank1", data);
+	memory_set_bank(space->machine(), "bank1", data);
 }
 
 static WRITE8_HANDLER( onetwo_coin_counters_w )
 {
-	watchdog_reset(space->machine);
-	coin_counter_w(space->machine, 0, BIT(data, 1));
-	coin_counter_w(space->machine, 1, BIT(data, 2));
+	watchdog_reset(space->machine());
+	coin_counter_w(space->machine(), 0, BIT(data, 1));
+	coin_counter_w(space->machine(), 1, BIT(data, 2));
 }
 
 static WRITE8_HANDLER( onetwo_soundlatch_w )
 {
-	onetwo_state *state = space->machine->driver_data<onetwo_state>();
+	onetwo_state *state = space->machine().driver_data<onetwo_state>();
 	soundlatch_w(space, 0, data);
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void set_color(running_machine *machine, int offset)
+static void set_color(running_machine &machine, int offset)
 {
-	onetwo_state *state = machine->driver_data<onetwo_state>();
+	onetwo_state *state = machine.driver_data<onetwo_state>();
 	int r, g, b;
 
 	r = state->paletteram[offset] & 0x1f;
@@ -142,16 +142,16 @@ static void set_color(running_machine *machine, int offset)
 
 static WRITE8_HANDLER(palette1_w)
 {
-	onetwo_state *state = space->machine->driver_data<onetwo_state>();
+	onetwo_state *state = space->machine().driver_data<onetwo_state>();
 	state->paletteram[offset] = data;
-	set_color(space->machine, offset);
+	set_color(space->machine(), offset);
 }
 
 static WRITE8_HANDLER(palette2_w)
 {
-	onetwo_state *state = space->machine->driver_data<onetwo_state>();
+	onetwo_state *state = space->machine().driver_data<onetwo_state>();
 	state->paletteram2[offset] = data;
-	set_color(space->machine, offset);
+	set_color(space->machine(), offset);
 }
 
 /*************************************
@@ -325,7 +325,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int linestate)
 {
-	onetwo_state *state = device->machine->driver_data<onetwo_state>();
+	onetwo_state *state = device->machine().driver_data<onetwo_state>();
 	device_set_input_line(state->audiocpu, 0, linestate);
 }
 
@@ -342,13 +342,13 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_START( onetwo )
 {
-	onetwo_state *state = machine->driver_data<onetwo_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	onetwo_state *state = machine.driver_data<onetwo_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 }
 
 static MACHINE_CONFIG_START( onetwo, onetwo_state )

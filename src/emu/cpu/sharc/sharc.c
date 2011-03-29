@@ -430,7 +430,7 @@ static CPU_INIT( sharc )
 
 	build_opcode_table();
 
-	cpustate->internal_ram = auto_alloc_array(device->machine, UINT16, 2 * 0x10000);		// 2x 128KB
+	cpustate->internal_ram = auto_alloc_array(device->machine(), UINT16, 2 * 0x10000);		// 2x 128KB
 	cpustate->internal_ram_block0 = &cpustate->internal_ram[0];
 	cpustate->internal_ram_block1 = &cpustate->internal_ram[0x20000/2];
 

@@ -88,7 +88,7 @@ public:
 
 static TILE_GET_INFO( y_get_bg_tile_info )
 {
-	albazg_state *state = machine->driver_data<albazg_state>();
+	albazg_state *state = machine.driver_data<albazg_state>();
 	int code = state->videoram[tile_index];
 	int color = state->colorram[tile_index];
 
@@ -102,13 +102,13 @@ static TILE_GET_INFO( y_get_bg_tile_info )
 
 static VIDEO_START( yumefuda )
 {
-	albazg_state *state = machine->driver_data<albazg_state>();
+	albazg_state *state = machine.driver_data<albazg_state>();
 	state->bg_tilemap = tilemap_create(machine, y_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE( yumefuda )
 {
-	albazg_state *state = screen->machine->driver_data<albazg_state>();
+	albazg_state *state = screen->machine().driver_data<albazg_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
@@ -133,14 +133,14 @@ GFXDECODE_END
 
 static WRITE8_HANDLER( yumefuda_vram_w )
 {
-	albazg_state *state = space->machine->driver_data<albazg_state>();
+	albazg_state *state = space->machine().driver_data<albazg_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( yumefuda_cram_w )
 {
-	albazg_state *state = space->machine->driver_data<albazg_state>();
+	albazg_state *state = space->machine().driver_data<albazg_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -148,14 +148,14 @@ static WRITE8_HANDLER( yumefuda_cram_w )
 /*Custom RAM (Thrash Protection)*/
 static READ8_HANDLER( custom_ram_r )
 {
-	albazg_state *state = space->machine->driver_data<albazg_state>();
+	albazg_state *state = space->machine().driver_data<albazg_state>();
 //  logerror("Custom RAM read at %02x PC = %x\n", offset + 0xaf80, cpu_get_pc(space->cpu));
 	return state->cus_ram[offset];// ^ 0x55;
 }
 
 static WRITE8_HANDLER( custom_ram_w )
 {
-	albazg_state *state = space->machine->driver_data<albazg_state>();
+	albazg_state *state = space->machine().driver_data<albazg_state>();
 //  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, cpu_get_pc(space->cpu));
 	if(state->prot_lock)
 		state->cus_ram[offset] = data;
@@ -164,23 +164,23 @@ static WRITE8_HANDLER( custom_ram_w )
 /*this might be used as NVRAM commands btw*/
 static WRITE8_HANDLER( prot_lock_w )
 {
-	albazg_state *state = space->machine->driver_data<albazg_state>();
+	albazg_state *state = space->machine().driver_data<albazg_state>();
 //  logerror("PC %04x Prot lock value written %02x\n", cpu_get_pc(space->cpu), data);
 	state->prot_lock = data;
 }
 
 static READ8_DEVICE_HANDLER( mux_r )
 {
-	albazg_state *state = device->machine->driver_data<albazg_state>();
+	albazg_state *state = device->machine().driver_data<albazg_state>();
 	switch(state->mux_data)
 	{
-		case 0x00: return input_port_read(device->machine, "IN0");
-		case 0x01: return input_port_read(device->machine, "IN1");
-		case 0x02: return input_port_read(device->machine, "IN2");
-		case 0x04: return input_port_read(device->machine, "IN3");
-		case 0x08: return input_port_read(device->machine, "IN4");
-		case 0x10: return input_port_read(device->machine, "IN5");
-		case 0x20: return input_port_read(device->machine, "IN6");
+		case 0x00: return input_port_read(device->machine(), "IN0");
+		case 0x01: return input_port_read(device->machine(), "IN1");
+		case 0x02: return input_port_read(device->machine(), "IN2");
+		case 0x04: return input_port_read(device->machine(), "IN3");
+		case 0x08: return input_port_read(device->machine(), "IN4");
+		case 0x10: return input_port_read(device->machine(), "IN5");
+		case 0x20: return input_port_read(device->machine(), "IN6");
 	}
 
 	return 0xff;
@@ -188,7 +188,7 @@ static READ8_DEVICE_HANDLER( mux_r )
 
 static WRITE8_DEVICE_HANDLER( mux_w )
 {
-	albazg_state *state = device->machine->driver_data<albazg_state>();
+	albazg_state *state = device->machine().driver_data<albazg_state>();
 	int new_bank = (data & 0xc0) >> 6;
 
 	//0x10000 "Learn Mode"
@@ -198,7 +198,7 @@ static WRITE8_DEVICE_HANDLER( mux_w )
 	if( state->bank != new_bank)
 	{
 		state->bank = new_bank;
-		memory_set_bank(device->machine, "bank1", state->bank);
+		memory_set_bank(device->machine(), "bank1", state->bank);
 	}
 
 	state->mux_data = data & ~0xc0;
@@ -206,12 +206,12 @@ static WRITE8_DEVICE_HANDLER( mux_w )
 
 static WRITE8_DEVICE_HANDLER( yumefuda_output_w )
 {
-	coin_counter_w(device->machine, 0, ~data & 4);
-	coin_counter_w(device->machine, 1, ~data & 2);
-	coin_lockout_global_w(device->machine, data & 1);
+	coin_counter_w(device->machine(), 0, ~data & 4);
+	coin_counter_w(device->machine(), 1, ~data & 2);
+	coin_lockout_global_w(device->machine(), data & 1);
 	//data & 0x10 hopper-c (active LOW)
 	//data & 0x08 divider (active HIGH)
-	flip_screen_set(device->machine, ~data & 0x20);
+	flip_screen_set(device->machine(), ~data & 0x20);
 }
 
 static const ay8910_interface ay8910_config =
@@ -375,8 +375,8 @@ INPUT_PORTS_END
 
 static MACHINE_START( yumefuda )
 {
-	albazg_state *state = machine->driver_data<albazg_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	albazg_state *state = machine.driver_data<albazg_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
 
@@ -387,7 +387,7 @@ static MACHINE_START( yumefuda )
 
 static MACHINE_RESET( yumefuda )
 {
-	albazg_state *state = machine->driver_data<albazg_state>();
+	albazg_state *state = machine.driver_data<albazg_state>();
 	state->mux_data = 0;
 	state->bank = -1;
 	state->prot_lock = 0;

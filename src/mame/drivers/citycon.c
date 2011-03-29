@@ -16,12 +16,12 @@ Dip locations added from dip listing at crazykong.com
 
 static READ8_HANDLER( citycon_in_r )
 {
-	return input_port_read(space->machine, flip_screen_get(space->machine) ? "P2" : "P1");
+	return input_port_read(space->machine(), flip_screen_get(space->machine()) ? "P2" : "P1");
 }
 
 static READ8_HANDLER( citycon_irq_ack_r )
 {
-	citycon_state *state = space->machine->driver_data<citycon_state>();
+	citycon_state *state = space->machine().driver_data<citycon_state>();
 	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 
 	return 0;
@@ -189,16 +189,16 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( citycon )
 {
-	citycon_state *state = machine->driver_data<citycon_state>();
+	citycon_state *state = machine.driver_data<citycon_state>();
 
-	state->maincpu = machine->device("maincpu");
+	state->maincpu = machine.device("maincpu");
 
 	state->save_item(NAME(state->bg_image));
 }
 
 static MACHINE_RESET( citycon )
 {
-	citycon_state *state = machine->driver_data<citycon_state>();
+	citycon_state *state = machine.driver_data<citycon_state>();
 
 	state->bg_image = 0;
 }
@@ -340,7 +340,7 @@ ROM_END
 
 static DRIVER_INIT( citycon )
 {
-	UINT8 *rom = machine->region("gfx1")->base();
+	UINT8 *rom = machine.region("gfx1")->base();
 	int i;
 
 	/*

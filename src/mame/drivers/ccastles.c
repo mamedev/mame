@@ -138,9 +138,9 @@
  *
  *************************************/
 
-INLINE void schedule_next_irq( running_machine *machine, int curscanline )
+INLINE void schedule_next_irq( running_machine &machine, int curscanline )
 {
-	ccastles_state *state = machine->driver_data<ccastles_state>();
+	ccastles_state *state = machine.driver_data<ccastles_state>();
 
 	/* scan for a rising edge on the IRQCK signal */
 	for (curscanline++; ; curscanline = (curscanline + 1) & 0xff)
@@ -148,13 +148,13 @@ INLINE void schedule_next_irq( running_machine *machine, int curscanline )
 			break;
 
 	/* next one at the start of this scanline */
-	state->irq_timer->adjust(machine->primary_screen->time_until_pos(curscanline), curscanline);
+	state->irq_timer->adjust(machine.primary_screen->time_until_pos(curscanline), curscanline);
 }
 
 
 static TIMER_CALLBACK( clock_irq )
 {
-	ccastles_state *state = machine->driver_data<ccastles_state>();
+	ccastles_state *state = machine.driver_data<ccastles_state>();
 
 	/* assert the IRQ if not already asserted */
 	if (!state->irq_state)
@@ -164,7 +164,7 @@ static TIMER_CALLBACK( clock_irq )
 	}
 
 	/* force an update now */
-	machine->primary_screen->update_partial(machine->primary_screen->vpos());
+	machine.primary_screen->update_partial(machine.primary_screen->vpos());
 
 	/* find the next edge */
 	schedule_next_irq(machine, param);
@@ -173,8 +173,8 @@ static TIMER_CALLBACK( clock_irq )
 
 static CUSTOM_INPUT( get_vblank )
 {
-	ccastles_state *state = field->port->machine->driver_data<ccastles_state>();
-	int scanline = field->port->machine->primary_screen->vpos();
+	ccastles_state *state = field->port->machine().driver_data<ccastles_state>();
+	int scanline = field->port->machine().primary_screen->vpos();
 	return state->syncprom[scanline & 0xff] & 1;
 }
 
@@ -188,11 +188,11 @@ static CUSTOM_INPUT( get_vblank )
 
 static MACHINE_START( ccastles )
 {
-	ccastles_state *state = machine->driver_data<ccastles_state>();
+	ccastles_state *state = machine.driver_data<ccastles_state>();
 	rectangle visarea;
 
 	/* initialize globals */
-	state->syncprom = machine->region("proms")->base() + 0x000;
+	state->syncprom = machine.region("proms")->base() + 0x000;
 
 	/* find the start of VBLANK in the SYNC PROM */
 	for (state->vblank_start = 0; state->vblank_start < 256; state->vblank_start++)
@@ -214,13 +214,13 @@ static MACHINE_START( ccastles )
 	visarea.max_x = 255;
 	visarea.min_y = state->vblank_end;
 	visarea.max_y = state->vblank_start - 1;
-	machine->primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
+	machine.primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* configure the ROM banking */
-	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0xa000, 0x6000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0xa000, 0x6000);
 
 	/* create a timer for IRQs and set up the first callback */
-	state->irq_timer = machine->scheduler().timer_alloc(FUNC(clock_irq));
+	state->irq_timer = machine.scheduler().timer_alloc(FUNC(clock_irq));
 	state->irq_state = 0;
 	schedule_next_irq(machine, 0);
 
@@ -232,7 +232,7 @@ static MACHINE_START( ccastles )
 
 static MACHINE_RESET( ccastles )
 {
-	ccastles_state *state = machine->driver_data<ccastles_state>();
+	ccastles_state *state = machine.driver_data<ccastles_state>();
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	state->irq_state = 0;
 }
@@ -247,7 +247,7 @@ static MACHINE_RESET( ccastles )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	ccastles_state *state = space->machine->driver_data<ccastles_state>();
+	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 	if (state->irq_state)
 	{
 		device_set_input_line(state->maincpu, 0, CLEAR_LINE);
@@ -258,19 +258,19 @@ static WRITE8_HANDLER( irq_ack_w )
 
 static WRITE8_HANDLER( led_w )
 {
-	set_led_status(space->machine, offset, ~data & 1);
+	set_led_status(space->machine(), offset, ~data & 1);
 }
 
 
 static WRITE8_HANDLER( ccounter_w )
 {
-	coin_counter_w(space->machine, offset, data & 1);
+	coin_counter_w(space->machine(), offset, data & 1);
 }
 
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 1);
+	memory_set_bank(space->machine(), "bank1", data & 1);
 }
 
 
@@ -278,7 +278,7 @@ static READ8_HANDLER( leta_r )
 {
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
 
-	return input_port_read(space->machine, letanames[offset]);
+	return input_port_read(space->machine(), letanames[offset]);
 }
 
 
@@ -291,7 +291,7 @@ static READ8_HANDLER( leta_r )
 
 static WRITE8_HANDLER( nvram_recall_w )
 {
-	ccastles_state *state = space->machine->driver_data<ccastles_state>();
+	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 	state->nvram_4b->recall(0);
 	state->nvram_4b->recall(1);
 	state->nvram_4b->recall(0);
@@ -303,7 +303,7 @@ static WRITE8_HANDLER( nvram_recall_w )
 
 static WRITE8_HANDLER( nvram_store_w )
 {
-	ccastles_state *state = space->machine->driver_data<ccastles_state>();
+	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 	state->nvram_store[offset] = data & 1;
 	state->nvram_4b->store(~state->nvram_store[0] & state->nvram_store[1]);
 	state->nvram_4a->store(~state->nvram_store[0] & state->nvram_store[1]);
@@ -312,14 +312,14 @@ static WRITE8_HANDLER( nvram_store_w )
 
 static READ8_HANDLER( nvram_r )
 {
-	ccastles_state *state = space->machine->driver_data<ccastles_state>();
+	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 	return (state->nvram_4b->read(*space, offset) & 0x0f) | (state->nvram_4a->read(*space, offset) << 4);
 }
 
 
 static WRITE8_HANDLER( nvram_w )
 {
-	ccastles_state *state = space->machine->driver_data<ccastles_state>();
+	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 	state->nvram_4b->write(*space, offset, data);
 	state->nvram_4a->write(*space, offset, data >> 4);
 }

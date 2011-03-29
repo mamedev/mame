@@ -75,14 +75,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 static WRITE8_HANDLER( mrflea_main_w )
 {
-	mrflea_state *state = space->machine->driver_data<mrflea_state>();
+	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 	state->status |= 0x01; // pending command to main CPU
 	state->main = data;
 }
 
 static WRITE8_HANDLER( mrflea_io_w )
 {
-	mrflea_state *state = space->machine->driver_data<mrflea_state>();
+	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 	state->status |= 0x08; // pending command to IO CPU
 	state->io = data;
 	device_set_input_line(state->subcpu, 0, HOLD_LINE );
@@ -90,21 +90,21 @@ static WRITE8_HANDLER( mrflea_io_w )
 
 static READ8_HANDLER( mrflea_main_r )
 {
-	mrflea_state *state = space->machine->driver_data<mrflea_state>();
+	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 	state->status &= ~0x01; // main CPU command read
 	return state->main;
 }
 
 static READ8_HANDLER( mrflea_io_r )
 {
-	mrflea_state *state = space->machine->driver_data<mrflea_state>();
+	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 	state->status &= ~0x08; // IO CPU command read
 	return state->io;
 }
 
 static READ8_HANDLER( mrflea_main_status_r )
 {
-	mrflea_state *state = space->machine->driver_data<mrflea_state>();
+	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 
 	/*  0x01: main CPU command pending
         0x08: io cpu ready */
@@ -113,7 +113,7 @@ static READ8_HANDLER( mrflea_main_status_r )
 
 static READ8_HANDLER( mrflea_io_status_r )
 {
-	mrflea_state *state = space->machine->driver_data<mrflea_state>();
+	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 
 	/*  0x08: IO CPU command pending
         0x01: main cpu ready */
@@ -122,7 +122,7 @@ static READ8_HANDLER( mrflea_io_status_r )
 
 static INTERRUPT_GEN( mrflea_slave_interrupt )
 {
-	mrflea_state *state = device->machine->driver_data<mrflea_state>();
+	mrflea_state *state = device->machine().driver_data<mrflea_state>();
 	if (cpu_getiloops(device) == 0 || (state->status & 0x08))
 		device_set_input_line(device, 0, HOLD_LINE);
 }
@@ -133,7 +133,7 @@ static READ8_HANDLER( mrflea_interrupt_type_r )
     1. triggered (in response to sound command)
     2. heartbeat (for music timing)
 */
-	mrflea_state *state = space->machine->driver_data<mrflea_state>();
+	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 
 	if (state->status & 0x08 )
 		return 0x00; /* process command */
@@ -143,7 +143,7 @@ static READ8_HANDLER( mrflea_interrupt_type_r )
 
 static WRITE8_HANDLER( mrflea_select1_w )
 {
-	mrflea_state *state = space->machine->driver_data<mrflea_state>();
+	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 	state->select1 = data;
 }
 
@@ -334,10 +334,10 @@ static const ay8910_interface mrflea_ay8910_interface_1 =
 
 static MACHINE_START( mrflea )
 {
-	mrflea_state *state = machine->driver_data<mrflea_state>();
+	mrflea_state *state = machine.driver_data<mrflea_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->subcpu = machine->device("sub");
+	state->maincpu = machine.device("maincpu");
+	state->subcpu = machine.device("sub");
 
 	state->save_item(NAME(state->gfx_bank));
 	state->save_item(NAME(state->io));
@@ -348,7 +348,7 @@ static MACHINE_START( mrflea )
 
 static MACHINE_RESET( mrflea )
 {
-	mrflea_state *state = machine->driver_data<mrflea_state>();
+	mrflea_state *state = machine.driver_data<mrflea_state>();
 
 	state->gfx_bank = 0;
 	state->io = 0;

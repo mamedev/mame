@@ -27,7 +27,7 @@ TODO:
 
 static WRITE8_HANDLER( irqack_w )
 {
-	ladybug_state *state = space->machine->driver_data<ladybug_state>();
+	ladybug_state *state = space->machine().driver_data<ladybug_state>();
 	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
@@ -78,7 +78,7 @@ ADDRESS_MAP_END
 */
 static INPUT_CHANGED( left_coin_inserted )
 {
-	ladybug_state *state = field->port->machine->driver_data<ladybug_state>();
+	ladybug_state *state = field->port->machine().driver_data<ladybug_state>();
 
 	if(newval)
 		device_set_input_line(state->maincpu, 0, ASSERT_LINE);
@@ -86,7 +86,7 @@ static INPUT_CHANGED( left_coin_inserted )
 
 static INPUT_CHANGED( right_coin_inserted )
 {
-	ladybug_state *state = field->port->machine->driver_data<ladybug_state>();
+	ladybug_state *state = field->port->machine().driver_data<ladybug_state>();
 
 	if(newval)
 		device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -328,9 +328,9 @@ GFXDECODE_END
 
 static MACHINE_START( redclash )
 {
-	ladybug_state *state = machine->driver_data<ladybug_state>();
+	ladybug_state *state = machine.driver_data<ladybug_state>();
 
-	state->maincpu = machine->device("maincpu");
+	state->maincpu = machine.device("maincpu");
 
 	state->save_item(NAME(state->star_speed));
 	state->save_item(NAME(state->gfxbank));
@@ -343,7 +343,7 @@ static MACHINE_START( redclash )
 
 static MACHINE_RESET( redclash )
 {
-	ladybug_state *state = machine->driver_data<ladybug_state>();
+	ladybug_state *state = machine.driver_data<ladybug_state>();
 
 	state->star_speed = 0;
 	state->gfxbank = 0;
@@ -545,9 +545,9 @@ ROM_END
 static DRIVER_INIT( redclash )
 {
 	int i,j;
-	const UINT8 *src = machine->region("gfx2")->base();
-	UINT8 *dst = machine->region("gfx3")->base();
-	int len = machine->region("gfx3")->bytes();
+	const UINT8 *src = machine.region("gfx2")->base();
+	UINT8 *dst = machine.region("gfx3")->base();
+	int len = machine.region("gfx3")->bytes();
 
 	/* rearrange the sprite graphics */
 	for (i = 0;i < len;i++)

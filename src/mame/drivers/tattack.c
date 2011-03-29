@@ -37,7 +37,7 @@ public:
 
 static TILE_GET_INFO( get_tile_info )
 {
-	tattack_state *state = machine->driver_data<tattack_state>();
+	tattack_state *state = machine.driver_data<tattack_state>();
 	int code = state->videoram[tile_index];
 	int color = state->colorram[tile_index];
 
@@ -55,7 +55,7 @@ static TILE_GET_INFO( get_tile_info )
 
 static SCREEN_UPDATE( tattack )
 {
-	tattack_state *state = screen->machine->driver_data<tattack_state>();
+	tattack_state *state = screen->machine().driver_data<tattack_state>();
 	tilemap_mark_all_tiles_dirty(state->tmap);
 	tilemap_draw(bitmap,cliprect,state->tmap, 0,0);
 	return 0;
@@ -63,7 +63,7 @@ static SCREEN_UPDATE( tattack )
 
 static VIDEO_START( tattack )
 {
-	tattack_state *state = machine->driver_data<tattack_state>();
+	tattack_state *state = machine.driver_data<tattack_state>();
 		state->tmap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
 }
 
@@ -237,7 +237,7 @@ ROM_END
 static DRIVER_INIT(tattack)
 {
 
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	rom[0x1b4]=0;
 	rom[0x1b5]=0;

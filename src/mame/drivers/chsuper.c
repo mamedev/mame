@@ -34,9 +34,9 @@ static VIDEO_START(chsuper)
 
 static SCREEN_UPDATE(chsuper)
 {
-	//chsuper_state *state = screen->machine->driver_data<chsuper_state>();
-	const gfx_element *gfx = screen->machine->gfx[0];
-	UINT8 *vram = screen->machine->region("vram")->base();
+	//chsuper_state *state = screen->machine().driver_data<chsuper_state>();
+	const gfx_element *gfx = screen->machine().gfx[0];
+	UINT8 *vram = screen->machine().region("vram")->base();
 	int count = 0x0000;
 	int y,x;
 
@@ -58,7 +58,7 @@ static SCREEN_UPDATE(chsuper)
 
 static WRITE8_HANDLER( paletteram_io_w )
 {
-	chsuper_state *state = space->machine->driver_data<chsuper_state>();
+	chsuper_state *state = space->machine().driver_data<chsuper_state>();
 	switch(offset)
 	{
 		case 0:
@@ -80,7 +80,7 @@ static WRITE8_HANDLER( paletteram_io_w )
 					break;
 				case 2:
 					state->pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					palette_set_color(space->machine, state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
+					palette_set_color(space->machine(), state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
 					state->pal.offs_internal = 0;
 					state->pal.offs++;
 					break;
@@ -97,7 +97,7 @@ static READ8_HANDLER( ff_r )
 
 static WRITE8_HANDLER( chsuper_vram_w )
 {
-	UINT8 *vram = space->machine->region("vram")->base();
+	UINT8 *vram = space->machine().region("vram")->base();
 
 	vram[offset] = data;
 }
@@ -280,9 +280,9 @@ ROM_END
 
 static DRIVER_INIT( chsuper2 )
 {
-	chsuper_state *state = machine->driver_data<chsuper_state>();
+	chsuper_state *state = machine.driver_data<chsuper_state>();
 	UINT8 *buffer;
-	UINT8 *rom = machine->region("gfx1")->base();
+	UINT8 *rom = machine.region("gfx1")->base();
 	int i;
 
 	state->tilexor = 0x7f00;
@@ -305,9 +305,9 @@ static DRIVER_INIT( chsuper2 )
 
 static DRIVER_INIT( chsuper3 )
 {
-	chsuper_state *state = machine->driver_data<chsuper_state>();
+	chsuper_state *state = machine.driver_data<chsuper_state>();
 	UINT8 *buffer;
-	UINT8 *rom = machine->region("gfx1")->base();
+	UINT8 *rom = machine.region("gfx1")->base();
 	int i;
 
 	state->tilexor = 0x0e00;
@@ -330,9 +330,9 @@ static DRIVER_INIT( chsuper3 )
 
 static DRIVER_INIT( chmpnum )
 {
-	chsuper_state *state = machine->driver_data<chsuper_state>();
+	chsuper_state *state = machine.driver_data<chsuper_state>();
 	UINT8 *buffer;
-	UINT8 *rom = machine->region("gfx1")->base();
+	UINT8 *rom = machine.region("gfx1")->base();
 	int i;
 
 	state->tilexor = 0x1800;

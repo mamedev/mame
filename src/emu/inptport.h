@@ -741,6 +741,7 @@ public:
 	~input_port_config();
 
 	input_port_config *next() const { return m_next; }
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 
 	input_port_config *			m_next;			/* pointer to next port */
 	const char *				tag;			/* pointer to this port's tag */
@@ -748,7 +749,7 @@ public:
 
 	/* these fields are only valid if the port is live */
 	input_port_state *			state;			/* live state of port (NULL if not live) */
-	running_machine *			machine;		/* machine if port is live */
+	running_machine *			m_machine;		/* machine if port is live */
 	device_config *				owner;			/* associated device, when appropriate */
 	input_port_value			active;			/* mask of active bits in the port */
 };
@@ -1081,7 +1082,7 @@ struct _inp_header
 /* ----- core system management ----- */
 
 /* initialize the input ports, processing the given token list */
-time_t input_port_init(running_machine *machine, const input_port_token *tokens, const device_config_list &devicelist);
+time_t input_port_init(running_machine &machine, const input_port_token *tokens, const device_config_list &devicelist);
 
 
 
@@ -1101,22 +1102,22 @@ const input_field_config *input_field_by_tag_and_mask(const ioport_list &portlis
 int input_type_is_analog(int type);
 
 /* return the name for the given type/player */
-const char *input_type_name(running_machine *machine, int type, int player);
+const char *input_type_name(running_machine &machine, int type, int player);
 
 /* return the group for the given type/player */
-int input_type_group(running_machine *machine, int type, int player);
+int input_type_group(running_machine &machine, int type, int player);
 
 /* return the global input mapping sequence for the given type/player */
-const input_seq *input_type_seq(running_machine *machine, int type, int player, input_seq_type seqtype);
+const input_seq *input_type_seq(running_machine &machine, int type, int player, input_seq_type seqtype);
 
 /* change the global input sequence for the given type/player */
-void input_type_set_seq(running_machine *machine, int type, int player, input_seq_type seqtype, const input_seq *newseq);
+void input_type_set_seq(running_machine &machine, int type, int player, input_seq_type seqtype, const input_seq *newseq);
 
 /* return TRUE if the sequence for the given input type/player is pressed */
-int input_type_pressed(running_machine *machine, int type, int player);
+int input_type_pressed(running_machine &machine, int type, int player);
 
 /* return the list of default mappings */
-const input_type_desc *input_type_list(running_machine *machine);
+const input_type_desc *input_type_list(running_machine &machine);
 
 
 
@@ -1153,13 +1154,13 @@ void input_field_select_next_setting(const input_field_config *field);
 /* ----- port checking ----- */
 
 /* return whether an input port exists */
-bool input_port_exists(running_machine *machine, const char *tag);
+bool input_port_exists(running_machine &machine, const char *tag);
 
 /* return a bitmask of which bits of an input port are active (i.e. not unused or unknown) */
-input_port_value input_port_active(running_machine *machine, const char *tag);
+input_port_value input_port_active(running_machine &machine, const char *tag);
 
 /* return a bitmask of which bits of an input port are active (i.e. not unused or unknown), or a default value if the port does not exist */
-input_port_value input_port_active_safe(running_machine *machine, const char *tag, input_port_value defvalue);
+input_port_value input_port_active_safe(running_machine &machine, const char *tag, input_port_value defvalue);
 
 
 /* ----- port reading ----- */
@@ -1168,19 +1169,19 @@ input_port_value input_port_active_safe(running_machine *machine, const char *ta
 input_port_value input_port_read_direct(const input_port_config *port);
 
 /* return the value of an input port specified by tag */
-input_port_value input_port_read(running_machine *machine, const char *tag);
+input_port_value input_port_read(running_machine &machine, const char *tag);
 
 /* return the value of a device input port specified by tag */
 input_port_value input_port_read(device_t *device, const char *tag);
 
 /* return the value of an input port specified by tag, or a default value if the port does not exist */
-input_port_value input_port_read_safe(running_machine *machine, const char *tag, input_port_value defvalue);
+input_port_value input_port_read_safe(running_machine &machine, const char *tag, input_port_value defvalue);
 
 /* return the extracted crosshair values for the given player */
-int input_port_get_crosshair_position(running_machine *machine, int player, float *x, float *y);
+int input_port_get_crosshair_position(running_machine &machine, int player, float *x, float *y);
 
 /* force an update to the input port values based on current conditions */
-void input_port_update_defaults(running_machine *machine);
+void input_port_update_defaults(running_machine &machine);
 
 
 
@@ -1190,50 +1191,50 @@ void input_port_update_defaults(running_machine *machine);
 void input_port_write_direct(const input_port_config *port, input_port_value value, input_port_value mask);
 
 /* write a value to a port specified by tag */
-void input_port_write(running_machine *machine, const char *tag, input_port_value value, input_port_value mask);
+void input_port_write(running_machine &machine, const char *tag, input_port_value value, input_port_value mask);
 
 /* write a value to a port, ignore if the port does not exist */
-void input_port_write_safe(running_machine *machine, const char *tag, input_port_value value, input_port_value mask);
+void input_port_write_safe(running_machine &machine, const char *tag, input_port_value value, input_port_value mask);
 
 
 
 /* ----- misc helper functions ----- */
 
 /* return the TRUE if the given condition attached is true */
-int input_condition_true(running_machine *machine, const input_condition *condition);
+int input_condition_true(running_machine &machine, const input_condition *condition);
 
 /* convert an input_port_token to a default string */
 const char *input_port_string_from_token(const input_port_token token);
 
 /* return TRUE if machine use full keyboard emulation */
-int input_machine_has_keyboard(running_machine *machine);
+int input_machine_has_keyboard(running_machine &machine);
 
 /* these are called by the core; they should not be called from FEs */
-void inputx_init(running_machine *machine);
+void inputx_init(running_machine &machine);
 
 /* called by drivers to setup natural keyboard support */
-void inputx_setup_natural_keyboard(running_machine *machine,
-	int (*queue_chars)(running_machine *machine, const unicode_char *text, size_t text_len),
-	int (*accept_char)(running_machine *machine, unicode_char ch),
-	int (*charqueue_empty)(running_machine *machine));
+void inputx_setup_natural_keyboard(running_machine &machine,
+	int (*queue_chars)(running_machine &machine, const unicode_char *text, size_t text_len),
+	int (*accept_char)(running_machine &machine, unicode_char ch),
+	int (*charqueue_empty)(running_machine &machine));
 
 /* validity checks */
 int validate_natural_keyboard_statics(void);
 
 /* these can be called from FEs */
-int inputx_can_post(running_machine *machine);
+int inputx_can_post(running_machine &machine);
 
 /* various posting functions; can be called from FEs */
-void inputx_postc(running_machine *machine, unicode_char ch);
-void inputx_post_utf8(running_machine *machine, const char *text);
-void inputx_post_utf8_rate(running_machine *machine, const char *text, attotime rate);
-int inputx_is_posting(running_machine *machine);
+void inputx_postc(running_machine &machine, unicode_char ch);
+void inputx_post_utf8(running_machine &machine, const char *text);
+void inputx_post_utf8_rate(running_machine &machine, const char *text, attotime rate);
+int inputx_is_posting(running_machine &machine);
 
 /* miscellaneous functions */
 int input_classify_port(const input_field_config *field);
-int input_has_input_class(running_machine *machine, int inputclass);
+int input_has_input_class(running_machine &machine, int inputclass);
 int input_player_number(const input_field_config *field);
-int input_count_players(running_machine *machine);
-int input_category_active(running_machine *machine, int category);
+int input_count_players(running_machine &machine);
+int input_category_active(running_machine &machine, int category);
 
 #endif	/* __INPTPORT_H__ */

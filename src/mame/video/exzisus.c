@@ -18,56 +18,56 @@ Functions to emulate the video hardware of the machine.
 
 READ8_HANDLER ( exzisus_videoram_0_r )
 {
-	exzisus_state *state = space->machine->driver_data<exzisus_state>();
+	exzisus_state *state = space->machine().driver_data<exzisus_state>();
 	return state->videoram0[offset];
 }
 
 
 READ8_HANDLER ( exzisus_videoram_1_r )
 {
-	exzisus_state *state = space->machine->driver_data<exzisus_state>();
+	exzisus_state *state = space->machine().driver_data<exzisus_state>();
 	return state->videoram1[offset];
 }
 
 
 READ8_HANDLER ( exzisus_objectram_0_r )
 {
-	exzisus_state *state = space->machine->driver_data<exzisus_state>();
+	exzisus_state *state = space->machine().driver_data<exzisus_state>();
 	return state->objectram0[offset];
 }
 
 
 READ8_HANDLER ( exzisus_objectram_1_r )
 {
-	exzisus_state *state = space->machine->driver_data<exzisus_state>();
+	exzisus_state *state = space->machine().driver_data<exzisus_state>();
 	return state->objectram1[offset];
 }
 
 
 WRITE8_HANDLER( exzisus_videoram_0_w )
 {
-	exzisus_state *state = space->machine->driver_data<exzisus_state>();
+	exzisus_state *state = space->machine().driver_data<exzisus_state>();
 	state->videoram0[offset] = data;
 }
 
 
 WRITE8_HANDLER( exzisus_videoram_1_w )
 {
-	exzisus_state *state = space->machine->driver_data<exzisus_state>();
+	exzisus_state *state = space->machine().driver_data<exzisus_state>();
 	state->videoram1[offset] = data;
 }
 
 
 WRITE8_HANDLER( exzisus_objectram_0_w )
 {
-	exzisus_state *state = space->machine->driver_data<exzisus_state>();
+	exzisus_state *state = space->machine().driver_data<exzisus_state>();
 	state->objectram0[offset] = data;
 }
 
 
 WRITE8_HANDLER( exzisus_objectram_1_w )
 {
-	exzisus_state *state = space->machine->driver_data<exzisus_state>();
+	exzisus_state *state = space->machine().driver_data<exzisus_state>();
 	state->objectram1[offset] = data;
 }
 
@@ -78,7 +78,7 @@ WRITE8_HANDLER( exzisus_objectram_1_w )
 
 SCREEN_UPDATE( exzisus )
 {
-	exzisus_state *state = screen->machine->driver_data<exzisus_state>();
+	exzisus_state *state = screen->machine().driver_data<exzisus_state>();
 	int offs;
 	int sx, sy, xc, yc;
 	int gfx_num, gfx_attr, gfx_offs;
@@ -139,16 +139,16 @@ SCREEN_UPDATE( exzisus )
 				x = (sx + (xc << 3)) & 0xff;
 				y = (sy + (yc << 3)) & 0xff;
 
-				if (flip_screen_get(screen->machine))
+				if (flip_screen_get(screen->machine()))
 				{
 					x = 248 - x;
 					y = 248 - y;
 				}
 
-				drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0],
+				drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0],
 						code & 0x3fff,
 						color,
-						flip_screen_get(screen->machine), flip_screen_get(screen->machine),
+						flip_screen_get(screen->machine()), flip_screen_get(screen->machine()),
 						x, y, 15);
 				goffs += 2;
 			}
@@ -208,16 +208,16 @@ SCREEN_UPDATE( exzisus )
 				x = (sx + (xc << 3)) & 0xff;
 				y = (sy + (yc << 3)) & 0xff;
 
-				if (flip_screen_get(screen->machine))
+				if (flip_screen_get(screen->machine()))
 				{
 					x = 248 - x;
 					y = 248 - y;
 				}
 
-				drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
+				drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
 						code & 0x3fff,
 						color,
-						flip_screen_get(screen->machine), flip_screen_get(screen->machine),
+						flip_screen_get(screen->machine()), flip_screen_get(screen->machine()),
 						x, y, 15);
 				goffs += 2;
 			}

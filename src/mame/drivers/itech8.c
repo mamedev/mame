@@ -569,10 +569,10 @@ static const via6522_interface via_interface =
  *
  *************************************/
 
-void itech8_update_interrupts(running_machine *machine, int periodic, int tms34061, int blitter)
+void itech8_update_interrupts(running_machine &machine, int periodic, int tms34061, int blitter)
 {
-	itech8_state *state = machine->driver_data<itech8_state>();
-	device_type main_cpu_type = machine->device("maincpu")->type();
+	itech8_state *state = machine.driver_data<itech8_state>();
+	device_type main_cpu_type = machine.device("maincpu")->type();
 
 	/* update the states */
 	if (periodic != -1) state->periodic_int = periodic;
@@ -613,23 +613,23 @@ static TIMER_CALLBACK( irq_off )
 static INTERRUPT_GEN( generate_nmi )
 {
 	/* signal the NMI */
-	itech8_update_interrupts(device->machine, 1, -1, -1);
-	device->machine->scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off));
+	itech8_update_interrupts(device->machine(), 1, -1, -1);
+	device->machine().scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off));
 
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", device->machine->primary_screen->vpos());
+	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", device->machine().primary_screen->vpos());
 }
 
 
 static WRITE8_HANDLER( itech8_nmi_ack_w )
 {
 /* doesn't seem to hold for every game (e.g., hstennis) */
-/*  cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);*/
+/*  cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);*/
 }
 
 
 static void generate_sound_irq(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine, "soundcpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "soundcpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -646,25 +646,25 @@ static TIMER_CALLBACK( behind_the_beam_update );
 static MACHINE_START( sstrike )
 {
 	/* we need to update behind the beam as well */
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(behind_the_beam_update), 32);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(behind_the_beam_update), 32);
 }
 
 static MACHINE_RESET( itech8 )
 {
-	itech8_state *state = machine->driver_data<itech8_state>();
-	device_type main_cpu_type = machine->device("maincpu")->type();
+	itech8_state *state = machine.driver_data<itech8_state>();
+	device_type main_cpu_type = machine.device("maincpu")->type();
 
 	/* make sure bank 0 is selected */
 	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
 	{
-		memory_set_bankptr(machine, "bank1", &machine->region("maincpu")->base()[0x4000]);
-		machine->device("maincpu")->reset();
+		memory_set_bankptr(machine, "bank1", &machine.region("maincpu")->base()[0x4000]);
+		machine.device("maincpu")->reset();
 	}
 
 	/* set the visible area */
 	if (state->visarea)
 	{
-		machine->primary_screen->set_visible_area(state->visarea->min_x, state->visarea->max_x, state->visarea->min_y, state->visarea->max_y);
+		machine.primary_screen->set_visible_area(state->visarea->min_x, state->visarea->max_x, state->visarea->min_y, state->visarea->max_y);
 		state->visarea = NULL;
 	}
 }
@@ -683,14 +683,14 @@ static TIMER_CALLBACK( behind_the_beam_update )
 	int interval = param & 0xff;
 
 	/* force a partial update to the current scanline */
-	machine->primary_screen->update_partial(scanline);
+	machine.primary_screen->update_partial(scanline);
 
 	/* advance by the interval, and wrap to 0 */
 	scanline += interval;
 	if (scanline >= 256) scanline = 0;
 
 	/* set a new timer */
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(behind_the_beam_update), (scanline << 8) + interval);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(behind_the_beam_update), (scanline << 8) + interval);
 }
 
 
@@ -705,7 +705,7 @@ static WRITE8_HANDLER( blitter_w )
 {
 	/* bit 0x20 on address 7 controls CPU banking */
 	if (offset / 2 == 7)
-		memory_set_bankptr(space->machine, "bank1", &space->machine->region("maincpu")->base()[0x4000 + 0xc000 * ((data >> 5) & 1)]);
+		memory_set_bankptr(space->machine(), "bank1", &space->machine().region("maincpu")->base()[0x4000 + 0xc000 * ((data >> 5) & 1)]);
 
 	/* the rest is handled by the video hardware */
 	itech8_blitter_w(space, offset, data);
@@ -715,7 +715,7 @@ static WRITE8_HANDLER( blitter_w )
 static WRITE8_HANDLER( rimrockn_bank_w )
 {
 	/* banking is controlled here instead of by the blitter output */
-	memory_set_bankptr(space->machine, "bank1", &space->machine->region("maincpu")->base()[0x4000 + 0xc000 * (data & 3)]);
+	memory_set_bankptr(space->machine(), "bank1", &space->machine().region("maincpu")->base()[0x4000 + 0xc000 * (data & 3)]);
 }
 
 
@@ -728,7 +728,7 @@ static WRITE8_HANDLER( rimrockn_bank_w )
 
 static CUSTOM_INPUT( special_r )
 {
-	itech8_state *state = field->port->machine->driver_data<itech8_state>();
+	itech8_state *state = field->port->machine().driver_data<itech8_state>();
 	return state->pia_portb_data & 0x01;
 }
 
@@ -741,7 +741,7 @@ static CUSTOM_INPUT( special_r )
 
 static WRITE8_DEVICE_HANDLER( pia_porta_out )
 {
-	itech8_state *state = device->machine->driver_data<itech8_state>();
+	itech8_state *state = device->machine().driver_data<itech8_state>();
 	logerror("PIA port A write = %02x\n", data);
 	state->pia_porta_data = data;
 }
@@ -749,7 +749,7 @@ static WRITE8_DEVICE_HANDLER( pia_porta_out )
 
 static WRITE8_HANDLER( pia_portb_out )
 {
-	itech8_state *state = space->machine->driver_data<itech8_state>();
+	itech8_state *state = space->machine().driver_data<itech8_state>();
 	logerror("PIA port B write = %02x\n", data);
 
 	/* bit 0 provides feedback to the main CPU */
@@ -757,14 +757,14 @@ static WRITE8_HANDLER( pia_portb_out )
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	state->pia_portb_data = data;
-	ticket_dispenser_w(space->machine->device("ticket"), 0, (data & 0x10) << 3);
-	coin_counter_w(space->machine, 0, (data & 0x20) >> 5);
+	ticket_dispenser_w(space->machine().device("ticket"), 0, (data & 0x10) << 3);
+	coin_counter_w(space->machine(), 0, (data & 0x20) >> 5);
 }
 
 
 static WRITE8_DEVICE_HANDLER( ym2203_portb_out )
 {
-	itech8_state *state = device->machine->driver_data<itech8_state>();
+	itech8_state *state = device->machine().driver_data<itech8_state>();
 	logerror("YM2203 port B write = %02x\n", data);
 
 	/* bit 0 provides feedback to the main CPU */
@@ -772,8 +772,8 @@ static WRITE8_DEVICE_HANDLER( ym2203_portb_out )
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	state->pia_portb_data = data;
-	ticket_dispenser_w(device->machine->device("ticket"), 0, data & 0x80);
-	coin_counter_w(device->machine, 0, (data & 0x20) >> 5);
+	ticket_dispenser_w(device->machine().device("ticket"), 0, data & 0x80);
+	coin_counter_w(device->machine(), 0, (data & 0x20) >> 5);
 }
 
 
@@ -786,7 +786,7 @@ static WRITE8_DEVICE_HANDLER( ym2203_portb_out )
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	itech8_state *state = machine->driver_data<itech8_state>();
+	itech8_state *state = machine.driver_data<itech8_state>();
 	state->sound_data = param;
 	cputag_set_input_line(machine, "soundcpu", M6809_IRQ_LINE, ASSERT_LINE);
 }
@@ -794,7 +794,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	space->machine->scheduler().synchronize(FUNC(delayed_sound_data_w), data);
+	space->machine().scheduler().synchronize(FUNC(delayed_sound_data_w), data);
 }
 
 
@@ -805,14 +805,14 @@ static WRITE8_HANDLER( gtg2_sound_data_w )
 	       ((data & 0x5d) << 1) |
 	       ((data & 0x20) >> 3) |
 	       ((data & 0x02) << 5);
-	space->machine->scheduler().synchronize(FUNC(delayed_sound_data_w), data);
+	space->machine().scheduler().synchronize(FUNC(delayed_sound_data_w), data);
 }
 
 
 static READ8_HANDLER( sound_data_r )
 {
-	itech8_state *state = space->machine->driver_data<itech8_state>();
-	cputag_set_input_line(space->machine, "soundcpu", M6809_IRQ_LINE, CLEAR_LINE);
+	itech8_state *state = space->machine().driver_data<itech8_state>();
+	cputag_set_input_line(space->machine(), "soundcpu", M6809_IRQ_LINE, CLEAR_LINE);
 	return state->sound_data;
 }
 
@@ -826,7 +826,7 @@ static READ8_HANDLER( sound_data_r )
 
 static WRITE16_HANDLER( grom_bank16_w )
 {
-	itech8_state *state = space->machine->driver_data<itech8_state>();
+	itech8_state *state = space->machine().driver_data<itech8_state>();
 	if (ACCESSING_BITS_8_15)
 		*state->grom_bank = data >> 8;
 }
@@ -1102,7 +1102,7 @@ static CUSTOM_INPUT( gtg_mux )
 {
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
-	return input_port_read(field->port->machine, tag1) & input_port_read(field->port->machine, tag2);
+	return input_port_read(field->port->machine(), tag1) & input_port_read(field->port->machine(), tag2);
 }
 
 static INPUT_PORTS_START( gtg )
@@ -2634,31 +2634,31 @@ ROM_END
 
 static DRIVER_INIT( grmatch )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0160, 0x0160, FUNC(grmatch_palette_w));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0180, 0x0180, FUNC(grmatch_xscroll_w));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x01e0, 0x01ff);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0160, 0x0160, FUNC(grmatch_palette_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0180, 0x0180, FUNC(grmatch_xscroll_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x01e0, 0x01ff);
 }
 
 
 static DRIVER_INIT( slikshot )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x0180, 0x0180, FUNC(slikshot_z80_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x01cf, 0x01cf, FUNC(slikshot_z80_control_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01cf, 0x01cf, FUNC(slikshot_z80_control_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x0180, 0x0180, FUNC(slikshot_z80_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x01cf, 0x01cf, FUNC(slikshot_z80_control_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01cf, 0x01cf, FUNC(slikshot_z80_control_w));
 }
 
 
 static DRIVER_INIT( sstrike )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x1180, 0x1180, FUNC(slikshot_z80_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x11cf, 0x11cf, FUNC(slikshot_z80_control_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x11cf, 0x11cf, FUNC(slikshot_z80_control_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x1180, 0x1180, FUNC(slikshot_z80_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x11cf, 0x11cf, FUNC(slikshot_z80_control_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x11cf, 0x11cf, FUNC(slikshot_z80_control_w));
 }
 
 
 static DRIVER_INIT( hstennis )
 {
-	itech8_state *state = machine->driver_data<itech8_state>();
+	itech8_state *state = machine.driver_data<itech8_state>();
 	static const rectangle visible = { 0, 375, 0, 239 };
 	state->visarea = &visible;
 }
@@ -2666,7 +2666,7 @@ static DRIVER_INIT( hstennis )
 
 static DRIVER_INIT( arligntn )
 {
-	itech8_state *state = machine->driver_data<itech8_state>();
+	itech8_state *state = machine.driver_data<itech8_state>();
 	static const rectangle visible = { 16, 389, 0, 239 };
 	state->visarea = &visible;
 }
@@ -2674,7 +2674,7 @@ static DRIVER_INIT( arligntn )
 
 static DRIVER_INIT( peggle )
 {
-	itech8_state *state = machine->driver_data<itech8_state>();
+	itech8_state *state = machine.driver_data<itech8_state>();
 	static const rectangle visible = { 18, 367, 0, 239 };
 	state->visarea = &visible;
 }
@@ -2682,7 +2682,7 @@ static DRIVER_INIT( peggle )
 
 static DRIVER_INIT( neckneck )
 {
-	itech8_state *state = machine->driver_data<itech8_state>();
+	itech8_state *state = machine.driver_data<itech8_state>();
 	static const rectangle visible = { 8, 375, 0, 239 };
 	state->visarea = &visible;
 }
@@ -2691,15 +2691,15 @@ static DRIVER_INIT( neckneck )
 static DRIVER_INIT( rimrockn )
 {
 	/* additional input ports */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0161, 0x0161, "161");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0162, 0x0162, "162");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0163, 0x0163, "163");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0164, 0x0164, "164");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0165, 0x0165, "165");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0161, 0x0161, "161");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0162, 0x0162, "162");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0163, 0x0163, "163");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0164, 0x0164, "164");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0165, 0x0165, "165");
 
 	/* different banking mechanism (disable the old one) */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01a0, 0x01a0, FUNC(rimrockn_bank_w));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01c0, 0x01df, FUNC(itech8_blitter_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01a0, 0x01a0, FUNC(rimrockn_bank_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01c0, 0x01df, FUNC(itech8_blitter_w));
 }
 
 

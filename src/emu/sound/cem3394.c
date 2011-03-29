@@ -334,14 +334,14 @@ static DEVICE_START( cem3394 )
 	chip->inv_sample_rate = 1.0 / (double)chip->sample_rate;
 
 	/* allocate stream channels, 1 per chip */
-	chip->stream = device->machine->sound().stream_alloc(*device, 0, 1, chip->sample_rate, chip, cem3394_update);
+	chip->stream = device->machine().sound().stream_alloc(*device, 0, 1, chip->sample_rate, chip, cem3394_update);
 	chip->external = intf->external;
 	chip->vco_zero_freq = intf->vco_zero_freq;
 	chip->filter_zero_freq = intf->filter_zero_freq;
 
 	/* allocate memory for a mixer buffer and external buffer (1 second should do it!) */
-	chip->mixer_buffer = auto_alloc_array(device->machine, INT16, chip->sample_rate);
-	chip->external_buffer = auto_alloc_array(device->machine, INT16, chip->sample_rate);
+	chip->mixer_buffer = auto_alloc_array(device->machine(), INT16, chip->sample_rate);
+	chip->external_buffer = auto_alloc_array(device->machine(), INT16, chip->sample_rate);
 
 	device->save_item(NAME(chip->values));
 	device->save_item(NAME(chip->wave_select));

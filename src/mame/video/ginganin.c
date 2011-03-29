@@ -76,7 +76,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *gfx = machine->region("gfx5")->base();
+	UINT8 *gfx = machine.region("gfx5")->base();
 	int code = gfx[2 * tile_index + 0] * 256 + gfx[2 * tile_index + 1];
 	SET_TILE_INFO(
 			BG_GFX,
@@ -94,7 +94,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	ginganin_state *state = machine->driver_data<ginganin_state>();
+	ginganin_state *state = machine.driver_data<ginganin_state>();
 	UINT16 code = state->fgram[tile_index];
 	SET_TILE_INFO(
 			FG_GFX,
@@ -105,7 +105,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 WRITE16_HANDLER( ginganin_fgram16_w )
 {
-	ginganin_state *state = space->machine->driver_data<ginganin_state>();
+	ginganin_state *state = space->machine().driver_data<ginganin_state>();
 	COMBINE_DATA(&state->fgram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
@@ -119,7 +119,7 @@ WRITE16_HANDLER( ginganin_fgram16_w )
 
 static TILE_GET_INFO( get_txt_tile_info )
 {
-	ginganin_state *state = machine->driver_data<ginganin_state>();
+	ginganin_state *state = machine.driver_data<ginganin_state>();
 	UINT16 code = state->txtram[tile_index];
 	SET_TILE_INFO(
 			TXT_GFX,
@@ -130,7 +130,7 @@ static TILE_GET_INFO( get_txt_tile_info )
 
 WRITE16_HANDLER( ginganin_txtram16_w )
 {
-	ginganin_state *state = space->machine->driver_data<ginganin_state>();
+	ginganin_state *state = space->machine().driver_data<ginganin_state>();
 	COMBINE_DATA(&state->txtram[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
 }
@@ -138,7 +138,7 @@ WRITE16_HANDLER( ginganin_txtram16_w )
 
 VIDEO_START( ginganin )
 {
-	ginganin_state *state = machine->driver_data<ginganin_state>();
+	ginganin_state *state = machine.driver_data<ginganin_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, BG_NX, BG_NY);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 16, 16, FG_NX, FG_NY);
 	state->tx_tilemap = tilemap_create(machine, get_txt_tile_info, tilemap_scan_rows, 8, 8, TXT_NX, TXT_NY);
@@ -150,7 +150,7 @@ VIDEO_START( ginganin )
 
 WRITE16_HANDLER( ginganin_vregs16_w )
 {
-	ginganin_state *state = space->machine->driver_data<ginganin_state>();
+	ginganin_state *state = space->machine().driver_data<ginganin_state>();
 	COMBINE_DATA(&state->vregs[offset]);
 	data = state->vregs[offset];
 
@@ -176,7 +176,7 @@ WRITE16_HANDLER( ginganin_vregs16_w )
  */
 	case 6:
 		state->flipscreen = !(data & 1);
-		tilemap_set_flip_all(space->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		tilemap_set_flip_all(space->machine(), state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 		break;
 	case 7:
 		soundlatch_w(space, 0, data);
@@ -209,9 +209,9 @@ Offset:         Values:         Format:
 
 ------------------------------------------------------------------------ */
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	ginganin_state *state = machine->driver_data<ginganin_state>();
+	ginganin_state *state = machine.driver_data<ginganin_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 
@@ -235,7 +235,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 				code & 0x3fff,
 				attr >> 12,
 				flipx, flipy,
@@ -247,18 +247,18 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 
 SCREEN_UPDATE( ginganin )
 {
-	ginganin_state *state = screen->machine->driver_data<ginganin_state>();
+	ginganin_state *state = screen->machine().driver_data<ginganin_state>();
 	int layers_ctrl1 = state->layers_ctrl;
 
 #ifdef MAME_DEBUG
-if (input_code_pressed(screen->machine, KEYCODE_Z))
+if (input_code_pressed(screen->machine(), KEYCODE_Z))
 {
 	int msk = 0;
 
-	if (input_code_pressed(screen->machine, KEYCODE_Q)) { msk |= 0xfff1;}
-	if (input_code_pressed(screen->machine, KEYCODE_W)) { msk |= 0xfff2;}
-	if (input_code_pressed(screen->machine, KEYCODE_E)) { msk |= 0xfff4;}
-	if (input_code_pressed(screen->machine, KEYCODE_A))	{ msk |= 0xfff8;}
+	if (input_code_pressed(screen->machine(), KEYCODE_Q)) { msk |= 0xfff1;}
+	if (input_code_pressed(screen->machine(), KEYCODE_W)) { msk |= 0xfff2;}
+	if (input_code_pressed(screen->machine(), KEYCODE_E)) { msk |= 0xfff4;}
+	if (input_code_pressed(screen->machine(), KEYCODE_A))	{ msk |= 0xfff8;}
 	if (msk != 0) layers_ctrl1 &= msk;
 
 #define SETSCROLL \
@@ -268,11 +268,11 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 	tilemap_set_scrolly(state->fg_tilemap, 0, state->posy); \
 	popmessage("B>%04X:%04X F>%04X:%04X",state->posx%(BG_NX*16),state->posy%(BG_NY*16),state->posx%(FG_NX*16),state->posy%(FG_NY*16));
 
-	if (input_code_pressed(screen->machine, KEYCODE_L))	{ state->posx +=8; SETSCROLL }
-	if (input_code_pressed(screen->machine, KEYCODE_J))	{ state->posx -=8; SETSCROLL }
-	if (input_code_pressed(screen->machine, KEYCODE_K))	{ state->posy +=8; SETSCROLL }
-	if (input_code_pressed(screen->machine, KEYCODE_I))	{ state->posy -=8; SETSCROLL }
-	if (input_code_pressed(screen->machine, KEYCODE_H))	{ state->posx = state->posy = 0;	SETSCROLL }
+	if (input_code_pressed(screen->machine(), KEYCODE_L))	{ state->posx +=8; SETSCROLL }
+	if (input_code_pressed(screen->machine(), KEYCODE_J))	{ state->posx -=8; SETSCROLL }
+	if (input_code_pressed(screen->machine(), KEYCODE_K))	{ state->posy +=8; SETSCROLL }
+	if (input_code_pressed(screen->machine(), KEYCODE_I))	{ state->posy -=8; SETSCROLL }
+	if (input_code_pressed(screen->machine(), KEYCODE_H))	{ state->posx = state->posy = 0;	SETSCROLL }
 
 }
 #endif
@@ -286,7 +286,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 	if (layers_ctrl1 & 2)
 		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	if (layers_ctrl1 & 8)
-		draw_sprites(screen->machine, bitmap, cliprect);
+		draw_sprites(screen->machine(), bitmap, cliprect);
 	if (layers_ctrl1 & 4)
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 

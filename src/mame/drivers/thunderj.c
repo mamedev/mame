@@ -31,9 +31,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	thunderj_state *state = machine->driver_data<thunderj_state>();
+	thunderj_state *state = machine.driver_data<thunderj_state>();
 	cputag_set_input_line(machine, "maincpu", 4, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "extra", 4, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 6, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
@@ -42,7 +42,7 @@ static void update_interrupts(running_machine *machine)
 
 static MACHINE_START( thunderj )
 {
-	thunderj_state *state = machine->driver_data<thunderj_state>();
+	thunderj_state *state = machine.driver_data<thunderj_state>();
 	atarigen_init(machine);
 
 	state->save_item(NAME(state->alpha_tile_bank));
@@ -51,11 +51,11 @@ static MACHINE_START( thunderj )
 
 static MACHINE_RESET( thunderj )
 {
-	thunderj_state *state = machine->driver_data<thunderj_state>();
+	thunderj_state *state = machine.driver_data<thunderj_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarivc_reset(*machine->primary_screen, state->atarivc_eof_data, 2);
+	atarivc_reset(*machine.primary_screen, state->atarivc_eof_data, 2);
 	atarijsa_reset();
 }
 
@@ -69,8 +69,8 @@ static MACHINE_RESET( thunderj )
 
 static READ16_HANDLER( special_port2_r )
 {
-	thunderj_state *state = space->machine->driver_data<thunderj_state>();
-	int result = input_port_read(space->machine, "260012");
+	thunderj_state *state = space->machine().driver_data<thunderj_state>();
+	int result = input_port_read(space->machine(), "260012");
 
 	if (state->sound_to_cpu_ready) result ^= 0x0004;
 	if (state->cpu_to_sound_ready) result ^= 0x0008;
@@ -82,21 +82,21 @@ static READ16_HANDLER( special_port2_r )
 
 static WRITE16_HANDLER( latch_w )
 {
-	thunderj_state *state = space->machine->driver_data<thunderj_state>();
+	thunderj_state *state = space->machine().driver_data<thunderj_state>();
 
 	/* reset extra CPU */
 	if (ACCESSING_BITS_0_7)
 	{
 		/* 0 means hold CPU 2's reset low */
 		if (data & 1)
-			cputag_set_input_line(space->machine, "extra", INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "extra", INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cputag_set_input_line(space->machine, "extra", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "extra", INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bits 2-5 are the alpha bank */
 		if (state->alpha_tile_bank != ((data >> 2) & 7))
 		{
-			space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+			space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 			tilemap_mark_all_tiles_dirty(state->alpha_tilemap);
 			state->alpha_tile_bank = (data >> 2) & 7;
 		}
@@ -133,13 +133,13 @@ static READ16_HANDLER( thunderj_atarivc_r )
 		mame_printf_debug("You're screwed!");
 #endif
 
-	return atarivc_r(*space->machine->primary_screen, offset);
+	return atarivc_r(*space->machine().primary_screen, offset);
 }
 
 
 static WRITE16_HANDLER( thunderj_atarivc_w )
 {
-	atarivc_w(*space->machine->primary_screen, offset, data, mem_mask);
+	atarivc_w(*space->machine().primary_screen, offset, data, mem_mask);
 }
 
 

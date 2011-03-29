@@ -20,14 +20,14 @@
 
 static INTERRUPT_GEN( ddribble_interrupt_0 )
 {
-	ddribble_state *state = device->machine->driver_data<ddribble_state>();
+	ddribble_state *state = device->machine().driver_data<ddribble_state>();
 	if (state->int_enable_0)
 		device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( ddribble_interrupt_1 )
 {
-	ddribble_state *state = device->machine->driver_data<ddribble_state>();
+	ddribble_state *state = device->machine().driver_data<ddribble_state>();
 	if (state->int_enable_1)
 		device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
@@ -35,31 +35,31 @@ static INTERRUPT_GEN( ddribble_interrupt_1 )
 
 static WRITE8_HANDLER( ddribble_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 }
 
 
 static READ8_HANDLER( ddribble_sharedram_r )
 {
-	ddribble_state *state = space->machine->driver_data<ddribble_state>();
+	ddribble_state *state = space->machine().driver_data<ddribble_state>();
 	return state->sharedram[offset];
 }
 
 static WRITE8_HANDLER( ddribble_sharedram_w )
 {
-	ddribble_state *state = space->machine->driver_data<ddribble_state>();
+	ddribble_state *state = space->machine().driver_data<ddribble_state>();
 	state->sharedram[offset] = data;
 }
 
 static READ8_HANDLER( ddribble_snd_sharedram_r )
 {
-	ddribble_state *state = space->machine->driver_data<ddribble_state>();
+	ddribble_state *state = space->machine().driver_data<ddribble_state>();
 	return state->snd_sharedram[offset];
 }
 
 static WRITE8_HANDLER( ddribble_snd_sharedram_w )
 {
-	ddribble_state *state = space->machine->driver_data<ddribble_state>();
+	ddribble_state *state = space->machine().driver_data<ddribble_state>();
 	state->snd_sharedram[offset] = data;
 }
 
@@ -69,13 +69,13 @@ static WRITE8_HANDLER( ddribble_coin_counter_w )
 	/* b2-b3: unknown */
 	/* b1: coin counter 2 */
 	/* b0: coin counter 1 */
-	coin_counter_w(space->machine, 0,(data) & 0x01);
-	coin_counter_w(space->machine, 1,(data >> 1) & 0x01);
+	coin_counter_w(space->machine(), 0,(data) & 0x01);
+	coin_counter_w(space->machine(), 1,(data >> 1) & 0x01);
 }
 
 static READ8_DEVICE_HANDLER( ddribble_vlm5030_busy_r )
 {
-	return device->machine->rand(); /* patch */
+	return device->machine().rand(); /* patch */
 	/* FIXME: remove ? */
 #if 0
 	if (vlm5030_bsy(device)) return 1;
@@ -85,8 +85,8 @@ static READ8_DEVICE_HANDLER( ddribble_vlm5030_busy_r )
 
 static WRITE8_DEVICE_HANDLER( ddribble_vlm5030_ctrl_w )
 {
-	ddribble_state *state = device->machine->driver_data<ddribble_state>();
-	UINT8 *SPEECH_ROM = device->machine->region("vlm")->base();
+	ddribble_state *state = device->machine().driver_data<ddribble_state>();
+	UINT8 *SPEECH_ROM = device->machine().region("vlm")->base();
 
 	/* b7 : vlm data bus OE   */
 
@@ -250,13 +250,13 @@ static const vlm5030_interface vlm5030_config =
 
 static MACHINE_START( ddribble )
 {
-	ddribble_state *state = machine->driver_data<ddribble_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	ddribble_state *state = machine.driver_data<ddribble_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 5, &ROM[0x10000], 0x2000);
 
-	state->filter1 = machine->device("filter1");
-	state->filter2 = machine->device("filter2");
-	state->filter3 = machine->device("filter3");
+	state->filter1 = machine.device("filter1");
+	state->filter2 = machine.device("filter2");
+	state->filter3 = machine.device("filter3");
 
 	state->save_item(NAME(state->int_enable_0));
 	state->save_item(NAME(state->int_enable_1));
@@ -267,7 +267,7 @@ static MACHINE_START( ddribble )
 
 static MACHINE_RESET( ddribble )
 {
-	ddribble_state *state = machine->driver_data<ddribble_state>();
+	ddribble_state *state = machine.driver_data<ddribble_state>();
 	int i;
 
 	for (i = 0; i < 5; i++)

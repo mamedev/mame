@@ -36,7 +36,7 @@ static WRITE8_HANDLER( battlera_sound_w )
 	if (offset == 0)
 	{
 		soundlatch_w(space,0,data);
-		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 	}
 }
 
@@ -44,20 +44,20 @@ static WRITE8_HANDLER( battlera_sound_w )
 
 static WRITE8_HANDLER( control_data_w )
 {
-	battlera_state *state = space->machine->driver_data<battlera_state>();
+	battlera_state *state = space->machine().driver_data<battlera_state>();
 	state->control_port_select=data;
 }
 
 static READ8_HANDLER( control_data_r )
 {
-	battlera_state *state = space->machine->driver_data<battlera_state>();
+	battlera_state *state = space->machine().driver_data<battlera_state>();
 	switch (state->control_port_select)
 	{
-		case 0xfe: return input_port_read(space->machine, "IN0"); /* Player 1 */
-		case 0xfd: return input_port_read(space->machine, "IN1"); /* Player 2 */
-		case 0xfb: return input_port_read(space->machine, "IN2"); /* Coins */
-		case 0xf7: return input_port_read(space->machine, "DSW2"); /* Dip 2 */
-		case 0xef: return input_port_read(space->machine, "DSW1"); /* Dip 1 */
+		case 0xfe: return input_port_read(space->machine(), "IN0"); /* Player 1 */
+		case 0xfd: return input_port_read(space->machine(), "IN1"); /* Player 2 */
+		case 0xfb: return input_port_read(space->machine(), "IN2"); /* Coins */
+		case 0xf7: return input_port_read(space->machine(), "DSW2"); /* Dip 2 */
+		case 0xef: return input_port_read(space->machine(), "DSW1"); /* Dip 1 */
 	}
 
     return 0xff;
@@ -87,19 +87,19 @@ ADDRESS_MAP_END
 
 static void battlera_adpcm_int(device_t *device)
 {
-	battlera_state *state = device->machine->driver_data<battlera_state>();
+	battlera_state *state = device->machine().driver_data<battlera_state>();
 
 	msm5205_data_w(device,state->msm5205next >> 4);
 	state->msm5205next <<= 4;
 
 	state->toggle = 1 - state->toggle;
 	if (state->toggle)
-		cputag_set_input_line(device->machine, "audiocpu", 1, HOLD_LINE);
+		cputag_set_input_line(device->machine(), "audiocpu", 1, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( battlera_adpcm_data_w )
 {
-	battlera_state *state = space->machine->driver_data<battlera_state>();
+	battlera_state *state = space->machine().driver_data<battlera_state>();
 	state->msm5205next = data;
 }
 

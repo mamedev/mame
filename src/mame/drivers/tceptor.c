@@ -25,13 +25,13 @@
 
 static READ16_HANDLER( m68k_shared_word_r )
 {
-	tceptor_state *state = space->machine->driver_data<tceptor_state>();
+	tceptor_state *state = space->machine().driver_data<tceptor_state>();
 	return state->m68k_shared_ram[offset];
 }
 
 static WRITE16_HANDLER( m68k_shared_word_w )
 {
-	tceptor_state *state = space->machine->driver_data<tceptor_state>();
+	tceptor_state *state = space->machine().driver_data<tceptor_state>();
 	if (ACCESSING_BITS_0_7)
 		state->m68k_shared_ram[offset] = data & 0xff;
 }
@@ -41,7 +41,7 @@ static WRITE16_HANDLER( m68k_shared_word_w )
 
 static INTERRUPT_GEN( m6809_vb_interrupt )
 {
-	tceptor_state *state = device->machine->driver_data<tceptor_state>();
+	tceptor_state *state = device->machine().driver_data<tceptor_state>();
 	if (state->m6809_irq_enable)
 		device_set_input_line(device, 0, HOLD_LINE);
 	else
@@ -50,34 +50,34 @@ static INTERRUPT_GEN( m6809_vb_interrupt )
 
 static WRITE8_HANDLER( m6809_irq_enable_w )
 {
-	tceptor_state *state = space->machine->driver_data<tceptor_state>();
+	tceptor_state *state = space->machine().driver_data<tceptor_state>();
 	state->m6809_irq_enable = 1;
 }
 
 static WRITE8_HANDLER( m6809_irq_disable_w )
 {
-	tceptor_state *state = space->machine->driver_data<tceptor_state>();
+	tceptor_state *state = space->machine().driver_data<tceptor_state>();
 	state->m6809_irq_enable = 0;
 }
 
 
 static INTERRUPT_GEN( m68k_vb_interrupt )
 {
-	tceptor_state *state = device->machine->driver_data<tceptor_state>();
+	tceptor_state *state = device->machine().driver_data<tceptor_state>();
 	if (state->m68k_irq_enable)
 		device_set_input_line(device, M68K_IRQ_1, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( m68k_irq_enable_w )
 {
-	tceptor_state *state = space->machine->driver_data<tceptor_state>();
+	tceptor_state *state = space->machine().driver_data<tceptor_state>();
 	state->m68k_irq_enable = data;
 }
 
 
 static INTERRUPT_GEN( mcu_vb_interrupt )
 {
-	tceptor_state *state = device->machine->driver_data<tceptor_state>();
+	tceptor_state *state = device->machine().driver_data<tceptor_state>();
 	if (state->mcu_irq_enable)
 		device_set_input_line(device, 0, HOLD_LINE);
 	else
@@ -86,13 +86,13 @@ static INTERRUPT_GEN( mcu_vb_interrupt )
 
 static WRITE8_HANDLER( mcu_irq_enable_w )
 {
-	tceptor_state *state = space->machine->driver_data<tceptor_state>();
+	tceptor_state *state = space->machine().driver_data<tceptor_state>();
 	state->mcu_irq_enable = 1;
 }
 
 static WRITE8_HANDLER( mcu_irq_disable_w )
 {
-	tceptor_state *state = space->machine->driver_data<tceptor_state>();
+	tceptor_state *state = space->machine().driver_data<tceptor_state>();
 	state->mcu_irq_enable = 0;
 }
 
@@ -138,22 +138,22 @@ static UINT8 fix_input1(UINT8 in1, UINT8 in2)
 
 static READ8_HANDLER( dsw0_r )
 {
-	return fix_input0(input_port_read(space->machine, "DSW1"), input_port_read(space->machine, "DSW2"));
+	return fix_input0(input_port_read(space->machine(), "DSW1"), input_port_read(space->machine(), "DSW2"));
 }
 
 static READ8_HANDLER( dsw1_r )
 {
-	return fix_input1(input_port_read(space->machine, "DSW1"), input_port_read(space->machine, "DSW2"));
+	return fix_input1(input_port_read(space->machine(), "DSW1"), input_port_read(space->machine(), "DSW2"));
 }
 
 static READ8_HANDLER( input0_r )
 {
-	return fix_input0(input_port_read(space->machine, "BUTTONS"), input_port_read(space->machine, "SERVICE"));
+	return fix_input0(input_port_read(space->machine(), "BUTTONS"), input_port_read(space->machine(), "SERVICE"));
 }
 
 static READ8_HANDLER( input1_r )
 {
-	return fix_input1(input_port_read(space->machine, "BUTTONS"), input_port_read(space->machine, "SERVICE"));
+	return fix_input1(input_port_read(space->machine(), "BUTTONS"), input_port_read(space->machine(), "SERVICE"));
 }
 
 static READ8_HANDLER( readFF )
@@ -348,7 +348,7 @@ static const namco_interface namco_config =
 
 static MACHINE_START( tceptor )
 {
-	tceptor_state *state = machine->driver_data<tceptor_state>();
+	tceptor_state *state = machine.driver_data<tceptor_state>();
 	state_save_register_global(machine, state->m6809_irq_enable);
 	state_save_register_global(machine, state->m68k_irq_enable);
 	state_save_register_global(machine, state->mcu_irq_enable);
@@ -359,7 +359,7 @@ static MACHINE_START( tceptor )
 
 static MACHINE_RESET( tceptor )
 {
-	tceptor_state *state = machine->driver_data<tceptor_state>();
+	tceptor_state *state = machine.driver_data<tceptor_state>();
 	state->m6809_irq_enable = 0;
 	state->m68k_irq_enable = 0;
 	state->mcu_irq_enable = 0;

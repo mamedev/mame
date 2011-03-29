@@ -500,7 +500,7 @@ static DEVICE_START( tms36xx )
 
 	tms->intf = (const tms36xx_interface *)device->baseconfig().static_config();
 
-   tms->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() * 64, tms, tms36xx_sound_update);
+   tms->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() * 64, tms, tms36xx_sound_update);
 	tms->samplerate = device->clock() * 64;
 	tms->basefreq = device->clock();
 	enable = 0;

@@ -314,7 +314,7 @@ device_execute_interface::~device_execute_interface()
 
 bool device_execute_interface::executing() const
 {
-	return (this == device().machine->scheduler().currently_executing());
+	return (this == device().machine().scheduler().currently_executing());
 }
 
 
@@ -372,7 +372,7 @@ void device_execute_interface::adjust_icount(int delta)
 void device_execute_interface::abort_timeslice()
 {
 	// ignore if not the executing device
-	if (this != device().machine->scheduler().currently_executing())
+	if (this != device().machine().scheduler().currently_executing())
 		return;
 
 	// swallow the remaining cycles
@@ -442,7 +442,7 @@ void device_execute_interface::spin_until_time(attotime duration)
 	suspend_until_trigger(TRIGGER_SUSPENDTIME + timetrig, true);
 
 	// then set a timer for it
-	device().machine->scheduler().timer_set(duration, FUNC(static_timed_trigger_callback), TRIGGER_SUSPENDTIME + timetrig, this);
+	device().machine().scheduler().timer_set(duration, FUNC(static_timed_trigger_callback), TRIGGER_SUSPENDTIME + timetrig, this);
 	timetrig = (timetrig + 1) % 256;
 }
 
@@ -547,7 +547,7 @@ void device_execute_interface::execute_set_input(int linenum, int state)
 void device_execute_interface::interface_pre_start()
 {
 	// fill in the initial states
-	int index = device().machine->m_devicelist.indexof(m_device);
+	int index = device().machine().m_devicelist.indexof(m_device);
 	m_suspend = SUSPEND_REASON_RESET;
 	m_profiler = profile_type(index + PROFILER_DEVICE_FIRST);
 	m_inttrigger = index + TRIGGER_INT;
@@ -558,9 +558,9 @@ void device_execute_interface::interface_pre_start()
 
 	// allocate timers if we need them
 	if (m_execute_config.m_vblank_interrupts_per_frame > 1)
-		m_partial_frame_timer = device().machine->scheduler().timer_alloc(FUNC(static_trigger_partial_frame_interrupt), (void *)this);
+		m_partial_frame_timer = device().machine().scheduler().timer_alloc(FUNC(static_trigger_partial_frame_interrupt), (void *)this);
 	if (m_execute_config.m_timed_interrupt_period != attotime::zero)
-		m_timedint_timer = device().machine->scheduler().timer_alloc(FUNC(static_trigger_periodic_interrupt), (void *)this);
+		m_timedint_timer = device().machine().scheduler().timer_alloc(FUNC(static_trigger_periodic_interrupt), (void *)this);
 
 	// register for save states
 	m_device.save_item(NAME(m_suspend));
@@ -623,11 +623,11 @@ void device_execute_interface::interface_post_reset()
 		// new style - use screen tag directly
 		screen_device *screen;
 		if (m_execute_config.m_vblank_interrupt_screen != NULL)
-			screen = downcast<screen_device *>(device().machine->device(m_execute_config.m_vblank_interrupt_screen));
+			screen = downcast<screen_device *>(device().machine().device(m_execute_config.m_vblank_interrupt_screen));
 
 		// old style 'hack' setup - use screen #0
 		else
-			screen = device().machine->first_screen();
+			screen = device().machine().first_screen();
 
 		assert(screen != NULL);
 		screen->register_vblank_callback(static_on_vblank, NULL);
@@ -665,7 +665,7 @@ void device_execute_interface::interface_clock_changed()
 	m_divisor = attos;
 
 	// re-compute the perfect interleave factor
-	device().machine->scheduler().compute_perfect_interleave();
+	device().machine().scheduler().compute_perfect_interleave();
 }
 
 
@@ -709,7 +709,7 @@ void device_execute_interface::static_on_vblank(screen_device &screen, void *par
 	if (vblank_state)
 	{
 		device_execute_interface *exec = NULL;
-		for (bool gotone = screen.machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
+		for (bool gotone = screen.machine().m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 			exec->on_vblank_start(screen);
 	}
 }
@@ -740,7 +740,7 @@ void device_execute_interface::on_vblank_start(screen_device &screen)
 		// if we have more than one interrupt per frame, start the timer now to trigger the rest of them
 		if (m_execute_config.m_vblank_interrupts_per_frame > 1 && !suspended(SUSPEND_REASON_DISABLE))
 		{
-			m_partial_frame_period = device().machine->primary_screen->frame_period() / m_execute_config.m_vblank_interrupts_per_frame;
+			m_partial_frame_period = device().machine().primary_screen->frame_period() / m_execute_config.m_vblank_interrupts_per_frame;
 			m_partial_frame_timer->adjust(m_partial_frame_period);
 		}
 	}
@@ -916,7 +916,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_device->tag(), m_linenum, state,
 
 		// if this is the first one, set the timer
 		if (event_index == 0)
-			m_execute->device().machine->scheduler().synchronize(FUNC(static_empty_event_queue), 0, (void *)this);
+			m_execute->device().machine().scheduler().synchronize(FUNC(static_empty_event_queue), 0, (void *)this);
 	}
 }
 

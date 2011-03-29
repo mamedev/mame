@@ -108,7 +108,7 @@ public:
 
 static WRITE8_HANDLER( jubileep_videoram_w )
 {
-	jubilee_state *state = space->machine->driver_data<jubilee_state>();
+	jubilee_state *state = space->machine().driver_data<jubilee_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -116,7 +116,7 @@ static WRITE8_HANDLER( jubileep_videoram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	jubilee_state *state = machine->driver_data<jubilee_state>();
+	jubilee_state *state = machine.driver_data<jubilee_state>();
 	int code = state->videoram[tile_index];
 
 	SET_TILE_INFO( 0, code, 0, 0);
@@ -126,14 +126,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( jubileep )
 {
-	jubilee_state *state = machine->driver_data<jubilee_state>();
+	jubilee_state *state = machine.driver_data<jubilee_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
 static SCREEN_UPDATE( jubileep )
 {
-	jubilee_state *state = screen->machine->driver_data<jubilee_state>();
+	jubilee_state *state = screen->machine().driver_data<jubilee_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
@@ -179,7 +179,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(unk_r)
 {
-	return (space->machine->rand() & 0xff);
+	return (space->machine().rand() & 0xff);
 }
 
 static ADDRESS_MAP_START( jubileep_cru_map, AS_IO, 8 )

@@ -56,18 +56,18 @@ Note: SW2, SW3 & SW4 not populated
 
 static WRITE8_HANDLER ( funybubl_vidram_bank_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 1);
+	memory_set_bank(space->machine(), "bank1", data & 1);
 }
 
 static WRITE8_HANDLER ( funybubl_cpurombank_w )
 {
-	memory_set_bank(space->machine, "bank2", data & 0x3f);	// should we add a check that (data&0x3f) < #banks?
+	memory_set_bank(space->machine(), "bank2", data & 0x3f);	// should we add a check that (data&0x3f) < #banks?
 }
 
 
 static WRITE8_HANDLER( funybubl_soundcommand_w )
 {
-	funybubl_state *state = space->machine->driver_data<funybubl_state>();
+	funybubl_state *state = space->machine().driver_data<funybubl_state>();
 	soundlatch_w(space, 0, data);
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
@@ -202,10 +202,10 @@ GFXDECODE_END
 
 static MACHINE_START( funybubl )
 {
-	funybubl_state *state = machine->driver_data<funybubl_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	funybubl_state *state = machine.driver_data<funybubl_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->banked_vram));
 

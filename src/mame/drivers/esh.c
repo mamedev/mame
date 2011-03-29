@@ -48,7 +48,7 @@ public:
 /* VIDEO GOODS */
 static SCREEN_UPDATE( esh )
 {
-	esh_state *state = screen->machine->driver_data<esh_state>();
+	esh_state *state = screen->machine().driver_data<esh_state>();
 	int charx, chary;
 
 	/* clear */
@@ -66,7 +66,7 @@ static SCREEN_UPDATE( esh )
 			//int blinkLine = (state->tile_control_ram[current_screen_character] & 0x40) >> 6;
 			//int blinkChar = (state->tile_control_ram[current_screen_character] & 0x80) >> 7;
 
-			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0],
+			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0],
 					state->tile_ram[current_screen_character] + (0x100 * tileOffs),
 					palIndex,
 					0, 0, charx*8, chary*8, 0);
@@ -82,19 +82,19 @@ static SCREEN_UPDATE( esh )
 /* MEMORY HANDLERS */
 static READ8_HANDLER(ldp_read)
 {
-	esh_state *state = space->machine->driver_data<esh_state>();
+	esh_state *state = space->machine().driver_data<esh_state>();
 	return laserdisc_data_r(state->laserdisc);
 }
 
 static WRITE8_HANDLER(ldp_write)
 {
-	esh_state *state = space->machine->driver_data<esh_state>();
+	esh_state *state = space->machine().driver_data<esh_state>();
 	laserdisc_data_w(state->laserdisc,data);
 }
 
 static WRITE8_HANDLER(misc_write)
 {
-	esh_state *state = space->machine->driver_data<esh_state>();
+	esh_state *state = space->machine().driver_data<esh_state>();
 	/* Bit 0 unknown */
 
 	if (data & 0x02)
@@ -141,9 +141,9 @@ static WRITE8_HANDLER(led_writes)
 static WRITE8_HANDLER(nmi_line_w)
 {
 	if (data == 0x00)
-		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	if (data == 0x01)
-		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
 	if (data != 0x00 && data != 0x01)
 		logerror("NMI line got a weird value!\n");
@@ -222,7 +222,7 @@ static PALETTE_INIT( esh )
 	int i;
 
 	/* Oddly enough, the top 4 bits of each byte is 0 */
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		int r,g,b;
 		int bit0,bit1,bit2;
@@ -278,13 +278,13 @@ static INTERRUPT_GEN( vblank_callback_esh )
 {
 	// IRQ
 	device_set_input_line(device, 0, ASSERT_LINE);
-	device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(irq_stop));
+	device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(irq_stop));
 }
 
 static MACHINE_START( esh )
 {
-	esh_state *state = machine->driver_data<esh_state>();
-	state->laserdisc = machine->device("laserdisc");
+	esh_state *state = machine.driver_data<esh_state>();
+	state->laserdisc = machine.device("laserdisc");
 }
 
 

@@ -70,9 +70,9 @@ public:
 
 
 /* VIDEO GOODS */
-static void gpworld_draw_tiles(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void gpworld_draw_tiles(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	gpworld_state *state = machine->driver_data<gpworld_state>();
+	gpworld_state *state = machine.driver_data<gpworld_state>();
 	UINT8 characterX, characterY;
 
 	/* Temporarily set to 64 wide to accommodate two screens */
@@ -82,7 +82,7 @@ static void gpworld_draw_tiles(running_machine *machine, bitmap_t *bitmap,const 
 		{
 			int current_screen_character = (characterY*64) + characterX;
 
-			drawgfx_transpen(bitmap, cliprect, machine->gfx[0], state->tile_RAM[current_screen_character],
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->tile_RAM[current_screen_character],
 					characterY, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
@@ -105,9 +105,9 @@ INLINE void draw_pixel(bitmap_t *bitmap,const rectangle *cliprect,int x,int y,in
 	*BITMAP_ADDR32(bitmap, y, x) = color;
 }
 
-static void gpworld_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void gpworld_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	gpworld_state *state = machine->driver_data<gpworld_state>();
+	gpworld_state *state = machine.driver_data<gpworld_state>();
 	const int SPR_Y_TOP     = 0;
 	const int SPR_Y_BOTTOM  = 1;
 	const int SPR_X_LO      = 2;
@@ -120,7 +120,7 @@ static void gpworld_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 	int i;
 
-	UINT8 *GFX = machine->region("gfx2")->base();
+	UINT8 *GFX = machine.region("gfx2")->base();
 
 	/* Heisted from Daphne which heisted it from MAME */
 	for (i = 0; i < 0x800; i += 8)
@@ -220,8 +220,8 @@ static SCREEN_UPDATE( gpworld )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 
-	gpworld_draw_tiles(screen->machine, bitmap, cliprect);
-	gpworld_draw_sprites(screen->machine, bitmap, cliprect);
+	gpworld_draw_tiles(screen->machine(), bitmap, cliprect);
+	gpworld_draw_sprites(screen->machine(), bitmap, cliprect);
 
 	return 0;
 }
@@ -229,8 +229,8 @@ static SCREEN_UPDATE( gpworld )
 
 static MACHINE_START( gpworld )
 {
-	gpworld_state *state = machine->driver_data<gpworld_state>();
-	state->laserdisc = machine->device("laserdisc");
+	gpworld_state *state = machine.driver_data<gpworld_state>();
+	state->laserdisc = machine.device("laserdisc");
 }
 
 
@@ -238,30 +238,30 @@ static MACHINE_START( gpworld )
 /* READS */
 static READ8_HANDLER( ldp_read )
 {
-	gpworld_state *state = space->machine->driver_data<gpworld_state>();
+	gpworld_state *state = space->machine().driver_data<gpworld_state>();
 	return state->ldp_read_latch;
 }
 
 static READ8_HANDLER( pedal_in )
 {
-	gpworld_state *state = space->machine->driver_data<gpworld_state>();
+	gpworld_state *state = space->machine().driver_data<gpworld_state>();
 	if (state->brake_gas)
-		return	input_port_read(space->machine, "INACCEL");
+		return	input_port_read(space->machine(), "INACCEL");
 
-	return	input_port_read(space->machine, "INBRAKE");
+	return	input_port_read(space->machine(), "INBRAKE");
 
 }
 
 /* WRITES */
 static WRITE8_HANDLER( ldp_write )
 {
-	gpworld_state *state = space->machine->driver_data<gpworld_state>();
+	gpworld_state *state = space->machine().driver_data<gpworld_state>();
 	state->ldp_write_latch = data;
 }
 
 static WRITE8_HANDLER( misc_io_write )
 {
-	gpworld_state *state = space->machine->driver_data<gpworld_state>();
+	gpworld_state *state = space->machine().driver_data<gpworld_state>();
 	state->start_lamp = (data & 0x04) >> 1;
 	state->nmi_enable = (data & 0x40) >> 6;
 	/*  dunno      = (data & 0x80) >> 7; */ //coin counter???
@@ -271,13 +271,13 @@ static WRITE8_HANDLER( misc_io_write )
 
 static WRITE8_HANDLER( brake_gas_write )
 {
-	gpworld_state *state = space->machine->driver_data<gpworld_state>();
+	gpworld_state *state = space->machine().driver_data<gpworld_state>();
 	state->brake_gas = data & 0x01;
 }
 
 static WRITE8_HANDLER( palette_write )
 {
-	gpworld_state *state = space->machine->driver_data<gpworld_state>();
+	gpworld_state *state = space->machine().driver_data<gpworld_state>();
 	/* This is all just a (bad) guess */
 	int pal_index, r, g, b, a;
 
@@ -293,7 +293,7 @@ static WRITE8_HANDLER( palette_write )
 
 	/* logerror("PAL WRITE index : %x  rgb : %d %d %d (real %x) at %x\n", pal_index, r,g,b, data, offset); */
 
-	palette_set_color(space->machine, (pal_index & 0xffe) >> 1, MAKE_ARGB(a, r, g, b));
+	palette_set_color(space->machine(), (pal_index & 0xffe) >> 1, MAKE_ARGB(a, r, g, b));
 }
 
 /* PROGRAM MAP */
@@ -431,7 +431,7 @@ static TIMER_CALLBACK( irq_stop )
 
 static INTERRUPT_GEN( vblank_callback_gpworld )
 {
-	gpworld_state *state = device->machine->driver_data<gpworld_state>();
+	gpworld_state *state = device->machine().driver_data<gpworld_state>();
 	/* Do an NMI if the enabled bit is set */
 	if (state->nmi_enable)
 	{
@@ -442,7 +442,7 @@ static INTERRUPT_GEN( vblank_callback_gpworld )
 
 	/* The time the IRQ line stays high is set just long enough to happen after the NMI - hacky? */
 	device_set_input_line(device, 0, ASSERT_LINE);
-	device->machine->scheduler().timer_set(attotime::from_usec(100), FUNC(irq_stop));
+	device->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(irq_stop));
 }
 
 static const gfx_layout gpworld_tile_layout =
@@ -527,7 +527,7 @@ ROM_END
 
 static DRIVER_INIT( gpworld )
 {
-	gpworld_state *state = machine->driver_data<gpworld_state>();
+	gpworld_state *state = machine.driver_data<gpworld_state>();
 	state->nmi_enable = 0;
 	state->start_lamp = 0;
 	state->brake_gas = 0;

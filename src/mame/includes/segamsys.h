@@ -24,7 +24,7 @@ extern WRITE8_HANDLER( sms_vdp_data_w );
 extern READ8_HANDLER( sms_vdp_ctrl_r );
 extern WRITE8_HANDLER( sms_vdp_ctrl_w );
 
-extern void init_for_megadrive(running_machine *machine);
+extern void init_for_megadrive(running_machine &machine);
 extern void segae_md_sms_stop_scanline_timer(void);
 
 
@@ -56,7 +56,7 @@ READ8_HANDLER (megatech_sms_ioport_dc_r);
 READ8_HANDLER (megatech_sms_ioport_dd_r);
 READ8_HANDLER( smsgg_backupram_r );
 WRITE8_HANDLER( smsgg_backupram_w );
-extern void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const char* tag, int mapper);
+extern void megatech_set_genz80_as_sms_standard_map(running_machine &machine, const char* tag, int mapper);
 MACHINE_CONFIG_EXTERN(sms);
 extern DRIVER_INIT(sms);
 extern DRIVER_INIT(smspal);

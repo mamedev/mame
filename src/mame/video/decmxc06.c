@@ -53,7 +53,7 @@ device_config *deco_mxc06_device_config::static_alloc_device_config(const machin
 
 device_t *deco_mxc06_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, deco_mxc06_device(machine, *this));
+	return auto_alloc(machine, deco_mxc06_device(machine, *this));
 }
 
 void deco_mxc06_device_config::set_gfx_region(device_config *device, int region)
@@ -72,7 +72,7 @@ deco_mxc06_device::deco_mxc06_device(running_machine &_machine, const deco_mxc06
 
 
 /* this implementation was originally from Mad Motor */
-void deco_mxc06_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask )
+void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask )
 {
 	int offs;
 
@@ -130,7 +130,7 @@ void deco_mxc06_device::draw_sprites( running_machine *machine, bitmap_t *bitmap
 				if (spriteram[offs] & 0x8000)
 				{
 					int draw = 0;
-					if (!flash || (machine->primary_screen->frame_number() & 1))
+					if (!flash || (machine.primary_screen->frame_number() & 1))
 					{
 
 						if (m_priority_type==0) // most cases
@@ -154,7 +154,7 @@ void deco_mxc06_device::draw_sprites( running_machine *machine, bitmap_t *bitmap
 					
 					if (draw)
 					{
-						drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+						drawgfx_transpen(bitmap,cliprect,machine.gfx[m_gfxregion],
 							code - y * incy + h * x,
 							color & col_mask,
 							flipx,flipy,

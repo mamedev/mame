@@ -258,13 +258,13 @@ const char *running_machine::describe_context()
 void running_machine::start()
 {
 	// initialize basic can't-fail systems here
-	config_init(this);
-	input_init(this);
-	output_init(this);
-	palette_init(this);
-	m_render = auto_alloc(this, render_manager(*this));
-	generic_machine_init(this);
-	generic_sound_init(this);
+	config_init(*this);
+	input_init(*this);
+	output_init(*this);
+	palette_init(*this);
+	m_render = auto_alloc(*this, render_manager(*this));
+	generic_machine_init(*this);
+	generic_sound_init(*this);
 
 	// allocate a soft_reset timer
 	m_soft_reset_timer = m_scheduler.timer_alloc(MSTUB(timer_expired, running_machine, soft_reset), this);
@@ -273,8 +273,8 @@ void running_machine::start()
 	m_osd.init(*this);
 
 	// create the video manager
-	m_video = auto_alloc(this, video_manager(*this));
-	ui_init(this);
+	m_video = auto_alloc(*this, video_manager(*this));
+	ui_init(*this);
 
 	// initialize the base time (needed for doing record/playback)
 	::time(&m_base_time);
@@ -282,44 +282,44 @@ void running_machine::start()
 	// initialize the input system and input ports for the game
 	// this must be done before memory_init in order to allow specifying
 	// callbacks based on input port tags
-	time_t newbase = input_port_init(this, m_system.ipt, m_config.m_devicelist);
+	time_t newbase = input_port_init(*this, m_system.ipt, m_config.m_devicelist);
 	if (newbase != 0)
 		m_base_time = newbase;
 
 	// intialize UI input
-	ui_input_init(this);
+	ui_input_init(*this);
 
 	// initialize the streams engine before the sound devices start
-	m_sound = auto_alloc(this, sound_manager(*this));
+	m_sound = auto_alloc(*this, sound_manager(*this));
 
 	// first load ROMs, then populate memory, and finally initialize CPUs
 	// these operations must proceed in this order
-	rom_init(this);
-	memory_init(this);
-	watchdog_init(this);
+	rom_init(*this);
+	memory_init(*this);
+	watchdog_init(*this);
 
 	// must happen after memory_init because this relies on generic.spriteram
-	generic_video_init(this);
+	generic_video_init(*this);
 
 	// allocate the gfx elements prior to device initialization
-	gfx_init(this);
+	gfx_init(*this);
 
 	// initialize natural keyboard support
-	inputx_init(this);
+	inputx_init(*this);
 
 	// initialize image devices
-	image_init(this);
-	tilemap_init(this);
-	crosshair_init(this);
+	image_init(*this);
+	tilemap_init(*this);
+	crosshair_init(*this);
 
 	// initialize the debugger
 	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debugger_init(this);
+		debugger_init(*this);
 
 	// call the game driver's init function
 	// this is where decryption is done and memory maps are altered
 	// so this location in the init order is important
-	ui_set_startup_text(this, "Initializing...", true);
+	ui_set_startup_text(*this, "Initializing...", true);
 
 	// start up the devices
 	m_devicelist.start_all();
@@ -334,7 +334,7 @@ void running_machine::start()
 		schedule_load("auto");
 
 	// set up the cheat engine
-	m_cheat = auto_alloc(this, cheat_manager(*this));
+	m_cheat = auto_alloc(*this, cheat_manager(*this));
 
 	// disallow save state registrations starting here
 	m_state.allow_registration(false);
@@ -358,7 +358,7 @@ int running_machine::run(bool firstrun)
 		// if we have a logfile, set up the callback
 		if (options().log())
 		{
-			m_logfile = auto_alloc(this, emu_file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS));
+			m_logfile = auto_alloc(*this, emu_file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS));
 			file_error filerr = m_logfile->open("error.log");
 			assert_always(filerr == FILERR_NONE, "unable to open log file");
 			add_logerror_callback(logfile_callback);
@@ -368,12 +368,12 @@ int running_machine::run(bool firstrun)
 		start();
 
 		// load the configuration settings and NVRAM
-		bool settingsloaded = config_load_settings(this);
-		nvram_load(this);
+		bool settingsloaded = config_load_settings(*this);
+		nvram_load(*this);
 		sound().ui_mute(false);
 
 		// display the startup screens
-		ui_display_startup_screens(this, firstrun, !settingsloaded);
+		ui_display_startup_screens(*this, firstrun, !settingsloaded);
 
 		// perform a soft reset -- this takes us to the running phase
 		soft_reset(*this);
@@ -404,8 +404,8 @@ int running_machine::run(bool firstrun)
 
 		// save the NVRAM and configuration
 		sound().ui_mute(true);
-		nvram_save(this);
-		config_save_settings(this);
+		nvram_save(*this);
+		config_save_settings(*this);
 	}
 	catch (emu_fatalerror &fatal)
 	{
@@ -430,7 +430,7 @@ int running_machine::run(bool firstrun)
 	zip_file_cache_clear();
 
 	// close the logfile
-	auto_free(this, m_logfile);
+	auto_free(*this, m_logfile);
 	return error;
 }
 
@@ -445,7 +445,7 @@ void running_machine::schedule_exit()
 	if (m_exit_to_game_select && options().system_name()[0] != 0)
 	{
 		options().set_system_name("");
-		ui_menu_force_game_select(this, &render().ui_container());
+		ui_menu_force_game_select(*this, &render().ui_container());
 	}
 
 	// otherwise, exit for real
@@ -610,7 +610,7 @@ memory_region *running_machine::region_alloc(const char *name, UINT32 length, UI
 		fatalerror("region_alloc called with duplicate region name \"%s\"\n", name);
 
 	// allocate the region
-	return &m_regionlist.append(name, *auto_alloc(this, memory_region(*this, name, length, width, endian)));
+	return &m_regionlist.append(name, *auto_alloc(*this, memory_region(*this, name, length, width, endian)));
 }
 
 
@@ -651,7 +651,7 @@ void running_machine::add_notifier(machine_notification event, notify_callback c
 void running_machine::add_logerror_callback(logerror_callback callback)
 {
 	assert_always(m_current_phase == MACHINE_PHASE_INIT, "Can only call add_logerror_callback at init time!");
-	m_logerror_list.append(*auto_alloc(this, logerror_callback_item(callback)));
+	m_logerror_list.append(*auto_alloc(*this, logerror_callback_item(callback)));
 }
 
 
@@ -877,7 +877,7 @@ memory_region::memory_region(running_machine &machine, const char *name, UINT32 
 	  m_endianness(endian)
 {
 	assert(width == 1 || width == 2 || width == 4 || width == 8);
-	m_base.u8 = auto_alloc_array(&machine, UINT8, length);
+	m_base.u8 = auto_alloc_array(machine, UINT8, length);
 }
 
 
@@ -887,7 +887,7 @@ memory_region::memory_region(running_machine &machine, const char *name, UINT32 
 
 memory_region::~memory_region()
 {
-	auto_free(&m_machine, m_base.v);
+	auto_free(m_machine, m_base.v);
 }
 
 
@@ -1026,7 +1026,7 @@ void driver_device::driver_start()
 void driver_device::machine_start()
 {
 	if (m_config.m_callbacks[driver_device_config_base::CB_MACHINE_START] != NULL)
-		(*m_config.m_callbacks[driver_device_config_base::CB_MACHINE_START])(&m_machine);
+		(*m_config.m_callbacks[driver_device_config_base::CB_MACHINE_START])(m_machine);
 }
 
 
@@ -1038,7 +1038,7 @@ void driver_device::machine_start()
 void driver_device::sound_start()
 {
 	if (m_config.m_callbacks[driver_device_config_base::CB_SOUND_START] != NULL)
-		(*m_config.m_callbacks[driver_device_config_base::CB_SOUND_START])(&m_machine);
+		(*m_config.m_callbacks[driver_device_config_base::CB_SOUND_START])(m_machine);
 }
 
 
@@ -1050,7 +1050,7 @@ void driver_device::sound_start()
 void driver_device::video_start()
 {
 	if (m_config.m_callbacks[driver_device_config_base::CB_VIDEO_START] != NULL)
-		(*m_config.m_callbacks[driver_device_config_base::CB_VIDEO_START])(&m_machine);
+		(*m_config.m_callbacks[driver_device_config_base::CB_VIDEO_START])(m_machine);
 }
 
 
@@ -1072,7 +1072,7 @@ void driver_device::driver_reset()
 void driver_device::machine_reset()
 {
 	if (m_config.m_callbacks[driver_device_config_base::CB_MACHINE_RESET] != NULL)
-		(*m_config.m_callbacks[driver_device_config_base::CB_MACHINE_RESET])(&m_machine);
+		(*m_config.m_callbacks[driver_device_config_base::CB_MACHINE_RESET])(m_machine);
 }
 
 
@@ -1084,7 +1084,7 @@ void driver_device::machine_reset()
 void driver_device::sound_reset()
 {
 	if (m_config.m_callbacks[driver_device_config_base::CB_SOUND_RESET] != NULL)
-		(*m_config.m_callbacks[driver_device_config_base::CB_SOUND_RESET])(&m_machine);
+		(*m_config.m_callbacks[driver_device_config_base::CB_SOUND_RESET])(m_machine);
 }
 
 
@@ -1096,7 +1096,7 @@ void driver_device::sound_reset()
 void driver_device::video_reset()
 {
 	if (m_config.m_callbacks[driver_device_config_base::CB_VIDEO_RESET] != NULL)
-		(*m_config.m_callbacks[driver_device_config_base::CB_VIDEO_RESET])(&m_machine);
+		(*m_config.m_callbacks[driver_device_config_base::CB_VIDEO_RESET])(m_machine);
 }
 
 
@@ -1134,14 +1134,14 @@ void driver_device::device_start()
 
 	// call the game-specific init
 	if (m_config.m_system->driver_init != NULL)
-		(*m_config.m_system->driver_init)(&m_machine);
+		(*m_config.m_system->driver_init)(m_machine);
 
 	// finish image devices init process
-	image_postdevice_init(&m_machine);
+	image_postdevice_init(m_machine);
 
 	// call palette_init if present
 	if (m_config.m_palette_init != NULL)
-		(*m_config.m_palette_init)(&m_machine, machine->region("proms")->base());
+		(*m_config.m_palette_init)(m_machine, m_machine.region("proms")->base());
 
 	// start the various pieces
 	driver_start();

@@ -326,7 +326,7 @@ device_config *z80sio_device_config::static_alloc_device_config(const machine_co
 
 device_t *z80sio_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, z80sio_device(machine, *this));
+	return auto_alloc(machine, z80sio_device(machine, *this));
 }
 
 
@@ -524,7 +524,7 @@ void z80sio_device::sio_channel::start(z80sio_device *device, int index)
 {
 	m_device = device;
 	m_index = index;
-	m_receive_timer = device->machine->scheduler().timer_alloc(FUNC(static_serial_callback), this);
+	m_receive_timer = device->machine().scheduler().timer_alloc(FUNC(static_serial_callback), this);
 }
 
 
@@ -713,7 +713,7 @@ int z80sio_device::sio_channel::rts()
 
 void z80sio_device::sio_channel::set_cts(int state)
 {
-	m_device->machine->scheduler().synchronize(FUNC(static_change_input_line), (SIO_RR0_CTS << 1) + (state != 0), this);
+	m_device->machine().scheduler().synchronize(FUNC(static_change_input_line), (SIO_RR0_CTS << 1) + (state != 0), this);
 }
 
 
@@ -723,7 +723,7 @@ void z80sio_device::sio_channel::set_cts(int state)
 
 void z80sio_device::sio_channel::set_dcd(int state)
 {
-	m_device->machine->scheduler().synchronize(FUNC(static_change_input_line), (SIO_RR0_DCD << 1) + (state != 0), this);
+	m_device->machine().scheduler().synchronize(FUNC(static_change_input_line), (SIO_RR0_DCD << 1) + (state != 0), this);
 }
 
 

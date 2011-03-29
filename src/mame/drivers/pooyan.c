@@ -25,7 +25,7 @@
 
 static INTERRUPT_GEN( pooyan_interrupt )
 {
-	pooyan_state *state = device->machine->driver_data<pooyan_state>();
+	pooyan_state *state = device->machine().driver_data<pooyan_state>();
 
 	if (state->irq_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
@@ -34,7 +34,7 @@ static INTERRUPT_GEN( pooyan_interrupt )
 
 static WRITE8_HANDLER( irq_enable_w )
 {
-	pooyan_state *state = space->machine->driver_data<pooyan_state>();
+	pooyan_state *state = space->machine().driver_data<pooyan_state>();
 
 	state->irq_enable = data & 1;
 	if (!state->irq_enable)
@@ -208,9 +208,9 @@ GFXDECODE_END
 
 static MACHINE_START( pooyan )
 {
-	pooyan_state *state = machine->driver_data<pooyan_state>();
+	pooyan_state *state = machine.driver_data<pooyan_state>();
 
-	state->maincpu = machine->device<cpu_device>("maincpu");
+	state->maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->irq_enable));
 }
@@ -218,7 +218,7 @@ static MACHINE_START( pooyan )
 
 static MACHINE_RESET( pooyan )
 {
-	pooyan_state *state = machine->driver_data<pooyan_state>();
+	pooyan_state *state = machine.driver_data<pooyan_state>();
 	state->irq_enable = 0;
 }
 

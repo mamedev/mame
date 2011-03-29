@@ -27,7 +27,9 @@
 typedef struct _poly_extra_data poly_extra_data;
 struct _poly_extra_data
 {
-	running_machine *machine;
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
+	running_machine *m_machine;
 	UINT32 tex, color;
 	float ooz_dx, ooz_dy, ooz_base;
 	float uoz_dx, uoz_dy, uoz_base;
@@ -57,16 +59,16 @@ static void gaelco3d_exit(running_machine &machine)
 
 VIDEO_START( gaelco3d )
 {
-	gaelco3d_state *state = machine->driver_data<gaelco3d_state>();
+	gaelco3d_state *state = machine.driver_data<gaelco3d_state>();
 	int width, height;
 
 	state->poly = poly_alloc(machine, 2000, sizeof(poly_extra_data), 0);
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, gaelco3d_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, gaelco3d_exit);
 
-	state->screenbits = machine->primary_screen->alloc_compatible_bitmap();
+	state->screenbits = machine.primary_screen->alloc_compatible_bitmap();
 
-	width = machine->primary_screen->width();
-	height = machine->primary_screen->height();
+	width = machine.primary_screen->width();
+	height = machine.primary_screen->height();
 	state->zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	state->palette = auto_alloc_array(machine, rgb_t, 32768);
@@ -116,7 +118,7 @@ VIDEO_START( gaelco3d )
 
 static void render_poly(screen_device &screen, UINT32 *polydata)
 {
-	gaelco3d_state *state = screen.machine->driver_data<gaelco3d_state>();
+	gaelco3d_state *state = screen.machine().driver_data<gaelco3d_state>();
 	float midx = screen.width() / 2;
 	float midy = screen.height() / 2;
 	float z0 = tms3203x_device::fp_to_float(polydata[0]);
@@ -160,7 +162,7 @@ static void render_poly(screen_device &screen, UINT32 *polydata)
 	}
 
 	/* fill in extra data */
-	extra->machine = screen.machine;
+	extra->m_machine = &screen.machine();
 	extra->tex = polydata[11];
 	extra->color = color;
 	extra->ooz_dx = ooz_dx;
@@ -210,7 +212,7 @@ static void render_poly(screen_device &screen, UINT32 *polydata)
 static void render_noz_noperspective(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	gaelco3d_state *state = extra->machine->driver_data<gaelco3d_state>();
+	gaelco3d_state *state = extra->machine().driver_data<gaelco3d_state>();
 	bitmap_t *bitmap = (bitmap_t *)destbase;
 	float zbase = recip_approx(extra->ooz_base);
 	float uoz_step = extra->uoz_dx * zbase;
@@ -252,7 +254,7 @@ static void render_noz_noperspective(void *destbase, INT32 scanline, const poly_
 static void render_normal(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	gaelco3d_state *state = extra->machine->driver_data<gaelco3d_state>();
+	gaelco3d_state *state = extra->machine().driver_data<gaelco3d_state>();
 	bitmap_t *bitmap = (bitmap_t *)destbase;
 	float ooz_dx = extra->ooz_dx;
 	float uoz_dx = extra->uoz_dx;
@@ -305,7 +307,7 @@ static void render_normal(void *destbase, INT32 scanline, const poly_extent *ext
 static void render_alphablend(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	gaelco3d_state *state = extra->machine->driver_data<gaelco3d_state>();
+	gaelco3d_state *state = extra->machine().driver_data<gaelco3d_state>();
 	bitmap_t *bitmap = (bitmap_t *)destbase;
 	float ooz_dx = extra->ooz_dx;
 	float uoz_dx = extra->uoz_dx;
@@ -363,7 +365,7 @@ static void render_alphablend(void *destbase, INT32 scanline, const poly_extent 
 
 void gaelco3d_render(screen_device &screen)
 {
-	gaelco3d_state *state = screen.machine->driver_data<gaelco3d_state>();
+	gaelco3d_state *state = screen.machine().driver_data<gaelco3d_state>();
 	/* wait for any queued stuff to complete */
 	poly_wait(state->poly, "Time to render");
 
@@ -389,25 +391,25 @@ void gaelco3d_render(screen_device &screen)
 
 WRITE32_HANDLER( gaelco3d_render_w )
 {
-	gaelco3d_state *state = space->machine->driver_data<gaelco3d_state>();
+	gaelco3d_state *state = space->machine().driver_data<gaelco3d_state>();
 	/* append the data to our buffer */
 	state->polydata_buffer[state->polydata_count++] = data;
 	if (state->polydata_count >= MAX_POLYDATA)
 		fatalerror("Out of polygon buffer space!");
 
 	/* if we've accumulated a completed poly set of data, queue it */
-	if (!space->machine->video().skip_this_frame())
+	if (!space->machine().video().skip_this_frame())
 	{
 		if (state->polydata_count >= 18 && (state->polydata_count % 2) == 1 && IS_POLYEND(state->polydata_buffer[state->polydata_count - 2]))
 		{
-			render_poly(*space->machine->primary_screen, &state->polydata_buffer[0]);
+			render_poly(*space->machine().primary_screen, &state->polydata_buffer[0]);
 			state->polydata_count = 0;
 		}
 		state->video_changed = TRUE;
 	}
 
 #if DISPLAY_STATS
-	state->lastscan = space->machine->primary_screen->vpos();
+	state->lastscan = space->machine().primary_screen->vpos();
 #endif
 }
 
@@ -421,20 +423,20 @@ WRITE32_HANDLER( gaelco3d_render_w )
 
 WRITE16_HANDLER( gaelco3d_paletteram_w )
 {
-	gaelco3d_state *state = space->machine->driver_data<gaelco3d_state>();
+	gaelco3d_state *state = space->machine().driver_data<gaelco3d_state>();
 	poly_wait(state->poly, "Palette change");
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	state->palette[offset] = ((space->machine->generic.paletteram.u16[offset] & 0x7fe0) << 6) | (space->machine->generic.paletteram.u16[offset] & 0x1f);
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	state->palette[offset] = ((space->machine().generic.paletteram.u16[offset] & 0x7fe0) << 6) | (space->machine().generic.paletteram.u16[offset] & 0x1f);
 }
 
 
 WRITE32_HANDLER( gaelco3d_paletteram_020_w )
 {
-	gaelco3d_state *state = space->machine->driver_data<gaelco3d_state>();
+	gaelco3d_state *state = space->machine().driver_data<gaelco3d_state>();
 	poly_wait(state->poly, "Palette change");
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
-	state->palette[offset*2+0] = ((space->machine->generic.paletteram.u32[offset] & 0x7fe00000) >> 10) | ((space->machine->generic.paletteram.u32[offset] & 0x1f0000) >> 16);
-	state->palette[offset*2+1] = ((space->machine->generic.paletteram.u32[offset] & 0x7fe0) << 6) | (space->machine->generic.paletteram.u32[offset] & 0x1f);
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	state->palette[offset*2+0] = ((space->machine().generic.paletteram.u32[offset] & 0x7fe00000) >> 10) | ((space->machine().generic.paletteram.u32[offset] & 0x1f0000) >> 16);
+	state->palette[offset*2+1] = ((space->machine().generic.paletteram.u32[offset] & 0x7fe0) << 6) | (space->machine().generic.paletteram.u32[offset] & 0x1f);
 }
 
 
@@ -447,29 +449,29 @@ WRITE32_HANDLER( gaelco3d_paletteram_020_w )
 
 SCREEN_UPDATE( gaelco3d )
 {
-	gaelco3d_state *state = screen->machine->driver_data<gaelco3d_state>();
+	gaelco3d_state *state = screen->machine().driver_data<gaelco3d_state>();
 	int x, y, ret;
 
-	if (DISPLAY_TEXTURE && (input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen->machine, KEYCODE_X)))
+	if (DISPLAY_TEXTURE && (input_code_pressed(screen->machine(), KEYCODE_Z) || input_code_pressed(screen->machine(), KEYCODE_X)))
 	{
 		static int xv = 0, yv = 0x1000;
 		UINT8 *base = state->texture;
 		int length = state->texture_size;
 
-		if (input_code_pressed(screen->machine, KEYCODE_X))
+		if (input_code_pressed(screen->machine(), KEYCODE_X))
 		{
 			base = state->texmask;
 			length = state->texmask_size;
 		}
 
-		if (input_code_pressed(screen->machine, KEYCODE_LEFT) && xv >= 4)
+		if (input_code_pressed(screen->machine(), KEYCODE_LEFT) && xv >= 4)
 			xv -= 4;
-		if (input_code_pressed(screen->machine, KEYCODE_RIGHT) && xv < 4096 - 4)
+		if (input_code_pressed(screen->machine(), KEYCODE_RIGHT) && xv < 4096 - 4)
 			xv += 4;
 
-		if (input_code_pressed(screen->machine, KEYCODE_UP) && yv >= 4)
+		if (input_code_pressed(screen->machine(), KEYCODE_UP) && yv >= 4)
 			yv -= 4;
-		if (input_code_pressed(screen->machine, KEYCODE_DOWN) && yv < 0x40000)
+		if (input_code_pressed(screen->machine(), KEYCODE_DOWN) && yv < 0x40000)
 			yv += 4;
 
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)

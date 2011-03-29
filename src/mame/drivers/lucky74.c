@@ -683,7 +683,7 @@
 
 static READ8_HANDLER( custom_09R81P_port_r )
 {
-	lucky74_state *state = space->machine->driver_data<lucky74_state>();
+	lucky74_state *state = space->machine().driver_data<lucky74_state>();
 	if (offset != 0x00)
 	{
 		return state->adpcm_reg[offset];
@@ -696,13 +696,13 @@ static READ8_HANDLER( custom_09R81P_port_r )
 
 static WRITE8_HANDLER( custom_09R81P_port_w )
 {
-	lucky74_state *state = space->machine->driver_data<lucky74_state>();
+	lucky74_state *state = space->machine().driver_data<lucky74_state>();
 	state->adpcm_reg[offset] = data;
 }
 
 static WRITE8_DEVICE_HANDLER( ym2149_portb_w )
 {
-	lucky74_state *state = device->machine->driver_data<lucky74_state>();
+	lucky74_state *state = device->machine().driver_data<lucky74_state>();
 /*  when is in game mode writes 0x0a.
     when is in test mode writes 0x0e.
     after reset writes 0x16.
@@ -710,7 +710,7 @@ static WRITE8_DEVICE_HANDLER( ym2149_portb_w )
     bit 0 contains the screen orientation.
 */
 	state->ym2149_portb = data;
-	flip_screen_set(device->machine, data & 0x01);
+	flip_screen_set(device->machine(), data & 0x01);
 }
 
 static READ8_HANDLER( usart_8251_r )
@@ -722,7 +722,7 @@ static READ8_HANDLER( usart_8251_r )
 
 static WRITE8_HANDLER( usart_8251_w )
 {
-	lucky74_state *state = space->machine->driver_data<lucky74_state>();
+	lucky74_state *state = space->machine().driver_data<lucky74_state>();
 	/* writes to USART 8251 port */
 	state->usart_8251 = data;
 	logerror("write to USART port: %02x \n", state->usart_8251);
@@ -737,7 +737,7 @@ static READ8_HANDLER( copro_sm7831_r )
 
 static WRITE8_HANDLER( copro_sm7831_w )
 {
-	lucky74_state *state = space->machine->driver_data<lucky74_state>();
+	lucky74_state *state = space->machine().driver_data<lucky74_state>();
 	/* write to SM7831 co-processor */
 	state->copro_sm7831 = data;
 	logerror("write to co-processor: %2X\n", state->copro_sm7831);
@@ -794,7 +794,7 @@ static WRITE8_DEVICE_HANDLER(lamps_b_w)
 
 static INTERRUPT_GEN( nmi_interrupt )
 {
-	lucky74_state *state = device->machine->driver_data<lucky74_state>();
+	lucky74_state *state = device->machine().driver_data<lucky74_state>();
 	if ((state->ym2149_portb & 0x10) == 0)	/* ym2149 portB bit 4 trigger the NMI */
 	{
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
@@ -1098,7 +1098,7 @@ GFXDECODE_END
 
 static SOUND_START( lucky74 )
 {
-	lucky74_state *state = machine->driver_data<lucky74_state>();
+	lucky74_state *state = machine.driver_data<lucky74_state>();
     /* cleaning all 09R81P registers */
 
 	UINT8 i;
@@ -1113,7 +1113,7 @@ static SOUND_START( lucky74 )
 
 static void lucky74_adpcm_int(device_t *device)
 {
-	lucky74_state *state = device->machine->driver_data<lucky74_state>();
+	lucky74_state *state = device->machine().driver_data<lucky74_state>();
 	if (state->adpcm_reg[05] == 0x01)	/* register 0x05 (bit 0 activated), trigger the sample */
 	{
 		/* conditional zone for samples reproduction */
@@ -1134,7 +1134,7 @@ static void lucky74_adpcm_int(device_t *device)
 		if (state->adpcm_data == -1)
 		{
 			/* transferring 1st nibble */
-			state->adpcm_data = device->machine->region("adpcm")->base()[state->adpcm_pos];
+			state->adpcm_data = device->machine().region("adpcm")->base()[state->adpcm_pos];
 			state->adpcm_pos = (state->adpcm_pos + 1) & 0xffff;
 			msm5205_data_w(device, state->adpcm_data >> 4);
 

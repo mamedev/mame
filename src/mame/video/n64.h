@@ -424,7 +424,7 @@ class Processor
 		{
 			if(m_machine)
 			{
-				m_tmem = auto_alloc_array(m_machine, UINT8, 0x1000);
+				m_tmem = auto_alloc_array(*m_machine, UINT8, 0x1000);
 				memset(m_tmem, 0, 0x1000);
 
 				UINT8 *normpoint = m_machine->region("normpoint")->base();
@@ -438,7 +438,7 @@ class Processor
 			}
 		}
 
-		void		SetMachine(running_machine* machine) { m_machine = machine; }
+		void		SetMachine(running_machine& machine) { m_machine = &machine; }
 
 		// CPU-visible registers
 		void		SetStartReg(UINT32 val) { m_start = val; }

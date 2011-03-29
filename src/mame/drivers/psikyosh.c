@@ -337,7 +337,7 @@ static READ32_DEVICE_HANDLER( psh_eeprom_r )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		return input_port_read(device->machine, "JP4");
+		return input_port_read(device->machine(), "JP4");
 	}
 
 	logerror("Unk EEPROM read mask %x\n", mem_mask);
@@ -354,7 +354,7 @@ static INTERRUPT_GEN(psikyosh_interrupt)
 // bit 0 controls game speed on readback, mechanism is a little weird
 static WRITE32_HANDLER( psikyosh_irqctrl_w )
 {
-	psikyosh_state *state = space->machine->driver_data<psikyosh_state>();
+	psikyosh_state *state = space->machine().driver_data<psikyosh_state>();
 	if (!(data & 0x00c00000))
 	{
 		device_set_input_line(state->maincpu, 4, CLEAR_LINE);
@@ -363,7 +363,7 @@ static WRITE32_HANDLER( psikyosh_irqctrl_w )
 
 static WRITE32_HANDLER( paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )
 {
-	psikyosh_state *state = space->machine->driver_data<psikyosh_state>();
+	psikyosh_state *state = space->machine().driver_data<psikyosh_state>();
 	int r, g, b;
 	COMBINE_DATA(&state->paletteram[offset]);
 
@@ -371,25 +371,25 @@ static WRITE32_HANDLER( paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )
 	g = ((state->paletteram[offset] & 0x00ff0000) >>16);
 	r = ((state->paletteram[offset] & 0xff000000) >>24);
 
-	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
 }
 
 static WRITE32_HANDLER( psikyosh_vidregs_w )
 {
-	psikyosh_state *state = space->machine->driver_data<psikyosh_state>();
+	psikyosh_state *state = space->machine().driver_data<psikyosh_state>();
 	COMBINE_DATA(&state->vidregs[offset]);
 
 	if (offset == 4) /* Configure bank for gfx test */
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
-			memory_set_bank(space->machine, "bank2", state->vidregs[offset] & 0xfff);
+			memory_set_bank(space->machine(), "bank2", state->vidregs[offset] & 0xfff);
 	}
 }
 
 static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 {
-	psikyosh_state *state = space->machine->driver_data<psikyosh_state>();
-	UINT8 *ROM = space->machine->region("ymf")->base();
+	psikyosh_state *state = space->machine().driver_data<psikyosh_state>();
+	UINT8 *ROM = space->machine().region("ymf")->base();
 
 	return ROM[state->sample_offs++] << 16;
 }
@@ -447,8 +447,8 @@ P1KEY11  29|30  P2KEY11
     GND  55|56  GND
 */
 
-	UINT32 controls = input_port_read(space->machine, "CONTROLLER");
-	UINT32 value = input_port_read(space->machine, "INPUTS");
+	UINT32 controls = input_port_read(space->machine(), "CONTROLLER");
+	UINT32 value = input_port_read(space->machine(), "INPUTS");
 
 	if(controls) {
 		// Clearly has ghosting, game will only recognise one key depressed at once, and keyboard can only represent keys with distinct rows and columns
@@ -493,7 +493,7 @@ P1KEY11  29|30  P2KEY11
 			KEY11 | KEY6, // Ron
 			KEY1 | KEY3   // Start
 		}; // generic Mahjong keyboard encoder, corresponds to ordering in input port
-		UINT32 keys = input_port_read(space->machine, "MAHJONG");
+		UINT32 keys = input_port_read(space->machine(), "MAHJONG");
 		UINT32 which_key = 0x1;
 		int count = 0;
 
@@ -788,7 +788,7 @@ INPUT_PORTS_END
 
 static void irqhandler(device_t *device, int linestate)
 {
-	psikyosh_state *state = device->machine->driver_data<psikyosh_state>();
+	psikyosh_state *state = device->machine().driver_data<psikyosh_state>();
 	device_set_input_line(state->maincpu, 12, linestate ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -800,11 +800,11 @@ static const ymf278b_interface ymf278b_config =
 
 static MACHINE_START( psikyosh )
 {
-	psikyosh_state *state = machine->driver_data<psikyosh_state>();
+	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 
-	state->maincpu = machine->device("maincpu");
+	state->maincpu = machine.device("maincpu");
 
-	memory_configure_bank(machine, "bank2", 0, 0x1000, machine->region("gfx1")->base(), 0x20000);
+	memory_configure_bank(machine, "bank2", 0, 0x1000, machine.region("gfx1")->base(), 0x20000);
 
 	state->sample_offs = 0;
 	state->save_item(NAME(state->sample_offs));
@@ -1217,60 +1217,60 @@ ROM_END
 
 static DRIVER_INIT( soldivid )
 {
-	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
 static DRIVER_INIT( s1945ii )
 {
-	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
 static DRIVER_INIT( daraku )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1", &RAM[0x100000]);
-	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
 static DRIVER_INIT( sbomberb )
 {
-	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
 static DRIVER_INIT( gunbird2 )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1", &RAM[0x100000]);
-	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
 static DRIVER_INIT( s1945iii )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1", &RAM[0x100000]);
-	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
 static DRIVER_INIT( dragnblz )
 {
-	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
 static DRIVER_INIT( gnbarich )
 {
-	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
 static DRIVER_INIT( tgm2 )
 {
-	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
 static DRIVER_INIT( mjgtaste )
 {
-	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x03000000, 0x03000003, FUNC(mjgtaste_input_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x03000000, 0x03000003, FUNC(mjgtaste_input_r));
 }
 
 

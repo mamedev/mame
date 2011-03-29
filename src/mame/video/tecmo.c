@@ -23,7 +23,7 @@
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	tecmo_state *state = machine->driver_data<tecmo_state>();
+	tecmo_state *state = machine.driver_data<tecmo_state>();
 	UINT8 attr = state->bgvideoram[tile_index+0x200];
 	SET_TILE_INFO(
 			3,
@@ -34,7 +34,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	tecmo_state *state = machine->driver_data<tecmo_state>();
+	tecmo_state *state = machine.driver_data<tecmo_state>();
 	UINT8 attr = state->fgvideoram[tile_index+0x200];
 	SET_TILE_INFO(
 			2,
@@ -45,7 +45,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( gemini_get_bg_tile_info )
 {
-	tecmo_state *state = machine->driver_data<tecmo_state>();
+	tecmo_state *state = machine.driver_data<tecmo_state>();
 	UINT8 attr = state->bgvideoram[tile_index+0x200];
 	SET_TILE_INFO(
 			3,
@@ -56,7 +56,7 @@ static TILE_GET_INFO( gemini_get_bg_tile_info )
 
 static TILE_GET_INFO( gemini_get_fg_tile_info )
 {
-	tecmo_state *state = machine->driver_data<tecmo_state>();
+	tecmo_state *state = machine.driver_data<tecmo_state>();
 	UINT8 attr = state->fgvideoram[tile_index+0x200];
 	SET_TILE_INFO(
 			2,
@@ -67,7 +67,7 @@ static TILE_GET_INFO( gemini_get_fg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	tecmo_state *state = machine->driver_data<tecmo_state>();
+	tecmo_state *state = machine.driver_data<tecmo_state>();
 	UINT8 attr = state->txvideoram[tile_index+0x400];
 	SET_TILE_INFO(
 			0,
@@ -86,7 +86,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( tecmo )
 {
-	tecmo_state *state = machine->driver_data<tecmo_state>();
+	tecmo_state *state = machine.driver_data<tecmo_state>();
 	if (state->video_type == 2)	/* gemini */
 	{
 		state->bg_tilemap = tilemap_create(machine, gemini_get_bg_tile_info,tilemap_scan_rows,16,16,32,16);
@@ -117,28 +117,28 @@ VIDEO_START( tecmo )
 
 WRITE8_HANDLER( tecmo_txvideoram_w )
 {
-	tecmo_state *state = space->machine->driver_data<tecmo_state>();
+	tecmo_state *state = space->machine().driver_data<tecmo_state>();
 	state->txvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tx_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( tecmo_fgvideoram_w )
 {
-	tecmo_state *state = space->machine->driver_data<tecmo_state>();
+	tecmo_state *state = space->machine().driver_data<tecmo_state>();
 	state->fgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset & 0x1ff);
 }
 
 WRITE8_HANDLER( tecmo_bgvideoram_w )
 {
-	tecmo_state *state = space->machine->driver_data<tecmo_state>();
+	tecmo_state *state = space->machine().driver_data<tecmo_state>();
 	state->bgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x1ff);
 }
 
 WRITE8_HANDLER( tecmo_fgscroll_w )
 {
-	tecmo_state *state = space->machine->driver_data<tecmo_state>();
+	tecmo_state *state = space->machine().driver_data<tecmo_state>();
 
 	state->fgscroll[offset] = data;
 
@@ -148,7 +148,7 @@ WRITE8_HANDLER( tecmo_fgscroll_w )
 
 WRITE8_HANDLER( tecmo_bgscroll_w )
 {
-	tecmo_state *state = space->machine->driver_data<tecmo_state>();
+	tecmo_state *state = space->machine().driver_data<tecmo_state>();
 
 	state->bgscroll[offset] = data;
 
@@ -158,7 +158,7 @@ WRITE8_HANDLER( tecmo_bgscroll_w )
 
 WRITE8_HANDLER( tecmo_flipscreen_w )
 {
-	flip_screen_set(space->machine, data & 1);
+	flip_screen_set(space->machine(), data & 1);
 }
 
 
@@ -169,9 +169,9 @@ WRITE8_HANDLER( tecmo_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	tecmo_state *state = machine->driver_data<tecmo_state>();
+	tecmo_state *state = machine.driver_data<tecmo_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 	static const UINT8 layout[8][8] =
@@ -234,12 +234,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				{
 					int sx = xpos + 8*(flipx?(size-1-x):x);
 					int sy = ypos + 8*(flipy?(size-1-y):y);
-					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 							code + layout[y][x],
 							flags & 0xf,
 							flipx,flipy,
 							sx,sy,
-							machine->priority_bitmap,
+							machine.priority_bitmap,
 							priority_mask,0);
 				}
 			}
@@ -250,13 +250,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( tecmo )
 {
-	tecmo_state *state = screen->machine->driver_data<tecmo_state>();
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	tecmo_state *state = screen->machine().driver_data<tecmo_state>();
+	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0x100);
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,2);
 	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,4);
 
-	draw_sprites(screen->machine, bitmap,cliprect);
+	draw_sprites(screen->machine(), bitmap,cliprect);
 	return 0;
 }

@@ -271,11 +271,11 @@ static DEVICE_START( leland_sound )
 	state->dac_bufout[0] = state->dac_bufout[1] = 0;
 
 	/* allocate the stream */
-	state->dac_stream = device->machine->sound().stream_alloc(*device, 0, 1, 256*60, NULL, leland_update);
+	state->dac_stream = device->machine().sound().stream_alloc(*device, 0, 1, 256*60, NULL, leland_update);
 
 	/* allocate memory */
-	state->dac_buffer[0] = auto_alloc_array(device->machine, UINT8, DAC_BUFFER_SIZE);
-	state->dac_buffer[1] = auto_alloc_array(device->machine, UINT8, DAC_BUFFER_SIZE);
+	state->dac_buffer[0] = auto_alloc_array(device->machine(), UINT8, DAC_BUFFER_SIZE);
+	state->dac_buffer[1] = auto_alloc_array(device->machine(), UINT8, DAC_BUFFER_SIZE);
 }
 
 
@@ -537,37 +537,37 @@ static TIMER_CALLBACK( dma_timer_callback );
 static DEVICE_START( common_sh_start )
 {
 	leland_sound_state *state = get_safe_token(device);
-	running_machine *machine = device->machine;
-	address_space *dmaspace = machine->device("audiocpu")->memory().space(AS_PROGRAM);
+	running_machine &machine = device->machine();
+	address_space *dmaspace = machine.device("audiocpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* determine which sound hardware is installed */
-	state->has_ym2151 = (device->machine->device("ymsnd") != NULL);
+	state->has_ym2151 = (device->machine().device("ymsnd") != NULL);
 
 	/* allocate separate streams for the DMA and non-DMA DACs */
-	state->dma_stream = device->machine->sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, (void *)dmaspace, leland_80186_dma_update);
-	state->nondma_stream = device->machine->sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, NULL, leland_80186_dac_update);
+	state->dma_stream = device->machine().sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, (void *)dmaspace, leland_80186_dma_update);
+	state->nondma_stream = device->machine().sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, NULL, leland_80186_dac_update);
 
 	/* if we have a 2151, install an externally driven DAC stream */
 	if (state->has_ym2151)
 	{
-		state->ext_base = machine->region("dac")->base();
-		state->extern_stream = device->machine->sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, NULL, leland_80186_extern_update);
+		state->ext_base = machine.region("dac")->base();
+		state->extern_stream = device->machine().sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, NULL, leland_80186_extern_update);
 	}
 
 	/* create timers here so they stick around */
 	state->i80186.cpu = dmaspace->cpu;
-	state->i80186.timer[0].int_timer = machine->scheduler().timer_alloc(FUNC(internal_timer_int), device);
-	state->i80186.timer[1].int_timer = machine->scheduler().timer_alloc(FUNC(internal_timer_int), device);
-	state->i80186.timer[2].int_timer = machine->scheduler().timer_alloc(FUNC(internal_timer_int), device);
-	state->i80186.timer[0].time_timer = machine->scheduler().timer_alloc(FUNC(NULL));
-	state->i80186.timer[1].time_timer = machine->scheduler().timer_alloc(FUNC(NULL));
-	state->i80186.timer[2].time_timer = machine->scheduler().timer_alloc(FUNC(NULL));
-	state->i80186.dma[0].finish_timer = machine->scheduler().timer_alloc(FUNC(dma_timer_callback), device);
-	state->i80186.dma[1].finish_timer = machine->scheduler().timer_alloc(FUNC(dma_timer_callback), device);
+	state->i80186.timer[0].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int), device);
+	state->i80186.timer[1].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int), device);
+	state->i80186.timer[2].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int), device);
+	state->i80186.timer[0].time_timer = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->i80186.timer[1].time_timer = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->i80186.timer[2].time_timer = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->i80186.dma[0].finish_timer = machine.scheduler().timer_alloc(FUNC(dma_timer_callback), device);
+	state->i80186.dma[1].finish_timer = machine.scheduler().timer_alloc(FUNC(dma_timer_callback), device);
 
 	for (i = 0; i < 9; i++)
-		state->counter[i].timer = machine->scheduler().timer_alloc(FUNC(NULL));
+		state->counter[i].timer = machine.scheduler().timer_alloc(FUNC(NULL));
 }
 
 static DEVICE_START( leland_80186_sound )
@@ -693,8 +693,8 @@ static DEVICE_RESET( leland_80186_sound )
 
 static IRQ_CALLBACK( int_callback )
 {
-	leland_sound_state *state = get_safe_token(device->machine->device("custom"));
-	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", device->machine->time().as_double(), state->i80186.intr.poll_status & 0x1f);
+	leland_sound_state *state = get_safe_token(device->machine().device("custom"));
+	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", device->machine().time().as_double(), state->i80186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
 	device_set_input_line(state->i80186.cpu, 0, CLEAR_LINE);
@@ -729,7 +729,7 @@ static IRQ_CALLBACK( int_callback )
 static void update_interrupt_state(device_t *device)
 {
 	leland_sound_state *state = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	int i, j, new_vector = 0;
 
 	if (LOG_INTERRUPTS) logerror("update_interrupt_status: req=%02X stat=%02X serv=%02X\n", state->i80186.intr.request, state->i80186.intr.status, state->i80186.intr.in_service);
@@ -809,14 +809,14 @@ generate_int:
 	if (!state->i80186.intr.pending)
 		cputag_set_input_line(machine, "audiocpu", 0, ASSERT_LINE);
 	state->i80186.intr.pending = 1;
-	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", machine->time().as_double(), new_vector);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", machine.time().as_double(), new_vector);
 }
 
 
 static void handle_eoi(device_t *device, int data)
 {
 	leland_sound_state *state = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	int i, j;
 
 	/* specific case */
@@ -834,9 +834,9 @@ static void handle_eoi(device_t *device, int data)
 			case 0x0d:	state->i80186.intr.in_service &= ~0x20;	break;
 			case 0x0e:	state->i80186.intr.in_service &= ~0x40;	break;
 			case 0x0f:	state->i80186.intr.in_service &= ~0x80;	break;
-			default:	logerror("%s:ERROR - 80186 EOI with unknown vector %02X\n", machine->describe_context(), data & 0x1f);
+			default:	logerror("%s:ERROR - 80186 EOI with unknown vector %02X\n", machine.describe_context(), data & 0x1f);
 		}
-		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", machine->time().as_double(), data & 0x1f);
+		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", machine.time().as_double(), data & 0x1f);
 	}
 
 	/* non-specific case */
@@ -849,7 +849,7 @@ static void handle_eoi(device_t *device, int data)
 			if ((state->i80186.intr.timer & 7) == i && (state->i80186.intr.in_service & 0x01))
 			{
 				state->i80186.intr.in_service &= ~0x01;
-				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", machine->time().as_double());
+				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", machine.time().as_double());
 				return;
 			}
 
@@ -858,7 +858,7 @@ static void handle_eoi(device_t *device, int data)
 				if ((state->i80186.intr.dma[j] & 7) == i && (state->i80186.intr.in_service & (0x04 << j)))
 				{
 					state->i80186.intr.in_service &= ~(0x04 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", machine->time().as_double(), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", machine.time().as_double(), j);
 					return;
 				}
 
@@ -867,7 +867,7 @@ static void handle_eoi(device_t *device, int data)
 				if ((state->i80186.intr.ext[j] & 7) == i && (state->i80186.intr.in_service & (0x10 << j)))
 				{
 					state->i80186.intr.in_service &= ~(0x10 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", machine->time().as_double(), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", machine.time().as_double(), j);
 					return;
 				}
 		}
@@ -1759,14 +1759,14 @@ WRITE8_DEVICE_HANDLER( leland_80186_control_w )
 	}
 
 	/* /RESET */
-	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_RESET, data & 0x80  ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_RESET, data & 0x80  ? CLEAR_LINE : ASSERT_LINE);
 
 	/* /NMI */
 /*  If the master CPU doesn't get a response by the time it's ready to send
     the next command, it uses an NMI to force the issue; unfortunately, this
     seems to really screw up the sound system. It turns out it's better to
     just wait for the original interrupt to occur naturally */
-/*  cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, data & 0x40  ? CLEAR_LINE : ASSERT_LINE);*/
+/*  cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, data & 0x40  ? CLEAR_LINE : ASSERT_LINE);*/
 
 	/* INT0 */
 	if (data & 0x20)
@@ -1807,14 +1807,14 @@ static TIMER_CALLBACK( command_lo_sync )
 {
 	device_t *device = (device_t *)ptr;
 	leland_sound_state *state = get_safe_token(device);
-	if (LOG_COMM) logerror("%s:Write sound command latch lo = %02X\n", machine->describe_context(), param);
+	if (LOG_COMM) logerror("%s:Write sound command latch lo = %02X\n", machine.describe_context(), param);
 	state->sound_command = (state->sound_command & 0xff00) | param;
 }
 
 
 WRITE8_DEVICE_HANDLER( leland_80186_command_lo_w )
 {
-	device->machine->scheduler().synchronize(FUNC(command_lo_sync), data, device);
+	device->machine().scheduler().synchronize(FUNC(command_lo_sync), data, device);
 }
 
 
@@ -1846,7 +1846,7 @@ static TIMER_CALLBACK( delayed_response_r )
 {
 	device_t *device = (device_t *)ptr;
 	leland_sound_state *state = get_safe_token(device);
-	cpu_device *master = machine->device<cpu_device>("master");
+	cpu_device *master = machine.device<cpu_device>("master");
 	int checkpc = param;
 	int pc = master->pc();
 	int oldaf = master->state(Z80_AF);
@@ -1877,7 +1877,7 @@ READ8_DEVICE_HANDLER( leland_80186_response_r )
 	if (LOG_COMM) logerror("%04X:Read sound response latch = %02X\n", pc, state->sound_response);
 
 	/* synchronize the response */
-	device->machine->scheduler().synchronize(FUNC(delayed_response_r), pc + 2, device);
+	device->machine().scheduler().synchronize(FUNC(delayed_response_r), pc + 2, device);
 	return state->sound_response;
 }
 
@@ -2124,7 +2124,7 @@ static READ16_DEVICE_HANDLER( peripheral_r )
 			if (!state->has_ym2151)
 				return pit8254_r(device, offset | 0x40, mem_mask);
 			else
-				return ym2151_r(device->machine->device("ymsnd"), offset);
+				return ym2151_r(device->machine().device("ymsnd"), offset);
 
 		case 4:
 			if (state->is_redline)
@@ -2161,7 +2161,7 @@ static WRITE16_DEVICE_HANDLER( peripheral_w )
 			if (!state->has_ym2151)
 				pit8254_w(device, offset | 0x40, data, mem_mask);
 			else
-				ym2151_w(device->machine->device("ymsnd"), offset, data);
+				ym2151_w(device->machine().device("ymsnd"), offset, data);
 			break;
 
 		case 4:

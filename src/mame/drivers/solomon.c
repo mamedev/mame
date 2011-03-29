@@ -14,7 +14,7 @@ driver by Mirko Buffoni
 static WRITE8_HANDLER( solomon_sh_command_w )
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* this is checked on the title screen and when you reach certain scores in the game

@@ -13,7 +13,7 @@ READ16_HANDLER( welltris_spriteram_r )
 
 WRITE16_HANDLER( welltris_spriteram_w )
 {
-	welltris_state *state = space->machine->driver_data<welltris_state>();
+	welltris_state *state = space->machine().driver_data<welltris_state>();
 	int offs;
 
 	COMBINE_DATA(&state->spriteram[offset]);
@@ -29,12 +29,12 @@ WRITE16_HANDLER( welltris_spriteram_w )
 
 
 /* Sprite Drawing is pretty much the same as fromance.c */
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	static const UINT8 zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
-	welltris_state *state = machine->driver_data<welltris_state>();
+	welltris_state *state = machine.driver_data<welltris_state>();
 	int offs;
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	/* draw the sprites */
 	for (offs = 0; offs < 0x200 - 4; offs += 4) {
@@ -70,10 +70,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, 0, 0,
+						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, 0, 0,
 								x + xt * 16, y + yt * 16, 15);
 					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine->gfx[1], code, color, 0, 0,
+						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], code, color, 0, 0,
 								x + xt * xzoom, y + yt * yzoom,
 								0x1000 * xzoom, 0x1000 * yzoom, 15);
 				}
@@ -89,10 +89,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, 1, 0,
+						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, 1, 0,
 								x + (xtiles - 1 - xt) * 16, y + yt * 16, 15);
 					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine->gfx[1], code, color, 1, 0,
+						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], code, color, 1, 0,
 								x + (xtiles - 1 - xt) * xzoom, y + yt * yzoom,
 								0x1000 * xzoom, 0x1000 * yzoom, 15);
 				}
@@ -108,10 +108,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, 0, 1,
+						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, 0, 1,
 								x + xt * 16, y + (ytiles - 1 - yt) * 16, 15);
 					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine->gfx[1], code, color, 0, 1,
+						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], code, color, 0, 1,
 								x + xt * xzoom, y + (ytiles - 1 - yt) * yzoom,
 								0x1000 * xzoom, 0x1000 * yzoom, 15);
 				}
@@ -127,10 +127,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, 1, 1,
+						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, 1, 1,
 								x + (xtiles - 1 - xt) * 16, y + (ytiles - 1 - yt) * 16, 15);
 					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine->gfx[1], code, color, 1, 1,
+						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], code, color, 1, 1,
 								x + (xtiles - 1 - xt) * xzoom, y + (ytiles - 1 - yt) * yzoom,
 								0x1000 * xzoom, 0x1000 * yzoom, 15);
 				}
@@ -159,7 +159,7 @@ WRITE16_HANDLER( welltris_palette_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		welltris_state *state = space->machine->driver_data<welltris_state>();
+		welltris_state *state = space->machine().driver_data<welltris_state>();
 
 		if (state->charpalettebank != (data & 0x03))
 		{
@@ -167,7 +167,7 @@ WRITE16_HANDLER( welltris_palette_bank_w )
 			tilemap_mark_all_tiles_dirty(state->char_tilemap);
 		}
 
-		flip_screen_set(space->machine, data & 0x80);
+		flip_screen_set(space->machine(), data & 0x80);
 
 		state->spritepalettebank = (data & 0x20) >> 5;
 		state->pixelpalettebank = (data & 0x08) >> 3;
@@ -178,7 +178,7 @@ WRITE16_HANDLER( welltris_gfxbank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		welltris_state *state = space->machine->driver_data<welltris_state>();
+		welltris_state *state = space->machine().driver_data<welltris_state>();
 
 		setbank(state, 0, (data & 0xf0) >> 4);
 		setbank(state, 1, data & 0x0f);
@@ -187,7 +187,7 @@ WRITE16_HANDLER( welltris_gfxbank_w )
 
 WRITE16_HANDLER( welltris_scrollreg_w )
 {
-	welltris_state *state = space->machine->driver_data<welltris_state>();
+	welltris_state *state = space->machine().driver_data<welltris_state>();
 
 	switch (offset) {
 		case 0: state->scrollx = data - 14; break;
@@ -197,7 +197,7 @@ WRITE16_HANDLER( welltris_scrollreg_w )
 
 static TILE_GET_INFO( get_welltris_tile_info )
 {
-	welltris_state *state = machine->driver_data<welltris_state>();
+	welltris_state *state = machine.driver_data<welltris_state>();
 	UINT16 code = state->charvideoram[tile_index];
 	int bank = (code & 0x1000) >> 12;
 
@@ -210,7 +210,7 @@ static TILE_GET_INFO( get_welltris_tile_info )
 
 WRITE16_HANDLER( welltris_charvideoram_w )
 {
-	welltris_state *state = space->machine->driver_data<welltris_state>();
+	welltris_state *state = space->machine().driver_data<welltris_state>();
 
 	COMBINE_DATA(&state->charvideoram[offset]);
 	tilemap_mark_tile_dirty(state->char_tilemap, offset);
@@ -218,15 +218,15 @@ WRITE16_HANDLER( welltris_charvideoram_w )
 
 VIDEO_START( welltris )
 {
-	welltris_state *state = machine->driver_data<welltris_state>();
+	welltris_state *state = machine.driver_data<welltris_state>();
 	state->char_tilemap = tilemap_create(machine, get_welltris_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(state->char_tilemap, 15);
 }
 
-static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	welltris_state *state = machine->driver_data<welltris_state>();
+	welltris_state *state = machine.driver_data<welltris_state>();
 	int x, y;
 	int pixdata;
 
@@ -242,12 +242,12 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 
 SCREEN_UPDATE( welltris )
 {
-	welltris_state *state = screen->machine->driver_data<welltris_state>();
+	welltris_state *state = screen->machine().driver_data<welltris_state>();
 	tilemap_set_scrollx(state->char_tilemap, 0, state->scrollx);
 	tilemap_set_scrolly(state->char_tilemap, 0, state->scrolly);
 
-	draw_background(screen->machine, bitmap, cliprect);
+	draw_background(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->char_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

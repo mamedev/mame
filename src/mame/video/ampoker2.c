@@ -88,7 +88,7 @@ PALETTE_INIT( ampoker2 )
 			2,	resistances_b,	weights_b,	0,	0);
 
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -113,7 +113,7 @@ PALETTE_INIT( ampoker2 )
 
 WRITE8_HANDLER( ampoker2_videoram_w )
 {
-	ampoker2_state *state = space->machine->driver_data<ampoker2_state>();
+	ampoker2_state *state = space->machine().driver_data<ampoker2_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
@@ -121,7 +121,7 @@ WRITE8_HANDLER( ampoker2_videoram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	ampoker2_state *state = machine->driver_data<ampoker2_state>();
+	ampoker2_state *state = machine.driver_data<ampoker2_state>();
 	UINT8 *videoram = state->videoram;
 	int offs = tile_index * 2;
 	int attr = videoram[offs + 1];
@@ -135,7 +135,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( s2k_get_bg_tile_info )
 {
-	ampoker2_state *state = machine->driver_data<ampoker2_state>();
+	ampoker2_state *state = machine.driver_data<ampoker2_state>();
 	UINT8 *videoram = state->videoram;
 	int offs = tile_index * 2;
 	int attr = videoram[offs + 1];
@@ -149,21 +149,21 @@ static TILE_GET_INFO( s2k_get_bg_tile_info )
 
 VIDEO_START(ampoker2)
 {
-	ampoker2_state *state = machine->driver_data<ampoker2_state>();
+	ampoker2_state *state = machine.driver_data<ampoker2_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 64, 32);
 }
 
 VIDEO_START(sigma2k)
 {
-	ampoker2_state *state = machine->driver_data<ampoker2_state>();
+	ampoker2_state *state = machine.driver_data<ampoker2_state>();
 	state->bg_tilemap = tilemap_create(machine, s2k_get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 64, 32);
 }
 
 SCREEN_UPDATE(ampoker2)
 {
-	ampoker2_state *state = screen->machine->driver_data<ampoker2_state>();
+	ampoker2_state *state = screen->machine().driver_data<ampoker2_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }

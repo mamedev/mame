@@ -454,10 +454,10 @@ static void draw_quads(model1_state *state, bitmap_t *bitmap, const rectangle *c
 
 		fill_quad(bitmap, view, q);
 #if 0
-		draw_line(bitmap, get_black_pen(screen->machine), q->p[0]->s.x, q->p[0]->s.y, q->p[1]->s.x, q->p[1]->s.y);
-		draw_line(bitmap, get_black_pen(screen->machine), q->p[1]->s.x, q->p[1]->s.y, q->p[2]->s.x, q->p[2]->s.y);
-		draw_line(bitmap, get_black_pen(screen->machine), q->p[2]->s.x, q->p[2]->s.y, q->p[3]->s.x, q->p[3]->s.y);
-		draw_line(bitmap, get_black_pen(screen->machine), q->p[3]->s.x, q->p[3]->s.y, q->p[0]->s.x, q->p[0]->s.y);
+		draw_line(bitmap, get_black_pen(screen->machine()), q->p[0]->s.x, q->p[0]->s.y, q->p[1]->s.x, q->p[1]->s.y);
+		draw_line(bitmap, get_black_pen(screen->machine()), q->p[1]->s.x, q->p[1]->s.y, q->p[2]->s.x, q->p[2]->s.y);
+		draw_line(bitmap, get_black_pen(screen->machine()), q->p[2]->s.x, q->p[2]->s.y, q->p[3]->s.x, q->p[3]->s.y);
+		draw_line(bitmap, get_black_pen(screen->machine()), q->p[3]->s.x, q->p[3]->s.y, q->p[0]->s.x, q->p[0]->s.y);
 #endif
 	}
 
@@ -724,9 +724,9 @@ static float compute_specular(struct vector *normal, struct vector *light,float 
 	return 0;
 }
 
-static void push_object(running_machine *machine, UINT32 tex_adr, UINT32 poly_adr, UINT32 size)
+static void push_object(running_machine &machine, UINT32 tex_adr, UINT32 poly_adr, UINT32 size)
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	struct view *view = state->view;
 	int i;
 	UINT32 flags;
@@ -896,8 +896,8 @@ static void push_object(running_machine *machine, UINT32 tex_adr, UINT32 poly_ad
 #if 0
 			float dif=mult_vector(&vn, &view->light);
 			float ln=view->lightparams[lightmode].a + view->lightparams[lightmode].d*MAX(0.0,dif);
-			cquad.col = scale_color(machine->pens[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
-			cquad.col = scale_color(machine->pens[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
+			cquad.col = scale_color(machine.pens[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
+			cquad.col = scale_color(machine.pens[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
 #endif
 			float dif=mult_vector(&vn, &view->light);
 			float spec=compute_specular(&vn,&view->light,dif,lightmode);
@@ -1073,7 +1073,7 @@ static UINT16 *push_direct(model1_state *state, UINT16 *list)
 			b=(state->color_xlat[(b<<8)|lumval|0x4000]>>3)&0x1f;
 			cquad.col=(r<<10)|(g<<5)|(b<<0);
 		}
-		//cquad.col  = scale_color(machine->pens[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)],((float) (lum>>24)) / 128.0);
+		//cquad.col  = scale_color(machine.pens[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)],((float) (lum>>24)) / 128.0);
 		if(flags & 0x00002000)
 			cquad.col |= MOIRE;
 
@@ -1161,16 +1161,16 @@ static int get_list_number(model1_state *state)
 	return state->listctl[0] & 0x40 ? 0 : 1;
 }
 
-static void end_frame(running_machine *machine)
+static void end_frame(running_machine &machine)
 {
-	model1_state *state = machine->driver_data<model1_state>();
-	if((state->listctl[0] & 4) && (machine->primary_screen->frame_number() & 1))
+	model1_state *state = machine.driver_data<model1_state>();
+	if((state->listctl[0] & 4) && (machine.primary_screen->frame_number() & 1))
 		state->listctl[0] ^= 0x40;
 }
 
 READ16_HANDLER( model1_listctl_r )
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	if(!offset)
 		return state->listctl[0] | 0x30;
 	else
@@ -1179,14 +1179,14 @@ READ16_HANDLER( model1_listctl_r )
 
 WRITE16_HANDLER( model1_listctl_w )
 {
-	model1_state *state = space->machine->driver_data<model1_state>();
+	model1_state *state = space->machine().driver_data<model1_state>();
 	COMBINE_DATA(state->listctl+offset);
 	LOG_TGP(("VIDEO: control=%08x\n", (state->listctl[1]<<16)|state->listctl[0]));
 }
 
-static void tgp_render(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void tgp_render(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	struct view *view = state->view;
 	state->render_done = 1;
 	if((state->listctl[1] & 0x1f) == 0x1f) {
@@ -1338,9 +1338,9 @@ static void tgp_render(running_machine *machine, bitmap_t *bitmap, const rectang
 	}
 }
 
-static void tgp_scan(running_machine *machine)
+static void tgp_scan(running_machine &machine)
 {
-	model1_state *state = machine->driver_data<model1_state>();
+	model1_state *state = machine.driver_data<model1_state>();
 	struct view *view = state->view;
 #if 0
 	if (input_code_pressed_once(machine, KEYCODE_F))
@@ -1447,14 +1447,14 @@ static void tgp_scan(running_machine *machine)
 
 VIDEO_START(model1)
 {
-	model1_state *state = machine->driver_data<model1_state>();
-	state->paletteram16 = machine->generic.paletteram.u16;
+	model1_state *state = machine.driver_data<model1_state>();
+	state->paletteram16 = machine.generic.paletteram.u16;
 
 	state->view = auto_alloc_clear(machine, struct view);
 
 	sys24_tile_vh_start(machine, 0x3fff);
 
-	state->poly_rom = (UINT32 *)machine->region("user1")->base();
+	state->poly_rom = (UINT32 *)machine.region("user1")->base();
 	state->poly_ram = auto_alloc_array_clear(machine, UINT32, 0x400000);
 	state->tgp_ram = auto_alloc_array_clear(machine, UINT16, 0x100000-0x40000);
 	state->pointdb = auto_alloc_array_clear(machine, struct point, 1000000*2);
@@ -1472,7 +1472,7 @@ VIDEO_START(model1)
 
 SCREEN_UPDATE(model1)
 {
-	model1_state *state = screen->machine->driver_data<model1_state>();
+	model1_state *state = screen->machine().driver_data<model1_state>();
 	struct view *view = state->view;
 #if 0
 	{
@@ -1480,35 +1480,35 @@ SCREEN_UPDATE(model1)
 		double delta;
 		delta = 1;
 
-		if(input_code_pressed(screen->machine, KEYCODE_F)) {
+		if(input_code_pressed(screen->machine(), KEYCODE_F)) {
 			mod = 1;
 			view->vxx -= delta;
 		}
-		if(input_code_pressed(screen->machine, KEYCODE_G)) {
+		if(input_code_pressed(screen->machine(), KEYCODE_G)) {
 			mod = 1;
 			view->vxx += delta;
 		}
-		if(input_code_pressed(screen->machine, KEYCODE_H)) {
+		if(input_code_pressed(screen->machine(), KEYCODE_H)) {
 			mod = 1;
 			view->vyy -= delta;
 		}
-		if(input_code_pressed(screen->machine, KEYCODE_J)) {
+		if(input_code_pressed(screen->machine(), KEYCODE_J)) {
 			mod = 1;
 			view->vyy += delta;
 		}
-		if(input_code_pressed(screen->machine, KEYCODE_K)) {
+		if(input_code_pressed(screen->machine(), KEYCODE_K)) {
 			mod = 1;
 			view->vzz -= delta;
 		}
-		if(input_code_pressed(screen->machine, KEYCODE_L)) {
+		if(input_code_pressed(screen->machine(), KEYCODE_L)) {
 			mod = 1;
 			view->vzz += delta;
 		}
-		if(input_code_pressed(screen->machine, KEYCODE_U)) {
+		if(input_code_pressed(screen->machine(), KEYCODE_U)) {
 			mod = 1;
 			view->ayy -= 0.05;
 		}
-		if(input_code_pressed(screen->machine, KEYCODE_I)) {
+		if(input_code_pressed(screen->machine(), KEYCODE_I)) {
 			mod = 1;
 			view->ayy += 0.05;
 		}
@@ -1520,20 +1520,20 @@ SCREEN_UPDATE(model1)
 	view->ayyc = cos(view->ayy);
 	view->ayys = sin(view->ayy);
 
-	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
+	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
+	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
 
-	sys24_tile_draw(screen->machine, bitmap, cliprect, 6, 0, 0);
-	sys24_tile_draw(screen->machine, bitmap, cliprect, 4, 0, 0);
-	sys24_tile_draw(screen->machine, bitmap, cliprect, 2, 0, 0);
-	sys24_tile_draw(screen->machine, bitmap, cliprect, 0, 0, 0);
+	sys24_tile_draw(screen->machine(), bitmap, cliprect, 6, 0, 0);
+	sys24_tile_draw(screen->machine(), bitmap, cliprect, 4, 0, 0);
+	sys24_tile_draw(screen->machine(), bitmap, cliprect, 2, 0, 0);
+	sys24_tile_draw(screen->machine(), bitmap, cliprect, 0, 0, 0);
 
-	tgp_render(screen->machine, bitmap, cliprect);
+	tgp_render(screen->machine(), bitmap, cliprect);
 
-	sys24_tile_draw(screen->machine, bitmap, cliprect, 7, 0, 0);
-	sys24_tile_draw(screen->machine, bitmap, cliprect, 5, 0, 0);
-	sys24_tile_draw(screen->machine, bitmap, cliprect, 3, 0, 0);
-	sys24_tile_draw(screen->machine, bitmap, cliprect, 1, 0, 0);
+	sys24_tile_draw(screen->machine(), bitmap, cliprect, 7, 0, 0);
+	sys24_tile_draw(screen->machine(), bitmap, cliprect, 5, 0, 0);
+	sys24_tile_draw(screen->machine(), bitmap, cliprect, 3, 0, 0);
+	sys24_tile_draw(screen->machine(), bitmap, cliprect, 1, 0, 0);
 
 	return 0;
 }

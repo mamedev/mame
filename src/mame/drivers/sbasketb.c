@@ -52,12 +52,12 @@ CPU/Video Board Parts:
 
 static WRITE8_HANDLER( sbasketb_sh_irqtrigger_w )
 {
-	device_set_input_line_and_vector(space->machine->device<cpu_device>("audiocpu"), 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(space->machine().device<cpu_device>("audiocpu"), 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( sbasketb_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset, data);
+	coin_counter_w(space->machine(), offset, data);
 }
 
 

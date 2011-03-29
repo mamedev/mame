@@ -76,7 +76,7 @@ device_config *deco_bac06_device_config::static_alloc_device_config(const machin
 
 device_t *deco_bac06_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, deco_bac06_device(machine, *this));
+	return auto_alloc(machine, deco_bac06_device(machine, *this));
 }
 
 void deco_bac06_device_config::set_gfx_region_wide(device_config *device, int region8x8, int region16x16, int wide)
@@ -188,9 +188,9 @@ void deco_bac06_device::create_tilemaps(int region8x8, int region16x16)
 
 void deco_bac06_device::device_start()
 {
-	pf_data = auto_alloc_array_clear(this->machine, UINT16, 0x4000 / 2); // 0x2000 is the maximum needed, some games / chip setups map less and mirror - stadium hero banks this to 0x4000?!
-	pf_rowscroll = auto_alloc_array_clear(this->machine, UINT16, 0x2000 / 2);
-	pf_colscroll = auto_alloc_array_clear(this->machine, UINT16, 0x2000 / 2);
+	pf_data = auto_alloc_array_clear(this->machine(), UINT16, 0x4000 / 2); // 0x2000 is the maximum needed, some games / chip setups map less and mirror - stadium hero banks this to 0x4000?!
+	pf_rowscroll = auto_alloc_array_clear(this->machine(), UINT16, 0x2000 / 2);
+	pf_colscroll = auto_alloc_array_clear(this->machine(), UINT16, 0x2000 / 2);
 
 	create_tilemaps(m_gfxregion8x8, m_gfxregion16x16);
 	m_gfxcolmask = 0x0f;
@@ -206,7 +206,7 @@ void deco_bac06_device::device_reset()
 }
 
 
-void deco_bac06_device::custom_tilemap_draw(running_machine *machine,
+void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 								bitmap_t *bitmap,
 								const rectangle *cliprect,
 								tilemap_t *tilemap_ptr,
@@ -304,7 +304,7 @@ void deco_bac06_device::custom_tilemap_draw(running_machine *machine,
 	}
 }
 
-void deco_bac06_device::deco_bac06_pf_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition)
+void deco_bac06_device::deco_bac06_pf_draw(running_machine &machine,bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition)
 {
 	tilemap_t* tm = 0;
 
@@ -338,7 +338,7 @@ void deco_bac06_device::deco_bac06_pf_draw(running_machine *machine,bitmap_t *bi
 }
 
 // used for pocket gal bootleg, which doesn't set registers properly and simply expects a fixed size tilemap.
-void deco_bac06_device::deco_bac06_pf_draw_bootleg(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int flags, int mode, int type)
+void deco_bac06_device::deco_bac06_pf_draw_bootleg(running_machine &machine,bitmap_t *bitmap,const rectangle *cliprect,int flags, int mode, int type)
 {
 	tilemap_t* tm = 0;
 	if (!mode) tm = pf8x8_tilemap[type];
@@ -363,7 +363,7 @@ WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_0_w )
 		{
 			// I don't know WHY Stadium Hero uses this as a bank but the RAM test expects it..
 			// I'm curious as to if anything else sets it tho
-			if (strcmp(dev->machine->system().name,"stadhero"))
+			if (strcmp(dev->machine().system().name,"stadhero"))
 				printf("tilemap ram bank change to %d\n", newbank&1);
 
 			dev->m_rambank = newbank&1;

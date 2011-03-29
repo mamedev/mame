@@ -72,7 +72,7 @@ device_config *mos6526_device_config::static_alloc_device_config(const machine_c
 
 device_t *mos6526_device_config::alloc_device(running_machine &machine) const
 {
-    return auto_alloc(&machine, mos6526_device(machine, *this));
+    return auto_alloc(machine, mos6526_device(machine, *this));
 }
 
 

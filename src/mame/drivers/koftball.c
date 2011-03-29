@@ -53,7 +53,7 @@ public:
 
 static TILE_GET_INFO( get_t1_tile_info )
 {
-	koftball_state *state = machine->driver_data<koftball_state>();
+	koftball_state *state = machine.driver_data<koftball_state>();
 	int data = state->bmc_1_videoram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -64,7 +64,7 @@ static TILE_GET_INFO( get_t1_tile_info )
 
 static TILE_GET_INFO( get_t2_tile_info )
 {
-	koftball_state *state = machine->driver_data<koftball_state>();
+	koftball_state *state = machine.driver_data<koftball_state>();
 	int data = state->bmc_2_videoram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -75,7 +75,7 @@ static TILE_GET_INFO( get_t2_tile_info )
 
 static VIDEO_START( koftball )
 {
-	koftball_state *state = machine->driver_data<koftball_state>();
+	koftball_state *state = machine.driver_data<koftball_state>();
 	state->tilemap_1 = tilemap_create(machine, get_t1_tile_info,tilemap_scan_rows,8,8,64,32);
 	state->tilemap_2 = tilemap_create(machine, get_t2_tile_info,tilemap_scan_rows,8,8,64,32);
 
@@ -84,7 +84,7 @@ static VIDEO_START( koftball )
 
 static SCREEN_UPDATE( koftball )
 {
-	koftball_state *state = screen->machine->driver_data<koftball_state>();
+	koftball_state *state = screen->machine().driver_data<koftball_state>();
 	tilemap_draw( bitmap, cliprect, state->tilemap_2, 0, 0);
 	tilemap_draw( bitmap, cliprect, state->tilemap_1, 0, 0);
 	return 0;
@@ -92,33 +92,33 @@ static SCREEN_UPDATE( koftball )
 
 static WRITE16_HANDLER( bmc_RAMDAC_offset_w )
 {
-	koftball_state *state = space->machine->driver_data<koftball_state>();
+	koftball_state *state = space->machine().driver_data<koftball_state>();
 	state->clr_offset=data*3;
 }
 
 static WRITE16_HANDLER( bmc_RAMDAC_color_w )
 {
-	koftball_state *state = space->machine->driver_data<koftball_state>();
+	koftball_state *state = space->machine().driver_data<koftball_state>();
 	state->bmc_colorram[state->clr_offset]=data;
-	palette_set_color_rgb(space->machine,state->clr_offset/3,pal6bit(state->bmc_colorram[(state->clr_offset/3)*3]),pal6bit(state->bmc_colorram[(state->clr_offset/3)*3+1]),pal6bit(state->bmc_colorram[(state->clr_offset/3)*3+2]));
+	palette_set_color_rgb(space->machine(),state->clr_offset/3,pal6bit(state->bmc_colorram[(state->clr_offset/3)*3]),pal6bit(state->bmc_colorram[(state->clr_offset/3)*3+1]),pal6bit(state->bmc_colorram[(state->clr_offset/3)*3+2]));
 	state->clr_offset=(state->clr_offset+1)%768;
 }
 
 static READ16_HANDLER( bmc_RAMDAC_color_r )
 {
-	koftball_state *state = space->machine->driver_data<koftball_state>();
+	koftball_state *state = space->machine().driver_data<koftball_state>();
 	return state->bmc_colorram[state->clr_offset];
 }
 
 static READ16_HANDLER(random_number_r)
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 
 static READ16_HANDLER(prot_r)
 {
-	koftball_state *state = space->machine->driver_data<koftball_state>();
+	koftball_state *state = space->machine().driver_data<koftball_state>();
 	switch(state->prot_data)
 	{
 		case 0x0000: return 0x0d00;
@@ -128,25 +128,25 @@ static READ16_HANDLER(prot_r)
 	}
 
 	logerror("unk prot r %x %x\n",state->prot_data,	cpu_get_previouspc(space->cpu));
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static WRITE16_HANDLER(prot_w)
 {
-	koftball_state *state = space->machine->driver_data<koftball_state>();
+	koftball_state *state = space->machine().driver_data<koftball_state>();
 	COMBINE_DATA(&state->prot_data);
 }
 
 static WRITE16_HANDLER(bmc_1_videoram_w)
 {
-	koftball_state *state = space->machine->driver_data<koftball_state>();
+	koftball_state *state = space->machine().driver_data<koftball_state>();
 	COMBINE_DATA(&state->bmc_1_videoram[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_1, offset);
 }
 
 static WRITE16_HANDLER(bmc_2_videoram_w)
 {
-	koftball_state *state = space->machine->driver_data<koftball_state>();
+	koftball_state *state = space->machine().driver_data<koftball_state>();
 	COMBINE_DATA(&state->bmc_2_videoram[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_2, offset);
 }
@@ -293,7 +293,7 @@ static const UINT16 nvram[]=
 #endif
 static DRIVER_INIT(koftball)
 {
-	koftball_state *state = machine->driver_data<koftball_state>();
+	koftball_state *state = machine.driver_data<koftball_state>();
 	state->bmc_colorram = auto_alloc_array(machine, UINT8, 768);
 
 #if NVRAM_HACK

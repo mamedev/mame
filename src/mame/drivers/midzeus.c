@@ -78,11 +78,11 @@ static TIMER_CALLBACK( invasn_gun_callback );
 
 static MACHINE_START( midzeus )
 {
-	timer[0] = machine->scheduler().timer_alloc(FUNC(NULL));
-	timer[1] = machine->scheduler().timer_alloc(FUNC(NULL));
+	timer[0] = machine.scheduler().timer_alloc(FUNC(NULL));
+	timer[1] = machine.scheduler().timer_alloc(FUNC(NULL));
 
-	gun_timer[0] = machine->scheduler().timer_alloc(FUNC(invasn_gun_callback));
-	gun_timer[1] = machine->scheduler().timer_alloc(FUNC(invasn_gun_callback));
+	gun_timer[0] = machine.scheduler().timer_alloc(FUNC(invasn_gun_callback));
+	gun_timer[1] = machine.scheduler().timer_alloc(FUNC(invasn_gun_callback));
 
 	state_save_register_global(machine, gun_control);
 	state_save_register_global(machine, gun_irq_state);
@@ -95,9 +95,9 @@ static MACHINE_START( midzeus )
 
 static MACHINE_RESET( midzeus )
 {
-	memcpy(ram_base, machine->region("user1")->base(), 0x40000*4);
+	memcpy(ram_base, machine.region("user1")->base(), 0x40000*4);
 	*ram_base <<= 1;
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 
 	cmos_protected = TRUE;
 }
@@ -118,7 +118,7 @@ static TIMER_CALLBACK( display_irq_off )
 static INTERRUPT_GEN( display_irq )
 {
 	device_set_input_line(device, 0, ASSERT_LINE);
-	device->machine->scheduler().timer_set(attotime::from_hz(30000000), FUNC(display_irq_off));
+	device->machine().scheduler().timer_set(attotime::from_hz(30000000), FUNC(display_irq_off));
 }
 
 
@@ -131,7 +131,7 @@ static INTERRUPT_GEN( display_irq )
 
 static WRITE32_HANDLER( cmos_w )
 {
-	midzeus_state *state = space->machine->driver_data<midzeus_state>();
+	midzeus_state *state = space->machine().driver_data<midzeus_state>();
 	if (bitlatch[2] && !cmos_protected)
 		COMBINE_DATA(&state->m_nvram[offset]);
 	else
@@ -142,7 +142,7 @@ static WRITE32_HANDLER( cmos_w )
 
 static READ32_HANDLER( cmos_r )
 {
-	midzeus_state *state = space->machine->driver_data<midzeus_state>();
+	midzeus_state *state = space->machine().driver_data<midzeus_state>();
 	return state->m_nvram[offset] | 0xffffff00;
 }
 
@@ -172,21 +172,21 @@ static WRITE32_DEVICE_HANDLER( zeus2_timekeeper_w )
 	if (bitlatch[2] && !cmos_protected)
 		timekeeper_w(device, offset, data);
 	else
-		logerror("%s:zeus2_timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", device->machine->describe_context(), bitlatch[2], cmos_protected);
+		logerror("%s:zeus2_timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", device->machine().describe_context(), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;
 }
 
 
 static READ32_HANDLER( zpram_r )
 {
-	midzeus_state *state = space->machine->driver_data<midzeus_state>();
+	midzeus_state *state = space->machine().driver_data<midzeus_state>();
 	return state->m_nvram[offset] | 0xffffff00;
 }
 
 
 static WRITE32_HANDLER( zpram_w )
 {
-	midzeus_state *state = space->machine->driver_data<midzeus_state>();
+	midzeus_state *state = space->machine().driver_data<midzeus_state>();
 	if (bitlatch[2])
 		COMBINE_DATA(&state->m_nvram[offset]);
 	else
@@ -275,7 +275,7 @@ static WRITE32_HANDLER( bitlatches_w )
 
 		/* ROM bank selection on Zeus 2 */
 		case 5:
-			memory_set_bank(space->machine, "bank1", bitlatch[offset] & 3);
+			memory_set_bank(space->machine(), "bank1", bitlatch[offset] & 3);
 			break;
 
 		/* unknown purpose; crusnexo/thegrid write 1 at startup */
@@ -432,7 +432,7 @@ static CUSTOM_INPUT( custom_49way_r )
 	static const UINT8 translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
 	const char *namex = (const char *)param;
 	const char *namey = namex + strlen(namex) + 1;
-	return (translate49[input_port_read(field->port->machine, namey) >> 4] << 4) | translate49[input_port_read(field->port->machine, namex) >> 4];
+	return (translate49[input_port_read(field->port->machine(), namey) >> 4] << 4) | translate49[input_port_read(field->port->machine(), namex) >> 4];
 }
 
 
@@ -445,7 +445,7 @@ static WRITE32_HANDLER( keypad_select_w )
 
 static CUSTOM_INPUT( keypad_r )
 {
-	UINT32 bits = input_port_read(field->port->machine, (const char *)param);
+	UINT32 bits = input_port_read(field->port->machine(), (const char *)param);
 	UINT8 select = keypad_select;
 	while ((select & 1) != 0)
 	{
@@ -468,7 +468,7 @@ static READ32_HANDLER( analog_r )
 	static const char * const tags[] = { "ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3" };
 	if (offset < 8 || offset > 11)
 		logerror("%06X:analog_r(%X)\n", cpu_get_pc(space->cpu), offset);
-	return input_port_read(space->machine, tags[offset & 3]);
+	return input_port_read(space->machine(), tags[offset & 3]);
 }
 
 
@@ -485,7 +485,7 @@ static WRITE32_HANDLER( analog_w )
  *
  *************************************/
 
-static void update_gun_irq(running_machine *machine)
+static void update_gun_irq(running_machine &machine)
 {
 	/* low 2 bits of gun_control seem to enable IRQs */
 	if (gun_irq_state & gun_control & 0x03)
@@ -498,7 +498,7 @@ static void update_gun_irq(running_machine *machine)
 static TIMER_CALLBACK( invasn_gun_callback )
 {
 	int player = param;
-	int beamy = machine->primary_screen->vpos();
+	int beamy = machine.primary_screen->vpos();
 
 	/* set the appropriate IRQ in the internal gun control and update */
 	gun_irq_state |= 0x01 << player;
@@ -506,8 +506,8 @@ static TIMER_CALLBACK( invasn_gun_callback )
 
 	/* generate another interrupt on the next scanline while we are within the BEAM_DY */
 	beamy++;
-	if (beamy <= machine->primary_screen->visible_area().max_y && beamy <= gun_y[player] + BEAM_DY)
-		gun_timer[player]->adjust(machine->primary_screen->time_until_pos(beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
+	if (beamy <= machine.primary_screen->visible_area().max_y && beamy <= gun_y[player] + BEAM_DY)
+		gun_timer[player]->adjust(machine.primary_screen->time_until_pos(beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
 }
 
 
@@ -521,22 +521,22 @@ static WRITE32_HANDLER( invasn_gun_w )
 	/* bits 0-1 enable IRQs (?) */
 	/* bits 2-3 reset IRQ states */
 	gun_irq_state &= ~((gun_control >> 2) & 3);
-	update_gun_irq(space->machine);
+	update_gun_irq(space->machine());
 
 	for (player = 0; player < 2; player++)
 	{
 		UINT8 pmask = 0x04 << player;
 		if (((old_control ^ gun_control) & pmask) != 0 && (gun_control & pmask) == 0)
 		{
-			const rectangle &visarea = space->machine->primary_screen->visible_area();
+			const rectangle &visarea = space->machine().primary_screen->visible_area();
 			static const char *const names[2][2] =
 			{
 				{ "GUNX1", "GUNY1" },
 				{ "GUNX2", "GUNY2" }
 			};
-			gun_x[player] = input_port_read(space->machine, names[player][0]) * (visarea.max_x + 1 - visarea.min_x) / 255 + visarea.min_x + BEAM_XOFFS;
-			gun_y[player] = input_port_read(space->machine, names[player][1]) * (visarea.max_y + 1 - visarea.min_y) / 255 + visarea.min_y;
-			gun_timer[player]->adjust(space->machine->primary_screen->time_until_pos(MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
+			gun_x[player] = input_port_read(space->machine(), names[player][0]) * (visarea.max_x + 1 - visarea.min_x) / 255 + visarea.min_x + BEAM_XOFFS;
+			gun_y[player] = input_port_read(space->machine(), names[player][1]) * (visarea.max_y + 1 - visarea.min_y) / 255 + visarea.min_y;
+			gun_timer[player]->adjust(space->machine().primary_screen->time_until_pos(MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
 		}
 	}
 }
@@ -544,8 +544,8 @@ static WRITE32_HANDLER( invasn_gun_w )
 
 static READ32_HANDLER( invasn_gun_r )
 {
-	int beamx = space->machine->primary_screen->hpos();
-	int beamy = space->machine->primary_screen->vpos();
+	int beamx = space->machine().primary_screen->hpos();
+	int beamy = space->machine().primary_screen->vpos();
 	UINT32 result = 0xffff;
 	int player;
 
@@ -1413,7 +1413,7 @@ static DRIVER_INIT( invasn )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 94, NULL);
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x9c0000, 0x9c0000, FUNC(invasn_gun_r), FUNC(invasn_gun_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x9c0000, 0x9c0000, FUNC(invasn_gun_r), FUNC(invasn_gun_w));
 }
 
 
@@ -1421,10 +1421,10 @@ static DRIVER_INIT( crusnexo )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
-	memory_configure_bank(machine, "bank1", 0, 3, machine->region("user2")->base(), 0x400000*4);
+	memory_configure_bank(machine, "bank1", 0, 3, machine.region("user2")->base(), 0x400000*4);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x9b0004, 0x9b0007, FUNC(crusnexo_leds_r), FUNC(crusnexo_leds_w));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler    (0x8d0009, 0x8d000a, FUNC(keypad_select_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x9b0004, 0x9b0007, FUNC(crusnexo_leds_r), FUNC(crusnexo_leds_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler    (0x8d0009, 0x8d000a, FUNC(keypad_select_w));
 }
 
 
@@ -1432,7 +1432,7 @@ static DRIVER_INIT( thegrid )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 474/* or 491 */, 99, NULL);
-	memory_configure_bank(machine, "bank1", 0, 3, machine->region("user2")->base(), 0x400000*4);
+	memory_configure_bank(machine, "bank1", 0, 3, machine.region("user2")->base(), 0x400000*4);
 }
 
 

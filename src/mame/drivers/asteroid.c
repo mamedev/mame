@@ -204,7 +204,7 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 
 static WRITE8_HANDLER( astdelux_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset,data);
+	coin_counter_w(space->machine(), offset,data);
 }
 
 
@@ -308,7 +308,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( clock_r )
 {
-	return (field->port->machine->device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
+	return (field->port->machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
 }
 
 static INPUT_PORTS_START( asteroid )
@@ -921,14 +921,14 @@ ROM_END
 
 static DRIVER_INIT( asteroidb )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2000, 0x2000, "IN0");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2003, 0x2003, "HS");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2000, 0x2000, "IN0");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2003, 0x2003, "HS");
 }
 
 
 static DRIVER_INIT( asterock )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2000, 0x2007, FUNC(asterock_IN0_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2000, 0x2007, FUNC(asterock_IN0_r));
 }
 
 

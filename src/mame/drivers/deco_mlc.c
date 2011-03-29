@@ -110,9 +110,9 @@
 static READ32_HANDLER(test2_r)
 {
 //  if (offset==0)
-//      return input_port_read(space->machine, "IN0"); //0xffffffff;
+//      return input_port_read(space->machine(), "IN0"); //0xffffffff;
 //   logerror("%08x:  Test2_r %d\n",cpu_get_pc(space->cpu),offset);
-	return space->machine->rand(); //0xffffffff;
+	return space->machine().rand(); //0xffffffff;
 }
 
 static READ32_HANDLER(test3_r)
@@ -122,7 +122,7 @@ static READ32_HANDLER(test3_r)
 
 */
 //if (offset==0)
-//  return space->machine->rand()|(space->machine->rand()<<16);
+//  return space->machine().rand()|(space->machine().rand()<<16);
 //  logerror("%08x:  Test3_r %d\n",cpu_get_pc(space->cpu),offset);
 	return 0xffffffff;
 }
@@ -141,19 +141,19 @@ static WRITE32_DEVICE_HANDLER( avengrs_eprom_w )
 		//volume control todo
 	}
 	else
-		logerror("%s:  eprom_w %08x mask %08x\n",device->machine->describe_context(),data,mem_mask);
+		logerror("%s:  eprom_w %08x mask %08x\n",device->machine().describe_context(),data,mem_mask);
 }
 
 static WRITE32_HANDLER( avengrs_palette_w )
 {
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
 	/* x bbbbb ggggg rrrrr */
-	palette_set_color_rgb(space->machine,offset,pal5bit(space->machine->generic.paletteram.u32[offset] >> 0),pal5bit(space->machine->generic.paletteram.u32[offset] >> 5),pal5bit(space->machine->generic.paletteram.u32[offset] >> 10));
+	palette_set_color_rgb(space->machine(),offset,pal5bit(space->machine().generic.paletteram.u32[offset] >> 0),pal5bit(space->machine().generic.paletteram.u32[offset] >> 5),pal5bit(space->machine().generic.paletteram.u32[offset] >> 10));
 }
 
 static READ32_HANDLER( decomlc_vbl_r )
 {
-	deco_mlc_state *state = space->machine->driver_data<deco_mlc_state>();
+	deco_mlc_state *state = space->machine().driver_data<deco_mlc_state>();
 	state->vbl_i ^=0xffffffff;
 //logerror("vbl r %08x\n", cpu_get_pc(space->cpu));
 	// Todo: Vblank probably in $10
@@ -162,31 +162,31 @@ static READ32_HANDLER( decomlc_vbl_r )
 
 static READ32_HANDLER( mlc_scanline_r )
 {
-//  logerror("read scanline counter (%d)\n", space->machine->primary_screen->vpos());
-	return space->machine->primary_screen->vpos();
+//  logerror("read scanline counter (%d)\n", space->machine().primary_screen->vpos());
+	return space->machine().primary_screen->vpos();
 }
 
 static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
-	deco_mlc_state *state = timer.machine->driver_data<deco_mlc_state>();
-//  logerror("hit scanline IRQ %d (%08x)\n", machine->primary_screen->vpos(), info.i);
-	cputag_set_input_line(timer.machine, "maincpu", state->mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
+	deco_mlc_state *state = timer.machine().driver_data<deco_mlc_state>();
+//  logerror("hit scanline IRQ %d (%08x)\n", machine.primary_screen->vpos(), info.i);
+	cputag_set_input_line(timer.machine(), "maincpu", state->mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
 }
 
 static WRITE32_HANDLER( mlc_irq_w )
 {
-	deco_mlc_state *state = space->machine->driver_data<deco_mlc_state>();
-	int scanline=space->machine->primary_screen->vpos();
+	deco_mlc_state *state = space->machine().driver_data<deco_mlc_state>();
+	int scanline=space->machine().primary_screen->vpos();
 	state->irq_ram[offset]=data&0xffff;
 
 	switch (offset*4)
 	{
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
-		cputag_set_input_line(space->machine, "maincpu", state->mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", state->mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
 	case 0x14: /* Prepare scanline interrupt */
-		state->raster_irq_timer->adjust(space->machine->primary_screen->time_until_pos(state->irq_ram[0x14/4]));
-		//logerror("prepare scanline to fire at %d (currently on %d)\n", state->irq_ram[0x14/4], space->machine->primary_screen->vpos());
+		state->raster_irq_timer->adjust(space->machine().primary_screen->time_until_pos(state->irq_ram[0x14/4]));
+		//logerror("prepare scanline to fire at %d (currently on %d)\n", state->irq_ram[0x14/4], space->machine().primary_screen->vpos());
 		return;
 	case 0x18:
 	case 0x1c:
@@ -222,13 +222,13 @@ static WRITE32_HANDLER( mlc_irq_w )
 
 static READ32_HANDLER(mlc_spriteram_r)
 {
-	deco_mlc_state *state = space->machine->driver_data<deco_mlc_state>();
+	deco_mlc_state *state = space->machine().driver_data<deco_mlc_state>();
 	return state->spriteram[offset]&0xffff;
 }
 
 static READ32_HANDLER(mlc_vram_r)
 {
-	deco_mlc_state *state = space->machine->driver_data<deco_mlc_state>();
+	deco_mlc_state *state = space->machine().driver_data<deco_mlc_state>();
 	return state->mlc_vram[offset]&0xffff;
 }
 
@@ -373,9 +373,9 @@ GFXDECODE_END
 
 static MACHINE_RESET( mlc )
 {
-	deco_mlc_state *state = machine->driver_data<deco_mlc_state>();
+	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
 	state->vbl_i = 0xffffffff;
-	state->raster_irq_timer = machine->device<timer_device>("int_timer");
+	state->raster_irq_timer = machine.device<timer_device>("int_timer");
 }
 
 static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
@@ -695,11 +695,11 @@ ROM_END
 
 /***************************************************************************/
 
-static void descramble_sound( running_machine *machine )
+static void descramble_sound( running_machine &machine )
 {
 	/* the same as simpl156 / heavy smash? */
-	UINT8 *rom = machine->region("ymz")->base();
-	int length = machine->region("ymz")->bytes();
+	UINT8 *rom = machine.region("ymz")->base();
+	int length = machine.region("ymz")->bytes();
 	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
 
 	UINT32 x;
@@ -725,7 +725,7 @@ static void descramble_sound( running_machine *machine )
 
 static READ32_HANDLER( avengrgs_speedup_r )
 {
-	deco_mlc_state *state = space->machine->driver_data<deco_mlc_state>();
+	deco_mlc_state *state = space->machine().driver_data<deco_mlc_state>();
 	UINT32 a=state->mlc_ram[0x89a0/4];
 	UINT32 p=cpu_get_pc(space->cpu);
 
@@ -736,26 +736,26 @@ static READ32_HANDLER( avengrgs_speedup_r )
 
 static DRIVER_INIT( avengrgs )
 {
-	deco_mlc_state *state = machine->driver_data<deco_mlc_state>();
+	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
 	// init options
-	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 
 	// set up speed cheat
-	sh2drc_add_pcflush(machine->device("maincpu"), 0x3234);
-	sh2drc_add_pcflush(machine->device("maincpu"), 0x32dc);
+	sh2drc_add_pcflush(machine.device("maincpu"), 0x3234);
+	sh2drc_add_pcflush(machine.device("maincpu"), 0x32dc);
 
 	state->mainCpuIsArm = 0;
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01089a0, 0x01089a3, FUNC(avengrgs_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01089a0, 0x01089a3, FUNC(avengrgs_speedup_r) );
 	descramble_sound(machine);
 }
 
 static DRIVER_INIT( mlc )
 {
-	deco_mlc_state *state = machine->driver_data<deco_mlc_state>();
+	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
 	/* The timing in the ARM core isn't as accurate as it should be, so bump up the
         effective clock rate here to compensate otherwise we have slowdowns in
         Skull Fung where there probably shouldn't be. */
-	machine->device("maincpu")->set_clock_scale(2.0f);
+	machine.device("maincpu")->set_clock_scale(2.0f);
 	state->mainCpuIsArm = 1;
 	deco156_decrypt(machine);
 	descramble_sound(machine);

@@ -18,7 +18,7 @@
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	atarig1_state *state = machine->driver_data<atarig1_state>();
+	atarig1_state *state = machine.driver_data<atarig1_state>();
 	UINT16 data = state->alpha[tile_index];
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	atarig1_state *state = machine->driver_data<atarig1_state>();
+	atarig1_state *state = machine.driver_data<atarig1_state>();
 	UINT16 data = state->playfield[tile_index];
 	int code = (state->playfield_tile_bank << 12) | (data & 0xfff);
 	int color = (data >> 12) & 7;
@@ -46,7 +46,7 @@ static TILE_GET_INFO( get_playfield_tile_info )
 
 VIDEO_START( atarig1 )
 {
-	atarig1_state *state = machine->driver_data<atarig1_state>();
+	atarig1_state *state = machine.driver_data<atarig1_state>();
 
 	/* blend the playfields and free the temporary one */
 	atarigen_blend_gfx(machine, 0, 2, 0x0f, 0x10);
@@ -55,7 +55,7 @@ VIDEO_START( atarig1 )
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 64,64);
 
 	/* initialize the motion objects */
-	state->rle = machine->device("rle");
+	state->rle = machine.device("rle");
 
 	/* initialize the alphanumerics */
 	state->alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
@@ -81,9 +81,9 @@ VIDEO_START( atarig1 )
 
 WRITE16_HANDLER( atarig1_mo_control_w )
 {
-	atarig1_state *state = space->machine->driver_data<atarig1_state>();
+	atarig1_state *state = space->machine().driver_data<atarig1_state>();
 
-	logerror("MOCONT = %d (scan = %d)\n", data, space->machine->primary_screen->vpos());
+	logerror("MOCONT = %d (scan = %d)\n", data, space->machine().primary_screen->vpos());
 
 	/* set the control value */
 	COMBINE_DATA(&state->current_control);
@@ -92,7 +92,7 @@ WRITE16_HANDLER( atarig1_mo_control_w )
 
 void atarig1_scanline_update(screen_device &screen, int scanline)
 {
-	atarig1_state *state = screen.machine->driver_data<atarig1_state>();
+	atarig1_state *state = screen.machine().driver_data<atarig1_state>();
 	UINT16 *base = &state->alpha[(scanline / 8) * 64 + 48];
 	int i;
 
@@ -153,7 +153,7 @@ void atarig1_scanline_update(screen_device &screen, int scanline)
 
 SCREEN_UPDATE( atarig1 )
 {
-	atarig1_state *state = screen->machine->driver_data<atarig1_state>();
+	atarig1_state *state = screen->machine().driver_data<atarig1_state>();
 
 	/* draw the playfield */
 	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 0, 0);
@@ -168,7 +168,7 @@ SCREEN_UPDATE( atarig1 )
 
 SCREEN_EOF( atarig1 )
 {
-	atarig1_state *state = machine->driver_data<atarig1_state>();
+	atarig1_state *state = machine.driver_data<atarig1_state>();
 
 	atarirle_eof(state->rle);
 }

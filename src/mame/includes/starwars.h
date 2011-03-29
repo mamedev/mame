@@ -52,8 +52,8 @@ CUSTOM_INPUT( matrix_flag_r );
 READ8_HANDLER( starwars_adc_r );
 WRITE8_HANDLER( starwars_adc_select_w );
 
-void starwars_mproc_init(running_machine *machine);
-void starwars_mproc_reset(running_machine *machine);
+void starwars_mproc_init(running_machine &machine);
+void starwars_mproc_reset(running_machine &machine);
 
 READ8_HANDLER( starwars_prng_r );
 READ8_HANDLER( starwars_div_reh_r );

@@ -58,6 +58,6 @@
 void debugwin_init_windows(running_machine &machine);
 void debugwin_destroy_windows(void);
 void debugwin_show(int type);
-void debugwin_update_during_game(running_machine *machine);
+void debugwin_update_during_game(running_machine &machine);
 
 #endif

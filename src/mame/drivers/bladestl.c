@@ -38,7 +38,7 @@
 
 static INTERRUPT_GEN( bladestl_interrupt )
 {
-	bladestl_state *state = device->machine->driver_data<bladestl_state>();
+	bladestl_state *state = device->machine().driver_data<bladestl_state>();
 
 	if (cpu_getiloops(device) == 0)
 	{
@@ -59,11 +59,11 @@ static INTERRUPT_GEN( bladestl_interrupt )
 
 static READ8_HANDLER( trackball_r )
 {
-	bladestl_state *state = space->machine->driver_data<bladestl_state>();
+	bladestl_state *state = space->machine().driver_data<bladestl_state>();
 	static const char *const port[] = { "TRACKBALL_P1_1", "TRACKBALL_P1_2", "TRACKBALL_P2_1", "TRACKBALL_P1_2" };
 	int curr, delta;
 
-	curr = input_port_read(space->machine, port[offset]);
+	curr = input_port_read(space->machine(), port[offset]);
 	delta = (curr - state->last_track[offset]) & 0xff;
 	state->last_track[offset] = curr;
 
@@ -72,20 +72,20 @@ static READ8_HANDLER( trackball_r )
 
 static WRITE8_HANDLER( bladestl_bankswitch_w )
 {
-	bladestl_state *state = space->machine->driver_data<bladestl_state>();
+	bladestl_state *state = space->machine().driver_data<bladestl_state>();
 
 	/* bits 0 & 1 = coin counters */
-	coin_counter_w(space->machine, 0,data & 0x01);
-	coin_counter_w(space->machine, 1,data & 0x02);
+	coin_counter_w(space->machine(), 0,data & 0x01);
+	coin_counter_w(space->machine(), 1,data & 0x02);
 
 	/* bits 2 & 3 = lamps */
-	set_led_status(space->machine, 0,data & 0x04);
-	set_led_status(space->machine, 1,data & 0x08);
+	set_led_status(space->machine(), 0,data & 0x04);
+	set_led_status(space->machine(), 1,data & 0x08);
 
 	/* bit 4 = relay (???) */
 
 	/* bits 5-6 = bank number */
-	memory_set_bank(space->machine, "bank1", (data & 0x60) >> 5);
+	memory_set_bank(space->machine(), "bank1", (data & 0x60) >> 5);
 
 	/* bit 7 = select sprite bank */
 	state->spritebank = (data & 0x80) << 3;
@@ -94,7 +94,7 @@ static WRITE8_HANDLER( bladestl_bankswitch_w )
 
 static WRITE8_HANDLER( bladestl_sh_irqtrigger_w )
 {
-	bladestl_state *state = space->machine->driver_data<bladestl_state>();
+	bladestl_state *state = space->machine().driver_data<bladestl_state>();
 
 	soundlatch_w(space, offset, data);
 	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
@@ -306,14 +306,14 @@ static const k007420_interface bladestl_k007420_intf =
 
 static MACHINE_START( bladestl )
 {
-	bladestl_state *state = machine->driver_data<bladestl_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	bladestl_state *state = machine.driver_data<bladestl_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
 
-	state->audiocpu = machine->device("audiocpu");
-	state->k007342 = machine->device("k007342");
-	state->k007420 = machine->device("k007420");
+	state->audiocpu = machine.device("audiocpu");
+	state->k007342 = machine.device("k007342");
+	state->k007420 = machine.device("k007420");
 
 	state->save_item(NAME(state->spritebank));
 	state->save_item(NAME(state->layer_colorbase));
@@ -322,7 +322,7 @@ static MACHINE_START( bladestl )
 
 static MACHINE_RESET( bladestl )
 {
-	bladestl_state *state = machine->driver_data<bladestl_state>();
+	bladestl_state *state = machine.driver_data<bladestl_state>();
 	int i;
 
 	state->layer_colorbase[0] = 0;

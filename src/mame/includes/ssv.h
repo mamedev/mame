@@ -57,7 +57,7 @@ READ16_HANDLER( ssv_vblank_r );
 WRITE16_HANDLER( ssv_scroll_w );
 WRITE16_HANDLER( paletteram16_xrgb_swap_word_w );
 WRITE16_HANDLER( gdfs_tmapram_w );
-void ssv_enable_video(running_machine *machine, int enable);
+void ssv_enable_video(running_machine &machine, int enable);
 
 VIDEO_START( ssv );
 VIDEO_START( eaglshot );

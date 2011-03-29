@@ -43,14 +43,14 @@ Notes:
 
 static READ8_HANDLER( trvquest_question_r )
 {
-	gameplan_state *state = space->machine->driver_data<gameplan_state>();
+	gameplan_state *state = space->machine().driver_data<gameplan_state>();
 
-	return space->machine->region("questions")->base()[*state->trvquest_question * 0x2000 + offset];
+	return space->machine().region("questions")->base()[*state->trvquest_question * 0x2000 + offset];
 }
 
 static WRITE8_DEVICE_HANDLER( trvquest_coin_w )
 {
-	coin_counter_w(device->machine, 0, ~data & 1);
+	coin_counter_w(device->machine(), 0, ~data & 1);
 }
 
 static WRITE8_DEVICE_HANDLER( trvquest_misc_w )
@@ -149,7 +149,7 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( via_irq_delayed )
 {
-	gameplan_state *state = machine->driver_data<gameplan_state>();
+	gameplan_state *state = machine.driver_data<gameplan_state>();
 	device_set_input_line(state->maincpu, 0, param);
 }
 
@@ -160,7 +160,7 @@ static void via_irq( device_t *device, int state )
 	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
        cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
        leave time for the program to see the flag change. */
-	device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(via_irq_delayed), state);
+	device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(via_irq_delayed), state);
 }
 
 
@@ -185,9 +185,9 @@ static const via6522_interface via_2_interface =
 
 static MACHINE_START( trvquest )
 {
-	gameplan_state *state = machine->driver_data<gameplan_state>();
+	gameplan_state *state = machine.driver_data<gameplan_state>();
 
-	state->maincpu = machine->device("maincpu");
+	state->maincpu = machine.device("maincpu");
 
 	/* register for save states */
 	state->save_item(NAME(state->video_x));
@@ -198,7 +198,7 @@ static MACHINE_START( trvquest )
 
 static MACHINE_RESET( trvquest )
 {
-	gameplan_state *state = machine->driver_data<gameplan_state>();
+	gameplan_state *state = machine.driver_data<gameplan_state>();
 
 	state->video_x = 0;
 	state->video_y = 0;
@@ -208,7 +208,7 @@ static MACHINE_RESET( trvquest )
 
 static INTERRUPT_GEN( trvquest_interrupt )
 {
-	gameplan_state *state = device->machine->driver_data<gameplan_state>();
+	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 	state->via_2->write_ca1(1);
 	state->via_2->write_ca1(0);
 }

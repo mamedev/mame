@@ -41,6 +41,6 @@ INTERRUPT_GEN( ajax_interrupt );
 VIDEO_START( ajax );
 SCREEN_UPDATE( ajax );
 
-extern void ajax_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void ajax_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
-extern void ajax_zoom_callback(running_machine *machine, int *code,int *color,int *flags);
+extern void ajax_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void ajax_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
+extern void ajax_zoom_callback(running_machine &machine, int *code,int *color,int *flags);

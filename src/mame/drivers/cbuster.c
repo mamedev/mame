@@ -28,7 +28,7 @@
 
 static WRITE16_HANDLER( twocrude_control_w )
 {
-	cbuster_state *state = space->machine->driver_data<cbuster_state>();
+	cbuster_state *state = space->machine().driver_data<cbuster_state>();
 
 	switch (offset << 1)
 	{
@@ -81,22 +81,22 @@ static WRITE16_HANDLER( twocrude_control_w )
 
 static READ16_HANDLER( twocrude_control_r )
 {
-	cbuster_state *state = space->machine->driver_data<cbuster_state>();
+	cbuster_state *state = space->machine().driver_data<cbuster_state>();
 
 	switch (offset << 1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(space->machine, "P1_P2");
+			return input_port_read(space->machine(), "P1_P2");
 
 		case 2: /* Dip Switches */
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 
 		case 4: /* Protection */
 			logerror("%04x : protection control read at 30c000 %d\n", cpu_get_pc(space->cpu), offset);
 			return state->prot;
 
 		case 6: /* Credits, VBL in byte 7 */
-			return input_port_read(space->machine, "COINS");
+			return input_port_read(space->machine(), "COINS");
 	}
 
 	return ~0;
@@ -266,7 +266,7 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int state)
 {
-	cbuster_state *driver_state = device->machine->driver_data<cbuster_state>();
+	cbuster_state *driver_state = device->machine().driver_data<cbuster_state>();
 	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
@@ -306,12 +306,12 @@ static const deco16ic_interface twocrude_deco16ic_tilegen2_intf =
 
 static MACHINE_START( cbuster )
 {
-	cbuster_state *state = machine->driver_data<cbuster_state>();
+	cbuster_state *state = machine.driver_data<cbuster_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->deco_tilegen1 = machine->device("tilegen1");
-	state->deco_tilegen2 = machine->device("tilegen2");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->deco_tilegen1 = machine.device("tilegen1");
+	state->deco_tilegen2 = machine.device("tilegen2");
 
 	state->save_item(NAME(state->prot));
 	state->save_item(NAME(state->pri));
@@ -319,7 +319,7 @@ static MACHINE_START( cbuster )
 
 static MACHINE_RESET( cbuster )
 {
-	cbuster_state *state = machine->driver_data<cbuster_state>();
+	cbuster_state *state = machine.driver_data<cbuster_state>();
 
 	state->prot = 0;
 	state->pri = 0;
@@ -533,7 +533,7 @@ ROM_END
 
 static DRIVER_INIT( twocrude )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	UINT8 *PTR;
 	int i, j;
 
@@ -550,8 +550,8 @@ static DRIVER_INIT( twocrude )
 	}
 
 	/* Rearrange the 'extra' sprite bank to be in the same format as main sprites */
-	RAM = machine->region("gfx3")->base() + 0x080000;
-	PTR = machine->region("gfx3")->base() + 0x140000;
+	RAM = machine.region("gfx3")->base() + 0x080000;
+	PTR = machine.region("gfx3")->base() + 0x140000;
 	for (i = 0; i < 0x20000; i += 64)
 	{
 		for (j = 0; j < 16; j += 1)

@@ -1744,7 +1744,7 @@ static int OPL_LockTable(device_t *device)
 	{
 		cymfile = fopen("3812_.cym","wb");
 		if (cymfile)
-			device->machine->scheduler().timer_pulse ( attotime::from_hz(110), FUNC(cymfile_callback)); /*110 Hz pulse timer*/
+			device->machine().scheduler().timer_pulse ( attotime::from_hz(110), FUNC(cymfile_callback)); /*110 Hz pulse timer*/
 		else
 			logerror("Could not create file 3812_.cym\n");
 	}
@@ -1957,7 +1957,7 @@ static void OPL_save_state(FM_OPL *OPL, device_t *device)
 	device->save_item(NAME(OPL->statusmask));
 	device->save_item(NAME(OPL->mode));
 
-	device->machine->state().register_postload(OPL_postload, OPL);
+	device->machine().state().register_postload(OPL_postload, OPL);
 }
 
 
@@ -1980,7 +1980,7 @@ static FM_OPL *OPLCreate(device_t *device, UINT32 clock, UINT32 rate, int type)
 #endif
 
 	/* allocate memory block */
-	ptr = (char *)auto_alloc_array_clear(device->machine, UINT8, state_size);
+	ptr = (char *)auto_alloc_array_clear(device->machine(), UINT8, state_size);
 
 	OPL  = (FM_OPL *)ptr;
 
@@ -2009,7 +2009,7 @@ static FM_OPL *OPLCreate(device_t *device, UINT32 clock, UINT32 rate, int type)
 static void OPLDestroy(FM_OPL *OPL)
 {
 	OPL_UnLockTable();
-	auto_free(OPL->device->machine, OPL);
+	auto_free(OPL->device->machine(), OPL);
 }
 
 /* Optional handlers */

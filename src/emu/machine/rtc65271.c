@@ -236,7 +236,7 @@ static int rtc65271_file_load(device_t *device, emu_file &file)
 		system_time systime;
 
 		/* get the current date/time from the core */
-		device->machine->current_datetime(systime);
+		device->machine().current_datetime(systime);
 
 		/* set clock registers */
 		state->regs[reg_second] = systime.local_time.second;
@@ -522,7 +522,7 @@ static TIMER_CALLBACK( rtc_begin_update_callback )
 		state->regs[reg_A] |= reg_A_UIP;
 
 		/* schedule end of update cycle */
-		device->machine->scheduler().timer_set(UPDATE_CYCLE_TIME, FUNC(rtc_end_update_callback), 0, (void *)device);
+		device->machine().scheduler().timer_set(UPDATE_CYCLE_TIME, FUNC(rtc_end_update_callback), 0, (void *)device);
 	}
 }
 
@@ -688,9 +688,9 @@ static DEVICE_START( rtc65271 )
 	rtc65271_config *config = (rtc65271_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	rtc65271_state *state = get_safe_token(device);
 
-	state->update_timer = device->machine->scheduler().timer_alloc(FUNC(rtc_begin_update_callback), (void *)device);
+	state->update_timer = device->machine().scheduler().timer_alloc(FUNC(rtc_begin_update_callback), (void *)device);
 	state->update_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
-	state->SQW_timer = device->machine->scheduler().timer_alloc(FUNC(rtc_SQW_callback), (void *)device);
+	state->SQW_timer = device->machine().scheduler().timer_alloc(FUNC(rtc_SQW_callback), (void *)device);
 	state->interrupt_callback = config->interrupt_callback;
 
 	device->save_item(NAME(state->regs));

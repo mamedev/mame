@@ -94,13 +94,13 @@ static WRITE8_HANDLER( portrait_ctrl_w )
 {
 	/* bits 4 and 5 are unknown */
 
-	coin_counter_w(space->machine, 0, data & 0x01);
-	coin_counter_w(space->machine, 1, data & 0x02);
-	coin_counter_w(space->machine, 2, data & 0x04);
+	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(space->machine(), 2, data & 0x04);
 
 	/* the 2 lamps near the camera */
-	set_led_status(space->machine, 0, data & 0x08);
-	set_led_status(space->machine, 1, data & 0x40);
+	set_led_status(space->machine(), 0, data & 0x08);
+	set_led_status(space->machine(), 1, data & 0x40);
 
 	/* shows the black and white photo from the camera */
 	output_set_value("photo", (data >> 7) & 1);
@@ -108,13 +108,13 @@ static WRITE8_HANDLER( portrait_ctrl_w )
 
 static WRITE8_HANDLER( portrait_positive_scroll_w )
 {
-	portrait_state *state = space->machine->driver_data<portrait_state>();
+	portrait_state *state = space->machine().driver_data<portrait_state>();
 	state->scroll = data;
 }
 
 static WRITE8_HANDLER( portrait_negative_scroll_w )
 {
-	portrait_state *state = space->machine->driver_data<portrait_state>();
+	portrait_state *state = space->machine().driver_data<portrait_state>();
 	state->scroll = - (data ^ 0xff);
 }
 

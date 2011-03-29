@@ -70,7 +70,7 @@ typedef struct _bitbanger_config bitbanger_config;
 struct _bitbanger_config
 {
 	/* callback to driver */
-	void (*input_callback)(running_machine *machine, UINT8 bit);
+	void (*input_callback)(running_machine &machine, UINT8 bit);
 	int default_mode;					   /* emulating a printer or modem */
 	int default_baud;					   /* output bits per second */
 	int default_tune;                /* fine tune adjustment to the baud */

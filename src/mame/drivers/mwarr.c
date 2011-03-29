@@ -77,7 +77,7 @@ public:
 
 static WRITE16_HANDLER( bg_videoram_w )
 {
-	mwarr_state *state = space->machine->driver_data<mwarr_state>();
+	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
 	COMBINE_DATA(&state->bg_videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
@@ -85,7 +85,7 @@ static WRITE16_HANDLER( bg_videoram_w )
 
 static WRITE16_HANDLER( mlow_videoram_w )
 {
-	mwarr_state *state = space->machine->driver_data<mwarr_state>();
+	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
 	COMBINE_DATA(&state->mlow_videoram[offset]);
 	tilemap_mark_tile_dirty(state->mlow_tilemap,offset);
@@ -93,7 +93,7 @@ static WRITE16_HANDLER( mlow_videoram_w )
 
 static WRITE16_HANDLER( mhigh_videoram_w )
 {
-	mwarr_state *state = space->machine->driver_data<mwarr_state>();
+	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
 	COMBINE_DATA(&state->mhigh_videoram[offset]);
 	tilemap_mark_tile_dirty(state->mhigh_tilemap,offset);
@@ -101,7 +101,7 @@ static WRITE16_HANDLER( mhigh_videoram_w )
 
 static WRITE16_HANDLER( tx_videoram_w )
 {
-	mwarr_state *state = space->machine->driver_data<mwarr_state>();
+	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
 	COMBINE_DATA(&state->tx_videoram[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap,offset);
@@ -114,7 +114,7 @@ static WRITE16_DEVICE_HANDLER( oki1_bank_w )
 
 static WRITE16_HANDLER( sprites_commands_w )
 {
-	mwarr_state *state = space->machine->driver_data<mwarr_state>();
+	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
 	if (state->which)
 	{
@@ -152,7 +152,7 @@ static WRITE16_HANDLER( sprites_commands_w )
 
 static WRITE16_HANDLER( mwarr_brightness_w )
 {
-	mwarr_state *state = space->machine->driver_data<mwarr_state>();
+	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 	int i;
 	double brightness;
 
@@ -161,7 +161,7 @@ static WRITE16_HANDLER( mwarr_brightness_w )
 	brightness = (double)(data & 0xff);
 	for (i = 0; i < 0x800; i++)
 	{
-		palette_set_pen_contrast(space->machine, i, brightness/255);
+		palette_set_pen_contrast(space->machine(), i, brightness/255);
 	}
 }
 
@@ -332,7 +332,7 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	mwarr_state *state = machine->driver_data<mwarr_state>();
+	mwarr_state *state = machine.driver_data<mwarr_state>();
 	int tileno = state->bg_videoram[tile_index] & 0x1fff;
 	int colour = (state->bg_videoram[tile_index] & 0xe000) >> 13;
 
@@ -341,7 +341,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_mlow_tile_info )
 {
-	mwarr_state *state = machine->driver_data<mwarr_state>();
+	mwarr_state *state = machine.driver_data<mwarr_state>();
 	int tileno = state->mlow_videoram[tile_index] & 0x1fff;
 	int colour = (state->mlow_videoram[tile_index] & 0xe000) >> 13;
 
@@ -350,7 +350,7 @@ static TILE_GET_INFO( get_mlow_tile_info )
 
 static TILE_GET_INFO( get_mhigh_tile_info )
 {
-	mwarr_state *state = machine->driver_data<mwarr_state>();
+	mwarr_state *state = machine.driver_data<mwarr_state>();
 	int tileno = state->mhigh_videoram[tile_index] & 0x1fff;
 	int colour = (state->mhigh_videoram[tile_index] & 0xe000) >> 13;
 
@@ -359,7 +359,7 @@ static TILE_GET_INFO( get_mhigh_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	mwarr_state *state = machine->driver_data<mwarr_state>();
+	mwarr_state *state = machine.driver_data<mwarr_state>();
 	int tileno = state->tx_videoram[tile_index] & 0x1fff;
 	int colour = (state->tx_videoram[tile_index] & 0xe000) >> 13;
 
@@ -368,7 +368,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 static VIDEO_START( mwarr )
 {
-	mwarr_state *state = machine->driver_data<mwarr_state>();
+	mwarr_state *state = machine.driver_data<mwarr_state>();
 
 	state->bg_tilemap    = tilemap_create(machine, get_bg_tile_info,    tilemap_scan_cols, 16, 16, 64, 16);
 	state->mlow_tilemap  = tilemap_create(machine, get_mlow_tile_info,  tilemap_scan_cols, 16, 16, 64, 16);
@@ -386,12 +386,12 @@ static VIDEO_START( mwarr )
 	state->save_item(NAME(state->sprites_buffer));
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	mwarr_state *state = machine->driver_data<mwarr_state>();
+	mwarr_state *state = machine.driver_data<mwarr_state>();
 	const UINT16 *source = state->sprites_buffer + 0x800 - 4;
 	const UINT16 *finish = state->sprites_buffer;
-	const gfx_element *gfx = machine->gfx[0];
+	const gfx_element *gfx = machine.gfx[0];
 	int x, y, color, flipx, dy, pri, pri_mask, i;
 
 	while (source >= finish)
@@ -419,7 +419,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 						  color,
 						  flipx,0,
 						  x,y+i*16,
-						  machine->priority_bitmap,pri_mask,0 );
+						  machine.priority_bitmap,pri_mask,0 );
 
 				/* wrap around x */
 				pdrawgfx_transpen( bitmap,
@@ -429,7 +429,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 						  color,
 						  flipx,0,
 						  x-1024,y+i*16,
-						  machine->priority_bitmap,pri_mask,0 );
+						  machine.priority_bitmap,pri_mask,0 );
 
 				/* wrap around y */
 				pdrawgfx_transpen( bitmap,
@@ -439,7 +439,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 						  color,
 						  flipx,0,
 						  x,y-512+i*16,
-						 machine->priority_bitmap,pri_mask,0 );
+						 machine.priority_bitmap,pri_mask,0 );
 
 				/* wrap around x & y */
 				pdrawgfx_transpen( bitmap,
@@ -449,7 +449,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 						  color,
 						  flipx,0,
 						  x-1024,y-512+i*16,
-						  machine->priority_bitmap,pri_mask,0 );
+						  machine.priority_bitmap,pri_mask,0 );
 			}
 		}
 
@@ -459,10 +459,10 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static SCREEN_UPDATE( mwarr )
 {
-	mwarr_state *state = screen->machine->driver_data<mwarr_state>();
+	mwarr_state *state = screen->machine().driver_data<mwarr_state>();
 	int i;
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	if (BIT(state->vidattrram[6], 0))
 	{
@@ -508,7 +508,7 @@ static SCREEN_UPDATE( mwarr )
 	tilemap_draw(bitmap, cliprect, state->mlow_tilemap,  0, 0x02);
 	tilemap_draw(bitmap, cliprect, state->mhigh_tilemap, 0, 0x04);
 	tilemap_draw(bitmap, cliprect, state->tx_tilemap,    0, 0x10);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -520,14 +520,14 @@ static SCREEN_UPDATE( mwarr )
 
 static MACHINE_START( mwarr )
 {
-	mwarr_state *state = machine->driver_data<mwarr_state>();
+	mwarr_state *state = machine.driver_data<mwarr_state>();
 
 	state->save_item(NAME(state->which));
 }
 
 static MACHINE_RESET( mwarr )
 {
-	mwarr_state *state = machine->driver_data<mwarr_state>();
+	mwarr_state *state = machine.driver_data<mwarr_state>();
 
 	state->which = 0;
 }

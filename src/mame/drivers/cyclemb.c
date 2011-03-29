@@ -123,10 +123,10 @@ static VIDEO_START( cyclemb )
 
 static SCREEN_UPDATE( cyclemb )
 {
-	cyclemb_state *state = screen->machine->driver_data<cyclemb_state>();
+	cyclemb_state *state = screen->machine().driver_data<cyclemb_state>();
 	int x,y,count;
-	const gfx_element *gfx = screen->machine->gfx[0];
-	UINT8 flip_screen = flip_screen_get(screen->machine);
+	const gfx_element *gfx = screen->machine().gfx[0];
+	UINT8 flip_screen = flip_screen_get(screen->machine());
 
 	count = 0;
 
@@ -208,7 +208,7 @@ static SCREEN_UPDATE( cyclemb )
 				fx = !fx;
 				fy = !fy;
 			}
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[region],spr_offs,col,fx,fy,x,y,0);
+			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[region],spr_offs,col,fx,fy,x,y,0);
 		}
 	}
 
@@ -217,14 +217,14 @@ static SCREEN_UPDATE( cyclemb )
 
 static WRITE8_HANDLER( cyclemb_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 3);
+	memory_set_bank(space->machine(), "bank1", data & 3);
 }
 
 #if 0
 static WRITE8_HANDLER( sound_cmd_w )
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 }
 #endif
 
@@ -238,13 +238,13 @@ static READ8_HANDLER( mcu_status_r )
 static WRITE8_HANDLER( sound_cmd_w ) //actually ciom
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 }
 #endif
 
 static WRITE8_HANDLER( cyclemb_flip_w )
 {
-	flip_screen_set(space->machine, data & 1);
+	flip_screen_set(space->machine(), data & 1);
 
 	// a bunch of other things are setted here
 }
@@ -604,7 +604,7 @@ ROM_END
 
 static DRIVER_INIT( cyclemb )
 {
-	memory_configure_bank(machine, "bank1", 0, 4, machine->region("maincpu")->base() + 0x10000, 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine.region("maincpu")->base() + 0x10000, 0x1000);
 }
 
 GAME( 1984, cyclemb,  0,   cyclemb,  cyclemb,  cyclemb, ROT0, "Taito Corporation", "Cycle Mahbou (Japan)", GAME_NOT_WORKING )

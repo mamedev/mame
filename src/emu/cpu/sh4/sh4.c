@@ -845,7 +845,7 @@ INLINE void LDCSR(sh4_state *sh4, UINT32 m)
 UINT32 reg;
 
 	reg = sh4->r[m];
-	if ((sh4->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((sh4->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		sh4_syncronize_register_bank(sh4, (sh4->sr & sRB) >> 29);
 	if ((sh4->r[m] & sRB) != (sh4->sr & sRB))
 		sh4_change_register_bank(sh4, sh4->r[m] & sRB ? 1 : 0);
@@ -873,7 +873,7 @@ UINT32 old;
 	old = sh4->sr;
 	sh4->ea = sh4->r[m];
 	sh4->sr = RL(sh4, sh4->ea ) & FLAGS;
-	if ((sh4->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((sh4->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		sh4_syncronize_register_bank(sh4, (old & sRB) >> 29);
 	if ((old & sRB) != (sh4->sr & sRB))
 		sh4_change_register_bank(sh4, sh4->sr & sRB ? 1 : 0);
@@ -1459,7 +1459,7 @@ INLINE void RTE(sh4_state *sh4)
 {
 	sh4->delay = sh4->pc;
 	sh4->pc = sh4->ea = sh4->spc;
-	if ((sh4->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((sh4->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		sh4_syncronize_register_bank(sh4, (sh4->sr & sRB) >> 29);
 	if ((sh4->ssr & sRB) != (sh4->sr & sRB))
 		sh4_change_register_bank(sh4, sh4->ssr & sRB ? 1 : 0);
@@ -1750,7 +1750,7 @@ INLINE void TRAPA(sh4_state *sh4, UINT32 i)
 	sh4->sgr = sh4->r[15];
 
 	sh4->sr |= MD;
-	if ((sh4->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((sh4->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		sh4_syncronize_register_bank(sh4, (sh4->sr & sRB) >> 29);
 	if (!(sh4->sr & sRB))
 		sh4_change_register_bank(sh4, 1);
@@ -3196,7 +3196,7 @@ INLINE void op1111(sh4_state *sh4, UINT16 opcode)
 									FRCHG(sh4);
 									break;
 								default:
-									debugger_break(sh4->device->machine);
+									debugger_break(sh4->device->machine());
 									break;
 							}
 						} else {
@@ -3207,7 +3207,7 @@ INLINE void op1111(sh4_state *sh4, UINT16 opcode)
 					}
 					break;
 				default:
-					debugger_break(sh4->device->machine);
+					debugger_break(sh4->device->machine());
 					break;
 			}
 			break;
@@ -3215,7 +3215,7 @@ INLINE void op1111(sh4_state *sh4, UINT16 opcode)
 			FMAC(sh4, Rm,Rn);
 			break;
 		default:
-			debugger_break(sh4->device->machine);
+			debugger_break(sh4->device->machine());
 			break;
 	}
 }

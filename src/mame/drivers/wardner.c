@@ -145,14 +145,14 @@ public:
 
 static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 {
-	wardner_state *state = space->machine->driver_data<wardner_state>();
+	wardner_state *state = space->machine().driver_data<wardner_state>();
 	if (state->wardner_membank != data) {
 		int bankaddress = 0;
 
 		address_space *mainspace;
-		UINT8 *RAM = space->machine->region("maincpu")->base();
+		UINT8 *RAM = space->machine().region("maincpu")->base();
 
-		mainspace = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
+		mainspace = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 		state->wardner_membank = data;
 
 		if (data)
@@ -169,7 +169,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 				case 6:  bankaddress = 0x30000; break; /* not used */
 				default: bankaddress = 0x00000; break; /* not used */
 			}
-			memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
+			memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);
 		}
 		else
 		{
@@ -177,18 +177,18 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 			mainspace->install_read_bank(0xa000, 0xadff, "bank4");
 			mainspace->install_read_bank(0xae00, 0xafff, "bank2");
 			mainspace->install_read_bank(0xc000, 0xc7ff, "bank3");
-			memory_set_bankptr(space->machine, "bank1", &RAM[0x0000]);
-			memory_set_bankptr(space->machine, "bank2", state->rambase_ae00);
-			memory_set_bankptr(space->machine, "bank3", state->rambase_c000);
-			memory_set_bankptr(space->machine, "bank4", space->machine->generic.paletteram.v);
+			memory_set_bankptr(space->machine(), "bank1", &RAM[0x0000]);
+			memory_set_bankptr(space->machine(), "bank2", state->rambase_ae00);
+			memory_set_bankptr(space->machine(), "bank3", state->rambase_c000);
+			memory_set_bankptr(space->machine(), "bank4", space->machine().generic.paletteram.v);
 		}
 	}
 }
 
 STATE_POSTLOAD( wardner_restore_bank )
 {
-	wardner_state *state = machine->driver_data<wardner_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	wardner_state *state = machine.driver_data<wardner_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	wardner_ramrom_bank_sw(space,0,1);	/* Dummy value to ensure restoration */
 	wardner_ramrom_bank_sw(space,0,state->wardner_membank);
@@ -383,7 +383,7 @@ static const gfx_layout spritelayout =
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

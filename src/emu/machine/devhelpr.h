@@ -47,7 +47,7 @@
 	{ return global_alloc(devname##_device_config(mconfig, tag, owner, clock)); } \
 	\
 	device_t *devname##_device_config::alloc_device(running_machine &machine) const \
-	{ return auto_alloc(&machine, devname##_device(machine, *this)); }
+	{ return auto_alloc(machine, devname##_device(machine, *this)); }
 
 #define GENERIC_DEVICE_DERIVED_CONFIG(basename, devname) \
 	class devname##_device_config : public basename##_device_config \

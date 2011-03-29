@@ -49,7 +49,7 @@ public:
 
 static TILE_GET_INFO( get_tile_info )
 {
-	suprgolf_state *state = machine->driver_data<suprgolf_state>();
+	suprgolf_state *state = machine.driver_data<suprgolf_state>();
 	int code = state->videoram[tile_index*2]+256*(state->videoram[tile_index*2+1]);
 	int color = state->videoram[tile_index*2+0x800] & 0x7f;
 
@@ -62,7 +62,7 @@ static TILE_GET_INFO( get_tile_info )
 
 static VIDEO_START( suprgolf )
 {
-	suprgolf_state *state = machine->driver_data<suprgolf_state>();
+	suprgolf_state *state = machine.driver_data<suprgolf_state>();
 
 	state->tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
 	state->paletteram = auto_alloc_array(machine, UINT8, 0x1000);
@@ -75,9 +75,9 @@ static VIDEO_START( suprgolf )
 
 static SCREEN_UPDATE( suprgolf )
 {
-	suprgolf_state *state = screen->machine->driver_data<suprgolf_state>();
+	suprgolf_state *state = screen->machine().driver_data<suprgolf_state>();
 	int x,y,count,color;
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	{
 		count = 0;
@@ -89,7 +89,7 @@ static SCREEN_UPDATE( suprgolf )
 				color = state->bg_fb[count];
 
 				if(x <= cliprect->max_x && y <= cliprect->max_y)
-					*BITMAP_ADDR16(bitmap, y, x) = screen->machine->pens[(color & 0x7ff)];
+					*BITMAP_ADDR16(bitmap, y, x) = screen->machine().pens[(color & 0x7ff)];
 
 				count++;
 			}
@@ -106,7 +106,7 @@ static SCREEN_UPDATE( suprgolf )
 				color = state->fg_fb[count];
 
 				if(((state->fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect->max_x && y <= cliprect->max_y))
-					*BITMAP_ADDR16(bitmap, y, x) = screen->machine->pens[(color & 0x7ff)];
+					*BITMAP_ADDR16(bitmap, y, x) = screen->machine().pens[(color & 0x7ff)];
 
 				count++;
 			}
@@ -120,7 +120,7 @@ static SCREEN_UPDATE( suprgolf )
 
 static READ8_HANDLER( suprgolf_videoram_r )
 {
-	suprgolf_state *state = space->machine->driver_data<suprgolf_state>();
+	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
 	if (state->palette_switch)
 		return state->paletteram[offset];
@@ -130,7 +130,7 @@ static READ8_HANDLER( suprgolf_videoram_r )
 
 static WRITE8_HANDLER( suprgolf_videoram_w )
 {
-	suprgolf_state *state = space->machine->driver_data<suprgolf_state>();
+	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
 	if(state->palette_switch)
 	{
@@ -143,7 +143,7 @@ static WRITE8_HANDLER( suprgolf_videoram_w )
 		g = (datax & 0x8000) ? 0 : ((datax)&0x03e0)>>5;
 		r = (datax & 0x8000) ? 0 : ((datax)&0x7c00)>>10;
 
-		palette_set_color_rgb(space->machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(space->machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 	else
 	{
@@ -154,14 +154,14 @@ static WRITE8_HANDLER( suprgolf_videoram_w )
 
 static READ8_HANDLER( suprgolf_vregs_r )
 {
-	suprgolf_state *state = space->machine->driver_data<suprgolf_state>();
+	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
 	return state->vreg_bank;
 }
 
 static WRITE8_HANDLER( suprgolf_vregs_w )
 {
-	suprgolf_state *state = space->machine->driver_data<suprgolf_state>();
+	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
 	//bits 0,1,2 and probably 3 controls the background vram banking
 	state->vreg_bank = data;
@@ -176,14 +176,14 @@ static WRITE8_HANDLER( suprgolf_vregs_w )
 
 static READ8_HANDLER( suprgolf_bg_vram_r )
 {
-	suprgolf_state *state = space->machine->driver_data<suprgolf_state>();
+	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
 	return state->bg_vram[offset+state->bg_bank*0x2000];
 }
 
 static WRITE8_HANDLER( suprgolf_bg_vram_w )
 {
-	suprgolf_state *state = space->machine->driver_data<suprgolf_state>();
+	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 	UINT8 hi_nibble,lo_nibble;
 	UINT8 hi_dirty_dot,lo_dirty_dot; // helpers
 
@@ -229,47 +229,47 @@ static WRITE8_HANDLER( suprgolf_bg_vram_w )
 
 static WRITE8_HANDLER( suprgolf_pen_w )
 {
-	suprgolf_state *state = space->machine->driver_data<suprgolf_state>();
+	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
 	state->vreg_pen = data;
 }
 
 static WRITE8_HANDLER( adpcm_data_w )
 {
-	suprgolf_state *state = space->machine->driver_data<suprgolf_state>();
+	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
 	state->msm5205next = data;
 }
 
 static READ8_HANDLER( rom_bank_select_r )
 {
-	suprgolf_state *state = space->machine->driver_data<suprgolf_state>();
+	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
 	return state->rom_bank;
 }
 
 static WRITE8_HANDLER( rom_bank_select_w )
 {
-	suprgolf_state *state = space->machine->driver_data<suprgolf_state>();
-	UINT8 *region_base = space->machine->region("user1")->base();
+	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
+	UINT8 *region_base = space->machine().region("user1")->base();
 
 	state->rom_bank = data;
 
 	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
 
 	mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
-	memory_set_bankptr(space->machine, "bank2", region_base + (data&0x3f ) * 0x4000);
+	memory_set_bankptr(space->machine(), "bank2", region_base + (data&0x3f ) * 0x4000);
 
 	state->msm_nmi_mask = data & 0x40;
-	flip_screen_set(space->machine, data & 0x80);
+	flip_screen_set(space->machine(), data & 0x80);
 }
 
 static WRITE8_HANDLER( rom2_bank_select_w )
 {
-	UINT8 *region_base = space->machine->region("user2")->base();
+	UINT8 *region_base = space->machine().region("user2")->base();
 	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
 
-	memory_set_bankptr(space->machine, "bank1", region_base + (data&0x0f ) * 0x4000);
+	memory_set_bankptr(space->machine(), "bank1", region_base + (data&0x0f ) * 0x4000);
 
 	if(data & 0xf0)
 		printf("Rom bank select 2 with data %02x activated\n",data);
@@ -279,20 +279,20 @@ static READ8_HANDLER( pedal_extra_bits_r )
 {
 	UINT8 p1_sht_sw,p2_sht_sw;
 
-	p1_sht_sw = (input_port_read(space->machine, "P1_RELEASE") & 0x80)>>7;
-	p2_sht_sw = (input_port_read(space->machine, "P2_RELEASE") & 0x80)>>6;
+	p1_sht_sw = (input_port_read(space->machine(), "P1_RELEASE") & 0x80)>>7;
+	p2_sht_sw = (input_port_read(space->machine(), "P2_RELEASE") & 0x80)>>6;
 
 	return p1_sht_sw | p2_sht_sw;
 }
 
 static READ8_HANDLER( p1_r )
 {
-	return (input_port_read(space->machine, "P1") & 0xf0) | ((input_port_read(space->machine, "P1_ANALOG") & 0xf));
+	return (input_port_read(space->machine(), "P1") & 0xf0) | ((input_port_read(space->machine(), "P1_ANALOG") & 0xf));
 }
 
 static READ8_HANDLER( p2_r )
 {
-	return (input_port_read(space->machine, "P2") & 0xf0) | ((input_port_read(space->machine, "P2_ANALOG") & 0xf));
+	return (input_port_read(space->machine(), "P2") & 0xf0) | ((input_port_read(space->machine(), "P2_ANALOG") & 0xf));
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
@@ -418,7 +418,7 @@ static WRITE8_DEVICE_HANDLER( suprgolf_writeB )
 
 static void irqhandler(device_t *device, int irq)
 {
-	//cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	//cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -436,7 +436,7 @@ static const ym2203_interface ym2203_config =
 
 static void adpcm_int(device_t *device)
 {
-	suprgolf_state *state = device->machine->driver_data<suprgolf_state>();
+	suprgolf_state *state = device->machine().driver_data<suprgolf_state>();
 
 	{
 		msm5205_reset_w(device,0);
@@ -444,7 +444,7 @@ static void adpcm_int(device_t *device)
 		if(state->toggle)
 		{
 			msm5205_data_w(device, (state->msm5205next & 0xf0) >> 4);
-			if(state->msm_nmi_mask) { cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); }
+			if(state->msm_nmi_mask) { cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE); }
 		}
 		else
 		{
@@ -476,7 +476,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( suprgolf )
 {
-	suprgolf_state *state = machine->driver_data<suprgolf_state>();
+	suprgolf_state *state = machine.driver_data<suprgolf_state>();
 
 	state->msm_nmi_mask = 0;
 }
@@ -582,7 +582,7 @@ ROM_END
 
 static DRIVER_INIT( suprgolf )
 {
-	UINT8 *ROM = machine->region("user2")->base();
+	UINT8 *ROM = machine.region("user2")->base();
 
 	ROM[0x74f4-0x4000] = 0x00;
 	ROM[0x74f5-0x4000] = 0x00;

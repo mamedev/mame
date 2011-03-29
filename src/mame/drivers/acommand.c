@@ -90,7 +90,7 @@ static TILEMAP_MAPPER( bg_scan )
 
 static TILE_GET_INFO( ac_get_bg_tile_info )
 {
-	acommand_state *state = machine->driver_data<acommand_state>();
+	acommand_state *state = machine.driver_data<acommand_state>();
 	int code = state->ac_bgvram[tile_index];
 	SET_TILE_INFO(
 			1,
@@ -101,7 +101,7 @@ static TILE_GET_INFO( ac_get_bg_tile_info )
 
 static TILE_GET_INFO( ac_get_tx_tile_info )
 {
-	acommand_state *state = machine->driver_data<acommand_state>();
+	acommand_state *state = machine.driver_data<acommand_state>();
 	int code = state->ac_txvram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -110,9 +110,9 @@ static TILE_GET_INFO( ac_get_tx_tile_info )
 			0);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority, int pri_mask)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority, int pri_mask)
 {
-	acommand_state *state = machine->driver_data<acommand_state>();
+	acommand_state *state = machine.driver_data<acommand_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
@@ -152,7 +152,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				xx = w;
 				do
 				{
-					drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 							code,
 							color,
 							flipx, flipy,
@@ -171,7 +171,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static VIDEO_START( acommand )
 {
-	acommand_state *state = machine->driver_data<acommand_state>();
+	acommand_state *state = machine.driver_data<acommand_state>();
 	state->tx_tilemap = tilemap_create(machine, ac_get_tx_tile_info,tilemap_scan_cols,8,8,512,32);
 	state->bg_tilemap = tilemap_create(machine, ac_get_bg_tile_info,bg_scan,16,16,256,16);
 
@@ -240,9 +240,9 @@ static void draw_led(bitmap_t *bitmap, int x, int y,UINT8 value)
 
 static SCREEN_UPDATE( acommand )
 {
-	acommand_state *state = screen->machine->driver_data<acommand_state>();
+	acommand_state *state = screen->machine().driver_data<acommand_state>();
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect,0,0);
+	draw_sprites(screen->machine(),bitmap,cliprect,0,0);
 	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
 
 	/*Order might be wrong,but these for sure are the led numbers tested*/
@@ -259,21 +259,21 @@ static SCREEN_UPDATE( acommand )
 
 static WRITE16_HANDLER( ac_bgvram_w )
 {
-	acommand_state *state = space->machine->driver_data<acommand_state>();
+	acommand_state *state = space->machine().driver_data<acommand_state>();
 	COMBINE_DATA(&state->ac_bgvram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
 
 static WRITE16_HANDLER( ac_txvram_w )
 {
-	acommand_state *state = space->machine->driver_data<acommand_state>();
+	acommand_state *state = space->machine().driver_data<acommand_state>();
 	COMBINE_DATA(&state->ac_txvram[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap,offset);
 }
 
 static WRITE16_HANDLER(ac_bgscroll_w)
 {
-	acommand_state *state = space->machine->driver_data<acommand_state>();
+	acommand_state *state = space->machine().driver_data<acommand_state>();
 	switch(offset)
 	{
 		case 0: tilemap_set_scrollx(state->bg_tilemap,0,data); break;
@@ -284,7 +284,7 @@ static WRITE16_HANDLER(ac_bgscroll_w)
 
 static WRITE16_HANDLER(ac_txscroll_w)
 {
-	acommand_state *state = space->machine->driver_data<acommand_state>();
+	acommand_state *state = space->machine().driver_data<acommand_state>();
 	switch(offset)
 	{
 		case 0: tilemap_set_scrollx(state->tx_tilemap,0,data); break;
@@ -298,7 +298,7 @@ static WRITE16_HANDLER(ac_txscroll_w)
 
 static READ16_HANDLER(ac_devices_r)
 {
-	acommand_state *state = space->machine->driver_data<acommand_state>();
+	acommand_state *state = space->machine().driver_data<acommand_state>();
 	logerror("(PC=%06x) read at %04x\n",cpu_get_pc(space->cpu),offset*2);
 
 	switch(offset)
@@ -316,13 +316,13 @@ static READ16_HANDLER(ac_devices_r)
                 ---- ---- ---- --x- (Activate Test)
                 ---- ---- ---- ---x (Advance Thru Tests)
             */
-			return input_port_read(space->machine, "IN0");
+			return input_port_read(space->machine(), "IN0");
 		case 0x0014/2:
 		case 0x0016/2:
-			return space->machine->device<okim6295_device>("oki1")->read(*space,0);
+			return space->machine().device<okim6295_device>("oki1")->read(*space,0);
 		case 0x0018/2:
 		case 0x001a/2:
-			return space->machine->device<okim6295_device>("oki2")->read(*space,0);
+			return space->machine().device<okim6295_device>("oki2")->read(*space,0);
 		case 0x0040/2:
 			/*
                 "Upper switch / Under Switch"
@@ -387,22 +387,22 @@ static READ16_HANDLER(ac_devices_r)
                 xxxx xxxx ---- ---- DIPSW4
                 ---- ---- xxxx xxxx DIPSW3
             */
-			return input_port_read(space->machine, "IN1");
+			return input_port_read(space->machine(), "IN1");
 	}
 	return state->ac_devram[offset];
 }
 
 static WRITE16_HANDLER(ac_devices_w)
 {
-	acommand_state *state = space->machine->driver_data<acommand_state>();
+	acommand_state *state = space->machine().driver_data<acommand_state>();
 	COMBINE_DATA(&state->ac_devram[offset]);
 	switch(offset)
 	{
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				okim6295_device *oki1 = space->machine->device<okim6295_device>("oki1");
-				okim6295_device *oki2 = space->machine->device<okim6295_device>("oki2");
+				okim6295_device *oki1 = space->machine().device<okim6295_device>("oki1");
+				okim6295_device *oki2 = space->machine().device<okim6295_device>("oki2");
 				oki1->set_bank_base(0x40000 * (data & 0x3));
 				oki2->set_bank_base(0x40000 * (data & 0x30) >> 4);
 			}
@@ -411,7 +411,7 @@ static WRITE16_HANDLER(ac_devices_w)
 		case 0x16/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				okim6295_device *oki1 = space->machine->device<okim6295_device>("oki1");
+				okim6295_device *oki1 = space->machine().device<okim6295_device>("oki1");
 				oki1->write(*space,0,data);
 			}
 			break;
@@ -419,7 +419,7 @@ static WRITE16_HANDLER(ac_devices_w)
 		case 0x1a/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				okim6295_device *oki2 = space->machine->device<okim6295_device>("oki2");
+				okim6295_device *oki2 = space->machine().device<okim6295_device>("oki2");
 				oki2->write(*space,0,data);
 			}
 			break;
@@ -585,10 +585,10 @@ static TIMER_DEVICE_CALLBACK( acommand_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line(timer.machine, "maincpu", 2, HOLD_LINE);
+		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
 
 	if(scanline == 0) // vblank-in irq? (update palette and layers)
-		cputag_set_input_line(timer.machine, "maincpu", 3, HOLD_LINE);
+		cputag_set_input_line(timer.machine(), "maincpu", 3, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( acommand, acommand_state )

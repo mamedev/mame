@@ -36,12 +36,12 @@
 ***************************************************************************/
 
 /* initialize the internal debugger */
-void debugint_init(running_machine *machine);
+void debugint_init(running_machine &machine);
 
 /* process events for internal debugger */
 void debugint_wait_for_debugger(device_t &device, bool firststop);
 
 /* update the  internal debugger during a game */
-void debugint_update_during_game(running_machine *machine);
+void debugint_update_during_game(running_machine &machine);
 
 #endif

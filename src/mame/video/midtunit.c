@@ -297,9 +297,9 @@ WRITE16_HANDLER( midtunit_paletteram_w )
 {
 	//int newword;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	//newword = space->machine->generic.paletteram.u16[offset];
-	palette_set_color_rgb(space->machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	//newword = space->machine().generic.paletteram.u16[offset];
+	palette_set_color_rgb(space->machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 
@@ -312,7 +312,7 @@ WRITE16_HANDLER( midxunit_paletteram_w )
 
 READ16_HANDLER( midxunit_paletteram_r )
 {
-	return space->machine->generic.paletteram.u16[offset / 2];
+	return space->machine().generic.paletteram.u16[offset / 2];
 }
 
 
@@ -679,7 +679,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 
 	/* high bit triggers action */
 	command = dma_register[DMA_COMMAND];
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 	if (!(command & 0x8000))
 		return;
 
@@ -715,7 +715,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 
 if (LOG_DMA)
 {
-	if (input_code_pressed(space->machine, KEYCODE_L))
+	if (input_code_pressed(space->machine(), KEYCODE_L))
 	{
 		logerror("DMA command %04X: (bpp=%d skip=%d xflip=%d yflip=%d preskip=%d postskip=%d)\n",
 				command, (command >> 12) & 7, (command >> 7) & 1, (command >> 4) & 1, (command >> 5) & 1, (command >> 8) & 3, (command >> 10) & 3);
@@ -789,7 +789,7 @@ if (LOG_DMA)
 
 	/* signal we're done */
 skipdma:
-	space->machine->scheduler().timer_set(attotime::from_nsec(41 * pixels), FUNC(dma_callback));
+	space->machine().scheduler().timer_set(attotime::from_nsec(41 * pixels), FUNC(dma_callback));
 
 	g_profiler.stop();
 }

@@ -177,7 +177,7 @@ static void taito8741_update(address_space *space, int num)
 					else
 					{ /* port select */
 						st->parallelselect = data & 0x07;
-						taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space,st->parallelselect) : st->portName ? input_port_read(space->machine, st->portName) : 0);
+						taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space,st->parallelselect) : st->portName ? input_port_read(space->machine(), st->portName) : 0);
 					}
 				}
 			}
@@ -188,7 +188,7 @@ static void taito8741_update(address_space *space, int num)
 			case -1: /* no command data */
 				break;
 			case 0x00: /* read from parallel port */
-				taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space,0) : st->portName ? input_port_read(space->machine, st->portName) : 0 );
+				taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space,0) : st->portName ? input_port_read(space->machine(), st->portName) : 0 );
 				break;
 			case 0x01: /* read receive buffer 0 */
 			case 0x02: /* read receive buffer 1 */
@@ -201,10 +201,10 @@ static void taito8741_update(address_space *space, int num)
 				taito8741_hostdata_w(st,st->rxd[data-1]);
 				break;
 			case 0x08:	/* latch received serial data */
-				st->txd[0] = st->portHandler ? st->portHandler(space,0) : st->portName ? input_port_read(space->machine, st->portName) : 0;
+				st->txd[0] = st->portHandler ? st->portHandler(space,0) : st->portName ? input_port_read(space->machine(), st->portName) : 0;
 				if( sst )
 				{
-					space->machine->scheduler().synchronize(FUNC(taito8741_serial_tx), num);
+					space->machine().scheduler().synchronize(FUNC(taito8741_serial_tx), num);
 					st->serial_out = 0;
 					st->status |= 0x04;
 					st->phase = CMD_08;
@@ -277,7 +277,7 @@ static int I8741_status_r(address_space *space, int num)
 {
 	I8741 *st = &taito8741[num];
 	taito8741_update(space, num);
-	LOG(("%s:8741-%d ST Read %02x\n",space->machine->describe_context(),num,st->status));
+	LOG(("%s:8741-%d ST Read %02x\n",space->machine().describe_context(),num,st->status));
 	return st->status;
 }
 
@@ -287,7 +287,7 @@ static int I8741_data_r(address_space *space, int num)
 	I8741 *st = &taito8741[num];
 	int ret = st->toData;
 	st->status &= 0xfe;
-	LOG(("%s:8741-%d DATA Read %02x\n",space->machine->describe_context(),num,ret));
+	LOG(("%s:8741-%d DATA Read %02x\n",space->machine().describe_context(),num,ret));
 
 	/* update chip */
 	taito8741_update(space, num);
@@ -295,7 +295,7 @@ static int I8741_data_r(address_space *space, int num)
 	switch( st->mode )
 	{
 	case TAITO8741_PORT: /* parallel data */
-		taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space, st->parallelselect) : st->portName ? input_port_read(space->machine, st->portName) : 0);
+		taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space, st->parallelselect) : st->portName ? input_port_read(space->machine(), st->portName) : 0);
 		break;
 	}
 	return ret;
@@ -305,7 +305,7 @@ static int I8741_data_r(address_space *space, int num)
 static void I8741_data_w(address_space *space, int num, int data)
 {
 	I8741 *st = &taito8741[num];
-	LOG(("%s:8741-%d DATA Write %02x\n",space->machine->describe_context(),num,data));
+	LOG(("%s:8741-%d DATA Write %02x\n",space->machine().describe_context(),num,data));
 	st->fromData = data;
 	st->status |= 0x02;
 	/* update chip */
@@ -316,7 +316,7 @@ static void I8741_data_w(address_space *space, int num, int data)
 static void I8741_command_w(address_space *space, int num, int data)
 {
 	I8741 *st = &taito8741[num];
-	LOG(("%s:8741-%d CMD Write %02x\n",space->machine->describe_context(),num,data));
+	LOG(("%s:8741-%d CMD Write %02x\n",space->machine().describe_context(),num,data));
 	st->fromCmd = data;
 	st->status |= 0x04;
 	/* update chip */
@@ -435,12 +435,12 @@ static TIMER_CALLBACK( josvolly_8741_tx )
 	dst->sts |=  0x01; /* RX ready  ? */
 }
 
-static void josvolly_8741_do(running_machine *machine, int num)
+static void josvolly_8741_do(running_machine &machine, int num)
 {
 	if( (i8741[num].sts & 0x02) )
 	{
 		/* transmit data */
-		machine->scheduler().timer_set (attotime::from_usec(1), FUNC(josvolly_8741_tx), num);
+		machine.scheduler().timer_set (attotime::from_usec(1), FUNC(josvolly_8741_tx), num);
 	}
 }
 
@@ -450,7 +450,7 @@ static void josvolly_8741_w(address_space *space, int num, int offset, int data)
 
 	if(offset==1)
 	{
-		LOG(("%s:8741[%d] CW %02X\n", space->machine->describe_context(), num, data));
+		LOG(("%s:8741[%d] CW %02X\n", space->machine().describe_context(), num, data));
 
 		/* read pointer */
 		mcu->cmd = data;
@@ -472,7 +472,7 @@ static void josvolly_8741_w(address_space *space, int num, int offset, int data)
 			break;
 		case 2:
 #if 1
-			mcu->rxd = input_port_read(space->machine, "DSW2");
+			mcu->rxd = input_port_read(space->machine(), "DSW2");
 			mcu->sts |= 0x01; /* RD ready */
 #endif
 			break;
@@ -488,7 +488,7 @@ static void josvolly_8741_w(address_space *space, int num, int offset, int data)
 	else
 	{
 		/* data */
-		LOG(("%s:8741[%d] DW %02X\n", space->machine->describe_context(), num, data));
+		LOG(("%s:8741[%d] DW %02X\n", space->machine().describe_context(), num, data));
 
 		mcu->txd = data ^ 0x40; /* parity reverce ? */
 		mcu->sts |= 0x02;     /* TXD busy         */
@@ -498,13 +498,13 @@ static void josvolly_8741_w(address_space *space, int num, int offset, int data)
 		{
 			if(josvolly_nmi_enable)
 			{
-				cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 				josvolly_nmi_enable = 0;
 			}
 		}
 #endif
 	}
-	josvolly_8741_do(space->machine, num);
+	josvolly_8741_do(space->machine(), num);
 }
 
 static INT8 josvolly_8741_r(address_space *space,int num,int offset)
@@ -515,16 +515,16 @@ static INT8 josvolly_8741_r(address_space *space,int num,int offset)
 	if(offset==1)
 	{
 		if(mcu->rst)
-			mcu->rxd = input_port_read(space->machine, mcu->initReadPort); /* port in */
+			mcu->rxd = input_port_read(space->machine(), mcu->initReadPort); /* port in */
 		ret = mcu->sts;
-		LOG(("%s:8741[%d]       SR %02X\n",space->machine->describe_context(),num,ret));
+		LOG(("%s:8741[%d]       SR %02X\n",space->machine().describe_context(),num,ret));
 	}
 	else
 	{
 		/* clear status port */
 		mcu->sts &= ~0x01; /* RD ready */
 		ret = mcu->rxd;
-		LOG(("%s:8741[%d]       DR %02X\n",space->machine->describe_context(),num,ret));
+		LOG(("%s:8741[%d]       DR %02X\n",space->machine().describe_context(),num,ret));
 		mcu->rst = 0;
 	}
 	return ret;
@@ -547,7 +547,7 @@ static struct
 	UINT8 rst;
 }cyclemb_mcu;
 
-void cyclemb_8741_reset(running_machine *machine)
+void cyclemb_8741_reset(running_machine &machine)
 {
 	cyclemb_mcu.txd = 0;
 	cyclemb_mcu.rst = 1;
@@ -579,11 +579,11 @@ static void cyclemb_8741_w(address_space *space, int num, int offset, int data)
 				cyclemb_mcu.rst = 0;
 				break;
 			case 2:
-				cyclemb_mcu.rxd = (input_port_read(space->machine, "DSW2") & 0x1f) << 2;
+				cyclemb_mcu.rxd = (input_port_read(space->machine(), "DSW2") & 0x1f) << 2;
 				cyclemb_mcu.rst = 0;
 				break;
 			case 3:
-				//cyclemb_mcu.rxd = input_port_read(space->machine, "DSW2");
+				//cyclemb_mcu.rxd = input_port_read(space->machine(), "DSW2");
 				cyclemb_mcu.rst = 1;
 				break;
 		}
@@ -613,15 +613,15 @@ static INT8 cyclemb_8741_r(address_space *space,int num,int offset)
 			/* FIXME: remove cpu_get_pc hack */
 			switch(cpu_get_pc(space->cpu))
 			{
-				case 0x760: cyclemb_mcu.rxd = ((input_port_read(space->machine,"DSW1") & 0x1f) << 2); break;
+				case 0x760: cyclemb_mcu.rxd = ((input_port_read(space->machine(),"DSW1") & 0x1f) << 2); break;
 				case 0x35c:
 				{
 					static UINT8 mux_r;
 					mux_r^=0x20;
 					if(mux_r & 0x20)
-						cyclemb_mcu.rxd = ((input_port_read(space->machine,"DSW3")) & 0x9f) | (mux_r) | (space->machine->rand() & 0x40);
+						cyclemb_mcu.rxd = ((input_port_read(space->machine(),"DSW3")) & 0x9f) | (mux_r) | (space->machine().rand() & 0x40);
 					else
-						cyclemb_mcu.rxd = ((input_port_read(space->machine,"IN0")) & 0x9f) | (mux_r) | (space->machine->rand() & 0x40);
+						cyclemb_mcu.rxd = ((input_port_read(space->machine(),"IN0")) & 0x9f) | (mux_r) | (space->machine().rand() & 0x40);
 				}
 				break;
 			}

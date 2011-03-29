@@ -35,8 +35,8 @@ public:
 
 /*----------- defined in video/dbz.c -----------*/
 
-extern void dbz_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
-extern void dbz_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
+extern void dbz_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
+extern void dbz_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 
 WRITE16_HANDLER(dbz_bg1_videoram_w);
 WRITE16_HANDLER(dbz_bg2_videoram_w);

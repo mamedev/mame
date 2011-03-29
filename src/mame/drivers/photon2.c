@@ -81,7 +81,7 @@ static PALETTE_INIT( spectrum )
 
 static VIDEO_START( spectrum )
 {
-	photon2_state *state = machine->driver_data<photon2_state>();
+	photon2_state *state = machine.driver_data<photon2_state>();
 	state->spectrum_frame_number = 0;
 	state->spectrum_flash_invert = 0;
 }
@@ -99,7 +99,7 @@ INLINE unsigned char get_display_color (unsigned char color, int invert)
    independent of frame skip etc. */
 static SCREEN_EOF( spectrum )
 {
-	photon2_state *state = machine->driver_data<photon2_state>();
+	photon2_state *state = machine.driver_data<photon2_state>();
     state->spectrum_frame_number++;
     if (state->spectrum_frame_number >= 25)
     {
@@ -115,7 +115,7 @@ INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 
 static SCREEN_UPDATE( spectrum )
 {
-	photon2_state *state = screen->machine->driver_data<photon2_state>();
+	photon2_state *state = screen->machine().driver_data<photon2_state>();
     /* for now do a full-refresh */
     int x, y, b, scrx, scry;
     unsigned short ink, pap;
@@ -187,7 +187,7 @@ static WRITE8_HANDLER(photon2_membank_w)
 		logerror( "Unknown banking write: %02X\n", data);
 	}
 
-	memory_set_bankptr(space->machine, "bank1", space->machine->region("maincpu")->base() + 0x4000*bank );
+	memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base() + 0x4000*bank );
 }
 
 static READ8_HANDLER(photon2_fe_r)
@@ -197,8 +197,8 @@ static READ8_HANDLER(photon2_fe_r)
 
 static WRITE8_HANDLER(photon2_fe_w)
 {
-	photon2_state *state = space->machine->driver_data<photon2_state>();
-	device_t *speaker = space->machine->device("speaker");
+	photon2_state *state = space->machine().driver_data<photon2_state>();
+	device_t *speaker = space->machine().device("speaker");
 	state->spectrum_port_fe = data;
 
 	speaker_level_w(speaker, BIT(data,4));
@@ -206,7 +206,7 @@ static WRITE8_HANDLER(photon2_fe_w)
 
 static WRITE8_HANDLER(photon2_misc_w)
 {
-	photon2_state *state = space->machine->driver_data<photon2_state>();
+	photon2_state *state = space->machine().driver_data<photon2_state>();
 	state->nmi_enable = !BIT(data,5);
 }
 
@@ -285,7 +285,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( spec_interrupt_hack )
 {
-	photon2_state *state = device->machine->driver_data<photon2_state>();
+	photon2_state *state = device->machine().driver_data<photon2_state>();
 	if (cpu_getiloops(device) == 1)
 	{
 		device_set_input_line(device, 0, HOLD_LINE);
@@ -294,14 +294,14 @@ static INTERRUPT_GEN( spec_interrupt_hack )
 	{
 		if ( state->nmi_enable )
 		{
-			cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 }
 
 static MACHINE_RESET( photon2 )
 {
-	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
+	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base());
 }
 
 static MACHINE_CONFIG_START( photon2, photon2_state )

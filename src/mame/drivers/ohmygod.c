@@ -19,11 +19,11 @@ Notes:
 
 static WRITE16_HANDLER( ohmygod_ctrl_w )
 {
-	ohmygod_state *state = space->machine->driver_data<ohmygod_state>();
+	ohmygod_state *state = space->machine().driver_data<ohmygod_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *rom = space->machine->region("oki")->base();
+		UINT8 *rom = space->machine().region("oki")->base();
 
 		/* ADPCM bank switch */
 		if (state->sndbank != ((data >> state->adpcm_bank_shift) & 0x0f))
@@ -34,8 +34,8 @@ static WRITE16_HANDLER( ohmygod_ctrl_w )
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine, 0, data & 0x1000);
-		coin_counter_w(space->machine, 1, data & 0x2000);
+		coin_counter_w(space->machine(), 0, data & 0x1000);
+		coin_counter_w(space->machine(), 1, data & 0x2000);
 	}
 }
 
@@ -296,7 +296,7 @@ GFXDECODE_END
 
 static MACHINE_START( ohmygod )
 {
-	ohmygod_state *state = machine->driver_data<ohmygod_state>();
+	ohmygod_state *state = machine.driver_data<ohmygod_state>();
 
 	state->save_item(NAME(state->spritebank));
 	state->save_item(NAME(state->scrollx));
@@ -306,8 +306,8 @@ static MACHINE_START( ohmygod )
 
 static MACHINE_RESET( ohmygod )
 {
-	ohmygod_state *state = machine->driver_data<ohmygod_state>();
-	UINT8 *rom = machine->region("oki")->base();
+	ohmygod_state *state = machine.driver_data<ohmygod_state>();
+	UINT8 *rom = machine.region("oki")->base();
 
 	state->sndbank = 0;
 	memcpy(rom + 0x20000, rom + 0x40000 + 0x20000 * state->sndbank, 0x20000);
@@ -393,13 +393,13 @@ ROM_END
 
 static DRIVER_INIT( ohmygod )
 {
-	ohmygod_state *state = machine->driver_data<ohmygod_state>();
+	ohmygod_state *state = machine.driver_data<ohmygod_state>();
 	state->adpcm_bank_shift = 4;
 }
 
 static DRIVER_INIT( naname )
 {
-	ohmygod_state *state = machine->driver_data<ohmygod_state>();
+	ohmygod_state *state = machine.driver_data<ohmygod_state>();
 	state->adpcm_bank_shift = 0;
 }
 

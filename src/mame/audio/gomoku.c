@@ -69,7 +69,7 @@ static void make_mixer_table(device_t *device, int voices, int gain)
 	int i;
 
 	/* allocate memory */
-	state->mixer_table = auto_alloc_array(device->machine, INT16, 256 * voices);
+	state->mixer_table = auto_alloc_array(device->machine(), INT16, 256 * voices);
 
 	/* find the middle of the table */
 	state->mixer_lookup = state->mixer_table + (128 * voices);
@@ -174,12 +174,12 @@ static STREAM_UPDATE( gomoku_update_mono )
 static DEVICE_START( gomoku_sound )
 {
 	gomoku_sound_state *state = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	sound_channel *voice;
 	int ch;
 
 	/* get stream channels */
-	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, samplerate, NULL, gomoku_update_mono);
+	state->stream = device->machine().sound().stream_alloc(*device, 0, 1, samplerate, NULL, gomoku_update_mono);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	state->mixer_buffer = auto_alloc_array(machine, short, 2 * samplerate);
@@ -192,7 +192,7 @@ static DEVICE_START( gomoku_sound )
 	state->num_voices = MAX_VOICES;
 	state->last_channel = state->channel_list + state->num_voices;
 
-	state->sound_rom = machine->region("gomoku")->base();
+	state->sound_rom = machine.region("gomoku")->base();
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	state->sound_enable = 1;

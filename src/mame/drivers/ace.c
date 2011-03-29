@@ -61,48 +61,48 @@ public:
 
 static WRITE8_HANDLER( ace_objpos_w )
 {
-	ace_state *state = space->machine->driver_data<ace_state>();
+	ace_state *state = space->machine().driver_data<ace_state>();
 	state->objpos[offset] = data;
 }
 
 #if 0
 static READ8_HANDLER( ace_objpos_r )
 {
-	ace_state *state = space->machine->driver_data<ace_state>();
+	ace_state *state = space->machine().driver_data<ace_state>();
 	return state->objpos[offset];
 }
 #endif
 
 static VIDEO_START( ace )
 {
-	ace_state *state = machine->driver_data<ace_state>();
-	gfx_element_set_source(machine->gfx[1], state->characterram);
-	gfx_element_set_source(machine->gfx[2], state->characterram);
-	gfx_element_set_source(machine->gfx[3], state->characterram);
-	gfx_element_set_source(machine->gfx[4], state->scoreram);
+	ace_state *state = machine.driver_data<ace_state>();
+	gfx_element_set_source(machine.gfx[1], state->characterram);
+	gfx_element_set_source(machine.gfx[2], state->characterram);
+	gfx_element_set_source(machine.gfx[3], state->characterram);
+	gfx_element_set_source(machine.gfx[4], state->scoreram);
 }
 
 static SCREEN_UPDATE( ace )
 {
-	ace_state *state = screen->machine->driver_data<ace_state>();
+	ace_state *state = screen->machine().driver_data<ace_state>();
 	int offs;
 
 	/* first of all, fill the screen with the background color */
 	bitmap_fill(bitmap, cliprect, 0);
 
-	drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[1],
+	drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[1],
 			0,
 			0,
 			0, 0,
 			state->objpos[0], state->objpos[1]);
 
-	drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[2],
+	drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[2],
 			0,
 			0,
 			0, 0,
 			state->objpos[2], state->objpos[3]);
 
-	drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[3],
+	drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[3],
 			0,
 			0,
 			0, 0,
@@ -111,7 +111,7 @@ static SCREEN_UPDATE( ace )
 	for (offs = 0; offs < 8; offs++)
 	{
 		drawgfx_opaque(bitmap,/* ?? */
-				cliprect, screen->machine->gfx[4],
+				cliprect, screen->machine().gfx[4],
 				offs,
 				0,
 				0, 0,
@@ -130,7 +130,7 @@ static PALETTE_INIT( ace )
 
 static WRITE8_HANDLER( ace_characterram_w )
 {
-	ace_state *state = space->machine->driver_data<ace_state>();
+	ace_state *state = space->machine().driver_data<ace_state>();
 	if (state->characterram[offset] != data)
 	{
 		if (data & ~0x07)
@@ -139,22 +139,22 @@ static WRITE8_HANDLER( ace_characterram_w )
 			popmessage("write to %04x data = %02x\n", 0x8000 + offset, data);
 		}
 		state->characterram[offset] = data;
-		gfx_element_mark_dirty(space->machine->gfx[1], 0);
-		gfx_element_mark_dirty(space->machine->gfx[2], 0);
-		gfx_element_mark_dirty(space->machine->gfx[3], 0);
+		gfx_element_mark_dirty(space->machine().gfx[1], 0);
+		gfx_element_mark_dirty(space->machine().gfx[2], 0);
+		gfx_element_mark_dirty(space->machine().gfx[3], 0);
 	}
 }
 
 static WRITE8_HANDLER( ace_scoreram_w )
 {
-	ace_state *state = space->machine->driver_data<ace_state>();
+	ace_state *state = space->machine().driver_data<ace_state>();
 	state->scoreram[offset] = data;
-	gfx_element_mark_dirty(space->machine->gfx[4], offset / 32);
+	gfx_element_mark_dirty(space->machine().gfx[4], offset / 32);
 }
 
 static READ8_HANDLER( unk_r )
 {
-	return space->machine->rand() & 0xff;
+	return space->machine().rand() & 0xff;
 }
 
 
@@ -319,22 +319,22 @@ GFXDECODE_END
 
 static STATE_POSTLOAD( ace_postload )
 {
-	gfx_element_mark_dirty(machine->gfx[1], 0);
-	gfx_element_mark_dirty(machine->gfx[2], 0);
-	gfx_element_mark_dirty(machine->gfx[3], 0);
-	gfx_element_mark_dirty(machine->gfx[4], 0);
+	gfx_element_mark_dirty(machine.gfx[1], 0);
+	gfx_element_mark_dirty(machine.gfx[2], 0);
+	gfx_element_mark_dirty(machine.gfx[3], 0);
+	gfx_element_mark_dirty(machine.gfx[4], 0);
 }
 
 static MACHINE_START( ace )
 {
-	ace_state *state = machine->driver_data<ace_state>();
+	ace_state *state = machine.driver_data<ace_state>();
 	state->save_item(NAME(state->objpos));
-	machine->state().register_postload(ace_postload, NULL);
+	machine.state().register_postload(ace_postload, NULL);
 }
 
 static MACHINE_RESET( ace )
 {
-	ace_state *state = machine->driver_data<ace_state>();
+	ace_state *state = machine.driver_data<ace_state>();
 	int i;
 
 	for (i = 0; i < 8; i++)

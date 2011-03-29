@@ -23,12 +23,12 @@ static KONAMI_SETLINES_CALLBACK( rollerg_banking );
 
 static WRITE8_HANDLER( rollerg_0010_w )
 {
-	rollerg_state *state = space->machine->driver_data<rollerg_state>();
+	rollerg_state *state = space->machine().driver_data<rollerg_state>();
 	logerror("%04x: write %02x to 0010\n",cpu_get_pc(space->cpu), data);
 
 	/* bits 0/1 are coin counters */
-	coin_counter_w(space->machine, 0, data & 0x01);
-	coin_counter_w(space->machine, 1, data & 0x02);
+	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(space->machine(), 1, data & 0x02);
 
 	/* bit 2 enables 051316 ROM reading */
 	state->readzoomroms = data & 0x04;
@@ -41,7 +41,7 @@ static WRITE8_HANDLER( rollerg_0010_w )
 
 static READ8_HANDLER( rollerg_k051316_r )
 {
-	rollerg_state *state = space->machine->driver_data<rollerg_state>();
+	rollerg_state *state = space->machine().driver_data<rollerg_state>();
 
 	if (state->readzoomroms)
 		return k051316_rom_r(state->k051316, offset);
@@ -58,21 +58,21 @@ static READ8_DEVICE_HANDLER( rollerg_sound_r )
 
 static WRITE8_HANDLER( soundirq_w )
 {
-	rollerg_state *state = space->machine->driver_data<rollerg_state>();
+	rollerg_state *state = space->machine().driver_data<rollerg_state>();
 	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	rollerg_state *state = machine->driver_data<rollerg_state>();
+	rollerg_state *state = machine.driver_data<rollerg_state>();
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
-	rollerg_state *state = space->machine->driver_data<rollerg_state>();
+	rollerg_state *state = space->machine().driver_data<rollerg_state>();
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
-	space->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
+	space->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 
 static READ8_HANDLER( pip_r )
@@ -236,27 +236,27 @@ static const k051316_interface rollerg_k051316_intf =
 
 static MACHINE_START( rollerg )
 {
-	rollerg_state *state = machine->driver_data<rollerg_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	rollerg_state *state = machine.driver_data<rollerg_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
 	memory_configure_bank(machine, "bank1", 6, 2, &ROM[0x10000], 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->k053244 = machine->device("k053244");
-	state->k051316 = machine->device("k051316");
-	state->k053260 = machine->device("k053260");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->k053244 = machine.device("k053244");
+	state->k051316 = machine.device("k051316");
+	state->k053260 = machine.device("k053260");
 
 	state->save_item(NAME(state->readzoomroms));
 }
 
 static MACHINE_RESET( rollerg )
 {
-	rollerg_state *state = machine->driver_data<rollerg_state>();
+	rollerg_state *state = machine.driver_data<rollerg_state>();
 
-	konami_configure_set_lines(machine->device("maincpu"), rollerg_banking);
+	konami_configure_set_lines(machine.device("maincpu"), rollerg_banking);
 
 	state->readzoomroms = 0;
 }
@@ -360,7 +360,7 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( rollerg_banking )
 {
-	memory_set_bank(device->machine, "bank1", lines & 0x07);
+	memory_set_bank(device->machine(), "bank1", lines & 0x07);
 }
 
 

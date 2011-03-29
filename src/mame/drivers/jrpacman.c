@@ -115,8 +115,8 @@ public:
 
 static WRITE8_HANDLER( jrpacman_interrupt_vector_w )
 {
-	device_set_input_line_vector(space->machine->device("maincpu"), 0, data);
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	device_set_input_line_vector(space->machine().device("maincpu"), 0, data);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -378,7 +378,7 @@ static DRIVER_INIT( jrpacman )
 	    { 0,0 }
 	};
 
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	int i, j, A;
 
 	for (i = A = 0; table[i].count; i++)

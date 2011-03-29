@@ -20,7 +20,7 @@
 
 SCREEN_UPDATE( malzak )
 {
-	malzak_state *state = screen->machine->driver_data<malzak_state>();
+	malzak_state *state = screen->machine().driver_data<malzak_state>();
 	int sx, sy;
 	int x,y;
 	bitmap_t *s2636_0_bitmap;
@@ -43,7 +43,7 @@ SCREEN_UPDATE( malzak )
 			if (sx < -15*2)
 				sx += 256*2;
 
-			drawgfxzoom_transpen(bitmap,cliprect, screen->machine->gfx[0], state->playfield_code[x * 16 + y], 7*2, 0, 0, sx, sy, 0x20000, 0x20000, 0);
+			drawgfxzoom_transpen(bitmap,cliprect, screen->machine().gfx[0], state->playfield_code[x * 16 + y], 7*2, 0, 0, sx, sy, 0x20000, 0x20000, 0);
 		}
 
 	/* update the S2636 chips */
@@ -85,7 +85,7 @@ SCREEN_UPDATE( malzak )
 
 WRITE8_HANDLER( malzak_playfield_w )
 {
-	malzak_state *state = space->machine->driver_data<malzak_state>();
+	malzak_state *state = space->machine().driver_data<malzak_state>();
 	int tile = ((state->malzak_x / 16) * 16) + (offset / 16);
 
 //  state->playfield_x[tile] = state->malzak_x / 16;

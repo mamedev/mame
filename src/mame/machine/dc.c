@@ -265,7 +265,7 @@ static void wave_dma_execute(address_space *space)
 	wave_dma.flag = (wave_dma.indirect & 1) ? 1 : 0;
 	/* Note: if you trigger an instant DMA IRQ trigger, sfz3upper doesn't play any bgm. */
 	/* TODO: timing of this */
-	space->machine->scheduler().timer_set(attotime::from_usec(300), FUNC(aica_dma_irq));
+	space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(aica_dma_irq));
 }
 
 static void pvr_dma_execute(address_space *space)
@@ -303,13 +303,13 @@ static void pvr_dma_execute(address_space *space)
 	}
 	/* Note: do not update the params, since this DMA type doesn't support it. */
 	/* TODO: timing of this */
-	space->machine->scheduler().timer_set(attotime::from_usec(250), FUNC(pvr_dma_irq));
+	space->machine().scheduler().timer_set(attotime::from_usec(250), FUNC(pvr_dma_irq));
 }
 
 // register decode helpers
 
 // this accepts only 32-bit accesses
-INLINE int decode_reg32_64(running_machine *machine, UINT32 offset, UINT64 mem_mask, UINT64 *shift)
+INLINE int decode_reg32_64(running_machine &machine, UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 {
 	int reg = offset * 2;
 
@@ -318,7 +318,7 @@ INLINE int decode_reg32_64(running_machine *machine, UINT32 offset, UINT64 mem_m
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
-		mame_printf_verbose("%s:Wrong mask!\n", machine->describe_context());
+		mame_printf_verbose("%s:Wrong mask!\n", machine.describe_context());
 //      debugger_break(machine);
 	}
 
@@ -332,7 +332,7 @@ INLINE int decode_reg32_64(running_machine *machine, UINT32 offset, UINT64 mem_m
 }
 
 // this accepts only 32 and 16 bit accesses
-INLINE int decode_reg3216_64(running_machine *machine, UINT32 offset, UINT64 mem_mask, UINT64 *shift)
+INLINE int decode_reg3216_64(running_machine &machine, UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 {
 	int reg = offset * 2;
 
@@ -342,7 +342,7 @@ INLINE int decode_reg3216_64(running_machine *machine, UINT32 offset, UINT64 mem
 	if ((mem_mask != U64(0x0000ffff00000000)) && (mem_mask != U64(0x000000000000ffff)) &&
 	    (mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
-		mame_printf_verbose("%s:Wrong mask!\n", machine->describe_context());
+		mame_printf_verbose("%s:Wrong mask!\n", machine.describe_context());
 //      debugger_break(machine);
 	}
 
@@ -355,7 +355,7 @@ INLINE int decode_reg3216_64(running_machine *machine, UINT32 offset, UINT64 mem
 	return reg;
 }
 
-int dc_compute_interrupt_level(running_machine *machine)
+int dc_compute_interrupt_level(running_machine &machine)
 {
 	UINT32 ln,lx,le;
 
@@ -386,7 +386,7 @@ int dc_compute_interrupt_level(running_machine *machine)
 	return 0;
 }
 
-void dc_update_interrupt_status(running_machine *machine)
+void dc_update_interrupt_status(running_machine &machine)
 {
 	int level;
 
@@ -409,14 +409,14 @@ void dc_update_interrupt_status(running_machine *machine)
 	}
 
 	level=dc_compute_interrupt_level(machine);
-	sh4_set_irln_input(machine->device("maincpu"), 15-level);
+	sh4_set_irln_input(machine.device("maincpu"), 15-level);
 
 	/* Wave DMA HW trigger */
 	if(wave_dma.flag && ((wave_dma.sel & 2) == 2))
 	{
 		if((dc_sysctrl_regs[SB_G2DTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_G2DTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
 		{
-			address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+			address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 			printf("Wave DMA HW trigger\n");
 			wave_dma_execute(space);
@@ -428,7 +428,7 @@ void dc_update_interrupt_status(running_machine *machine)
 	{
 		if((dc_sysctrl_regs[SB_PDTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_PDTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
 		{
-			address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+			address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 			printf("PVR-DMA HW trigger\n");
 			pvr_dma_execute(space);
@@ -487,7 +487,7 @@ static int jvsboard_init(int pos)
 	return 13;
 }
 
-static int jvsboard_indirect_read(running_machine *machine, int pos)
+static int jvsboard_indirect_read(running_machine &machine, int pos)
 {
 	// report1,jvsbytes repeated for each function
 	//1 digital inputs
@@ -545,7 +545,7 @@ static int jvsboard_indirect_read(running_machine *machine, int pos)
 	return 17;
 }
 
-static int jvsboard_direct_read(running_machine *machine)
+static int jvsboard_direct_read(running_machine &machine)
 {
 	/* valid data check*/
 	maple0x86data2[0x11] = 0x00;
@@ -620,7 +620,7 @@ READ64_HANDLER( dc_sysctrl_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x41) && (reg != 0x42) && (reg != 0x23) && (reg > 2))	// filter out IRQ status reads
@@ -640,7 +640,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 	UINT32 address;
 	struct sh4_ddt_dma ddtdata;
 
-	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	old = dc_sysctrl_regs[reg];
 	dc_sysctrl_regs[reg] = dat; // 5f6800+off*4=dat
@@ -663,7 +663,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 				ddtdata.direction=0;
 				ddtdata.channel=2;
 				ddtdata.mode=25; //011001
-				sh4_dma_ddt(space->machine->device("maincpu"),&ddtdata);
+				sh4_dma_ddt(space->machine().device("maincpu"),&ddtdata);
 				#if DEBUG_SYSCTRL
 				if ((address >= 0x11000000) && (address <= 0x11FFFFFF))
 					if (dc_sysctrl_regs[SB_LMMODE0])
@@ -689,26 +689,26 @@ WRITE64_HANDLER( dc_sysctrl_w )
 					dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
 
 				/* 200 usecs breaks sfz3upper */
-				space->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(ch2_dma_irq));
+				space->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(ch2_dma_irq));
 				/* simulate YUV FIFO processing here */
 				if((address & 0x1800000) == 0x0800000)
-					space->machine->scheduler().timer_set(attotime::from_usec(500), FUNC(yuv_fifo_irq));
+					space->machine().scheduler().timer_set(attotime::from_usec(500), FUNC(yuv_fifo_irq));
 			}
 			break;
 
 		case SB_ISTNRM:
 			dc_sysctrl_regs[SB_ISTNRM] = old & ~(dat | 0xC0000000); // bits 31,30 ro
-			dc_update_interrupt_status(space->machine);
+			dc_update_interrupt_status(space->machine());
 			break;
 
 		case SB_ISTEXT:
 			dc_sysctrl_regs[SB_ISTEXT] = old;
-			dc_update_interrupt_status(space->machine);
+			dc_update_interrupt_status(space->machine());
 			break;
 
 		case SB_ISTERR:
 			dc_sysctrl_regs[SB_ISTERR] = old & ~dat;
-			dc_update_interrupt_status(space->machine);
+			dc_update_interrupt_status(space->machine());
 			break;
 		case SB_SDST:
 			if(dat & 1)
@@ -718,7 +718,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 
 				dc_sysctrl_regs[SB_SDST] = 0;
 				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_SORT;
-				dc_update_interrupt_status(space->machine);
+				dc_update_interrupt_status(space->machine());
 			}
 			break;
 	}
@@ -737,7 +737,7 @@ READ64_HANDLER( naomi_maple_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 
 	#if DEBUG_MAPLE_REGS
 	mame_printf_verbose("MAPLE:  Unmapped read %08x\n", 0x5f6c00+reg*4);
@@ -759,7 +759,7 @@ WRITE64_HANDLER( naomi_maple_w )
 	int a;
 	int off,len/*,func*/;
 
-	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	old = maple_regs[reg];
 
@@ -793,7 +793,7 @@ WRITE64_HANDLER( naomi_maple_w )
 					ddtdata.direction=0;	// 0 source to buffer, 1 buffer to source
 					ddtdata.channel= -1;	// not used
 					ddtdata.mode= -1;		// copy from/to buffer
-					sh4_dma_ddt(space->machine->device("maincpu"), &ddtdata);
+					sh4_dma_ddt(space->machine().device("maincpu"), &ddtdata);
 
 					endflag=buff[0] & 0x80000000;
 					port=(buff[0] >> 16) & 3;
@@ -832,7 +832,7 @@ WRITE64_HANDLER( naomi_maple_w )
 								ddtdata.direction=0;
 								ddtdata.channel= -1;
 								ddtdata.mode=-1;
-								sh4_dma_ddt(space->machine->device("maincpu"),&ddtdata);
+								sh4_dma_ddt(space->machine().device("maincpu"),&ddtdata);
 								chk=0;
 								for (a=1;a < length;a++)
 								{
@@ -850,7 +850,7 @@ WRITE64_HANDLER( naomi_maple_w )
 								break;
 							case 0x82: // get license string
 								for (a=0;a < 16;a++)
-									buff[a] = (input_port_read(space->machine, "DSW") & 1) ? maple0x82answer_31kHz[a] : maple0x82answer_15kHz[a];
+									buff[a] = (input_port_read(space->machine(), "DSW") & 1) ? maple0x82answer_31kHz[a] : maple0x82answer_15kHz[a];
 								ddtdata.length=16;
 								break;
 							case 0x86:
@@ -858,7 +858,7 @@ WRITE64_HANDLER( naomi_maple_w )
 								ddtdata.direction=0;
 								ddtdata.channel= -1;
 								ddtdata.mode=-1;
-								sh4_dma_ddt(space->machine->device("maincpu"),&ddtdata);
+								sh4_dma_ddt(space->machine().device("maincpu"),&ddtdata);
 
 								subcommand = buff[0] & 0xff;
 								#if DEBUG_MAPLE
@@ -909,7 +909,7 @@ WRITE64_HANDLER( naomi_maple_w )
 									maple0x86data2[3] = maple0x86data2[3] | 0x0c;
 									maple0x86data2[6] = maple0x86data2[6] & 0xcf;
 
-									a = input_port_read(space->machine, "IN0"); // put keys here
+									a = input_port_read(space->machine(), "IN0"); // put keys here
 									maple0x86data2[6] = maple0x86data2[6] | (a << 4);
 									pos = 0x11;
 									tocopy = 17;
@@ -971,7 +971,7 @@ WRITE64_HANDLER( naomi_maple_w )
 												break;
 											case -1: // special case to read controls
 											case -2:
-												jvsboard_indirect_read(space->machine,pos);
+												jvsboard_indirect_read(space->machine(),pos);
 												if (jvs_command == -1)
 												{
 													// ?
@@ -1015,10 +1015,10 @@ WRITE64_HANDLER( naomi_maple_w )
 									maple0x86data2[3] = maple0x86data2[3] | 0x0c;
 									maple0x86data2[6] = maple0x86data2[6] & 0xcf;
 
-									a = input_port_read(space->machine, "IN0"); // put keys here
+									a = input_port_read(space->machine(), "IN0"); // put keys here
 									maple0x86data2[6] = maple0x86data2[6] | (a << 4);
 
-									tocopy = jvsboard_direct_read(space->machine);
+									tocopy = jvsboard_direct_read(space->machine());
 
 									// command end flag
 									maple0x86data2[0x18] = (jvs_command == -1) ? 19 : 17;
@@ -1062,11 +1062,11 @@ WRITE64_HANDLER( naomi_maple_w )
 					ddtdata.destination=destination;
 					ddtdata.buffer=buff;
 					ddtdata.direction=1;
-					sh4_dma_ddt(space->machine->device("maincpu"),&ddtdata);
+					sh4_dma_ddt(space->machine().device("maincpu"),&ddtdata);
 
 					if (endflag)
 					{
-						space->machine->scheduler().timer_set(attotime::from_usec(200), FUNC(maple_dma_irq));
+						space->machine().scheduler().timer_set(attotime::from_usec(200), FUNC(maple_dma_irq));
 						break;
 					}
 					// skip fixed packet header
@@ -1088,7 +1088,7 @@ READ64_HANDLER( dc_maple_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 
 	#if DEBUG_MAPLE_REGS
 	mame_printf_verbose("MAPLE:  Unmapped read %08x\n", 0x5f6c00+reg*4);
@@ -1105,7 +1105,7 @@ WRITE64_HANDLER( dc_maple_w )
 	UINT32 buff[512];
 	UINT32 endflag,port,pattern,length,command,dap,sap,destination;
 
-	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	old = maple_regs[reg];
 
@@ -1139,7 +1139,7 @@ WRITE64_HANDLER( dc_maple_w )
 					ddtdata.direction=0;	// 0 source to buffer, 1 buffer to source
 					ddtdata.channel= -1;	// not used
 					ddtdata.mode= -1;		// copy from/to buffer
-					sh4_dma_ddt(space->machine->device("maincpu"), &ddtdata);
+					sh4_dma_ddt(space->machine().device("maincpu"), &ddtdata);
 
 					endflag=buff[0] & 0x80000000;
 					port=(buff[0] >> 16) & 3;
@@ -1194,7 +1194,7 @@ WRITE64_HANDLER( dc_maple_w )
 								sprintf(pH, "P%dH", port+1);
 
 								buff[1] = func;
-								buff[2] = input_port_read(space->machine, pH)<<8 | input_port_read(space->machine, pL) | 0xffff0000;
+								buff[2] = input_port_read(space->machine(), pH)<<8 | input_port_read(space->machine(), pL) | 0xffff0000;
 								buff[3] = 0xffffffff;
 								ddtdata.length=(8/4)+1;
 								break;
@@ -1211,11 +1211,11 @@ WRITE64_HANDLER( dc_maple_w )
 					ddtdata.destination=destination;
 					ddtdata.buffer=buff;
 					ddtdata.direction=1;
-					sh4_dma_ddt(space->machine->device("maincpu"),&ddtdata);
+					sh4_dma_ddt(space->machine().device("maincpu"),&ddtdata);
 
 					if (endflag)
 					{
-						space->machine->scheduler().timer_set(attotime::from_usec(200), FUNC(maple_dma_irq));
+						space->machine().scheduler().timer_set(attotime::from_usec(200), FUNC(maple_dma_irq));
 						break;
 					}
 					// skip fixed packet header
@@ -1283,7 +1283,7 @@ READ64_HANDLER( dc_g1_ctrl_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 	mame_printf_verbose("G1CTRL:  Unmapped read %08x\n", 0x5f7400+reg*4);
 	return (UINT64)g1bus_regs[reg] << shift;
 }
@@ -1297,7 +1297,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 	UINT8 *ROM;
 	UINT32 dmaoffset;
 
-	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	old = g1bus_regs[reg];
 
@@ -1316,8 +1316,8 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 			}
 			g1bus_regs[SB_GDST] = dat & 1;
 //          printf("ROM board DMA to %x len %x (PC %x)\n", g1bus_regs[SB_GDSTAR], g1bus_regs[SB_GDLEN], cpu_get_pc(space->cpu));
-			ROM = (UINT8 *)naomibd_get_memory(space->machine->device("rom_board"));
-			dmaoffset = naomibd_get_dmaoffset(space->machine->device("rom_board"));
+			ROM = (UINT8 *)naomibd_get_memory(space->machine().device("rom_board"));
+			dmaoffset = naomibd_get_dmaoffset(space->machine().device("rom_board"));
 			ddtdata.destination=g1bus_regs[SB_GDSTAR];		// destination address
 			ddtdata.length=g1bus_regs[SB_GDLEN] >> 5;		// words to transfer
 			/* data in the lower 5 bits makes the length size to round by 32 bytes, this'll be needed by Virtua Tennis to boot (according to Deunan) */
@@ -1330,10 +1330,10 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 			ddtdata.channel= -1;	// not used
 			ddtdata.mode= -1;		// copy from/to buffer
 			mame_printf_verbose("G1CTRL: transfer %x from ROM %08x to sdram %08x\n", g1bus_regs[SB_GDLEN], dmaoffset, g1bus_regs[SB_GDSTAR]);
-			sh4_dma_ddt(space->machine->device("maincpu"), &ddtdata);
+			sh4_dma_ddt(space->machine().device("maincpu"), &ddtdata);
 			/* Note: KOF Neowave definitely wants this to be delayed (!) */
 			/* FIXME: timing of this */
-			space->machine->scheduler().timer_set(attotime::from_usec(500), FUNC(gdrom_dma_irq));
+			space->machine().scheduler().timer_set(attotime::from_usec(500), FUNC(gdrom_dma_irq));
 		}
 		break;
 	}
@@ -1344,7 +1344,7 @@ READ64_HANDLER( dc_g2_ctrl_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 	mame_printf_verbose("G2CTRL:  Unmapped read %08x\n", 0x5f7800+reg*4);
 	return (UINT64)g2bus_regs[reg] << shift;
 }
@@ -1356,7 +1356,7 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 	UINT32 dat;
 	UINT8 old;
 
-	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 
 	g2bus_regs[reg] = dat; // 5f7800+reg*4=dat
@@ -1499,7 +1499,7 @@ READ64_HANDLER( dc_modem_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 
 	// from ElSemi: this makes Atomiswave do it's "verbose boot" with a Sammy logo and diagnostics instead of just running the cart.
 	// our PVR emulation is apparently not good enough for that to work yet though.
@@ -1518,7 +1518,7 @@ WRITE64_HANDLER( dc_modem_w )
 	UINT64 shift;
 	UINT32 dat;
 
-	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	mame_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
@@ -1528,7 +1528,7 @@ READ64_HANDLER( dc_rtc_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg3216_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg3216_64(space->machine(), offset, mem_mask, &shift);
 	mame_printf_verbose("RTC:  Unmapped read %08x\n", 0x710000+reg*4);
 
 	return (UINT64)dc_rtcregister[reg] << shift;
@@ -1540,7 +1540,7 @@ WRITE64_HANDLER( dc_rtc_w )
 	UINT64 shift;
 	UINT32 old,dat;
 
-	reg = decode_reg3216_64(space->machine, offset, mem_mask, &shift);
+	reg = decode_reg3216_64(space->machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	old = dc_rtcregister[reg];
 	dc_rtcregister[reg] = dat & 0xFFFF; // 5f6c00+off*4=dat
@@ -1573,13 +1573,13 @@ static TIMER_CALLBACK(dc_rtc_increment)
 }
 
 /* fill the RTC registers with the proper start-up values */
-static void rtc_initial_setup(running_machine *machine)
+static void rtc_initial_setup(running_machine &machine)
 {
 	static UINT32 current_time;
 	static int year_count,cur_year,i;
 	static const int month_to_day_conversion[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 	system_time systime;
-	machine->base_datetime(systime);
+	machine.base_datetime(systime);
 
 	memset(dc_rtcregister, 0, sizeof(dc_rtcregister));
 
@@ -1609,7 +1609,7 @@ static void rtc_initial_setup(running_machine *machine)
 	dc_rtcregister[RTC2] = current_time & 0x0000ffff;
 	dc_rtcregister[RTC1] = (current_time & 0xffff0000) >> 16;
 
-	dc_rtc_timer = machine->scheduler().timer_alloc(FUNC(dc_rtc_increment));
+	dc_rtc_timer = machine.scheduler().timer_alloc(FUNC(dc_rtc_increment));
 }
 
 MACHINE_START( dc )
@@ -1638,7 +1638,7 @@ READ64_DEVICE_HANDLER( dc_aica_reg_r )
 	//int reg;
 	UINT64 shift;
 
-	/*reg = */decode_reg32_64(device->machine, offset, mem_mask, &shift);
+	/*reg = */decode_reg32_64(device->machine(), offset, mem_mask, &shift);
 
 //  mame_printf_verbose("AICA REG: [%08x] read %" I64FMT "x, mask %" I64FMT "x\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
 
@@ -1651,7 +1651,7 @@ WRITE64_DEVICE_HANDLER( dc_aica_reg_w )
 	UINT64 shift;
 	UINT32 dat;
 
-	reg = decode_reg32_64(device->machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(device->machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 
 	if (reg == (0x2c00/4))
@@ -1659,12 +1659,12 @@ WRITE64_DEVICE_HANDLER( dc_aica_reg_w )
 		if (dat & 1)
 		{
 			/* halt the ARM7 */
-			cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(device->machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
 		}
 		else
 		{
 			/* it's alive ! */
-			cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(device->machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
 		}
     }
 

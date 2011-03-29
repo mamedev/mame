@@ -1171,7 +1171,7 @@ WRITE8_DEVICE_HANDLER( spc_io_w )
 			if ((data & 0x80) != (spc700->ram[0xf1] & 0x80))
 			{
 				if (data & 0x80)
-					memcpy(spc700->ipl_region, device->machine->region("user5")->base(), 64);
+					memcpy(spc700->ipl_region, device->machine().region("user5")->base(), 64);
 				else
 					memcpy(spc700->ipl_region, &spc700->ram[0xffc0], 64);
 			}
@@ -1188,7 +1188,7 @@ WRITE8_DEVICE_HANDLER( spc_io_w )
 		case 0x7:		/* Port 3 */
 			// mame_printf_debug("SPC: %02x to APU @ %d (PC=%x)\n", data, offset & 3, cpu_get_pc(space->cpu));
 			spc700->port_out[offset - 4] = data;
-			device->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+			device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 			break;
 		case 0xa:		/* Timer 0 */
 		case 0xb:		/* Timer 1 */
@@ -1309,26 +1309,26 @@ static void state_register( device_t *device )
 static DEVICE_START( snes_sound )
 {
 	snes_sound_state *spc700 = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 
-	spc700->channel = device->machine->sound().stream_alloc(*device, 0, 2, 32000, 0, snes_sh_update);
+	spc700->channel = device->machine().sound().stream_alloc(*device, 0, 2, 32000, 0, snes_sh_update);
 
-	spc700->ram = auto_alloc_array_clear(device->machine, UINT8, SNES_SPCRAM_SIZE);
+	spc700->ram = auto_alloc_array_clear(device->machine(), UINT8, SNES_SPCRAM_SIZE);
 
 	/* default to ROM visible */
 	spc700->ram[0xf1] = 0x80;
 
 	/* put IPL image at the top of RAM */
-	memcpy(spc700->ipl_region, machine->region("user5")->base(), 64);
+	memcpy(spc700->ipl_region, machine.region("user5")->base(), 64);
 
 	/* Initialize the timers */
-	spc700->timer[0] = machine->scheduler().timer_alloc(FUNC(snes_spc_timer), spc700);
+	spc700->timer[0] = machine.scheduler().timer_alloc(FUNC(snes_spc_timer), spc700);
 	spc700->timer[0]->adjust(attotime::from_hz(8000),  0, attotime::from_hz(8000));
 	spc700->timer[0]->enable(false);
-	spc700->timer[1] = machine->scheduler().timer_alloc(FUNC(snes_spc_timer), spc700);
+	spc700->timer[1] = machine.scheduler().timer_alloc(FUNC(snes_spc_timer), spc700);
 	spc700->timer[1]->adjust(attotime::from_hz(8000),  1, attotime::from_hz(8000));
 	spc700->timer[1]->enable(false);
-	spc700->timer[2] = machine->scheduler().timer_alloc(FUNC(snes_spc_timer), spc700);
+	spc700->timer[2] = machine.scheduler().timer_alloc(FUNC(snes_spc_timer), spc700);
 	spc700->timer[2]->adjust(attotime::from_hz(64000), 2, attotime::from_hz(64000));
 	spc700->timer[2]->enable(false);
 

@@ -36,13 +36,13 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	eprom_state *state = machine->driver_data<eprom_state>();
+	eprom_state *state = machine.driver_data<eprom_state>();
 
 	cputag_set_input_line(machine, "maincpu", 4, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
 
-	if (machine->device("extra") != NULL)
+	if (machine.device("extra") != NULL)
 		cputag_set_input_line(machine, "extra", 4, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
 
 	cputag_set_input_line(machine, "maincpu", 6, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
@@ -57,11 +57,11 @@ static MACHINE_START( eprom )
 
 static MACHINE_RESET( eprom )
 {
-	eprom_state *state = machine->driver_data<eprom_state>();
+	eprom_state *state = machine.driver_data<eprom_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine->primary_screen, eprom_scanline_update, 8);
+	atarigen_scanline_timer_reset(*machine.primary_screen, eprom_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -75,8 +75,8 @@ static MACHINE_RESET( eprom )
 
 static READ16_HANDLER( special_port1_r )
 {
-	eprom_state *state = space->machine->driver_data<eprom_state>();
-	int result = input_port_read(space->machine, "260010");
+	eprom_state *state = space->machine().driver_data<eprom_state>();
+	int result = input_port_read(space->machine(), "260010");
 
 	if (state->sound_to_cpu_ready) result ^= 0x0004;
 	if (state->cpu_to_sound_ready) result ^= 0x0008;
@@ -88,9 +88,9 @@ static READ16_HANDLER( special_port1_r )
 
 static READ16_HANDLER( adc_r )
 {
-	eprom_state *state = space->machine->driver_data<eprom_state>();
+	eprom_state *state = space->machine().driver_data<eprom_state>();
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-	int result = input_port_read(space->machine, adcnames[state->last_offset & 3]);
+	int result = input_port_read(space->machine(), adcnames[state->last_offset & 3]);
 
 	state->last_offset = offset;
 	return result;
@@ -106,15 +106,15 @@ static READ16_HANDLER( adc_r )
 
 static WRITE16_HANDLER( eprom_latch_w )
 {
-	eprom_state *state = space->machine->driver_data<eprom_state>();
+	eprom_state *state = space->machine().driver_data<eprom_state>();
 
-	if (ACCESSING_BITS_0_7 && (space->machine->device("extra") != NULL))
+	if (ACCESSING_BITS_0_7 && (space->machine().device("extra") != NULL))
 	{
 		/* bit 0: reset extra CPU */
 		if (data & 1)
-			cputag_set_input_line(space->machine, "extra", INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "extra", INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cputag_set_input_line(space->machine, "extra", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "extra", INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bits 1-4: screen intensity */
 		state->screen_intensity = (data & 0x1e) >> 1;
@@ -134,14 +134,14 @@ static WRITE16_HANDLER( eprom_latch_w )
 
 static READ16_HANDLER( sync_r )
 {
-	eprom_state *state = space->machine->driver_data<eprom_state>();
+	eprom_state *state = space->machine().driver_data<eprom_state>();
 	return state->sync_data[offset];
 }
 
 
 static WRITE16_HANDLER( sync_w )
 {
-	eprom_state *state = space->machine->driver_data<eprom_state>();
+	eprom_state *state = space->machine().driver_data<eprom_state>();
 	int oldword = state->sync_data[offset];
 	int newword = oldword;
 	COMBINE_DATA(&newword);
@@ -725,13 +725,13 @@ ROM_END
 
 static DRIVER_INIT( eprom )
 {
-	eprom_state *state = machine->driver_data<eprom_state>();
+	eprom_state *state = machine.driver_data<eprom_state>();
 
 	atarijsa_init(machine, "260010", 0x0002);
 
 	/* install CPU synchronization handlers */
-	state->sync_data = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x16cc00, 0x16cc01, FUNC(sync_r), FUNC(sync_w));
-	state->sync_data = machine->device("extra")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x16cc00, 0x16cc01, FUNC(sync_r), FUNC(sync_w));
+	state->sync_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x16cc00, 0x16cc01, FUNC(sync_r), FUNC(sync_w));
+	state->sync_data = machine.device("extra")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x16cc00, 0x16cc01, FUNC(sync_r), FUNC(sync_w));
 }
 
 

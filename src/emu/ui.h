@@ -91,7 +91,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef INT32 (*slider_update)(running_machine *machine, void *arg, astring *string, INT32 newval);
+typedef INT32 (*slider_update)(running_machine &machine, void *arg, astring *string, INT32 newval);
 
 typedef struct _slider_state slider_state;
 struct _slider_state
@@ -121,16 +121,16 @@ struct _slider_state
 ***************************************************************************/
 
 /* main init/exit routines */
-int ui_init(running_machine *machine);
+int ui_init(running_machine &machine);
 
 /* display the startup screens */
-int ui_display_startup_screens(running_machine *machine, int first_time, int show_disclaimer);
+int ui_display_startup_screens(running_machine &machine, int first_time, int show_disclaimer);
 
 /* set the current text to display at startup */
-void ui_set_startup_text(running_machine *machine, const char *text, int force);
+void ui_set_startup_text(running_machine &machine, const char *text, int force);
 
 /* once-per-frame update and render */
-void ui_update_and_render(running_machine *machine, render_container *container);
+void ui_update_and_render(running_machine &machine, render_container *container);
 
 /* returns the current UI font */
 render_font *ui_get_font(running_machine &machine);
@@ -173,18 +173,18 @@ void ui_show_menu(void);
 int ui_is_menu_active(void);
 
 /* print the game info string into a buffer */
-astring &game_info_astring(running_machine *machine, astring &string);
+astring &game_info_astring(running_machine &machine, astring &string);
 
 /* get the list of sliders */
 const slider_state *ui_get_slider_list(void);
 
 /* paste */
-void ui_paste(running_machine *machine);
+void ui_paste(running_machine &machine);
 
 /* returns whether the natural keyboard is active */
-int ui_get_use_natural_keyboard(running_machine *machine);
+int ui_get_use_natural_keyboard(running_machine &machine);
 
 /* specifies whether the natural keyboard is active */
-void ui_set_use_natural_keyboard(running_machine *machine, int use_natural_keyboard);
+void ui_set_use_natural_keyboard(running_machine &machine, int use_natural_keyboard);
 
 #endif	/* __USRINTRF_H__ */

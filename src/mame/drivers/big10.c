@@ -81,21 +81,21 @@ public:
 *      Interrupt handling & Video      *
 ***************************************/
 
-static void big10_vdp_interrupt(running_machine *machine, int i)
+static void big10_vdp_interrupt(running_machine &machine, int i)
 {
 	cputag_set_input_line (machine, "maincpu", 0, (i ? ASSERT_LINE : CLEAR_LINE));
 }
 
 static INTERRUPT_GEN( big10_interrupt )
 {
-	v9938_interrupt(device->machine, 0);
+	v9938_interrupt(device->machine(), 0);
 }
 
 
 static VIDEO_START( big10 )
 {
 	VIDEO_START_CALL(generic_bitmapped);
-	v9938_init (machine, 0, *machine->primary_screen, machine->generic.tmpbitmap, MODEL_V9938, VDP_MEM, big10_vdp_interrupt);
+	v9938_init (machine, 0, *machine.primary_screen, machine.generic.tmpbitmap, MODEL_V9938, VDP_MEM, big10_vdp_interrupt);
 	v9938_reset(0);
 }
 
@@ -117,18 +117,18 @@ static MACHINE_RESET(big10)
 
 static WRITE8_DEVICE_HANDLER( mux_w )
 {
-	big10_state *state = device->machine->driver_data<big10_state>();
+	big10_state *state = device->machine().driver_data<big10_state>();
 	state->mux_data = ~data;
 }
 
 static READ8_HANDLER( mux_r )
 {
-	big10_state *state = space->machine->driver_data<big10_state>();
+	big10_state *state = space->machine().driver_data<big10_state>();
 	switch(state->mux_data)
 	{
-		case 1: return input_port_read(space->machine, "IN1");
-		case 2: return input_port_read(space->machine, "IN2");
-		case 4: return input_port_read(space->machine, "IN3");
+		case 1: return input_port_read(space->machine(), "IN1");
+		case 2: return input_port_read(space->machine(), "IN2");
+		case 4: return input_port_read(space->machine(), "IN3");
 	}
 
 	return state->mux_data;

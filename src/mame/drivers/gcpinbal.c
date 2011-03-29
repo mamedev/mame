@@ -44,14 +44,14 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 static TIMER_CALLBACK( gcpinbal_interrupt1 )
 {
-	gcpinbal_state *state = machine->driver_data<gcpinbal_state>();
+	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
 	device_set_input_line(state->maincpu, 1, HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
 static TIMER_CALLBACK( gcpinbal_interrupt3 )
 {
-	gcpinbal_state *state = machine->driver_data<gcpinbal_state>();
+	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
 	// IRQ3 is from the M6585
 //  if (!ADPCM_playing(0))
 	{
@@ -64,8 +64,8 @@ static INTERRUPT_GEN( gcpinbal_interrupt )
 {
 	/* Unsure of actual sequence */
 
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(500), FUNC(gcpinbal_interrupt1));
-//  device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(1000), FUNC(gcpinbal_interrupt3));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(500), FUNC(gcpinbal_interrupt1));
+//  device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(1000), FUNC(gcpinbal_interrupt3));
 	device_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -76,20 +76,20 @@ static INTERRUPT_GEN( gcpinbal_interrupt )
 
 static READ16_HANDLER( ioc_r )
 {
-	gcpinbal_state *state = space->machine->driver_data<gcpinbal_state>();
+	gcpinbal_state *state = space->machine().driver_data<gcpinbal_state>();
 
 	/* 20 (only once), 76, a0 are read in log */
 
 	switch (offset)
 	{
 		case 0x80/2:
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 
 		case 0x84/2:
-			return input_port_read(space->machine, "IN0");
+			return input_port_read(space->machine(), "IN0");
 
 		case 0x86/2:
-			return input_port_read(space->machine, "IN1");
+			return input_port_read(space->machine(), "IN1");
 
 		case 0x50:
 		case 0x51:
@@ -105,7 +105,7 @@ static READ16_HANDLER( ioc_r )
 
 static WRITE16_HANDLER( ioc_w )
 {
-	gcpinbal_state *state = space->machine->driver_data<gcpinbal_state>();
+	gcpinbal_state *state = space->machine().driver_data<gcpinbal_state>();
 	COMBINE_DATA(&state->ioc_ram[offset]);
 
 //  switch (offset)
@@ -114,8 +114,8 @@ static WRITE16_HANDLER( ioc_w )
 //          return;
 //
 //      case 0x88/2:    /* coin control (+ others) ??? */
-//          coin_lockout_w(space->machine, 0, ~data & 0x01);
-//          coin_lockout_w(space->machine, 1, ~data & 0x02);
+//          coin_lockout_w(space->machine(), 0, ~data & 0x01);
+//          coin_lockout_w(space->machine(), 1, ~data & 0x02);
 //popmessage(" address %04x value %04x", offset, data);
 //  }
 
@@ -204,7 +204,7 @@ static WRITE16_HANDLER( ioc_w )
 /* Controlled through ioc? */
 static void gcp_adpcm_int( device_t *device )
 {
-	gcpinbal_state *state = device->machine->driver_data<gcpinbal_state>();
+	gcpinbal_state *state = device->machine().driver_data<gcpinbal_state>();
 
 	if (state->adpcm_idle)
 		msm5205_reset_w(device, 1);
@@ -216,7 +216,7 @@ static void gcp_adpcm_int( device_t *device )
 	}
 	else
 	{
-		UINT8 *ROM = device->machine->region("msm")->base();
+		UINT8 *ROM = device->machine().region("msm")->base();
 
 		state->adpcm_data = ((state->adpcm_trigger ? (ROM[state->adpcm_start] & 0x0f) : (ROM[state->adpcm_start] & 0xf0) >> 4));
 		msm5205_data_w(device, state->adpcm_data & 0xf);
@@ -394,7 +394,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( gcpinbal )
 {
-	gcpinbal_state *state = machine->driver_data<gcpinbal_state>();
+	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
 
 	state->save_item(NAME(state->scrollx));
 	state->save_item(NAME(state->scrolly));
@@ -412,7 +412,7 @@ static MACHINE_START( gcpinbal )
 
 static MACHINE_RESET( gcpinbal )
 {
-	gcpinbal_state *state = machine->driver_data<gcpinbal_state>();
+	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
 	int i;
 
 	for (i = 0; i < 3; i++)

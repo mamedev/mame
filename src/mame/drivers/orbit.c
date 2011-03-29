@@ -33,7 +33,7 @@ Atari Orbit Driver
 
 static TIMER_DEVICE_CALLBACK( nmi_32v )
 {
-	orbit_state *state = timer.machine->driver_data<orbit_state>();
+	orbit_state *state = timer.machine().driver_data<orbit_state>();
 	int scanline = param;
 	int nmistate = (scanline & 32) && (state->misc_flags & 4);
 	device_set_input_line(state->maincpu, INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
@@ -42,7 +42,7 @@ static TIMER_DEVICE_CALLBACK( nmi_32v )
 
 static TIMER_CALLBACK( irq_off )
 {
-	orbit_state *state = machine->driver_data<orbit_state>();
+	orbit_state *state = machine.driver_data<orbit_state>();
 	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
@@ -50,7 +50,7 @@ static TIMER_CALLBACK( irq_off )
 static INTERRUPT_GEN( orbit_interrupt )
 {
 	device_set_input_line(device, 0, ASSERT_LINE);
-	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_vblank_end(), FUNC(irq_off));
+	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_vblank_end(), FUNC(irq_off));
 }
 
 
@@ -61,9 +61,9 @@ static INTERRUPT_GEN( orbit_interrupt )
  *
  *************************************/
 
-static void update_misc_flags(running_machine *machine, UINT8 val)
+static void update_misc_flags(running_machine &machine, UINT8 val)
 {
-	orbit_state *state = machine->driver_data<orbit_state>();
+	orbit_state *state = machine.driver_data<orbit_state>();
 
 	state->misc_flags = val;
 
@@ -88,13 +88,13 @@ static void update_misc_flags(running_machine *machine, UINT8 val)
 
 static WRITE8_HANDLER( orbit_misc_w )
 {
-	orbit_state *state = space->machine->driver_data<orbit_state>();
+	orbit_state *state = space->machine().driver_data<orbit_state>();
 	UINT8 bit = offset >> 1;
 
 	if (offset & 1)
-		update_misc_flags(space->machine, state->misc_flags | (1 << bit));
+		update_misc_flags(space->machine(), state->misc_flags | (1 << bit));
 	else
-		update_misc_flags(space->machine, state->misc_flags & ~(1 << bit));
+		update_misc_flags(space->machine(), state->misc_flags & ~(1 << bit));
 }
 
 
@@ -274,10 +274,10 @@ GFXDECODE_END
 
 static MACHINE_START( orbit )
 {
-	orbit_state *state = machine->driver_data<orbit_state>();
+	orbit_state *state = machine.driver_data<orbit_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->discrete = machine->device("discrete");
+	state->maincpu = machine.device("maincpu");
+	state->discrete = machine.device("discrete");
 
 	state->save_item(NAME(state->misc_flags));
 	state->save_item(NAME(state->flip_screen));
@@ -285,7 +285,7 @@ static MACHINE_START( orbit )
 
 static MACHINE_RESET( orbit )
 {
-	orbit_state *state = machine->driver_data<orbit_state>();
+	orbit_state *state = machine.driver_data<orbit_state>();
 
 	update_misc_flags(machine, 0);
 	state->flip_screen = 0;

@@ -68,12 +68,12 @@ static STREAM_UPDATE( mjkjidai_adpcm_callback )
 
 static DEVICE_START( mjkjidai_adpcm )
 {
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	mjkjidai_adpcm_state *state = (mjkjidai_adpcm_state *)downcast<legacy_device_base *>(device)->token();
 
 	state->playing = 0;
-	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock(), state, mjkjidai_adpcm_callback);
-	state->base = machine->region("adpcm")->base();
+	state->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), state, mjkjidai_adpcm_callback);
+	state->base = machine.region("adpcm")->base();
 	state->adpcm.reset();
 }
 
@@ -114,7 +114,7 @@ static WRITE8_DEVICE_HANDLER( adpcm_w )
 
 static READ8_HANDLER( keyboard_r )
 {
-	mjkjidai_state *state = space->machine->driver_data<mjkjidai_state>();
+	mjkjidai_state *state = space->machine().driver_data<mjkjidai_state>();
 	int res = 0x3f,i;
 	static const char *const keynames[] = { "PL2_1", "PL2_2", "PL2_3", "PL2_4", "PL2_5", "PL2_6", "PL1_1", "PL1_2", "PL1_3", "PL1_4", "PL1_5", "PL1_6" };
 
@@ -124,12 +124,12 @@ static READ8_HANDLER( keyboard_r )
 	{
 		if (~state->keyb & (1 << i))
 		{
-			res = input_port_read(space->machine, keynames[i]) & 0x3f;
+			res = input_port_read(space->machine(), keynames[i]) & 0x3f;
 			break;
 		}
 	}
 
-	res |= (input_port_read(space->machine, "IN3") & 0xc0);
+	res |= (input_port_read(space->machine(), "IN3") & 0xc0);
 
 	if (state->nvram_init_count)
 	{
@@ -142,7 +142,7 @@ static READ8_HANDLER( keyboard_r )
 
 static WRITE8_HANDLER( keyboard_select_w )
 {
-	mjkjidai_state *state = space->machine->driver_data<mjkjidai_state>();
+	mjkjidai_state *state = space->machine().driver_data<mjkjidai_state>();
 
 //  logerror("%04x: keyboard_select %d = %02x\n",cpu_get_pc(space->cpu),offset,data);
 
@@ -155,7 +155,7 @@ static WRITE8_HANDLER( keyboard_select_w )
 
 static NVRAM_HANDLER( mjkjidai )
 {
-	mjkjidai_state *state = machine->driver_data<mjkjidai_state>();
+	mjkjidai_state *state = machine.driver_data<mjkjidai_state>();
 
 	if (read_or_write)
 		file->write(state->nvram, state->nvram_size);

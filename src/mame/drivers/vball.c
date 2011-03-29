@@ -110,28 +110,28 @@ INLINE int scanline_to_vcount(int scanline)
 
 static TIMER_DEVICE_CALLBACK( vball_scanline )
 {
-	vball_state *state = timer.machine->driver_data<vball_state>();
+	vball_state *state = timer.machine().driver_data<vball_state>();
 	int scanline = param;
-	int screen_height = timer.machine->primary_screen->height();
+	int screen_height = timer.machine().primary_screen->height();
 	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
 	int vcount = scanline_to_vcount(scanline);
 
 	/* Update to the current point */
 	if (scanline > 0)
 	{
-		timer.machine->primary_screen->update_partial(scanline - 1);
+		timer.machine().primary_screen->update_partial(scanline - 1);
 	}
 
 	/* IRQ fires every on every 8th scanline */
 	if (!(vcount_old & 8) && (vcount & 8))
 	{
-		cputag_set_input_line(timer.machine, "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(timer.machine(), "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
 	}
 
 	/* NMI fires on scanline 248 (VBL) and is latched */
 	if (vcount == 0xf8)
 	{
-		cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 
 	/* Save the scroll x register value */
@@ -144,10 +144,10 @@ static TIMER_DEVICE_CALLBACK( vball_scanline )
 static WRITE8_HANDLER( vball_irq_ack_w )
 {
 	if (offset == 0)
-		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
 	else
-		cputag_set_input_line(space->machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -162,14 +162,14 @@ static WRITE8_HANDLER( vball_irq_ack_w )
 */
 static WRITE8_HANDLER( vb_bankswitch_w )
 {
-	vball_state *state = space->machine->driver_data<vball_state>();
-	UINT8 *RAM = space->machine->region("maincpu")->base();
-	memory_set_bankptr(space->machine, "bank1", &RAM[0x10000 + (0x4000 * (data & 1))]);
+	vball_state *state = space->machine().driver_data<vball_state>();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
+	memory_set_bankptr(space->machine(), "bank1", &RAM[0x10000 + (0x4000 * (data & 1))]);
 
 	if (state->gfxset != ((data  & 0x20) ^ 0x20))
 	{
 		state->gfxset = (data  & 0x20) ^ 0x20;
-			vb_mark_all_dirty(space->machine);
+			vb_mark_all_dirty(space->machine());
 	}
 	state->vb_scrolly_hi = (data & 0x40) << 2;
 }
@@ -178,7 +178,7 @@ static WRITE8_HANDLER( vb_bankswitch_w )
 static WRITE8_HANDLER( cpu_sound_command_w )
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -193,17 +193,17 @@ static WRITE8_HANDLER( cpu_sound_command_w )
 */
 static WRITE8_HANDLER( vb_scrollx_hi_w )
 {
-	vball_state *state = space->machine->driver_data<vball_state>();
-	flip_screen_set(space->machine, ~data&1);
+	vball_state *state = space->machine().driver_data<vball_state>();
+	flip_screen_set(space->machine(), ~data&1);
 	state->vb_scrollx_hi = (data & 0x02) << 7;
-	vb_bgprombank_w(space->machine, (data >> 2) & 0x07);
-	vb_spprombank_w(space->machine, (data >> 5) & 0x07);
+	vb_bgprombank_w(space->machine(), (data >> 2) & 0x07);
+	vb_spprombank_w(space->machine(), (data >> 5) & 0x07);
 	//logerror("%04x: vb_scrollx_hi = %d\n", cpu_get_previouspc(space->cpu), state->vb_scrollx_hi);
 }
 
 static WRITE8_HANDLER(vb_scrollx_lo_w)
 {
-	vball_state *state = space->machine->driver_data<vball_state>();
+	vball_state *state = space->machine().driver_data<vball_state>();
 	state->vb_scrollx_lo = data;
 	//logerror("%04x: vb_scrollx_lo =%d\n", cpu_get_previouspc(space->cpu), state->vb_scrollx_lo);
 }
@@ -410,7 +410,7 @@ GFXDECODE_END
 
 static void vball_irq_handler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

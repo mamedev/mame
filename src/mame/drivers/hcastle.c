@@ -19,19 +19,19 @@
 
 static WRITE8_HANDLER( hcastle_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x1f);
+	memory_set_bank(space->machine(), "bank1", data & 0x1f);
 }
 
 static WRITE8_HANDLER( hcastle_soundirq_w )
 {
-	hcastle_state *state = space->machine->driver_data<hcastle_state>();
+	hcastle_state *state = space->machine().driver_data<hcastle_state>();
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( hcastle_coin_w )
 {
-	coin_counter_w(space->machine, 0, data & 0x40);
-	coin_counter_w(space->machine, 1, data & 0x80);
+	coin_counter_w(space->machine(), 0, data & 0x40);
+	coin_counter_w(space->machine(), 1, data & 0x80);
 }
 
 
@@ -156,7 +156,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int linestate)
 {
-//  hcastle_state *state = device->machine->driver_data<hcastle_state>();
+//  hcastle_state *state = device->machine().driver_data<hcastle_state>();
 //  cputag_set_input_line(state->audiocpu, 0, linestate);
 }
 
@@ -178,14 +178,14 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_START( hcastle )
 {
-	hcastle_state *state = machine->driver_data<hcastle_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	hcastle_state *state = machine.driver_data<hcastle_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x10000], 0x2000);
 
-	state->audiocpu = machine->device("audiocpu");
-	state->k007121_1 = machine->device("k007121_1");
-	state->k007121_2 = machine->device("k007121_2");
+	state->audiocpu = machine.device("audiocpu");
+	state->k007121_1 = machine.device("k007121_1");
+	state->k007121_2 = machine.device("k007121_2");
 
 	state->save_item(NAME(state->pf2_bankbase));
 	state->save_item(NAME(state->pf1_bankbase));
@@ -196,7 +196,7 @@ static MACHINE_START( hcastle )
 
 static MACHINE_RESET( hcastle )
 {
-	hcastle_state *state = machine->driver_data<hcastle_state>();
+	hcastle_state *state = machine.driver_data<hcastle_state>();
 
 	state->pf2_bankbase = 0;
 	state->pf1_bankbase = 0;

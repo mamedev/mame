@@ -23,18 +23,18 @@
   Palette color
 ***************************************************************************/
 
-static void psychic5_change_palette(running_machine *machine, int color, int offset)
+static void psychic5_change_palette(running_machine &machine, int color, int offset)
 {
-	psychic5_state *state = machine->driver_data<psychic5_state>();
+	psychic5_state *state = machine.driver_data<psychic5_state>();
 	UINT8 lo = state->ps5_palette_ram[offset & ~1];
 	UINT8 hi = state->ps5_palette_ram[offset | 1];
 	jal_blend_set(color, hi & 0x0f);
 	palette_set_color_rgb(machine, color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
 }
 
-static void psychic5_change_bg_palette(running_machine *machine, int color, int lo_offs, int hi_offs)
+static void psychic5_change_bg_palette(running_machine &machine, int color, int lo_offs, int hi_offs)
 {
-	psychic5_state *state = machine->driver_data<psychic5_state>();
+	psychic5_state *state = machine.driver_data<psychic5_state>();
 	UINT8 r,g,b,lo,hi,ir,ig,ib,ix;
 	rgb_t irgb;
 
@@ -72,9 +72,9 @@ static void psychic5_change_bg_palette(running_machine *machine, int color, int 
 	}
 }
 
-static void set_background_palette_intensity(running_machine *machine)
+static void set_background_palette_intensity(running_machine &machine)
 {
-	psychic5_state *state = machine->driver_data<psychic5_state>();
+	psychic5_state *state = machine.driver_data<psychic5_state>();
 	int i;
 	state->palette_intensity = state->ps5_palette_ram[BG_PAL_INTENSITY_BU] |
 						(state->ps5_palette_ram[BG_PAL_INTENSITY_RG]<<8);
@@ -91,34 +91,34 @@ static void set_background_palette_intensity(running_machine *machine)
 
 READ8_HANDLER( psychic5_vram_page_select_r )
 {
-	psychic5_state *state = space->machine->driver_data<psychic5_state>();
+	psychic5_state *state = space->machine().driver_data<psychic5_state>();
 	return state->ps5_vram_page;
 }
 
 WRITE8_HANDLER( psychic5_vram_page_select_w )
 {
-	psychic5_state *state = space->machine->driver_data<psychic5_state>();
+	psychic5_state *state = space->machine().driver_data<psychic5_state>();
 	state->ps5_vram_page = data & 1;
 }
 
 WRITE8_HANDLER( psychic5_title_screen_w )
 {
-	psychic5_state *state = space->machine->driver_data<psychic5_state>();
+	psychic5_state *state = space->machine().driver_data<psychic5_state>();
 	state->title_screen = data;
 }
 
 READ8_HANDLER( psychic5_paged_ram_r )
 {
-	psychic5_state *state = space->machine->driver_data<psychic5_state>();
+	psychic5_state *state = space->machine().driver_data<psychic5_state>();
 	if (state->ps5_vram_page == 1)
 	{
 		switch (offset)
 		{
-			case 0x00: return input_port_read(space->machine, "SYSTEM");
-			case 0x01: return input_port_read(space->machine, "P1");
-			case 0x02: return input_port_read(space->machine, "P2");
-			case 0x03: return input_port_read(space->machine, "DSW1");
-			case 0x04: return input_port_read(space->machine, "DSW2");
+			case 0x00: return input_port_read(space->machine(), "SYSTEM");
+			case 0x01: return input_port_read(space->machine(), "P1");
+			case 0x02: return input_port_read(space->machine(), "P2");
+			case 0x03: return input_port_read(space->machine(), "DSW1");
+			case 0x04: return input_port_read(space->machine(), "DSW2");
 		}
 	}
 
@@ -127,7 +127,7 @@ READ8_HANDLER( psychic5_paged_ram_r )
 
 WRITE8_HANDLER( psychic5_paged_ram_w )
 {
-	psychic5_state *state = space->machine->driver_data<psychic5_state>();
+	psychic5_state *state = space->machine().driver_data<psychic5_state>();
 	state->ps5_pagedram[state->ps5_vram_page][offset] = data;
 
 	if (state->ps5_vram_page == 0)
@@ -152,11 +152,11 @@ WRITE8_HANDLER( psychic5_paged_ram_w )
 			state->bg_status = state->ps5_io_ram[BG_SCREEN_MODE];
 		}
 		else if (offset >= 0x400 && offset <= 0x5ff)	/* Sprite color */
-			psychic5_change_palette(space->machine,((offset >> 1) & 0xff)+0x000,offset-0x400);
+			psychic5_change_palette(space->machine(),((offset >> 1) & 0xff)+0x000,offset-0x400);
 		else if (offset >= 0x800 && offset <= 0x9ff)	/* BG color */
-			psychic5_change_palette(space->machine,((offset >> 1) & 0xff)+0x100,offset-0x400);
+			psychic5_change_palette(space->machine(),((offset >> 1) & 0xff)+0x100,offset-0x400);
 		else if (offset >= 0xa00 && offset <= 0xbff)	/* Text color */
-			psychic5_change_palette(space->machine,((offset >> 1) & 0xff)+0x200,offset-0x400);
+			psychic5_change_palette(space->machine(),((offset >> 1) & 0xff)+0x200,offset-0x400);
 		else if (offset >= 0x1000)
 			tilemap_mark_tile_dirty(state->fg_tilemap, (offset-0x1000) >> 1);
 	}
@@ -164,7 +164,7 @@ WRITE8_HANDLER( psychic5_paged_ram_w )
 
 WRITE8_HANDLER( bombsa_paged_ram_w )
 {
-	psychic5_state *state = space->machine->driver_data<psychic5_state>();
+	psychic5_state *state = space->machine().driver_data<psychic5_state>();
 	state->ps5_pagedram[state->ps5_vram_page][offset] = data;
 
 	if (state->ps5_vram_page == 0)
@@ -190,13 +190,13 @@ WRITE8_HANDLER( bombsa_paged_ram_w )
 		else if (offset >= 0x0800 && offset <= 0x0fff)
 			tilemap_mark_tile_dirty(state->fg_tilemap, (offset & 0x7ff) >> 1);
 		else if (offset >= 0x1000 && offset <= 0x15ff)
-			psychic5_change_palette(space->machine, (offset >> 1) & 0x3ff, offset-0x1000);
+			psychic5_change_palette(space->machine(), (offset >> 1) & 0x3ff, offset-0x1000);
 	}
 }
 
 WRITE8_HANDLER( bombsa_unknown_w )
 {
-	psychic5_state *state = space->machine->driver_data<psychic5_state>();
+	psychic5_state *state = space->machine().driver_data<psychic5_state>();
 	state->bombsa_unknown = data;
 }
 
@@ -207,7 +207,7 @@ WRITE8_HANDLER( bombsa_unknown_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	psychic5_state *state = machine->driver_data<psychic5_state>();
+	psychic5_state *state = machine.driver_data<psychic5_state>();
 	int offs = tile_index << 1;
 	int attr = state->bg_videoram[offs + 1];
 	int code = state->bg_videoram[offs] | ((attr & 0xc0) << 2);
@@ -219,7 +219,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	psychic5_state *state = machine->driver_data<psychic5_state>();
+	psychic5_state *state = machine.driver_data<psychic5_state>();
 	int offs = tile_index << 1;
 	int attr = state->fg_videoram[offs + 1];
 	int code = state->fg_videoram[offs] | ((attr & 0xc0) << 2);
@@ -236,7 +236,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( psychic5 )
 {
-	psychic5_state *state = machine->driver_data<psychic5_state>();
+	psychic5_state *state = machine.driver_data<psychic5_state>();
 	/*                          info              offset             w   h  col  row */
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 64, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols,  8,  8, 32, 32);
@@ -260,7 +260,7 @@ VIDEO_START( psychic5 )
 
 VIDEO_START( bombsa )
 {
-	psychic5_state *state = machine->driver_data<psychic5_state>();
+	psychic5_state *state = machine.driver_data<psychic5_state>();
 	/*                          info              offset             w   h   col  row */
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 128, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols,  8,  8,  32, 32);
@@ -284,7 +284,7 @@ VIDEO_START( bombsa )
 
 VIDEO_RESET( psychic5 )
 {
-	psychic5_state *state = machine->driver_data<psychic5_state>();
+	psychic5_state *state = machine.driver_data<psychic5_state>();
 	state->bg_clip_mode = 0;
 	state->ps5_vram_page = 0;
 	state->bg_status = 0;
@@ -295,7 +295,7 @@ VIDEO_RESET( psychic5 )
 
 VIDEO_RESET( bombsa )
 {
-	psychic5_state *state = machine->driver_data<psychic5_state>();
+	psychic5_state *state = machine.driver_data<psychic5_state>();
 	state->ps5_vram_page = 0;
 	state->bg_status = 0;
 	state->title_screen = 0;
@@ -309,11 +309,11 @@ VIDEO_RESET( bombsa )
   Screen refresh
 ***************************************************************************/
 
-#define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(bitmap, cliprect, machine->gfx[0], code, color, flipx, flipy, sx, sy, 15);
+#define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(bitmap, cliprect, machine.gfx[0], code, color, flipx, flipy, sx, sy, 15);
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	psychic5_state *state = machine->driver_data<psychic5_state>();
+	psychic5_state *state = machine.driver_data<psychic5_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -365,9 +365,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	psychic5_state *state = machine->driver_data<psychic5_state>();
+	psychic5_state *state = machine.driver_data<psychic5_state>();
 	UINT8 *spriteram = state->spriteram;
 
 	rectangle clip = *cliprect;
@@ -434,24 +434,24 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 
 SCREEN_UPDATE( psychic5 )
 {
-	psychic5_state *state = screen->machine->driver_data<psychic5_state>();
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	psychic5_state *state = screen->machine().driver_data<psychic5_state>();
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	if (state->bg_status & 1)	/* Backgound enable */
-		draw_background(screen->machine, bitmap, cliprect);
+		draw_background(screen->machine(), bitmap, cliprect);
 	if (!(state->title_screen & 1))
-		draw_sprites(screen->machine, bitmap, cliprect);
+		draw_sprites(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE( bombsa )
 {
-	psychic5_state *state = screen->machine->driver_data<psychic5_state>();
+	psychic5_state *state = screen->machine().driver_data<psychic5_state>();
 	if (state->bg_status & 1)	/* Backgound enable */
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	else
-		bitmap_fill(bitmap, cliprect, screen->machine->pens[0x0ff]);
-	draw_sprites(screen->machine, bitmap, cliprect);
+		bitmap_fill(bitmap, cliprect, screen->machine().pens[0x0ff]);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
 }

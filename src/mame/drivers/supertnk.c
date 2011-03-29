@@ -127,27 +127,27 @@ public:
 
 static WRITE8_HANDLER( supertnk_bankswitch_0_w )
 {
-	supertnk_state *state = space->machine->driver_data<supertnk_state>();
+	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 	offs_t bank_address;
 
 	state->rom_bank = (state->rom_bank & 0x02) | ((data << 0) & 0x01);
 
 	bank_address = 0x10000 + (state->rom_bank * 0x1000);
 
-	memory_set_bankptr(space->machine, "bank1", &space->machine->region("maincpu")->base()[bank_address]);
+	memory_set_bankptr(space->machine(), "bank1", &space->machine().region("maincpu")->base()[bank_address]);
 }
 
 
 static WRITE8_HANDLER( supertnk_bankswitch_1_w )
 {
-	supertnk_state *state = space->machine->driver_data<supertnk_state>();
+	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 	offs_t bank_address;
 
 	state->rom_bank = (state->rom_bank & 0x01) | ((data << 1) & 0x02);
 
 	bank_address = 0x10000 + (state->rom_bank * 0x1000);
 
-	memory_set_bankptr(space->machine, "bank1", &space->machine->region("maincpu")->base()[bank_address]);
+	memory_set_bankptr(space->machine(), "bank1", &space->machine().region("maincpu")->base()[bank_address]);
 }
 
 
@@ -167,7 +167,7 @@ static INTERRUPT_GEN( supertnk_interrupt )
 
 static WRITE8_HANDLER( supertnk_interrupt_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -180,9 +180,9 @@ static WRITE8_HANDLER( supertnk_interrupt_ack_w )
 
 static VIDEO_START( supertnk )
 {
-	supertnk_state *state = machine->driver_data<supertnk_state>();
+	supertnk_state *state = machine.driver_data<supertnk_state>();
 	offs_t i;
-	const UINT8 *prom = machine->region("proms")->base();
+	const UINT8 *prom = machine.region("proms")->base();
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
@@ -199,7 +199,7 @@ static VIDEO_START( supertnk )
 
 static WRITE8_HANDLER( supertnk_videoram_w )
 {
-	supertnk_state *state = space->machine->driver_data<supertnk_state>();
+	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 
 	if (state->bitplane_select > 2)
 	{
@@ -216,7 +216,7 @@ static WRITE8_HANDLER( supertnk_videoram_w )
 
 static READ8_HANDLER( supertnk_videoram_r )
 {
-	supertnk_state *state = space->machine->driver_data<supertnk_state>();
+	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 	UINT8 ret = 0x00;
 
 	if (state->bitplane_select < 3)
@@ -228,7 +228,7 @@ static READ8_HANDLER( supertnk_videoram_r )
 
 static WRITE8_HANDLER( supertnk_bitplane_select_0_w )
 {
-	supertnk_state *state = space->machine->driver_data<supertnk_state>();
+	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 
 	state->bitplane_select = (state->bitplane_select & 0x02) | ((data << 0) & 0x01);
 }
@@ -236,7 +236,7 @@ static WRITE8_HANDLER( supertnk_bitplane_select_0_w )
 
 static WRITE8_HANDLER( supertnk_bitplane_select_1_w )
 {
-	supertnk_state *state = space->machine->driver_data<supertnk_state>();
+	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 
 	state->bitplane_select = (state->bitplane_select & 0x01) | ((data << 1) & 0x02);
 }
@@ -244,7 +244,7 @@ static WRITE8_HANDLER( supertnk_bitplane_select_1_w )
 
 static SCREEN_UPDATE( supertnk )
 {
-	supertnk_state *state = screen->machine->driver_data<supertnk_state>();
+	supertnk_state *state = screen->machine().driver_data<supertnk_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x2000; offs++)
@@ -284,7 +284,7 @@ static SCREEN_UPDATE( supertnk )
 
 static MACHINE_RESET( supertnk )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	supertnk_bankswitch_0_w(space, 0, 0);
 	supertnk_bankswitch_1_w(space, 0, 0);
 
@@ -489,8 +489,8 @@ static DRIVER_INIT( supertnk )
 {
 	/* decode the TMS9980 ROMs */
 	offs_t offs;
-	UINT8 *rom = machine->region("maincpu")->base();
-	size_t len = machine->region("maincpu")->bytes();
+	UINT8 *rom = machine.region("maincpu")->base();
+	size_t len = machine.region("maincpu")->bytes();
 
 	for (offs = 0; offs < len; offs++)
 	{

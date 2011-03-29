@@ -6,8 +6,8 @@
 
 WRITE8_DEVICE_HANDLER(homerun_banking_w)
 {
-	homerun_state *state = device->machine->driver_data<homerun_state>();
-	if (device->machine->primary_screen->vpos() > half_screen)
+	homerun_state *state = device->machine().driver_data<homerun_state>();
+	if (device->machine().primary_screen->vpos() > half_screen)
 		state->gc_down = data & 3;
 	else
 		state->gc_up = data & 3;
@@ -15,12 +15,12 @@ WRITE8_DEVICE_HANDLER(homerun_banking_w)
 	tilemap_mark_all_tiles_dirty(state->tilemap);
 
 	data >>= 5;
-	memory_set_bank(device->machine, "bank1", data & 0x07);
+	memory_set_bank(device->machine(), "bank1", data & 0x07);
 }
 
 WRITE8_HANDLER( homerun_videoram_w )
 {
-	homerun_state *state = space->machine->driver_data<homerun_state>();
+	homerun_state *state = space->machine().driver_data<homerun_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap, offset & 0xfff);
 }
@@ -41,12 +41,12 @@ WRITE8_HANDLER(homerun_color_w)
 	bit1 = (data >> 6) & 0x01;
 	bit2 = (data >> 7) & 0x01;
 	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-	palette_set_color(space->machine, offset, MAKE_RGB(r,g,b));
+	palette_set_color(space->machine(), offset, MAKE_RGB(r,g,b));
 }
 
 static TILE_GET_INFO( get_homerun_tile_info )
 {
-	homerun_state *state = machine->driver_data<homerun_state>();
+	homerun_state *state = machine.driver_data<homerun_state>();
 	int tileno = (state->videoram[tile_index]) + ((state->videoram[tile_index + 0x1000] & 0x38) << 5) + ((state->gfx_ctrl & 1) << 11);
 	int palno = (state->videoram[tile_index + 0x1000] & 0x07);
 
@@ -55,13 +55,13 @@ static TILE_GET_INFO( get_homerun_tile_info )
 
 VIDEO_START( homerun )
 {
-	homerun_state *state = machine->driver_data<homerun_state>();
+	homerun_state *state = machine.driver_data<homerun_state>();
 	state->tilemap = tilemap_create(machine, get_homerun_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	homerun_state *state = machine->driver_data<homerun_state>();
+	homerun_state *state = machine.driver_data<homerun_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -74,7 +74,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		color = (spriteram[offs + 2] & 0x7) + 8 ;
 		flipx=(spriteram[offs + 2] & 0x40) ;
 		flipy=(spriteram[offs + 2] & 0x80) ;
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[1],
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -84,7 +84,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE(homerun)
 {
-	homerun_state *state = screen->machine->driver_data<homerun_state>();
+	homerun_state *state = screen->machine().driver_data<homerun_state>();
 	rectangle myclip = *cliprect;
 
 	/* upper part */
@@ -94,14 +94,14 @@ SCREEN_UPDATE(homerun)
 	myclip.max_y /= 2;
 	state->gfx_ctrl = state->gc_up;
 	tilemap_draw(bitmap, &myclip, state->tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, &myclip);
+	draw_sprites(screen->machine(), bitmap, &myclip);
 
 	/* lower part */
 	myclip.min_y += myclip.max_y;
 	myclip.max_y *= 2;
 	state->gfx_ctrl = state->gc_down;
 	tilemap_draw(bitmap, &myclip, state->tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, &myclip);
+	draw_sprites(screen->machine(), bitmap, &myclip);
 
 	state->gc_down = state->gc_up;
 	return 0;

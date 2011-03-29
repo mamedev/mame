@@ -63,7 +63,7 @@ static READ16_HANDLER( eeprom_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return input_port_read(space->machine, "IN1");
+		return input_port_read(space->machine(), "IN1");
 	}
 
 //  logerror("msb access to eeprom port\n");
@@ -75,7 +75,7 @@ static WRITE16_HANDLER( mweeprom_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		input_port_write(space->machine, "EEPROMOUT", data, 0xffff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xffff);
 	}
 
 //  logerror("unknown LSB write %x to eeprom\n", data);
@@ -86,17 +86,17 @@ static READ16_HANDLER( dddeeprom_r )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		return input_port_read(space->machine, "IN1") << 8;
+		return input_port_read(space->machine(), "IN1") << 8;
 	}
 
-	return input_port_read(space->machine, "P2");
+	return input_port_read(space->machine(), "P2");
 }
 
 static WRITE16_HANDLER( mmeeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 	}
 }
 
@@ -106,7 +106,7 @@ static WRITE16_HANDLER( mmeeprom_w )
 
 static INTERRUPT_GEN(mystwarr_interrupt)
 {
-	mystwarr_state *state = device->machine->driver_data<mystwarr_state>();
+	mystwarr_state *state = device->machine().driver_data<mystwarr_state>();
 	if (!(state->mw_irq_control & 0x01)) return;
 
 	switch (cpu_getiloops(device))
@@ -145,7 +145,7 @@ static INTERRUPT_GEN(metamrph_interrupt)
 
 static INTERRUPT_GEN(mchamp_interrupt)
 {
-	mystwarr_state *state = device->machine->driver_data<mystwarr_state>();
+	mystwarr_state *state = device->machine().driver_data<mystwarr_state>();
 	if (!(state->mw_irq_control & 0x02)) return;
 
 	switch (cpu_getiloops(device))
@@ -192,7 +192,7 @@ static WRITE16_HANDLER( sound_cmd2_msb_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "soundcpu", 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
@@ -215,7 +215,7 @@ static READ16_HANDLER( sound_status_msb_r )
 
 static WRITE16_HANDLER( irq_ack_w )
 {
-	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
+	mystwarr_state *state = space->machine().driver_data<mystwarr_state>();
 	K056832_b_word_w(space, offset, data, mem_mask);
 
 	if (offset == 3 && ACCESSING_BITS_0_7)
@@ -231,7 +231,7 @@ static WRITE16_HANDLER( irq_ack_w )
 /* of RAM, but they put 0x10000 there. The CPU can access them all. */
 static READ16_HANDLER( K053247_scattered_word_r )
 {
-	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
+	mystwarr_state *state = space->machine().driver_data<mystwarr_state>();
 	if (offset & 0x0078)
 		return state->spriteram[offset];
 	else
@@ -243,7 +243,7 @@ static READ16_HANDLER( K053247_scattered_word_r )
 
 static WRITE16_HANDLER( K053247_scattered_word_w )
 {
-	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
+	mystwarr_state *state = space->machine().driver_data<mystwarr_state>();
 	if (offset & 0x0078)
 	{
 //      mame_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, cpu_get_pc(space->cpu));
@@ -386,7 +386,7 @@ ADDRESS_MAP_END
 // Martial Champion specific interfaces
 static READ16_HANDLER( K053247_martchmp_word_r )
 {
-	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
+	mystwarr_state *state = space->machine().driver_data<mystwarr_state>();
 	if (offset & 0x0018)
 		return state->spriteram[offset];
 	else
@@ -398,7 +398,7 @@ static READ16_HANDLER( K053247_martchmp_word_r )
 
 static WRITE16_HANDLER( K053247_martchmp_word_w )
 {
-	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
+	mystwarr_state *state = space->machine().driver_data<mystwarr_state>();
 	if (offset & 0x0018)
 	{
 		COMBINE_DATA(state->spriteram+offset);
@@ -413,13 +413,13 @@ static WRITE16_HANDLER( K053247_martchmp_word_w )
 
 static READ16_HANDLER( mccontrol_r )
 {
-	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
+	mystwarr_state *state = space->machine().driver_data<mystwarr_state>();
 	return state->mw_irq_control<<8;
 }
 
 static WRITE16_HANDLER( mccontrol_w )
 {
-	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
+	mystwarr_state *state = space->machine().driver_data<mystwarr_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		state->mw_irq_control = data>>8;
@@ -574,17 +574,17 @@ ADDRESS_MAP_END
 /**********************************************************************************/
 
 
-static void reset_sound_region(running_machine *machine)
+static void reset_sound_region(running_machine &machine)
 {
-	mystwarr_state *state = machine->driver_data<mystwarr_state>();
-	memory_set_bankptr(machine, "bank2", machine->region("soundcpu")->base() + 0x10000 + state->cur_sound_region*0x4000);
+	mystwarr_state *state = machine.driver_data<mystwarr_state>();
+	memory_set_bankptr(machine, "bank2", machine.region("soundcpu")->base() + 0x10000 + state->cur_sound_region*0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
+	mystwarr_state *state = space->machine().driver_data<mystwarr_state>();
 	state->cur_sound_region = (data & 0xf);
-	reset_sound_region(space->machine);
+	reset_sound_region(space->machine());
 }
 
 /* sound memory maps
@@ -865,7 +865,7 @@ static STATE_POSTLOAD( mystwarr_postload )
 
 static MACHINE_START( mystwarr )
 {
-	mystwarr_state *state = machine->driver_data<mystwarr_state>();
+	mystwarr_state *state = machine.driver_data<mystwarr_state>();
 	/* set default bankswitch */
 	state->cur_sound_region = 2;
 	reset_sound_region(machine);
@@ -874,13 +874,13 @@ static MACHINE_START( mystwarr )
 
 	state_save_register_global(machine, state->mw_irq_control);
 	state_save_register_global(machine, state->cur_sound_region);
-	machine->state().register_postload(mystwarr_postload, NULL);
+	machine.state().register_postload(mystwarr_postload, NULL);
 }
 
 static MACHINE_RESET(mystwarr)
 {
-	device_t *k054539_1 = machine->device("konami1");
-	device_t *k054539_2 = machine->device("konami2");
+	device_t *k054539_1 = machine.device("konami1");
+	device_t *k054539_2 = machine.device("konami2");
 	int i;
 
 	// soften chorus(chip 0 channel 0-3), boost voice(chip 0 channel 4-7)
@@ -896,7 +896,7 @@ static MACHINE_RESET(mystwarr)
 
 static MACHINE_RESET(dadandrn)
 {
-	device_t *k054539_1 = machine->device("konami1");
+	device_t *k054539_1 = machine.device("konami1");
 	int i;
 
 	// boost voice(chip 0 channel 4-7)
@@ -905,7 +905,7 @@ static MACHINE_RESET(dadandrn)
 
 static MACHINE_RESET(viostorm)
 {
-	device_t *k054539_1 = machine->device("konami1");
+	device_t *k054539_1 = machine.device("konami1");
 	int i;
 
 	// boost voice(chip 0 channel 4-7)
@@ -914,8 +914,8 @@ static MACHINE_RESET(viostorm)
 
 static MACHINE_RESET(metamrph)
 {
-	device_t *k054539_1 = machine->device("konami1");
-	device_t *k054539_2 = machine->device("konami2");
+	device_t *k054539_1 = machine.device("konami1");
+	device_t *k054539_2 = machine.device("konami2");
 	int i;
 
 	// boost voice(chip 0 channel 4-7) and soften other channels
@@ -930,7 +930,7 @@ static MACHINE_RESET(metamrph)
 
 static MACHINE_RESET(martchmp)
 {
-	device_t *k054539_1 = machine->device("konami1");
+	device_t *k054539_1 = machine.device("konami1");
 	int i;
 
 	k054539_init_flags(k054539_1, K054539_REVERSE_STEREO);
@@ -941,7 +941,7 @@ static MACHINE_RESET(martchmp)
 
 static MACHINE_RESET(gaiapols)
 {
-	device_t *k054539_1 = machine->device("konami1");
+	device_t *k054539_1 = machine.device("konami1");
 	int i;
 
 	// boost voice(chip 0 channel 5-7)

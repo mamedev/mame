@@ -19,30 +19,30 @@
 static INPUT_CHANGED( coin_inserted )
 {
 	/* coin insertion causes an NMI */
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-INLINE UINT8 shift_common(running_machine *machine, UINT8 hi, UINT8 lo)
+INLINE UINT8 shift_common(running_machine &machine, UINT8 hi, UINT8 lo)
 {
-	const UINT8 *table = machine->region("user2")->base();
+	const UINT8 *table = machine.region("user2")->base();
 
 	return table[((hi & 0x07) << 8) | lo];
 }
 
 static READ8_HANDLER( shift_r )
 {
-	madalien_state *state = space->machine->driver_data<madalien_state>();
-	return shift_common(space->machine, *state->shift_hi, *state->shift_lo);
+	madalien_state *state = space->machine().driver_data<madalien_state>();
+	return shift_common(space->machine(), *state->shift_hi, *state->shift_lo);
 }
 
 static READ8_HANDLER( shift_rev_r )
 {
-	madalien_state *state = space->machine->driver_data<madalien_state>();
+	madalien_state *state = space->machine().driver_data<madalien_state>();
 	UINT8 hi = *state->shift_hi ^ 0x07;
 	UINT8 lo = BITSWAP8(*state->shift_lo,0,1,2,3,4,5,6,7);
 
-	UINT8 ret = shift_common(space->machine, hi, lo);
+	UINT8 ret = shift_common(space->machine(), hi, lo);
 
 	return BITSWAP8(ret,7,0,1,2,3,4,5,6) & 0x7f;
 }
@@ -56,14 +56,14 @@ static WRITE8_HANDLER( madalien_output_w )
 
 static WRITE8_HANDLER( madalien_sound_command_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", 0, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, ASSERT_LINE);
 	soundlatch_w(space, offset, data);
 }
 
 
 static READ8_HANDLER(madalien_sound_command_r )
 {
-	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
 	return soundlatch_r(space, offset);
 }
 

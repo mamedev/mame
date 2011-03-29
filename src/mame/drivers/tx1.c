@@ -61,23 +61,23 @@
 /* Main CPU and Z80 synchronisation */
 static WRITE16_HANDLER( z80_busreq_w )
 {
-	cputag_set_input_line(space->machine, "audio_cpu", INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "audio_cpu", INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( resume_math_w )
 {
-	cputag_set_input_line(space->machine, "math_cpu", INPUT_LINE_TEST, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "math_cpu", INPUT_LINE_TEST, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( halt_math_w )
 {
-	cputag_set_input_line(space->machine, "math_cpu", INPUT_LINE_TEST, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "math_cpu", INPUT_LINE_TEST, CLEAR_LINE);
 }
 
 /* Z80 can trigger its own interrupts */
 static WRITE8_HANDLER( z80_intreq_w )
 {
-	cputag_set_input_line(space->machine, "audio_cpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audio_cpu", 0, HOLD_LINE);
 }
 
 /* Periodic Z80 interrupt */
@@ -88,13 +88,13 @@ static INTERRUPT_GEN( z80_irq )
 
 static READ16_HANDLER( z80_shared_r )
 {
-	address_space *cpu2space = space->machine->device("audio_cpu")->memory().space(AS_PROGRAM);
+	address_space *cpu2space = space->machine().device("audio_cpu")->memory().space(AS_PROGRAM);
 	return cpu2space->read_byte(offset);
 }
 
 static WRITE16_HANDLER( z80_shared_w )
 {
-	address_space *cpu2space = space->machine->device("audio_cpu")->memory().space(AS_PROGRAM);
+	address_space *cpu2space = space->machine().device("audio_cpu")->memory().space(AS_PROGRAM);
 	cpu2space->write_byte(offset, data & 0xff);
 }
 
@@ -381,8 +381,8 @@ INPUT_PORTS_END
 
 static READ16_HANDLER( dipswitches_r )
 {
-	tx1_state *state = space->machine->driver_data<tx1_state>();
-	return (input_port_read(space->machine, "DSW") & 0xfffe) | state->ts;
+	tx1_state *state = space->machine().driver_data<tx1_state>();
+	return (input_port_read(space->machine(), "DSW") & 0xfffe) | state->ts;
 }
 
 /*
@@ -391,14 +391,14 @@ static READ16_HANDLER( dipswitches_r )
 */
 static WRITE8_HANDLER( ts_w )
 {
-	tx1_state *state = space->machine->driver_data<tx1_state>();
+	tx1_state *state = space->machine().driver_data<tx1_state>();
 //  TS = 1;
 	state->z80_ram[offset] = data;
 }
 
 static READ8_HANDLER( ts_r )
 {
-	tx1_state *state = space->machine->driver_data<tx1_state>();
+	tx1_state *state = space->machine().driver_data<tx1_state>();
 //  TS = 1;
 	return state->z80_ram[offset];
 }
@@ -406,35 +406,35 @@ static READ8_HANDLER( ts_r )
 
 static WRITE8_DEVICE_HANDLER( tx1_coin_cnt_w )
 {
-	coin_counter_w(device->machine, 0, data & 0x80);
-	coin_counter_w(device->machine, 1, data & 0x40);
-//  coin_counter_w(device->machine, 2, data & 0x40);
+	coin_counter_w(device->machine(), 0, data & 0x80);
+	coin_counter_w(device->machine(), 1, data & 0x40);
+//  coin_counter_w(device->machine(), 2, data & 0x40);
 }
 
 static WRITE8_DEVICE_HANDLER( bb_coin_cnt_w )
 {
-	coin_counter_w(device->machine, 0, data & 0x01);
-	coin_counter_w(device->machine, 1, data & 0x02);
-//  coin_counter_w(device->machine, 2, data & 0x04);
+	coin_counter_w(device->machine(), 0, data & 0x01);
+	coin_counter_w(device->machine(), 1, data & 0x02);
+//  coin_counter_w(device->machine(), 2, data & 0x04);
 }
 
 static WRITE8_HANDLER( tx1_ppi_latch_w )
 {
-	tx1_state *state = space->machine->driver_data<tx1_state>();
-	state->ppi_latch_a = ((input_port_read(space->machine, "AN_BRAKE") & 0xf) << 4) | (input_port_read(space->machine, "AN_ACCELERATOR") & 0xf);
-	state->ppi_latch_b = input_port_read(space->machine, "AN_STEERING");
+	tx1_state *state = space->machine().driver_data<tx1_state>();
+	state->ppi_latch_a = ((input_port_read(space->machine(), "AN_BRAKE") & 0xf) << 4) | (input_port_read(space->machine(), "AN_ACCELERATOR") & 0xf);
+	state->ppi_latch_b = input_port_read(space->machine(), "AN_STEERING");
 }
 
 static READ8_DEVICE_HANDLER( tx1_ppi_porta_r )
 {
-	tx1_state *state = device->machine->driver_data<tx1_state>();
+	tx1_state *state = device->machine().driver_data<tx1_state>();
 	return state->ppi_latch_a;
 }
 
 static READ8_DEVICE_HANDLER( tx1_ppi_portb_r )
 {
-	tx1_state *state = device->machine->driver_data<tx1_state>();
-	return input_port_read(device->machine, "PPI_PORTD") | state->ppi_latch_b;
+	tx1_state *state = device->machine().driver_data<tx1_state>();
+	return input_port_read(device->machine(), "PPI_PORTD") | state->ppi_latch_b;
 }
 
 
@@ -450,17 +450,17 @@ static UINT8 bit_reverse8(UINT8 val)
 static READ8_HANDLER( bb_analog_r )
 {
 	if (offset == 0)
-		return bit_reverse8(((input_port_read(space->machine, "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(space->machine, "AN_STEERING"));
+		return bit_reverse8(((input_port_read(space->machine(), "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(space->machine(), "AN_STEERING"));
 	else
-		return bit_reverse8((input_port_read(space->machine, "AN_BRAKE") & 0xf) << 4);
+		return bit_reverse8((input_port_read(space->machine(), "AN_BRAKE") & 0xf) << 4);
 }
 
 static READ8_HANDLER( bbjr_analog_r )
 {
 	if (offset == 0)
-		return ((input_port_read(space->machine, "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(space->machine, "AN_STEERING");
+		return ((input_port_read(space->machine(), "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(space->machine(), "AN_STEERING");
 	else
-		return (input_port_read(space->machine, "AN_BRAKE") & 0xf) << 4;
+		return (input_port_read(space->machine(), "AN_BRAKE") & 0xf) << 4;
 }
 
 

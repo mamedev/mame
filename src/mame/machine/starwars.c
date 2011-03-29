@@ -37,7 +37,7 @@
 
 static TIMER_CALLBACK( math_run_clear )
 {
-	starwars_state *state = machine->driver_data<starwars_state>();
+	starwars_state *state = machine.driver_data<starwars_state>();
 	state->math_run = 0;
 }
 
@@ -50,9 +50,9 @@ static TIMER_CALLBACK( math_run_clear )
 
 WRITE8_HANDLER( starwars_nstore_w )
 {
-	space->machine->device<x2212_device>("x2212")->store(0);
-	space->machine->device<x2212_device>("x2212")->store(1);
-	space->machine->device<x2212_device>("x2212")->store(0);
+	space->machine().device<x2212_device>("x2212")->store(0);
+	space->machine().device<x2212_device>("x2212")->store(1);
+	space->machine().device<x2212_device>("x2212")->store(0);
 }
 
 /*************************************
@@ -63,39 +63,39 @@ WRITE8_HANDLER( starwars_nstore_w )
 
 WRITE8_HANDLER( starwars_out_w )
 {
-	starwars_state *state = space->machine->driver_data<starwars_state>();
+	starwars_state *state = space->machine().driver_data<starwars_state>();
 	switch (offset & 7)
 	{
 		case 0:		/* Coin counter 1 */
-			coin_counter_w(space->machine, 0, data);
+			coin_counter_w(space->machine(), 0, data);
 			break;
 
 		case 1:		/* Coin counter 2 */
-			coin_counter_w(space->machine, 1, data);
+			coin_counter_w(space->machine(), 1, data);
 			break;
 
 		case 2:		/* LED 3 */
-			set_led_status(space->machine, 2, ~data & 0x80);
+			set_led_status(space->machine(), 2, ~data & 0x80);
 			break;
 
 		case 3:		/* LED 2 */
-			set_led_status(space->machine, 1, ~data & 0x80);
+			set_led_status(space->machine(), 1, ~data & 0x80);
 			break;
 
 		case 4:		/* bank switch */
-			memory_set_bank(space->machine, "bank1", (data >> 7) & 1);
+			memory_set_bank(space->machine(), "bank1", (data >> 7) & 1);
 			if (state->is_esb)
-				memory_set_bank(space->machine, "bank2", (data >> 7) & 1);
+				memory_set_bank(space->machine(), "bank2", (data >> 7) & 1);
 			break;
 		case 5:		/* reset PRNG */
 			break;
 
 		case 6:		/* LED 1 */
-			set_led_status(space->machine, 0, ~data & 0x80);
+			set_led_status(space->machine(), 0, ~data & 0x80);
 			break;
 
 		case 7:		/* NVRAM array recall */
-			space->machine->device<x2212_device>("x2212")->recall(~data & 0x80);
+			space->machine().device<x2212_device>("x2212")->recall(~data & 0x80);
 			break;
 	}
 }
@@ -110,7 +110,7 @@ WRITE8_HANDLER( starwars_out_w )
 
 CUSTOM_INPUT( matrix_flag_r )
 {
-	starwars_state *state = field->port->machine->driver_data<starwars_state>();
+	starwars_state *state = field->port->machine().driver_data<starwars_state>();
 	/* set the matrix processor flag */
 	return state->math_run ? 1 : 0;
 }
@@ -125,14 +125,14 @@ CUSTOM_INPUT( matrix_flag_r )
 
 READ8_HANDLER( starwars_adc_r )
 {
-	starwars_state *state = space->machine->driver_data<starwars_state>();
+	starwars_state *state = space->machine().driver_data<starwars_state>();
 	/* pitch */
 	if (state->control_num == kPitch)
-		return input_port_read(space->machine, "STICKY");
+		return input_port_read(space->machine(), "STICKY");
 
 	/* yaw */
 	else if (state->control_num == kYaw)
-		return input_port_read(space->machine, "STICKX");
+		return input_port_read(space->machine(), "STICKX");
 
 	/* default to unused thrust */
 	else
@@ -142,7 +142,7 @@ READ8_HANDLER( starwars_adc_r )
 
 WRITE8_HANDLER( starwars_adc_select_w )
 {
-	starwars_state *state = space->machine->driver_data<starwars_state>();
+	starwars_state *state = space->machine().driver_data<starwars_state>();
 	state->control_num = offset;
 }
 
@@ -154,10 +154,10 @@ WRITE8_HANDLER( starwars_adc_select_w )
  *
  *************************************/
 
-void starwars_mproc_init(running_machine *machine)
+void starwars_mproc_init(running_machine &machine)
 {
-	starwars_state *state = machine->driver_data<starwars_state>();
-	UINT8 *src = machine->region("user2")->base();
+	starwars_state *state = machine.driver_data<starwars_state>();
+	UINT8 *src = machine.region("user2")->base();
 	int cnt, val;
 
 	state->PROM_STR = auto_alloc_array(machine, UINT8, 1024);
@@ -178,7 +178,7 @@ void starwars_mproc_init(running_machine *machine)
 		state->PROM_AM[cnt]  = (val >> 7) & 0x0001;
 	}
 
-	state->math_timer = machine->scheduler().timer_alloc(FUNC(math_run_clear));
+	state->math_timer = machine.scheduler().timer_alloc(FUNC(math_run_clear));
 }
 
 
@@ -189,9 +189,9 @@ void starwars_mproc_init(running_machine *machine)
  *
  *************************************/
 
-void starwars_mproc_reset(running_machine *machine)
+void starwars_mproc_reset(running_machine &machine)
 {
-	starwars_state *state = machine->driver_data<starwars_state>();
+	starwars_state *state = machine.driver_data<starwars_state>();
 	state->MPA = state->BIC = 0;
 	state->math_run = 0;
 }
@@ -204,9 +204,9 @@ void starwars_mproc_reset(running_machine *machine)
  *
  *************************************/
 
-static void run_mproc(running_machine *machine)
+static void run_mproc(running_machine &machine)
 {
-	starwars_state *state = machine->driver_data<starwars_state>();
+	starwars_state *state = machine.driver_data<starwars_state>();
 
 	int RAMWORD = 0;
 	int MA_byte;
@@ -386,7 +386,7 @@ READ8_HANDLER( starwars_prng_r )
      */
 
 	/* Use MAME's PRNG for now */
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 
@@ -399,21 +399,21 @@ READ8_HANDLER( starwars_prng_r )
 
 READ8_HANDLER( starwars_div_reh_r )
 {
-	starwars_state *state = space->machine->driver_data<starwars_state>();
+	starwars_state *state = space->machine().driver_data<starwars_state>();
 	return (state->quotient_shift & 0xff00) >> 8;
 }
 
 
 READ8_HANDLER( starwars_div_rel_r )
 {
-	starwars_state *state = space->machine->driver_data<starwars_state>();
+	starwars_state *state = space->machine().driver_data<starwars_state>();
 	return state->quotient_shift & 0x00ff;
 }
 
 
 WRITE8_HANDLER( starwars_math_w )
 {
-	starwars_state *state = space->machine->driver_data<starwars_state>();
+	starwars_state *state = space->machine().driver_data<starwars_state>();
 	int i;
 
 	data &= 0xff;	/* ASG 971002 -- make sure we only get bytes here */
@@ -421,7 +421,7 @@ WRITE8_HANDLER( starwars_math_w )
 	{
 		case 0:	/* mw0 */
 			state->MPA = data << 2;	/* Set starting PROM address */
-			run_mproc(space->machine);			/* and run the Matrix Processor */
+			run_mproc(space->machine());			/* and run the Matrix Processor */
 			break;
 
 		case 1:	/* mw1 */

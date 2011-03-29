@@ -60,7 +60,7 @@ static void get_pens(pen_t *pens)
 
 static SCREEN_UPDATE( wldarrow )
 {
-	wldarrow_state *state = screen->machine->driver_data<wldarrow_state>();
+	wldarrow_state *state = screen->machine().driver_data<wldarrow_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
@@ -124,7 +124,7 @@ static WRITE8_HANDLER( lights_2_w )
 
 static WRITE8_HANDLER( counter_w )
 {
-	coin_counter_w(space->machine, 0, data);
+	coin_counter_w(space->machine(), 0, data);
 }
 
 
@@ -483,7 +483,7 @@ ROM_END
 static DRIVER_INIT( wldarrow )
 {
 	offs_t i;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	for (i = 0; i < 0x3800; i++)
 		rom[i] ^= 0xff;

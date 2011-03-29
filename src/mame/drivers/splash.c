@@ -54,7 +54,7 @@ static WRITE16_HANDLER( splash_sh_irqtrigger_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 	}
 }
 
@@ -63,7 +63,7 @@ static WRITE16_HANDLER( roldf_sh_irqtrigger_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	// give the z80 time to see it
@@ -78,11 +78,11 @@ static WRITE16_HANDLER( splash_coin_w )
 		{
 			case 0x00:	/* Coin Lockouts */
 			case 0x01:
-				coin_lockout_w( space->machine, (offset >> 3) & 0x01, (data & 0x0400) >> 8);
+				coin_lockout_w( space->machine(), (offset >> 3) & 0x01, (data & 0x0400) >> 8);
 				break;
 			case 0x02:	/* Coin Counters */
 			case 0x03:
-				coin_counter_w( space->machine, (offset >> 3) & 0x01, (data & 0x0100) >> 8);
+				coin_counter_w( space->machine(), (offset >> 3) & 0x01, (data & 0x0100) >> 8);
 				break;
 		}
 	}
@@ -107,14 +107,14 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( splash_adpcm_data_w )
 {
-	splash_state *state = space->machine->driver_data<splash_state>();
+	splash_state *state = space->machine().driver_data<splash_state>();
 
 	state->adpcm_data = data;
 }
 
 static void splash_msm5205_int(device_t *device)
 {
-	splash_state *state = device->machine->driver_data<splash_state>();
+	splash_state *state = device->machine().driver_data<splash_state>();
 
 	msm5205_data_w(device, state->adpcm_data >> 4);
 	state->adpcm_data = (state->adpcm_data << 4) & 0xf0;
@@ -134,7 +134,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( roldfrog_bombs_r )
 {
-	splash_state *state = space->machine->driver_data<splash_state>();
+	splash_state *state = space->machine().driver_data<splash_state>();
 
 	state->ret ^= 0x100;
 	return state->ret;
@@ -142,30 +142,30 @@ static READ16_HANDLER( roldfrog_bombs_r )
 
 static WRITE8_HANDLER(sound_bank_w)
 {
-	memory_set_bank(space->machine, "sound_bank", data & 0xf);
+	memory_set_bank(space->machine(), "sound_bank", data & 0xf);
 }
 
 
-static void roldfrog_update_irq( running_machine *machine )
+static void roldfrog_update_irq( running_machine &machine )
 {
-	splash_state * state = machine->driver_data<splash_state>();
+	splash_state * state = machine.driver_data<splash_state>();
 	int irq = (state->sound_irq ? 0x08 : 0) | ((state->vblank_irq) ? 0x18 : 0);
-	device_set_input_line_and_vector(machine->device("audiocpu"), 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq);
+	device_set_input_line_and_vector(machine.device("audiocpu"), 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq);
 }
 
 static WRITE8_HANDLER( roldfrog_vblank_ack_w )
 {
-	splash_state * driver_state = space->machine->driver_data<splash_state>();
+	splash_state * driver_state = space->machine().driver_data<splash_state>();
 	driver_state->vblank_irq = 0;
-	roldfrog_update_irq(space->machine);
+	roldfrog_update_irq(space->machine());
 }
 
 
 static void ym_irq(device_t *device, int state)
 {
-	splash_state * driver_state = device->machine->driver_data<splash_state>();
+	splash_state * driver_state = device->machine().driver_data<splash_state>();
 	driver_state->sound_irq = state;
-	roldfrog_update_irq(device->machine);
+	roldfrog_update_irq(device->machine());
 }
 
 static ADDRESS_MAP_START( roldfrog_map, AS_PROGRAM, 16 )
@@ -214,13 +214,13 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER(spr_read)
 {
-	splash_state *state = space->machine->driver_data<splash_state>();
+	splash_state *state = space->machine().driver_data<splash_state>();
 	return state->spriteram[offset]|0xff00;
 }
 
 static WRITE16_HANDLER(spr_write)
 {
-	splash_state *state = space->machine->driver_data<splash_state>();
+	splash_state *state = space->machine().driver_data<splash_state>();
 	COMBINE_DATA(&state->spriteram[offset]);
 	state->spriteram[offset]|=0xff00; /* 8 bit, expected 0xffnn when read as 16 bit */
 }
@@ -228,7 +228,7 @@ static WRITE16_HANDLER(spr_write)
 static WRITE16_HANDLER( funystrp_sh_irqtrigger_w )
 {
 	soundlatch_w(space, 0, data>>8);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( funystrp_map, AS_PROGRAM, 16 )
@@ -258,13 +258,13 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(int_source_r)
 {
-	splash_state *state = space->machine->driver_data<splash_state>();
+	splash_state *state = space->machine().driver_data<splash_state>();
 	return ~state->msm_source;
 }
 
 static WRITE8_HANDLER(msm1_data_w)
 {
-	splash_state *state = space->machine->driver_data<splash_state>();
+	splash_state *state = space->machine().driver_data<splash_state>();
 	state->msm_data1=data;
 	state->msm_source&=~1;
 	state->msm_toggle1=0;
@@ -272,19 +272,19 @@ static WRITE8_HANDLER(msm1_data_w)
 
 static WRITE8_HANDLER(msm1_interrupt_w)
 {
-	splash_state *state = space->machine->driver_data<splash_state>();
+	splash_state *state = space->machine().driver_data<splash_state>();
 	state->snd_interrupt_enable1=~data;
 }
 
 static WRITE8_HANDLER(msm2_interrupt_w)
 {
-	splash_state *state = space->machine->driver_data<splash_state>();
+	splash_state *state = space->machine().driver_data<splash_state>();
 	state->snd_interrupt_enable2=~data;
 }
 
 static WRITE8_HANDLER(msm2_data_w)
 {
-	splash_state *state = space->machine->driver_data<splash_state>();
+	splash_state *state = space->machine().driver_data<splash_state>();
 	state->msm_data2=data;
 	state->msm_source&=~2;
 	state->msm_toggle2=0;
@@ -303,7 +303,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( funystrp )
 {
-	splash_state *state = machine->driver_data<splash_state>();
+	splash_state *state = machine.driver_data<splash_state>();
 
 	state->adpcm_data = 0;
 	state->ret = 0x100;
@@ -497,7 +497,7 @@ static const msm5205_interface splash_msm5205_interface =
 
 static MACHINE_RESET( splash )
 {
-	splash_state *state = machine->driver_data<splash_state>();
+	splash_state *state = machine.driver_data<splash_state>();
 
 	state->adpcm_data = 0;
 	state->ret = 0x100;
@@ -555,9 +555,9 @@ static const ym2203_interface ym2203_config =
 
 static INTERRUPT_GEN(  roldfrog_interrupt )
 {
-	splash_state *state = device->machine->driver_data<splash_state>();
+	splash_state *state = device->machine().driver_data<splash_state>();
 	state->vblank_irq = 1;
-	roldfrog_update_irq(device->machine);
+	roldfrog_update_irq(device->machine());
 }
 
 static MACHINE_CONFIG_START( roldfrog, splash_state )
@@ -603,7 +603,7 @@ MACHINE_CONFIG_END
 
 static void adpcm_int1( device_t *device )
 {
-	splash_state *state = device->machine->driver_data<splash_state>();
+	splash_state *state = device->machine().driver_data<splash_state>();
 	if (state->snd_interrupt_enable1  || state->msm_toggle1 == 1)
 	{
 		msm5205_data_w(device, state->msm_data1 >> 4);
@@ -612,14 +612,14 @@ static void adpcm_int1( device_t *device )
 		if (state->msm_toggle1 == 0)
 		{
 			state->msm_source|=1;
-			device_set_input_line_and_vector(device->machine->device("audiocpu"), 0, HOLD_LINE, 0x38);
+			device_set_input_line_and_vector(device->machine().device("audiocpu"), 0, HOLD_LINE, 0x38);
 		}
 	}
 }
 
 static void adpcm_int2( device_t *device )
 {
-	splash_state *state = device->machine->driver_data<splash_state>();
+	splash_state *state = device->machine().driver_data<splash_state>();
 	if (state->snd_interrupt_enable2 || state->msm_toggle2 == 1)
 	{
 		msm5205_data_w(device, state->msm_data2 >> 4);
@@ -628,7 +628,7 @@ static void adpcm_int2( device_t *device )
 		if (state->msm_toggle2 == 0)
 		{
 			state->msm_source|=2;
-			device_set_input_line_and_vector(device->machine->device("audiocpu"), 0, HOLD_LINE, 0x38);
+			device_set_input_line_and_vector(device->machine().device("audiocpu"), 0, HOLD_LINE, 0x38);
 		}
 	}
 }
@@ -1012,7 +1012,7 @@ ROM_END
 
 static DRIVER_INIT( splash )
 {
-	splash_state *state = machine->driver_data<splash_state>();
+	splash_state *state = machine.driver_data<splash_state>();
 
 	state->bitmap_type = 0;
 	state->sprite_attr2_shift = 8;
@@ -1020,7 +1020,7 @@ static DRIVER_INIT( splash )
 
 static DRIVER_INIT( splash10 )
 {
-	splash_state *state = machine->driver_data<splash_state>();
+	splash_state *state = machine.driver_data<splash_state>();
 
 	state->bitmap_type = 0;
 	state->sprite_attr2_shift = 0;
@@ -1028,8 +1028,8 @@ static DRIVER_INIT( splash10 )
 
 static DRIVER_INIT( roldfrog )
 {
-	splash_state *state = machine->driver_data<splash_state>();
-	UINT8 * ROM = (UINT8 *)machine->region("audiocpu")->base();
+	splash_state *state = machine.driver_data<splash_state>();
+	UINT8 * ROM = (UINT8 *)machine.region("audiocpu")->base();
 	memory_configure_bank(machine, "sound_bank", 0, 16, &ROM[0x10000], 0x8000);
 
 	state->bitmap_type = 1;
@@ -1038,8 +1038,8 @@ static DRIVER_INIT( roldfrog )
 
 static DRIVER_INIT( rebus )
 {
-	splash_state *state = machine->driver_data<splash_state>();
-	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
+	splash_state *state = machine.driver_data<splash_state>();
+	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
 
 	state->bitmap_type = 1;
 	state->sprite_attr2_shift = 0;
@@ -1068,8 +1068,8 @@ static DRIVER_INIT( rebus )
 
 static DRIVER_INIT( funystrp )
 {
-	splash_state *state = machine->driver_data<splash_state>();
-	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
+	splash_state *state = machine.driver_data<splash_state>();
+	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
 
 	state->bitmap_type = 0;
 	state->sprite_attr2_shift = 0;
@@ -1108,7 +1108,7 @@ static DRIVER_INIT( funystrp )
 	ROM[0x11730/2] = 0x7001;
 	ROM[0x11f80/2] = 0x7001;
 
-	ROM = (UINT16 *)machine->region("audiocpu")->base();
+	ROM = (UINT16 *)machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "sound_bank", 0, 16, &ROM[0x00000], 0x8000);
 

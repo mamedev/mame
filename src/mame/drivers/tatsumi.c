@@ -157,56 +157,56 @@
 
 static READ16_HANDLER(cyclwarr_cpu_bb_r)
 {
-	tatsumi_state *state = space->machine->driver_data<tatsumi_state>();
+	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
 	return state->cyclwarr_cpub_ram[offset];
 }
 
 static WRITE16_HANDLER(cyclwarr_cpu_bb_w)
 {
-	tatsumi_state *state = space->machine->driver_data<tatsumi_state>();
+	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
 	COMBINE_DATA(&state->cyclwarr_cpub_ram[offset]);
 }
 
-static READ16_HANDLER(cyclwarr_palette_r) { return space->machine->generic.paletteram.u16[offset]; }
+static READ16_HANDLER(cyclwarr_palette_r) { return space->machine().generic.paletteram.u16[offset]; }
 static READ16_HANDLER(cyclwarr_sprite_r) {
-	tatsumi_state *state = space->machine->driver_data<tatsumi_state>(); return state->spriteram[offset]; }
+	tatsumi_state *state = space->machine().driver_data<tatsumi_state>(); return state->spriteram[offset]; }
 static WRITE16_HANDLER(cyclwarr_sprite_w) {
-	tatsumi_state *state = space->machine->driver_data<tatsumi_state>(); COMBINE_DATA(&state->spriteram[offset]); }
+	tatsumi_state *state = space->machine().driver_data<tatsumi_state>(); COMBINE_DATA(&state->spriteram[offset]); }
 
 static WRITE16_HANDLER(bigfight_a20000_w)
 {
-	tatsumi_state *state = space->machine->driver_data<tatsumi_state>();
+	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
 	COMBINE_DATA(&state->bigfight_a20000[offset]);
 }
 
 static WRITE16_HANDLER(bigfight_a40000_w)
 {
-	tatsumi_state *state = space->machine->driver_data<tatsumi_state>();
+	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
 	COMBINE_DATA(&state->bigfight_a40000[offset]);
 }
 
 static WRITE16_HANDLER(bigfight_a60000_w)
 {
-	tatsumi_state *state = space->machine->driver_data<tatsumi_state>();
+	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
 	COMBINE_DATA(&state->bigfight_a60000[offset]);
 }
 
 static READ16_HANDLER(cyclwarr_input_r)
 {
 	static const char *const port[] = { "SERVICE", "P1", "P2", "DSW3" };
-	return input_port_read(space->machine, port[offset]);
+	return input_port_read(space->machine(), port[offset]);
 }
 
 static READ16_HANDLER(cyclwarr_input2_r)
 {
 	static const char *const port2[] = { "DSW1", "DSW2", "P3", "P4" };
-	return input_port_read(space->machine, port2[offset]);
+	return input_port_read(space->machine(), port2[offset]);
 }
 
 static WRITE16_HANDLER(cyclwarr_sound_w)
 {
 	soundlatch_w(space, 0, data >> 8);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /***************************************************************************/
@@ -847,7 +847,7 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_IRQ0, state);
+	cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_IRQ0, state);
 }
 
 static const ym2151_interface ym2151_config =
@@ -862,7 +862,7 @@ static INTERRUPT_GEN( roundup5_interrupt )
 
 static void apache3_68000_reset(device_t *device)
 {
-	cputag_set_input_line(device->machine, "sub2", INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(device->machine(), "sub2", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static MACHINE_RESET( apache3 )
@@ -870,7 +870,7 @@ static MACHINE_RESET( apache3 )
 	cputag_set_input_line(machine, "sub2", INPUT_LINE_RESET, ASSERT_LINE); // TODO
 
 	/* Hook the RESET line, which resets the Z80 */
-	m68k_set_reset_callback(machine->device("sub"), apache3_68000_reset);
+	m68k_set_reset_callback(machine.device("sub"), apache3_68000_reset);
 }
 
 
@@ -1293,10 +1293,10 @@ ROM_END
 
 static DRIVER_INIT( apache3 )
 {
-	tatsumi_state *state = machine->driver_data<tatsumi_state>();
-	UINT8 *dst = machine->region("gfx1")->base();
-	UINT8 *src1 = machine->region("gfx2")->base();
-	UINT8 *src2 = machine->region("gfx3")->base();
+	tatsumi_state *state = machine.driver_data<tatsumi_state>();
+	UINT8 *dst = machine.region("gfx1")->base();
+	UINT8 *src1 = machine.region("gfx2")->base();
+	UINT8 *src2 = machine.region("gfx3")->base();
 	int i;
 
 	for (i=0; i<0x100000; i+=32) {
@@ -1309,10 +1309,10 @@ static DRIVER_INIT( apache3 )
 	}
 
 	// Copy sprite & palette data out of GFX rom area
-	state->rom_sprite_lookup1 = machine->region("gfx2")->base();
-	state->rom_sprite_lookup2 = machine->region("gfx3")->base();
-	state->rom_clut0 = machine->region("gfx2")->base()+ 0x100000 - 0x800;
-	state->rom_clut1 = machine->region("gfx3")->base()+ 0x100000 - 0x800;
+	state->rom_sprite_lookup1 = machine.region("gfx2")->base();
+	state->rom_sprite_lookup2 = machine.region("gfx3")->base();
+	state->rom_clut0 = machine.region("gfx2")->base()+ 0x100000 - 0x800;
+	state->rom_clut1 = machine.region("gfx3")->base()+ 0x100000 - 0x800;
 
 	tatsumi_reset(machine);
 
@@ -1321,10 +1321,10 @@ static DRIVER_INIT( apache3 )
 
 static DRIVER_INIT( roundup5 )
 {
-	tatsumi_state *state = machine->driver_data<tatsumi_state>();
-	UINT8 *dst = machine->region("gfx1")->base();
-	UINT8 *src1 = machine->region("gfx2")->base();
-	UINT8 *src2 = machine->region("gfx3")->base();
+	tatsumi_state *state = machine.driver_data<tatsumi_state>();
+	UINT8 *dst = machine.region("gfx1")->base();
+	UINT8 *src1 = machine.region("gfx2")->base();
+	UINT8 *src2 = machine.region("gfx3")->base();
 	int i;
 
 	for (i=0; i<0xc0000; i+=32) {
@@ -1337,22 +1337,22 @@ static DRIVER_INIT( roundup5 )
 	}
 
 	// Copy sprite & palette data out of GFX rom area
-	state->rom_sprite_lookup1 = machine->region("gfx2")->base();
-	state->rom_sprite_lookup2 = machine->region("gfx3")->base();
-	state->rom_clut0 = machine->region("gfx2")->base()+ 0xc0000 - 0x800;
-	state->rom_clut1 = machine->region("gfx3")->base()+ 0xc0000 - 0x800;
+	state->rom_sprite_lookup1 = machine.region("gfx2")->base();
+	state->rom_sprite_lookup2 = machine.region("gfx3")->base();
+	state->rom_clut0 = machine.region("gfx2")->base()+ 0xc0000 - 0x800;
+	state->rom_clut1 = machine.region("gfx3")->base()+ 0xc0000 - 0x800;
 
 	tatsumi_reset(machine);
 }
 
 static DRIVER_INIT( cyclwarr )
 {
-	tatsumi_state *state = machine->driver_data<tatsumi_state>();
-	UINT8 *dst = machine->region("gfx1")->base();
-	UINT8 *src1 = machine->region("gfx2")->base();
-	int len1 = machine->region("gfx2")->bytes();
-	UINT8 *src2 = machine->region("gfx3")->base();
-	int len2 = machine->region("gfx3")->bytes();
+	tatsumi_state *state = machine.driver_data<tatsumi_state>();
+	UINT8 *dst = machine.region("gfx1")->base();
+	UINT8 *src1 = machine.region("gfx2")->base();
+	int len1 = machine.region("gfx2")->bytes();
+	UINT8 *src2 = machine.region("gfx3")->base();
+	int len2 = machine.region("gfx3")->bytes();
 	int i;
 	for (i=0; i<len1; i+=32) {
 		memcpy(dst,src1,32);
@@ -1363,19 +1363,19 @@ static DRIVER_INIT( cyclwarr )
 		src2+=32;
 	}
 
-	dst = machine->region("maincpu")->base();
+	dst = machine.region("maincpu")->base();
 	memcpy(state->cyclwarr_cpua_ram,dst,8);
 	memory_set_bankptr(machine, "bank1", dst);
 
-	dst = machine->region("sub")->base();
+	dst = machine.region("sub")->base();
 	memcpy(state->cyclwarr_cpub_ram,dst,8);
 	memory_set_bankptr(machine, "bank2", dst);
 
 	// Copy sprite & palette data out of GFX rom area
-	state->rom_sprite_lookup1 = machine->region("gfx2")->base();
-	state->rom_sprite_lookup2 = machine->region("gfx3")->base();
-	state->rom_clut0 = machine->region("gfx2")->base() + len1 - 0x1000;
-	state->rom_clut1 = machine->region("gfx3")->base() + len2 - 0x1000;
+	state->rom_sprite_lookup1 = machine.region("gfx2")->base();
+	state->rom_sprite_lookup2 = machine.region("gfx3")->base();
+	state->rom_clut0 = machine.region("gfx2")->base() + len1 - 0x1000;
+	state->rom_clut1 = machine.region("gfx3")->base() + len2 - 0x1000;
 
 	tatsumi_reset(machine);
 }

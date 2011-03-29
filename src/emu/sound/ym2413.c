@@ -1940,7 +1940,7 @@ static int OPLL_LockTable(device_t *device)
 	{
 		cymfile = fopen("2413_.cym","wb");
 		if (cymfile)
-			device->machine->scheduler().timer_pulse ( attotime::from_hz(110), FUNC(cymfile_callback)); /*110 Hz pulse timer*/
+			device->machine().scheduler().timer_pulse ( attotime::from_hz(110), FUNC(cymfile_callback)); /*110 Hz pulse timer*/
 		else
 			logerror("Could not create file 2413_.cym\n");
 	}
@@ -2011,7 +2011,7 @@ static YM2413 *OPLLCreate(device_t *device, int clock, int rate)
 	if (OPLL_LockTable(device) == -1) return NULL;
 
 	/* allocate memory block */
-	chip = auto_alloc_clear(device->machine, YM2413);
+	chip = auto_alloc_clear(device->machine(), YM2413);
 
 	chip->device = device;
 	chip->clock = clock;
@@ -2029,7 +2029,7 @@ static YM2413 *OPLLCreate(device_t *device, int clock, int rate)
 static void OPLLDestroy(YM2413 *chip)
 {
 	OPLL_UnLockTable();
-	auto_free(chip->device->machine, chip);
+	auto_free(chip->device->machine(), chip);
 }
 
 /* Option handlers */

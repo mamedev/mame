@@ -566,7 +566,7 @@ static DEVICE_START( vr0video )
 	vr0video_state *vr0 = get_safe_token(device);
 	const vr0video_interface *intf = get_interface(device);
 
-	vr0->cpu = device->machine->device(intf->cpu);
+	vr0->cpu = device->machine().device(intf->cpu);
 
 	device->save_item(NAME(vr0->InternalPalette));
 	device->save_item(NAME(vr0->LastPalUpdate));

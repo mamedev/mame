@@ -17,31 +17,31 @@ PALETTE_INIT( jackal )
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x200);
+	machine.colortable = colortable_alloc(machine, 0x200);
 
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT16 ctabentry = i | 0x100;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 
 	for (i = 0x100; i < 0x200; i++)
 	{
 		UINT16 ctabentry = color_prom[i - 0x100] & 0x0f;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 
 	for (i = 0x200; i < 0x300; i++)
 	{
 		UINT16 ctabentry = (color_prom[i - 0x100] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 }
 
 
-static void set_pens( running_machine *machine )
+static void set_pens( running_machine &machine )
 {
-	jackal_state *state = machine->driver_data<jackal_state>();
+	jackal_state *state = machine.driver_data<jackal_state>();
 	int i;
 
 	for (i = 0; i < 0x400; i += 2)
@@ -50,20 +50,20 @@ static void set_pens( running_machine *machine )
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine->colortable, i >> 1, color);
+		colortable_palette_set_color(machine.colortable, i >> 1, color);
 	}
 }
 
 
-void jackal_mark_tile_dirty( running_machine *machine, int offset )
+void jackal_mark_tile_dirty( running_machine &machine, int offset )
 {
-	jackal_state *state = machine->driver_data<jackal_state>();
+	jackal_state *state = machine.driver_data<jackal_state>();
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *RAM = machine->region("master")->base();
+	UINT8 *RAM = machine.region("master")->base();
 
 	int attr = RAM[0x2000 + tile_index];
 	int code = RAM[0x2400 + tile_index] + ((attr & 0xc0) << 2) + ((attr & 0x30) << 6);
@@ -75,14 +75,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( jackal )
 {
-	jackal_state *state = machine->driver_data<jackal_state>();
+	jackal_state *state = machine.driver_data<jackal_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static void draw_background( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	jackal_state *state = machine->driver_data<jackal_state>();
-	UINT8 *RAM = machine->region("master")->base();
+	jackal_state *state = machine.driver_data<jackal_state>();
+	UINT8 *RAM = machine.region("master")->base();
 	int i;
 
 	state->scrollram = &RAM[0x0020];
@@ -115,9 +115,9 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 }
 
-#define DRAW_SPRITE(bank, code, sx, sy) drawgfx_transpen(bitmap, cliprect, machine->gfx[bank], code, color, flipx, flipy, sx, sy, 0);
+#define DRAW_SPRITE(bank, code, sx, sy) drawgfx_transpen(bitmap, cliprect, machine.gfx[bank], code, color, flipx, flipy, sx, sy, 0);
 
-static void draw_sprites_region( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *sram, int length, int bank )
+static void draw_sprites_region( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *sram, int length, int bank )
 {
 	int offs;
 
@@ -201,10 +201,10 @@ static void draw_sprites_region( running_machine *machine, bitmap_t *bitmap, con
 	}
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	jackal_state *state = machine->driver_data<jackal_state>();
-	UINT8 *RAM = machine->region("master")->base();
+	jackal_state *state = machine.driver_data<jackal_state>();
+	UINT8 *RAM = machine.region("master")->base();
 	UINT8 *sr, *ss;
 
 	if (state->videoctrl[0x03] & 0x08)
@@ -224,8 +224,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( jackal )
 {
-	set_pens(screen->machine);
-	draw_background(screen->machine, bitmap, cliprect);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	set_pens(screen->machine());
+	draw_background(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

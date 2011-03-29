@@ -56,7 +56,7 @@ Note about version levels using Mutant Fighter as the example:
 
 static WRITE16_HANDLER( cninja_sound_w )
 {
-	cninja_state *state = space->machine->driver_data<cninja_state>();
+	cninja_state *state = space->machine().driver_data<cninja_state>();
 
 	soundlatch_w(space, 0, data & 0xff);
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
@@ -64,7 +64,7 @@ static WRITE16_HANDLER( cninja_sound_w )
 
 static WRITE16_HANDLER( stoneage_sound_w )
 {
-	cninja_state *state = space->machine->driver_data<cninja_state>();
+	cninja_state *state = space->machine().driver_data<cninja_state>();
 
 	soundlatch_w(space, 0, data & 0xff);
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -72,7 +72,7 @@ static WRITE16_HANDLER( stoneage_sound_w )
 
 static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
-	cninja_state *state = timer.machine->driver_data<cninja_state>();
+	cninja_state *state = timer.machine().driver_data<cninja_state>();
 
 	device_set_input_line(state->maincpu, (state->irq_mask & 0x10) ? 3 : 4, ASSERT_LINE);
 	state->raster_irq_timer->reset();
@@ -80,7 +80,7 @@ static TIMER_DEVICE_CALLBACK( interrupt_gen )
 
 static READ16_HANDLER( cninja_irq_r )
 {
-	cninja_state *state = space->machine->driver_data<cninja_state>();
+	cninja_state *state = space->machine().driver_data<cninja_state>();
 
 	switch (offset)
 	{
@@ -100,7 +100,7 @@ static READ16_HANDLER( cninja_irq_r )
 
 static WRITE16_HANDLER( cninja_irq_w )
 {
-	cninja_state *state = space->machine->driver_data<cninja_state>();
+	cninja_state *state = space->machine().driver_data<cninja_state>();
 
 	switch (offset)
 	{
@@ -118,7 +118,7 @@ static WRITE16_HANDLER( cninja_irq_w )
 		state->scanline = data & 0xff;
 
 		if (!BIT(state->irq_mask, 1) && state->scanline > 0 && state->scanline < 240)
-			state->raster_irq_timer->adjust(space->machine->primary_screen->time_until_pos(state->scanline), state->scanline);
+			state->raster_irq_timer->adjust(space->machine().primary_screen->time_until_pos(state->scanline), state->scanline);
 		else
 			state->raster_irq_timer->reset();
 		return;
@@ -135,11 +135,11 @@ static READ16_HANDLER( robocop2_prot_r )
 	switch (offset << 1)
 	{
 		case 0x41a: /* Player 1 & 2 input ports */
-			return input_port_read(space->machine, "IN0");
+			return input_port_read(space->machine(), "IN0");
 		case 0x320: /* Coins */
-			return input_port_read(space->machine, "IN1");
+			return input_port_read(space->machine(), "IN1");
 		case 0x4e6: /* Dip switches */
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 		case 0x504: /* PC: 6b6.  b4, 2c, 36 written before read */
 			logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", cpu_get_pc(space->cpu), offset);
 			return 0x84;
@@ -152,17 +152,17 @@ static READ16_HANDLER( robocop2_prot_r )
 
 static WRITE16_HANDLER( cninja_pf12_control_w )
 {
-	cninja_state *state = space->machine->driver_data<cninja_state>();
+	cninja_state *state = space->machine().driver_data<cninja_state>();
 	deco16ic_pf_control_w(state->deco_tilegen1, offset, data, mem_mask);
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 }
 
 
 static WRITE16_HANDLER( cninja_pf34_control_w )
 {
-	cninja_state *state = space->machine->driver_data<cninja_state>();
+	cninja_state *state = space->machine().driver_data<cninja_state>();
 	deco16ic_pf_control_w(state->deco_tilegen2, offset, data, mem_mask);
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 }
 
 
@@ -722,19 +722,19 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int state)
 {
-	cninja_state *driver_state = device->machine->driver_data<cninja_state>();
+	cninja_state *driver_state = device->machine().driver_data<cninja_state>();
 	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static void sound_irq2(device_t *device, int state)
 {
-	cninja_state *driver_state = device->machine->driver_data<cninja_state>();
+	cninja_state *driver_state = device->machine().driver_data<cninja_state>();
 	device_set_input_line(driver_state->audiocpu, 0, state);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	cninja_state *state = device->machine->driver_data<cninja_state>();
+	cninja_state *state = device->machine().driver_data<cninja_state>();
 
 	/* the second OKIM6295 ROM is bank switched */
 	state->oki2->set_bank_base((data & 1) * 0x40000);
@@ -883,7 +883,7 @@ static const deco16ic_interface mutantf_deco16ic_tilegen2_intf =
 
 static MACHINE_START( cninja )
 {
-	cninja_state *state = machine->driver_data<cninja_state>();
+	cninja_state *state = machine.driver_data<cninja_state>();
 
 	state->save_item(NAME(state->scanline));
 	state->save_item(NAME(state->irq_mask));
@@ -891,7 +891,7 @@ static MACHINE_START( cninja )
 
 static MACHINE_RESET( cninja )
 {
-	cninja_state *state = machine->driver_data<cninja_state>();
+	cninja_state *state = machine.driver_data<cninja_state>();
 
 	state->scanline = 0;
 	state->irq_mask = 0;
@@ -2002,9 +2002,9 @@ ROM_END
 
 /**********************************************************************************/
 
-static void cninja_patch( running_machine *machine )
+static void cninja_patch( running_machine &machine )
 {
-	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x80000 / 2; i++)
@@ -2032,19 +2032,19 @@ static void cninja_patch( running_machine *machine )
 
 static DRIVER_INIT( cninja )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1bc0a8, 0x1bc0a9, FUNC(cninja_sound_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1bc0a8, 0x1bc0a9, FUNC(cninja_sound_w));
 	cninja_patch(machine);
 }
 
 static DRIVER_INIT( stoneage )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1bc0a8, 0x1bc0a9, FUNC(stoneage_sound_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1bc0a8, 0x1bc0a9, FUNC(stoneage_sound_w));
 }
 
 static DRIVER_INIT( mutantf )
 {
-	const UINT8 *src = machine->region("gfx2")->base();
-	UINT8 *dst = machine->region("gfx1")->base();
+	const UINT8 *src = machine.region("gfx2")->base();
+	UINT8 *dst = machine.region("gfx1")->base();
 
 	/* The 16x16 graphic has some 8x8 chars in it - decode them in GFX1 */
 	memcpy(dst + 0x50000, dst + 0x10000, 0x10000);

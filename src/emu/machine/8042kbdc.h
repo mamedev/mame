@@ -21,14 +21,14 @@ typedef enum
 struct kbdc8042_interface
 {
 	kbdc8042_type_t type;
-	void (*set_gate_a20)(running_machine *machine, int a20);
-	void (*keyboard_interrupt)(running_machine *machine, int state);
-	int (*get_out2)(running_machine *machine);
+	void (*set_gate_a20)(running_machine &machine, int a20);
+	void (*keyboard_interrupt)(running_machine &machine, int state);
+	int (*get_out2)(running_machine &machine);
 };
 
 
 
-void kbdc8042_init(running_machine *machine, const struct kbdc8042_interface *intf);
+void kbdc8042_init(running_machine &machine, const struct kbdc8042_interface *intf);
 
 READ8_HANDLER(kbdc8042_8_r);
 WRITE8_HANDLER(kbdc8042_8_w);

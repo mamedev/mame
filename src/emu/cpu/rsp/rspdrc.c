@@ -496,7 +496,7 @@ static void cfunc_unimplemented_opcode(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
-	if ((rsp->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((rsp->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		char string[200];
 		rsp_dasm_one(string, rsp->ppc, op);
@@ -508,7 +508,7 @@ static void cfunc_unimplemented_opcode(void *param)
 
 static void unimplemented_opcode(rsp_state *rsp, UINT32 op)
 {
-	if ((rsp->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((rsp->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		char string[200];
 		rsp_dasm_one(string, rsp->ppc, op);
@@ -612,7 +612,7 @@ static CPU_INIT( rsp )
 	//int elnum;
 
 	/* allocate enough space for the cache and the core */
-	cache = auto_alloc(device->machine, drc_cache(CACHE_SIZE + sizeof(*rsp)));
+	cache = auto_alloc(device->machine(), drc_cache(CACHE_SIZE + sizeof(*rsp)));
 
 	/* allocate the core memory */
 	*(rsp_state **)device->token() = rsp = (rsp_state *)cache->alloc_near(sizeof(*rsp));
@@ -638,7 +638,7 @@ static CPU_INIT( rsp )
 	{
 		flags |= DRCUML_OPTION_LOG_NATIVE;
 	}
-	rsp->impstate->drcuml = auto_alloc(device->machine, drcuml_state(*device, *cache, flags, 8, 32, 2));
+	rsp->impstate->drcuml = auto_alloc(device->machine(), drcuml_state(*device, *cache, flags, 8, 32, 2));
 
 	/* add symbols for our stuff */
 	rsp->impstate->drcuml->symbol_add(&rsp->pc, sizeof(rsp->pc), "pc");
@@ -656,7 +656,7 @@ static CPU_INIT( rsp )
 	rsp->impstate->drcuml->symbol_add(&rsp->impstate->numcycles, sizeof(rsp->impstate->numcycles), "numcycles");
 
 	/* initialize the front-end helper */
-	rsp->impstate->drcfe = auto_alloc(device->machine, rsp_frontend(*rsp, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
+	rsp->impstate->drcfe = auto_alloc(device->machine(), rsp_frontend(*rsp, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
 
 	/* compute the register parameters */
 	for (regnum = 0; regnum < 32; regnum++)
@@ -696,9 +696,9 @@ static CPU_EXIT( rsp )
 	rsp_state *rsp = get_safe_token(device);
 
 	/* clean up the DRC */
-	auto_free(device->machine, rsp->impstate->drcfe);
-	auto_free(device->machine, rsp->impstate->drcuml);
-	auto_free(device->machine, rsp->impstate->cache);
+	auto_free(device->machine(), rsp->impstate->drcfe);
+	auto_free(device->machine(), rsp->impstate->drcuml);
+	auto_free(device->machine(), rsp->impstate->cache);
 }
 
 
@@ -3817,7 +3817,7 @@ static void generate_sequence_instruction(rsp_state *rsp, drcuml_block *block, c
 	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);								// mapvar  CYCLES,compiler->cycles
 
 	/* if we are debugging, call the debugger */
-	if ((rsp->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((rsp->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		UML_MOV(block, mem(&rsp->pc), desc->pc);								// mov     [pc],desc->pc
 		save_fast_iregs(rsp, block);

@@ -19,7 +19,7 @@ const z80_daisy_config senjyo_daisy_chain[] =
 
 static READ8_DEVICE_HANDLER( pio_pa_r )
 {
-	senjyo_state *state = device->machine->driver_data<senjyo_state>();
+	senjyo_state *state = device->machine().driver_data<senjyo_state>();
 
 	return state->sound_cmd;
 }
@@ -48,8 +48,8 @@ Z80CTC_INTERFACE( senjyo_ctc_intf )
 
 WRITE8_HANDLER( senjyo_volume_w )
 {
-	senjyo_state *state = space->machine->driver_data<senjyo_state>();
-	samples_device *samples = space->machine->device<samples_device>("samples");
+	senjyo_state *state = space->machine().driver_data<senjyo_state>();
+	samples_device *samples = space->machine().device<samples_device>("samples");
 
 	state->single_volume = data & 0x0f;
 	sample_set_volume(samples, 0, state->single_volume / 15.0);
@@ -58,11 +58,11 @@ WRITE8_HANDLER( senjyo_volume_w )
 
 static TIMER_CALLBACK( senjyo_sh_update )
 {
-	device_t *samples = machine->device("samples");
-	senjyo_state *state = machine->driver_data<senjyo_state>();
+	device_t *samples = machine.device("samples");
+	senjyo_state *state = machine.driver_data<senjyo_state>();
 
 	/* ctc2 timer single tone generator frequency */
-	z80ctc_device *ctc = machine->device<z80ctc_device>("z80ctc");
+	z80ctc_device *ctc = machine.device<z80ctc_device>("z80ctc");
 	attotime period = ctc->period(2);
 	if (period != attotime::zero)
 		state->single_rate = ATTOSECONDS_TO_HZ(period.attoseconds);
@@ -75,8 +75,8 @@ static TIMER_CALLBACK( senjyo_sh_update )
 
 SAMPLES_START( senjyo_sh_start )
 {
-	running_machine *machine = device->machine;
-	senjyo_state *state = machine->driver_data<senjyo_state>();
+	running_machine &machine = device->machine();
+	senjyo_state *state = machine.driver_data<senjyo_state>();
 	int i;
 
 	state->single_data = auto_alloc_array(machine, INT16, SINGLE_LENGTH);
@@ -90,5 +90,5 @@ SAMPLES_START( senjyo_sh_start )
 	sample_set_volume(device, 0, state->single_volume / 15.0);
 	sample_start_raw(device, 0, state->single_data, SINGLE_LENGTH, state->single_rate, 1);
 
-	machine->scheduler().timer_pulse(machine->primary_screen->frame_period(), FUNC(senjyo_sh_update));
+	machine.scheduler().timer_pulse(machine.primary_screen->frame_period(), FUNC(senjyo_sh_update));
 }

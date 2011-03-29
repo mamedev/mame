@@ -202,7 +202,7 @@ device_config *dsp32c_device_config::static_alloc_device_config(const machine_co
 
 device_t *dsp32c_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, dsp32c_device(machine, *this));
+	return auto_alloc(machine, dsp32c_device(machine, *this));
 }
 
 

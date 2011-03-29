@@ -33,7 +33,7 @@
 
 static WRITE8_HANDLER( ajax_bankswitch_w )
 {
-	ajax_state *state = space->machine->driver_data<ajax_state>();
+	ajax_state *state = space->machine().driver_data<ajax_state>();
 	int bank = 0;
 
 	/* rom select */
@@ -41,15 +41,15 @@ static WRITE8_HANDLER( ajax_bankswitch_w )
 		bank += 4;
 
 	/* coin counters */
-	coin_counter_w(space->machine, 0, data & 0x20);
-	coin_counter_w(space->machine, 1, data & 0x40);
+	coin_counter_w(space->machine(), 0, data & 0x20);
+	coin_counter_w(space->machine(), 1, data & 0x40);
 
 	/* priority */
 	state->priority = data & 0x08;
 
 	/* bank # (ROMS N11 and N12) */
 	bank += (data & 0x07);
-	memory_set_bank(space->machine, "bank2", bank);
+	memory_set_bank(space->machine(), "bank2", bank);
 }
 
 /*  ajax_lamps_w:
@@ -78,14 +78,14 @@ static WRITE8_HANDLER( ajax_bankswitch_w )
 
 static WRITE8_HANDLER( ajax_lamps_w )
 {
-	set_led_status(space->machine, 1, data & 0x02);	/* super weapon lamp */
-	set_led_status(space->machine, 2, data & 0x04);	/* power up lamps */
-	set_led_status(space->machine, 5, data & 0x04);	/* power up lamps */
-	set_led_status(space->machine, 0, data & 0x20);	/* start lamp */
-	set_led_status(space->machine, 3, data & 0x40);	/* game over lamps */
-	set_led_status(space->machine, 6, data & 0x40);	/* game over lamps */
-	set_led_status(space->machine, 4, data & 0x80);	/* game over lamps */
-	set_led_status(space->machine, 7, data & 0x80);	/* game over lamps */
+	set_led_status(space->machine(), 1, data & 0x02);	/* super weapon lamp */
+	set_led_status(space->machine(), 2, data & 0x04);	/* power up lamps */
+	set_led_status(space->machine(), 5, data & 0x04);	/* power up lamps */
+	set_led_status(space->machine(), 0, data & 0x20);	/* start lamp */
+	set_led_status(space->machine(), 3, data & 0x40);	/* game over lamps */
+	set_led_status(space->machine(), 6, data & 0x40);	/* game over lamps */
+	set_led_status(space->machine(), 4, data & 0x80);	/* game over lamps */
+	set_led_status(space->machine(), 7, data & 0x80);	/* game over lamps */
 }
 
 /*  ajax_ls138_f10:
@@ -113,17 +113,17 @@ READ8_HANDLER( ajax_ls138_f10_r )
 	switch ((offset & 0x01c0) >> 6)
 	{
 		case 0x00:	/* ??? */
-			data = space->machine->rand();
+			data = space->machine().rand();
 			break;
 		case 0x04:	/* 2P inputs */
-			data = input_port_read(space->machine, "P2");
+			data = input_port_read(space->machine(), "P2");
 			break;
 		case 0x06:	/* 1P inputs + DIPSW #1 & #2 */
 			index = offset & 0x01;
-			data = input_port_read(space->machine, (offset & 0x02) ? portnames[2 + index] : portnames[index]);
+			data = input_port_read(space->machine(), (offset & 0x02) ? portnames[2 + index] : portnames[index]);
 			break;
 		case 0x07:	/* DIPSW #3 */
-			data = input_port_read(space->machine, "DSW3");
+			data = input_port_read(space->machine(), "DSW3");
 			break;
 
 		default:
@@ -135,7 +135,7 @@ READ8_HANDLER( ajax_ls138_f10_r )
 
 WRITE8_HANDLER( ajax_ls138_f10_w )
 {
-	ajax_state *state = space->machine->driver_data<ajax_state>();
+	ajax_state *state = space->machine().driver_data<ajax_state>();
 
 	switch ((offset & 0x01c0) >> 6)
 	{
@@ -182,7 +182,7 @@ WRITE8_HANDLER( ajax_ls138_f10_w )
 
 WRITE8_HANDLER( ajax_bankswitch_2_w )
 {
-	ajax_state *state = space->machine->driver_data<ajax_state>();
+	ajax_state *state = space->machine().driver_data<ajax_state>();
 
 	/* enable char ROM reading through the video RAM */
 	k052109_set_rmrd_line(state->k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
@@ -194,14 +194,14 @@ WRITE8_HANDLER( ajax_bankswitch_2_w )
 	state->firq_enable = data & 0x10;
 
 	/* bank # (ROMS G16 and I16) */
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 }
 
 MACHINE_START( ajax )
 {
-	ajax_state *state = machine->driver_data<ajax_state>();
-	UINT8 *MAIN = machine->region("maincpu")->base();
-	UINT8 *SUB  = machine->region("sub")->base();
+	ajax_state *state = machine.driver_data<ajax_state>();
+	UINT8 *MAIN = machine.region("maincpu")->base();
+	UINT8 *SUB  = machine.region("sub")->base();
 
 	memory_configure_bank(machine, "bank1", 0,  9,  &SUB[0x10000], 0x2000);
 	memory_configure_bank(machine, "bank2", 0, 12, &MAIN[0x10000], 0x2000);
@@ -209,14 +209,14 @@ MACHINE_START( ajax )
 	memory_set_bank(machine, "bank1", 0);
 	memory_set_bank(machine, "bank2", 0);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->subcpu = machine->device("sub");
-	state->k007232_1 = machine->device("k007232_1");
-	state->k007232_2 = machine->device("k007232_2");
-	state->k052109 = machine->device("k052109");
-	state->k051960 = machine->device("k051960");
-	state->k051316 = machine->device("k051316");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->subcpu = machine.device("sub");
+	state->k007232_1 = machine.device("k007232_1");
+	state->k007232_2 = machine.device("k007232_2");
+	state->k052109 = machine.device("k052109");
+	state->k051960 = machine.device("k051960");
+	state->k051316 = machine.device("k051316");
 
 	state->save_item(NAME(state->priority));
 	state->save_item(NAME(state->firq_enable));
@@ -224,7 +224,7 @@ MACHINE_START( ajax )
 
 MACHINE_RESET( ajax )
 {
-	ajax_state *state = machine->driver_data<ajax_state>();
+	ajax_state *state = machine.driver_data<ajax_state>();
 
 	state->priority = 0;
 	state->firq_enable = 0;
@@ -232,7 +232,7 @@ MACHINE_RESET( ajax )
 
 INTERRUPT_GEN( ajax_interrupt )
 {
-	ajax_state *state = device->machine->driver_data<ajax_state>();
+	ajax_state *state = device->machine().driver_data<ajax_state>();
 
 	if (k051960_is_irq_enabled(state->k051960))
 		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);

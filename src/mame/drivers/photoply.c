@@ -56,7 +56,7 @@ public:
 	visarea.max_x = _x_-1; \
 	visarea.min_y = 0; \
 	visarea.max_y = _y_-1; \
-	machine->primary_screen->configure(_x_, _y_, visarea, machine->primary_screen->frame_period().attoseconds ); \
+	machine.primary_screen->configure(_x_, _y_, visarea, machine.primary_screen->frame_period().attoseconds ); \
 	} \
 
 #define RES_320x200 0
@@ -66,9 +66,9 @@ static VIDEO_START(photoply)
 {
 }
 
-static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs,UINT8 gfx_num)
+static void cga_alphanumeric_tilemap(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs,UINT8 gfx_num)
 {
-	photoply_state *state = machine->driver_data<photoply_state>();
+	photoply_state *state = machine.driver_data<photoply_state>();
 	UINT32 offs,x,y,max_x,max_y;
 	int tile,color;
 
@@ -97,7 +97,7 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 			tile =  (state->vga_vram[offs] & 0x00ff0000)>>16;
 			color = (state->vga_vram[offs] & 0xff000000)>>24;
 
-			drawgfx_opaque(bitmap,cliprect,machine->gfx[gfx_num],
+			drawgfx_opaque(bitmap,cliprect,machine.gfx[gfx_num],
 					tile,
 					color,
 					0,0,
@@ -107,7 +107,7 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 			tile =  (state->vga_vram[offs] & 0x000000ff);
 			color = (state->vga_vram[offs] & 0x0000ff00)>>8;
 
-			drawgfx_opaque(bitmap,cliprect,machine->gfx[gfx_num],
+			drawgfx_opaque(bitmap,cliprect,machine.gfx[gfx_num],
 					tile,
 					color,
 					0,0,
@@ -120,7 +120,7 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 
 static SCREEN_UPDATE(photoply)
 {
-	cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_640x200,0x18000/4,0);
+	cga_alphanumeric_tilemap(screen->machine(),bitmap,cliprect,RES_640x200,0x18000/4,0);
 
 	return 0;
 }
@@ -132,7 +132,7 @@ DMA8237 Controller
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( device, state );
@@ -141,7 +141,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 
 static READ8_HANDLER( pc_dma_read_byte )
 {
-	photoply_state *state = space->machine->driver_data<photoply_state>();
+	photoply_state *state = space->machine().driver_data<photoply_state>();
 	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
@@ -151,7 +151,7 @@ static READ8_HANDLER( pc_dma_read_byte )
 
 static WRITE8_HANDLER( pc_dma_write_byte )
 {
-	photoply_state *state = space->machine->driver_data<photoply_state>();
+	photoply_state *state = space->machine().driver_data<photoply_state>();
 	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
@@ -160,7 +160,7 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 
 static READ8_HANDLER(dma_page_select_r)
 {
-	photoply_state *state = space->machine->driver_data<photoply_state>();
+	photoply_state *state = space->machine().driver_data<photoply_state>();
 	UINT8 data = state->at_pages[offset % 0x10];
 
 	switch(offset % 8)
@@ -184,7 +184,7 @@ static READ8_HANDLER(dma_page_select_r)
 
 static WRITE8_HANDLER(dma_page_select_w)
 {
-	photoply_state *state = space->machine->driver_data<photoply_state>();
+	photoply_state *state = space->machine().driver_data<photoply_state>();
 	state->at_pages[offset % 0x10] = data;
 
 	switch(offset % 8)
@@ -206,7 +206,7 @@ static WRITE8_HANDLER(dma_page_select_w)
 
 static void set_dma_channel(device_t *device, int channel, int state)
 {
-	photoply_state *drvstate = device->machine->driver_data<photoply_state>();
+	photoply_state *drvstate = device->machine().driver_data<photoply_state>();
 	if (!state) drvstate->dma_channel = channel;
 }
 
@@ -244,7 +244,7 @@ static I8237_INTERFACE( dma8237_2_config )
 
 static WRITE_LINE_DEVICE_HANDLER( pic8259_1_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface pic8259_1_config =
@@ -259,7 +259,7 @@ static const struct pic8259_interface pic8259_2_config =
 
 static IRQ_CALLBACK(irq_callback)
 {
-	photoply_state *state = device->machine->driver_data<photoply_state>();
+	photoply_state *state = device->machine().driver_data<photoply_state>();
 	int r = 0;
 	r = pic8259_acknowledge(state->pic8259_2);
 	if (r==0)
@@ -271,7 +271,7 @@ static IRQ_CALLBACK(irq_callback)
 
 static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out0_changed )
 {
-	photoply_state *drvstate = device->machine->driver_data<photoply_state>();
+	photoply_state *drvstate = device->machine().driver_data<photoply_state>();
 	if ( drvstate->pic8259_1 )
 	{
 		pic8259_ir0_w(drvstate->pic8259_1, state);
@@ -316,13 +316,13 @@ ADDRESS_MAP_END
 
 static READ32_HANDLER( kludge_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 /* 3c8-3c9 -> ramdac*/
 static WRITE32_HANDLER( vga_ramdac_w )
 {
-	photoply_state *state = space->machine->driver_data<photoply_state>();
+	photoply_state *state = space->machine().driver_data<photoply_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		//printf("%02x X\n",data);
@@ -344,7 +344,7 @@ static WRITE32_HANDLER( vga_ramdac_w )
 				break;
 			case 2:
 				state->pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(space->machine, 0x200+state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
+				palette_set_color(space->machine(), 0x200+state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
 				state->pal.offs_internal = 0;
 				state->pal.offs++;
 				break;
@@ -354,7 +354,7 @@ static WRITE32_HANDLER( vga_ramdac_w )
 
 static WRITE32_HANDLER( vga_regs_w )
 {
-	photoply_state *state = space->machine->driver_data<photoply_state>();
+	photoply_state *state = space->machine().driver_data<photoply_state>();
 
 	if (ACCESSING_BITS_0_7)
 		state->vga_address = data;
@@ -474,25 +474,25 @@ static PALETTE_INIT(pcat_286)
 	//todo: 256 colors
 }
 
-static void photoply_set_keyb_int(running_machine *machine, int state)
+static void photoply_set_keyb_int(running_machine &machine, int state)
 {
-	photoply_state *drvstate = machine->driver_data<photoply_state>();
+	photoply_state *drvstate = machine.driver_data<photoply_state>();
 	pic8259_ir1_w(drvstate->pic8259_1, state);
 }
 
 
 static MACHINE_START( photoply )
 {
-	photoply_state *state = machine->driver_data<photoply_state>();
+	photoply_state *state = machine.driver_data<photoply_state>();
 //  bank = -1;
 //  lastvalue = -1;
 //  hv_blank = 0;
-	device_set_irq_callback(machine->device("maincpu"), irq_callback);
-	state->pit8253 = machine->device( "pit8254" );
-	state->pic8259_1 = machine->device( "pic8259_1" );
-	state->pic8259_2 = machine->device( "pic8259_2" );
-	state->dma8237_1 = machine->device( "dma8237_1" );
-	state->dma8237_2 = machine->device( "dma8237_2" );
+	device_set_irq_callback(machine.device("maincpu"), irq_callback);
+	state->pit8253 = machine.device( "pit8254" );
+	state->pic8259_1 = machine.device( "pic8259_1" );
+	state->pic8259_2 = machine.device( "pic8259_2" );
+	state->dma8237_1 = machine.device( "dma8237_1" );
+	state->dma8237_2 = machine.device( "dma8237_2" );
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, photoply_set_keyb_int);
 }

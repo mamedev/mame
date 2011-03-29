@@ -114,11 +114,11 @@ cc_p14.j2 8192 0xedc6a1eb M5L2764k
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	mainsnk_state *state = space->machine->driver_data<mainsnk_state>();
+	mainsnk_state *state = space->machine().driver_data<mainsnk_state>();
 
 	state->sound_cpu_busy = 1;
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( sound_command_r )
@@ -128,7 +128,7 @@ static READ8_HANDLER( sound_command_r )
 
 static READ8_HANDLER( sound_ack_r )
 {
-	mainsnk_state *state = space->machine->driver_data<mainsnk_state>();
+	mainsnk_state *state = space->machine().driver_data<mainsnk_state>();
 
 	state->sound_cpu_busy = 0;
 	return 0xff;
@@ -136,7 +136,7 @@ static READ8_HANDLER( sound_ack_r )
 
 static CUSTOM_INPUT( mainsnk_sound_r )
 {
-	mainsnk_state *state = field->port->machine->driver_data<mainsnk_state>();
+	mainsnk_state *state = field->port->machine().driver_data<mainsnk_state>();
 
 	return (state->sound_cpu_busy) ? 0x01 : 0x00;
 }

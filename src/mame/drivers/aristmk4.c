@@ -224,15 +224,15 @@ static const UINT8 cashcade_p[] ={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0
 static VIDEO_START(aristmk4)
 {
     int tile;
-    for (tile = 0; tile < machine->gfx[0]->total_elements; tile++)
+    for (tile = 0; tile < machine.gfx[0]->total_elements; tile++)
     {
-		gfx_element_decode(machine->gfx[0], tile);
+		gfx_element_decode(machine.gfx[0], tile);
     }
 }
 
-INLINE void uBackgroundColour(running_machine *machine)
+INLINE void uBackgroundColour(running_machine &machine)
 {
-	aristmk4_state *state = machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = machine.driver_data<aristmk4_state>();
     /* SW7 can be set when the main door is open, this allows the colours for the background
         to be adjusted whilst the machine is running.
 
@@ -266,8 +266,8 @@ INLINE void uBackgroundColour(running_machine *machine)
 
 static SCREEN_UPDATE(aristmk4)
 {
-	aristmk4_state *state = screen->machine->driver_data<aristmk4_state>();
-	const gfx_element *gfx = screen->machine->gfx[0];
+	aristmk4_state *state = screen->machine().driver_data<aristmk4_state>();
+	const gfx_element *gfx = screen->machine().gfx[0];
 	int x,y;
 	int count = 0;
     int color;
@@ -283,7 +283,7 @@ static SCREEN_UPDATE(aristmk4)
             color = ((state->mkiv_vram[count]) & 0xe0) >> 5;
 			tile = (state->mkiv_vram[count+1]|state->mkiv_vram[count]<<8) & 0x3ff;
 			bgtile = (state->mkiv_vram[count+1]|state->mkiv_vram[count]<<8) & 0xff; // first 256 tiles
-			uBackgroundColour(screen->machine); // read sw7
+			uBackgroundColour(screen->machine()); // read sw7
 			gfx_element_decode(gfx, bgtile);    // force the machine to update only the first 256 tiles.
 			                                    // as we only update the background, not the entire display.
 			flipx = ((state->mkiv_vram[count]) & 0x04);
@@ -297,19 +297,19 @@ static SCREEN_UPDATE(aristmk4)
 
 static READ8_HANDLER(ldsw)
 {
-	aristmk4_state *state = space->machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
-   int U3_p2_ret= input_port_read(space->machine, "5002");
+   int U3_p2_ret= input_port_read(space->machine(), "5002");
    if(U3_p2_ret & 0x1)
    {
         return 0;
    }
-   return state->cgdrsw = input_port_read(space->machine, "CGDRSW");
+   return state->cgdrsw = input_port_read(space->machine(), "CGDRSW");
 }
 
 static READ8_HANDLER(cgdrr)
 {
-	aristmk4_state *state = space->machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
    if(state->cgdrsw) // is the LC closed
    {
@@ -320,7 +320,7 @@ static READ8_HANDLER(cgdrr)
 
 static WRITE8_HANDLER(cgdrw)
 {
-	aristmk4_state *state = space->machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
     state->ripple = data;
 
@@ -328,7 +328,7 @@ static WRITE8_HANDLER(cgdrw)
 
 static WRITE8_HANDLER(u3_p0)
 {
-	aristmk4_state *state = space->machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
 	state->u3_p0_w = data;
 	//logerror("u3_p0_w: %02X\n",state->u3_p0_w);
@@ -337,10 +337,10 @@ static WRITE8_HANDLER(u3_p0)
 
 static READ8_HANDLER(u3_p2)
 {
-	aristmk4_state *state = space->machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
-    int u3_p2_ret= input_port_read(space->machine, "5002");
-    int u3_p3_ret= input_port_read(space->machine, "5003");
+    int u3_p2_ret= input_port_read(space->machine(), "5002");
+    int u3_p3_ret= input_port_read(space->machine(), "5003");
 
     output_set_lamp_value(19, (u3_p2_ret >> 4) & 1); //auditkey light
     output_set_lamp_value(20, (u3_p3_ret >> 2) & 1); //jackpotkey light
@@ -353,7 +353,7 @@ static READ8_HANDLER(u3_p2)
 
     if (state->inscrd==0)
     {
-		state->inscrd=input_port_read(space->machine, "insertcoin");
+		state->inscrd=input_port_read(space->machine(), "insertcoin");
 	}
 
     if (state->inscrd==1)
@@ -391,7 +391,7 @@ static READ8_HANDLER(mkiv_pia_ina)
 {
      /* uncomment this code once RTC is fixed */
 
-    //return space->machine->device<mc146818_device>("rtc")->read(*space,1);
+    //return space->machine().device<mc146818_device>("rtc")->read(*space,1);
     return 0;       // OK for now, the aussie version has no RTC on the MB so this is valid.
 }
 
@@ -399,8 +399,8 @@ static READ8_HANDLER(mkiv_pia_ina)
 
 static WRITE8_HANDLER(mkiv_pia_outa)
 {
-	aristmk4_state *state = space->machine->driver_data<aristmk4_state>();
-	mc146818_device *mc = space->machine->device<mc146818_device>("rtc");
+	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
+	mc146818_device *mc = space->machine().device<mc146818_device>("rtc");
     if(state->rtc_data_strobe)
     {
         mc->write(*space,1,data);
@@ -419,7 +419,7 @@ static WRITE8_HANDLER(mkiv_pia_outa)
 //output ca2
 static WRITE8_DEVICE_HANDLER(mkiv_pia_ca2)
 {
-	aristmk4_state *state = device->machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
      state->rtc_address_strobe = data;
     // logerror("address strobe %02X\n", address_strobe);
 }
@@ -428,7 +428,7 @@ static WRITE8_DEVICE_HANDLER(mkiv_pia_ca2)
 //output cb2
 static WRITE8_DEVICE_HANDLER(mkiv_pia_cb2)
 {
-	aristmk4_state *state = device->machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
      state->rtc_data_strobe = data;
      //logerror("data strobe: %02X\n", data);
 }
@@ -438,7 +438,7 @@ static WRITE8_DEVICE_HANDLER(mkiv_pia_cb2)
 //output b
 static WRITE8_DEVICE_HANDLER(mkiv_pia_outb)
 {
-	aristmk4_state *state = device->machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
 
      UINT8 emet[5];
      int i = 0;
@@ -489,7 +489,7 @@ VERSATILE INTERFACE ADAPTER CONFIGURATION
 
 static TIMER_CALLBACK(coin_input_reset)
 {
-	aristmk4_state *state = machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = machine.driver_data<aristmk4_state>();
 
 	state->inscrd=0; //reset credit input after 150msec
 
@@ -497,7 +497,7 @@ static TIMER_CALLBACK(coin_input_reset)
 
 static TIMER_CALLBACK(hopper_reset)
 {
-	aristmk4_state *state = machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = machine.driver_data<aristmk4_state>();
 
 	state->hopper_motor=0x01;
 
@@ -508,18 +508,18 @@ static TIMER_CALLBACK(hopper_reset)
 
 static READ8_DEVICE_HANDLER(via_a_r)
 {
-	aristmk4_state *state = device->machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
 	int psg_ret=0;
 
     if (state->ay8910_1&0x03) // SW1 read.
     {
-    	psg_ret = ay8910_r(device->machine->device("ay1"), 0);
+    	psg_ret = ay8910_r(device->machine().device("ay1"), 0);
     	//logerror("PSG porta ay1 returned %02X\n",psg_ret);
     }
 
 	else if (state->ay8910_2&0x03) //i don't think we read anything from Port A on ay2, Can be removed once game works ok.
 	{
-		psg_ret = ay8910_r(device->machine->device("ay2"), 0);
+		psg_ret = ay8910_r(device->machine().device("ay2"), 0);
 		//logerror("PSG porta ay2 returned %02X\n",psg_ret);
 	}
 	return psg_ret;
@@ -529,9 +529,9 @@ static READ8_DEVICE_HANDLER(via_a_r)
 
 static READ8_DEVICE_HANDLER(via_b_r)
 {
-	aristmk4_state *state = device->machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
 
-    int ret=input_port_read(device->machine, "via_port_b");
+    int ret=input_port_read(device->machine(), "via_port_b");
 
 // Not expecting to read anything from port B on the AY8910's ( controls BC1, BC2 and BDIR )
 // However there are extra 4 bits not going to the AY8910's on the schematics, which get read from here.
@@ -556,7 +556,7 @@ static READ8_DEVICE_HANDLER(via_b_r)
 		case 0x02:
 			ret=ret^0x20;
 			state->inscrd++;
-			device->machine->scheduler().timer_set(attotime::from_msec(150), FUNC(coin_input_reset));
+			device->machine().scheduler().timer_set(attotime::from_msec(150), FUNC(coin_input_reset));
 			break;
 
 		default:
@@ -570,7 +570,7 @@ static READ8_DEVICE_HANDLER(via_b_r)
 	{
 		case 0x00:
 			ret=ret^0x40;
-			device->machine->scheduler().timer_set(attotime::from_msec(175), FUNC(hopper_reset));
+			device->machine().scheduler().timer_set(attotime::from_msec(175), FUNC(hopper_reset));
 			state->hopper_motor=0x02;
 			break;
 		case 0x01:
@@ -587,7 +587,7 @@ static READ8_DEVICE_HANDLER(via_b_r)
 
 static WRITE8_DEVICE_HANDLER(via_a_w)
 {
-	aristmk4_state *state = device->machine->driver_data<aristmk4_state>();   //via_b_w will handle sending the data to the ay8910, so just write the data for it to use later
+	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();   //via_b_w will handle sending the data to the ay8910, so just write the data for it to use later
 
 	//logerror("VIA port A write %02X\n",data);
 	state->psg_data = data;
@@ -596,7 +596,7 @@ static WRITE8_DEVICE_HANDLER(via_a_w)
 
 static WRITE8_DEVICE_HANDLER(via_b_w)
 {
-	aristmk4_state *state = device->machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
 	state->ay8910_1 = ( data & 0x0F ) ; //only need first 4 bits per schematics
                                  //NOTE: when bit 4 is off, we write to AY1, when bit 4 is on, we write to AY2
 	state->ay8910_2 = state->ay8910_1;
@@ -629,14 +629,14 @@ static WRITE8_DEVICE_HANDLER(via_b_w)
 
 		case 0x06:  //WRITE
         {
-        	ay8910_data_w( device->machine->device("ay1"), 0 , state->psg_data );
+        	ay8910_data_w( device->machine().device("ay1"), 0 , state->psg_data );
         	//logerror("VIA Port A write data ay1: %02X\n",state->psg_data);
         	break;
         }
 
 		case 0x07:  //LATCH Address (set register)
         {
-        	ay8910_address_w( device->machine->device("ay1"), 0 , state->psg_data );
+        	ay8910_address_w( device->machine().device("ay1"), 0 , state->psg_data );
         	//logerror("VIA Port B write register ay1: %02X\n",state->psg_data);
         	break;
         }
@@ -662,14 +662,14 @@ static WRITE8_DEVICE_HANDLER(via_b_w)
 
 		case 0x06:  //WRITE
         {
-        	ay8910_data_w( device->machine->device("ay2"), 0 , state->psg_data );
+        	ay8910_data_w( device->machine().device("ay2"), 0 , state->psg_data );
         	//logerror("VIA Port A write data ay2: %02X\n",state->psg_data);
         	break;
         }
 
 		case 0x07:  //LATCH Address (set register)
         {
-            ay8910_address_w( device->machine->device("ay2"), 0 , state->psg_data );
+            ay8910_address_w( device->machine().device("ay2"), 0 , state->psg_data );
             //logerror("VIA Port B write register ay2: %02X\n",state->psg_data);
             break;
         }
@@ -709,7 +709,7 @@ static WRITE8_DEVICE_HANDLER(via_ca2_w)
 
 static WRITE8_DEVICE_HANDLER(via_cb2_w)
 {
-	aristmk4_state *state = device->machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
 // CB2 = hopper motor (HOPMO1). When it is 0x01, it is not running (active low)
 	// when it goes to 0, we're expecting to coins to be paid out, handled in via_b_r
 	// as soon as it is 1, HOPCO1 to remain 'ON'
@@ -771,7 +771,7 @@ static WRITE8_DEVICE_HANDLER(zn434_w)
 
 static READ8_HANDLER(cashcade_r)
 {
-	aristmk4_state *state = space->machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 	/* work around for cashcade games */
 	return cashcade_p[(state->cashcade_c++)%15];
 }
@@ -1330,7 +1330,7 @@ static const ay8910_interface ay8910_config2 =
 
 static WRITE8_DEVICE_HANDLER(firq)
 {
-       cputag_set_input_line(device->machine, "maincpu", M6809_FIRQ_LINE, data ? ASSERT_LINE : CLEAR_LINE);
+       cputag_set_input_line(device->machine(), "maincpu", M6809_FIRQ_LINE, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const via6522_interface via_interface =
@@ -1381,12 +1381,12 @@ static const mc6845_interface mc6845_intf =
 
 static READ8_DEVICE_HANDLER(pa1_r)
 {
-	return (input_port_read(device->machine, "SW3") << 4) + input_port_read(device->machine, "SW4");
+	return (input_port_read(device->machine(), "SW3") << 4) + input_port_read(device->machine(), "SW4");
 }
 
 static READ8_DEVICE_HANDLER(pb1_r)
 {
-	return (input_port_read(device->machine, "SW5") << 4) + input_port_read(device->machine, "SW6");
+	return (input_port_read(device->machine(), "SW5") << 4) + input_port_read(device->machine(), "SW6");
 }
 
 static READ8_DEVICE_HANDLER(pc1_r)
@@ -1409,7 +1409,7 @@ static PALETTE_INIT( aristmk4 )
 {
 	int i;
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -1434,17 +1434,17 @@ static PALETTE_INIT( aristmk4 )
 
 static DRIVER_INIT( aristmk4 )
 {
-	aristmk4_state *state = machine->driver_data<aristmk4_state>();
-	state->shapeRomPtr = (UINT8 *)machine->region("tile_gfx")->base();
+	aristmk4_state *state = machine.driver_data<aristmk4_state>();
+	state->shapeRomPtr = (UINT8 *)machine.region("tile_gfx")->base();
     memcpy(state->shapeRom,state->shapeRomPtr,sizeof(state->shapeRom)); // back up
 	state->nvram = auto_alloc_array(machine, UINT8, 0x1000);
 }
 
 static MACHINE_START( aristmk4 )
 {
-	aristmk4_state *state = machine->driver_data<aristmk4_state>();
+	aristmk4_state *state = machine.driver_data<aristmk4_state>();
 
-	state->samples = machine->device("samples");
+	state->samples = machine.device("samples");
     state_save_register_global_pointer(machine, state->nvram, 0x1000); // state->nvram
 }
 
@@ -1455,10 +1455,10 @@ static MACHINE_RESET( aristmk4 )
     switch(input_port_read(machine, "LK13"))  // cpu speed control... 3mhz or 1.5mhz
     {
         case  0x00:
-            machine->device("maincpu")->set_unscaled_clock(MAIN_CLOCK/4);  // 3 Mhz
+            machine.device("maincpu")->set_unscaled_clock(MAIN_CLOCK/4);  // 3 Mhz
             break;
         case  0x10:
-            machine->device("maincpu")->set_unscaled_clock(MAIN_CLOCK/8);  // 1.5 Mhz
+            machine.device("maincpu")->set_unscaled_clock(MAIN_CLOCK/8);  // 1.5 Mhz
             break;
     }
 
@@ -1483,9 +1483,9 @@ static TIMER_DEVICE_CALLBACK( aristmk4_pf )
 
     */
 
-    if(input_port_read(timer.machine, "powerfail")) // send NMI signal if L pressed
+    if(input_port_read(timer.machine(), "powerfail")) // send NMI signal if L pressed
     {
-        cputag_set_input_line( timer.machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE );
+        cputag_set_input_line( timer.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE );
     }
 }
 

@@ -332,7 +332,7 @@ St.     Instr.       Comment
 */
 
 /* jamtable disassembler */
-static void jamtable_disasm(running_machine *machine, address_space *space,UINT32 address,UINT32 size) // 0xff000080 == fff00080
+static void jamtable_disasm(running_machine &machine, address_space *space,UINT32 address,UINT32 size) // 0xff000080 == fff00080
 {
 	UINT32 base,addr;
 	UINT32 opcode,op1,op2;
@@ -426,9 +426,9 @@ static void jamtable_disasm(running_machine *machine, address_space *space,UINT3
 	}
 }
 
-void jamtable_disasm_command(running_machine *machine, int ref, int params, const char **param)
+void jamtable_disasm_command(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space *space=machine->firstcpu->space();
+	address_space *space=machine.firstcpu->space();
 	UINT64	addr,size;
 
 	if (params < 2)
@@ -569,7 +569,7 @@ INPUT_PORTS_END
 static MACHINE_START( chihiro )
 {
 	smbus_register_device(0x45,smbus_cx25871);
-	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
 		debug_console_register_command(machine,"jamdis",CMDFLAG_NONE,0,2,3,jamtable_disasm_command);
 }
 

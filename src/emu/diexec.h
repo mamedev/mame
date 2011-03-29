@@ -300,7 +300,7 @@ protected:
 		int				m_qindex;			// index within the queue
 
 	private:
-		static void static_empty_event_queue(running_machine *machine, void *ptr, int param);
+		static void static_empty_event_queue(running_machine &machine, void *ptr, int param);
 		void empty_event_queue();
 	};
 
@@ -344,15 +344,15 @@ protected:
 
 private:
 	// callbacks
-	static void static_timed_trigger_callback(running_machine *machine, void *ptr, int param);
+	static void static_timed_trigger_callback(running_machine &machine, void *ptr, int param);
 
 	static void static_on_vblank(screen_device &screen, void *param, bool vblank_state);
 	void on_vblank_start(screen_device &screen);
 
-	static void static_trigger_partial_frame_interrupt(running_machine *machine, void *ptr, int param);
+	static void static_trigger_partial_frame_interrupt(running_machine &machine, void *ptr, int param);
 	void trigger_partial_frame_interrupt();
 
-	static void static_trigger_periodic_interrupt(running_machine *machine, void *ptr, int param);
+	static void static_trigger_periodic_interrupt(running_machine &machine, void *ptr, int param);
 	void trigger_periodic_interrupt();
 
 	attoseconds_t minimum_quantum() const;

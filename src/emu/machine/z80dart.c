@@ -221,7 +221,7 @@ device_config *z80dart_device_config::static_alloc_device_config(const machine_c
 
 device_t *z80dart_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, z80dart_device(machine, *this));
+	return auto_alloc(machine, z80dart_device(machine, *this));
 }
 
 

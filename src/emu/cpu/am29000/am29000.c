@@ -388,7 +388,7 @@ INLINE void fetch_decode(am29000_state *am29000)
 static CPU_EXECUTE( am29000 )
 {
 	am29000_state *am29000 = get_safe_token(device);
-	UINT32 call_debugger = (device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0;
+	UINT32 call_debugger = (device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0;
 
 	external_irq_check(am29000);
 

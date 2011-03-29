@@ -313,7 +313,7 @@ GFXDECODE_END
 
 static void irqhandler( device_t *device, int linestate )
 {
-	crospang_state *state = device->machine->driver_data<crospang_state>();
+	crospang_state *state = device->machine().driver_data<crospang_state>();
 	device_set_input_line(state->audiocpu, 0, linestate);
 }
 
@@ -325,9 +325,9 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_START( crospang )
 {
-	crospang_state *state = machine->driver_data<crospang_state>();
+	crospang_state *state = machine.driver_data<crospang_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->bestri_tilebank));
 	state->save_item(NAME(state->xsproff));
@@ -336,7 +336,7 @@ static MACHINE_START( crospang )
 
 static MACHINE_RESET( crospang )
 {
-	crospang_state *state = machine->driver_data<crospang_state>();
+	crospang_state *state = machine.driver_data<crospang_state>();
 
 	state->bestri_tilebank = 0;
 //  state->xsproff = 4;
@@ -586,10 +586,10 @@ ROM_START( bestri )
 ROM_END
 
 
-static void tumblepb_gfx1_rearrange(running_machine *machine)
+static void tumblepb_gfx1_rearrange(running_machine &machine)
 {
-	UINT8 *rom = machine->region("gfx1")->base();
-	int len = machine->region("gfx1")->bytes();
+	UINT8 *rom = machine.region("gfx1")->base();
+	int len = machine.region("gfx1")->bytes();
 	int i;
 
 	/* gfx data is in the wrong order */

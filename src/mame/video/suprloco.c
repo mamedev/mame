@@ -76,7 +76,7 @@ PALETTE_INIT( suprloco )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	suprloco_state *state = machine->driver_data<suprloco_state>();
+	suprloco_state *state = machine.driver_data<suprloco_state>();
 	UINT8 attr = state->videoram[2*tile_index+1];
 	SET_TILE_INFO(
 			0,
@@ -96,7 +96,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( suprloco )
 {
-	suprloco_state *state = machine->driver_data<suprloco_state>();
+	suprloco_state *state = machine.driver_data<suprloco_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_scroll_rows(state->bg_tilemap,32);
@@ -112,15 +112,15 @@ VIDEO_START( suprloco )
 
 WRITE8_HANDLER( suprloco_videoram_w )
 {
-	suprloco_state *state = space->machine->driver_data<suprloco_state>();
+	suprloco_state *state = space->machine().driver_data<suprloco_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset/2);
 }
 
 WRITE8_HANDLER( suprloco_scrollram_w )
 {
-	suprloco_state *state = space->machine->driver_data<suprloco_state>();
-	int adj = flip_screen_get(space->machine) ? -8 : 8;
+	suprloco_state *state = space->machine().driver_data<suprloco_state>();
+	int adj = flip_screen_get(space->machine()) ? -8 : 8;
 
 	state->scrollram[offset] = data;
 	tilemap_set_scrollx(state->bg_tilemap,offset, data - adj);
@@ -128,7 +128,7 @@ WRITE8_HANDLER( suprloco_scrollram_w )
 
 WRITE8_HANDLER( suprloco_control_w )
 {
-	suprloco_state *state = space->machine->driver_data<suprloco_state>();
+	suprloco_state *state = space->machine().driver_data<suprloco_state>();
 	/* There is probably a palette select in here */
 
 	/* Bit 0   - coin counter A */
@@ -144,10 +144,10 @@ WRITE8_HANDLER( suprloco_control_w )
 		/*logerror("Bit 4 = %d\n", (data >> 4) & 1); */
 	}
 
-	coin_counter_w(space->machine, 0, data & 0x01);
-	coin_counter_w(space->machine, 1, data & 0x02);
+	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(space->machine(), 1, data & 0x02);
 
-	flip_screen_set(space->machine, data & 0x80);
+	flip_screen_set(space->machine(), data & 0x80);
 
 	state->control = data;
 }
@@ -155,7 +155,7 @@ WRITE8_HANDLER( suprloco_control_w )
 
 READ8_HANDLER( suprloco_control_r )
 {
-	suprloco_state *state = space->machine->driver_data<suprloco_state>();
+	suprloco_state *state = space->machine().driver_data<suprloco_state>();
 	return state->control;
 }
 
@@ -179,9 +179,9 @@ INLINE void draw_pixel(bitmap_t *bitmap,const rectangle *cliprect,int x,int y,in
 }
 
 
-static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int spr_number)
+static void draw_sprite(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int spr_number)
 {
-	suprloco_state *state = machine->driver_data<suprloco_state>();
+	suprloco_state *state = machine.driver_data<suprloco_state>();
 	int flip = flip_screen_get(machine);
 	int sx,sy,col,row,height,src,adjy,dy;
 	UINT8 *spr_reg;
@@ -211,7 +211,7 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectang
 		dy = -1;
 	}
 
-	gfx2 = machine->region("gfx2")->base();
+	gfx2 = machine.region("gfx2")->base();
 	for (row = 0;row < height;row++,adjy+=dy)
 	{
 		int color1,color2,flipx;
@@ -254,9 +254,9 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectang
 	}
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	suprloco_state *state = machine->driver_data<suprloco_state>();
+	suprloco_state *state = machine.driver_data<suprloco_state>();
 	int spr_number;
 	UINT8 *spr_reg;
 
@@ -271,9 +271,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( suprloco )
 {
-	suprloco_state *state = screen->machine->driver_data<suprloco_state>();
+	suprloco_state *state = screen->machine().driver_data<suprloco_state>();
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	draw_sprites(screen->machine(),bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,1,0);
 	return 0;
 }

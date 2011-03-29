@@ -310,7 +310,7 @@ static WRITE16_HANDLER( galsnew_6295_bankswitch_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = space->machine->region("oki")->base();
+		UINT8 *rom = space->machine().region("oki")->base();
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 	}
 }
@@ -323,14 +323,14 @@ static WRITE16_HANDLER( galsnew_6295_bankswitch_w )
 
 static WRITE16_HANDLER( galsnew_paletteram_w )
 {
-	data = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	palette_set_color_rgb(space->machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
+	data = COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	palette_set_color_rgb(space->machine(),offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
 
 static WRITE16_HANDLER(galsnew_vram_0_bank_w)
 {
-	expro02_state *state = space->machine->driver_data<expro02_state>();
+	expro02_state *state = space->machine().driver_data<expro02_state>();
 	int i;
 	if(state->vram_0_bank_num != data)
 	{
@@ -347,7 +347,7 @@ static WRITE16_HANDLER(galsnew_vram_0_bank_w)
 
 static WRITE16_HANDLER(galsnew_vram_1_bank_w)
 {
-	expro02_state *state = space->machine->driver_data<expro02_state>();
+	expro02_state *state = space->machine().driver_data<expro02_state>();
 	int i;
 	if(state->vram_1_bank_num != data)
 	{
@@ -739,8 +739,8 @@ ROM_END
 
 static DRIVER_INIT(galsnew)
 {
-	UINT32 *src = (UINT32 *)machine->region("gfx3" )->base();
-	UINT32 *dst = (UINT32 *)machine->region("gfx2" )->base();
+	UINT32 *src = (UINT32 *)machine.region("gfx3" )->base();
+	UINT32 *dst = (UINT32 *)machine.region("gfx2" )->base();
 	int x, offset;
 
 

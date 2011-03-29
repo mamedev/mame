@@ -173,27 +173,27 @@ TODO:
 
 static WRITE8_DEVICE_HANDLER( taitosj_sndnmi_msk_w )
 {
-	taitosj_state *state = device->machine->driver_data<taitosj_state>();
+	taitosj_state *state = device->machine().driver_data<taitosj_state>();
 	state->sndnmi_disable = data & 0x01;
 }
 
 static WRITE8_HANDLER( taitosj_soundcommand_w )
 {
-	taitosj_state *state = space->machine->driver_data<taitosj_state>();
+	taitosj_state *state = space->machine().driver_data<taitosj_state>();
 	soundlatch_w(space,offset,data);
-	if (!state->sndnmi_disable) cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	if (!state->sndnmi_disable) cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static WRITE8_DEVICE_HANDLER( input_port_4_f0_w )
 {
-	taitosj_state *state = device->machine->driver_data<taitosj_state>();
+	taitosj_state *state = device->machine().driver_data<taitosj_state>();
 	state->input_port_4_f0 = data >> 4;
 }
 
 static CUSTOM_INPUT( input_port_4_f0_r )
 {
-	taitosj_state *state = field->port->machine->driver_data<taitosj_state>();
+	taitosj_state *state = field->port->machine().driver_data<taitosj_state>();
 	return state->input_port_4_f0;
 }
 
@@ -282,7 +282,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( kikstart_gear_r )
 {
-	taitosj_state *state = field->port->machine->driver_data<taitosj_state>();
+	taitosj_state *state = field->port->machine().driver_data<taitosj_state>();
 	const char *port_tag;
 
 	int player = (int)(FPTR)param;
@@ -293,9 +293,9 @@ static CUSTOM_INPUT( kikstart_gear_r )
 		port_tag = "GEARP2";
 
 	/* gear MUST be 1, 2 or 3 */
-	if (input_port_read(field->port->machine, port_tag) & 0x01) state->kikstart_gears[player] = 0x02;
-	if (input_port_read(field->port->machine, port_tag) & 0x02) state->kikstart_gears[player] = 0x03;
-	if (input_port_read(field->port->machine, port_tag) & 0x04) state->kikstart_gears[player] = 0x01;
+	if (input_port_read(field->port->machine(), port_tag) & 0x01) state->kikstart_gears[player] = 0x02;
+	if (input_port_read(field->port->machine(), port_tag) & 0x02) state->kikstart_gears[player] = 0x03;
+	if (input_port_read(field->port->machine(), port_tag) & 0x04) state->kikstart_gears[player] = 0x01;
 
 	return state->kikstart_gears[player];
 }
@@ -1736,14 +1736,14 @@ static const UINT8 voltable[256] =
 
 static WRITE8_DEVICE_HANDLER( dac_out_w )
 {
-	taitosj_state *state = device->machine->driver_data<taitosj_state>();
+	taitosj_state *state = device->machine().driver_data<taitosj_state>();
 	state->dac_out = data - 0x80;
 	dac_signed_data_16_w(device,state->dac_out * state->dac_vol + 0x8000);
 }
 
 static WRITE8_DEVICE_HANDLER( dac_vol_w )
 {
-	taitosj_state *state = device->machine->driver_data<taitosj_state>();
+	taitosj_state *state = device->machine().driver_data<taitosj_state>();
 	state->dac_vol = voltable[data];
 	dac_signed_data_16_w(device,state->dac_out * state->dac_vol + 0x8000);
 }
@@ -2720,16 +2720,16 @@ static void reset_common(running_machine &machine)
 	state->dac_vol = 0;
 }
 
-static void init_common(running_machine *machine)
+static void init_common(running_machine &machine)
 {
-	taitosj_state *state = machine->driver_data<taitosj_state>();
+	taitosj_state *state = machine.driver_data<taitosj_state>();
 	state->save_item(NAME(state->sndnmi_disable));
 	state->save_item(NAME(state->input_port_4_f0));
 	state->save_item(NAME(state->kikstart_gears));
 	state->save_item(NAME(state->dac_out));
 	state->save_item(NAME(state->dac_vol));
 
-	machine->add_notifier(MACHINE_NOTIFY_RESET, reset_common);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, reset_common);
 }
 
 static DRIVER_INIT( taitosj )
@@ -2742,7 +2742,7 @@ static DRIVER_INIT( spacecr )
 	init_common(machine);
 
 	/* install protection handler */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd48b, 0xd48b, FUNC(spacecr_prot_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd48b, 0xd48b, FUNC(spacecr_prot_r));
 }
 
 static DRIVER_INIT( alpine )
@@ -2750,8 +2750,8 @@ static DRIVER_INIT( alpine )
 	init_common(machine);
 
 	/* install protection handlers */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd40b, 0xd40b, FUNC(alpine_port_2_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd50f, 0xd50f, FUNC(alpine_protection_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd40b, 0xd40b, FUNC(alpine_port_2_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd50f, 0xd50f, FUNC(alpine_protection_w));
 }
 
 static DRIVER_INIT( alpinea )
@@ -2759,8 +2759,8 @@ static DRIVER_INIT( alpinea )
 	init_common(machine);
 
 	/* install protection handlers */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd40b, 0xd40b, FUNC(alpine_port_2_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd50e, 0xd50e, FUNC(alpinea_bankswitch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd40b, 0xd40b, FUNC(alpine_port_2_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd50e, 0xd50e, FUNC(alpinea_bankswitch_w));
 }
 
 static DRIVER_INIT( junglhbr )
@@ -2768,7 +2768,7 @@ static DRIVER_INIT( junglhbr )
 	init_common(machine);
 
 	/* inverter on bits 0 and 1 */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x9000, 0xbfff, FUNC(junglhbr_characterram_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x9000, 0xbfff, FUNC(junglhbr_characterram_w));
 }
 
 GAME( 1981, spaceskr, 0,        nomcu,    spaceskr,   taitosj, ROT0,   "Taito Corporation", "Space Seeker", GAME_SUPPORTS_SAVE )

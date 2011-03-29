@@ -7,11 +7,11 @@
 /* Sprites - These are a pain! */
 
 /* this decodes one of the funky sprites to a bitmap so we can draw it more easily -- slow but easier to use*/
-static void pgm_prepare_sprite( running_machine *machine, int wide, int high, int palt, int boffset )
+static void pgm_prepare_sprite( running_machine &machine, int wide, int high, int palt, int boffset )
 {
-	pgm_state *state = machine->driver_data<pgm_state>();
-	UINT8 *bdata = machine->region("sprmask")->base();
-	size_t  bdatasize = machine->region("sprmask")->bytes() - 1;
+	pgm_state *state = machine.driver_data<pgm_state>();
+	UINT8 *bdata = machine.region("sprmask")->base();
+	size_t  bdatasize = machine.region("sprmask")->bytes() - 1;
 	UINT8 *adata = state->sprite_a_region;
 	size_t  adatasize = state->sprite_a_region_size - 1;
 	int xcnt, ycnt;
@@ -54,9 +54,9 @@ static void pgm_prepare_sprite( running_machine *machine, int wide, int high, in
 
 
 // in the dest bitmap 0x10000 is used to mark 'used pixel' and 0x8000 is used to mark 'high priority'
-static void draw_sprite_line( running_machine *machine, int wide, UINT32* dest, int xzoom, int xgrow, int yoffset, int flip, int xpos, int pri )
+static void draw_sprite_line( running_machine &machine, int wide, UINT32* dest, int xzoom, int xgrow, int yoffset, int flip, int xpos, int pri )
 {
-	pgm_state *state = machine->driver_data<pgm_state>();
+	pgm_state *state = machine.driver_data<pgm_state>();
 	int xcnt,xcntdraw;
 	int xzoombit;
 	int xoffset;
@@ -130,7 +130,7 @@ static void draw_sprite_line( running_machine *machine, int wide, UINT32* dest, 
 	}
 }
 /* this just loops over our decoded bitmap and puts it on the screen */
-static void draw_sprite_new_zoomed( running_machine *machine, int wide, int high, int xpos, int ypos, int palt, int boffset, int flip, bitmap_t* bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow, int pri )
+static void draw_sprite_new_zoomed( running_machine &machine, int wide, int high, int xpos, int ypos, int palt, int boffset, int flip, bitmap_t* bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow, int pri )
 {
 	int ycnt;
 	int ydrawpos;
@@ -210,7 +210,7 @@ static void draw_sprite_new_zoomed( running_machine *machine, int wide, int high
 }
 
 
-static void draw_sprites( running_machine *machine, bitmap_t* spritebitmap, UINT16 *sprite_source )
+static void draw_sprites( running_machine &machine, bitmap_t* spritebitmap, UINT16 *sprite_source )
 {
 	/* ZZZZ Zxxx xxxx xxxx
        zzzz z-yy yyyy yyyy
@@ -220,7 +220,7 @@ static void draw_sprites( running_machine *machine, bitmap_t* spritebitmap, UINT
     */
 
 
-	pgm_state *state = machine->driver_data<pgm_state>();
+	pgm_state *state = machine.driver_data<pgm_state>();
 	const UINT16 *finish = state->spritebufferram + (0xa00 / 2);
 
 	while (sprite_source < finish)
@@ -274,7 +274,7 @@ static void draw_sprites( running_machine *machine, bitmap_t* spritebitmap, UINT
 /* TX Layer */
 WRITE16_HANDLER( pgm_tx_videoram_w )
 {
-	pgm_state *state = space->machine->driver_data<pgm_state>();
+	pgm_state *state = space->machine().driver_data<pgm_state>();
 	state->tx_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset / 2);
 }
@@ -296,7 +296,7 @@ static TILE_GET_INFO( get_pgm_tx_tilemap_tile_info )
     p = palette
     f = flip
 */
-	pgm_state *state = machine->driver_data<pgm_state>();
+	pgm_state *state = machine.driver_data<pgm_state>();
 	int tileno, colour, flipyx; //,game;
 
 	tileno = state->tx_videoram[tile_index * 2] & 0xffff;
@@ -310,7 +310,7 @@ static TILE_GET_INFO( get_pgm_tx_tilemap_tile_info )
 
 WRITE16_HANDLER( pgm_bg_videoram_w )
 {
-	pgm_state *state = space->machine->driver_data<pgm_state>();
+	pgm_state *state = space->machine().driver_data<pgm_state>();
 	state->bg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
@@ -319,7 +319,7 @@ static TILE_GET_INFO( get_pgm_bg_tilemap_tile_info )
 {
 	/* pretty much the same as tx layer */
 
-	pgm_state *state = machine->driver_data<pgm_state>();
+	pgm_state *state = machine.driver_data<pgm_state>();
 	int tileno, colour, flipyx;
 
 	tileno = state->bg_videoram[tile_index *2] & 0xffff;
@@ -336,7 +336,7 @@ static TILE_GET_INFO( get_pgm_bg_tilemap_tile_info )
 
 VIDEO_START( pgm )
 {
-	pgm_state *state = machine->driver_data<pgm_state>();
+	pgm_state *state = machine.driver_data<pgm_state>();
 	int i;
 
 	state->tx_tilemap = tilemap_create(machine, get_pgm_tx_tilemap_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
@@ -364,13 +364,13 @@ VIDEO_START( pgm )
 
 SCREEN_UPDATE( pgm )
 {
-	pgm_state *state = screen->machine->driver_data<pgm_state>();
+	pgm_state *state = screen->machine().driver_data<pgm_state>();
 	int y;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	bitmap_fill(state->tmppgmbitmap, cliprect, 0x00000000);
 
-	draw_sprites(screen->machine, state->tmppgmbitmap, state->spritebufferram);
+	draw_sprites(screen->machine(), state->tmppgmbitmap, state->spritebufferram);
 
 	tilemap_set_scrolly(state->bg_tilemap,0, state->videoregs[0x2000/2]);
 
@@ -420,7 +420,7 @@ SCREEN_UPDATE( pgm )
 
 SCREEN_EOF( pgm )
 {
-	pgm_state *state = machine->driver_data<pgm_state>();
+	pgm_state *state = machine.driver_data<pgm_state>();
 
 	/* first 0xa00 of main ram = sprites, seems to be buffered, DMA? */
 	memcpy(state->spritebufferram, pgm_mainram, 0xa00);

@@ -282,10 +282,10 @@ static WRITE16_HANDLER( growl_coin_word_w )	/* what about coins 3&4 ?? */
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(space->machine, 0, ~data & 0x01);
-		coin_lockout_w(space->machine, 1, ~data & 0x02);
-		coin_counter_w(space->machine, 0,  data & 0x04);
-		coin_counter_w(space->machine, 1,  data & 0x08);
+		coin_lockout_w(space->machine(), 0, ~data & 0x01);
+		coin_lockout_w(space->machine(), 1, ~data & 0x02);
+		coin_counter_w(space->machine(), 0,  data & 0x04);
+		coin_counter_w(space->machine(), 1,  data & 0x08);
 	}
 }
 
@@ -293,14 +293,14 @@ static WRITE16_HANDLER( taitof2_4p_coin_word_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(space->machine, 0, ~data & 0x01);
-		coin_lockout_w(space->machine, 1, ~data & 0x02);
-		coin_lockout_w(space->machine, 2, ~data & 0x04);
-		coin_lockout_w(space->machine, 3, ~data & 0x08);
-		coin_counter_w(space->machine, 0,  data & 0x10);
-		coin_counter_w(space->machine, 1,  data & 0x20);
-		coin_counter_w(space->machine, 2,  data & 0x40);
-		coin_counter_w(space->machine, 3,  data & 0x80);
+		coin_lockout_w(space->machine(), 0, ~data & 0x01);
+		coin_lockout_w(space->machine(), 1, ~data & 0x02);
+		coin_lockout_w(space->machine(), 2, ~data & 0x04);
+		coin_lockout_w(space->machine(), 3, ~data & 0x08);
+		coin_counter_w(space->machine(), 0,  data & 0x10);
+		coin_counter_w(space->machine(), 1,  data & 0x20);
+		coin_counter_w(space->machine(), 2,  data & 0x40);
+		coin_counter_w(space->machine(), 3,  data & 0x80);
 	}
 }
 
@@ -308,14 +308,14 @@ static WRITE16_HANDLER( ninjak_coin_word_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_lockout_w(space->machine, 0, ~data & 0x0100);
-		coin_lockout_w(space->machine, 1, ~data & 0x0200);
-		coin_lockout_w(space->machine, 2, ~data & 0x0400);
-		coin_lockout_w(space->machine, 3, ~data & 0x0800);
-		coin_counter_w(space->machine, 0,  data & 0x1000);
-		coin_counter_w(space->machine, 1,  data & 0x2000);
-		coin_counter_w(space->machine, 2,  data & 0x4000);
-		coin_counter_w(space->machine, 3,  data & 0x8000);
+		coin_lockout_w(space->machine(), 0, ~data & 0x0100);
+		coin_lockout_w(space->machine(), 1, ~data & 0x0200);
+		coin_lockout_w(space->machine(), 2, ~data & 0x0400);
+		coin_lockout_w(space->machine(), 3, ~data & 0x0800);
+		coin_counter_w(space->machine(), 0,  data & 0x1000);
+		coin_counter_w(space->machine(), 1,  data & 0x2000);
+		coin_counter_w(space->machine(), 2,  data & 0x4000);
+		coin_counter_w(space->machine(), 3,  data & 0x8000);
 	}
 }
 
@@ -324,25 +324,25 @@ static READ16_HANDLER( ninjak_input_r )
 	switch (offset)
 	{
 		case 0x00:
-			return (input_port_read(space->machine, "DSWA") << 8);
+			return (input_port_read(space->machine(), "DSWA") << 8);
 
 		case 0x01:
-			return (input_port_read(space->machine, "DSWB") << 8);
+			return (input_port_read(space->machine(), "DSWB") << 8);
 
 		case 0x02:
-			return (input_port_read(space->machine, "IN0") << 8);
+			return (input_port_read(space->machine(), "IN0") << 8);
 
 		case 0x03:
-			return (input_port_read(space->machine, "IN1") << 8);
+			return (input_port_read(space->machine(), "IN1") << 8);
 
 		case 0x04:
-			return (input_port_read(space->machine, "IN3") << 8);
+			return (input_port_read(space->machine(), "IN3") << 8);
 
 		case 0x05:
-			return (input_port_read(space->machine, "IN4") << 8);
+			return (input_port_read(space->machine(), "IN4") << 8);
 
 		case 0x06:
-			return (input_port_read(space->machine, "IN2") << 8);
+			return (input_port_read(space->machine(), "IN2") << 8);
 
 //      case 0x07:
 //          return (coin_word & mem_mask);
@@ -355,19 +355,19 @@ static READ16_HANDLER( ninjak_input_r )
 
 static READ16_HANDLER( cameltry_paddle_r )
 {
-	taitof2_state *state = space->machine->driver_data<taitof2_state>();
+	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 	int curr, res = 0xff;
 
 	switch (offset)
 	{
 		case 0x00:
-			curr = input_port_read(space->machine, "PADDLE1");
+			curr = input_port_read(space->machine(), "PADDLE1");
 			res = curr - state->last[0];
 			state->last[0] = curr;
 			return res;
 
 		case 0x02:
-			curr = input_port_read(space->machine, "PADDLE2");
+			curr = input_port_read(space->machine(), "PADDLE2");
 			res = curr - state->last[1];
 			state->last[1] = curr;
 			return res;
@@ -384,12 +384,12 @@ static READ16_HANDLER( mjnquest_dsw_r )
 	{
 		case 0x00:
 		{
-			return (input_port_read(space->machine, "IN5") << 8) + input_port_read(space->machine, "DSWA");	/* DSW A + coin */
+			return (input_port_read(space->machine(), "IN5") << 8) + input_port_read(space->machine(), "DSWA");	/* DSW A + coin */
 		}
 
 		case 0x01:
 		{
-			return (input_port_read(space->machine, "IN6") << 8) + input_port_read(space->machine, "DSWB");	/* DSW B + coin */
+			return (input_port_read(space->machine(), "IN6") << 8) + input_port_read(space->machine(), "DSWB");	/* DSW B + coin */
 		}
 	}
 
@@ -400,23 +400,23 @@ static READ16_HANDLER( mjnquest_dsw_r )
 
 static READ16_HANDLER( mjnquest_input_r )
 {
-	taitof2_state *state = space->machine->driver_data<taitof2_state>();
+	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 	switch (state->mjnquest_input)
 	{
 		case 0x01:
-			  return input_port_read(space->machine, "IN0");
+			  return input_port_read(space->machine(), "IN0");
 
 		 case 0x02:
-			  return input_port_read(space->machine, "IN1");
+			  return input_port_read(space->machine(), "IN1");
 
 		 case 0x04:
-			  return input_port_read(space->machine, "IN2");
+			  return input_port_read(space->machine(), "IN2");
 
 		 case 0x08:
-			  return input_port_read(space->machine, "IN3");
+			  return input_port_read(space->machine(), "IN3");
 
 		 case 0x10:
-			  return input_port_read(space->machine, "IN4");
+			  return input_port_read(space->machine(), "IN4");
 
 	}
 
@@ -427,7 +427,7 @@ static READ16_HANDLER( mjnquest_input_r )
 
 static WRITE16_HANDLER( mjnquest_inputselect_w )
 {
-	taitof2_state *state = space->machine->driver_data<taitof2_state>();
+	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 	state->mjnquest_input = (data >> 6);
 }
 
@@ -577,13 +577,13 @@ driftout  8000 0000/8  0000 0000    The first control changes from 8000 to 0000 
 
 static TIMER_CALLBACK( taitof2_interrupt6 )
 {
-	taitof2_state *state = machine->driver_data<taitof2_state>();
+	taitof2_state *state = machine.driver_data<taitof2_state>();
 	device_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( taitof2_interrupt )
 {
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(500), FUNC(taitof2_interrupt6));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(500), FUNC(taitof2_interrupt6));
 	device_set_input_line(device, 5, HOLD_LINE);
 }
 
@@ -594,7 +594,7 @@ static INTERRUPT_GEN( taitof2_interrupt )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank2", (data - 1) & 7);
+	memory_set_bank(space->machine(), "bank2", (data - 1) & 7);
 
 #ifdef MAME_DEBUG
 	if (((data - 1) & 7) > 2)
@@ -605,7 +605,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static READ8_HANDLER( driveout_sound_command_r)
 {
-	taitof2_state *state = space->machine->driver_data<taitof2_state>();
+	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 
 	device_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 //  logerror("sound IRQ OFF (sound command=%02x)\n", state->driveout_sound_latch);
@@ -613,26 +613,26 @@ static READ8_HANDLER( driveout_sound_command_r)
 }
 
 
-static void reset_driveout_sound_region( running_machine *machine )
+static void reset_driveout_sound_region( running_machine &machine )
 {
-	taitof2_state *state = machine->driver_data<taitof2_state>();
+	taitof2_state *state = machine.driver_data<taitof2_state>();
 	state->oki->set_bank_base(state->oki_bank * 0x40000);
 }
 
 static WRITE8_HANDLER( oki_bank_w )
 {
-	taitof2_state *state = space->machine->driver_data<taitof2_state>();
+	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 	if ((data & 4) && (state->oki_bank != (data & 3)) )
 	{
 		state->oki_bank = (data & 3);
 	}
 
-	reset_driveout_sound_region(space->machine);
+	reset_driveout_sound_region(space->machine());
 }
 
 static WRITE16_HANDLER( driveout_sound_command_w )
 {
-	taitof2_state *state = space->machine->driver_data<taitof2_state>();
+	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -668,7 +668,7 @@ static WRITE16_HANDLER( driveout_sound_command_w )
 
 static WRITE16_HANDLER( cchip2_word_w )
 {
-	taitof2_state *state = space->machine->driver_data<taitof2_state>();
+	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 
 	logerror("cchip2_w pc: %06x offset %04x: %02x\n", cpu_get_pc(space->cpu), offset, data);
 
@@ -677,7 +677,7 @@ static WRITE16_HANDLER( cchip2_word_w )
 
 static READ16_HANDLER( cchip2_word_r )
 {
-	taitof2_state *state = space->machine->driver_data<taitof2_state>();
+	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 
 	/* C-Chip ID */
 	if (offset == 0x401)
@@ -3215,7 +3215,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irq_handler( device_t *device, int irq )
 {
-	taitof2_state *state = device->machine->driver_data<taitof2_state>();
+	taitof2_state *state = device->machine().driver_data<taitof2_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -3423,23 +3423,23 @@ static const tc0140syt_interface taitof2_tc0140syt_intf =
 
 static MACHINE_START( common )
 {
-	taitof2_state *state = machine->driver_data<taitof2_state>();
+	taitof2_state *state = machine.driver_data<taitof2_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");;
-	state->tc0100scn = machine->device("tc0100scn");;
-	state->tc0100scn_1 = machine->device("tc0100scn_1");;
-	state->tc0100scn_2 = machine->device("tc0100scn_2");;
-	state->tc0360pri = machine->device("tc0360pri");;
-	state->tc0280grd = machine->device("tc0280grd");;
-	state->tc0430grw = machine->device("tc0430grw");;
-	state->tc0480scp = machine->device("tc0480scp");;
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");;
+	state->tc0100scn = machine.device("tc0100scn");;
+	state->tc0100scn_1 = machine.device("tc0100scn_1");;
+	state->tc0100scn_2 = machine.device("tc0100scn_2");;
+	state->tc0360pri = machine.device("tc0360pri");;
+	state->tc0280grd = machine.device("tc0280grd");;
+	state->tc0430grw = machine.device("tc0430grw");;
+	state->tc0480scp = machine.device("tc0480scp");;
 }
 
 static MACHINE_START( f2 )
 {
 	MACHINE_START_CALL(common);
-	memory_configure_bank(machine, "bank2", 0, 8, machine->region("audiocpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank2", 0, 8, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 static MACHINE_CONFIG_START( taito_f2, taitof2_state )
@@ -5703,7 +5703,7 @@ static DRIVER_INIT( finalb )
 	int i;
 	UINT8 data;
 	UINT32 offset;
-	UINT8 *gfx = machine->region("gfx2")->base();
+	UINT8 *gfx = machine.region("gfx2")->base();
 
 	offset = 0x100000;
 	for (i = 0x180000; i < 0x200000; i++)
@@ -5727,7 +5727,7 @@ static DRIVER_INIT( finalb )
 
 static DRIVER_INIT( cameltry )
 {
-	taitof2_state *state = machine->driver_data<taitof2_state>();
+	taitof2_state *state = machine.driver_data<taitof2_state>();
 
 	state->last[0] = 0;
 	state->last[1] = 0;
@@ -5738,9 +5738,9 @@ static DRIVER_INIT( cameltry )
 
 static DRIVER_INIT( mjnquest )
 {
-	taitof2_state *state = machine->driver_data<taitof2_state>();
-	int i, len = machine->region("gfx2")->bytes();
-	UINT8 *gfx = machine->region("gfx2")->base();
+	taitof2_state *state = machine.driver_data<taitof2_state>();
+	int i, len = machine.region("gfx2")->bytes();
+	UINT8 *gfx = machine.region("gfx2")->base();
 
 	/* the bytes in each longword are in reversed order, put them in the
        order used by the other games. */
@@ -5765,7 +5765,7 @@ static STATE_POSTLOAD( driveout_postload )
 
 static DRIVER_INIT( driveout )
 {
-	taitof2_state *state = machine->driver_data<taitof2_state>();
+	taitof2_state *state = machine.driver_data<taitof2_state>();
 
 	state->driveout_sound_latch = 0;
 	state->oki_bank = 0;
@@ -5774,7 +5774,7 @@ static DRIVER_INIT( driveout )
 	state->save_item(NAME(state->driveout_sound_latch));
 	state->save_item(NAME(state->oki_bank));
 	state->save_item(NAME(state->nibble));
-	machine->state().register_postload(driveout_postload, NULL);
+	machine.state().register_postload(driveout_postload, NULL);
 }
 
 

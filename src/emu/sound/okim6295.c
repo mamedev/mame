@@ -115,7 +115,7 @@ device_config *okim6295_device_config::static_alloc_device_config(const machine_
 
 device_t *okim6295_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, okim6295_device(machine, *this));
+	return auto_alloc(machine, okim6295_device(machine, *this));
 }
 
 
@@ -266,7 +266,7 @@ void okim6295_device::set_bank_base(offs_t base)
 	if (m_bank_installed)
 	{
 		m_bank_offs = base;
-		memory_set_bankptr(&m_machine, tag(), m_region->base() + base);
+		memory_set_bankptr(m_machine, tag(), m_region->base() + base);
 	}
 }
 

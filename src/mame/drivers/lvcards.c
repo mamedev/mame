@@ -82,7 +82,7 @@ TODO:
 
 static MACHINE_START( lvpoker )
 {
-	lvcards_state *state = machine->driver_data<lvcards_state>();
+	lvcards_state *state = machine.driver_data<lvcards_state>();
 	state_save_register_global(machine, state->payout);
 	state_save_register_global(machine, state->pulse);
 	state_save_register_global(machine, state->result);
@@ -90,7 +90,7 @@ static MACHINE_START( lvpoker )
 
 static MACHINE_RESET( lvpoker )
 {
-	lvcards_state *state = machine->driver_data<lvcards_state>();
+	lvcards_state *state = machine.driver_data<lvcards_state>();
 	state->payout = 0;
 	state->pulse = 0;
 	state->result = 0;
@@ -98,7 +98,7 @@ static MACHINE_RESET( lvpoker )
 
 static WRITE8_HANDLER(control_port_2_w)
 {
-	lvcards_state *state = space->machine->driver_data<lvcards_state>();
+	lvcards_state *state = space->machine().driver_data<lvcards_state>();
 	switch (data)
 	{
 		case 0x60:
@@ -115,7 +115,7 @@ static WRITE8_HANDLER(control_port_2_w)
 
 static WRITE8_HANDLER(control_port_2a_w)
 {
-	lvcards_state *state = space->machine->driver_data<lvcards_state>();
+	lvcards_state *state = space->machine().driver_data<lvcards_state>();
 	switch (data)
 	{
 		case 0x60:
@@ -132,8 +132,8 @@ static WRITE8_HANDLER(control_port_2a_w)
 
 static READ8_HANDLER( payout_r )
 {
-	lvcards_state *state = space->machine->driver_data<lvcards_state>();
-	state->result = input_port_read(space->machine, "IN2");
+	lvcards_state *state = space->machine().driver_data<lvcards_state>();
+	state->result = input_port_read(space->machine(), "IN2");
 
 	if (state->payout)
 	{

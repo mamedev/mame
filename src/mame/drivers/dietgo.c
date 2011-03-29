@@ -162,7 +162,7 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int state)
 {
-	dietgo_state *driver_state = device->machine->driver_data<dietgo_state>();
+	dietgo_state *driver_state = device->machine().driver_data<dietgo_state>();
 	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
@@ -197,11 +197,11 @@ static const deco16ic_interface dietgo_deco16ic_tilegen1_intf =
 
 static MACHINE_START( dietgo )
 {
-	dietgo_state *state = machine->driver_data<dietgo_state>();
+	dietgo_state *state = machine.driver_data<dietgo_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->deco_tilegen1 = machine->device("tilegen1");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->deco_tilegen1 = machine.device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( dietgo, dietgo_state )

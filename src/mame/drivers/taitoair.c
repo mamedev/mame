@@ -232,7 +232,7 @@ cpu #2 (PC=0000060E): unmapped memory word read from 0000683A & FFFF
 
 static WRITE16_HANDLER( system_control_w )
 {
-	taitoair_state *state = space->machine->driver_data<taitoair_state>();
+	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 
 	if ((ACCESSING_BITS_0_7 == 0) && ACCESSING_BITS_8_15)
 		data >>= 8;
@@ -246,13 +246,13 @@ static WRITE16_HANDLER( system_control_w )
 
 static READ16_HANDLER( lineram_r )
 {
-	taitoair_state *state = space->machine->driver_data<taitoair_state>();
+	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 	return state->line_ram[offset];
 }
 
 static WRITE16_HANDLER( lineram_w )
 {
-	taitoair_state *state = space->machine->driver_data<taitoair_state>();
+	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 		state->line_ram[offset] = data;
@@ -260,13 +260,13 @@ static WRITE16_HANDLER( lineram_w )
 
 static READ16_HANDLER( dspram_r )
 {
-	taitoair_state *state = space->machine->driver_data<taitoair_state>();
+	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 	return state->dsp_ram[offset];
 }
 
 static WRITE16_HANDLER( dspram_w )
 {
-	taitoair_state *state = space->machine->driver_data<taitoair_state>();
+	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 		state->dsp_ram[offset] = data;
@@ -274,7 +274,7 @@ static WRITE16_HANDLER( dspram_w )
 
 static READ16_HANDLER( dsp_HOLD_signal_r )
 {
-	taitoair_state *state = space->machine->driver_data<taitoair_state>();
+	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 
 	/* HOLD signal is active low */
 	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", cpu_get_previouspc(space->cpu), state->dsp_hold_signal);
@@ -291,13 +291,13 @@ static WRITE16_HANDLER( dsp_HOLDA_signal_w )
 
 static WRITE16_HANDLER( airsys_paletteram16_w )	/* xxBBBBxRRRRxGGGG */
 {
-	taitoair_state *state = space->machine->driver_data<taitoair_state>();
+	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 	int a;
 
 	COMBINE_DATA(&state->paletteram[offset]);
 
 	a = state->paletteram[offset];
-	palette_set_color_rgb(space->machine, offset, pal4bit(a >> 0), pal4bit(a >> 5), pal4bit(a >> 10));
+	palette_set_color_rgb(space->machine(), offset, pal4bit(a >> 0), pal4bit(a >> 5), pal4bit(a >> 10));
 }
 
 
@@ -314,16 +314,16 @@ static READ16_HANDLER( stick_input_r )
 	switch( offset )
 	{
 		case 0x00:	/* "counter 1" lo */
-			return input_port_read(space->machine, STICK1_PORT_TAG);
+			return input_port_read(space->machine(), STICK1_PORT_TAG);
 
 		case 0x01:	/* "counter 2" lo */
-			return input_port_read(space->machine, STICK2_PORT_TAG);
+			return input_port_read(space->machine(), STICK2_PORT_TAG);
 
 		case 0x02:	/* "counter 1" hi */
-			return (input_port_read(space->machine, STICK1_PORT_TAG) & 0xff00) >> 8;
+			return (input_port_read(space->machine(), STICK1_PORT_TAG) & 0xff00) >> 8;
 
 		case 0x03:	/* "counter 2" hi */
-			return (input_port_read(space->machine, STICK2_PORT_TAG) & 0xff00) >> 8;
+			return (input_port_read(space->machine(), STICK2_PORT_TAG) & 0xff00) >> 8;
 	}
 
 	return 0;
@@ -334,10 +334,10 @@ static READ16_HANDLER( stick2_input_r )
 	switch( offset )
 	{
 		case 0x00:	/* "counter 3" lo */
-			return input_port_read(space->machine, STICK3_PORT_TAG);
+			return input_port_read(space->machine(), STICK3_PORT_TAG);
 
 		case 0x02:	/* "counter 3" hi */
-			return (input_port_read(space->machine, STICK3_PORT_TAG) & 0xff00) >> 8;
+			return (input_port_read(space->machine(), STICK3_PORT_TAG) & 0xff00) >> 8;
 	}
 
 	return 0;
@@ -345,18 +345,18 @@ static READ16_HANDLER( stick2_input_r )
 
 
 
-static void reset_sound_region( running_machine *machine )
+static void reset_sound_region( running_machine &machine )
 {
-	taitoair_state *state = machine->driver_data<taitoair_state>();
+	taitoair_state *state = machine.driver_data<taitoair_state>();
 	memory_set_bank(machine, "bank1", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	taitoair_state *state = space->machine->driver_data<taitoair_state>();
+	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 
 	state->banknum = data & 3;
-	reset_sound_region(space->machine);
+	reset_sound_region(space->machine());
 }
 
 
@@ -571,7 +571,7 @@ GFXDECODE_END
 /* Handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler( device_t *device, int irq )
 {
-	taitoair_state *state = device->machine->driver_data<taitoair_state>();
+	taitoair_state *state = device->machine().driver_data<taitoair_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -610,15 +610,15 @@ static STATE_POSTLOAD( taitoair_postload )
 
 static MACHINE_START( taitoair )
 {
-	taitoair_state *state = machine->driver_data<taitoair_state>();
-	UINT8 *ROM = machine->region("audiocpu")->base();
+	taitoair_state *state = machine.driver_data<taitoair_state>();
+	UINT8 *ROM = machine.region("audiocpu")->base();
 	int i;
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);
 
-	state->audiocpu = machine->device("audiocpu");
-	state->dsp = machine->device("dsp");
-	state->tc0080vco = machine->device("tc0080vco");
+	state->audiocpu = machine.device("audiocpu");
+	state->dsp = machine.device("dsp");
+	state->tc0080vco = machine.device("tc0080vco");
 
 	state->save_item(NAME(state->banknum));
 	state->save_item(NAME(state->q.col));
@@ -630,12 +630,12 @@ static MACHINE_START( taitoair )
 		state_save_register_item(machine, "globals", NULL, i, state->q.p[i].y);
 	}
 
-	machine->state().register_postload(taitoair_postload, NULL);
+	machine.state().register_postload(taitoair_postload, NULL);
 }
 
 static MACHINE_RESET( taitoair )
 {
-	taitoair_state *state = machine->driver_data<taitoair_state>();
+	taitoair_state *state = machine.driver_data<taitoair_state>();
 	int i;
 
 	state->dsp_hold_signal = ASSERT_LINE;

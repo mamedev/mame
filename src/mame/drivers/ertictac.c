@@ -41,11 +41,11 @@ static READ32_HANDLER( ertictac_podule_r )
 
 	switch(offset)
 	{
-		case 0x04/4: return input_port_read(space->machine, "DSW1") & 0xff;
-		case 0x08/4: return input_port_read(space->machine, "DSW2") & 0xff;
-		case 0x10/4: return input_port_read(space->machine, "SYSTEM") & 0xff;
-		case 0x14/4: return input_port_read(space->machine, "P2") & 0xff;
-		case 0x18/4: return input_port_read(space->machine, "P1") & 0xff;
+		case 0x04/4: return input_port_read(space->machine(), "DSW1") & 0xff;
+		case 0x08/4: return input_port_read(space->machine(), "DSW2") & 0xff;
+		case 0x10/4: return input_port_read(space->machine(), "SYSTEM") & 0xff;
+		case 0x14/4: return input_port_read(space->machine(), "P2") & 0xff;
+		case 0x18/4: return input_port_read(space->machine(), "P1") & 0xff;
 	}
 
 	return 0;
@@ -194,7 +194,7 @@ static MACHINE_START( ertictac )
 	archimedes_init(machine);
 
 	// reset the DAC to centerline
-	//dac_signed_data_w(machine->device("dac"), 0x80);
+	//dac_signed_data_w(machine.device("dac"), 0x80);
 }
 
 static MACHINE_RESET( ertictac )
@@ -204,7 +204,7 @@ static MACHINE_RESET( ertictac )
 
 static INTERRUPT_GEN( ertictac_podule_irq )
 {
-	archimedes_request_irq_b(device->machine, ARCHIMEDES_IRQB_PODULE_IRQ);
+	archimedes_request_irq_b(device->machine(), ARCHIMEDES_IRQB_PODULE_IRQ);
 }
 
 /* TODO: Are we sure that this HW have I2C device? */

@@ -35,8 +35,8 @@ enum
 
 void cinemat_vector_callback(device_t *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift)
 {
-	cinemat_state *state = device->machine->driver_data<cinemat_state>();
-	const rectangle &visarea = device->machine->primary_screen->visible_area();
+	cinemat_state *state = device->machine().driver_data<cinemat_state>();
+	const rectangle &visarea = device->machine().primary_screen->visible_area();
 	int intensity = 0xff;
 
 	/* adjust for slop */
@@ -51,10 +51,10 @@ void cinemat_vector_callback(device_t *device, INT16 sx, INT16 sy, INT16 ex, INT
 
 	/* move to the starting position if we're not there already */
 	if (sx != state->lastx || sy != state->lasty)
-		vector_add_point(device->machine, sx << 16, sy << 16, 0, 0);
+		vector_add_point(device->machine(), sx << 16, sy << 16, 0, 0);
 
 	/* draw the vector */
-	vector_add_point(device->machine, ex << 16, ey << 16, state->vector_color, intensity);
+	vector_add_point(device->machine(), ex << 16, ey << 16, state->vector_color, intensity);
 
 	/* remember the last point */
 	state->lastx = ex;
@@ -71,9 +71,9 @@ void cinemat_vector_callback(device_t *device, INT16 sx, INT16 sy, INT16 ex, INT
 
 WRITE8_HANDLER(cinemat_vector_control_w)
 {
-	cinemat_state *state = space->machine->driver_data<cinemat_state>();
+	cinemat_state *state = space->machine().driver_data<cinemat_state>();
 	int r, g, b, i;
-	cpu_device *cpu = space->machine->device<cpu_device>("maincpu");
+	cpu_device *cpu = space->machine().device<cpu_device>("maincpu");
 
 	switch (state->color_mode)
 	{
@@ -168,7 +168,7 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 
 VIDEO_START( cinemat_bilevel )
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
+	cinemat_state *state = machine.driver_data<cinemat_state>();
 	state->color_mode = COLOR_BILEVEL;
 	VIDEO_START_CALL(vector);
 }
@@ -176,7 +176,7 @@ VIDEO_START( cinemat_bilevel )
 
 VIDEO_START( cinemat_16level )
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
+	cinemat_state *state = machine.driver_data<cinemat_state>();
 	state->color_mode = COLOR_16LEVEL;
 	VIDEO_START_CALL(vector);
 }
@@ -184,7 +184,7 @@ VIDEO_START( cinemat_16level )
 
 VIDEO_START( cinemat_64level )
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
+	cinemat_state *state = machine.driver_data<cinemat_state>();
 	state->color_mode = COLOR_64LEVEL;
 	VIDEO_START_CALL(vector);
 }
@@ -192,7 +192,7 @@ VIDEO_START( cinemat_64level )
 
 VIDEO_START( cinemat_color )
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
+	cinemat_state *state = machine.driver_data<cinemat_state>();
 	state->color_mode = COLOR_RGB;
 	VIDEO_START_CALL(vector);
 }
@@ -200,7 +200,7 @@ VIDEO_START( cinemat_color )
 
 VIDEO_START( cinemat_qb3color )
 {
-	cinemat_state *state = machine->driver_data<cinemat_state>();
+	cinemat_state *state = machine.driver_data<cinemat_state>();
 	state->color_mode = COLOR_QB3;
 	VIDEO_START_CALL(vector);
 }
@@ -218,7 +218,7 @@ SCREEN_UPDATE( cinemat )
 	SCREEN_UPDATE_CALL(vector);
 	vector_clear_list();
 
-	ccpu_wdt_timer_trigger(screen->machine->device("maincpu"));
+	ccpu_wdt_timer_trigger(screen->machine().device("maincpu"));
 
 	return 0;
 }
@@ -233,7 +233,7 @@ SCREEN_UPDATE( cinemat )
 
 SCREEN_UPDATE( spacewar )
 {
-	int sw_option = input_port_read(screen->machine, "INPUTS");
+	int sw_option = input_port_read(screen->machine(), "INPUTS");
 
 	SCREEN_UPDATE_CALL(cinemat);
 

@@ -79,14 +79,14 @@ public:
 
 static WRITE32_HANDLER( mk5_ext_latch_w )
 {
-	aristmk5_state *state = space->machine->driver_data<aristmk5_state>();
+	aristmk5_state *state = space->machine().driver_data<aristmk5_state>();
 	/* this banks "something" */
 	state->ext_latch = data & 1;
 }
 
 static READ32_HANDLER( ext_timer_latch_r )
 {
-	aristmk5_state *state = space->machine->driver_data<aristmk5_state>();
+	aristmk5_state *state = space->machine().driver_data<aristmk5_state>();
 	/* reset 2KHz timer */
 	ioc_regs[IRQ_STATUS_A] &= 0xfe;
 	state->mk5_2KHz_timer->adjust(attotime::from_hz(2000));
@@ -97,7 +97,7 @@ static READ32_HANDLER( ext_timer_latch_r )
 /* same as plain AA but with the I2C unconnected */
 static READ32_HANDLER( mk5_ioc_r )
 {
-	aristmk5_state *state = space->machine->driver_data<aristmk5_state>();
+	aristmk5_state *state = space->machine().driver_data<aristmk5_state>();
 	UINT32 ioc_addr;
 
 	ioc_addr = offset*4;
@@ -108,10 +108,10 @@ static READ32_HANDLER( mk5_ioc_r )
 	{
 		int vert_pos;
 
-		vert_pos = space->machine->primary_screen->vpos();
+		vert_pos = space->machine().primary_screen->vpos();
 		state->flyback = (vert_pos <= vidc_regs[VIDC_VDSR] || vert_pos >= vidc_regs[VIDC_VDER]) ? 0x80 : 0x00;
 
-		//i2c_data = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
+		//i2c_data = (i2cmem_sda_read(space->machine().device("i2cmem")) & 1);
 
 		return (state->flyback) | (ioc_regs[CONTROL] & 0x7c) | (1<<1) | 1;
 	}
@@ -121,7 +121,7 @@ static READ32_HANDLER( mk5_ioc_r )
 
 static WRITE32_HANDLER( mk5_ioc_w )
 {
-	aristmk5_state *state = space->machine->driver_data<aristmk5_state>();
+	aristmk5_state *state = space->machine().driver_data<aristmk5_state>();
 	UINT32 ioc_addr;
 
 	ioc_addr = offset*4;
@@ -186,7 +186,7 @@ static WRITE32_HANDLER( sram_banksel_w )
     write: 03010420 00  select bank 0
     */
 
-    memory_set_bank(space->machine,"sram_bank", (data & 0xc0) >> 6);
+    memory_set_bank(space->machine(),"sram_bank", (data & 0xc0) >> 6);
 }
 
 static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32 )
@@ -225,7 +225,7 @@ INPUT_PORTS_END
 
 static DRIVER_INIT( aristmk5 )
 {
-	UINT8 *SRAM = machine->region("sram")->base();
+	UINT8 *SRAM = machine.region("sram")->base();
 	archimedes_driver_init(machine);
 
 	memory_configure_bank(machine, "sram_bank", 0, 4, &SRAM[0], 0x8000);
@@ -233,7 +233,7 @@ static DRIVER_INIT( aristmk5 )
 
 static TIMER_CALLBACK( mk5_2KHz_callback )
 {
-	aristmk5_state *state = machine->driver_data<aristmk5_state>();
+	aristmk5_state *state = machine.driver_data<aristmk5_state>();
 	ioc_regs[IRQ_STATUS_A] |= 1;
 
 	state->mk5_2KHz_timer->adjust(attotime::never);
@@ -241,18 +241,18 @@ static TIMER_CALLBACK( mk5_2KHz_callback )
 
 static MACHINE_START( aristmk5 )
 {
-	aristmk5_state *state = machine->driver_data<aristmk5_state>();
+	aristmk5_state *state = machine.driver_data<aristmk5_state>();
 	archimedes_init(machine);
 
 	// reset the DAC to centerline
-	//dac_signed_data_w(machine->device("dac"), 0x80);
+	//dac_signed_data_w(machine.device("dac"), 0x80);
 
-	state->mk5_2KHz_timer = machine->scheduler().timer_alloc(FUNC(mk5_2KHz_callback));
+	state->mk5_2KHz_timer = machine.scheduler().timer_alloc(FUNC(mk5_2KHz_callback));
 }
 
 static MACHINE_RESET( aristmk5 )
 {
-	aristmk5_state *state = machine->driver_data<aristmk5_state>();
+	aristmk5_state *state = machine.driver_data<aristmk5_state>();
 	archimedes_reset(machine);
 	state->mk5_2KHz_timer->adjust(attotime::from_hz(2000));
 
@@ -260,15 +260,15 @@ static MACHINE_RESET( aristmk5 )
 
 	/* load the roms according to what the operator wants */
 	{
-		UINT8 *ROM = machine->region("maincpu")->base();
-		UINT8 *PRG;// = machine->region("prg_code")->base();
+		UINT8 *ROM = machine.region("maincpu")->base();
+		UINT8 *PRG;// = machine.region("prg_code")->base();
 		int i;
 		UINT8 op_mode;
 		static const char *const rom_region[] = { "set_chip_4.04", "set_chip_4.4", "game_prg", "game_prg" };
 
 		op_mode = input_port_read(machine, "ROM_LOAD");
 
-		PRG = machine->region(rom_region[op_mode & 3])->base();
+		PRG = machine.region(rom_region[op_mode & 3])->base();
 
 		for(i=0;i<0x300000;i++)
 			ROM[i] = PRG[i];

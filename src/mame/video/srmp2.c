@@ -14,11 +14,11 @@ PALETTE_INIT( srmp2 )
 {
 	int i;
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		int col;
 
-		col = (color_prom[i] << 8) + color_prom[i + machine->total_colors()];
+		col = (color_prom[i] << 8) + color_prom[i + machine.total_colors()];
 		palette_set_color_rgb(machine,i ^ 0x0f,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
 	}
 }
@@ -28,17 +28,17 @@ PALETTE_INIT( srmp3 )
 {
 	int i;
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		int col;
 
-		col = (color_prom[i] << 8) + color_prom[i + machine->total_colors()];
+		col = (color_prom[i] << 8) + color_prom[i + machine.total_colors()];
 		palette_set_color_rgb(machine,i,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
 	}
 }
 
 
-static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void srmp2_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 /*
     Sprite RAM A:   spriteram16_2
@@ -61,7 +61,7 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
       ---- ----  -x-- ---- : Flip screen
 */
 
-	srmp2_state *state = machine->driver_data<srmp2_state>();
+	srmp2_state *state = machine.driver_data<srmp2_state>();
 	UINT16 *spriteram16 = state->spriteram1.u16;
 	UINT16 *spriteram16_2 = state->spriteram2.u16;
 	int offs;
@@ -75,7 +75,7 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 	/* Sprites Banking and/or Sprites Buffering */
 	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
-	int max_y = machine->primary_screen->height();
+	int max_y = machine.primary_screen->height();
 
 	xoffs	=	flip ? 0x10 : 0x10;
 	yoffs	=	flip ? 0x05 : 0x07;
@@ -103,7 +103,7 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 		if (state->color_bank) color |= 0x20;
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[0],
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[0],
 				code,
 				color,
 				flipx, flipy,
@@ -113,9 +113,9 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 }
 
 
-static void srmp3_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void srmp3_draw_sprites_map(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	srmp2_state *state = machine->driver_data<srmp2_state>();
+	srmp2_state *state = machine.driver_data<srmp2_state>();
 	UINT8 *spriteram = state->spriteram1.u8;
 	UINT8 *spriteram_2 = state->spriteram2.u8;
 	UINT8 *spriteram_3 = state->spriteram3.u8;
@@ -158,7 +158,7 @@ static void srmp3_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, c
 
 			int sx		=	  x + xoffs  + (offs & 1) * 16;
 			int sy		=	-(y + yoffs) + (offs / 2) * 16 -
-							(machine->primary_screen->height() - (machine->primary_screen->visible_area().max_y + 1));
+							(machine.primary_screen->height() - (machine.primary_screen->visible_area().max_y + 1));
 
 			if (upper & (1 << col))	sx += 256;
 
@@ -173,7 +173,7 @@ static void srmp3_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, c
 
 #define DRAWTILE(_x_, _y_)  \
 			drawgfx_transpen(bitmap, \
-					cliprect, machine->gfx[0], \
+					cliprect, machine.gfx[0], \
 					code, \
 					color, \
 					flipx, flipy, \
@@ -190,7 +190,7 @@ static void srmp3_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, c
 }
 
 
-static void srmp3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void srmp3_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 /*
     Sprite RAM A:   spriteram_2
@@ -225,14 +225,14 @@ static void srmp3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
       -x-- ---- : Flip screen
 */
 
-	srmp2_state *state = machine->driver_data<srmp2_state>();
+	srmp2_state *state = machine.driver_data<srmp2_state>();
 	UINT8 *spriteram = state->spriteram1.u8;
 	UINT8 *spriteram_2 = state->spriteram2.u8;
 	UINT8 *spriteram_3 = state->spriteram3.u8;
 	int offs;
 	int xoffs, yoffs;
 
-	int max_y = machine->primary_screen->height();
+	int max_y = machine.primary_screen->height();
 
 	int ctrl	=	spriteram[ 0x600/2 ];
 	//int ctrl2   =   spriteram[ 0x602/2 ];
@@ -267,7 +267,7 @@ static void srmp3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect, machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect, machine.gfx[0],
 				code,
 				color,
 				flipx, flipy,
@@ -277,15 +277,15 @@ static void srmp3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 }
 
 
-static void mjyuugi_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void mjyuugi_draw_sprites_map(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	srmp2_state *state = machine->driver_data<srmp2_state>();
+	srmp2_state *state = machine.driver_data<srmp2_state>();
 	UINT16 *spriteram16 = state->spriteram1.u16;
 	UINT16 *spriteram16_2 = state->spriteram2.u16;
 	int offs, col;
 	int xoffs, yoffs;
 
-	int total_color_codes	=	machine->config().m_gfxdecodeinfo[0].total_color_codes;
+	int total_color_codes	=	machine.config().m_gfxdecodeinfo[0].total_color_codes;
 
 	int ctrl	=	spriteram16[ 0x600/2 ];
 	int ctrl2	=	spriteram16[ 0x602/2 ];
@@ -327,7 +327,7 @@ static void mjyuugi_draw_sprites_map(running_machine *machine, bitmap_t *bitmap,
 
 			int sx		=	  x + xoffs  + (offs & 1) * 16;
 			int sy		=	-(y + yoffs) + (offs / 2) * 16 -
-							(machine->primary_screen->height() - (machine->primary_screen->visible_area().max_y + 1));
+							(machine.primary_screen->height() - (machine.primary_screen->visible_area().max_y + 1));
 
 			if (upper & (1 << col))	sx += 256;
 
@@ -343,7 +343,7 @@ static void mjyuugi_draw_sprites_map(running_machine *machine, bitmap_t *bitmap,
 
 #define DRAWTILE(_x_, _y_)  \
 			drawgfx_transpen(bitmap, \
-					cliprect, machine->gfx[0], \
+					cliprect, machine.gfx[0], \
 					code, \
 					color, \
 					flipx, flipy, \
@@ -360,7 +360,7 @@ static void mjyuugi_draw_sprites_map(running_machine *machine, bitmap_t *bitmap,
 }
 
 
-static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void mjyuugi_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 /*
     Sprite RAM A:   spriteram16_2
@@ -384,7 +384,7 @@ static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
       ---- ----  -x-- ---- : Flip screen
 */
 
-	srmp2_state *state = machine->driver_data<srmp2_state>();
+	srmp2_state *state = machine.driver_data<srmp2_state>();
 	UINT16 *spriteram16 = state->spriteram1.u16;
 	UINT16 *spriteram16_2 = state->spriteram2.u16;
 	int offs;
@@ -398,7 +398,7 @@ static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 	/* Sprites Banking and/or Sprites Buffering */
 	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
-	int max_y = machine->primary_screen->height();
+	int max_y = machine.primary_screen->height();
 
 	mjyuugi_draw_sprites_map(machine, bitmap, cliprect);
 
@@ -424,12 +424,12 @@ static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 		if (flip)
 		{
 			y = max_y - y
-				+(machine->primary_screen->height() - (machine->primary_screen->visible_area().max_y + 1));
+				+(machine.primary_screen->height() - (machine.primary_screen->visible_area().max_y + 1));
 			flipx = !flipx;
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect, machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect, machine.gfx[0],
 				code,
 				color,
 				flipx, flipy,
@@ -442,7 +442,7 @@ static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 SCREEN_UPDATE( srmp2 )
 {
 	bitmap_fill(bitmap, cliprect, 0x1ff);
-	srmp2_draw_sprites(screen->machine, bitmap, cliprect);
+	srmp2_draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -450,7 +450,7 @@ SCREEN_UPDATE( srmp2 )
 SCREEN_UPDATE( srmp3 )
 {
 	bitmap_fill(bitmap, cliprect, 0x1f0);
-	srmp3_draw_sprites(screen->machine, bitmap, cliprect);
+	srmp3_draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -458,6 +458,6 @@ SCREEN_UPDATE( srmp3 )
 SCREEN_UPDATE( mjyuugi )
 {
 	bitmap_fill(bitmap, cliprect, 0x1f0);
-	mjyuugi_draw_sprites(screen->machine, bitmap, cliprect);
+	mjyuugi_draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

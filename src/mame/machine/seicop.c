@@ -1433,7 +1433,7 @@ static UINT8 cop_rng_max_value;
 
 static UINT16 copd2_offs = 0;
 
-static void copd2_set_tableoffset(running_machine *machine, UINT16 data)
+static void copd2_set_tableoffset(running_machine &machine, UINT16 data)
 {
 	//logerror("mcu_offs %04x\n", data);
 	copd2_offs = data;
@@ -1450,7 +1450,7 @@ static void copd2_set_tableoffset(running_machine *machine, UINT16 data)
     {
         FILE *fp;
         char filename[256];
-        sprintf(filename,"copdat_%s.table2", machine->system().name);
+        sprintf(filename,"copdat_%s.table2", machine.system().name);
         fp=fopen(filename, "w+b");
         if (fp)
         {
@@ -1461,7 +1461,7 @@ static void copd2_set_tableoffset(running_machine *machine, UINT16 data)
     {
         FILE *fp;
         char filename[256];
-        sprintf(filename,"copdat_%s.table3", machine->system().name);
+        sprintf(filename,"copdat_%s.table3", machine.system().name);
         fp=fopen(filename, "w+b");
         if (fp)
         {
@@ -1472,7 +1472,7 @@ static void copd2_set_tableoffset(running_machine *machine, UINT16 data)
     {
         FILE *fp;
         char filename[256];
-        sprintf(filename,"copdat_%s.table4", machine->system().name);
+        sprintf(filename,"copdat_%s.table4", machine.system().name);
         fp=fopen(filename, "w+b");
         if (fp)
         {
@@ -1505,7 +1505,7 @@ static void copd2_set_tableoffset(running_machine *machine, UINT16 data)
 
 }
 
-static void copd2_set_tabledata(running_machine *machine, UINT16 data)
+static void copd2_set_tabledata(running_machine &machine, UINT16 data)
 {
 	copd2_table[copd2_offs] = data;
 	//logerror("mcu_data %04x\n", data);
@@ -1513,7 +1513,7 @@ static void copd2_set_tabledata(running_machine *machine, UINT16 data)
     {
         FILE *fp;
         char filename[256];
-        sprintf(filename,"copdat_%s.data", machine->system().name);
+        sprintf(filename,"copdat_%s.data", machine.system().name);
         fp=fopen(filename, "w+b");
         if (fp)
         {
@@ -1529,12 +1529,12 @@ static UINT16 seibu_vregs[0x50/2];
 
 static WRITE16_HANDLER( seibu_common_video_regs_w )
 {
-	legionna_state *state = space->machine->driver_data<legionna_state>();
+	legionna_state *state = space->machine().driver_data<legionna_state>();
 	COMBINE_DATA(&seibu_vregs[offset]);
 
 	switch(offset)
 	{
-		case (0x01a/2): { flip_screen_set(space->machine, seibu_vregs[offset] & 0x01); break; }
+		case (0x01a/2): { flip_screen_set(space->machine(), seibu_vregs[offset] & 0x01); break; }
 		case (0x01c/2): { state->layer_disable =  seibu_vregs[offset]; break; }
 		case (0x020/2): { state->scrollram16[0] = seibu_vregs[offset]; break; }
 		case (0x022/2): { state->scrollram16[1] = seibu_vregs[offset]; break; }
@@ -1680,17 +1680,17 @@ READ16_HANDLER( copdxbl_0_r )
 		//case (0x5b4/2):
 		//  return cop_mcu_ram[offset];
 
-		case (0x700/2): return input_port_read(space->machine, "DSW1");
-		case (0x704/2):	return input_port_read(space->machine, "PLAYERS12");
-		case (0x708/2):	return input_port_read(space->machine, "PLAYERS34");
-		case (0x70c/2):	return input_port_read(space->machine, "SYSTEM");
-		case (0x71c/2): return input_port_read(space->machine, "DSW2");
+		case (0x700/2): return input_port_read(space->machine(), "DSW1");
+		case (0x704/2):	return input_port_read(space->machine(), "PLAYERS12");
+		case (0x708/2):	return input_port_read(space->machine(), "PLAYERS34");
+		case (0x70c/2):	return input_port_read(space->machine(), "SYSTEM");
+		case (0x71c/2): return input_port_read(space->machine(), "DSW2");
 	}
 }
 
 WRITE16_HANDLER( copdxbl_0_w )
 {
-	legionna_state *state = space->machine->driver_data<legionna_state>();
+	legionna_state *state = space->machine().driver_data<legionna_state>();
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
 	switch(offset)
@@ -1714,7 +1714,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 		case (0x740/2):
 		{
 			soundlatch_w(space, 0, data & 0xff);
-			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 			break;
 		}
 	}
@@ -1814,7 +1814,7 @@ static UINT16 u1,u2;
 	u1 == _u1_ && u2 == _u2_) \
 
 
-static UINT8 cop_calculate_collsion_detection(running_machine *machine)
+static UINT8 cop_calculate_collsion_detection(running_machine &machine)
 {
 	static UINT8 res;
 
@@ -1885,7 +1885,7 @@ static READ16_HANDLER( generic_cop_r )
 		case 0x1a2/2:
 		case 0x1a4/2:
 		case 0x1a6/2:
-			return space->machine->firstcpu->total_cycles() % (cop_rng_max_value+1);
+			return space->machine().firstcpu->total_cycles() % (cop_rng_max_value+1);
 
 		case 0x1b0/2:
 			return cop_status;
@@ -1983,8 +1983,8 @@ static WRITE16_HANDLER( generic_cop_w )
 			break;
 
 		/* Command tables for 0x500 / 0x502 commands */
-		case (0x032/2): { copd2_set_tabledata(space->machine, data); break; }
-		case (0x034/2): { copd2_set_tableoffset(space->machine, data); break; }
+		case (0x032/2): { copd2_set_tabledata(space->machine(), data); break; }
+		case (0x034/2): { copd2_set_tableoffset(space->machine(), data); break; }
 		case (0x038/2):	{ cop_438 = data; break; }
 		case (0x03a/2):	{ cop_43a = data; break; }
 		case (0x03c/2): { cop_43c = data; break; }
@@ -2342,7 +2342,7 @@ static WRITE16_HANDLER( generic_cop_w )
 					cop_collision_info[0].max_y = cop_collision_info[0].y + (0x10 << 16);
 				}
 				/* do the math */
-				cop_hit_status = cop_calculate_collsion_detection(space->machine);
+				cop_hit_status = cop_calculate_collsion_detection(space->machine());
 				return;
 			}
 
@@ -2368,7 +2368,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				//popmessage("0: %08x %08x %08x 1: %08x %08x %08x",cop_collision_info[0].x,cop_collision_info[0].y,cop_collision_info[0].hitbox,cop_collision_info[1].x,cop_collision_info[1].y,cop_collision_info[1].hitbox);
 
 				/* do the math */
-				cop_hit_status = cop_calculate_collsion_detection(space->machine);
+				cop_hit_status = cop_calculate_collsion_detection(space->machine());
 				return;
 			}
 
@@ -2734,7 +2734,7 @@ READ16_HANDLER( heatbrl_mcu_r )
 	{
 		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		return input_port_read(space->machine, portnames[(offset >> 1) & 3]);
+		return input_port_read(space->machine(), portnames[(offset >> 1) & 3]);
 	}
 
 	return generic_cop_r(space, offset, mem_mask);
@@ -2747,7 +2747,7 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 	/* external pin register, used for banking */
 	if(offset == 0x070/2)
 	{
-		heatbrl_setgfxbank(space->machine, cop_mcu_ram[offset]);
+		heatbrl_setgfxbank(space->machine(), cop_mcu_ram[offset]);
 		return;
 	}
 
@@ -2784,12 +2784,12 @@ READ16_HANDLER( cupsoc_mcu_r )
 	{
 		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		return input_port_read(space->machine, portnames[(offset >> 1) & 3]);
+		return input_port_read(space->machine(), portnames[(offset >> 1) & 3]);
 	}
 
 	if(offset == 0x35c/2)
 	{
-		return input_port_read(space->machine, "DSW2");
+		return input_port_read(space->machine(), "DSW2");
 	}
 
 	return generic_cop_r(space, offset, mem_mask);
@@ -2826,12 +2826,12 @@ READ16_HANDLER( cupsocs_mcu_r )
 	{
 		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		return input_port_read(space->machine, portnames[(offset >> 1) & 3]);
+		return input_port_read(space->machine(), portnames[(offset >> 1) & 3]);
 	}
 
 	if(offset == 0x31c/2)
 	{
-		return input_port_read(space->machine, "DSW2");
+		return input_port_read(space->machine(), "DSW2");
 	}
 
 	return generic_cop_r(space, offset, mem_mask);
@@ -2878,7 +2878,7 @@ READ16_HANDLER( godzilla_mcu_r )
 	{
 		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		return input_port_read(space->machine, portnames[(offset >> 1) & 3]);
+		return input_port_read(space->machine(), portnames[(offset >> 1) & 3]);
 	}
 
 	return generic_cop_r(space, offset, mem_mask);
@@ -2890,7 +2890,7 @@ WRITE16_HANDLER( godzilla_mcu_w )
 
 	if(offset == 0x070/2)
 	{
-		denjinmk_setgfxbank(space->machine, cop_mcu_ram[offset]);
+		denjinmk_setgfxbank(space->machine(), cop_mcu_ram[offset]);
 		return;
 	}
 
@@ -2925,12 +2925,12 @@ READ16_HANDLER( denjinmk_mcu_r )
 	{
 		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		return input_port_read(space->machine, portnames[(offset >> 1) & 3]);
+		return input_port_read(space->machine(), portnames[(offset >> 1) & 3]);
 	}
 
 	if(offset == 0x35c/2)
 	{
-		return input_port_read(space->machine, "DSW2");
+		return input_port_read(space->machine(), "DSW2");
 	}
 
 	return generic_cop_r(space, offset, mem_mask);
@@ -2945,7 +2945,7 @@ WRITE16_HANDLER( denjinmk_mcu_w )
 
 	if(offset == 0x070/2)
 	{
-		denjinmk_setgfxbank(space->machine, cop_mcu_ram[offset]);
+		denjinmk_setgfxbank(space->machine(), cop_mcu_ram[offset]);
 		return;
 	}
 
@@ -2977,12 +2977,12 @@ READ16_HANDLER( grainbow_mcu_r )
 	{
 		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		return input_port_read(space->machine, portnames[(offset >> 1) & 3]);
+		return input_port_read(space->machine(), portnames[(offset >> 1) & 3]);
 	}
 
 	if(offset == 0x35c/2)
 	{
-		return input_port_read(space->machine, "DSW2");
+		return input_port_read(space->machine(), "DSW2");
 	}
 
 	return generic_cop_r(space, offset, mem_mask);
@@ -3025,7 +3025,7 @@ READ16_HANDLER( legionna_mcu_r )
 	{
 		static const char *const portnames[] = { "DSW1", "PLAYERS12", "UNK", "SYSTEM" };
 
-		return input_port_read(space->machine, portnames[(offset >> 1) & 3]);
+		return input_port_read(space->machine(), portnames[(offset >> 1) & 3]);
 	}
 
 	return generic_cop_r(space, offset, mem_mask);

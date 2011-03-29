@@ -59,20 +59,20 @@ To enter service mode, keep 1&2 pressed on reset
 
 static MACHINE_START( circusc )
 {
-	circusc_state *state = machine->driver_data<circusc_state>();
+	circusc_state *state = machine.driver_data<circusc_state>();
 
-	state->audiocpu = machine->device<cpu_device>("audiocpu");
-	state->sn1 = machine->device("sn1");
-	state->sn2 = machine->device("sn2");
-	state->dac = machine->device("dac");
-	state->discrete = machine->device("fltdisc");
+	state->audiocpu = machine.device<cpu_device>("audiocpu");
+	state->sn1 = machine.device("sn1");
+	state->sn2 = machine.device("sn2");
+	state->dac = machine.device("dac");
+	state->discrete = machine.device("fltdisc");
 
 	state->save_item(NAME(state->sn_latch));
 }
 
 static MACHINE_RESET( circusc )
 {
-	circusc_state *state = machine->driver_data<circusc_state>();
+	circusc_state *state = machine.driver_data<circusc_state>();
 	state->sn_latch = 0;
 }
 
@@ -89,7 +89,7 @@ static READ8_HANDLER( circusc_sh_timer_r )
      * Can be shortened to:
      */
 
-	circusc_state *state = space->machine->driver_data<circusc_state>();
+	circusc_state *state = space->machine().driver_data<circusc_state>();
 	int clock;
 
 	clock = state->audiocpu->total_cycles() >> 9;
@@ -99,18 +99,18 @@ static READ8_HANDLER( circusc_sh_timer_r )
 
 static WRITE8_HANDLER( circusc_sh_irqtrigger_w )
 {
-	circusc_state *state = space->machine->driver_data<circusc_state>();
+	circusc_state *state = space->machine().driver_data<circusc_state>();
 	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( circusc_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset, data);
+	coin_counter_w(space->machine(), offset, data);
 }
 
 static WRITE8_HANDLER(circusc_sound_w)
 {
-	circusc_state *state = space->machine->driver_data<circusc_state>();
+	circusc_state *state = space->machine().driver_data<circusc_state>();
 
 	switch (offset & 7)
 	{

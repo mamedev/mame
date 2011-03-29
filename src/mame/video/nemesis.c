@@ -23,7 +23,7 @@ sprite_data[8] =
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	nemesis_state *state = machine->driver_data<nemesis_state>();
+	nemesis_state *state = machine.driver_data<nemesis_state>();
 	int code, color, flags, mask, layer;
 
 	code = state->videoram2[tile_index];
@@ -59,7 +59,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	nemesis_state *state = machine->driver_data<nemesis_state>();
+	nemesis_state *state = machine.driver_data<nemesis_state>();
 	int code, color, flags, mask, layer;
 
 	code = state->videoram1[tile_index];
@@ -96,7 +96,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 WRITE16_HANDLER( nemesis_gfx_flipx_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -107,7 +107,7 @@ WRITE16_HANDLER( nemesis_gfx_flipx_word_w )
 		else
 			state->tilemap_flip &= ~TILEMAP_FLIPX;
 
-		tilemap_set_flip_all(space->machine, state->tilemap_flip);
+		tilemap_set_flip_all(space->machine(), state->tilemap_flip);
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -119,7 +119,7 @@ WRITE16_HANDLER( nemesis_gfx_flipx_word_w )
 
 WRITE16_HANDLER( nemesis_gfx_flipy_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -128,14 +128,14 @@ WRITE16_HANDLER( nemesis_gfx_flipy_word_w )
 		else
 			state->tilemap_flip &= ~TILEMAP_FLIPY;
 
-		tilemap_set_flip_all(space->machine, state->tilemap_flip);
+		tilemap_set_flip_all(space->machine(), state->tilemap_flip);
 	}
 }
 
 
 WRITE16_HANDLER( salamand_control_port_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -156,15 +156,15 @@ WRITE16_HANDLER( salamand_control_port_word_w )
 			state->tilemap_flip &= ~TILEMAP_FLIPY;
 
 		if (accessing_bits & 0x0c)
-			tilemap_set_flip_all(space->machine, state->tilemap_flip);
+			tilemap_set_flip_all(space->machine(), state->tilemap_flip);
 
 		state->irq_port_last = data;
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_lockout_w(space->machine, 0, data & 0x0200);
-		coin_lockout_w(space->machine, 1, data & 0x0400);
+		coin_lockout_w(space->machine(), 0, data & 0x0200);
+		coin_lockout_w(space->machine(), 1, data & 0x0400);
 
 		if (data & 0x0800)
 			device_set_input_line(state->audiocpu, 0, HOLD_LINE);
@@ -176,7 +176,7 @@ WRITE16_HANDLER( salamand_control_port_word_w )
 
 WRITE16_HANDLER( nemesis_palette_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 	int r, g, b, bit1, bit2, bit3, bit4, bit5;
 
 	COMBINE_DATA(state->paletteram + offset);
@@ -213,24 +213,24 @@ WRITE16_HANDLER( nemesis_palette_word_w )
 	bit5 = BIT(data, 14);
 	b = MULTIPLIER;
 
-	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
 }
 
 WRITE16_HANDLER( salamander_palette_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	COMBINE_DATA(state->paletteram + offset);
 	offset &= ~1;
 
 	data = ((state->paletteram[offset] << 8) & 0xff00) | (state->paletteram[offset + 1] & 0xff);
-	palette_set_color_rgb(space->machine, offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+	palette_set_color_rgb(space->machine(), offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
 
 WRITE16_HANDLER( nemesis_videoram1_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	COMBINE_DATA(state->videoram1 + offset);
 	tilemap_mark_tile_dirty(state->foreground, offset);
@@ -238,7 +238,7 @@ WRITE16_HANDLER( nemesis_videoram1_word_w )
 
 WRITE16_HANDLER( nemesis_videoram2_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	COMBINE_DATA(state->videoram2 + offset);
 	tilemap_mark_tile_dirty(state->background, offset);
@@ -246,7 +246,7 @@ WRITE16_HANDLER( nemesis_videoram2_word_w )
 
 WRITE16_HANDLER( nemesis_colorram1_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	COMBINE_DATA(state->colorram1 + offset);
 	tilemap_mark_tile_dirty(state->foreground, offset);
@@ -254,7 +254,7 @@ WRITE16_HANDLER( nemesis_colorram1_word_w )
 
 WRITE16_HANDLER( nemesis_colorram2_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	COMBINE_DATA(state->colorram2 + offset);
 	tilemap_mark_tile_dirty(state->background, offset);
@@ -264,7 +264,7 @@ WRITE16_HANDLER( nemesis_colorram2_word_w )
 /* we have to straighten out the 16-bit word into bytes for gfxdecode() to work */
 WRITE16_HANDLER( nemesis_charram_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 	UINT16 oldword = state->charram[offset];
 
 	COMBINE_DATA(state->charram + offset);
@@ -277,7 +277,7 @@ WRITE16_HANDLER( nemesis_charram_word_w )
 		{
 			int w = sprite_data[i].width;
 			int h = sprite_data[i].height;
-			gfx_element_mark_dirty(space->machine->gfx[sprite_data[i].char_type], offset * 4 / (w * h));
+			gfx_element_mark_dirty(space->machine().gfx[sprite_data[i].char_type], offset * 4 / (w * h));
 		}
 	}
 }
@@ -285,7 +285,7 @@ WRITE16_HANDLER( nemesis_charram_word_w )
 
 static STATE_POSTLOAD( nemesis_postload )
 {
-	nemesis_state *state = machine->driver_data<nemesis_state>();
+	nemesis_state *state = machine.driver_data<nemesis_state>();
 	int i, offs;
 
 	for (offs = 0; offs < state->charram_size; offs++)
@@ -294,7 +294,7 @@ static STATE_POSTLOAD( nemesis_postload )
 		{
 			int w = sprite_data[i].width;
 			int h = sprite_data[i].height;
-			gfx_element_mark_dirty(machine->gfx[sprite_data[i].char_type], offs * 4 / (w * h));
+			gfx_element_mark_dirty(machine.gfx[sprite_data[i].char_type], offs * 4 / (w * h));
 		}
 	}
 	tilemap_mark_all_tiles_dirty(state->background);
@@ -305,7 +305,7 @@ static STATE_POSTLOAD( nemesis_postload )
 /* claim a palette dirty array */
 VIDEO_START( nemesis )
 {
-	nemesis_state *state = machine->driver_data<nemesis_state>();
+	nemesis_state *state = machine.driver_data<nemesis_state>();
 
 	state->spriteram_words = state->spriteram_size / 2;
 
@@ -320,21 +320,21 @@ VIDEO_START( nemesis )
 	memset(state->charram, 0, state->charram_size);
 	memset(state->blank_tile, 0, ARRAY_LENGTH(state->blank_tile));
 
-	gfx_element_set_source(machine->gfx[0], (UINT8 *)state->charram);
-	gfx_element_set_source(machine->gfx[1], (UINT8 *)state->charram);
-	gfx_element_set_source(machine->gfx[2], (UINT8 *)state->charram);
-	gfx_element_set_source(machine->gfx[3], (UINT8 *)state->charram);
-	gfx_element_set_source(machine->gfx[4], (UINT8 *)state->charram);
-	gfx_element_set_source(machine->gfx[5], (UINT8 *)state->charram);
-	gfx_element_set_source(machine->gfx[6], (UINT8 *)state->charram);
-	gfx_element_set_source(machine->gfx[7], (UINT8 *)state->charram);
+	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->charram);
+	gfx_element_set_source(machine.gfx[1], (UINT8 *)state->charram);
+	gfx_element_set_source(machine.gfx[2], (UINT8 *)state->charram);
+	gfx_element_set_source(machine.gfx[3], (UINT8 *)state->charram);
+	gfx_element_set_source(machine.gfx[4], (UINT8 *)state->charram);
+	gfx_element_set_source(machine.gfx[5], (UINT8 *)state->charram);
+	gfx_element_set_source(machine.gfx[6], (UINT8 *)state->charram);
+	gfx_element_set_source(machine.gfx[7], (UINT8 *)state->charram);
 
 	/* Set up save state */
-	machine->state().register_postload(nemesis_postload, NULL);
+	machine.state().register_postload(nemesis_postload, NULL);
 }
 
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	/*
      *  16 bytes per sprite, in memory from 56000-56fff
@@ -351,7 +351,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
      *  byte    E : not used.
      */
 
-	nemesis_state *state = machine->driver_data<nemesis_state>();
+	nemesis_state *state = machine.driver_data<nemesis_state>();
 	UINT16 *spriteram = state->spriteram;
 	int adress;	/* start of sprite in spriteram */
 	int sx;	/* sprite X-pos */
@@ -410,13 +410,13 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 						flipy = !flipy;
 					}
 
-					pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[char_type],
+					pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[char_type],
 						code,
 						color,
 						flipx,flipy,
 						sx,sy,
 						zoom,zoom,
-						machine->priority_bitmap,0xffcc,0 );
+						machine.priority_bitmap,0xffcc,0 );
 				}
 			}
 		}
@@ -427,11 +427,11 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( nemesis )
 {
-	nemesis_state *state = screen->machine->driver_data<nemesis_state>();
+	nemesis_state *state = screen->machine().driver_data<nemesis_state>();
 	int offs;
 	rectangle clip;
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 	clip.min_x = 0;
@@ -476,7 +476,7 @@ SCREEN_UPDATE( nemesis )
 		}
 	}
 
-	draw_sprites(screen->machine,bitmap,cliprect);
+	draw_sprites(screen->machine(),bitmap,cliprect);
 
 	return 0;
 }

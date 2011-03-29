@@ -171,13 +171,13 @@ Language
 
 static void appoooh_adpcm_int(device_t *device)
 {
-	appoooh_state *state = device->machine->driver_data<appoooh_state>();
+	appoooh_state *state = device->machine().driver_data<appoooh_state>();
 
 	if (state->adpcm_address != 0xffffffff)
 	{
 		if (state->adpcm_data == 0xffffffff)
 		{
-			UINT8 *RAM = device->machine->region("adpcm")->base();
+			UINT8 *RAM = device->machine().region("adpcm")->base();
 
 			state->adpcm_data = RAM[state->adpcm_address++];
 			msm5205_data_w(device, state->adpcm_data >> 4);
@@ -199,7 +199,7 @@ static void appoooh_adpcm_int(device_t *device)
 /* adpcm address write */
 static WRITE8_HANDLER( appoooh_adpcm_w )
 {
-	appoooh_state *state = space->machine->driver_data<appoooh_state>();
+	appoooh_state *state = space->machine().driver_data<appoooh_state>();
 
 	state->adpcm_address = data << 8;
 	msm5205_reset_w(state->adpcm, 0);
@@ -402,9 +402,9 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( appoooh )
 {
-	appoooh_state *state = machine->driver_data<appoooh_state>();
+	appoooh_state *state = machine.driver_data<appoooh_state>();
 
-	state->adpcm = machine->device("msm");
+	state->adpcm = machine.device("msm");
 
 	state->save_item(NAME(state->adpcm_data));
 	state->save_item(NAME(state->adpcm_address));
@@ -413,7 +413,7 @@ static MACHINE_START( appoooh )
 
 static MACHINE_RESET( appoooh )
 {
-	appoooh_state *state = machine->driver_data<appoooh_state>();
+	appoooh_state *state = machine.driver_data<appoooh_state>();
 
 	state->adpcm_address = 0xffffffff;
 	state->adpcm_data = 0;
@@ -598,8 +598,8 @@ static DRIVER_INIT(robowres)
 
 static DRIVER_INIT(robowresb)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x1c000);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	space->set_decrypted_region(0x0000, 0x7fff, machine.region("maincpu")->base() + 0x1c000);
 }
 
 

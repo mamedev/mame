@@ -64,14 +64,14 @@ Known issues:
 
 static WRITE8_HANDLER( tankbatt_led_w )
 {
-	set_led_status(space->machine, offset,data & 1);
+	set_led_status(space->machine(), offset,data & 1);
 }
 
 static READ8_HANDLER( tankbatt_in0_r )
 {
 	int val;
 
-	val = input_port_read(space->machine, "P1");
+	val = input_port_read(space->machine(), "P1");
 	return ((val << (7 - offset)) & 0x80);
 }
 
@@ -79,7 +79,7 @@ static READ8_HANDLER( tankbatt_in1_r )
 {
 	int val;
 
-	val = input_port_read(space->machine, "P2");
+	val = input_port_read(space->machine(), "P2");
 	return ((val << (7 - offset)) & 0x80);
 }
 
@@ -87,42 +87,42 @@ static READ8_HANDLER( tankbatt_dsw_r )
 {
 	int val;
 
-	val = input_port_read(space->machine, "DSW");
+	val = input_port_read(space->machine(), "DSW");
 	return ((val << (7 - offset)) & 0x80);
 }
 
 static WRITE8_HANDLER( tankbatt_interrupt_enable_w )
 {
-	tankbatt_state *state = space->machine->driver_data<tankbatt_state>();
+	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
 	state->nmi_enable = !data;
 	state->sound_enable = !data;
 
 	/* hack - turn off the engine noise if the normal game nmi's are disabled */
-	if (data) sample_stop (space->machine->device("samples"), 2);
+	if (data) sample_stop (space->machine().device("samples"), 2);
 //  interrupt_enable_w (offset, !data);
 }
 
 static WRITE8_HANDLER( tankbatt_demo_interrupt_enable_w )
 {
-	tankbatt_state *state = space->machine->driver_data<tankbatt_state>();
+	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
 	state->nmi_enable = data;
 //  interrupt_enable_w (offset, data);
 }
 
 static WRITE8_HANDLER( tankbatt_sh_expl_w )
 {
-	tankbatt_state *state = space->machine->driver_data<tankbatt_state>();
+	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
 	if (state->sound_enable)
 	{
-		device_t *samples = space->machine->device("samples");
+		device_t *samples = space->machine().device("samples");
 		sample_start (samples, 1, 3, 0);
 	}
 }
 
 static WRITE8_HANDLER( tankbatt_sh_engine_w )
 {
-	tankbatt_state *state = space->machine->driver_data<tankbatt_state>();
-	device_t *samples = space->machine->device("samples");
+	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
+	device_t *samples = space->machine().device("samples");
 	if (state->sound_enable)
 	{
 		if (data)
@@ -135,10 +135,10 @@ static WRITE8_HANDLER( tankbatt_sh_engine_w )
 
 static WRITE8_HANDLER( tankbatt_sh_fire_w )
 {
-	tankbatt_state *state = space->machine->driver_data<tankbatt_state>();
+	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
 	if (state->sound_enable)
 	{
-		device_t *samples = space->machine->device("samples");
+		device_t *samples = space->machine().device("samples");
 		sample_start (samples, 0, 0, 0);
 	}
 }
@@ -146,19 +146,19 @@ static WRITE8_HANDLER( tankbatt_sh_fire_w )
 static WRITE8_HANDLER( tankbatt_irq_ack_w )
 {
 	/* 0x6e written at the end of the irq routine, could be either irq ack or a coin sample */
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( tankbatt_coin_counter_w )
 {
-	coin_counter_w(space->machine, 0,data & 1);
-	coin_counter_w(space->machine, 1,data & 1);
+	coin_counter_w(space->machine(), 0,data & 1);
+	coin_counter_w(space->machine(), 1,data & 1);
 }
 
 static WRITE8_HANDLER( tankbatt_coin_lockout_w )
 {
-	coin_lockout_w(space->machine, 0,data & 1);
-	coin_lockout_w(space->machine, 1,data & 1);
+	coin_lockout_w(space->machine(), 0,data & 1);
+	coin_lockout_w(space->machine(), 1,data & 1);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
@@ -188,13 +188,13 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( tankbatt_interrupt )
 {
-	tankbatt_state *state = device->machine->driver_data<tankbatt_state>();
+	tankbatt_state *state = device->machine().driver_data<tankbatt_state>();
 	if (state->nmi_enable) device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cputag_set_input_line(field->port->machine, "maincpu", 0, ASSERT_LINE);
+	cputag_set_input_line(field->port->machine(), "maincpu", 0, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( tankbatt )

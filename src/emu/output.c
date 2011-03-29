@@ -144,14 +144,14 @@ INLINE output_item *create_new_item(const char *outname, INT32 value)
     output_init - initialize everything
 -------------------------------------------------*/
 
-void output_init(running_machine *machine)
+void output_init(running_machine &machine)
 {
 	/* add pause callback */
-	machine->add_notifier(MACHINE_NOTIFY_PAUSE, output_pause);
-	machine->add_notifier(MACHINE_NOTIFY_RESUME, output_resume);
+	machine.add_notifier(MACHINE_NOTIFY_PAUSE, output_pause);
+	machine.add_notifier(MACHINE_NOTIFY_RESUME, output_resume);
 
 	/* get a callback when done */
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, output_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, output_exit);
 
 	/* reset the lists */
 	memset(itemtable, 0, sizeof(itemtable));

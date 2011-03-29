@@ -17,7 +17,7 @@
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	vindictr_state *state = machine->driver_data<vindictr_state>();
+	vindictr_state *state = machine.driver_data<vindictr_state>();
 	UINT16 data = state->alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
@@ -28,7 +28,7 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	vindictr_state *state = machine->driver_data<vindictr_state>();
+	vindictr_state *state = machine.driver_data<vindictr_state>();
 	UINT16 data = state->playfield[tile_index];
 	int code = (state->playfield_tile_bank * 0x1000) + (data & 0xfff);
 	int color = 0x10 + 2 * ((data >> 12) & 7);
@@ -81,7 +81,7 @@ VIDEO_START( vindictr )
 		0,					/* resulting value to indicate "special" */
 		NULL				/* callback routine for special entries */
 	};
-	vindictr_state *state = machine->driver_data<vindictr_state>();
+	vindictr_state *state = machine.driver_data<vindictr_state>();
 
 	/* initialize the playfield */
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
@@ -114,8 +114,8 @@ WRITE16_HANDLER( vindictr_paletteram_w )
 	int c;
 
 	/* first blend the data */
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	data = space->machine->generic.paletteram.u16[offset];
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	data = space->machine().generic.paletteram.u16[offset];
 
 	/* now generate colors at all 16 intensities */
 	for (c = 0; c < 8; c++)
@@ -125,7 +125,7 @@ WRITE16_HANDLER( vindictr_paletteram_w )
 		int g = ((data >> 4) & 15) * i;
 		int b = ((data >> 0) & 15) * i;
 
-		palette_set_color(space->machine,offset + c*2048,MAKE_RGB(r,g,b));
+		palette_set_color(space->machine(),offset + c*2048,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -139,7 +139,7 @@ WRITE16_HANDLER( vindictr_paletteram_w )
 
 void vindictr_scanline_update(screen_device &screen, int scanline)
 {
-	vindictr_state *state = screen.machine->driver_data<vindictr_state>();
+	vindictr_state *state = screen.machine().driver_data<vindictr_state>();
 	UINT16 *base = &state->alpha[((scanline - 8) / 8) * 64 + 42];
 	int x;
 
@@ -186,7 +186,7 @@ void vindictr_scanline_update(screen_device &screen, int scanline)
 				break;
 
 			case 6:		/* /VIRQ */
-				atarigen_scanline_int_gen(screen.machine->device("maincpu"));
+				atarigen_scanline_int_gen(screen.machine().device("maincpu"));
 				break;
 
 			case 7:		/* /PFVS */
@@ -219,7 +219,7 @@ void vindictr_scanline_update(screen_device &screen, int scanline)
 
 SCREEN_UPDATE( vindictr )
 {
-	vindictr_state *state = screen->machine->driver_data<vindictr_state>();
+	vindictr_state *state = screen->machine().driver_data<vindictr_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

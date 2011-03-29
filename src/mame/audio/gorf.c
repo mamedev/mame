@@ -116,7 +116,7 @@ static int plural = 0;
 
 READ8_HANDLER( gorf_speech_r )
 {
-	device_t *samples = space->machine->device("samples");
+	device_t *samples = space->machine().device("samples");
     int Phoneme,Intonation;
     int i = 0;
 
@@ -182,6 +182,6 @@ READ8_HANDLER( gorf_speech_r )
 
 CUSTOM_INPUT( gorf_speech_status_r )
 {
-	device_t *samples = field->port->machine->device("samples");
+	device_t *samples = field->port->machine().device("samples");
 	return !sample_playing(samples, 0);
 }

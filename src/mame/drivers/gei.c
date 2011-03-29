@@ -90,7 +90,7 @@ public:
 
 static WRITE8_HANDLER( gei_drawctrl_w )
 {
-	gei_state *state = space->machine->driver_data<gei_state>();
+	gei_state *state = space->machine().driver_data<gei_state>();
 	state->drawctrl[offset] = data;
 	if (offset == 2)
 	{
@@ -102,7 +102,7 @@ static WRITE8_HANDLER( gei_drawctrl_w )
 
 static WRITE8_HANDLER( gei_bitmap_w )
 {
-	gei_state *state = space->machine->driver_data<gei_state>();
+	gei_state *state = space->machine().driver_data<gei_state>();
 	int sx,sy;
 	int i;
 
@@ -115,7 +115,7 @@ static WRITE8_HANDLER( gei_bitmap_w )
 
 
 	for (i = 0; i < 8; i++)
-		*BITMAP_ADDR16(space->machine->generic.tmpbitmap, sy, sx+i) = state->color[8-i-1];
+		*BITMAP_ADDR16(space->machine().generic.tmpbitmap, sy, sx+i) = state->color[8-i-1];
 }
 
 static PALETTE_INIT(gei)
@@ -141,66 +141,66 @@ static PALETTE_INIT(quizvid)
 static WRITE8_DEVICE_HANDLER( lamps_w )
 {
 	/* 5 button lamps */
-	set_led_status(device->machine, 0,data & 0x01);
-	set_led_status(device->machine, 1,data & 0x02);
-	set_led_status(device->machine, 2,data & 0x04);
-	set_led_status(device->machine, 3,data & 0x08);
-	set_led_status(device->machine, 4,data & 0x10);
+	set_led_status(device->machine(), 0,data & 0x01);
+	set_led_status(device->machine(), 1,data & 0x02);
+	set_led_status(device->machine(), 2,data & 0x04);
+	set_led_status(device->machine(), 3,data & 0x08);
+	set_led_status(device->machine(), 4,data & 0x10);
 
 	/* 3 button lamps for deal, cancel, stand in poker games;
     lamp order verified in poker and selection self tests */
-	set_led_status(device->machine, 7,data & 0x20);
-	set_led_status(device->machine, 5,data & 0x40);
-	set_led_status(device->machine, 6,data & 0x80);
+	set_led_status(device->machine(), 7,data & 0x20);
+	set_led_status(device->machine(), 5,data & 0x40);
+	set_led_status(device->machine(), 6,data & 0x80);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_w )
 {
-	address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
-	coin_lockout_global_w(device->machine, ~data & 0x08);
-	set_led_status(device->machine, 9,data & 0x08);
+	coin_lockout_global_w(device->machine(), ~data & 0x08);
+	set_led_status(device->machine(), 9,data & 0x08);
 
 	/* bit 5 - ticket out in trivia games */
-	ticket_dispenser_w(device->machine->device("ticket"), 0, (data & 0x20)<< 2);
+	ticket_dispenser_w(device->machine().device("ticket"), 0, (data & 0x20)<< 2);
 
 	/* bit 6 enables NMI */
 	interrupt_enable_w(space, 0, data & 0x40);
 
 	/* bit 7 goes directly to the sound amplifier */
-	dac_data_w(device->machine->device("dac"), ((data & 0x80) >> 7) * 255);
+	dac_data_w(device->machine().device("dac"), ((data & 0x80) >> 7) * 255);
 }
 
 static WRITE8_DEVICE_HANDLER( sound2_w )
 {
 	/* bit 3,6 - coin lockout, lamp10+11 in selection test mode */
-	coin_lockout_w(device->machine, 0, ~data & 0x08);
-	coin_lockout_w(device->machine, 1, ~data & 0x40);
-	set_led_status(device->machine, 9,data & 0x08);
-	set_led_status(device->machine, 10,data & 0x40);
+	coin_lockout_w(device->machine(), 0, ~data & 0x08);
+	coin_lockout_w(device->machine(), 1, ~data & 0x40);
+	set_led_status(device->machine(), 9,data & 0x08);
+	set_led_status(device->machine(), 10,data & 0x40);
 
 	/* bit 4,5 - lamps 12, 13 in selection test mode;
     12 lights up if dsw maximum bet = 30 an bet > 15 or if dsw maximum bet = 10 an bet = 10 */
-	set_led_status(device->machine, 11,data & 0x10);
-	set_led_status(device->machine, 12,data & 0x20);
+	set_led_status(device->machine(), 11,data & 0x10);
+	set_led_status(device->machine(), 12,data & 0x20);
 
 	/* bit 7 goes directly to the sound amplifier */
-	dac_data_w(device->machine->device("dac"), ((data & 0x80) >> 7) * 255);
+	dac_data_w(device->machine().device("dac"), ((data & 0x80) >> 7) * 255);
 }
 
 static WRITE8_DEVICE_HANDLER( lamps2_w )
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in poker test mode  */
-	set_led_status(device->machine, 8,data & 0x10);
+	set_led_status(device->machine(), 8,data & 0x10);
 }
 
 static WRITE8_DEVICE_HANDLER( nmi_w )
 {
-	address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
-	set_led_status(device->machine, 8,data & 0x10);
+	set_led_status(device->machine(), 8,data & 0x10);
 
 	/* bit 6 enables NMI */
 	interrupt_enable_w(space, 0, data & 0x40);
@@ -223,68 +223,68 @@ static READ8_DEVICE_HANDLER( portC_r )
 
 static WRITE8_HANDLER( banksel_main_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x8000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x8000);
 }
 static WRITE8_HANDLER( banksel_1_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x10000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x10000);
 }
 static WRITE8_HANDLER( banksel_2_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x18000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x18000);
 }
 static WRITE8_HANDLER( banksel_3_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x20000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x20000);
 }
 static WRITE8_HANDLER( banksel_4_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x28000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x28000);
 }
 static WRITE8_HANDLER( banksel_5_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x30000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x30000);
 }
 
 static WRITE8_HANDLER( banksel_1_1_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x10000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x10000);
 }
 static WRITE8_HANDLER( banksel_2_1_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x14000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x14000);
 }
 static WRITE8_HANDLER( banksel_3_1_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x18000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x18000);
 }
 static WRITE8_HANDLER( banksel_4_1_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x1c000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x1c000);
 }
 static WRITE8_HANDLER( banksel_5_1_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x20000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x20000);
 }
 static WRITE8_HANDLER( banksel_1_2_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x12000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x12000);
 }
 static WRITE8_HANDLER( banksel_2_2_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x16000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x16000);
 }
 static WRITE8_HANDLER( banksel_3_2_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x1a000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x1a000);
 }
 static WRITE8_HANDLER( banksel_4_2_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x1e000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x1e000);
 }
 static WRITE8_HANDLER( banksel_5_2_w )
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x22000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x22000);
 }
 
 static WRITE8_HANDLER(geimulti_bank_w)
@@ -312,36 +312,36 @@ static WRITE8_HANDLER(geimulti_bank_w)
 	}
 
 	if (bank != -1)
-		memory_set_bankptr(space->machine, "bank1", space->machine->region("bank")->base() + bank*0x8000);
+		memory_set_bankptr(space->machine(), "bank1", space->machine().region("bank")->base() + bank*0x8000);
 }
 
 static READ8_HANDLER(banksel_1_r)
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x10000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x10000);
 	return 0x03;
 };
 
 static READ8_HANDLER(banksel_2_r)
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x18000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x18000);
 	return 0x03;
 }
 
 static READ8_HANDLER(banksel_3_r)
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x20000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x20000);
 	return 0x03;
 }
 
 static READ8_HANDLER(banksel_4_r)
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x28000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x28000);
 	return 0x03;
 }
 
 static READ8_HANDLER(banksel_5_r)
 {
-	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x30000);
+	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x30000);
 	return 0x03;
 }
 
@@ -349,13 +349,13 @@ static READ8_HANDLER(banksel_5_r)
 
 static READ8_HANDLER( signature_r )
 {
-	gei_state *state = space->machine->driver_data<gei_state>();
+	gei_state *state = space->machine().driver_data<gei_state>();
 	return state->signature_answer;
 }
 
 static WRITE8_HANDLER( signature_w )
 {
-	gei_state *state = space->machine->driver_data<gei_state>();
+	gei_state *state = space->machine().driver_data<gei_state>();
 	if (data == 0) state->signature_pos = 0;
 	else
 	{
@@ -369,7 +369,7 @@ static WRITE8_HANDLER( signature_w )
 
 static WRITE8_HANDLER( signature2_w )
 {
-	gei_state *state = space->machine->driver_data<gei_state>();
+	gei_state *state = space->machine().driver_data<gei_state>();
 	if (data == 0) state->signature_pos = 0;
 	else
 	{
@@ -1824,12 +1824,12 @@ ROM_END
 
 static DRIVER_INIT( setbank )
 {
-	memory_set_bankptr(machine, "bank1",machine->region("maincpu")->base() + 0x2000);
+	memory_set_bankptr(machine, "bank1",machine.region("maincpu")->base() + 0x2000);
 }
 
 static DRIVER_INIT( geimulti )
 {
-	memory_set_bankptr(machine, "bank1",machine->region("bank")->base() + 0x0000);
+	memory_set_bankptr(machine, "bank1",machine.region("bank")->base() + 0x0000);
 }
 
 GAME( 1982, jokpoker, 0,        gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03B)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

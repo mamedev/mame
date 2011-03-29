@@ -24,12 +24,12 @@ static void jal_blend_reset(running_machine &machine)
 	memset(jal_blend_table, 0, 0xc00);
 }
 
-void jal_blend_init(running_machine *machine, int enable)
+void jal_blend_init(running_machine &machine, int enable)
 {
 	if (enable)
 	{
 		jal_blend_table = auto_alloc_array_clear(machine, UINT8, 0xc00);
-		machine->add_notifier(MACHINE_NOTIFY_RESET, jal_blend_reset);
+		machine.add_notifier(MACHINE_NOTIFY_RESET, jal_blend_reset);
 	}
 	else
 	{
@@ -97,7 +97,7 @@ void jal_blend_drawgfx(bitmap_t *dest_bmp,const rectangle *clip,const gfx_elemen
 	/* Start drawing */
 	if (gfx)
 	{
-		const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		const UINT8 *alpha = &jal_blend_table[gfx->color_granularity * (color % gfx->total_colors)];
 		const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 		int x_index_base, y_index, sx, sy, ex, ey;

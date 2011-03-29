@@ -19,7 +19,7 @@
 #ifdef UNUSED_FUNCTION
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	mcr3_state *state = machine->driver_data<mcr3_state>();
+	mcr3_state *state = machine.driver_data<mcr3_state>();
 	UINT8 *videoram = state->videoram;
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0x400);
@@ -31,7 +31,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( mcrmono_get_bg_tile_info )
 {
-	mcr3_state *state = machine->driver_data<mcr3_state>();
+	mcr3_state *state = machine.driver_data<mcr3_state>();
 	UINT8 *videoram = state->videoram;
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0x400);
@@ -49,7 +49,7 @@ static TILEMAP_MAPPER( spyhunt_bg_scan )
 
 static TILE_GET_INFO( spyhunt_get_bg_tile_info )
 {
-	mcr3_state *state = machine->driver_data<mcr3_state>();
+	mcr3_state *state = machine.driver_data<mcr3_state>();
 	UINT8 *videoram = state->videoram;
 	int data = videoram[tile_index];
 	int code = (data & 0x3f) | ((data >> 1) & 0x40);
@@ -59,7 +59,7 @@ static TILE_GET_INFO( spyhunt_get_bg_tile_info )
 
 static TILE_GET_INFO( spyhunt_get_alpha_tile_info )
 {
-	mcr3_state *state = machine->driver_data<mcr3_state>();
+	mcr3_state *state = machine.driver_data<mcr3_state>();
 	SET_TILE_INFO(2, state->spyhunt_alpharam[tile_index], 0, 0);
 }
 
@@ -91,7 +91,7 @@ PALETTE_INIT( spyhunt )
 #ifdef UNUSED_FUNCTION
 VIDEO_START( mcr3 )
 {
-	mcr3_state *state = machine->driver_data<mcr3_state>();
+	mcr3_state *state = machine.driver_data<mcr3_state>();
 	/* initialize the background tilemap */
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  16,16, 32,30);
 }
@@ -100,7 +100,7 @@ VIDEO_START( mcr3 )
 
 VIDEO_START( mcrmono )
 {
-	mcr3_state *state = machine->driver_data<mcr3_state>();
+	mcr3_state *state = machine.driver_data<mcr3_state>();
 	/* initialize the background tilemap */
 	state->bg_tilemap = tilemap_create(machine, mcrmono_get_bg_tile_info, tilemap_scan_rows,  16,16, 32,30);
 }
@@ -108,7 +108,7 @@ VIDEO_START( mcrmono )
 
 VIDEO_START( spyhunt )
 {
-	mcr3_state *state = machine->driver_data<mcr3_state>();
+	mcr3_state *state = machine.driver_data<mcr3_state>();
 	/* initialize the background tilemap */
 	state->bg_tilemap = tilemap_create(machine, spyhunt_get_bg_tile_info, spyhunt_bg_scan,  64,32, 64,32);
 
@@ -133,11 +133,11 @@ VIDEO_START( spyhunt )
 
 WRITE8_HANDLER( mcr3_paletteram_w )
 {
-	space->machine->generic.paletteram.u8[offset] = data;
+	space->machine().generic.paletteram.u8[offset] = data;
 	offset &= 0x7f;
 
 	/* high bit of red comes from low bit of address */
-	palette_set_color_rgb(space->machine, offset / 2, pal3bit(((offset & 1) << 2) + (data >> 6)), pal3bit(data >> 0), pal3bit(data >> 3));
+	palette_set_color_rgb(space->machine(), offset / 2, pal3bit(((offset & 1) << 2) + (data >> 6)), pal3bit(data >> 0), pal3bit(data >> 3));
 }
 
 
@@ -150,7 +150,7 @@ WRITE8_HANDLER( mcr3_paletteram_w )
 
 WRITE8_HANDLER( mcr3_videoram_w )
 {
-	mcr3_state *state = space->machine->driver_data<mcr3_state>();
+	mcr3_state *state = space->machine().driver_data<mcr3_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
@@ -159,7 +159,7 @@ WRITE8_HANDLER( mcr3_videoram_w )
 
 WRITE8_HANDLER( spyhunt_videoram_w )
 {
-	mcr3_state *state = space->machine->driver_data<mcr3_state>();
+	mcr3_state *state = space->machine().driver_data<mcr3_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -168,7 +168,7 @@ WRITE8_HANDLER( spyhunt_videoram_w )
 
 WRITE8_HANDLER( spyhunt_alpharam_w )
 {
-	mcr3_state *state = space->machine->driver_data<mcr3_state>();
+	mcr3_state *state = space->machine().driver_data<mcr3_state>();
 	state->spyhunt_alpharam[offset] = data;
 	tilemap_mark_tile_dirty(state->alpha_tilemap, offset);
 }
@@ -176,7 +176,7 @@ WRITE8_HANDLER( spyhunt_alpharam_w )
 
 WRITE8_HANDLER( spyhunt_scroll_value_w )
 {
-	mcr3_state *state = space->machine->driver_data<mcr3_state>();
+	mcr3_state *state = space->machine().driver_data<mcr3_state>();
 	switch (offset)
 	{
 		case 0:
@@ -205,13 +205,13 @@ WRITE8_HANDLER( spyhunt_scroll_value_w )
  *
  *************************************/
 
-static void mcr3_update_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int color_mask, int code_xor, int dx, int dy)
+static void mcr3_update_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int color_mask, int code_xor, int dx, int dy)
 {
-	mcr3_state *state = machine->driver_data<mcr3_state>();
+	mcr3_state *state = machine.driver_data<mcr3_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
-	bitmap_fill(machine->priority_bitmap, cliprect, 1);
+	bitmap_fill(machine.priority_bitmap, cliprect, 1);
 
 	/* loop over sprite RAM */
 	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
@@ -252,22 +252,22 @@ static void mcr3_update_sprites(running_machine *machine, bitmap_t *bitmap, cons
 		if (!mcr_cocktail_flip)
 		{
 			/* first draw the sprite, visible */
-			pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, sx, sy,
-					machine->priority_bitmap, 0x00, 0x0101);
+			pdrawgfx_transmask(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy, sx, sy,
+					machine.priority_bitmap, 0x00, 0x0101);
 
 			/* then draw the mask, behind the background but obscuring following sprites */
-			pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, sx, sy,
-					machine->priority_bitmap, 0x02, 0xfeff);
+			pdrawgfx_transmask(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy, sx, sy,
+					machine.priority_bitmap, 0x02, 0xfeff);
 		}
 		else
 		{
 			/* first draw the sprite, visible */
-			pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
-					machine->priority_bitmap, 0x00, 0x0101);
+			pdrawgfx_transmask(bitmap, cliprect, machine.gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
+					machine.priority_bitmap, 0x00, 0x0101);
 
 			/* then draw the mask, behind the background but obscuring following sprites */
-			pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
-					machine->priority_bitmap, 0x02, 0xfeff);
+			pdrawgfx_transmask(bitmap, cliprect, machine.gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
+					machine.priority_bitmap, 0x02, 0xfeff);
 		}
 	}
 }
@@ -282,7 +282,7 @@ static void mcr3_update_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 SCREEN_UPDATE( mcr3 )
 {
-	mcr3_state *state = screen->machine->driver_data<mcr3_state>();
+	mcr3_state *state = screen->machine().driver_data<mcr3_state>();
 	/* update the flip state */
 	tilemap_set_flip(state->bg_tilemap, mcr_cocktail_flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
@@ -290,14 +290,14 @@ SCREEN_UPDATE( mcr3 )
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* draw the sprites */
-	mcr3_update_sprites(screen->machine, bitmap, cliprect, 0x03, 0, 0, 0);
+	mcr3_update_sprites(screen->machine(), bitmap, cliprect, 0x03, 0, 0, 0);
 	return 0;
 }
 
 
 SCREEN_UPDATE( spyhunt )
 {
-	mcr3_state *state = screen->machine->driver_data<mcr3_state>();
+	mcr3_state *state = screen->machine().driver_data<mcr3_state>();
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->spyhunt_scrollx * 2 + state->spyhunt_scroll_offset);
@@ -305,7 +305,7 @@ SCREEN_UPDATE( spyhunt )
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* draw the sprites */
-	mcr3_update_sprites(screen->machine, bitmap, cliprect, state->spyhunt_sprite_color_mask, 0, -12, 0);
+	mcr3_update_sprites(screen->machine(), bitmap, cliprect, state->spyhunt_sprite_color_mask, 0, -12, 0);
 
 	/* render any characters on top */
 	tilemap_draw(bitmap, cliprect, state->alpha_tilemap, 0, 0);

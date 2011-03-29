@@ -437,7 +437,7 @@ READ8_DEVICE_HANDLER( ins8250_r )
 		case 5:
 
 #if 0
-			if (ins8250->send.active && (machine->time()-ins8250->send.time>uart_byte_time(n)))
+			if (ins8250->send.active && (machine.time()-ins8250->send.time>uart_byte_time(n)))
 			{
 				// currently polling is enough for pc1512
 				ins8250->lsr |= 0x40; /* set TSRE */

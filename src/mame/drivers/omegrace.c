@@ -240,7 +240,7 @@ public:
 
 static MACHINE_RESET( omegrace )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	/* Omega Race expects the vector processor to be ready. */
 	avgdvg_reset_w(space, 0, 0);
 }
@@ -293,7 +293,7 @@ static const UINT8 spinnerTable[64] =
 
 static READ8_HANDLER( omegrace_spinner1_r )
 {
-	return (spinnerTable[input_port_read(space->machine, "SPIN0") & 0x3f]);
+	return (spinnerTable[input_port_read(space->machine(), "SPIN0") & 0x3f]);
 }
 
 
@@ -307,14 +307,14 @@ static READ8_HANDLER( omegrace_spinner1_r )
 static WRITE8_HANDLER( omegrace_leds_w )
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(space->machine, 0,data & 0x01);
-	coin_counter_w(space->machine, 1,data & 0x02);
+	coin_counter_w(space->machine(), 0,data & 0x01);
+	coin_counter_w(space->machine(), 1,data & 0x02);
 
 	/* bits 2 to 5 are the start leds (4 and 5 cocktail only) */
-	set_led_status(space->machine, 0,~data & 0x04);
-	set_led_status(space->machine, 1,~data & 0x08);
-	set_led_status(space->machine, 2,~data & 0x10);
-	set_led_status(space->machine, 3,~data & 0x20);
+	set_led_status(space->machine(), 0,~data & 0x04);
+	set_led_status(space->machine(), 1,~data & 0x08);
+	set_led_status(space->machine(), 2,~data & 0x10);
+	set_led_status(space->machine(), 3,~data & 0x20);
 
 	/* bit 6 flips screen (not supported) */
 }
@@ -323,7 +323,7 @@ static WRITE8_HANDLER( omegrace_leds_w )
 static WRITE8_HANDLER( omegrace_soundlatch_w )
 {
 	soundlatch_w (space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 
@@ -585,8 +585,8 @@ ROM_END
 
 static DRIVER_INIT( omegrace )
 {
-	int i, len = machine->region("user1")->bytes();
-	UINT8 *prom = machine->region("user1")->base();
+	int i, len = machine.region("user1")->bytes();
+	UINT8 *prom = machine.region("user1")->base();
 
 	/* Omega Race has two pairs of the state PROM output
      * lines swapped before going into the decoder.

@@ -614,7 +614,7 @@ static void	simulate2(device_t *device, struct pit8253_timer *timer, INT64 elaps
 	{
 		attotime next_fire_time = timer->last_updated + cycles_to_output * attotime::from_hz( timer->clockin );
 
-		timer->updatetimer->adjust(next_fire_time - device->machine->time(), timer->index );
+		timer->updatetimer->adjust(next_fire_time - device->machine().time(), timer->index );
 	}
 
     LOG2(("pit8253: simulate2(): simulating %d cycles for %d in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x, cycles_to_output = %04x\n",
@@ -654,7 +654,7 @@ static void	update(device_t *device, struct pit8253_timer *timer)
 {
 	/* With the 82C54's maximum clockin of 10MHz, 64 bits is nearly 60,000
        years of time. Should be enough for now. */
-	attotime now =	device->machine->time();
+	attotime now =	device->machine().time();
 	attotime elapsed_time = now - timer->last_updated;
 	INT64 elapsed_cycles =	elapsed_time.as_double() * timer->clockin;
 
@@ -916,7 +916,7 @@ WRITE8_DEVICE_HANDLER( pit8253_w )
 
 		update(device, timer);
 
-		if ( device->machine->time() > timer->last_updated && timer->clockin != 0 )
+		if ( device->machine().time() > timer->last_updated && timer->clockin != 0 )
 		{
 			middle_of_a_cycle = 1;
 		}
@@ -1081,7 +1081,7 @@ static void common_start( device_t *device, int device_type ) {
 
 		/* initialize timer */
 		timer->clockin = pit8253->config->timer[timerno].clockin;
-		timer->updatetimer = device->machine->scheduler().timer_alloc(FUNC(update_timer_cb), (void *)device);
+		timer->updatetimer = device->machine().scheduler().timer_alloc(FUNC(update_timer_cb), (void *)device);
 		timer->updatetimer->adjust(attotime::never, timerno);
 
 		/* resolve callbacks */
@@ -1148,7 +1148,7 @@ static DEVICE_RESET( pit8253 ) {
 		timer->null_count = 1;
 		timer->cycles_to_output = CYCLES_NEVER;
 
-		timer->last_updated = device->machine->time();
+		timer->last_updated = device->machine().time();
 
 		update(device, timer);
 	}

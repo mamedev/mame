@@ -71,7 +71,7 @@ correctly.
 
 static WRITE8_HANDLER( c1942_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x03);
+	memory_set_bank(space->machine(), "bank1", data & 0x03);
 }
 
 static TIMER_DEVICE_CALLBACK( c1942_scanline )
@@ -79,10 +79,10 @@ static TIMER_DEVICE_CALLBACK( c1942_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line_and_vector(timer.machine, "maincpu", 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
 
 	if(scanline == 0) // unknown irq event, presumably vblank-in or a periodic one (writes to the soundlatch and drives freeze dip-switch)
-		cputag_set_input_line_and_vector(timer.machine, "maincpu", 0, HOLD_LINE, 0xcf);	/* RST 08h */
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xcf);	/* RST 08h */
 }
 
 
@@ -238,9 +238,9 @@ GFXDECODE_END
 
 static MACHINE_START( 1942 )
 {
-	_1942_state *state = machine->driver_data<_1942_state>();
+	_1942_state *state = machine.driver_data<_1942_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->palette_bank));
 	state->save_item(NAME(state->scroll));
@@ -248,7 +248,7 @@ static MACHINE_START( 1942 )
 
 static MACHINE_RESET( 1942 )
 {
-	_1942_state *state = machine->driver_data<_1942_state>();
+	_1942_state *state = machine.driver_data<_1942_state>();
 
 	state->palette_bank = 0;
 	state->scroll[0] = 0;
@@ -506,7 +506,7 @@ ROM_END
 
 static DRIVER_INIT( 1942 )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x10000], 0x4000);
 }
 

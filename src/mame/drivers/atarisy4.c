@@ -125,7 +125,7 @@ static MACHINE_RESET( airrace );
 
 static VIDEO_START( atarisy4 )
 {
-	atarisy4_state *state = machine->driver_data<atarisy4_state>();
+	atarisy4_state *state = machine.driver_data<atarisy4_state>();
 	state->poly = poly_alloc(machine, 1024, sizeof(poly_extra_data), POLYFLAG_NO_WORK_QUEUE);
 }
 
@@ -136,7 +136,7 @@ static VIDEO_RESET( atarisy4 )
 
 static SCREEN_UPDATE( atarisy4 )
 {
-	atarisy4_state *state = screen->machine->driver_data<atarisy4_state>();
+	atarisy4_state *state = screen->machine().driver_data<atarisy4_state>();
 	int y;
 	UINT32 offset = 0;
 
@@ -161,8 +161,8 @@ static SCREEN_UPDATE( atarisy4 )
 		{
 			UINT16 data = *src++;
 
-			*dest++ = screen->machine->pens[data & 0xff];
-			*dest++ = screen->machine->pens[data >> 8];
+			*dest++ = screen->machine().pens[data & 0xff];
+			*dest++ = screen->machine().pens[data >> 8];
 		}
 	}
 	return 0;
@@ -304,9 +304,9 @@ static void draw_polygon(atarisy4_state *state, UINT16 color)
     PFVR    0x2B    Polygon vector relative
     PFC     0x2C    Polygon close
 */
-void execute_gpu_command(running_machine *machine)
+void execute_gpu_command(running_machine &machine)
 {
-	atarisy4_state *state = machine->driver_data<atarisy4_state>();
+	atarisy4_state *state = machine.driver_data<atarisy4_state>();
 	switch (gpu.ecr)
 	{
 		case 0x04:
@@ -457,7 +457,7 @@ static WRITE16_HANDLER( gpu_w )
 		case 0x17:
 		{
 			gpu.ecr = data;
-			execute_gpu_command(space->machine);
+			execute_gpu_command(space->machine());
 			break;
 		}
 		case 0x1a:	gpu.far = data;		break;
@@ -466,7 +466,7 @@ static WRITE16_HANDLER( gpu_w )
 			gpu.mcr = data;
 
 			if (~data & 0x08)
-				cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
+				cputag_set_input_line(space->machine(), "maincpu", 6, CLEAR_LINE);
 
 			break;
 		}
@@ -501,7 +501,7 @@ static READ16_HANDLER( gpu_r )
 static INTERRUPT_GEN( vblank_int )
 {
 	if (gpu.mcr & 0x08)
-		cputag_set_input_line(device->machine, "maincpu", 6, ASSERT_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", 6, ASSERT_LINE);
 }
 
 
@@ -513,7 +513,7 @@ static INTERRUPT_GEN( vblank_int )
 
 static READ16_HANDLER( m68k_shared_0_r )
 {
-	atarisy4_state *state = space->machine->driver_data<atarisy4_state>();
+	atarisy4_state *state = space->machine().driver_data<atarisy4_state>();
 	if (!BIT(state->csr[0], 3))
 		return (state->shared_ram[0][offset]);
 	else
@@ -522,14 +522,14 @@ static READ16_HANDLER( m68k_shared_0_r )
 
 static WRITE16_HANDLER( m68k_shared_0_w )
 {
-	atarisy4_state *state = space->machine->driver_data<atarisy4_state>();
+	atarisy4_state *state = space->machine().driver_data<atarisy4_state>();
 	if (!BIT(state->csr[0], 3))
 		COMBINE_DATA(&state->shared_ram[0][offset]);
 }
 
 static READ16_HANDLER( m68k_shared_1_r )
 {
-	atarisy4_state *state = space->machine->driver_data<atarisy4_state>();
+	atarisy4_state *state = space->machine().driver_data<atarisy4_state>();
 	if (!BIT(state->csr[1], 3))
 		return (state->shared_ram[1][offset]);
 	else
@@ -538,35 +538,35 @@ static READ16_HANDLER( m68k_shared_1_r )
 
 static WRITE16_HANDLER( m68k_shared_1_w )
 {
-	atarisy4_state *state = space->machine->driver_data<atarisy4_state>();
+	atarisy4_state *state = space->machine().driver_data<atarisy4_state>();
 	if (!BIT(state->csr[1], 3))
 		COMBINE_DATA(&state->shared_ram[1][offset]);
 }
 
 static READ16_HANDLER( dsp0_status_r )
 {
-	atarisy4_state *state = space->machine->driver_data<atarisy4_state>();
+	atarisy4_state *state = space->machine().driver_data<atarisy4_state>();
 	return state->csr[0];
 }
 
 static WRITE16_HANDLER( dsp0_control_w )
 {
-	atarisy4_state *state = space->machine->driver_data<atarisy4_state>();
-	cputag_set_input_line(space->machine, "dsp0", INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(space->machine, "dsp0", 0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
+	atarisy4_state *state = space->machine().driver_data<atarisy4_state>();
+	cputag_set_input_line(space->machine(), "dsp0", INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "dsp0", 0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
 
 	state->csr[0] = data;
 }
 
 static READ16_HANDLER( dsp0_bio_r )
 {
-	atarisy4_state *state = space->machine->driver_data<atarisy4_state>();
+	atarisy4_state *state = space->machine().driver_data<atarisy4_state>();
 	return BIT(state->csr[0], 2);
 }
 
 static WRITE16_HANDLER( dsp0_bank_w )
 {
-	atarisy4_state *state = space->machine->driver_data<atarisy4_state>();
+	atarisy4_state *state = space->machine().driver_data<atarisy4_state>();
 	if (data & 0x4000)
 	{
 		/* Set TIDONE bit */
@@ -577,34 +577,34 @@ static WRITE16_HANDLER( dsp0_bank_w )
 	}
 
 	data &= 0x3800;
-	memory_set_bankptr(space->machine, "dsp0_bank1", &state->shared_ram[0][data]);
+	memory_set_bankptr(space->machine(), "dsp0_bank1", &state->shared_ram[0][data]);
 	state->dsp_bank[0] = data;
 }
 
 static READ16_HANDLER( dsp1_status_r )
 {
-	atarisy4_state *state = space->machine->driver_data<atarisy4_state>();
+	atarisy4_state *state = space->machine().driver_data<atarisy4_state>();
 	return state->csr[1];
 }
 
 static WRITE16_HANDLER( dsp1_control_w )
 {
-	atarisy4_state *state = space->machine->driver_data<atarisy4_state>();
-	cputag_set_input_line(space->machine, "dsp1", INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(space->machine, "dsp1", 0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
+	atarisy4_state *state = space->machine().driver_data<atarisy4_state>();
+	cputag_set_input_line(space->machine(), "dsp1", INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "dsp1", 0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
 
 	state->csr[1] = data;
 }
 
 static READ16_HANDLER( dsp1_bio_r )
 {
-	atarisy4_state *state = space->machine->driver_data<atarisy4_state>();
+	atarisy4_state *state = space->machine().driver_data<atarisy4_state>();
 	return BIT(state->csr[1], 2);
 }
 
 static WRITE16_HANDLER( dsp1_bank_w )
 {
-	atarisy4_state *state = space->machine->driver_data<atarisy4_state>();
+	atarisy4_state *state = space->machine().driver_data<atarisy4_state>();
 	if (data & 0x4000)
 	{
 		/* Set TIDONE bit */
@@ -615,7 +615,7 @@ static WRITE16_HANDLER( dsp1_bank_w )
 	}
 
 	data &= 0x3800;
-	memory_set_bankptr(space->machine, "dsp1_bank1", &state->shared_ram[1][data]);
+	memory_set_bankptr(space->machine(), "dsp1_bank1", &state->shared_ram[1][data]);
 	state->dsp_bank[1] = data;
 }
 
@@ -685,7 +685,7 @@ ADDRESS_MAP_END
 
  static READ16_HANDLER( analog_r )
 {
-	return (input_port_read(space->machine, "STICKX") << 8) | input_port_read(space->machine, "STICKY");
+	return (input_port_read(space->machine(), "STICKX") << 8) | input_port_read(space->machine(), "STICKY");
 }
 
 static INPUT_PORTS_START( atarisy4 )
@@ -961,41 +961,41 @@ next_line:
 
 static DRIVER_INIT( laststar )
 {
-	atarisy4_state *state = machine->driver_data<atarisy4_state>();
-	address_space *main = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	atarisy4_state *state = machine.driver_data<atarisy4_state>();
+	address_space *main = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Allocate 16kB of shared RAM */
 	state->shared_ram[0] = auto_alloc_array_clear(machine, UINT16, 0x2000);
 
 	/* Populate the 68000 address space with data from the HEX files */
-	load_hexfile(main, machine->region("code")->base());
-	load_hexfile(main, machine->region("data")->base());
+	load_hexfile(main, machine.region("code")->base());
+	load_hexfile(main, machine.region("data")->base());
 
 	/* Set up the DSP */
 	memory_set_bankptr(machine, "dsp0_bank0", state->shared_ram[0]);
 	memory_set_bankptr(machine, "dsp0_bank1", &state->shared_ram[0][0x800]);
-	load_ldafile(machine->device("dsp0")->memory().space(AS_PROGRAM), machine->region("dsp")->base());
+	load_ldafile(machine.device("dsp0")->memory().space(AS_PROGRAM), machine.region("dsp")->base());
 }
 
 static DRIVER_INIT( airrace )
 {
-	atarisy4_state *state = machine->driver_data<atarisy4_state>();
+	atarisy4_state *state = machine.driver_data<atarisy4_state>();
 	/* Allocate two sets of 32kB shared RAM */
 	state->shared_ram[0] = auto_alloc_array_clear(machine, UINT16, 0x4000);
 	state->shared_ram[1] = auto_alloc_array_clear(machine, UINT16, 0x4000);
 
 	/* Populate RAM with data from the HEX files */
-	load_hexfile(machine->device("maincpu")->memory().space(AS_PROGRAM), machine->region("code")->base());
+	load_hexfile(machine.device("maincpu")->memory().space(AS_PROGRAM), machine.region("code")->base());
 
 	/* Set up the first DSP */
 	memory_set_bankptr(machine, "dsp0_bank0", state->shared_ram[0]);
 	memory_set_bankptr(machine, "dsp0_bank1", &state->shared_ram[0][0x800]);
-	load_ldafile(machine->device("dsp0")->memory().space(AS_PROGRAM), machine->region("dsp")->base());
+	load_ldafile(machine.device("dsp0")->memory().space(AS_PROGRAM), machine.region("dsp")->base());
 
 	/* Set up the second DSP */
 	memory_set_bankptr(machine, "dsp1_bank0", state->shared_ram[1]);
 	memory_set_bankptr(machine, "dsp1_bank1", &state->shared_ram[1][0x800]);
-	load_ldafile(machine->device("dsp1")->memory().space(AS_PROGRAM), machine->region("dsp")->base());
+	load_ldafile(machine.device("dsp1")->memory().space(AS_PROGRAM), machine.region("dsp")->base());
 }
 
 static MACHINE_RESET( atarisy4 )

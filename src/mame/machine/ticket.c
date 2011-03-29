@@ -69,7 +69,7 @@ static TIMER_CALLBACK( ticket_dispenser_toggle )
 READ8_DEVICE_HANDLER( ticket_dispenser_r )
 {
 	ticket_state *state = get_safe_token(device);
-	LOG(("%s: Ticket Status Read = %02X\n", device->machine->describe_context(), state->status));
+	LOG(("%s: Ticket Status Read = %02X\n", device->machine().describe_context(), state->status));
 	return state->status;
 }
 
@@ -90,7 +90,7 @@ WRITE8_DEVICE_HANDLER( ticket_dispenser_w )
 	{
 		if (!state->power)
 		{
-			LOG(("%s: Ticket Power On\n", device->machine->describe_context()));
+			LOG(("%s: Ticket Power On\n", device->machine().describe_context()));
 			state->timer->adjust(attotime::from_msec(state->time_msec));
 			state->power = 1;
 
@@ -101,9 +101,9 @@ WRITE8_DEVICE_HANDLER( ticket_dispenser_w )
 	{
 		if (state->power)
 		{
-			LOG(("%s: Ticket Power Off\n", device->machine->describe_context()));
+			LOG(("%s: Ticket Power Off\n", device->machine().describe_context()));
 			state->timer->adjust(attotime::never);
-			set_led_status(device->machine, 2,0);
+			set_led_status(device->machine(), 2,0);
 			state->power = 0;
 		}
 	}
@@ -133,7 +133,7 @@ static DEVICE_START( ticket )
 	state->ticketdispensed		= config->statushigh ? state->active_bit : 0;
 	state->ticketnotdispensed	= state->ticketdispensed ^ state->active_bit;
 
-	state->timer				= device->machine->scheduler().timer_alloc(FUNC(ticket_dispenser_toggle), (void *)device);
+	state->timer				= device->machine().scheduler().timer_alloc(FUNC(ticket_dispenser_toggle), (void *)device);
 
 	device->save_item(NAME(state->status));
 	device->save_item(NAME(state->power));

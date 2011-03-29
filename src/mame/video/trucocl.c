@@ -46,21 +46,21 @@ PALETTE_INIT( trucocl )
 
 WRITE8_HANDLER( trucocl_videoram_w )
 {
-	trucocl_state *state = space->machine->driver_data<trucocl_state>();
+	trucocl_state *state = space->machine().driver_data<trucocl_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( trucocl_colorram_w )
 {
-	trucocl_state *state = space->machine->driver_data<trucocl_state>();
+	trucocl_state *state = space->machine().driver_data<trucocl_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	trucocl_state *state = machine->driver_data<trucocl_state>();
+	trucocl_state *state = machine.driver_data<trucocl_state>();
 	int gfxsel = state->colorram[tile_index] & 1;
 	int bank = ( ( state->colorram[tile_index] >> 2 ) & 0x07 );
 	int code = state->videoram[tile_index];
@@ -75,13 +75,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( trucocl )
 {
-	trucocl_state *state = machine->driver_data<trucocl_state>();
+	trucocl_state *state = machine.driver_data<trucocl_state>();
 	state->bg_tilemap = tilemap_create( machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32 );
 }
 
 SCREEN_UPDATE( trucocl )
 {
-	trucocl_state *state = screen->machine->driver_data<trucocl_state>();
+	trucocl_state *state = screen->machine().driver_data<trucocl_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }

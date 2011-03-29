@@ -18,7 +18,7 @@
  *
  *************************************/
 
-static void subtract_from_counter(running_machine *machine, int counter, int count);
+static void subtract_from_counter(running_machine &machine, int counter, int count);
 
 static TIMER_CALLBACK( mcr68_493_callback );
 static TIMER_CALLBACK( zwackery_493_callback );
@@ -40,7 +40,7 @@ static TIMER_CALLBACK( counter_fired_callback );
 
 static READ8_DEVICE_HANDLER( zwackery_port_1_r )
 {
-	UINT8 ret = input_port_read(device->machine, "IN1");
+	UINT8 ret = input_port_read(device->machine(), "IN1");
 
 	pia6821_set_port_a_z_mask(device, ret);
 
@@ -50,7 +50,7 @@ static READ8_DEVICE_HANDLER( zwackery_port_1_r )
 
 static READ8_DEVICE_HANDLER( zwackery_port_3_r )
 {
-	UINT8 ret = input_port_read(device->machine, "IN3");
+	UINT8 ret = input_port_read(device->machine(), "IN3");
 
 	pia6821_set_port_a_z_mask(device, ret);
 
@@ -118,14 +118,14 @@ const pia6821_interface zwackery_pia2_intf =
 
 MACHINE_START( mcr68 )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	int i;
 
 	for (i = 0; i < 3; i++)
 	{
 		struct counter_state *m6840 = &state->m6840_state[i];
 
-		m6840->timer = machine->scheduler().timer_alloc(FUNC(counter_fired_callback));
+		m6840->timer = machine.scheduler().timer_alloc(FUNC(counter_fired_callback));
 
 		state_save_register_item(machine, "m6840", NULL, i, m6840->control);
 		state_save_register_item(machine, "m6840", NULL, i, m6840->latch);
@@ -143,9 +143,9 @@ MACHINE_START( mcr68 )
 }
 
 
-static void mcr68_common_init(running_machine *machine)
+static void mcr68_common_init(running_machine &machine)
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	int i;
 
 	/* reset the 6840's */
@@ -169,7 +169,7 @@ static void mcr68_common_init(running_machine *machine)
 	}
 
 	/* initialize the clock */
-	state->m6840_internal_counter_period = attotime::from_hz(machine->device("maincpu")->unscaled_clock() / 10);
+	state->m6840_internal_counter_period = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10);
 
 	/* initialize the sound */
 	mcr_sound_reset(machine);
@@ -178,7 +178,7 @@ static void mcr68_common_init(running_machine *machine)
 
 MACHINE_RESET( mcr68 )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	/* for the most part all MCR/68k games are the same */
 	mcr68_common_init(machine);
 	state->v493_callback = mcr68_493_callback;
@@ -197,7 +197,7 @@ MACHINE_START( zwackery )
 
 MACHINE_RESET( zwackery )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	/* for the most part all MCR/68k games are the same */
 	mcr68_common_init(machine);
 	state->v493_callback = zwackery_493_callback;
@@ -217,17 +217,17 @@ MACHINE_RESET( zwackery )
 
 INTERRUPT_GEN( mcr68_interrupt )
 {
-	mcr68_state *state = device->machine->driver_data<mcr68_state>();
+	mcr68_state *state = device->machine().driver_data<mcr68_state>();
 	/* update the 6840 VBLANK clock */
 	if (!state->m6840_state[0].timer_active)
-		subtract_from_counter(device->machine, 0, 1);
+		subtract_from_counter(device->machine(), 0, 1);
 
 	logerror("--- VBLANK ---\n");
 
 	/* also set a timer to generate the 493 signal at a specific time before the next VBLANK */
 	/* the timing of this is crucial for Blasted and Tri-Sports, which check the timing of */
 	/* VBLANK and 493 using counter 2 */
-	device->machine->scheduler().timer_set(attotime::from_hz(30) - state->timing_factor, FUNC(state->v493_callback));
+	device->machine().scheduler().timer_set(attotime::from_hz(30) - state->timing_factor, FUNC(state->v493_callback));
 }
 
 
@@ -238,9 +238,9 @@ INTERRUPT_GEN( mcr68_interrupt )
  *
  *************************************/
 
-static void update_mcr68_interrupts(running_machine *machine)
+static void update_mcr68_interrupts(running_machine &machine)
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	cputag_set_input_line(machine, "maincpu", state->v493_irq_vector, state->v493_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", state->m6840_irq_vector, state->m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -248,7 +248,7 @@ static void update_mcr68_interrupts(running_machine *machine)
 
 static TIMER_CALLBACK( mcr68_493_off_callback )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	state->v493_irq_state = 0;
 	update_mcr68_interrupts(machine);
 }
@@ -256,10 +256,10 @@ static TIMER_CALLBACK( mcr68_493_off_callback )
 
 static TIMER_CALLBACK( mcr68_493_callback )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	state->v493_irq_state = 1;
 	update_mcr68_interrupts(machine);
-	machine->scheduler().timer_set(machine->primary_screen->scan_period(), FUNC(mcr68_493_off_callback));
+	machine.scheduler().timer_set(machine.primary_screen->scan_period(), FUNC(mcr68_493_off_callback));
 	logerror("--- (INT1) ---\n");
 }
 
@@ -274,7 +274,7 @@ static TIMER_CALLBACK( mcr68_493_callback )
 WRITE8_DEVICE_HANDLER( zwackery_pia0_w )
 {
 	/* bit 7 is the watchdog */
-	if (!(data & 0x80)) watchdog_reset(device->machine);
+	if (!(data & 0x80)) watchdog_reset(device->machine());
 
 	/* bits 5 and 6 control hflip/vflip */
 	/* bits 3 and 4 control coin counters? */
@@ -284,40 +284,40 @@ WRITE8_DEVICE_HANDLER( zwackery_pia0_w )
 
 WRITE8_DEVICE_HANDLER( zwackery_pia1_w )
 {
-	mcr68_state *state = device->machine->driver_data<mcr68_state>();
+	mcr68_state *state = device->machine().driver_data<mcr68_state>();
 	state->zwackery_sound_data = (data >> 4) & 0x0f;
 }
 
 
 WRITE_LINE_DEVICE_HANDLER( zwackery_ca2_w )
 {
-	mcr68_state *drvstate = device->machine->driver_data<mcr68_state>();
-	address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	mcr68_state *drvstate = device->machine().driver_data<mcr68_state>();
+	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	csdeluxe_data_w(space, 0, (state << 4) | drvstate->zwackery_sound_data);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( zwackery_pia_irq )
 {
-	mcr68_state *drvstate = device->machine->driver_data<mcr68_state>();
+	mcr68_state *drvstate = device->machine().driver_data<mcr68_state>();
 	drvstate->v493_irq_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
-	update_mcr68_interrupts(device->machine);
+	update_mcr68_interrupts(device->machine());
 }
 
 
 static TIMER_CALLBACK( zwackery_493_off_callback )
 {
-	device_t *pia = machine->device("pia0");
+	device_t *pia = machine.device("pia0");
 	pia6821_ca1_w(pia, 0);
 }
 
 
 static TIMER_CALLBACK( zwackery_493_callback )
 {
-	device_t *pia = machine->device("pia0");
+	device_t *pia = machine.device("pia0");
 
 	pia6821_ca1_w(pia, 1);
-	machine->scheduler().timer_set(machine->primary_screen->scan_period(), FUNC(zwackery_493_off_callback));
+	machine.scheduler().timer_set(machine.primary_screen->scan_period(), FUNC(zwackery_493_off_callback));
 }
 
 
@@ -328,9 +328,9 @@ static TIMER_CALLBACK( zwackery_493_callback )
  *
  *************************************/
 
-INLINE void update_interrupts(running_machine *machine)
+INLINE void update_interrupts(running_machine &machine)
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	state->m6840_status &= ~0x80;
 
 	if ((state->m6840_status & 0x01) && (state->m6840_state[0].control & 0x40)) state->m6840_status |= 0x80;
@@ -342,9 +342,9 @@ INLINE void update_interrupts(running_machine *machine)
 }
 
 
-static void subtract_from_counter(running_machine *machine, int counter, int count)
+static void subtract_from_counter(running_machine &machine, int counter, int count)
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	struct counter_state *m6840 = &state->m6840_state[counter];
 
 	/* dual-byte mode */
@@ -407,7 +407,7 @@ static void subtract_from_counter(running_machine *machine, int counter, int cou
 
 static TIMER_CALLBACK( counter_fired_callback )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	int count = param >> 2;
 	int counter = param & 3;
 	struct counter_state *m6840 = &state->m6840_state[counter];
@@ -499,7 +499,7 @@ static UINT16 compute_counter(mcr68_state *state, int counter)
 
 static WRITE8_HANDLER( mcr68_6840_w_common )
 {
-	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	int i;
 
 	/* offsets 0 and 1 are control registers */
@@ -532,7 +532,7 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 			}
 
 			state->m6840_status = 0;
-			update_interrupts(space->machine);
+			update_interrupts(space->machine());
 		}
 
 		/* changing the clock source? (needed for Zwackery) */
@@ -558,7 +558,7 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 
 		/* clear the interrupt */
 		state->m6840_status &= ~(1 << counter);
-		update_interrupts(space->machine);
+		update_interrupts(space->machine());
 
 		/* reload the count if in an appropriate mode */
 		if (!(m6840->control & 0x10))
@@ -571,7 +571,7 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 
 static READ16_HANDLER( mcr68_6840_r_common )
 {
-	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	/* offset 0 is a no-op */
 	if (offset == 0)
 		return 0;
@@ -593,7 +593,7 @@ static READ16_HANDLER( mcr68_6840_r_common )
 		/* clear the interrupt if the status has been read */
 		if (state->m6840_status_read_since_int & (1 << counter))
 			state->m6840_status &= ~(1 << counter);
-		update_interrupts(space->machine);
+		update_interrupts(space->machine());
 
 		state->m6840_lsb_buffer = result & 0xff;
 

@@ -181,15 +181,15 @@ static WRITE32_HANDLER( dsp_flags_w );
  *
  *************************************/
 
-void jaguar_dsp_suspend(running_machine *machine)
+void jaguar_dsp_suspend(running_machine &machine)
 {
-	machine->device<cpu_device>("audiocpu")->suspend(SUSPEND_REASON_SPIN, 1);
+	machine.device<cpu_device>("audiocpu")->suspend(SUSPEND_REASON_SPIN, 1);
 }
 
 
-void jaguar_dsp_resume(running_machine *machine)
+void jaguar_dsp_resume(running_machine &machine)
 {
-	machine->device<cpu_device>("audiocpu")->resume(SUSPEND_REASON_SPIN);
+	machine.device<cpu_device>("audiocpu")->resume(SUSPEND_REASON_SPIN);
 }
 
 
@@ -200,7 +200,7 @@ void jaguar_dsp_resume(running_machine *machine)
  *
  *************************************/
 
-static void update_gpu_irq(running_machine *machine)
+static void update_gpu_irq(running_machine &machine)
 {
 	if (gpu_irq_state & dsp_regs[JINTCTRL] & 0x1f)
 	{
@@ -218,7 +218,7 @@ void jaguar_external_int(device_t *device, int state)
 		gpu_irq_state |= 1;
 	else
 		gpu_irq_state &= ~1;
-	update_gpu_irq(device->machine);
+	update_gpu_irq(device->machine());
 }
 
 
@@ -229,7 +229,7 @@ void jaguar_external_int(device_t *device, int state)
  *
  *************************************/
 
-void cojag_sound_init(running_machine *machine)
+void cojag_sound_init(running_machine &machine)
 {
 	int i;
 
@@ -252,17 +252,17 @@ void cojag_sound_init(running_machine *machine)
 		jaguar_wave_rom[0x200 + i] = (int)(32767. * sin(2.0 * M_PI * (double)i / (double)0x80));
 
 		/* F1DA00 = traingle wave with noise */
-		jaguar_wave_rom[0x280 + i] = jaguar_wave_rom[0x000 + i] * (machine->rand() % 32768) / 32768;
+		jaguar_wave_rom[0x280 + i] = jaguar_wave_rom[0x000 + i] * (machine.rand() % 32768) / 32768;
 
 		/* F1DC00 = spike */
 		jaguar_wave_rom[0x300 + i] = (i == 0x40) ? 32767 : 0;
 
 		/* F1DE00 = white noise */
-		jaguar_wave_rom[0x380 + i] = machine->rand() % 32768;
+		jaguar_wave_rom[0x380 + i] = machine.rand() % 32768;
 	}
 
 #if ENABLE_SPEEDUP_HACKS
-	machine->device("audiocpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf1a100, 0xf1a103, FUNC(dsp_flags_w));
+	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf1a100, 0xf1a103, FUNC(dsp_flags_w));
 #endif
 }
 
@@ -299,7 +299,7 @@ WRITE16_HANDLER( jaguar_jerry_regs_w )
 	{
 		case JINTCTRL:
 			gpu_irq_state &= ~(dsp_regs[JINTCTRL] >> 8);
-			update_gpu_irq(space->machine);
+			update_gpu_irq(space->machine());
 			break;
 	}
 
@@ -339,18 +339,18 @@ WRITE32_HANDLER( jaguar_jerry_regs32_w )
 static WRITE32_HANDLER( dsp_flags_w )
 {
 	/* write the data through */
-	jaguardsp_ctrl_w(space->machine->device("audiocpu"), offset, data, mem_mask);
+	jaguardsp_ctrl_w(space->machine().device("audiocpu"), offset, data, mem_mask);
 
 	/* if they were clearing the A2S interrupt, see if we are headed for the spin */
 	/* loop with R22 != 0; if we are, just start spinning again */
-	if (space->cpu == space->machine->device("audiocpu") && ACCESSING_BITS_8_15 && (data & 0x400))
+	if (space->cpu == space->machine().device("audiocpu") && ACCESSING_BITS_8_15 && (data & 0x400))
 	{
 		/* see if we're going back to the spin loop */
 		if (!(data & 0x04000) && cpu_get_reg(space->cpu, JAGUAR_R22) != 0)
 		{
 			UINT32 r30 = cpu_get_reg(space->cpu, JAGUAR_R30) & 0xffffff;
 			if (r30 >= 0xf1b124 && r30 <= 0xf1b126)
-				jaguar_dsp_suspend(space->machine);
+				jaguar_dsp_suspend(space->machine());
 		}
 	}
 }
@@ -370,8 +370,8 @@ static WRITE32_HANDLER( dsp_flags_w )
 TIMER_DEVICE_CALLBACK( jaguar_serial_callback )
 {
 	/* assert the A2S IRQ on CPU #2 (DSP) */
-	cputag_set_input_line(timer.machine, "audiocpu", 1, ASSERT_LINE);
-	jaguar_dsp_resume(timer.machine);
+	cputag_set_input_line(timer.machine(), "audiocpu", 1, ASSERT_LINE);
+	jaguar_dsp_resume(timer.machine());
 
 	/* fix flaky code in interrupt handler which thwarts our speedup */
 	if ((jaguar_dsp_ram[0x3e/4] & 0xffff) == 0xbfbc &&
@@ -389,8 +389,8 @@ TIMER_DEVICE_CALLBACK( jaguar_serial_callback )
 TIMER_DEVICE_CALLBACK( jaguar_serial_callback )
 {
 	/* assert the A2S IRQ on CPU #2 (DSP) */
-	cputag_set_input_line(timer.machine, "audiocpu", 1, ASSERT_LINE);
-	jaguar_dsp_resume(timer.machine);
+	cputag_set_input_line(timer.machine(), "audiocpu", 1, ASSERT_LINE);
+	jaguar_dsp_resume(timer.machine());
 }
 
 #endif
@@ -416,12 +416,12 @@ WRITE32_HANDLER( jaguar_serial_w )
 	{
 		/* right DAC */
 		case 2:
-			dac_signed_data_16_w(space->machine->device("dac2"), (data & 0xffff) ^ 0x8000);
+			dac_signed_data_16_w(space->machine().device("dac2"), (data & 0xffff) ^ 0x8000);
 			break;
 
 		/* left DAC */
 		case 3:
-			dac_signed_data_16_w(space->machine->device("dac1"), (data & 0xffff) ^ 0x8000);
+			dac_signed_data_16_w(space->machine().device("dac1"), (data & 0xffff) ^ 0x8000);
 			break;
 
 		/* frequency register */
@@ -436,7 +436,7 @@ WRITE32_HANDLER( jaguar_serial_w )
 			if ((data & 0x3f) == 0x15)
 			{
 				attotime rate = attotime::from_hz(26000000) * (32 * 2 * (serial_frequency + 1));
-				timer_device *serial_timer = space->machine->device<timer_device>("serial_timer");
+				timer_device *serial_timer = space->machine().device<timer_device>("serial_timer");
 				serial_timer->adjust(rate, 0, rate);
 			}
 			break;

@@ -35,8 +35,8 @@ public:
 	timer_device *irq_timer_clear;
 	int turns;
 	UINT16 *system24temp_sys16_shared_ram;
-	UINT8  (*system24temp_sys16_io_io_r)(running_machine *machine, int port);
-	void   (*system24temp_sys16_io_io_w)(running_machine *machine, int port, UINT8 data);
+	UINT8  (*system24temp_sys16_io_io_r)(running_machine &machine, int port);
+	void   (*system24temp_sys16_io_io_w)(running_machine &machine, int port, UINT8 data);
 	void   (*system24temp_sys16_io_cnt_w)(address_space *space, UINT8 data);
 	read16_space_func system24temp_sys16_io_iod_r;
 	write16_space_func system24temp_sys16_io_iod_w;
@@ -55,9 +55,9 @@ public:
 /* New Code */
 
 void system24temp_sys16_io_set_callbacks(
-	running_machine *machine,
-	UINT8 (*io_r)(running_machine *machine, int port),
-	void  (*io_w)(running_machine *machine, int port, UINT8 data),
+	running_machine &machine,
+	UINT8 (*io_r)(running_machine &machine, int port),
+	void  (*io_w)(running_machine &machine, int port, UINT8 data),
 	void  (*cnt_w)(address_space *space, UINT8 data),
 	read16_space_func iod_r,
 	write16_space_func iod_w);
@@ -71,8 +71,8 @@ READ32_HANDLER ( system24temp_sys16_io_dword_r );
 
 /*----------- defined in machine/s24fd.c -----------*/
 
-extern void s24_fd1094_machine_init(running_machine *machine);
-extern void s24_fd1094_driver_init(running_machine *machine);
+extern void s24_fd1094_machine_init(running_machine &machine);
+extern void s24_fd1094_driver_init(running_machine &machine);
 
 
 /*----------- defined in video/segas24.c -----------*/

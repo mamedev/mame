@@ -377,7 +377,7 @@ ROM_END
 /***************************************************************************/
 static DRIVER_INIT( sdgndmps )
 {
-	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
 	RAM[0x1356/2] = 0x4e71; /* beq -> nop */
 	RAM[0x1358/2] = 0x4e71;
 

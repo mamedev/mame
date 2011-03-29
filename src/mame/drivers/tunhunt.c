@@ -72,12 +72,12 @@ static WRITE8_HANDLER( tunhunt_control_w )
         0x40    start LED
         0x80    in-game
     */
-	tunhunt_state *state = space->machine->driver_data<tunhunt_state>();
+	tunhunt_state *state = space->machine().driver_data<tunhunt_state>();
 
 	state->control = data;
-	coin_counter_w( space->machine, 0,data&0x01 );
-	coin_counter_w( space->machine, 1,data&0x02 );
-	set_led_status( space->machine, 0, data&0x40 ); /* start */
+	coin_counter_w( space->machine(), 0,data&0x01 );
+	coin_counter_w( space->machine(), 1,data&0x02 );
+	set_led_status( space->machine(), 0, data&0x40 ); /* start */
 }
 
 
@@ -90,38 +90,38 @@ static WRITE8_HANDLER( tunhunt_control_w )
 
 static READ8_HANDLER( tunhunt_button_r )
 {
-	int data = input_port_read(space->machine, "IN0");
+	int data = input_port_read(space->machine(), "IN0");
 	return ((data>>offset)&1)?0x00:0x80;
 }
 
 
 static READ8_DEVICE_HANDLER( dsw2_0r )
 {
-	return (input_port_read(device->machine, "DSW")&0x0100)?0x80:0x00;
+	return (input_port_read(device->machine(), "DSW")&0x0100)?0x80:0x00;
 }
 
 
 static READ8_DEVICE_HANDLER( dsw2_1r )
 {
-	return (input_port_read(device->machine, "DSW")&0x0200)?0x80:0x00;
+	return (input_port_read(device->machine(), "DSW")&0x0200)?0x80:0x00;
 }
 
 
 static READ8_DEVICE_HANDLER( dsw2_2r )
 {
-	return (input_port_read(device->machine, "DSW")&0x0400)?0x80:0x00;
+	return (input_port_read(device->machine(), "DSW")&0x0400)?0x80:0x00;
 }
 
 
 static READ8_DEVICE_HANDLER( dsw2_3r )
 {
-	return (input_port_read(device->machine, "DSW")&0x0800)?0x80:0x00;
+	return (input_port_read(device->machine(), "DSW")&0x0800)?0x80:0x00;
 }
 
 
 static READ8_DEVICE_HANDLER( dsw2_4r )
 {
-	return (input_port_read(device->machine, "DSW")&0x1000)?0x80:0x00;
+	return (input_port_read(device->machine(), "DSW")&0x1000)?0x80:0x00;
 }
 
 

@@ -40,5 +40,5 @@ public:
 SCREEN_UPDATE( asterix );
 WRITE16_HANDLER( asterix_spritebank_w );
 
-extern void asterix_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
-extern void asterix_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
+extern void asterix_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
+extern void asterix_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);

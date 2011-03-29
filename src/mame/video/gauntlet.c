@@ -18,7 +18,7 @@
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	gauntlet_state *state = machine->driver_data<gauntlet_state>();
+	gauntlet_state *state = machine.driver_data<gauntlet_state>();
 	UINT16 data = state->alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	gauntlet_state *state = machine->driver_data<gauntlet_state>();
+	gauntlet_state *state = machine.driver_data<gauntlet_state>();
 	UINT16 data = state->playfield[tile_index];
 	int code = ((state->playfield_tile_bank * 0x1000) + (data & 0xfff)) ^ 0x800;
 	int color = 0x10 + (state->playfield_color_bank * 8) + ((data >> 12) & 7);
@@ -83,7 +83,7 @@ VIDEO_START( gauntlet )
 		0					/* callback routine for special entries */
 	};
 
-	gauntlet_state *state = machine->driver_data<gauntlet_state>();
+	gauntlet_state *state = machine.driver_data<gauntlet_state>();
 	UINT16 *codelookup;
 	int i, size;
 
@@ -120,14 +120,14 @@ VIDEO_START( gauntlet )
 
 WRITE16_HANDLER( gauntlet_xscroll_w )
 {
-	gauntlet_state *state = space->machine->driver_data<gauntlet_state>();
+	gauntlet_state *state = space->machine().driver_data<gauntlet_state>();
 	UINT16 oldxscroll = *state->xscroll;
 	COMBINE_DATA(state->xscroll);
 
 	/* if something changed, force a partial update */
 	if (*state->xscroll != oldxscroll)
 	{
-		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 
 		/* adjust the scrolls */
 		tilemap_set_scrollx(state->playfield_tilemap, 0, *state->xscroll);
@@ -145,14 +145,14 @@ WRITE16_HANDLER( gauntlet_xscroll_w )
 
 WRITE16_HANDLER( gauntlet_yscroll_w )
 {
-	gauntlet_state *state = space->machine->driver_data<gauntlet_state>();
+	gauntlet_state *state = space->machine().driver_data<gauntlet_state>();
 	UINT16 oldyscroll = *state->yscroll;
 	COMBINE_DATA(state->yscroll);
 
 	/* if something changed, force a partial update */
 	if (*state->yscroll != oldyscroll)
 	{
-		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 
 		/* if the bank changed, mark all tiles dirty */
 		if (state->playfield_tile_bank != (*state->yscroll & 3))
@@ -177,7 +177,7 @@ WRITE16_HANDLER( gauntlet_yscroll_w )
 
 SCREEN_UPDATE( gauntlet )
 {
-	gauntlet_state *state = screen->machine->driver_data<gauntlet_state>();
+	gauntlet_state *state = screen->machine().driver_data<gauntlet_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

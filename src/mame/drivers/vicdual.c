@@ -69,21 +69,21 @@
 
 static TIMER_CALLBACK( clear_coin_status )
 {
-	vicdual_state *state = machine->driver_data<vicdual_state>();
+	vicdual_state *state = machine.driver_data<vicdual_state>();
 	state->coin_status = 0;
 }
 
 
-static void assert_coin_status(running_machine *machine)
+static void assert_coin_status(running_machine &machine)
 {
-	vicdual_state *state = machine->driver_data<vicdual_state>();
+	vicdual_state *state = machine.driver_data<vicdual_state>();
 	state->coin_status = 1;
 }
 
 
 static CUSTOM_INPUT( vicdual_read_coin_status )
 {
-	vicdual_state *state = field->port->machine->driver_data<vicdual_state>();
+	vicdual_state *state = field->port->machine().driver_data<vicdual_state>();
 	return state->coin_status;
 }
 
@@ -93,13 +93,13 @@ static INPUT_CHANGED( coin_changed )
 	if (newval && !oldval)
 	{
 		/* increment the coin counter */
-		coin_counter_w(field->port->machine, 0, 1);
-		coin_counter_w(field->port->machine, 0, 0);
+		coin_counter_w(field->port->machine(), 0, 1);
+		coin_counter_w(field->port->machine(), 0, 0);
 
-		cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
-		field->port->machine->scheduler().timer_set(4 * field->port->machine->primary_screen->frame_period(), FUNC(clear_coin_status));
+		field->port->machine().scheduler().timer_set(4 * field->port->machine().primary_screen->frame_period(), FUNC(clear_coin_status));
 	}
 }
 
@@ -122,13 +122,13 @@ static INPUT_CHANGED( coin_changed )
  *
  *************************************/
 
-static int get_vcounter(running_machine *machine)
+static int get_vcounter(running_machine &machine)
 {
-	int vcounter = machine->primary_screen->vpos();
+	int vcounter = machine.primary_screen->vpos();
 
 	/* the vertical synch counter gets incremented at the end of HSYNC,
        compensate for this */
-	if (machine->primary_screen->hpos() >= VICDUAL_HSEND)
+	if (machine.primary_screen->hpos() >= VICDUAL_HSEND)
 		vcounter = (vcounter + 1) % VICDUAL_VTOTAL;
 
 	return vcounter;
@@ -137,26 +137,26 @@ static int get_vcounter(running_machine *machine)
 
 static CUSTOM_INPUT( vicdual_get_64v )
 {
-	return (get_vcounter(field->port->machine) >> 6) & 0x01;
+	return (get_vcounter(field->port->machine()) >> 6) & 0x01;
 }
 
 
 static CUSTOM_INPUT( vicdual_get_vblank_comp )
 {
-	return (get_vcounter(field->port->machine) < VICDUAL_VBSTART);
+	return (get_vcounter(field->port->machine()) < VICDUAL_VBSTART);
 }
 
 
 static CUSTOM_INPUT( vicdual_get_composite_blank_comp )
 {
-	return (vicdual_get_vblank_comp(field, 0) && !field->port->machine->primary_screen->hblank());
+	return (vicdual_get_vblank_comp(field, 0) && !field->port->machine().primary_screen->hblank());
 }
 
 
 static CUSTOM_INPUT( vicdual_get_timer_value )
 {
 	/* return the state of the timer (old code claims "4MHz square wave", but it was toggled once every 2msec, or 500Hz) */
-	return field->port->machine->time().as_ticks(500) & 1;
+	return field->port->machine().time().as_ticks(500) & 1;
 }
 
 
@@ -169,7 +169,7 @@ static CUSTOM_INPUT( vicdual_get_timer_value )
 #define COLOR_BW_PORT_TAG		"COLOR_BW"
 
 
-int vicdual_is_cabinet_color(running_machine *machine)
+int vicdual_is_cabinet_color(running_machine &machine)
 {
 	return (input_port_read(machine, COLOR_BW_PORT_TAG) == 0);
 }
@@ -193,16 +193,16 @@ int vicdual_is_cabinet_color(running_machine *machine)
 
 static WRITE8_HANDLER( vicdual_videoram_w )
 {
-	vicdual_state *state = space->machine->driver_data<vicdual_state>();
-	space->machine->primary_screen->update_now();
+	vicdual_state *state = space->machine().driver_data<vicdual_state>();
+	space->machine().primary_screen->update_now();
 	state->videoram[offset] = data;
 }
 
 
 static WRITE8_HANDLER( vicdual_characterram_w )
 {
-	vicdual_state *state = space->machine->driver_data<vicdual_state>();
-	space->machine->primary_screen->update_now();
+	vicdual_state *state = space->machine().driver_data<vicdual_state>();
+	space->machine().primary_screen->update_now();
 	state->characterram[offset] = data;
 }
 
@@ -237,8 +237,8 @@ static READ8_HANDLER( depthch_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(space->machine, "IN0");
-	if (offset & 0x08)  ret = input_port_read(space->machine, "IN1");
+	if (offset & 0x01)  ret = input_port_read(space->machine(), "IN0");
+	if (offset & 0x08)  ret = input_port_read(space->machine(), "IN1");
 
 	return ret;
 }
@@ -246,7 +246,7 @@ static READ8_HANDLER( depthch_io_r )
 
 static WRITE8_HANDLER( depthch_io_w )
 {
-	if (offset & 0x01)  assert_coin_status(space->machine);
+	if (offset & 0x01)  assert_coin_status(space->machine());
 	if (offset & 0x04)  depthch_audio_w(space, 0, data);
 }
 
@@ -319,8 +319,8 @@ static READ8_HANDLER( safari_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(space->machine, "IN0");
-	if (offset & 0x08)  ret = input_port_read(space->machine, "IN1");
+	if (offset & 0x01)  ret = input_port_read(space->machine(), "IN0");
+	if (offset & 0x08)  ret = input_port_read(space->machine(), "IN1");
 
 	return ret;
 }
@@ -328,7 +328,7 @@ static READ8_HANDLER( safari_io_r )
 
 static WRITE8_HANDLER( safari_io_w )
 {
-	if (offset & 0x01)  assert_coin_status(space->machine);
+	if (offset & 0x01)  assert_coin_status(space->machine());
 	if (offset & 0x02) { /* safari_audio_w(0, data) */ }
 }
 
@@ -403,8 +403,8 @@ static READ8_HANDLER( frogs_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(space->machine, "IN0");
-	if (offset & 0x08)  ret = input_port_read(space->machine, "IN1");
+	if (offset & 0x01)  ret = input_port_read(space->machine(), "IN0");
+	if (offset & 0x08)  ret = input_port_read(space->machine(), "IN1");
 
 	return ret;
 }
@@ -412,7 +412,7 @@ static READ8_HANDLER( frogs_io_r )
 
 static WRITE8_HANDLER( frogs_io_w )
 {
-	if (offset & 0x01)  assert_coin_status(space->machine);
+	if (offset & 0x01)  assert_coin_status(space->machine());
 	if (offset & 0x02)  frogs_audio_w(space, 0, data);
 }
 
@@ -511,8 +511,8 @@ static READ8_HANDLER( headon_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(space->machine, "IN0");
-	if (offset & 0x08)  ret = input_port_read(space->machine, "IN1");
+	if (offset & 0x01)  ret = input_port_read(space->machine(), "IN0");
+	if (offset & 0x08)  ret = input_port_read(space->machine(), "IN1");
 
 	return ret;
 }
@@ -522,9 +522,9 @@ static READ8_HANDLER( sspaceat_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(space->machine, "IN0");
-	if (offset & 0x04)  ret = input_port_read(space->machine, "IN1");
-	if (offset & 0x08)  ret = input_port_read(space->machine, "IN2");
+	if (offset & 0x01)  ret = input_port_read(space->machine(), "IN0");
+	if (offset & 0x04)  ret = input_port_read(space->machine(), "IN1");
+	if (offset & 0x08)  ret = input_port_read(space->machine(), "IN2");
 
 	return ret;
 }
@@ -532,7 +532,7 @@ static READ8_HANDLER( sspaceat_io_r )
 
 static WRITE8_HANDLER( headon_io_w )
 {
-	if (offset & 0x01)  assert_coin_status(space->machine);
+	if (offset & 0x01)  assert_coin_status(space->machine());
 	if (offset & 0x02)  headon_audio_w(space, 0, data);
 	if (offset & 0x04) { /* vicdual_palette_bank_w(0, data)  */ }	 /* not written to */
 }
@@ -721,10 +721,10 @@ static READ8_HANDLER( headon2_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(space->machine, "IN0");
+	if (offset & 0x01)  ret = input_port_read(space->machine(), "IN0");
 	if (offset & 0x02)  /* schematics show this as in input port, but never read from */
-	if (offset & 0x04)  ret = input_port_read(space->machine, "IN1");
-	if (offset & 0x08)  ret = input_port_read(space->machine, "IN2");
+	if (offset & 0x04)  ret = input_port_read(space->machine(), "IN1");
+	if (offset & 0x08)  ret = input_port_read(space->machine(), "IN2");
 	if (offset & 0x12)  logerror("********* Read from port %x\n", offset);
 
 	return ret;
@@ -733,7 +733,7 @@ static READ8_HANDLER( headon2_io_r )
 
 static WRITE8_HANDLER( headon2_io_w )
 {
-	if (offset & 0x01)  assert_coin_status(space->machine);
+	if (offset & 0x01)  assert_coin_status(space->machine());
 	if (offset & 0x02)  headon_audio_w(space, 0, data);
 	if (offset & 0x04)  vicdual_palette_bank_w(space, 0, data);
     if (offset & 0x08) { /* schematics show this as going into a shifer circuit, but never written to */ }
@@ -744,7 +744,7 @@ static WRITE8_HANDLER( headon2_io_w )
 
 static WRITE8_HANDLER( digger_io_w )
 {
-	if (offset & 0x01)  assert_coin_status(space->machine);
+	if (offset & 0x01)  assert_coin_status(space->machine());
 	if (offset & 0x02) { /* digger_audio_1_w(0, data) */ }
 	if (offset & 0x04)
 	{
@@ -949,7 +949,7 @@ static WRITE8_HANDLER( invho2_io_w )
 {
 	if (offset & 0x01)  invho2_audio_w(space, 0, data);
 	if (offset & 0x02)  invinco_audio_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status(space->machine);
+	if (offset & 0x08)  assert_coin_status(space->machine());
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -958,7 +958,7 @@ static WRITE8_HANDLER( invds_io_w )
 {
 	if (offset & 0x01)  invinco_audio_w(space, 0, data);
 	if (offset & 0x02) { /* deepscan_audio_w(0, data) */ }
-	if (offset & 0x08)  assert_coin_status(space->machine);
+	if (offset & 0x08)  assert_coin_status(space->machine());
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -967,7 +967,7 @@ static WRITE8_HANDLER( sspacaho_io_w )
 {
 	if (offset & 0x01)  invho2_audio_w(space, 0, data);
 	if (offset & 0x02) { /* sspaceatt_audio_w(space, 0, data) */ }
-	if (offset & 0x08)  assert_coin_status(space->machine);
+	if (offset & 0x08)  assert_coin_status(space->machine());
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -976,7 +976,7 @@ static WRITE8_HANDLER( tranqgun_io_w )
 {
 	if (offset & 0x01) { /* tranqgun_audio_w(space, 0, data) */ }
 	if (offset & 0x02)  vicdual_palette_bank_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status(space->machine);
+	if (offset & 0x08)  assert_coin_status(space->machine());
 }
 
 
@@ -984,7 +984,7 @@ static WRITE8_HANDLER( spacetrk_io_w )
 {
 	if (offset & 0x01) { /* spacetrk_audio_w(space, 0, data) */ }
 	if (offset & 0x02) { /* spacetrk_audio_w(space, 0, data) */ }
-	if (offset & 0x08)  assert_coin_status(space->machine);
+	if (offset & 0x08)  assert_coin_status(space->machine());
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -993,7 +993,7 @@ static WRITE8_HANDLER( carnival_io_w )
 {
 	if (offset & 0x01)  carnival_audio_1_w(space, 0, data);
 	if (offset & 0x02)  carnival_audio_2_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status(space->machine);
+	if (offset & 0x08)  assert_coin_status(space->machine());
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -1002,7 +1002,7 @@ static WRITE8_HANDLER( brdrline_io_w )
 {
 	if (offset & 0x01) { /* brdrline_audio_w(space, 0, data) */ }
 	if (offset & 0x02)  vicdual_palette_bank_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status(space->machine);
+	if (offset & 0x08)  assert_coin_status(space->machine());
 }
 
 
@@ -1010,7 +1010,7 @@ static WRITE8_HANDLER( pulsar_io_w )
 {
 	if (offset & 0x01)  pulsar_audio_1_w(space, 0, data);
 	if (offset & 0x02)  pulsar_audio_2_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status(space->machine);
+	if (offset & 0x08)  assert_coin_status(space->machine());
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -1025,7 +1025,7 @@ static WRITE8_HANDLER( heiankyo_io_w )
 		/* heiankyo_audio_2_w(0, data & 0x3f); */
 	}
 
-	if (offset & 0x08)  assert_coin_status(space->machine);
+	if (offset & 0x08)  assert_coin_status(space->machine());
 }
 
 
@@ -1033,7 +1033,7 @@ static WRITE8_HANDLER( alphaho_io_w )
 {
 	if (offset & 0x01) { /* headon_audio_w(0, data) */ }
 	if (offset & 0x02) { /* alphaf_audio_w(0, data) */ }
-	if (offset & 0x08)  assert_coin_status(space->machine);
+	if (offset & 0x08)  assert_coin_status(space->machine());
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -1632,7 +1632,7 @@ INPUT_PORTS_END
 static CUSTOM_INPUT( brdrline_lives )
 {
 	int bit_mask = (FPTR)param;
-	return (input_port_read(field->port->machine, "FAKE_LIVES") & bit_mask) ? 0x00 : 0x01;
+	return (input_port_read(field->port->machine(), "FAKE_LIVES") & bit_mask) ? 0x00 : 0x01;
 }
 
 static INPUT_PORTS_START( brdrline )
@@ -2046,14 +2046,14 @@ MACHINE_CONFIG_END
 
 static WRITE8_HANDLER( samurai_protection_w )
 {
-	vicdual_state *state = space->machine->driver_data<vicdual_state>();
+	vicdual_state *state = space->machine().driver_data<vicdual_state>();
 	state->samurai_protection_data = data;
 }
 
 
 static CUSTOM_INPUT( samurai_protection_r )
 {
-	vicdual_state *state = field->port->machine->driver_data<vicdual_state>();
+	vicdual_state *state = field->port->machine().driver_data<vicdual_state>();
 	int offset = (FPTR)param;
 	UINT32 answer = 0;
 
@@ -2069,7 +2069,7 @@ static CUSTOM_INPUT( samurai_protection_r )
 static WRITE8_HANDLER( samurai_io_w )
 {
 	if (offset & 0x02) { /* samurai_audio_w(0, data) */ }
-	if (offset & 0x08)  assert_coin_status(space->machine);
+	if (offset & 0x08)  assert_coin_status(space->machine());
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -2173,8 +2173,8 @@ static READ8_HANDLER( nsub_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(space->machine, "IN0");
-	if (offset & 0x08)  ret = input_port_read(space->machine, "IN1");
+	if (offset & 0x01)  ret = input_port_read(space->machine(), "IN0");
+	if (offset & 0x08)  ret = input_port_read(space->machine(), "IN1");
 
 	return ret;
 }
@@ -2182,7 +2182,7 @@ static READ8_HANDLER( nsub_io_r )
 
 static WRITE8_HANDLER( nsub_io_w )
 {
-	if (offset & 0x01)  assert_coin_status(space->machine);
+	if (offset & 0x01)  assert_coin_status(space->machine());
 	if (offset & 0x02) { /* nsub_audio_w(0, data) */ }
 	if (offset & 0x04)  vicdual_palette_bank_w(space, 0, data);
 }
@@ -2268,9 +2268,9 @@ static READ8_HANDLER( invinco_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(space->machine, "IN0");
-	if (offset & 0x02)  ret = input_port_read(space->machine, "IN1");
-	if (offset & 0x08)  ret = input_port_read(space->machine, "IN2");
+	if (offset & 0x01)  ret = input_port_read(space->machine(), "IN0");
+	if (offset & 0x02)  ret = input_port_read(space->machine(), "IN1");
+	if (offset & 0x08)  ret = input_port_read(space->machine(), "IN2");
 
 	return ret;
 }
@@ -2278,7 +2278,7 @@ static READ8_HANDLER( invinco_io_r )
 
 static WRITE8_HANDLER( invinco_io_w )
 {
-	if (offset & 0x01)  assert_coin_status(space->machine);
+	if (offset & 0x01)  assert_coin_status(space->machine());
 	if (offset & 0x02)  invinco_audio_w(space, 0, data);
 	if (offset & 0x04)  vicdual_palette_bank_w(space, 0, data);
 }

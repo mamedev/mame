@@ -99,7 +99,7 @@ extern const char build_version[];
 int mame_execute(emu_options &options, osd_interface &osd);
 
 /* return true if the given machine is valid */
-int mame_is_valid_machine(running_machine *machine);
+int mame_is_valid_machine(running_machine &machine);
 
 
 

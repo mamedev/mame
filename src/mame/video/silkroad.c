@@ -7,10 +7,10 @@
 /* Clean Up */
 /* is theres a bg colour register? */
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	silkroad_state *state = machine->driver_data<silkroad_state>();
-	const gfx_element *gfx = machine->gfx[0];
+	silkroad_state *state = machine.driver_data<silkroad_state>();
+	const gfx_element *gfx = machine.gfx[0];
 	UINT32 *source = state->sprram;
 	UINT32 *finish = source + 0x1000/4;
 
@@ -38,7 +38,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			for (wcount=0;wcount<width;wcount++)
 			{
-				pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+wcount,color,0,0,xpos+wcount*16+8,ypos,machine->priority_bitmap,pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+wcount,color,0,0,xpos+wcount*16+8,ypos,machine.priority_bitmap,pri_mask,0);
 			}
 		}
 		else
@@ -46,7 +46,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			for (wcount=width;wcount>0;wcount--)
 			{
-				pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+(width-wcount),color,1,0,xpos+wcount*16-16+8,ypos,machine->priority_bitmap,pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+(width-wcount),color,1,0,xpos+wcount*16-16+8,ypos,machine.priority_bitmap,pri_mask,0);
 			}
 		}
 
@@ -57,7 +57,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	silkroad_state *state = machine->driver_data<silkroad_state>();
+	silkroad_state *state = machine.driver_data<silkroad_state>();
 	int code = ((state->vidram[tile_index] & 0xffff0000) >> 16 );
 	int color = ((state->vidram[tile_index] & 0x000001f));
 	int flipx =  ((state->vidram[tile_index] & 0x0000080) >> 7);
@@ -75,7 +75,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 WRITE32_HANDLER( silkroad_fgram_w )
 {
-	silkroad_state *state = space->machine->driver_data<silkroad_state>();
+	silkroad_state *state = space->machine().driver_data<silkroad_state>();
 
 	COMBINE_DATA(&state->vidram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
@@ -83,7 +83,7 @@ WRITE32_HANDLER( silkroad_fgram_w )
 
 static TILE_GET_INFO( get_fg2_tile_info )
 {
-	silkroad_state *state = machine->driver_data<silkroad_state>();
+	silkroad_state *state = machine.driver_data<silkroad_state>();
 	int code = ((state->vidram2[tile_index] & 0xffff0000) >> 16 );
 	int color = ((state->vidram2[tile_index] & 0x000001f));
 	int flipx =  ((state->vidram2[tile_index] & 0x0000080) >> 7);
@@ -99,7 +99,7 @@ static TILE_GET_INFO( get_fg2_tile_info )
 
 WRITE32_HANDLER( silkroad_fgram2_w )
 {
-	silkroad_state *state = space->machine->driver_data<silkroad_state>();
+	silkroad_state *state = space->machine().driver_data<silkroad_state>();
 
 	COMBINE_DATA(&state->vidram2[offset]);
 	tilemap_mark_tile_dirty(state->fg2_tilemap,offset);
@@ -107,7 +107,7 @@ WRITE32_HANDLER( silkroad_fgram2_w )
 
 static TILE_GET_INFO( get_fg3_tile_info )
 {
-	silkroad_state *state = machine->driver_data<silkroad_state>();
+	silkroad_state *state = machine.driver_data<silkroad_state>();
 	int code = ((state->vidram3[tile_index] & 0xffff0000) >> 16 );
 	int color = ((state->vidram3[tile_index] & 0x000001f));
 	int flipx =  ((state->vidram3[tile_index] & 0x0000080) >> 7);
@@ -123,7 +123,7 @@ static TILE_GET_INFO( get_fg3_tile_info )
 
 WRITE32_HANDLER( silkroad_fgram3_w )
 {
-	silkroad_state *state = space->machine->driver_data<silkroad_state>();
+	silkroad_state *state = space->machine().driver_data<silkroad_state>();
 
 	COMBINE_DATA(&state->vidram3[offset]);
 	tilemap_mark_tile_dirty(state->fg3_tilemap,offset);
@@ -131,7 +131,7 @@ WRITE32_HANDLER( silkroad_fgram3_w )
 
 VIDEO_START(silkroad)
 {
-	silkroad_state *state = machine->driver_data<silkroad_state>();
+	silkroad_state *state = machine.driver_data<silkroad_state>();
 	state->fg_tilemap  = tilemap_create(machine, get_fg_tile_info,  tilemap_scan_rows, 16, 16, 64, 64);
 	state->fg2_tilemap = tilemap_create(machine, get_fg2_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->fg3_tilemap = tilemap_create(machine, get_fg3_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
@@ -143,8 +143,8 @@ VIDEO_START(silkroad)
 
 SCREEN_UPDATE(silkroad)
 {
-	silkroad_state *state = screen->machine->driver_data<silkroad_state>();
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	silkroad_state *state = screen->machine().driver_data<silkroad_state>();
+	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0x7c0);
 
 	tilemap_set_scrollx( state->fg_tilemap, 0, ((state->regs[0] & 0xffff0000) >> 16) );
@@ -159,7 +159,7 @@ SCREEN_UPDATE(silkroad)
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap, 0,0);
 	tilemap_draw(bitmap,cliprect,state->fg2_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,state->fg3_tilemap,0,2);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	draw_sprites(screen->machine(),bitmap,cliprect);
 
 	if (0)
 	{

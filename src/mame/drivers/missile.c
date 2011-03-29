@@ -415,9 +415,9 @@ INLINE int v_to_scanline(missile_state *state, int v)
 }
 
 
-INLINE void schedule_next_irq(running_machine *machine, int curv)
+INLINE void schedule_next_irq(running_machine &machine, int curv)
 {
-	missile_state *state = machine->driver_data<missile_state>();
+	missile_state *state = machine.driver_data<missile_state>();
 	/* IRQ = /32V, clocked by /16V ^ flip */
 	/* When not flipped, clocks on 0, 64, 128, 192 */
 	/* When flipped, clocks on 16, 80, 144, 208 */
@@ -427,13 +427,13 @@ INLINE void schedule_next_irq(running_machine *machine, int curv)
 		curv = ((curv + 32) & 0xff) & ~0x10;
 
 	/* next one at the start of this scanline */
-	state->irq_timer->adjust(machine->primary_screen->time_until_pos(v_to_scanline(state, curv)), curv);
+	state->irq_timer->adjust(machine.primary_screen->time_until_pos(v_to_scanline(state, curv)), curv);
 }
 
 
 static TIMER_CALLBACK( clock_irq )
 {
-	missile_state *state = machine->driver_data<missile_state>();
+	missile_state *state = machine.driver_data<missile_state>();
 	int curv = param;
 
 	/* assert the IRQ if not already asserted */
@@ -441,7 +441,7 @@ static TIMER_CALLBACK( clock_irq )
 	cputag_set_input_line(machine, "maincpu", 0, state->irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* force an update while we're here */
-	machine->primary_screen->update_partial(v_to_scanline(state, curv));
+	machine.primary_screen->update_partial(v_to_scanline(state, curv));
 
 	/* find the next edge */
 	schedule_next_irq(machine, curv);
@@ -450,8 +450,8 @@ static TIMER_CALLBACK( clock_irq )
 
 static CUSTOM_INPUT( get_vblank )
 {
-	missile_state *state = field->port->machine->driver_data<missile_state>();
-	int v = scanline_to_v(state, field->port->machine->primary_screen->vpos());
+	missile_state *state = field->port->machine().driver_data<missile_state>();
+	int v = scanline_to_v(state, field->port->machine().primary_screen->vpos());
 	return v < 24;
 }
 
@@ -465,18 +465,18 @@ static CUSTOM_INPUT( get_vblank )
 
 static TIMER_CALLBACK( adjust_cpu_speed )
 {
-	missile_state *state = machine->driver_data<missile_state>();
+	missile_state *state = machine.driver_data<missile_state>();
 	int curv = param;
 
 	/* starting at scanline 224, the CPU runs at half speed */
 	if (curv == 224)
-		machine->device("maincpu")->set_unscaled_clock(MASTER_CLOCK/16);
+		machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK/16);
 	else
-		machine->device("maincpu")->set_unscaled_clock(MASTER_CLOCK/8);
+		machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK/8);
 
 	/* scanline for the next run */
 	curv ^= 224;
-	state->cpu_timer->adjust(machine->primary_screen->time_until_pos(v_to_scanline(state, curv)), curv);
+	state->cpu_timer->adjust(machine.primary_screen->time_until_pos(v_to_scanline(state, curv)), curv);
 }
 
 
@@ -489,7 +489,7 @@ DIRECT_UPDATE_HANDLER( missile_direct_handler )
 	/* RAM? */
 	if (address < 0x4000)
 	{
-		missile_state *state = direct.space().m_machine.driver_data<missile_state>();
+		missile_state *state = direct.space().machine().driver_data<missile_state>();
 		direct.explicit_configure(0x0000 | offset, 0x3fff | offset, 0x3fff, state->videoram);
 		return ~0;
 	}
@@ -497,7 +497,7 @@ DIRECT_UPDATE_HANDLER( missile_direct_handler )
 	/* ROM? */
 	else if (address >= 0x5000)
 	{
-		direct.explicit_configure(0x5000 | offset, 0x7fff | offset, 0x7fff, direct.space().m_machine.region("maincpu")->base() + 0x5000);
+		direct.explicit_configure(0x5000 | offset, 0x7fff | offset, 0x7fff, direct.space().machine().region("maincpu")->base() + 0x5000);
 		return ~0;
 	}
 
@@ -508,21 +508,21 @@ DIRECT_UPDATE_HANDLER( missile_direct_handler )
 
 static MACHINE_START( missile )
 {
-	missile_state *state = machine->driver_data<missile_state>();
+	missile_state *state = machine.driver_data<missile_state>();
 	/* initialize globals */
-	state->writeprom = machine->region("proms")->base();
+	state->writeprom = machine.region("proms")->base();
 	state->flipscreen = 0;
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
-	address_space *space = machine->device<m6502_device>("maincpu")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate_create_static(missile_direct_handler, *machine));
+	address_space *space = machine.device<m6502_device>("maincpu")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate_create_static(missile_direct_handler, machine));
 
 	/* create a timer to speed/slow the CPU */
-	state->cpu_timer = machine->scheduler().timer_alloc(FUNC(adjust_cpu_speed));
-	state->cpu_timer->adjust(machine->primary_screen->time_until_pos(v_to_scanline(state, 0), 0));
+	state->cpu_timer = machine.scheduler().timer_alloc(FUNC(adjust_cpu_speed));
+	state->cpu_timer->adjust(machine.primary_screen->time_until_pos(v_to_scanline(state, 0), 0));
 
 	/* create a timer for IRQs and set up the first callback */
-	state->irq_timer = machine->scheduler().timer_alloc(FUNC(clock_irq));
+	state->irq_timer = machine.scheduler().timer_alloc(FUNC(clock_irq));
 	state->irq_state = 0;
 	schedule_next_irq(machine, -32);
 
@@ -537,7 +537,7 @@ static MACHINE_START( missile )
 
 static MACHINE_RESET( missile )
 {
-	missile_state *state = machine->driver_data<missile_state>();
+	missile_state *state = machine.driver_data<missile_state>();
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	state->irq_state = 0;
 }
@@ -552,7 +552,7 @@ static MACHINE_RESET( missile )
 
 INLINE int get_madsel(address_space *space)
 {
-	missile_state *state = space->machine->driver_data<missile_state>();
+	missile_state *state = space->machine().driver_data<missile_state>();
 	UINT16 pc = cpu_get_previouspc(space->cpu);
 
 	/* if we're at a different instruction than last time, reset our delay counter */
@@ -590,7 +590,7 @@ INLINE offs_t get_bit3_addr(offs_t pixaddr)
 
 static void write_vram(address_space *space, offs_t address, UINT8 data)
 {
-	missile_state *state = space->machine->driver_data<missile_state>();
+	missile_state *state = space->machine().driver_data<missile_state>();
 	UINT8 *videoram = state->videoram;
 	static const UINT8 data_lookup[4] = { 0x00, 0x0f, 0xf0, 0xff };
 	offs_t vramaddr;
@@ -622,7 +622,7 @@ static void write_vram(address_space *space, offs_t address, UINT8 data)
 
 static UINT8 read_vram(address_space *space, offs_t address)
 {
-	missile_state *state = space->machine->driver_data<missile_state>();
+	missile_state *state = space->machine().driver_data<missile_state>();
 	UINT8 *videoram = state->videoram;
 	offs_t vramaddr;
 	UINT8 vramdata;
@@ -666,7 +666,7 @@ static UINT8 read_vram(address_space *space, offs_t address)
 
 static SCREEN_UPDATE( missile )
 {
-	missile_state *state = screen->machine->driver_data<missile_state>();
+	missile_state *state = screen->machine().driver_data<missile_state>();
 	UINT8 *videoram = state->videoram;
 	int x, y;
 
@@ -709,7 +709,7 @@ static SCREEN_UPDATE( missile )
 
 static WRITE8_HANDLER( missile_w )
 {
-	missile_state *state = space->machine->driver_data<missile_state>();
+	missile_state *state = space->machine().driver_data<missile_state>();
 	UINT8 *videoram = state->videoram;
 	/* if we're in MADSEL mode, write to video RAM */
 	if (get_madsel(space))
@@ -727,34 +727,34 @@ static WRITE8_HANDLER( missile_w )
 
 	/* POKEY */
 	else if (offset < 0x4800)
-		pokey_w(space->machine->device("pokey"), offset & 0x0f, data);
+		pokey_w(space->machine().device("pokey"), offset & 0x0f, data);
 
 	/* OUT0 */
 	else if (offset < 0x4900)
 	{
 		state->flipscreen = ~data & 0x40;
-		coin_counter_w(space->machine, 0, data & 0x20);
-		coin_counter_w(space->machine, 1, data & 0x10);
-		coin_counter_w(space->machine, 2, data & 0x08);
-		set_led_status(space->machine, 1, ~data & 0x04);
-		set_led_status(space->machine, 0, ~data & 0x02);
+		coin_counter_w(space->machine(), 0, data & 0x20);
+		coin_counter_w(space->machine(), 1, data & 0x10);
+		coin_counter_w(space->machine(), 2, data & 0x08);
+		set_led_status(space->machine(), 1, ~data & 0x04);
+		set_led_status(space->machine(), 0, ~data & 0x02);
 		state->ctrld = data & 1;
 	}
 
 	/* color RAM */
 	else if (offset >= 0x4b00 && offset < 0x4c00)
-		palette_set_color_rgb(space->machine, offset & 7, pal1bit(~data >> 3), pal1bit(~data >> 2), pal1bit(~data >> 1));
+		palette_set_color_rgb(space->machine(), offset & 7, pal1bit(~data >> 3), pal1bit(~data >> 2), pal1bit(~data >> 1));
 
 	/* watchdog */
 	else if (offset >= 0x4c00 && offset < 0x4d00)
-		watchdog_reset(space->machine);
+		watchdog_reset(space->machine());
 
 	/* interrupt ack */
 	else if (offset >= 0x4d00 && offset < 0x4e00)
 	{
 		if (state->irq_state)
 		{
-			cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 			state->irq_state = 0;
 		}
 	}
@@ -767,7 +767,7 @@ static WRITE8_HANDLER( missile_w )
 
 static READ8_HANDLER( missile_r )
 {
-	missile_state *state = space->machine->driver_data<missile_state>();
+	missile_state *state = space->machine().driver_data<missile_state>();
 	UINT8 *videoram = state->videoram;
 	UINT8 result = 0xff;
 
@@ -784,11 +784,11 @@ static READ8_HANDLER( missile_r )
 
 	/* ROM */
 	else if (offset >= 0x5000)
-		result = space->machine->region("maincpu")->base()[offset];
+		result = space->machine().region("maincpu")->base()[offset];
 
 	/* POKEY */
 	else if (offset < 0x4800)
-		result = pokey_r(space->machine->device("pokey"), offset & 0x0f);
+		result = pokey_r(space->machine().device("pokey"), offset & 0x0f);
 
 	/* IN0 */
 	else if (offset < 0x4900)
@@ -796,21 +796,21 @@ static READ8_HANDLER( missile_r )
 		if (state->ctrld)	/* trackball */
 		{
 			if (!state->flipscreen)
-			    result = ((input_port_read(space->machine, "TRACK0_Y") << 4) & 0xf0) | (input_port_read(space->machine, "TRACK0_X") & 0x0f);
+			    result = ((input_port_read(space->machine(), "TRACK0_Y") << 4) & 0xf0) | (input_port_read(space->machine(), "TRACK0_X") & 0x0f);
 			else
-			    result = ((input_port_read(space->machine, "TRACK1_Y") << 4) & 0xf0) | (input_port_read(space->machine, "TRACK1_X") & 0x0f);
+			    result = ((input_port_read(space->machine(), "TRACK1_Y") << 4) & 0xf0) | (input_port_read(space->machine(), "TRACK1_X") & 0x0f);
 		}
 		else	/* buttons */
-			result = input_port_read(space->machine, "IN0");
+			result = input_port_read(space->machine(), "IN0");
 	}
 
 	/* IN1 */
 	else if (offset < 0x4a00)
-		result = input_port_read(space->machine, "IN1");
+		result = input_port_read(space->machine(), "IN1");
 
 	/* IN2 */
 	else if (offset < 0x4b00)
-		result = input_port_read(space->machine, "R10");
+		result = input_port_read(space->machine(), "R10");
 
 	/* anything else */
 	else
@@ -1168,7 +1168,7 @@ ROM_END
 static DRIVER_INIT( suprmatk )
 {
 	int i;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	for (i = 0; i < 0x40; i++)
 	{

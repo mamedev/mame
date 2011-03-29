@@ -35,7 +35,7 @@ public:
 
 static SCREEN_UPDATE( sstrangr )
 {
-	sstrangr_state *state = screen->machine->driver_data<sstrangr_state>();
+	sstrangr_state *state = screen->machine().driver_data<sstrangr_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x2000; offs++)
@@ -84,14 +84,14 @@ static void get_pens(pen_t *pens)
 
 static SCREEN_UPDATE( sstrngr2 )
 {
-	sstrangr_state *state = screen->machine->driver_data<sstrangr_state>();
+	sstrangr_state *state = screen->machine().driver_data<sstrangr_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *color_map_base;
 
 	get_pens(pens);
 
-	color_map_base = &screen->machine->region("proms")->base()[state->flip_screen ? 0x0000 : 0x0200];
+	color_map_base = &screen->machine().region("proms")->base()[state->flip_screen ? 0x0000 : 0x0200];
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
@@ -132,7 +132,7 @@ static SCREEN_UPDATE( sstrngr2 )
 
 static WRITE8_HANDLER( port_w )
 {
-	sstrangr_state *state = space->machine->driver_data<sstrangr_state>();
+	sstrangr_state *state = space->machine().driver_data<sstrangr_state>();
 
 	state->flip_screen = data & 0x20;
 }

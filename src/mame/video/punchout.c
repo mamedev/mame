@@ -12,28 +12,28 @@
 
 DRIVER_INIT( punchout )
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	state->palette_reverse_top = 0x00;
 	state->palette_reverse_bot = 0xff;
 }
 
 DRIVER_INIT( spnchout )
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	state->palette_reverse_top = 0x00;
 	state->palette_reverse_bot = 0xff;
 }
 
 DRIVER_INIT( spnchotj )
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	state->palette_reverse_top = 0xff;
 	state->palette_reverse_bot = 0xff;
 }
 
 DRIVER_INIT( armwrest )
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	state->palette_reverse_top = 0x00;
 	state->palette_reverse_bot = 0x00;
 }
@@ -49,7 +49,7 @@ DRIVER_INIT( armwrest )
 
 static TILE_GET_INFO( top_get_info )
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	int attr = state->bg_top_videoram[tile_index*2 + 1];
 	int code = state->bg_top_videoram[tile_index*2] + ((attr & 0x03) << 8);
 	int color = ((attr & 0x7c) >> 2);
@@ -59,7 +59,7 @@ static TILE_GET_INFO( top_get_info )
 
 static TILE_GET_INFO( armwrest_top_get_info )
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	int attr = state->bg_top_videoram[tile_index*2 + 1];
 	int code = state->bg_top_videoram[tile_index*2] + ((attr & 0x03) << 8) + ((attr & 0x80) << 3);
 	int color = ((attr & 0x7c) >> 2);
@@ -68,7 +68,7 @@ static TILE_GET_INFO( armwrest_top_get_info )
 
 static TILE_GET_INFO( bot_get_info )
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	int attr = state->bg_bot_videoram[tile_index*2 + 1];
 	int code = state->bg_bot_videoram[tile_index*2] + ((attr & 0x03) << 8);
 	int color = ((attr & 0x7c) >> 2);
@@ -78,7 +78,7 @@ static TILE_GET_INFO( bot_get_info )
 
 static TILE_GET_INFO( armwrest_bot_get_info )
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	int attr = state->bg_bot_videoram[tile_index*2 + 1];
 	int code = state->bg_bot_videoram[tile_index*2] + ((attr & 0x03) << 8);
 	int color = ((attr & 0x7c) >> 2) + 0x40;
@@ -88,7 +88,7 @@ static TILE_GET_INFO( armwrest_bot_get_info )
 
 static TILE_GET_INFO( bs1_get_info )
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	int attr = state->spr1_videoram[tile_index*4 + 3];
 	int code = state->spr1_videoram[tile_index*4] + ((state->spr1_videoram[tile_index*4 + 1] & 0x1f) << 8);
 	int color = attr & 0x1f;
@@ -98,7 +98,7 @@ static TILE_GET_INFO( bs1_get_info )
 
 static TILE_GET_INFO( bs2_get_info )
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	int attr = state->spr2_videoram[tile_index*4 + 3];
 	int code = state->spr2_videoram[tile_index*4] + ((state->spr2_videoram[tile_index*4 + 1] & 0x0f) << 8);
 	int color = attr & 0x3f;
@@ -108,7 +108,7 @@ static TILE_GET_INFO( bs2_get_info )
 
 static TILE_GET_INFO( armwrest_fg_get_info )
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	int attr = state->armwrest_fg_videoram[tile_index*2 + 1];
 	int code = state->armwrest_fg_videoram[tile_index*2] + 256 * (attr & 0x07);
 	int color = ((attr & 0xf8) >> 3);
@@ -132,7 +132,7 @@ static TILEMAP_MAPPER( armwrest_bs1_scan_flipx )
 
 VIDEO_START( punchout )
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	state->bg_top_tilemap = tilemap_create(machine, top_get_info, tilemap_scan_rows,  8,8, 32,32);
 	state->bg_bot_tilemap = tilemap_create(machine, bot_get_info, tilemap_scan_rows,  8,8, 64,32);
 	tilemap_set_scroll_rows(state->bg_bot_tilemap, 32);
@@ -149,7 +149,7 @@ VIDEO_START( punchout )
 
 VIDEO_START( armwrest )
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	state->bg_top_tilemap = tilemap_create(machine, armwrest_top_get_info, tilemap_scan_rows,  8,8, 32,32);
 	state->bg_bot_tilemap = tilemap_create(machine, armwrest_bot_get_info, tilemap_scan_rows,  8,8, 32,32);
 
@@ -168,28 +168,28 @@ VIDEO_START( armwrest )
 
 WRITE8_HANDLER( punchout_bg_top_videoram_w )
 {
-	punchout_state *state = space->machine->driver_data<punchout_state>();
+	punchout_state *state = space->machine().driver_data<punchout_state>();
 	state->bg_top_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_top_tilemap, offset/2);
 }
 
 WRITE8_HANDLER( punchout_bg_bot_videoram_w )
 {
-	punchout_state *state = space->machine->driver_data<punchout_state>();
+	punchout_state *state = space->machine().driver_data<punchout_state>();
 	state->bg_bot_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_bot_tilemap, offset/2);
 }
 
 WRITE8_HANDLER( armwrest_fg_videoram_w )
 {
-	punchout_state *state = space->machine->driver_data<punchout_state>();
+	punchout_state *state = space->machine().driver_data<punchout_state>();
 	state->armwrest_fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset/2);
 }
 
 WRITE8_HANDLER( punchout_spr1_videoram_w )
 {
-	punchout_state *state = space->machine->driver_data<punchout_state>();
+	punchout_state *state = space->machine().driver_data<punchout_state>();
 	state->spr1_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->spr1_tilemap, offset/4);
 	if (state->spr1_tilemap_flipx)
@@ -198,16 +198,16 @@ WRITE8_HANDLER( punchout_spr1_videoram_w )
 
 WRITE8_HANDLER( punchout_spr2_videoram_w )
 {
-	punchout_state *state = space->machine->driver_data<punchout_state>();
+	punchout_state *state = space->machine().driver_data<punchout_state>();
 	state->spr2_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->spr2_tilemap, offset/4);
 }
 
 
 
-static void draw_big_sprite(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int palette)
+static void draw_big_sprite(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int palette)
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	int zoom;
 
 	zoom = state->spr1_ctrlram[0] + 256 * (state->spr1_ctrlram[1] & 0x0f);
@@ -249,9 +249,9 @@ static void draw_big_sprite(running_machine *machine, bitmap_t *bitmap, const re
 }
 
 
-static void armwrest_draw_big_sprite(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int palette)
+static void armwrest_draw_big_sprite(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int palette)
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	int zoom;
 
 	zoom = state->spr1_ctrlram[0] + 256 * (state->spr1_ctrlram[1] & 0x0f);
@@ -296,9 +296,9 @@ static void armwrest_draw_big_sprite(running_machine *machine, bitmap_t *bitmap,
 	}
 }
 
-static void drawbs2(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void drawbs2(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	int sx,sy;
 	int incxx;
 
@@ -328,11 +328,11 @@ static void drawbs2(running_machine *machine, bitmap_t *bitmap, const rectangle 
 
 
 
-static void punchout_copy_top_palette(running_machine *machine, int bank)
+static void punchout_copy_top_palette(running_machine &machine, int bank)
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	int i;
-	const UINT8 *color_prom = machine->region("proms")->base();
+	const UINT8 *color_prom = machine.region("proms")->base();
 
 	// top monitor palette
 	for (i = 0; i < 0x100; i++)
@@ -348,11 +348,11 @@ static void punchout_copy_top_palette(running_machine *machine, int bank)
 	}
 }
 
-static void punchout_copy_bot_palette(running_machine *machine, int bank)
+static void punchout_copy_bot_palette(running_machine &machine, int bank)
 {
-	punchout_state *state = machine->driver_data<punchout_state>();
+	punchout_state *state = machine.driver_data<punchout_state>();
 	int i;
-	const UINT8 *color_prom = machine->region("proms")->base() + 0x600;
+	const UINT8 *color_prom = machine.region("proms")->base() + 0x600;
 
 	// bottom monitor palette
 	for (i = 0; i < 0x100; i++)
@@ -371,24 +371,24 @@ static void punchout_copy_bot_palette(running_machine *machine, int bank)
 
 SCREEN_UPDATE( punchout )
 {
-	punchout_state *state = screen->machine->driver_data<punchout_state>();
-	device_t *top_screen    = screen->machine->device("top");
-	device_t *bottom_screen = screen->machine->device("bottom");
+	punchout_state *state = screen->machine().driver_data<punchout_state>();
+	device_t *top_screen    = screen->machine().device("top");
+	device_t *bottom_screen = screen->machine().device("bottom");
 
 	if (screen == top_screen)
 	{
-		punchout_copy_top_palette(screen->machine, BIT(*state->palettebank,1));
+		punchout_copy_top_palette(screen->machine(), BIT(*state->palettebank,1));
 
 		tilemap_draw(bitmap, cliprect, state->bg_top_tilemap, 0, 0);
 
 		if (state->spr1_ctrlram[7] & 1)	/* display in top monitor */
-			draw_big_sprite(screen->machine, bitmap, cliprect, 0);
+			draw_big_sprite(screen->machine(), bitmap, cliprect, 0);
 	}
 	else if (screen == bottom_screen)
 	{
 		int offs;
 
-		punchout_copy_bot_palette(screen->machine, BIT(*state->palettebank,0));
+		punchout_copy_bot_palette(screen->machine(), BIT(*state->palettebank,0));
 
 		/* copy the character mapped graphics */
 		for (offs = 0;offs < 32;offs++)
@@ -397,8 +397,8 @@ SCREEN_UPDATE( punchout )
 		tilemap_draw(bitmap, cliprect, state->bg_bot_tilemap, 0, 0);
 
 		if (state->spr1_ctrlram[7] & 2)	/* display in bottom monitor */
-			draw_big_sprite(screen->machine, bitmap, cliprect, 1);
-		drawbs2(screen->machine, bitmap, cliprect);
+			draw_big_sprite(screen->machine(), bitmap, cliprect, 1);
+		drawbs2(screen->machine(), bitmap, cliprect);
 	}
 	return 0;
 }
@@ -406,28 +406,28 @@ SCREEN_UPDATE( punchout )
 
 SCREEN_UPDATE( armwrest )
 {
-	punchout_state *state = screen->machine->driver_data<punchout_state>();
-	device_t *top_screen    = screen->machine->device("top");
-	device_t *bottom_screen = screen->machine->device("bottom");
+	punchout_state *state = screen->machine().driver_data<punchout_state>();
+	device_t *top_screen    = screen->machine().device("top");
+	device_t *bottom_screen = screen->machine().device("bottom");
 
 	if (screen == top_screen)
 	{
-		punchout_copy_top_palette(screen->machine, BIT(*state->palettebank,1));
+		punchout_copy_top_palette(screen->machine(), BIT(*state->palettebank,1));
 
 		tilemap_draw(bitmap, cliprect, state->bg_top_tilemap, 0, 0);
 
 		if (state->spr1_ctrlram[7] & 1)	/* display in top monitor */
-			armwrest_draw_big_sprite(screen->machine, bitmap, cliprect, 0);
+			armwrest_draw_big_sprite(screen->machine(), bitmap, cliprect, 0);
 	}
 	else if (screen == bottom_screen)
 	{
-		punchout_copy_bot_palette(screen->machine, BIT(*state->palettebank,0));
+		punchout_copy_bot_palette(screen->machine(), BIT(*state->palettebank,0));
 
 		tilemap_draw(bitmap, cliprect, state->bg_bot_tilemap, 0, 0);
 
 		if (state->spr1_ctrlram[7] & 2)	/* display in bottom monitor */
-			armwrest_draw_big_sprite(screen->machine, bitmap, cliprect, 1);
-		drawbs2(screen->machine, bitmap, cliprect);
+			armwrest_draw_big_sprite(screen->machine(), bitmap, cliprect, 1);
+		drawbs2(screen->machine(), bitmap, cliprect);
 
 		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	}

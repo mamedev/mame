@@ -188,43 +188,43 @@ Cisco Heat.
 
 static READ16_HANDLER( sharedram1_r )
 {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	return state->sharedram1[offset];
 }
 
 static READ16_HANDLER( sharedram2_r )
 {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	return state->sharedram2[offset];
 }
 
 static WRITE16_HANDLER( sharedram1_w )
 {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	COMBINE_DATA(&state->sharedram1[offset]);
 }
 
 static WRITE16_HANDLER( sharedram2_w )
 {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	COMBINE_DATA(&state->sharedram2[offset]);
 }
 
 static READ16_HANDLER( rom_1_r )
 {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	return state->rom_1[offset];
 }
 
 static READ16_HANDLER( rom_2_r )
 {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	return state->rom_2[offset];
 }
 
 static READ16_HANDLER( rom_3_r )
 {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	return state->rom_3[offset];
 }
 
@@ -235,23 +235,23 @@ static READ16_HANDLER( rom_3_r )
 
 static WRITE16_HANDLER( bigrun_paletteram16_w )
 {
-	UINT16 word = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	UINT16 word = COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 	int r = pal5bit(((word >> 11) & 0x1E ) | ((word >> 3) & 0x01));
 	int g = pal5bit(((word >> 7 ) & 0x1E ) | ((word >> 2) & 0x01));
 	int b = pal5bit(((word >> 3 ) & 0x1E ) | ((word >> 1) & 0x01));
 
 	// Scroll 0
-	if ( (offset >= 0x0e00/2) && (offset <= 0x0fff/2) ) { palette_set_color(space->machine, 0x000 + offset - 0x0e00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x0e00/2) && (offset <= 0x0fff/2) ) { palette_set_color(space->machine(), 0x000 + offset - 0x0e00/2, MAKE_RGB(r,g,b) ); return;}
 	// Scroll 1
-	if ( (offset >= 0x1600/2) && (offset <= 0x17ff/2) ) { palette_set_color(space->machine, 0x100 + offset - 0x1600/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x1600/2) && (offset <= 0x17ff/2) ) { palette_set_color(space->machine(), 0x100 + offset - 0x1600/2, MAKE_RGB(r,g,b) ); return;}
 	// Road 0
-	if ( (offset >= 0x1800/2) && (offset <= 0x1fff/2) ) { palette_set_color(space->machine, 0x200 + offset - 0x1800/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x1800/2) && (offset <= 0x1fff/2) ) { palette_set_color(space->machine(), 0x200 + offset - 0x1800/2, MAKE_RGB(r,g,b) ); return;}
 	// Road 1
-	if ( (offset >= 0x2000/2) && (offset <= 0x27ff/2) ) { palette_set_color(space->machine, 0x600 + offset - 0x2000/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x2000/2) && (offset <= 0x27ff/2) ) { palette_set_color(space->machine(), 0x600 + offset - 0x2000/2, MAKE_RGB(r,g,b) ); return;}
 	// Sprites
-	if ( (offset >= 0x2800/2) && (offset <= 0x2fff/2) ) { palette_set_color(space->machine, 0xa00 + offset - 0x2800/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x2800/2) && (offset <= 0x2fff/2) ) { palette_set_color(space->machine(), 0xa00 + offset - 0x2800/2, MAKE_RGB(r,g,b) ); return;}
 	// Scroll 2
-	if ( (offset >= 0x3600/2) && (offset <= 0x37ff/2) ) { palette_set_color(space->machine, 0xe00 + offset - 0x3600/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x3600/2) && (offset <= 0x37ff/2) ) { palette_set_color(space->machine(), 0xe00 + offset - 0x3600/2, MAKE_RGB(r,g,b) ); return;}
 }
 
 static ADDRESS_MAP_START( bigrun_map, AS_PROGRAM, 16 )
@@ -288,23 +288,23 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( cischeat_paletteram16_w )
 {
-	UINT16 word = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	UINT16 word = COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 	int r = pal5bit(((word >> 11) & 0x1E ) | ((word >> 3) & 0x01));
 	int g = pal5bit(((word >> 7 ) & 0x1E ) | ((word >> 2) & 0x01));
 	int b = pal5bit(((word >> 3 ) & 0x1E ) | ((word >> 1) & 0x01));
 
 	// Scroll 0
-	if ( (offset >= 0x1c00/2) && (offset <= 0x1fff/2) ) { palette_set_color(space->machine, 0x000 + offset - 0x1c00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x1c00/2) && (offset <= 0x1fff/2) ) { palette_set_color(space->machine(), 0x000 + offset - 0x1c00/2, MAKE_RGB(r,g,b) ); return;}
 	// Scroll 1
-	if ( (offset >= 0x2c00/2) && (offset <= 0x2fff/2) ) { palette_set_color(space->machine, 0x200 + offset - 0x2c00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x2c00/2) && (offset <= 0x2fff/2) ) { palette_set_color(space->machine(), 0x200 + offset - 0x2c00/2, MAKE_RGB(r,g,b) ); return;}
 	// Scroll 2
-	if ( (offset >= 0x6c00/2) && (offset <= 0x6fff/2) ) { palette_set_color(space->machine, 0x400 + offset - 0x6c00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x6c00/2) && (offset <= 0x6fff/2) ) { palette_set_color(space->machine(), 0x400 + offset - 0x6c00/2, MAKE_RGB(r,g,b) ); return;}
 	// Road 0
-	if ( (offset >= 0x3800/2) && (offset <= 0x3fff/2) ) { palette_set_color(space->machine, 0x600 + offset - 0x3800/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x3800/2) && (offset <= 0x3fff/2) ) { palette_set_color(space->machine(), 0x600 + offset - 0x3800/2, MAKE_RGB(r,g,b) ); return;}
 	// Road 1
-	if ( (offset >= 0x4800/2) && (offset <= 0x4fff/2) ) { palette_set_color(space->machine, 0xa00 + offset - 0x4800/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x4800/2) && (offset <= 0x4fff/2) ) { palette_set_color(space->machine(), 0xa00 + offset - 0x4800/2, MAKE_RGB(r,g,b) ); return;}
 	// Sprites
-	if ( (offset >= 0x5000/2) && (offset <= 0x5fff/2) ) { palette_set_color(space->machine, 0xe00 + offset - 0x5000/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x5000/2) && (offset <= 0x5fff/2) ) { palette_set_color(space->machine(), 0xe00 + offset - 0x5000/2, MAKE_RGB(r,g,b) ); return;}
 }
 
 static ADDRESS_MAP_START( cischeat_map, AS_PROGRAM, 16 )
@@ -340,23 +340,23 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( f1gpstar_paletteram16_w )
 {
-	UINT16 word = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	UINT16 word = COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 	int r = pal5bit(((word >> 11) & 0x1E ) | ((word >> 3) & 0x01));
 	int g = pal5bit(((word >> 7 ) & 0x1E ) | ((word >> 2) & 0x01));
 	int b = pal5bit(((word >> 3 ) & 0x1E ) | ((word >> 1) & 0x01));
 
 	// Scroll 0
-	if ( (offset >= 0x1e00/2) && (offset <= 0x1fff/2) ) { palette_set_color(space->machine, 0x000 + offset - 0x1e00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x1e00/2) && (offset <= 0x1fff/2) ) { palette_set_color(space->machine(), 0x000 + offset - 0x1e00/2, MAKE_RGB(r,g,b) ); return;}
 	// Scroll 1
-	if ( (offset >= 0x2e00/2) && (offset <= 0x2fff/2) ) { palette_set_color(space->machine, 0x100 + offset - 0x2e00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x2e00/2) && (offset <= 0x2fff/2) ) { palette_set_color(space->machine(), 0x100 + offset - 0x2e00/2, MAKE_RGB(r,g,b) ); return;}
 	// Scroll 2
-	if ( (offset >= 0x6e00/2) && (offset <= 0x6fff/2) ) { palette_set_color(space->machine, 0x200 + offset - 0x6e00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x6e00/2) && (offset <= 0x6fff/2) ) { palette_set_color(space->machine(), 0x200 + offset - 0x6e00/2, MAKE_RGB(r,g,b) ); return;}
 	// Road 0
-	if ( (offset >= 0x3800/2) && (offset <= 0x3fff/2) ) { palette_set_color(space->machine, 0x300 + offset - 0x3800/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x3800/2) && (offset <= 0x3fff/2) ) { palette_set_color(space->machine(), 0x300 + offset - 0x3800/2, MAKE_RGB(r,g,b) ); return;}
 	// Road 1
-	if ( (offset >= 0x4800/2) && (offset <= 0x4fff/2) ) { palette_set_color(space->machine, 0x700 + offset - 0x4800/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x4800/2) && (offset <= 0x4fff/2) ) { palette_set_color(space->machine(), 0x700 + offset - 0x4800/2, MAKE_RGB(r,g,b) ); return;}
 	// Sprites
-	if ( (offset >= 0x5000/2) && (offset <= 0x5fff/2) ) { palette_set_color(space->machine, 0xb00 + offset - 0x5000/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x5000/2) && (offset <= 0x5fff/2) ) { palette_set_color(space->machine(), 0xb00 + offset - 0x5000/2, MAKE_RGB(r,g,b) ); return;}
 }
 
 /*  F1 GP Star tests:
@@ -420,18 +420,18 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( scudhamm_paletteram16_w )
 {
-	int newword = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	int newword = COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 
 	int r = pal5bit(((newword >> 11) & 0x1E ) | ((newword >> 3) & 0x01));
 	int g = pal5bit(((newword >> 7 ) & 0x1E ) | ((newword >> 2) & 0x01));
 	int b = pal5bit(((newword >> 3 ) & 0x1E ) | ((newword >> 1) & 0x01));
 
 	// Scroll 0
-	if ( (offset >= 0x1e00/2) && (offset <= 0x1fff/2) ) { palette_set_color(space->machine, 0x000 + offset - 0x1e00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x1e00/2) && (offset <= 0x1fff/2) ) { palette_set_color(space->machine(), 0x000 + offset - 0x1e00/2, MAKE_RGB(r,g,b) ); return;}
 	// Scroll 2
-	if ( (offset >= 0x4e00/2) && (offset <= 0x4fff/2) ) { palette_set_color(space->machine, 0x100 + offset - 0x4e00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x4e00/2) && (offset <= 0x4fff/2) ) { palette_set_color(space->machine(), 0x100 + offset - 0x4e00/2, MAKE_RGB(r,g,b) ); return;}
 	// Sprites
-	if ( (offset >= 0x3000/2) && (offset <= 0x3fff/2) ) { palette_set_color(space->machine, 0x200 + offset - 0x3000/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x3000/2) && (offset <= 0x3fff/2) ) { palette_set_color(space->machine(), 0x200 + offset - 0x3000/2, MAKE_RGB(r,g,b) ); return;}
 }
 
 
@@ -446,7 +446,7 @@ static WRITE16_HANDLER( scudhamm_paletteram16_w )
 
 READ16_HANDLER( scudhamm_motor_status_r )
 {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	return state->scudhamm_motor_command;	// Motor Status
 }
 
@@ -467,15 +467,15 @@ READ16_HANDLER( scudhamm_motor_pos_r )
 
 static WRITE16_HANDLER( scudhamm_motor_command_w )
 {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	COMBINE_DATA( &state->scudhamm_motor_command );
 }
 
 
 READ16_HANDLER( scudhamm_analog_r )
 {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();
-	int i=input_port_read(space->machine, "IN1"),j;
+	cischeat_state *state = space->machine().driver_data<cischeat_state>();
+	int i=input_port_read(space->machine(), "IN1"),j;
 
 	if ((i^state->prev)&0x4000) {
 		if (i<state->prev) state->prev-=0x8000;
@@ -503,15 +503,15 @@ static WRITE16_HANDLER( scudhamm_leds_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(space->machine, 0, data & 0x0100);	// 3 buttons
-		set_led_status(space->machine, 1, data & 0x0200);
-		set_led_status(space->machine, 2, data & 0x0400);
+		set_led_status(space->machine(), 0, data & 0x0100);	// 3 buttons
+		set_led_status(space->machine(), 1, data & 0x0200);
+		set_led_status(space->machine(), 2, data & 0x0400);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-//      set_led_status(space->machine, 3, data & 0x0010);   // if we had more leds..
-//      set_led_status(space->machine, 4, data & 0x0020);
+//      set_led_status(space->machine(), 3, data & 0x0010);   // if we had more leds..
+//      set_led_status(space->machine(), 4, data & 0x0020);
 	}
 }
 
@@ -529,8 +529,8 @@ static WRITE16_HANDLER( scudhamm_oki_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki1 = space->machine->device<okim6295_device>("oki1");
-		okim6295_device *oki2 = space->machine->device<okim6295_device>("oki2");
+		okim6295_device *oki1 = space->machine().device<okim6295_device>("oki1");
+		okim6295_device *oki2 = space->machine().device<okim6295_device>("oki2");
 		oki1->set_bank_base(0x40000 * ((data >> 0) & 0x3) );
 		oki2->set_bank_base(0x40000 * ((data >> 4) & 0x3) );
 	}
@@ -566,26 +566,26 @@ static READ16_HANDLER( armchmp2_motor_status_r )
 
 static WRITE16_HANDLER( armchmp2_motor_command_w )
 {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	COMBINE_DATA( &state->scudhamm_motor_command );
 }
 
 static READ16_HANDLER( armchmp2_analog_r )
 {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	int armdelta;
 
-	armdelta = input_port_read(space->machine, "IN1") - state->armold;
-	state->armold = input_port_read(space->machine, "IN1");
+	armdelta = input_port_read(space->machine(), "IN1") - state->armold;
+	state->armold = input_port_read(space->machine(), "IN1");
 
 	return ~( state->scudhamm_motor_command + armdelta );	// + x : x<=0 and player loses, x>0 and player wins
 }
 
 static READ16_HANDLER( armchmp2_buttons_r )
 {
-	int arm_x = input_port_read(space->machine, "IN1");
+	int arm_x = input_port_read(space->machine(), "IN1");
 
-	UINT16 ret = input_port_read(space->machine, "IN0");
+	UINT16 ret = input_port_read(space->machine(), "IN0");
 
 	if (arm_x < 0x40)		ret &= ~1;
 	else if (arm_x > 0xc0)	ret &= ~2;
@@ -606,16 +606,16 @@ static WRITE16_HANDLER( armchmp2_leds_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(space->machine, 0, data & 0x0100);
-		set_led_status(space->machine, 1, data & 0x1000);
-		set_led_status(space->machine, 2, data & 0x2000);
-		set_led_status(space->machine, 3, data & 0x4000);
+		set_led_status(space->machine(), 0, data & 0x0100);
+		set_led_status(space->machine(), 1, data & 0x1000);
+		set_led_status(space->machine(), 2, data & 0x2000);
+		set_led_status(space->machine(), 3, data & 0x4000);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0, data & 0x0040);
-		coin_counter_w(space->machine, 1, data & 0x0080);
+		coin_counter_w(space->machine(), 0, data & 0x0040);
+		coin_counter_w(space->machine(), 1, data & 0x0080);
 	}
 }
 
@@ -727,8 +727,8 @@ static WRITE16_HANDLER( bigrun_soundbank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki1 = space->machine->device<okim6295_device>("oki1");
-		okim6295_device *oki2 = space->machine->device<okim6295_device>("oki2");
+		okim6295_device *oki1 = space->machine().device<okim6295_device>("oki1");
+		okim6295_device *oki2 = space->machine().device<okim6295_device>("oki2");
 		oki1->set_bank_base(0x40000 * ((data >> 0) & 1) );
 		oki2->set_bank_base(0x40000 * ((data >> 4) & 1) );
 	}
@@ -810,13 +810,13 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER ( f1gpstr2_io_r )
 {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	return state->vregs[offset + 0x1000/2];
 }
 
 static WRITE16_HANDLER( f1gpstr2_io_w )
 {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	COMBINE_DATA(&state->vregs[offset + 0x1000/2]);
 }
 
@@ -1832,10 +1832,10 @@ MACHINE_CONFIG_END
 
     We need to untangle it
 */
-static void cischeat_untangle_sprites(running_machine *machine, const char *region)
+static void cischeat_untangle_sprites(running_machine &machine, const char *region)
 {
-	UINT8		*src = machine->region(region)->base();
-	const UINT8	*end = src + machine->region(region)->bytes();
+	UINT8		*src = machine.region(region)->base();
+	const UINT8	*end = src + machine.region(region)->bytes();
 
 	while (src < end)
 	{
@@ -1987,9 +1987,9 @@ ROM_END
 
 static DRIVER_INIT( bigrun )
 {
-	cischeat_state *state = machine->driver_data<cischeat_state>();
+	cischeat_state *state = machine.driver_data<cischeat_state>();
 	/* Split ROMs */
-	state->rom_1 = (UINT16 *) machine->region("user1")->base();
+	state->rom_1 = (UINT16 *) machine.region("user1")->base();
 
 	cischeat_untangle_sprites(machine, "gfx4");	// Untangle sprites
 	phantasm_rom_decode(machine, "soundcpu");					// Decrypt sound cpu code
@@ -2110,19 +2110,19 @@ ROM_END
 
 static DRIVER_INIT( cischeat )
 {
-	cischeat_state *state = machine->driver_data<cischeat_state>();
+	cischeat_state *state = machine.driver_data<cischeat_state>();
 	/* Split ROMs */
-	state->rom_1 = (UINT16 *) (machine->region("user1")->base() + 0x00000);
-	state->rom_2 = (UINT16 *) (machine->region("cpu2")->base()  + 0x40000);
-	state->rom_3 = (UINT16 *) (machine->region("cpu3")->base()  + 0x40000);
+	state->rom_1 = (UINT16 *) (machine.region("user1")->base() + 0x00000);
+	state->rom_2 = (UINT16 *) (machine.region("cpu2")->base()  + 0x40000);
+	state->rom_3 = (UINT16 *) (machine.region("cpu3")->base()  + 0x40000);
 
-	memcpy(machine->region("user1")->base() + 0x80000, state->rom_2, 0x40000);
+	memcpy(machine.region("user1")->base() + 0x80000, state->rom_2, 0x40000);
 	memset(state->rom_2, 0, 0x40000);
-	state->rom_2 = (UINT16 *) (machine->region("user1")->base() + 0x80000);
+	state->rom_2 = (UINT16 *) (machine.region("user1")->base() + 0x80000);
 
-	memcpy(machine->region("user1")->base() + 0xc0000, state->rom_3, 0x40000);
+	memcpy(machine.region("user1")->base() + 0xc0000, state->rom_3, 0x40000);
 	memset(state->rom_3, 0, 0x40000);
-	state->rom_3 = (UINT16 *) (machine->region("user1")->base() + 0xc0000);
+	state->rom_3 = (UINT16 *) (machine.region("user1")->base() + 0xc0000);
 
 	cischeat_untangle_sprites(machine, "gfx4");	// Untangle sprites
 	astyanax_rom_decode(machine, "soundcpu");					// Decrypt sound cpu code
@@ -2338,9 +2338,9 @@ ROM_END
 
 static DRIVER_INIT( f1gpstar )
 {
-	cischeat_state *state = machine->driver_data<cischeat_state>();
+	cischeat_state *state = machine.driver_data<cischeat_state>();
 	/* Split ROMs */
-	state->rom_1 = (UINT16 *) machine->region("user1")->base();
+	state->rom_1 = (UINT16 *) machine.region("user1")->base();
 
 	cischeat_untangle_sprites(machine, "gfx4");
 }
@@ -2554,7 +2554,7 @@ ROM_END
 
 static DRIVER_INIT( wildplt )
 {
-	machine->device("cpu1")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x080000, 0x087fff, FUNC(wildplt_vregs_r) );
+	machine.device("cpu1")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x080000, 0x087fff, FUNC(wildplt_vregs_r) );
 
 	DRIVER_INIT_CALL(f1gpstar);
 }

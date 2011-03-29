@@ -457,7 +457,7 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 	if (result != DD_OK) mame_printf_verbose("DirectDraw: Error %08X unlocking blit surface\n", (int)result);
 
 	// sync to VBLANK
-	if ((video_config.waitvsync || video_config.syncrefresh) && window->machine->video().throttled() && (!window->fullscreen || dd->back == NULL))
+	if ((video_config.waitvsync || video_config.syncrefresh) && window->machine().video().throttled() && (!window->fullscreen || dd->back == NULL))
 	{
 		result = IDirectDraw7_WaitForVerticalBlank(dd->ddraw, DDWAITVB_BLOCKBEGIN, NULL);
 		if (result != DD_OK) mame_printf_verbose("DirectDraw: Error %08X waiting for VBLANK\n", (int)result);
@@ -613,7 +613,7 @@ static int ddraw_create_surfaces(win_window_info *window)
 	if (window->fullscreen)
 	{
 		// only set the gamma if it's not 1.0f
-		windows_options &options = downcast<windows_options &>(window->machine->options());
+		windows_options &options = downcast<windows_options &>(window->machine().options());
 		float brightness = options.full_screen_brightness();
 		float contrast = options.full_screen_contrast();
 		float gamma = options.full_screen_gamma();
@@ -1328,7 +1328,7 @@ static void pick_best_mode(win_window_info *window)
 
 	// determine the refresh rate of the primary screen
 	einfo.target_refresh = 60.0;
-	const screen_device_config *primary_screen = window->machine->config().first_screen();
+	const screen_device_config *primary_screen = window->machine().config().first_screen();
 	if (primary_screen != NULL)
 		einfo.target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh());
 	printf("Target refresh = %f\n", einfo.target_refresh);

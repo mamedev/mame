@@ -105,8 +105,8 @@ DECLARE_LEGACY_MEMORY_DEVICE(PPU_2C05_04, ppu2c05_04);	// Vs. Unisystem (Top Gun
 DECLARE_LEGACY_MEMORY_DEVICE(PPU_2C07, ppu2c07);		// PAL NES
 
 /* routines */
-void ppu2c0x_init_palette(running_machine *machine, int first_entry ) ATTR_NONNULL(1);
-void ppu2c0x_init_palette_rgb(running_machine *machine, int first_entry ) ATTR_NONNULL(1);
+void ppu2c0x_init_palette(running_machine &machine, int first_entry );
+void ppu2c0x_init_palette_rgb(running_machine &machine, int first_entry );
 
 void ppu2c0x_spriteram_dma(address_space *space, device_t *device, const UINT8 page ) ATTR_NONNULL(1);
 void ppu2c0x_render( device_t *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy ) ATTR_NONNULL(1);

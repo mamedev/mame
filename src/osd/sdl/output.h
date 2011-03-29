@@ -14,7 +14,7 @@
 //  FUNCTION PROTOTYPES
 //============================================================
 
-void sdloutput_init(running_machine *machine);
+void sdloutput_init(running_machine &machine);
 
 
 #endif /* __SDLMAME_OUTPUT_H__ */

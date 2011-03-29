@@ -34,28 +34,28 @@ PALETTE_INIT( exterm )
 
 void exterm_to_shiftreg_master(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	exterm_state *state = space->machine->driver_data<exterm_state>();
+	exterm_state *state = space->machine().driver_data<exterm_state>();
 	memcpy(shiftreg, &state->master_videoram[TOWORD(address)], 256 * sizeof(UINT16));
 }
 
 
 void exterm_from_shiftreg_master(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	exterm_state *state = space->machine->driver_data<exterm_state>();
+	exterm_state *state = space->machine().driver_data<exterm_state>();
 	memcpy(&state->master_videoram[TOWORD(address)], shiftreg, 256 * sizeof(UINT16));
 }
 
 
 void exterm_to_shiftreg_slave(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	exterm_state *state = space->machine->driver_data<exterm_state>();
+	exterm_state *state = space->machine().driver_data<exterm_state>();
 	memcpy(shiftreg, &state->slave_videoram[TOWORD(address)], 256 * 2 * sizeof(UINT8));
 }
 
 
 void exterm_from_shiftreg_slave(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	exterm_state *state = space->machine->driver_data<exterm_state>();
+	exterm_state *state = space->machine().driver_data<exterm_state>();
 	memcpy(&state->slave_videoram[TOWORD(address)], shiftreg, 256 * 2 * sizeof(UINT8));
 }
 
@@ -69,7 +69,7 @@ void exterm_from_shiftreg_slave(address_space *space, UINT32 address, UINT16 *sh
 
 void exterm_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	exterm_state *state = screen.machine->driver_data<exterm_state>();
+	exterm_state *state = screen.machine().driver_data<exterm_state>();
 	UINT16 *bgsrc = &state->master_videoram[(params->rowaddr << 8) & 0xff00];
 	UINT16 *fgsrc = NULL;
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
@@ -79,7 +79,7 @@ void exterm_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanlin
 	int x;
 
 	/* get parameters for the slave CPU */
-	tms34010_get_display_params(screen.machine->device("slave"), &fgparams);
+	tms34010_get_display_params(screen.machine().device("slave"), &fgparams);
 
 	/* compute info about the slave vram */
 	if (fgparams.enabled && scanline >= fgparams.veblnk && scanline < fgparams.vsblnk && fgparams.heblnk < fgparams.hsblnk)

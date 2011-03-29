@@ -7,10 +7,10 @@
 #define CGBOARD_TYPE_HORNET		3
 #define CGBOARD_TYPE_HANGPLT	4
 
-void init_konami_cgboard(running_machine *machine, int board_id, int type);
+void init_konami_cgboard(running_machine &machine, int board_id, int type);
 void set_cgboard_id(int board_id);
 int get_cgboard_id(void);
-void set_cgboard_texture_bank(running_machine *machine, int board, const char *bank, UINT8 *rom);
+void set_cgboard_texture_bank(running_machine &machine, int board, const char *bank, UINT8 *rom);
 
 READ32_HANDLER( cgboard_dsp_comm_r_ppc );
 WRITE32_HANDLER( cgboard_dsp_comm_w_ppc );

@@ -177,12 +177,12 @@ static const UINT8 ssingles_colors[NUM_PENS*3]=
 
 static MC6845_UPDATE_ROW( update_row )
 {
-	ssingles_state *state = device->machine->driver_data<ssingles_state>();
+	ssingles_state *state = device->machine().driver_data<ssingles_state>();
 	int cx,x;
 	UINT32 tile_address;
 	UINT16 cell,palette;
 	UINT8 b0,b1;
-	const UINT8 *gfx = device->machine->region("gfx1")->base();
+	const UINT8 *gfx = device->machine().region("gfx1")->base();
 
 	for(cx=0;cx<x_count;++cx)
 	{
@@ -229,20 +229,20 @@ static const mc6845_interface mc6845_intf =
 
 static WRITE8_HANDLER(ssingles_videoram_w)
 {
-	ssingles_state *state = space->machine->driver_data<ssingles_state>();
+	ssingles_state *state = space->machine().driver_data<ssingles_state>();
 	state->videoram[offset]=data;
 }
 
 static WRITE8_HANDLER(ssingles_colorram_w)
 {
-	ssingles_state *state = space->machine->driver_data<ssingles_state>();
+	ssingles_state *state = space->machine().driver_data<ssingles_state>();
 	state->colorram[offset]=data;
 }
 
 
 static VIDEO_START(ssingles)
 {
-	ssingles_state *state = machine->driver_data<ssingles_state>();
+	ssingles_state *state = machine.driver_data<ssingles_state>();
 
 	{
 		int i;
@@ -256,7 +256,7 @@ static VIDEO_START(ssingles)
 
 static SCREEN_UPDATE( ssingles )
 {
-	device_t *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine().device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
@@ -265,14 +265,14 @@ static SCREEN_UPDATE( ssingles )
 
 static READ8_HANDLER(c000_r)
 {
-	ssingles_state *state = space->machine->driver_data<ssingles_state>();
+	ssingles_state *state = space->machine().driver_data<ssingles_state>();
 
 	return state->prot_data;
 }
 
 static READ8_HANDLER(c001_r)
 {
-	ssingles_state *state = space->machine->driver_data<ssingles_state>();
+	ssingles_state *state = space->machine().driver_data<ssingles_state>();
 
 	state->prot_data=0xc4;
 	return 0;
@@ -280,7 +280,7 @@ static READ8_HANDLER(c001_r)
 
 static WRITE8_HANDLER(c001_w)
 {
-	ssingles_state *state = space->machine->driver_data<ssingles_state>();
+	ssingles_state *state = space->machine().driver_data<ssingles_state>();
 
 	state->prot_data^=data^0x11;
 }
@@ -288,7 +288,7 @@ static WRITE8_HANDLER(c001_w)
 static CUSTOM_INPUT(controls_r)
 {
 	int data = 7;
-	switch(input_port_read(field->port->machine, "EXTRA"))		//multiplexed
+	switch(input_port_read(field->port->machine(), "EXTRA"))		//multiplexed
 	{
 		case 0x01: data = 1; break;
 		case 0x02: data = 2; break;
@@ -547,7 +547,7 @@ ROM_END
 
 static DRIVER_INIT(ssingles)
 {
-	ssingles_state *state = machine->driver_data<ssingles_state>();
+	ssingles_state *state = machine.driver_data<ssingles_state>();
 
 	state->save_item(NAME(state->videoram));
 	state->save_item(NAME(state->colorram));

@@ -41,12 +41,12 @@ INLINE irem_audio_state *get_safe_token( device_t *device )
 static DEVICE_START( irem_audio )
 {
 	irem_audio_state *state = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 
-	state->adpcm1 = machine->device("msm1");
-	state->adpcm2 = machine->device("msm2");
-	state->ay1 = machine->device("ay1");
-	state->ay2 = machine->device("ay2");
+	state->adpcm1 = machine.device("msm1");
+	state->adpcm2 = machine.device("msm2");
+	state->ay1 = machine.device("ay1");
+	state->ay2 = machine.device("ay2");
 
 	device->save_item(NAME(state->port1));
 	device->save_item(NAME(state->port2));
@@ -66,7 +66,7 @@ WRITE8_HANDLER( irem_sound_cmd_w )
 	if ((data & 0x80) == 0)
 		soundlatch_w(space, 0, data & 0x7f);
 	else
-		cputag_set_input_line(space->machine, "iremsound", 0, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "iremsound", 0, ASSERT_LINE);
 }
 
 
@@ -180,7 +180,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_1_porta_w )
 
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
-	cputag_set_input_line(space->machine, "iremsound", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "iremsound", 0, CLEAR_LINE);
 }
 
 
@@ -219,9 +219,9 @@ static WRITE8_DEVICE_HANDLER( m62_adpcm_w )
 
 static void adpcm_int(device_t *device)
 {
-	device_t *adpcm2 = device->machine->device("msm2");
+	device_t *adpcm2 = device->machine().device("msm2");
 
-	cputag_set_input_line(device->machine, "iremsound", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(device->machine(), "iremsound", INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the first MSM5205 clocks the second */
 	if (adpcm2 != NULL)

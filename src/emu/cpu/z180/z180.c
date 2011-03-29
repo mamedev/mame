@@ -1945,8 +1945,8 @@ static CPU_INIT( z180 )
 		cpustate->daisy.init(device, (const z80_daisy_config *)device->baseconfig().static_config());
 	cpustate->irq_callback = irqcallback;
 
-	SZHVC_add = auto_alloc_array(device->machine, UINT8, 2*256*256);
-	SZHVC_sub = auto_alloc_array(device->machine, UINT8, 2*256*256);
+	SZHVC_add = auto_alloc_array(device->machine(), UINT8, 2*256*256);
+	SZHVC_sub = auto_alloc_array(device->machine(), UINT8, 2*256*256);
 
 	/* set up the state table */
 	{

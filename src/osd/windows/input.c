@@ -163,6 +163,8 @@ struct _rawinput_device_info
 typedef struct _device_info device_info;
 struct _device_info
 {
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
 	// device information
 	device_info **			head;
 	device_info *			next;
@@ -170,7 +172,7 @@ struct _device_info
 	void					(*poll)(device_info *info);
 
 	// MAME information
-	running_machine *		machine;
+	running_machine *		m_machine;
 	input_device *			device;
 
 	// device state
@@ -253,7 +255,7 @@ static void device_list_poll_devices(device_info *devlist_head);
 static void device_list_reset_devices(device_info *devlist_head);
 
 // generic device management
-static device_info *generic_device_alloc(running_machine *machine, device_info **devlist_head_ptr, const TCHAR *name);
+static device_info *generic_device_alloc(running_machine &machine, device_info **devlist_head_ptr, const TCHAR *name);
 static void generic_device_free(device_info *devinfo);
 static int generic_device_index(device_info *devlist_head, device_info *devinfo);
 static void generic_device_reset(device_info *devinfo);
@@ -261,16 +263,16 @@ static INT32 generic_button_get_state(void *device_internal, void *item_internal
 static INT32 generic_axis_get_state(void *device_internal, void *item_internal);
 
 // Win32-specific input code
-static void win32_init(running_machine *machine);
+static void win32_init(running_machine &machine);
 static void win32_exit(running_machine &machine);
 static void win32_keyboard_poll(device_info *devinfo);
 static void win32_lightgun_poll(device_info *devinfo);
 
 // DirectInput-specific code
-static void dinput_init(running_machine *machine);
+static void dinput_init(running_machine &machine);
 static void dinput_exit(running_machine &machine);
 static HRESULT dinput_set_dword_property(LPDIRECTINPUTDEVICE device, REFGUID property_guid, DWORD object, DWORD how, DWORD value);
-static device_info *dinput_device_create(running_machine *machine, device_info **devlist_head_ptr, LPCDIDEVICEINSTANCE instance, LPCDIDATAFORMAT format1, LPCDIDATAFORMAT format2, DWORD cooperative_level);
+static device_info *dinput_device_create(running_machine &machine, device_info **devlist_head_ptr, LPCDIDEVICEINSTANCE instance, LPCDIDATAFORMAT format1, LPCDIDATAFORMAT format2, DWORD cooperative_level);
 static void dinput_device_release(device_info *devinfo);
 static char *dinput_device_item_name(device_info *devinfo, int offset, const TCHAR *defstring, const TCHAR *suffix);
 static HRESULT dinput_device_poll(device_info *devinfo);
@@ -283,14 +285,14 @@ static void dinput_joystick_poll(device_info *devinfo);
 static INT32 dinput_joystick_pov_get_state(void *device_internal, void *item_internal);
 
 // RawInput-specific code
-static void rawinput_init(running_machine *machine);
+static void rawinput_init(running_machine &machine);
 static void rawinput_exit(running_machine &machine);
-static device_info *rawinput_device_create(running_machine *machine, device_info **devlist_head_ptr, PRAWINPUTDEVICELIST device);
+static device_info *rawinput_device_create(running_machine &machine, device_info **devlist_head_ptr, PRAWINPUTDEVICELIST device);
 static void rawinput_device_release(device_info *info);
 static TCHAR *rawinput_device_improve_name(TCHAR *name);
-static void rawinput_keyboard_enum(running_machine *machine, PRAWINPUTDEVICELIST device);
+static void rawinput_keyboard_enum(running_machine &machine, PRAWINPUTDEVICELIST device);
 static void rawinput_keyboard_update(HANDLE device, RAWKEYBOARD *data);
-static void rawinput_mouse_enum(running_machine *machine, PRAWINPUTDEVICELIST device);
+static void rawinput_mouse_enum(running_machine &machine, PRAWINPUTDEVICELIST device);
 static void rawinput_mouse_update(HANDLE device, RAWMOUSE *data);
 static void rawinput_mouse_poll(device_info *devinfo);
 
@@ -446,7 +448,7 @@ static const int win_key_trans_table[][4] =
 //  INLINE FUNCTIONS
 //============================================================
 
-INLINE void poll_if_necessary(running_machine *machine)
+INLINE void poll_if_necessary(running_machine &machine)
 {
 	// make sure we poll at least once every 1/4 second
 	if (GetTickCount() > last_poll + 1000 / 4)
@@ -497,19 +499,19 @@ INLINE INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
 //  wininput_init
 //============================================================
 
-void wininput_init(running_machine *machine)
+void wininput_init(running_machine &machine)
 {
 	// we need pause and exit callbacks
-	machine->add_notifier(MACHINE_NOTIFY_PAUSE, wininput_pause);
-	machine->add_notifier(MACHINE_NOTIFY_RESUME, wininput_resume);
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, wininput_exit);
+	machine.add_notifier(MACHINE_NOTIFY_PAUSE, wininput_pause);
+	machine.add_notifier(MACHINE_NOTIFY_RESUME, wininput_resume);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, wininput_exit);
 
 	// allocate a lock for input synchronizations, since messages sometimes come from another thread
 	input_lock = osd_lock_alloc();
 	assert_always(input_lock != NULL, "Failed to allocate input_lock");
 
 	// decode the options
-	lightgun_shared_axis_mode = downcast<windows_options &>(machine->options()).dual_lightgun();
+	lightgun_shared_axis_mode = downcast<windows_options &>(machine.options()).dual_lightgun();
 
 	// initialize RawInput and DirectInput (RawInput first so we can fall back)
 	rawinput_init(machine);
@@ -559,7 +561,7 @@ static void wininput_exit(running_machine &machine)
 //  wininput_poll
 //============================================================
 
-void wininput_poll(running_machine *machine)
+void wininput_poll(running_machine &machine)
 {
 	int hasfocus = winwindow_has_focus() && input_enabled;
 
@@ -809,7 +811,7 @@ static void device_list_reset_devices(device_info *devlist_head)
 //  generic_device_alloc
 //============================================================
 
-static device_info *generic_device_alloc(running_machine *machine, device_info **devlist_head_ptr, const TCHAR *name)
+static device_info *generic_device_alloc(running_machine &machine, device_info **devlist_head_ptr, const TCHAR *name)
 {
 	device_info **curdev_ptr;
 	device_info *devinfo;
@@ -817,7 +819,7 @@ static device_info *generic_device_alloc(running_machine *machine, device_info *
 	// allocate memory for the device object
 	devinfo = global_alloc_clear(device_info);
 	devinfo->head = devlist_head_ptr;
-	devinfo->machine = machine;
+	devinfo->m_machine = &machine;
 
 	// allocate a UTF8 copy of the name
 	devinfo->name = utf8_from_tstring(name);
@@ -913,7 +915,7 @@ static INT32 generic_button_get_state(void *device_internal, void *item_internal
 	BYTE *itemdata = (BYTE *)item_internal;
 
 	// return the current state
-	poll_if_necessary(devinfo->machine);
+	poll_if_necessary(devinfo->machine());
 	return *itemdata >> 7;
 }
 
@@ -928,7 +930,7 @@ static INT32 generic_axis_get_state(void *device_internal, void *item_internal)
 	LONG *axisdata = (LONG *)item_internal;
 
 	// return the current state
-	poll_if_necessary(devinfo->machine);
+	poll_if_necessary(devinfo->machine());
 	return *axisdata;
 }
 
@@ -937,7 +939,7 @@ static INT32 generic_axis_get_state(void *device_internal, void *item_internal)
 //  win32_init
 //============================================================
 
-static void win32_init(running_machine *machine)
+static void win32_init(running_machine &machine)
 {
 	int gunnum;
 
@@ -946,7 +948,7 @@ static void win32_init(running_machine *machine)
 		return;
 
 	// we need an exit callback
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, win32_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, win32_exit);
 
 	// allocate two lightgun devices
 	for (gunnum = 0; gunnum < 2; gunnum++)
@@ -1069,7 +1071,7 @@ static void win32_lightgun_poll(device_info *devinfo)
 //  dinput_init
 //============================================================
 
-static void dinput_init(running_machine *machine)
+static void dinput_init(running_machine &machine)
 {
 	HRESULT result;
 #if DIRECTINPUT_VERSION >= 0x800
@@ -1114,13 +1116,13 @@ static void dinput_init(running_machine *machine)
 	mame_printf_verbose("DirectInput: Using DirectInput %d\n", dinput_version >> 8);
 
 	// we need an exit callback
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, dinput_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, dinput_exit);
 
 	// initialize keyboard devices, but only if we don't have any yet
 	if (keyboard_list == NULL)
 	{
 		// enumerate the ones we have
-		result = IDirectInput_EnumDevices(dinput, didevtype_keyboard, dinput_keyboard_enum, machine, DIEDFL_ATTACHEDONLY);
+		result = IDirectInput_EnumDevices(dinput, didevtype_keyboard, dinput_keyboard_enum, &machine, DIEDFL_ATTACHEDONLY);
 		if (result != DI_OK)
 			fatalerror("DirectInput: Unable to enumerate keyboards (result=%08X)\n", (UINT32)result);
 	}
@@ -1129,13 +1131,13 @@ static void dinput_init(running_machine *machine)
 	if (mouse_list == NULL)
 	{
 		// enumerate the ones we have
-		result = IDirectInput_EnumDevices(dinput, didevtype_mouse, dinput_mouse_enum, machine, DIEDFL_ATTACHEDONLY);
+		result = IDirectInput_EnumDevices(dinput, didevtype_mouse, dinput_mouse_enum, &machine, DIEDFL_ATTACHEDONLY);
 		if (result != DI_OK)
 			fatalerror("DirectInput: Unable to enumerate mice (result=%08X)\n", (UINT32)result);
 	}
 
 	// initialize joystick devices
-	result = IDirectInput_EnumDevices(dinput, didevtype_joystick, dinput_joystick_enum, machine, DIEDFL_ATTACHEDONLY);
+	result = IDirectInput_EnumDevices(dinput, didevtype_joystick, dinput_joystick_enum, &machine, DIEDFL_ATTACHEDONLY);
 	if (result != DI_OK)
 		fatalerror("DirectInput: Unable to enumerate joysticks (result=%08X)\n", (UINT32)result);
 }
@@ -1186,7 +1188,7 @@ static HRESULT dinput_set_dword_property(LPDIRECTINPUTDEVICE device, REFGUID pro
 //  dinput_device_create
 //============================================================
 
-static device_info *dinput_device_create(running_machine *machine, device_info **devlist_head_ptr, LPCDIDEVICEINSTANCE instance, LPCDIDATAFORMAT format1, LPCDIDATAFORMAT format2, DWORD cooperative_level)
+static device_info *dinput_device_create(running_machine &machine, device_info **devlist_head_ptr, LPCDIDEVICEINSTANCE instance, LPCDIDATAFORMAT format1, LPCDIDATAFORMAT format2, DWORD cooperative_level)
 {
 	device_info *devinfo;
 	HRESULT result;
@@ -1330,7 +1332,7 @@ static HRESULT dinput_device_poll(device_info *devinfo)
 
 static BOOL CALLBACK dinput_keyboard_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 {
-	running_machine *machine = (running_machine *)ref;
+	running_machine &machine = *(running_machine *)ref;
 	device_info *devinfo;
 	int keynum;
 
@@ -1386,7 +1388,7 @@ static void dinput_keyboard_poll(device_info *devinfo)
 static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 {
 	device_info *devinfo, *guninfo = NULL;
-	running_machine *machine = (running_machine *)ref;
+	running_machine &machine = *(running_machine *)ref;
 	int axisnum, butnum;
 	HRESULT result;
 
@@ -1489,7 +1491,7 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 {
 	DWORD cooperative_level = DISCL_FOREGROUND | DISCL_EXCLUSIVE;
 	int axisnum, axiscount, povnum, butnum;
-	running_machine *machine = (running_machine *)ref;
+	running_machine &machine = *(running_machine *)ref;
 	device_info *devinfo;
 	HRESULT result;
 
@@ -1623,7 +1625,7 @@ static INT32 dinput_joystick_pov_get_state(void *device_internal, void *item_int
 	DWORD pov;
 
 	// get the current state
-	poll_if_necessary(devinfo->machine);
+	poll_if_necessary(devinfo->machine());
 	pov = devinfo->joystick.state.rgdwPOV[povnum];
 
 	// if invalid, return 0
@@ -1646,7 +1648,7 @@ static INT32 dinput_joystick_pov_get_state(void *device_internal, void *item_int
 //  rawinput_init
 //============================================================
 
-static void rawinput_init(running_machine *machine)
+static void rawinput_init(running_machine &machine)
 {
 	RAWINPUTDEVICELIST *devlist = NULL;
 	int device_count, devnum, regcount;
@@ -1654,7 +1656,7 @@ static void rawinput_init(running_machine *machine)
 	HMODULE user32;
 
 	// we need pause and exit callbacks
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, rawinput_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, rawinput_exit);
 
 	// look in user32 for the raw input APIs
 	user32 = LoadLibrary(TEXT("user32.dll"));
@@ -1746,7 +1748,7 @@ static void rawinput_exit(running_machine &machine)
 //  rawinput_device_create
 //============================================================
 
-static device_info *rawinput_device_create(running_machine *machine, device_info **devlist_head_ptr, PRAWINPUTDEVICELIST device)
+static device_info *rawinput_device_create(running_machine &machine, device_info **devlist_head_ptr, PRAWINPUTDEVICELIST device)
 {
 	device_info *devinfo = NULL;
 	TCHAR *tname = NULL;
@@ -1950,7 +1952,7 @@ exit:
 //  rawinput_keyboard_enum
 //============================================================
 
-static void rawinput_keyboard_enum(running_machine *machine, PRAWINPUTDEVICELIST device)
+static void rawinput_keyboard_enum(running_machine &machine, PRAWINPUTDEVICELIST device)
 {
 	device_info *devinfo;
 	int keynum;
@@ -2015,7 +2017,7 @@ static void rawinput_keyboard_update(HANDLE device, RAWKEYBOARD *data)
 //  rawinput_mouse_enum
 //============================================================
 
-static void rawinput_mouse_enum(running_machine *machine, PRAWINPUTDEVICELIST device)
+static void rawinput_mouse_enum(running_machine &machine, PRAWINPUTDEVICELIST device)
 {
 	device_info *devinfo, *guninfo = NULL;
 	int axisnum, butnum;
@@ -2122,7 +2124,7 @@ static void rawinput_mouse_update(HANDLE device, RAWMOUSE *data)
 
 static void rawinput_mouse_poll(device_info *devinfo)
 {
-	poll_if_necessary(devinfo->machine);
+	poll_if_necessary(devinfo->machine());
 
 	// copy the accumulated raw state to the actual state
 	osd_lock_acquire(input_lock);

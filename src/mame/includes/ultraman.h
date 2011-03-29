@@ -30,10 +30,10 @@ public:
 
 /*----------- defined in video/ultraman.c -----------*/
 
-extern void ultraman_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
-extern void ultraman_zoom_callback_0(running_machine *machine, int *code,int *color,int *flags);
-extern void ultraman_zoom_callback_1(running_machine *machine, int *code,int *color,int *flags);
-extern void ultraman_zoom_callback_2(running_machine *machine, int *code,int *color,int *flags);
+extern void ultraman_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
+extern void ultraman_zoom_callback_0(running_machine &machine, int *code,int *color,int *flags);
+extern void ultraman_zoom_callback_1(running_machine &machine, int *code,int *color,int *flags);
+extern void ultraman_zoom_callback_2(running_machine &machine, int *code,int *color,int *flags);
 
 WRITE16_HANDLER( ultraman_gfxctrl_w );
 

@@ -71,11 +71,11 @@ PID_CAST osd_getpid(void)
 //  sdloutput_init
 //============================================================
 
-void sdloutput_init(running_machine *machine)
+void sdloutput_init(running_machine &machine)
 {
 	int fildes;
 
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, sdloutput_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, sdloutput_exit);
 
 	fildes = open(SDLMAME_OUTPUT, O_RDWR | O_NONBLOCK);
 
@@ -89,7 +89,7 @@ void sdloutput_init(running_machine *machine)
 		output = fdopen(fildes, "w");
 
 		mame_printf_verbose("ouput: opened output notifier file %s\n", SDLMAME_OUTPUT);
-		fprintf(output, "MAME " PID_FMT " START %s\n", osd_getpid(), machine->system().name);
+		fprintf(output, "MAME " PID_FMT " START %s\n", osd_getpid(), machine.system().name);
 		fflush(output);
 	}
 
@@ -134,7 +134,7 @@ static void notifier_callback(const char *outname, INT32 value, void *param)
 //  Stub for win32
 //============================================================
 
-void sdloutput_init(running_machine *machine)
+void sdloutput_init(running_machine &machine)
 {
 }
 

@@ -178,7 +178,7 @@ public:
 
 static void duart_irq_handler( device_t *device, UINT8 vector )
 {
-	adp_state *state = device->machine->driver_data<adp_state>();
+	adp_state *state = device->machine().driver_data<adp_state>();
 	device_set_input_line_and_vector(state->maincpu, 4, HOLD_LINE, vector);
 };
 
@@ -190,25 +190,25 @@ static void duart_tx( device_t *device, int channel, UINT8 data )
 	}
 };
 
-static void microtouch_tx( running_machine *machine, UINT8 data )
+static void microtouch_tx( running_machine &machine, UINT8 data )
 {
-	adp_state *state = machine->driver_data<adp_state>();
+	adp_state *state = machine.driver_data<adp_state>();
 	duart68681_rx_data(state->duart, 0, data);
 }
 
 static UINT8 duart_input( device_t *device )
 {
-	return input_port_read(device->machine, "DSW1");
+	return input_port_read(device->machine(), "DSW1");
 }
 
 static MACHINE_START( skattv )
 {
-	adp_state *state = machine->driver_data<adp_state>();
+	adp_state *state = machine.driver_data<adp_state>();
 	microtouch_init(machine, microtouch_tx, 0);
 
-	state->maincpu = machine->device("maincpu");
-	state->duart = machine->device("duart68681");
-	state->hd63484 = machine->device("hd63484");
+	state->maincpu = machine.device("maincpu");
+	state->duart = machine.device("duart68681");
+	state->hd63484 = machine.device("hd63484");
 
 	state->save_item(NAME(state->mux_data));
 	state->save_item(NAME(state->register_active));
@@ -224,10 +224,10 @@ static MACHINE_START( skattv )
 
 	// hack to handle acrt rom
 	{
-		UINT16 *rom = (UINT16*)machine->region("gfx1")->base();
+		UINT16 *rom = (UINT16*)machine.region("gfx1")->base();
 		int i;
 
-		device_t *hd63484 = machine->device("hd63484");
+		device_t *hd63484 = machine.device("hd63484");
 
 		for(i = 0; i < 0x40000/2; ++i)
 		{
@@ -241,7 +241,7 @@ static MACHINE_START( skattv )
 
 static MACHINE_RESET( skattv )
 {
-	adp_state *state = machine->driver_data<adp_state>();
+	adp_state *state = machine.driver_data<adp_state>();
 
 	state->mux_data = 0;
 	state->register_active = 0;
@@ -259,7 +259,7 @@ static PALETTE_INIT( adp )
 {
     int i;
 
-    for (i = 0; i < machine->total_colors(); i++)
+    for (i = 0; i < machine.total_colors(); i++)
     {
         int bit0, bit1, bit2, r, g, b;
 
@@ -291,34 +291,34 @@ static VIDEO_START(adp)
 
 static SCREEN_UPDATE( adp )
 {
-	adp_state *state = screen->machine->driver_data<adp_state>();
+	adp_state *state = screen->machine().driver_data<adp_state>();
 	int x, y, b, src;
 
 	b = ((hd63484_regs_r(state->hd63484, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(state->hd63484, 0xce/2, 0xffff);
 #if 1
-	if (input_code_pressed(screen->machine, KEYCODE_M)) b = 0;
-	if (input_code_pressed(screen->machine, KEYCODE_Q)) b += 0x2000 * 1;
-	if (input_code_pressed(screen->machine, KEYCODE_W)) b += 0x2000 * 2;
-	if (input_code_pressed(screen->machine, KEYCODE_E)) b += 0x2000 * 3;
-	if (input_code_pressed(screen->machine, KEYCODE_R)) b += 0x2000 * 4;
-	if (input_code_pressed(screen->machine, KEYCODE_T)) b += 0x2000 * 5;
-	if (input_code_pressed(screen->machine, KEYCODE_Y)) b += 0x2000 * 6;
-	if (input_code_pressed(screen->machine, KEYCODE_U)) b += 0x2000 * 7;
-	if (input_code_pressed(screen->machine, KEYCODE_I)) b += 0x2000 * 8;
-	if (input_code_pressed(screen->machine, KEYCODE_A)) b += 0x2000 * 9;
-	if (input_code_pressed(screen->machine, KEYCODE_S)) b += 0x2000 * 10;
-	if (input_code_pressed(screen->machine, KEYCODE_D)) b += 0x2000 * 11;
-	if (input_code_pressed(screen->machine, KEYCODE_F)) b += 0x2000 * 12;
-	if (input_code_pressed(screen->machine, KEYCODE_G)) b += 0x2000 * 13;
-	if (input_code_pressed(screen->machine, KEYCODE_H)) b += 0x2000 * 14;
-	if (input_code_pressed(screen->machine, KEYCODE_J)) b += 0x2000 * 15;
-	if (input_code_pressed(screen->machine, KEYCODE_K)) b += 0x2000 * 16;
-	if (input_code_pressed(screen->machine, KEYCODE_Z)) b += 0x2000 * 17;
-	if (input_code_pressed(screen->machine, KEYCODE_X)) b += 0x2000 * 18;
-	if (input_code_pressed(screen->machine, KEYCODE_C)) b += 0x2000 * 19;
-	if (input_code_pressed(screen->machine, KEYCODE_V)) b += 0x2000 * 20;
-	if (input_code_pressed(screen->machine, KEYCODE_B)) b += 0x2000 * 21;
-	if (input_code_pressed(screen->machine, KEYCODE_N)) b += 0x2000 * 22;
+	if (input_code_pressed(screen->machine(), KEYCODE_M)) b = 0;
+	if (input_code_pressed(screen->machine(), KEYCODE_Q)) b += 0x2000 * 1;
+	if (input_code_pressed(screen->machine(), KEYCODE_W)) b += 0x2000 * 2;
+	if (input_code_pressed(screen->machine(), KEYCODE_E)) b += 0x2000 * 3;
+	if (input_code_pressed(screen->machine(), KEYCODE_R)) b += 0x2000 * 4;
+	if (input_code_pressed(screen->machine(), KEYCODE_T)) b += 0x2000 * 5;
+	if (input_code_pressed(screen->machine(), KEYCODE_Y)) b += 0x2000 * 6;
+	if (input_code_pressed(screen->machine(), KEYCODE_U)) b += 0x2000 * 7;
+	if (input_code_pressed(screen->machine(), KEYCODE_I)) b += 0x2000 * 8;
+	if (input_code_pressed(screen->machine(), KEYCODE_A)) b += 0x2000 * 9;
+	if (input_code_pressed(screen->machine(), KEYCODE_S)) b += 0x2000 * 10;
+	if (input_code_pressed(screen->machine(), KEYCODE_D)) b += 0x2000 * 11;
+	if (input_code_pressed(screen->machine(), KEYCODE_F)) b += 0x2000 * 12;
+	if (input_code_pressed(screen->machine(), KEYCODE_G)) b += 0x2000 * 13;
+	if (input_code_pressed(screen->machine(), KEYCODE_H)) b += 0x2000 * 14;
+	if (input_code_pressed(screen->machine(), KEYCODE_J)) b += 0x2000 * 15;
+	if (input_code_pressed(screen->machine(), KEYCODE_K)) b += 0x2000 * 16;
+	if (input_code_pressed(screen->machine(), KEYCODE_Z)) b += 0x2000 * 17;
+	if (input_code_pressed(screen->machine(), KEYCODE_X)) b += 0x2000 * 18;
+	if (input_code_pressed(screen->machine(), KEYCODE_C)) b += 0x2000 * 19;
+	if (input_code_pressed(screen->machine(), KEYCODE_V)) b += 0x2000 * 20;
+	if (input_code_pressed(screen->machine(), KEYCODE_B)) b += 0x2000 * 21;
+	if (input_code_pressed(screen->machine(), KEYCODE_N)) b += 0x2000 * 22;
 #endif
 	for (y = 0;y < 280;y++)
 	{
@@ -333,7 +333,7 @@ static SCREEN_UPDATE( adp )
 			b++;
 		}
 	}
-if (!input_code_pressed(screen->machine, KEYCODE_O)) // debug: toggle window
+if (!input_code_pressed(screen->machine(), KEYCODE_O)) // debug: toggle window
 	if ((hd63484_regs_r(state->hd63484, 0x06/2, 0xffff) & 0x0300) == 0x0300)
 	{
 		int sy = (hd63484_regs_r(state->hd63484, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(state->hd63484, 0x88/2, 0xffff) >> 8);
@@ -368,49 +368,49 @@ if (!input_code_pressed(screen->machine, KEYCODE_O)) // debug: toggle window
 
 static READ16_HANDLER( test_r )
 {
-	adp_state *state = space->machine->driver_data<adp_state>();
+	adp_state *state = space->machine().driver_data<adp_state>();
 	int value = 0xffff;
 
 	switch (state->mux_data)
 	{
-		case 0x00: value = input_port_read(space->machine, "x0"); break;
-		case 0x01: value = input_port_read(space->machine, "x1"); break;
-		case 0x02: value = input_port_read(space->machine, "x2"); break;
-		case 0x03: value = input_port_read(space->machine, "1P_UP"); break;
-		case 0x04: value = input_port_read(space->machine, "1P_B1"); break;
-		case 0x05: value = input_port_read(space->machine, "x5"); break;
-		case 0x06: value = input_port_read(space->machine, "1P_RIGHT"); break;
-		case 0x07: value = input_port_read(space->machine, "1P_DOWN"); break;
-		case 0x08: value = input_port_read(space->machine, "1P_LEFT"); break;
-		case 0x09: value = input_port_read(space->machine, "x9"); break;
-		case 0x0a: value = input_port_read(space->machine, "x10"); break;
-		case 0x0b: value = input_port_read(space->machine, "x11"); break;
-		case 0x0c: value = input_port_read(space->machine, "x12"); break;
-		case 0x0d: value = input_port_read(space->machine, "x13"); break;
-		case 0x0e: value = input_port_read(space->machine, "1P_START"); break;
-		case 0x0f: value = input_port_read(space->machine, "1P_COIN"); break;
+		case 0x00: value = input_port_read(space->machine(), "x0"); break;
+		case 0x01: value = input_port_read(space->machine(), "x1"); break;
+		case 0x02: value = input_port_read(space->machine(), "x2"); break;
+		case 0x03: value = input_port_read(space->machine(), "1P_UP"); break;
+		case 0x04: value = input_port_read(space->machine(), "1P_B1"); break;
+		case 0x05: value = input_port_read(space->machine(), "x5"); break;
+		case 0x06: value = input_port_read(space->machine(), "1P_RIGHT"); break;
+		case 0x07: value = input_port_read(space->machine(), "1P_DOWN"); break;
+		case 0x08: value = input_port_read(space->machine(), "1P_LEFT"); break;
+		case 0x09: value = input_port_read(space->machine(), "x9"); break;
+		case 0x0a: value = input_port_read(space->machine(), "x10"); break;
+		case 0x0b: value = input_port_read(space->machine(), "x11"); break;
+		case 0x0c: value = input_port_read(space->machine(), "x12"); break;
+		case 0x0d: value = input_port_read(space->machine(), "x13"); break;
+		case 0x0e: value = input_port_read(space->machine(), "1P_START"); break;
+		case 0x0f: value = input_port_read(space->machine(), "1P_COIN"); break;
 	}
 
 	state->mux_data++;
 	state->mux_data &= 0xf;
 /*
-    switch (space->machine->rand() & 3)
+    switch (space->machine().rand() & 3)
     {
         case 0:
             return 0;
         case 1:
             return 0xffff;
         default:
-            return space->machine->rand() & 0xffff;
+            return space->machine().rand() & 0xffff;
     }
 */
-	return value | (space->machine->rand() & 0x0000);
+	return value | (space->machine().rand() & 0x0000);
 }
 
 /*???*/
 static WRITE16_HANDLER(wh2_w)
 {
-	adp_state *state = space->machine->driver_data<adp_state>();
+	adp_state *state = space->machine().driver_data<adp_state>();
 	state->register_active = data;
 }
 
@@ -419,15 +419,15 @@ static READ8_DEVICE_HANDLER(t2_r)
 	UINT8 res;
 	int h,w;
 	res = 0;
-	h = device->machine->primary_screen->height();
-	w = device->machine->primary_screen->width();
+	h = device->machine().primary_screen->height();
+	w = device->machine().primary_screen->width();
 
 //  popmessage("%d %d",h,w);
 
-	if (device->machine->primary_screen->hpos() > h)
+	if (device->machine().primary_screen->hpos() > h)
 		res|= 0x20; //hblank
 
-	if (device->machine->primary_screen->vpos() > w)
+	if (device->machine().primary_screen->vpos() > w)
 		res|= 0x40; //vblank
 
 	return res;
@@ -465,7 +465,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( ramdac_io_w )
 {
-	adp_state *state = space->machine->driver_data<adp_state>();
+	adp_state *state = space->machine().driver_data<adp_state>();
 	switch(offset)
 	{
 		case 0:
@@ -488,7 +488,7 @@ static WRITE8_HANDLER( ramdac_io_w )
 					break;
 				case 2:
 					state->pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					palette_set_color(space->machine, state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
+					palette_set_color(space->machine(), state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
 					state->pal.offs_internal = 0;
 					state->pal.offs++;
 					state->pal.offs&=0xff;

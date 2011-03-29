@@ -24,7 +24,7 @@
 
 static WRITE16_HANDLER( lemmings_control_w )
 {
-	lemmings_state *state = space->machine->driver_data<lemmings_state>();
+	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 
 	/* Offset==0 Pixel layer X scroll */
 	if (offset == 4)
@@ -36,10 +36,10 @@ static READ16_HANDLER( lemmings_trackball_r )
 {
 	switch (offset)
 	{
-	case 0: return input_port_read(space->machine, "AN0");
-	case 1: return input_port_read(space->machine, "AN1");
-	case 4: return input_port_read(space->machine, "AN2");
-	case 5: return input_port_read(space->machine, "AN3");
+	case 0: return input_port_read(space->machine(), "AN0");
+	case 1: return input_port_read(space->machine(), "AN1");
+	case 4: return input_port_read(space->machine(), "AN2");
+	case 5: return input_port_read(space->machine(), "AN3");
 	}
 	return 0;
 }
@@ -50,13 +50,13 @@ static READ16_HANDLER( lemmings_prot_r )
 	switch (offset << 1)
 	{
 		case 0x41a:
-			return input_port_read(space->machine, "BUTTONS");
+			return input_port_read(space->machine(), "BUTTONS");
 
 		case 0x320:
-			return input_port_read(space->machine, "SYSTEM");
+			return input_port_read(space->machine(), "SYSTEM");
 
 		case 0x4e6:
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 	}
 
 	return 0;
@@ -64,7 +64,7 @@ static READ16_HANDLER( lemmings_prot_r )
 
 static WRITE16_HANDLER( lemmings_palette_24bit_w )
 {
-	lemmings_state *state = space->machine->driver_data<lemmings_state>();
+	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 	int r, g, b;
 
 	COMBINE_DATA(&state->paletteram[offset]);
@@ -75,19 +75,19 @@ static WRITE16_HANDLER( lemmings_palette_24bit_w )
 	g = (state->paletteram[offset + 1] >> 8) & 0xff;
 	r = (state->paletteram[offset + 1] >> 0) & 0xff;
 
-	palette_set_color(space->machine, offset / 2, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset / 2, MAKE_RGB(r, g, b));
 }
 
 static WRITE16_HANDLER( lemmings_sound_w )
 {
-	lemmings_state *state = space->machine->driver_data<lemmings_state>();
+	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	device_set_input_line(state->audiocpu, 1, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( lemmings_sound_ack_w )
 {
-	lemmings_state *state = space->machine->driver_data<lemmings_state>();
+	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 	device_set_input_line(state->audiocpu, 1, CLEAR_LINE);
 }
 
@@ -246,7 +246,7 @@ GFXDECODE_END
 
 static void sound_irq( device_t *device, int state )
 {
-	lemmings_state *lemmings = device->machine->driver_data<lemmings_state>();
+	lemmings_state *lemmings = device->machine().driver_data<lemmings_state>();
 	device_set_input_line(lemmings->audiocpu, 0, state);
 }
 
@@ -257,9 +257,9 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_START( lemmings )
 {
-	lemmings_state *state = machine->driver_data<lemmings_state>();
+	lemmings_state *state = machine.driver_data<lemmings_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 }
 
 static MACHINE_CONFIG_START( lemmings, lemmings_state )

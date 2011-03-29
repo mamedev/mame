@@ -47,7 +47,7 @@
 
 static SCREEN_UPDATE( avalnche )
 {
-	avalnche_state *state = screen->machine->driver_data<avalnche_state>();
+	avalnche_state *state = screen->machine().driver_data<avalnche_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->videoram_size; offs++)
@@ -86,29 +86,29 @@ static SCREEN_UPDATE( avalnche )
 
 static WRITE8_HANDLER( avalance_video_invert_w )
 {
-	avalnche_state *state = space->machine->driver_data<avalnche_state>();
+	avalnche_state *state = space->machine().driver_data<avalnche_state>();
 	state->avalance_video_inverted = data & 0x01;
 }
 
 static WRITE8_HANDLER( catch_coin_counter_w )
 {
-	coin_counter_w(space->machine, 0, data & 1);
-	coin_counter_w(space->machine, 1, data & 2);
+	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(space->machine(), 1, data & 2);
 }
 
 static WRITE8_HANDLER( avalance_credit_1_lamp_w )
 {
-	set_led_status(space->machine, 0, data & 1);
+	set_led_status(space->machine(), 0, data & 1);
 }
 
 static WRITE8_HANDLER( avalance_credit_2_lamp_w )
 {
-	set_led_status(space->machine, 1, data & 1);
+	set_led_status(space->machine(), 1, data & 1);
 }
 
 static WRITE8_HANDLER( avalance_start_lamp_w )
 {
-	set_led_status(space->machine, 2, data & 1);
+	set_led_status(space->machine(), 2, data & 1);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
@@ -241,14 +241,14 @@ static INTERRUPT_GEN( avalnche_interrupt )
 
 static MACHINE_START( avalnche )
 {
-	avalnche_state *state = machine->driver_data<avalnche_state>();
+	avalnche_state *state = machine.driver_data<avalnche_state>();
 
 	state->save_item(NAME(state->avalance_video_inverted));
 }
 
 static MACHINE_RESET( avalnche )
 {
-	avalnche_state *state = machine->driver_data<avalnche_state>();
+	avalnche_state *state = machine.driver_data<avalnche_state>();
 
 	state->avalance_video_inverted = 0;
 }

@@ -559,19 +559,19 @@
 
 static VIDEO_START( norautp )
 {
-	norautp_state *state = machine->driver_data<norautp_state>();
+	norautp_state *state = machine.driver_data<norautp_state>();
 	state->np_vram = auto_alloc_array(machine, UINT16, 0x1000/2);
 }
 
 
 static SCREEN_UPDATE( norautp )
 {
-	norautp_state *state = screen->machine->driver_data<norautp_state>();
+	norautp_state *state = screen->machine().driver_data<norautp_state>();
 	int x, y, count;
 
 	count = 0;
 
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]); //black pen
+	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]); //black pen
 
 	for(y = 0; y < 8; y++)
 	{
@@ -583,7 +583,7 @@ static SCREEN_UPDATE( norautp )
 				int tile = state->np_vram[count] & 0x3f;
 				int colour = (state->np_vram[count] & 0xc0) >> 6;
 
-				drawgfx_opaque(bitmap,cliprect, screen->machine->gfx[1], tile, colour, 0, 0, (x * 32) + 8, y * 32);
+				drawgfx_opaque(bitmap,cliprect, screen->machine().gfx[1], tile, colour, 0, 0, (x * 32) + 8, y * 32);
 
 				count+=2;
 			}
@@ -595,7 +595,7 @@ static SCREEN_UPDATE( norautp )
 				int tile = state->np_vram[count] & 0x3f;
 				int colour = (state->np_vram[count] & 0xc0) >> 6;
 
-				drawgfx_opaque(bitmap,cliprect, screen->machine->gfx[0], tile, colour, 0, 0, x * 16, y * 32);
+				drawgfx_opaque(bitmap,cliprect, screen->machine().gfx[0], tile, colour, 0, 0, x * 16, y * 32);
 
 				count++;
 			}
@@ -664,7 +664,7 @@ static WRITE8_DEVICE_HANDLER( soundlamps_w )
   xxxx ----  * Discrete Sound Lines.
 */
 
-	device_t *discrete = device->machine->device("discrete");
+	device_t *discrete = device->machine().device("discrete");
 
 	output_set_lamp_value(8, (data >> 0) & 1);	/* DEAL / DRAW lamp */
 	output_set_lamp_value(9, (data >> 1) & 1);	/* BET / COLLECT lamp */
@@ -694,9 +694,9 @@ static WRITE8_DEVICE_HANDLER( counterlamps_w )
 	output_set_lamp_value(10, (data >> 0) & 1);	/* HI lamp */
 	output_set_lamp_value(11, (data >> 1) & 1);	/* LO lamp */
 
-	coin_counter_w(device->machine, 0, data & 0x10);	/* Coin1/3 counter */
-	coin_counter_w(device->machine, 1, data & 0x20);	/* Coin2 counter */
-	coin_counter_w(device->machine, 2, data & 0x08);	/* Payout pulse */
+	coin_counter_w(device->machine(), 0, data & 0x10);	/* Coin1/3 counter */
+	coin_counter_w(device->machine(), 1, data & 0x20);	/* Coin2 counter */
+	coin_counter_w(device->machine(), 2, data & 0x08);	/* Payout pulse */
 }
 
 
@@ -725,26 +725,26 @@ static READ8_HANDLER( test_r )
 static READ8_HANDLER( vram_data_r )
 //static READ8_DEVICE_HANDLER( vram_data_r )
 {
-	norautp_state *state = space->machine->driver_data<norautp_state>();
+	norautp_state *state = space->machine().driver_data<norautp_state>();
 	return state->np_vram[state->np_addr];
 }
 
 static WRITE8_HANDLER( vram_data_w )
 //static WRITE8_DEVICE_HANDLER( vram_data_w )
 {
-	norautp_state *state = space->machine->driver_data<norautp_state>();
+	norautp_state *state = space->machine().driver_data<norautp_state>();
 	state->np_vram[state->np_addr] = data & 0xff;
 
 	/* trigger 8255-2 port C bit 7 (/OBF) */
-//  i8255a_pc7_w(device->machine->device("ppi8255_2"), 0);
-//  i8255a_pc7_w(device->machine->device("ppi8255_2"), 1);
+//  i8255a_pc7_w(device->machine().device("ppi8255_2"), 0);
+//  i8255a_pc7_w(device->machine().device("ppi8255_2"), 1);
 
 }
 
 static WRITE8_HANDLER( vram_addr_w )
 //static WRITE8_DEVICE_HANDLER( vram_addr_w )
 {
-	norautp_state *state = space->machine->driver_data<norautp_state>();
+	norautp_state *state = space->machine().driver_data<norautp_state>();
 	state->np_addr = data;
 }
 
@@ -3370,21 +3370,21 @@ ROM_END
 */
 //static DRIVER_INIT( norautrh )
 //{
-//  UINT8 *ROM = machine->region("maincpu")->base();
+//  UINT8 *ROM = machine.region("maincpu")->base();
 //  ROM[0x1110] = 0x00;
 //  ROM[0x1111] = 0x00;
 //}
 
 //static DRIVER_INIT( norautpn )
 //{
-//  UINT8 *ROM = machine->region("maincpu")->base();
+//  UINT8 *ROM = machine.region("maincpu")->base();
 //  ROM[0x0827] = 0x00;
 //  ROM[0x0828] = 0x00;
 //}
 
 //static DRIVER_INIT( norautu )
 //{
-//  UINT8 *ROM = machine->region("maincpu")->base();
+//  UINT8 *ROM = machine.region("maincpu")->base();
 //  ROM[0x083c] = 0x00;
 //  ROM[0x083d] = 0x00;
 //  ROM[0x083e] = 0x00;
@@ -3392,7 +3392,7 @@ ROM_END
 
 //static DRIVER_INIT( gtipoker )
 //{
-//  UINT8 *ROM = machine->region("maincpu")->base();
+//  UINT8 *ROM = machine.region("maincpu")->base();
 //  ROM[0x0cc6] = 0x00;
 //  ROM[0x0cc7] = 0x00;
 //  ROM[0x0cc8] = 0x00;
@@ -3403,7 +3403,7 @@ ROM_END
 
 //static DRIVER_INIT( dphl )
 //{
-//  UINT8 *ROM = machine->region("maincpu")->base();
+//  UINT8 *ROM = machine.region("maincpu")->base();
 //  ROM[0x1510] = 0x00;
 //  ROM[0x1511] = 0x00;
 //  ROM[0x1512] = 0x00;
@@ -3411,7 +3411,7 @@ ROM_END
 
 //static DRIVER_INIT( dphla )
 //{
-//  UINT8 *ROM = machine->region("maincpu")->base();
+//  UINT8 *ROM = machine.region("maincpu")->base();
 //  ROM[0x0b09] = 0x00;
 //  ROM[0x0b0a] = 0x00;
 //  ROM[0x0b0b] = 0x00;
@@ -3421,9 +3421,9 @@ static DRIVER_INIT( enc )
 {
 /* Attempt to decrypt the program ROM */
 
-//  UINT8 *rom = machine->region("maincpu")->base();
+//  UINT8 *rom = machine.region("maincpu")->base();
 //  UINT8 *buffer;
-//  int size = 0x2000; //machine->region("maincpu")->bytes();
+//  int size = 0x2000; //machine.region("maincpu")->bytes();
 //  int start = 0;
 //  int i;
 
@@ -3460,7 +3460,7 @@ static DRIVER_INIT( deb )
 /* Just for debugging purposes */
 /*   Should be removed soon    */
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	ROM[0x02f7] = 0xca;
 	ROM[0x02f8] = 0x18;
 	ROM[0x206c] = 0xff;
@@ -3470,7 +3470,7 @@ static DRIVER_INIT( ssa )
 /* Passing the video PPI handshaking lines */
 /* Just for debugging purposes */
 {
-//  UINT8 *ROM = machine->region("maincpu")->base();
+//  UINT8 *ROM = machine.region("maincpu")->base();
 
 //  ROM[0x073b] = 0x00;
 //  ROM[0x073c] = 0x00;

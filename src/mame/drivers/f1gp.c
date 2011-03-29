@@ -30,19 +30,19 @@
 
 static READ16_HANDLER( sharedram_r )
 {
-	f1gp_state *state = space->machine->driver_data<f1gp_state>();
+	f1gp_state *state = space->machine().driver_data<f1gp_state>();
 	return state->sharedram[offset];
 }
 
 static WRITE16_HANDLER( sharedram_w )
 {
-	f1gp_state *state = space->machine->driver_data<f1gp_state>();
+	f1gp_state *state = space->machine().driver_data<f1gp_state>();
 	COMBINE_DATA(&state->sharedram[offset]);
 }
 
 static READ16_HANDLER( extrarom_r )
 {
-	UINT8 *rom = space->machine->region("user1")->base();
+	UINT8 *rom = space->machine().region("user1")->base();
 
 	offset *= 2;
 
@@ -51,7 +51,7 @@ static READ16_HANDLER( extrarom_r )
 
 static READ16_HANDLER( extrarom2_r )
 {
-	UINT8 *rom = space->machine->region("user2")->base();
+	UINT8 *rom = space->machine().region("user2")->base();
 
 	offset *= 2;
 
@@ -60,13 +60,13 @@ static READ16_HANDLER( extrarom2_r )
 
 static WRITE8_HANDLER( f1gp_sh_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x01);
+	memory_set_bank(space->machine(), "bank1", data & 0x01);
 }
 
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	f1gp_state *state = space->machine->driver_data<f1gp_state>();
+	f1gp_state *state = space->machine().driver_data<f1gp_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -78,13 +78,13 @@ static WRITE16_HANDLER( sound_command_w )
 
 static READ16_HANDLER( command_pending_r )
 {
-	f1gp_state *state = space->machine->driver_data<f1gp_state>();
+	f1gp_state *state = space->machine().driver_data<f1gp_state>();
 	return (state->pending_command ? 0xff : 0);
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	f1gp_state *state = space->machine->driver_data<f1gp_state>();
+	f1gp_state *state = space->machine().driver_data<f1gp_state>();
 	state->pending_command = 0;
 }
 
@@ -168,8 +168,8 @@ static WRITE16_HANDLER( f1gpb_misc_w )
     if(old_bank != new_bank && new_bank < 5)
     {
         // oki banking
-        UINT8 *src = space->machine->region("oki")->base() + 0x40000 + 0x10000 * new_bank;
-        UINT8 *dst = space->machine->region("oki")->base() + 0x30000;
+        UINT8 *src = space->machine().region("oki")->base() + 0x40000 + 0x10000 * new_bank;
+        UINT8 *dst = space->machine().region("oki")->base() + 0x30000;
         memcpy(dst, src, 0x10000);
 
         old_bank = new_bank;
@@ -411,7 +411,7 @@ GFXDECODE_END
 
 static void irqhandler( device_t *device, int irq )
 {
-	f1gp_state *state = device->machine->driver_data<f1gp_state>();
+	f1gp_state *state = device->machine().driver_data<f1gp_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -433,7 +433,7 @@ static const k053936_interface f1gp2_k053936_intf =
 
 static MACHINE_START( f1gpb )
 {
-	f1gp_state *state = machine->driver_data<f1gp_state>();
+	f1gp_state *state = machine.driver_data<f1gp_state>();
 
 	state->save_item(NAME(state->pending_command));
 	state->save_item(NAME(state->roz_bank));
@@ -444,20 +444,20 @@ static MACHINE_START( f1gpb )
 
 static MACHINE_START( f1gp )
 {
-	f1gp_state *state = machine->driver_data<f1gp_state>();
-	UINT8 *ROM = machine->region("audiocpu")->base();
+	f1gp_state *state = machine.driver_data<f1gp_state>();
+	UINT8 *ROM = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x8000);
 
-	state->audiocpu = machine->device("audiocpu");
-	state->k053936 = machine->device("k053936");
+	state->audiocpu = machine.device("audiocpu");
+	state->k053936 = machine.device("k053936");
 
 	MACHINE_START_CALL(f1gpb);
 }
 
 static MACHINE_RESET( f1gp )
 {
-	f1gp_state *state = machine->driver_data<f1gp_state>();
+	f1gp_state *state = machine.driver_data<f1gp_state>();
 
 	state->pending_command = 0;
 	state->roz_bank = 0;

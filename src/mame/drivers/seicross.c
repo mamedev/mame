@@ -51,7 +51,7 @@ This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
 
 static NVRAM_HANDLER( seicross )
 {
-	seicross_state *state = machine->driver_data<seicross_state>();
+	seicross_state *state = machine.driver_data<seicross_state>();
 	UINT8 *nvram = state->nvram;
 	size_t nvram_size = state->nvram_size;
 
@@ -83,18 +83,18 @@ static MACHINE_RESET( friskyt )
 
 static READ8_DEVICE_HANDLER( friskyt_portB_r )
 {
-	seicross_state *state = device->machine->driver_data<seicross_state>();
+	seicross_state *state = device->machine().driver_data<seicross_state>();
 
-	return (state->portb & 0x9f) | (input_port_read_safe(device->machine, "DEBUG", 0) & 0x60);
+	return (state->portb & 0x9f) | (input_port_read_safe(device->machine(), "DEBUG", 0) & 0x60);
 }
 
 static WRITE8_DEVICE_HANDLER( friskyt_portB_w )
 {
-	seicross_state *state = device->machine->driver_data<seicross_state>();
+	seicross_state *state = device->machine().driver_data<seicross_state>();
 
 	//logerror("PC %04x: 8910 port B = %02x\n", cpu_get_pc(space->cpu), data);
 	/* bit 0 is IRQ enable */
-	cpu_interrupt_enable(device->machine->device("maincpu"), data & 1);
+	cpu_interrupt_enable(device->machine().device("maincpu"), data & 1);
 
 	/* bit 1 flips screen */
 
@@ -102,8 +102,8 @@ static WRITE8_DEVICE_HANDLER( friskyt_portB_w )
 	if (((state->portb & 4) == 0) && (data & 4))
 	{
 		/* reset and start the protection mcu */
-		cputag_set_input_line(device->machine, "mcu", INPUT_LINE_RESET, PULSE_LINE);
-		cputag_set_input_line(device->machine, "mcu", INPUT_LINE_HALT, CLEAR_LINE);
+		cputag_set_input_line(device->machine(), "mcu", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(device->machine(), "mcu", INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
 	/* other bits unknown */

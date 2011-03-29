@@ -84,7 +84,7 @@ static PALETTE_INIT( olibochu )
 {
 	int i;
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		UINT8 pen;
 		int bit0, bit1, bit2, r, g, b;
@@ -119,24 +119,24 @@ static PALETTE_INIT( olibochu )
 
 static WRITE8_HANDLER( olibochu_videoram_w )
 {
-	olibochu_state *state = space->machine->driver_data<olibochu_state>();
+	olibochu_state *state = space->machine().driver_data<olibochu_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( olibochu_colorram_w )
 {
-	olibochu_state *state = space->machine->driver_data<olibochu_state>();
+	olibochu_state *state = space->machine().driver_data<olibochu_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( olibochu_flipscreen_w )
 {
-	if (flip_screen_get(space->machine) != (data & 0x80))
+	if (flip_screen_get(space->machine()) != (data & 0x80))
 	{
-		flip_screen_set(space->machine, data & 0x80);
-		tilemap_mark_all_tiles_dirty_all(space->machine);
+		flip_screen_set(space->machine(), data & 0x80);
+		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 
 	/* other bits are used, but unknown */
@@ -144,7 +144,7 @@ static WRITE8_HANDLER( olibochu_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	olibochu_state *state = machine->driver_data<olibochu_state>();
+	olibochu_state *state = machine.driver_data<olibochu_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + ((attr & 0x20) << 3);
 	int color = (attr & 0x1f) + 0x20;
@@ -155,13 +155,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( olibochu )
 {
-	olibochu_state *state = machine->driver_data<olibochu_state>();
+	olibochu_state *state = machine.driver_data<olibochu_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	olibochu_state *state = machine->driver_data<olibochu_state>();
+	olibochu_state *state = machine.driver_data<olibochu_state>();
 	UINT8 *spriteram = state->spriteram;
 	UINT8 *spriteram_2 = state->spriteram2;
 	int offs;
@@ -186,7 +186,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		}
 
 		drawgfx_transpen(bitmap, cliprect,
-			machine->gfx[1],
+			machine.gfx[1],
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -212,7 +212,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		}
 
 		drawgfx_transpen(bitmap, cliprect,
-			machine->gfx[0],
+			machine.gfx[0],
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -221,16 +221,16 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static SCREEN_UPDATE( olibochu )
 {
-	olibochu_state *state = screen->machine->driver_data<olibochu_state>();
+	olibochu_state *state = screen->machine().driver_data<olibochu_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	olibochu_state *state = space->machine->driver_data<olibochu_state>();
+	olibochu_state *state = space->machine().driver_data<olibochu_state>();
 	int c;
 
 	if (offset == 0)
@@ -424,14 +424,14 @@ static INTERRUPT_GEN( olibochu_interrupt )
 
 static MACHINE_START( olibochu )
 {
-	olibochu_state *state = machine->driver_data<olibochu_state>();
+	olibochu_state *state = machine.driver_data<olibochu_state>();
 
 	state->save_item(NAME(state->cmd));
 }
 
 static MACHINE_RESET( olibochu )
 {
-	olibochu_state *state = machine->driver_data<olibochu_state>();
+	olibochu_state *state = machine.driver_data<olibochu_state>();
 
 	state->cmd = 0;
 }

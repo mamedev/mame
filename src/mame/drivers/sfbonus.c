@@ -625,7 +625,7 @@ INPUT_PORTS_END
 
 static TILE_GET_INFO( get_sfbonus_tile_info )
 {
-	sfbonus_state *state = machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = machine.driver_data<sfbonus_state>();
 	int code = state->tilemap_ram[(tile_index*2)+0] | (state->tilemap_ram[(tile_index*2)+1]<<8);
 	int flipx = (state->tilemap_ram[(tile_index*2)+1] & 0x80)>>7;
 	int flipy = (state->tilemap_ram[(tile_index*2)+1] & 0x40)>>5;
@@ -639,7 +639,7 @@ static TILE_GET_INFO( get_sfbonus_tile_info )
 
 static TILE_GET_INFO( get_sfbonus_reel_tile_info )
 {
-	sfbonus_state *state = machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = machine.driver_data<sfbonus_state>();
 	int code = state->reel_ram[(tile_index*2)+0] | (state->reel_ram[(tile_index*2)+1]<<8);
 	int flipx = (state->reel_ram[(tile_index*2)+1] & 0x80)>>7;
 	int flipy = 0;//(state->reel_ram[(tile_index*2)+1] & 0x40)>>5;
@@ -655,7 +655,7 @@ static TILE_GET_INFO( get_sfbonus_reel_tile_info )
 
 static TILE_GET_INFO( get_sfbonus_reel2_tile_info )
 {
-	sfbonus_state *state = machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = machine.driver_data<sfbonus_state>();
 	int code = state->reel2_ram[(tile_index*2)+0] | (state->reel2_ram[(tile_index*2)+1]<<8);
 	int flipx = (state->reel2_ram[(tile_index*2)+1] & 0x80)>>7;
 	int flipy = 0;//(state->reel2_ram[(tile_index*2)+1] & 0x40)>>5;
@@ -671,7 +671,7 @@ static TILE_GET_INFO( get_sfbonus_reel2_tile_info )
 
 static TILE_GET_INFO( get_sfbonus_reel3_tile_info )
 {
-	sfbonus_state *state = machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = machine.driver_data<sfbonus_state>();
 	int code = state->reel3_ram[(tile_index*2)+0] | (state->reel3_ram[(tile_index*2)+1]<<8);
 	int flipx = (state->reel3_ram[(tile_index*2)+1] & 0x80)>>7;
 	int flipy = 0;//(state->reel3_ram[(tile_index*2)+1] & 0x40)>>5;
@@ -687,7 +687,7 @@ static TILE_GET_INFO( get_sfbonus_reel3_tile_info )
 
 static TILE_GET_INFO( get_sfbonus_reel4_tile_info )
 {
-	sfbonus_state *state = machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = machine.driver_data<sfbonus_state>();
 	int code = state->reel4_ram[(tile_index*2)+0] | (state->reel4_ram[(tile_index*2)+1]<<8);
 	int flipx = (state->reel4_ram[(tile_index*2)+1] & 0x80)>>7;
 	int flipy = 0;//(state->reel4_ram[(tile_index*2)+1] & 0x40)>>5;
@@ -704,7 +704,7 @@ static TILE_GET_INFO( get_sfbonus_reel4_tile_info )
 
 static WRITE8_HANDLER( sfbonus_videoram_w )
 {
-	sfbonus_state *state = space->machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
 	if (offset<0x4000) /* 0x0000 - 0x3fff */
 	{
 		state->tilemap_ram[offset] = data;
@@ -756,7 +756,7 @@ static WRITE8_HANDLER( sfbonus_videoram_w )
 
 static VIDEO_START(sfbonus)
 {
-	sfbonus_state *state = machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = machine.driver_data<sfbonus_state>();
 	state->temp_reel_bitmap = auto_bitmap_alloc(machine,1024,512,BITMAP_FORMAT_INDEXED16);
 
 	state->tilemap = tilemap_create(machine,get_sfbonus_tile_info,tilemap_scan_rows,8,8, 128, 64);
@@ -783,7 +783,7 @@ static VIDEO_START(sfbonus)
 
 static void sfbonus_draw_reel_layer(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int catagory)
 {
-	sfbonus_state *state = screen->machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = screen->machine().driver_data<sfbonus_state>();
 	int zz;
 	int i;
 	int startclipmin;
@@ -922,7 +922,7 @@ static void sfbonus_draw_reel_layer(screen_device *screen, bitmap_t *bitmap, con
 
 static SCREEN_UPDATE(sfbonus)
 {
-	sfbonus_state *state = screen->machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = screen->machine().driver_data<sfbonus_state>();
 
 	int globalyscroll = (state->vregs[2] | state->vregs[3]<<8);
 	int globalxscroll = (state->vregs[0] | state->vregs[1]<<8);
@@ -934,8 +934,8 @@ static SCREEN_UPDATE(sfbonus)
 	globalyscroll += 8;
 	globalxscroll += 8;
 
-	bitmap_fill(bitmap,cliprect,screen->machine->pens[0]);
-	bitmap_fill(state->temp_reel_bitmap,cliprect,screen->machine->pens[0]);
+	bitmap_fill(bitmap,cliprect,screen->machine().pens[0]);
+	bitmap_fill(state->temp_reel_bitmap,cliprect,screen->machine().pens[0]);
 
 	/* render reels to bitmap */
 	sfbonus_draw_reel_layer(screen,state->temp_reel_bitmap,cliprect,0);
@@ -1031,7 +1031,7 @@ static SCREEN_UPDATE(sfbonus)
     state->_1800_regs[7]);
 #endif
 
-	ipt = screen->machine->system().ipt;
+	ipt = screen->machine().system().ipt;
 	if ((ipt == INPUT_PORTS_NAME(amcoe2_reels3)) || (ipt == INPUT_PORTS_NAME(amcoe2_reels4))
 		|| (ipt == INPUT_PORTS_NAME(amcoe2_poker)))
 	{
@@ -1060,7 +1060,7 @@ static SCREEN_UPDATE(sfbonus)
 
 static WRITE8_HANDLER( paletteram_io_w )
 {
-	sfbonus_state *state = space->machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
 	switch(offset)
 	{
 		case 0:
@@ -1082,7 +1082,7 @@ static WRITE8_HANDLER( paletteram_io_w )
 					break;
 				case 2:
 					state->pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					palette_set_color(space->machine, state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
+					palette_set_color(space->machine(), state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
 					state->pal.offs_internal = 0;
 					state->pal.offs++;
 					break;
@@ -1101,34 +1101,34 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sfbonus_bank_w )
 {
-	UINT8 *ROM = space->machine->region("maincpu")->base();
+	UINT8 *ROM = space->machine().region("maincpu")->base();
 	UINT8 bank;
 
 	bank = data & 7;
 
-	memory_set_bankptr(space->machine, "bank1", &ROM[bank * 0x10000]);
+	memory_set_bankptr(space->machine(), "bank1", &ROM[bank * 0x10000]);
 }
 
 
 
 static READ8_HANDLER( sfbonus_2800_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static READ8_HANDLER( sfbonus_2801_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static READ8_HANDLER( sfbonus_2c00_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static READ8_HANDLER( sfbonus_2c01_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static READ8_HANDLER( sfbonus_3800_r )
@@ -1140,31 +1140,31 @@ static READ8_HANDLER( sfbonus_3800_r )
 // lamps and coin counters
 static WRITE8_HANDLER( sfbonus_1800_w )
 {
-	sfbonus_state *state = space->machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
 	state->_1800_regs[offset] = data;
 }
 
 static WRITE8_HANDLER( sfbonus_3800_w )
 {
-	sfbonus_state *state = space->machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
 	state->_3800_regs[offset] = data;
 }
 
 static WRITE8_HANDLER( sfbonus_3000_w )
 {
-	sfbonus_state *state = space->machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
 	state->_3000_regs[offset] = data;
 }
 
 static WRITE8_HANDLER( sfbonus_2801_w )
 {
-	sfbonus_state *state = space->machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
 	state->_2801_regs[offset] = data;
 }
 
 static WRITE8_HANDLER( sfbonus_2c01_w )
 {
-	sfbonus_state *state = space->machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
 	state->_2c01_regs[offset] = data;
 }
 
@@ -1238,14 +1238,14 @@ GFXDECODE_END
 
 static MACHINE_RESET( sfbonus )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_set_bankptr(machine, "bank1", &ROM[0]);
 }
 
 static NVRAM_HANDLER( sfbonus )
 {
-	sfbonus_state *state = machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = machine.driver_data<sfbonus_state>();
 	if (read_or_write)
 		file->write(state->nvram,state->nvram_size);
 	else
@@ -1257,12 +1257,12 @@ static NVRAM_HANDLER( sfbonus )
 		}
 		else
 		{
-			UINT8* defaultram = machine->region("defaults")->base();
+			UINT8* defaultram = machine.region("defaults")->base();
 			memset(state->nvram,0x00,state->nvram_size);
 
 			if (defaultram)
 				if ((defaultram[0x02]==0x00) && (defaultram[0x03]==0x00)) // hack! rom region optional regions get cleared with garbage if no rom is present, this is not good!
-					memcpy(state->nvram, machine->region("defaults")->base(), machine->region("defaults")->bytes());
+					memcpy(state->nvram, machine.region("defaults")->base(), machine.region("defaults")->bytes());
 		}
 	}
 }
@@ -5466,7 +5466,7 @@ ROM_END
 
 static DRIVER_INIT( sfbonus_common)
 {
-	sfbonus_state *state = machine->driver_data<sfbonus_state>();
+	sfbonus_state *state = machine.driver_data<sfbonus_state>();
 	state->tilemap_ram = auto_alloc_array(machine, UINT8, 0x4000);
 	memset(state->tilemap_ram, 0xff, 0x4000);
 	state_save_register_global_pointer(machine, state->tilemap_ram , 0x4000);
@@ -5488,7 +5488,7 @@ static DRIVER_INIT( sfbonus_common)
 	state_save_register_global_pointer(machine, state->reel4_ram , 0x0800);
 
 	// hack, because the debugger is broken
-	state->videoram = machine->region("debugram")->base();
+	state->videoram = machine.region("debugram")->base();
 	if (!state->videoram)
 		state->videoram = auto_alloc_array(machine, UINT8, 0x10000);
 
@@ -5498,9 +5498,9 @@ static DRIVER_INIT( sfbonus_common)
 
 	// dummy.rom helper
 	{
-		UINT8 *ROM = machine->region("maincpu")->base();
-		int length = machine->region("maincpu")->bytes();
-		UINT8* ROM2 = machine->region("user1")->base();
+		UINT8 *ROM = machine.region("maincpu")->base();
+		int length = machine.region("maincpu")->bytes();
+		UINT8* ROM2 = machine.region("user1")->base();
 
 		if (ROM2)
 		{
@@ -5526,7 +5526,7 @@ static DRIVER_INIT( sfbonus_common)
 			{
 				FILE *fp;
 				char filename[256];
-				sprintf(filename,"decr_%s", machine->system().name);
+				sprintf(filename,"decr_%s", machine.system().name);
 				fp = fopen(filename, "w+b");
 				if (fp)
 				{
@@ -5538,7 +5538,7 @@ static DRIVER_INIT( sfbonus_common)
 	}
 }
 
-static void sfbonus_bitswap( running_machine* machine,
+static void sfbonus_bitswap( running_machine& machine,
 						UINT8 xor0, UINT8 b00, UINT8 b01, UINT8 b02, UINT8 b03, UINT8 b04, UINT8 b05, UINT8 b06,UINT8 b07,
                         UINT8 xor1, UINT8 b10, UINT8 b11, UINT8 b12, UINT8 b13, UINT8 b14, UINT8 b15, UINT8 b16,UINT8 b17,
 	                    UINT8 xor2, UINT8 b20, UINT8 b21, UINT8 b22, UINT8 b23, UINT8 b24, UINT8 b25, UINT8 b26,UINT8 b27,
@@ -5550,9 +5550,9 @@ static void sfbonus_bitswap( running_machine* machine,
 {
 
 	int i;
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
-	for(i = 0; i < machine->region("maincpu")->bytes(); i++)
+	for(i = 0; i < machine.region("maincpu")->bytes(); i++)
 	{
 		UINT8 x = ROM[i];
 

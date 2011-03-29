@@ -37,8 +37,8 @@ WRITE32_DEVICE_HANDLER( dc_arm_aica_w );
 MACHINE_START( dc );
 MACHINE_RESET( dc );
 
-int dc_compute_interrupt_level(running_machine *machine);
-void dc_update_interrupt_status(running_machine *machine);
+int dc_compute_interrupt_level(running_machine &machine);
+void dc_update_interrupt_status(running_machine &machine);
 
 INPUT_CHANGED( dc_coin_slots_callback );
 

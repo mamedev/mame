@@ -10,8 +10,8 @@ static WRITE8_HANDLER( pc10_nt_w );
 static READ8_HANDLER( pc10_nt_r );
 static WRITE8_HANDLER( pc10_chr_w );
 static READ8_HANDLER( pc10_chr_r );
-static void pc10_set_videorom_bank( running_machine *machine, int first, int count, int bank, int size );
-static void set_videoram_bank( running_machine *machine, int first, int count, int bank, int size );
+static void pc10_set_videorom_bank( running_machine &machine, int first, int count, int bank, int size );
+static void set_videoram_bank( running_machine &machine, int first, int count, int bank, int size );
 
 
 /*************************************
@@ -22,8 +22,8 @@ static void set_videoram_bank( running_machine *machine, int first, int count, i
 
 MACHINE_RESET( pc10 )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
-	device_t *rp5h01 = machine->device("rp5h01");
+	playch10_state *state = machine.driver_data<playch10_state>();
+	device_t *rp5h01 = machine.device("rp5h01");
 
 	/* initialize latches and flip-flops */
 	state->pc10_nmi_enable = state->pc10_dog_di = state->pc10_dispmask = state->pc10_sdcs = state->pc10_int_detect = 0;
@@ -50,29 +50,29 @@ MACHINE_RESET( pc10 )
 
 MACHINE_START( pc10 )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
-	state->vrom = machine->region("gfx2")->base();
+	playch10_state *state = machine.driver_data<playch10_state>();
+	state->vrom = machine.region("gfx2")->base();
 
 	/* allocate 4K of nametable ram here */
 	/* move to individual boards as documentation of actual boards allows */
 	state->nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
 
-	machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0, 0x1fff, FUNC(pc10_chr_r), FUNC(pc10_chr_w));
-	machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(pc10_nt_r), FUNC(pc10_nt_w));
+	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0, 0x1fff, FUNC(pc10_chr_r), FUNC(pc10_chr_w));
+	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(pc10_nt_r), FUNC(pc10_nt_w));
 
 	if (NULL != state->vram)
 		set_videoram_bank(machine, 0, 8, 0, 8);
 	else pc10_set_videorom_bank(machine, 0, 8, 0, 8);
 
-	nvram_device *nvram = machine->device<nvram_device>("nvram");
+	nvram_device *nvram = machine.device<nvram_device>("nvram");
 	if (nvram != NULL)
-		nvram->set_base(machine->region("cart" )->base() + 0x6000, 0x1000);
+		nvram->set_base(machine.region("cart" )->base() + 0x6000, 0x1000);
 }
 
 MACHINE_START( playch10_hboard )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
-	state->vrom = machine->region("gfx2")->base();
+	playch10_state *state = machine.driver_data<playch10_state>();
+	state->vrom = machine.region("gfx2")->base();
 
 	/* allocate 4K of nametable ram here */
 	/* move to individual boards as documentation of actual boards allows */
@@ -81,8 +81,8 @@ MACHINE_START( playch10_hboard )
 
 	state->vram = auto_alloc_array(machine, UINT8, 0x2000);
 
-	machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0, 0x1fff, FUNC(pc10_chr_r), FUNC(pc10_chr_w));
-	machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(pc10_nt_r), FUNC(pc10_nt_w));
+	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0, 0x1fff, FUNC(pc10_chr_r), FUNC(pc10_chr_w));
+	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(pc10_nt_r), FUNC(pc10_nt_w));
 }
 
 /*************************************
@@ -93,13 +93,13 @@ MACHINE_START( playch10_hboard )
 
 CUSTOM_INPUT( pc10_int_detect_r )
 {
-	playch10_state *state = field->port->machine->driver_data<playch10_state>();
+	playch10_state *state = field->port->machine().driver_data<playch10_state>();
 	return ~state->pc10_int_detect & 1;
 }
 
 WRITE8_HANDLER( pc10_SDCS_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	/*
         Hooked to CLR on LS194A - Sheet 2, bottom left.
         Drives character and color code to 0.
@@ -111,13 +111,13 @@ WRITE8_HANDLER( pc10_SDCS_w )
 
 WRITE8_HANDLER( pc10_CNTRLMASK_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	state->cntrl_mask = ~data & 1;
 }
 
 WRITE8_HANDLER( pc10_DISPMASK_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	state->pc10_dispmask = ~data & 1;
 }
 
@@ -128,35 +128,35 @@ WRITE8_HANDLER( pc10_SOUNDMASK_w )
 
 WRITE8_HANDLER( pc10_NMIENABLE_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	state->pc10_nmi_enable = data & 1;
 }
 
 WRITE8_HANDLER( pc10_DOGDI_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	state->pc10_dog_di = data & 1;
 }
 
 WRITE8_HANDLER( pc10_GAMERES_w )
 {
-	cputag_set_input_line(space->machine, "cart", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE );
+	cputag_set_input_line(space->machine(), "cart", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 WRITE8_HANDLER( pc10_GAMESTOP_w )
 {
-	cputag_set_input_line(space->machine, "cart", INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE );
+	cputag_set_input_line(space->machine(), "cart", INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 WRITE8_HANDLER( pc10_PPURES_w )
 {
 	if (data & 1)
-		devtag_reset(space->machine, "ppu");
+		devtag_reset(space->machine(), "ppu");
 }
 
 READ8_HANDLER( pc10_detectclr_r )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	state->pc10_int_detect = 0;
 
 	return 0;
@@ -164,7 +164,7 @@ READ8_HANDLER( pc10_detectclr_r )
 
 WRITE8_HANDLER( pc10_CARTSEL_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	state->cart_sel &= ~(1 << offset);
 	state->cart_sel |= (data & 1) << offset;
 }
@@ -178,8 +178,8 @@ WRITE8_HANDLER( pc10_CARTSEL_w )
 
 READ8_HANDLER( pc10_prot_r )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
-	device_t *rp5h01 = space->machine->device("rp5h01");
+	playch10_state *state = space->machine().driver_data<playch10_state>();
+	device_t *rp5h01 = space->machine().device("rp5h01");
 	int data = 0xe7;
 
 	/* we only support a single cart connected at slot 0 */
@@ -195,8 +195,8 @@ READ8_HANDLER( pc10_prot_r )
 
 WRITE8_HANDLER( pc10_prot_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
-	device_t *rp5h01 = space->machine->device("rp5h01");
+	playch10_state *state = space->machine().driver_data<playch10_state>();
+	device_t *rp5h01 = space->machine().device("rp5h01");
 	/* we only support a single cart connected at slot 0 */
 	if (state->cart_sel == 0)
 	{
@@ -211,7 +211,7 @@ WRITE8_HANDLER( pc10_prot_w )
 		/* is the actual protection memory area                     */
 		/* setting the whole 0x2000 region every time is a waste    */
 		/* so we just set $ffff with the current value              */
-		space->machine->region("maincpu")->base()[0xffff] = pc10_prot_r(space, 0);
+		space->machine().region("maincpu")->base()[0xffff] = pc10_prot_r(space, 0);
 	}
 }
 
@@ -224,14 +224,14 @@ WRITE8_HANDLER( pc10_prot_w )
 
 WRITE8_HANDLER( pc10_in0_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	/* Toggling bit 0 high then low resets both controllers */
 	if (data & 1)
 		return;
 
 	/* load up the latches */
-	state->input_latch[0] = input_port_read(space->machine, "P1");
-	state->input_latch[1] = input_port_read(space->machine, "P2");
+	state->input_latch[0] = input_port_read(space->machine(), "P1");
+	state->input_latch[1] = input_port_read(space->machine(), "P2");
 
 	/* apply any masking from the BIOS */
 	if (state->cntrl_mask)
@@ -243,7 +243,7 @@ WRITE8_HANDLER( pc10_in0_w )
 
 READ8_HANDLER( pc10_in0_r )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	int ret = (state->input_latch[0]) & 1;
 
 	/* shift */
@@ -258,7 +258,7 @@ READ8_HANDLER( pc10_in0_r )
 
 READ8_HANDLER( pc10_in1_r )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	int ret = (state->input_latch[1]) & 1;
 
 	/* shift */
@@ -267,10 +267,10 @@ READ8_HANDLER( pc10_in1_r )
 	/* do the gun thing */
 	if (state->pc10_gun_controller)
 	{
-		device_t *ppu = space->machine->device("ppu");
-		int trigger = input_port_read(space->machine, "P1");
-		int x = input_port_read(space->machine, "GUNX");
-		int y = input_port_read(space->machine, "GUNY");
+		device_t *ppu = space->machine().device("ppu");
+		int trigger = input_port_read(space->machine(), "P1");
+		int x = input_port_read(space->machine(), "GUNX");
+		int y = input_port_read(space->machine(), "GUNY");
 		UINT32 pix, color_base;
 
 		/* no sprite hit (yet) */
@@ -310,21 +310,21 @@ READ8_HANDLER( pc10_in1_r )
 
 static WRITE8_HANDLER( pc10_nt_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	int page = ((offset & 0xc00) >> 10);
 	state->nametable[page][offset & 0x3ff] = data;
 }
 
 static READ8_HANDLER( pc10_nt_r )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	int page = ((offset & 0xc00) >> 10);
 	return state->nametable[page][offset & 0x3ff];
 }
 
 static WRITE8_HANDLER( pc10_chr_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	int bank = offset >> 10;
 	if (state->chr_page[bank].writable)
 	{
@@ -334,7 +334,7 @@ static WRITE8_HANDLER( pc10_chr_w )
 
 static READ8_HANDLER( pc10_chr_r )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	int bank = offset >> 10;
 	return state->chr_page[bank].chr[offset & 0x3ff];
 }
@@ -379,9 +379,9 @@ static void pc10_set_mirroring( playch10_state *state, int mirroring )
  *  64         1 *
 \*****************/
 
-static void pc10_set_videorom_bank( running_machine *machine, int first, int count, int bank, int size )
+static void pc10_set_videorom_bank( running_machine &machine, int first, int count, int bank, int size )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
+	playch10_state *state = machine.driver_data<playch10_state>();
 	int i, len;
 	/* first = first bank to map */
 	/* count = number of 1K banks to map */
@@ -392,7 +392,7 @@ static void pc10_set_videorom_bank( running_machine *machine, int first, int cou
 	/* yeah, this is probably a horrible assumption to make.*/
 	/* but the driver is 100% consistant */
 
-	len = machine->region("gfx2")->bytes();
+	len = machine.region("gfx2")->bytes();
 	len /= 0x400;	// convert to KB
 	len /= size;	// convert to bank resolution
 	len--;			// convert to mask
@@ -405,9 +405,9 @@ static void pc10_set_videorom_bank( running_machine *machine, int first, int cou
 	}
 }
 
-static void set_videoram_bank( running_machine *machine, int first, int count, int bank, int size )
+static void set_videoram_bank( running_machine &machine, int first, int count, int bank, int size )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
+	playch10_state *state = machine.driver_data<playch10_state>();
 	int i;
 	/* first = first bank to map */
 	/* count = number of 1K banks to map */
@@ -434,7 +434,7 @@ static void set_videoram_bank( running_machine *machine, int first, int count, i
 
 DRIVER_INIT( playch10 )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
+	playch10_state *state = machine.driver_data<playch10_state>();
 	state->vram = NULL;
 
 	/* set the controller to default */
@@ -454,7 +454,7 @@ DRIVER_INIT( playch10 )
 
 DRIVER_INIT( pc_gun )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
+	playch10_state *state = machine.driver_data<playch10_state>();
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
 
@@ -470,7 +470,7 @@ DRIVER_INIT( pc_gun )
 
 DRIVER_INIT( pc_hrz )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
+	playch10_state *state = machine.driver_data<playch10_state>();
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
 
@@ -483,7 +483,7 @@ DRIVER_INIT( pc_hrz )
 
 static WRITE8_HANDLER( mmc1_rom_switch_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	/* basically, a MMC1 mapper from the nes */
 	static int size16k, switchlow, vrom4k;
 
@@ -553,25 +553,25 @@ static WRITE8_HANDLER( mmc1_rom_switch_w )
 
 			case 1:	/* video rom banking - bank 0 - 4k or 8k */
 				if (state->vram)
-					set_videoram_bank(space->machine, 0, (vrom4k) ? 4 : 8, (state->mmc1_shiftreg & 0x1f), 4);
+					set_videoram_bank(space->machine(), 0, (vrom4k) ? 4 : 8, (state->mmc1_shiftreg & 0x1f), 4);
 				else
-					pc10_set_videorom_bank(space->machine, 0, (vrom4k) ? 4 : 8, (state->mmc1_shiftreg & 0x1f), 4);
+					pc10_set_videorom_bank(space->machine(), 0, (vrom4k) ? 4 : 8, (state->mmc1_shiftreg & 0x1f), 4);
 			break;
 
 			case 2: /* video rom banking - bank 1 - 4k only */
 				if (vrom4k)
 				{
 					if (state->vram)
-						set_videoram_bank(space->machine, 0, (vrom4k) ? 4 : 8, (state->mmc1_shiftreg & 0x1f), 4);
+						set_videoram_bank(space->machine(), 0, (vrom4k) ? 4 : 8, (state->mmc1_shiftreg & 0x1f), 4);
 					else
-						pc10_set_videorom_bank(space->machine, 4, 4, (state->mmc1_shiftreg & 0x1f), 4);
+						pc10_set_videorom_bank(space->machine(), 4, 4, (state->mmc1_shiftreg & 0x1f), 4);
 				}
 			break;
 
 			case 3:	/* program banking */
 				{
 					int bank = (state->mmc1_shiftreg & state->mmc1_rom_mask) * 0x4000;
-					UINT8 *prg = space->machine->region("cart")->base();
+					UINT8 *prg = space->machine().region("cart")->base();
 
 					if (!size16k)
 					{
@@ -603,14 +603,14 @@ static WRITE8_HANDLER( mmc1_rom_switch_w )
 
 static WRITE8_HANDLER( aboard_vrom_switch_w )
 {
-	pc10_set_videorom_bank(space->machine, 0, 8, (data & 3), 8);
+	pc10_set_videorom_bank(space->machine(), 0, 8, (data & 3), 8);
 }
 
 DRIVER_INIT( pcaboard )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
+	playch10_state *state = machine.driver_data<playch10_state>();
 	/* switches vrom with writes to the $803e-$8041 area */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0x8fff, FUNC(aboard_vrom_switch_w) );
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0x8fff, FUNC(aboard_vrom_switch_w) );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -628,22 +628,22 @@ DRIVER_INIT( pcaboard )
 static WRITE8_HANDLER( bboard_rom_switch_w )
 {
 	int bankoffset = 0x10000 + ((data & 7) * 0x4000);
-	UINT8 *prg = space->machine->region("cart")->base();
+	UINT8 *prg = space->machine().region("cart")->base();
 
 	memcpy(&prg[0x08000], &prg[bankoffset], 0x4000);
 }
 
 DRIVER_INIT( pcbboard )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
-	UINT8 *prg = machine->region("cart")->base();
+	playch10_state *state = machine.driver_data<playch10_state>();
+	UINT8 *prg = machine.region("cart")->base();
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
 	/* Roms are banked at $8000 to $bfff */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(bboard_rom_switch_w) );
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(bboard_rom_switch_w) );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -662,14 +662,14 @@ DRIVER_INIT( pcbboard )
 
 static WRITE8_HANDLER( cboard_vrom_switch_w )
 {
-	pc10_set_videorom_bank(space->machine, 0, 8, ((data >> 1) & 1), 8);
+	pc10_set_videorom_bank(space->machine(), 0, 8, ((data >> 1) & 1), 8);
 }
 
 DRIVER_INIT( pccboard )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
+	playch10_state *state = machine.driver_data<playch10_state>();
 	/* switches vrom with writes to $6000 */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x6000, 0x6000, FUNC(cboard_vrom_switch_w) );
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x6000, 0x6000, FUNC(cboard_vrom_switch_w) );
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
 	state->vram = NULL;
@@ -683,8 +683,8 @@ DRIVER_INIT( pccboard )
 
 DRIVER_INIT( pcdboard )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
-	UINT8 *prg = machine->region("cart")->base();
+	playch10_state *state = machine.driver_data<playch10_state>();
+	UINT8 *prg = machine.region("cart")->base();
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -693,7 +693,7 @@ DRIVER_INIT( pcdboard )
 	state->mmc1_rom_mask = 0x07;
 
 	/* MMC mapper at writes to $8000-$ffff */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(mmc1_rom_switch_w) );
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(mmc1_rom_switch_w) );
 
 
 	/* common init */
@@ -708,9 +708,9 @@ DRIVER_INIT( pcdboard )
 
 DRIVER_INIT( pcdboard_2 )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
+	playch10_state *state = machine.driver_data<playch10_state>();
 	/* extra ram at $6000-$7fff */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
 
 	/* common init */
 	DRIVER_INIT_CALL(pcdboard);
@@ -727,40 +727,40 @@ DRIVER_INIT( pcdboard_2 )
 /* callback for the ppu_latch */
 static void mapper9_latch( device_t *ppu, offs_t offset )
 {
-	playch10_state *state = ppu->machine->driver_data<playch10_state>();
+	playch10_state *state = ppu->machine().driver_data<playch10_state>();
 
 	if((offset & 0x1ff0) == 0x0fd0 && state->MMC2_bank_latch[0] != 0xfd)
 	{
 		state->MMC2_bank_latch[0] = 0xfd;
-		pc10_set_videorom_bank(ppu->machine, 0, 4, state->MMC2_bank[0], 4);
+		pc10_set_videorom_bank(ppu->machine(), 0, 4, state->MMC2_bank[0], 4);
 	}
 	else if((offset & 0x1ff0) == 0x0fe0 && state->MMC2_bank_latch[0] != 0xfe)
 	{
 		state->MMC2_bank_latch[0] = 0xfe;
-		pc10_set_videorom_bank(ppu->machine, 0, 4, state->MMC2_bank[1], 4);
+		pc10_set_videorom_bank(ppu->machine(), 0, 4, state->MMC2_bank[1], 4);
 	}
 	else if((offset & 0x1ff0) == 0x1fd0 && state->MMC2_bank_latch[1] != 0xfd)
 	{
 		state->MMC2_bank_latch[1] = 0xfd;
-		pc10_set_videorom_bank(ppu->machine, 4, 4, state->MMC2_bank[2], 4);
+		pc10_set_videorom_bank(ppu->machine(), 4, 4, state->MMC2_bank[2], 4);
 	}
 	else if((offset & 0x1ff0) == 0x1fe0 && state->MMC2_bank_latch[1] != 0xfe)
 	{
 		state->MMC2_bank_latch[1] = 0xfe;
-		pc10_set_videorom_bank(ppu->machine, 4, 4, state->MMC2_bank[3], 4);
+		pc10_set_videorom_bank(ppu->machine(), 4, 4, state->MMC2_bank[3], 4);
 	}
 }
 
 static WRITE8_HANDLER( eboard_rom_switch_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	/* a variation of mapper 9 on a nes */
 	switch (offset & 0x7000)
 	{
 		case 0x2000: /* code bank switching */
 			{
 				int bankoffset = 0x10000 + (data & 0x0f) * 0x2000;
-				UINT8 *prg = space->machine->region("cart")->base();
+				UINT8 *prg = space->machine().region("cart")->base();
 				memcpy(&prg[0x08000], &prg[bankoffset], 0x2000);
 			}
 		break;
@@ -768,25 +768,25 @@ static WRITE8_HANDLER( eboard_rom_switch_w )
 		case 0x3000: /* gfx bank 0 - 4k */
 			state->MMC2_bank[0] = data;
 			if (state->MMC2_bank_latch[0] == 0xfd)
-				pc10_set_videorom_bank(space->machine, 0, 4, data, 4);
+				pc10_set_videorom_bank(space->machine(), 0, 4, data, 4);
 		break;
 
 		case 0x4000: /* gfx bank 0 - 4k */
 			state->MMC2_bank[1] = data;
 			if (state->MMC2_bank_latch[0] == 0xfe)
-				pc10_set_videorom_bank(space->machine, 0, 4, data, 4);
+				pc10_set_videorom_bank(space->machine(), 0, 4, data, 4);
 		break;
 
 		case 0x5000: /* gfx bank 1 - 4k */
 			state->MMC2_bank[2] = data;
 			if (state->MMC2_bank_latch[1] == 0xfd)
-				pc10_set_videorom_bank(space->machine, 4, 4, data, 4);
+				pc10_set_videorom_bank(space->machine(), 4, 4, data, 4);
 		break;
 
 		case 0x6000: /* gfx bank 1 - 4k */
 			state->MMC2_bank[3] = data;
 			if (state->MMC2_bank_latch[1] == 0xfe)
-				pc10_set_videorom_bank(space->machine, 4, 4, data, 4);
+				pc10_set_videorom_bank(space->machine(), 4, 4, data, 4);
 		break;
 
 		case 0x7000: /* mirroring */
@@ -798,8 +798,8 @@ static WRITE8_HANDLER( eboard_rom_switch_w )
 
 DRIVER_INIT( pceboard )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
-	UINT8 *prg = machine->region("cart")->base();
+	playch10_state *state = machine.driver_data<playch10_state>();
+	UINT8 *prg = machine.region("cart")->base();
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
 	state->vram = NULL;
@@ -809,13 +809,13 @@ DRIVER_INIT( pceboard )
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
 	/* basically a mapper 9 on a nes */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(eboard_rom_switch_w) );
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(eboard_rom_switch_w) );
 
 	/* ppu_latch callback */
-	ppu2c0x_set_latch(machine->device("ppu"), mapper9_latch);
+	ppu2c0x_set_latch(machine.device("ppu"), mapper9_latch);
 
 	/* nvram at $6000-$6fff */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x6fff);
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x6fff);
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -826,8 +826,8 @@ DRIVER_INIT( pceboard )
 
 DRIVER_INIT( pcfboard )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
-	UINT8 *prg = machine->region("cart")->base();
+	playch10_state *state = machine.driver_data<playch10_state>();
+	UINT8 *prg = machine.region("cart")->base();
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
 	state->vram = NULL;
@@ -839,7 +839,7 @@ DRIVER_INIT( pcfboard )
 	state->mmc1_rom_mask = 0x07;
 
 	/* MMC mapper at writes to $8000-$ffff */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(mmc1_rom_switch_w) );
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(mmc1_rom_switch_w) );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -849,9 +849,9 @@ DRIVER_INIT( pcfboard )
 
 DRIVER_INIT( pcfboard_2 )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
+	playch10_state *state = machine.driver_data<playch10_state>();
 	/* extra ram at $6000-$6fff */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x6fff);
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x6fff);
 
 	state->vram = NULL;
 
@@ -865,21 +865,21 @@ DRIVER_INIT( pcfboard_2 )
 
 static void gboard_scanline_cb( device_t *device, int scanline, int vblank, int blanked )
 {
-	playch10_state *state = device->machine->driver_data<playch10_state>();
+	playch10_state *state = device->machine().driver_data<playch10_state>();
 	if (!vblank && !blanked)
 	{
 		if (--state->gboard_scanline_counter == -1)
 		{
 			state->gboard_scanline_counter = state->gboard_scanline_latch;
-			generic_pulse_irq_line(device->machine->device("cart"), 0);
+			generic_pulse_irq_line(device->machine().device("cart"), 0);
 		}
 	}
 }
 
 static WRITE8_HANDLER( gboard_rom_switch_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
-	device_t *ppu = space->machine->device("ppu");
+	playch10_state *state = space->machine().driver_data<playch10_state>();
+	device_t *ppu = space->machine().device("ppu");
 
 	/* basically, a MMC3 mapper from the nes */
 
@@ -891,7 +891,7 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 			if (state->gboard_last_bank != (data & 0xc0))
 			{
 				int bank;
-				UINT8 *prg = space->machine->region("cart")->base();
+				UINT8 *prg = space->machine().region("cart")->base();
 
 				/* reset the banks */
 				if (state->gboard_command & 0x40)
@@ -931,7 +931,7 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 					case 1: /* char banking */
 						data &= 0xfe;
 						page ^= (cmd << 1);
-						pc10_set_videorom_bank(space->machine, page, 2, data, 1);
+						pc10_set_videorom_bank(space->machine(), page, 2, data, 1);
 					break;
 
 					case 2: /* char banking */
@@ -939,12 +939,12 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 					case 4: /* char banking */
 					case 5: /* char banking */
 						page ^= cmd + 2;
-						pc10_set_videorom_bank(space->machine, page, 1, data, 1);
+						pc10_set_videorom_bank(space->machine(), page, 1, data, 1);
 					break;
 
 					case 6: /* program banking */
 					{
-						UINT8 *prg = space->machine->region("cart")->base();
+						UINT8 *prg = space->machine().region("cart")->base();
 						if (state->gboard_command & 0x40)
 						{
 							/* high bank */
@@ -969,7 +969,7 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 					case 7: /* program banking */
 						{
 							/* mid bank */
-							UINT8 *prg = space->machine->region("cart")->base();
+							UINT8 *prg = space->machine().region("cart")->base();
 							state->gboard_banks[1] = data & 0x1f;
 							bank = state->gboard_banks[1] * 0x2000 + 0x10000;
 
@@ -1014,8 +1014,8 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 
 DRIVER_INIT( pcgboard )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
-	UINT8 *prg = machine->region("cart")->base();
+	playch10_state *state = machine.driver_data<playch10_state>();
+	UINT8 *prg = machine.region("cart")->base();
 	state->vram = NULL;
 
 	/* We do manual banking, in case the code falls through */
@@ -1024,10 +1024,10 @@ DRIVER_INIT( pcgboard )
 	memcpy(&prg[0x0c000], &prg[0x4c000], 0x4000);
 
 	/* MMC3 mapper at writes to $8000-$ffff */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(gboard_rom_switch_w) );
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(gboard_rom_switch_w) );
 
 	/* extra ram at $6000-$7fff */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
 
 	state->gboard_banks[0] = 0x1e;
 	state->gboard_banks[1] = 0x1f;
@@ -1041,7 +1041,7 @@ DRIVER_INIT( pcgboard )
 
 DRIVER_INIT( pcgboard_type2 )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
+	playch10_state *state = machine.driver_data<playch10_state>();
 	state->vram = NULL;
 	/* common init */
 	DRIVER_INIT_CALL(pcgboard);
@@ -1055,9 +1055,9 @@ DRIVER_INIT( pcgboard_type2 )
 
 static WRITE8_HANDLER( iboard_rom_switch_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	int bank = data & 7;
-	UINT8 *prg = space->machine->region("cart")->base();
+	UINT8 *prg = space->machine().region("cart")->base();
 
 	if (data & 0x10)
 		pc10_set_mirroring(state, PPU_MIRROR_HIGH);
@@ -1069,15 +1069,15 @@ static WRITE8_HANDLER( iboard_rom_switch_w )
 
 DRIVER_INIT( pciboard )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
-	UINT8 *prg = machine->region("cart")->base();
+	playch10_state *state = machine.driver_data<playch10_state>();
+	UINT8 *prg = machine.region("cart")->base();
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
 	memcpy(&prg[0x08000], &prg[0x10000], 0x8000);
 
 	/* Roms are banked at $8000 to $bfff */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(iboard_rom_switch_w) );
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(iboard_rom_switch_w) );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -1093,7 +1093,7 @@ DRIVER_INIT( pciboard )
 
 static WRITE8_HANDLER( hboard_rom_switch_w )
 {
-	playch10_state *state = space->machine->driver_data<playch10_state>();
+	playch10_state *state = space->machine().driver_data<playch10_state>();
 	switch (offset & 0x7001)
 	{
 		case 0x0001:
@@ -1109,11 +1109,11 @@ static WRITE8_HANDLER( hboard_rom_switch_w )
 						page ^= (cmd << 1);
 						if (data & 0x40)
 						{
-							set_videoram_bank(space->machine, page, 2, data, 1);
+							set_videoram_bank(space->machine(), page, 2, data, 1);
 						}
 						else
 						{
-							pc10_set_videorom_bank(space->machine, page, 2, data, 1);
+							pc10_set_videorom_bank(space->machine(), page, 2, data, 1);
 						}
 					return;
 
@@ -1124,11 +1124,11 @@ static WRITE8_HANDLER( hboard_rom_switch_w )
 						page ^= cmd + 2;
 						if (data & 0x40)
 						{
-							set_videoram_bank(space->machine, page, 1, data, 1);
+							set_videoram_bank(space->machine(), page, 1, data, 1);
 						}
 						else
 						{
-							pc10_set_videorom_bank(space->machine, page, 1, data, 1);
+							pc10_set_videorom_bank(space->machine(), page, 1, data, 1);
 						}
 					return;
 				}
@@ -1140,16 +1140,16 @@ static WRITE8_HANDLER( hboard_rom_switch_w )
 
 DRIVER_INIT( pchboard )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
-	UINT8 *prg = machine->region("cart")->base();
+	playch10_state *state = machine.driver_data<playch10_state>();
+	UINT8 *prg = machine.region("cart")->base();
 	memcpy(&prg[0x08000], &prg[0x4c000], 0x4000);
 	memcpy(&prg[0x0c000], &prg[0x4c000], 0x4000);
 
 	/* Roms are banked at $8000 to $bfff */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(hboard_rom_switch_w) );
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(hboard_rom_switch_w) );
 
 	/* extra ram at $6000-$7fff */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
 
 	state->gboard_banks[0] = 0x1e;
 	state->gboard_banks[1] = 0x1f;
@@ -1167,8 +1167,8 @@ DRIVER_INIT( pchboard )
 
 DRIVER_INIT( pckboard )
 {
-	playch10_state *state = machine->driver_data<playch10_state>();
-	UINT8 *prg = machine->region("cart")->base();
+	playch10_state *state = machine.driver_data<playch10_state>();
+	UINT8 *prg = machine.region("cart")->base();
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -1177,10 +1177,10 @@ DRIVER_INIT( pckboard )
 	state->mmc1_rom_mask = 0x0f;
 
 	/* extra ram at $6000-$7fff */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
 
 	/* Roms are banked at $8000 to $bfff */
-	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(mmc1_rom_switch_w) );
+	machine.device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(mmc1_rom_switch_w) );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);

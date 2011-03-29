@@ -42,7 +42,7 @@ from 2.bin to 9.bin program eproms
 
 static WRITE16_HANDLER( fcrash_soundlatch_w )
 {
-	cps_state *state = space->machine->driver_data<cps_state>();
+	cps_state *state = space->machine().driver_data<cps_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -53,17 +53,17 @@ static WRITE16_HANDLER( fcrash_soundlatch_w )
 
 static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 {
-	cps_state *state = space->machine->driver_data<cps_state>();
+	cps_state *state = space->machine().driver_data<cps_state>();
 
 	state->msm_1->set_output_gain(0, (data & 0x08) ? 0.0 : 1.0);
 	state->msm_2->set_output_gain(0, (data & 0x10) ? 0.0 : 1.0);
 
-	memory_set_bank(space->machine, "bank1", data & 0x07);
+	memory_set_bank(space->machine(), "bank1", data & 0x07);
 }
 
 static void m5205_int1( device_t *device )
 {
-	cps_state *state = device->machine->driver_data<cps_state>();
+	cps_state *state = device->machine().driver_data<cps_state>();
 
 	msm5205_data_w(device, state->sample_buffer1 & 0x0f);
 	state->sample_buffer1 >>= 4;
@@ -74,7 +74,7 @@ static void m5205_int1( device_t *device )
 
 static void m5205_int2( device_t *device )
 {
-	cps_state *state = device->machine->driver_data<cps_state>();
+	cps_state *state = device->machine().driver_data<cps_state>();
 
 	msm5205_data_w(device, state->sample_buffer2 & 0x0f);
 	state->sample_buffer2 >>= 4;
@@ -84,13 +84,13 @@ static void m5205_int2( device_t *device )
 
 static WRITE8_HANDLER( fcrash_msm5205_0_data_w )
 {
-	cps_state *state = space->machine->driver_data<cps_state>();
+	cps_state *state = space->machine().driver_data<cps_state>();
 	state->sample_buffer1 = data;
 }
 
 static WRITE8_HANDLER( fcrash_msm5205_1_data_w )
 {
-	cps_state *state = space->machine->driver_data<cps_state>();
+	cps_state *state = space->machine().driver_data<cps_state>();
 	state->sample_buffer2 = data;
 }
 
@@ -99,9 +99,9 @@ static WRITE8_HANDLER( fcrash_msm5205_1_data_w )
 /* not verified */
 #define CPS1_ROWSCROLL_OFFS     (0x20/2)    /* base of row scroll offsets in other RAM */
 
-static void fcrash_update_transmasks( running_machine *machine )
+static void fcrash_update_transmasks( running_machine &machine )
 {
-	cps_state *state = machine->driver_data<cps_state>();
+	cps_state *state = machine.driver_data<cps_state>();
 	int i;
 	int priority[4];
 
@@ -126,9 +126,9 @@ static void fcrash_update_transmasks( running_machine *machine )
 	}
 }
 
-static void fcrash_render_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void fcrash_render_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	cps_state *state = machine->driver_data<cps_state>();
+	cps_state *state = machine.driver_data<cps_state>();
 	int pos;
 	int base = 0x50c8 / 2;
 
@@ -153,15 +153,15 @@ static void fcrash_render_sprites( running_machine *machine, bitmap_t *bitmap, c
 		colour = state->gfxram[base +pos + 1] & 0x1f;
 		ypos = 256 - ypos;
 
-		pdrawgfx_transpen(bitmap, cliprect, machine->gfx[2], tileno, colour, flipx, flipy, xpos + 49, ypos - 16, machine->priority_bitmap, 0x02, 15);
+		pdrawgfx_transpen(bitmap, cliprect, machine.gfx[2], tileno, colour, flipx, flipy, xpos + 49, ypos - 16, machine.priority_bitmap, 0x02, 15);
 
 	}
 
 }
 
-static void fcrash_render_layer( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int primask )
+static void fcrash_render_layer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int primask )
 {
-	cps_state *state = machine->driver_data<cps_state>();
+	cps_state *state = machine.driver_data<cps_state>();
 
 	switch (layer)
 	{
@@ -176,9 +176,9 @@ static void fcrash_render_layer( running_machine *machine, bitmap_t *bitmap, con
 	}
 }
 
-static void fcrash_render_high_layer( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer )
+static void fcrash_render_high_layer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer )
 {
-	cps_state *state = machine->driver_data<cps_state>();
+	cps_state *state = machine.driver_data<cps_state>();
 
 	switch (layer)
 	{
@@ -193,9 +193,9 @@ static void fcrash_render_high_layer( running_machine *machine, bitmap_t *bitmap
 	}
 }
 
-static void fcrash_build_palette( running_machine *machine )
+static void fcrash_build_palette( running_machine &machine )
 {
-	cps_state *state = machine->driver_data<cps_state>();
+	cps_state *state = machine.driver_data<cps_state>();
 	int offset;
 
 	for (offset = 0; offset < 32 * 6 * 16; offset++)
@@ -218,22 +218,22 @@ static void fcrash_build_palette( running_machine *machine )
 
 static SCREEN_UPDATE( fcrash )
 {
-	cps_state *state = screen->machine->driver_data<cps_state>();
+	cps_state *state = screen->machine().driver_data<cps_state>();
 	int layercontrol, l0, l1, l2, l3;
 	int videocontrol = state->cps_a_regs[0x22 / 2];
 
 
-	flip_screen_set(screen->machine, videocontrol & 0x8000);
+	flip_screen_set(screen->machine(), videocontrol & 0x8000);
 
 	layercontrol = state->cps_b_regs[0x20 / 2];
 
 	/* Get video memory base registers */
-	cps1_get_video_base(screen->machine);
+	cps1_get_video_base(screen->machine());
 
 	/* Build palette */
-	fcrash_build_palette(screen->machine);
+	fcrash_build_palette(screen->machine());
 
-	fcrash_update_transmasks(screen->machine);
+	fcrash_update_transmasks(screen->machine());
 
 	tilemap_set_scrollx(state->bg_tilemap[0], 0, state->scroll1x - 62);
 	tilemap_set_scrolly(state->bg_tilemap[0], 0, state->scroll1y);
@@ -270,28 +270,28 @@ static SCREEN_UPDATE( fcrash )
 	/* Blank screen */
 	bitmap_fill(bitmap, cliprect, 0xbff);
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
 	l0 = (layercontrol >> 0x06) & 03;
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;
 	l3 = (layercontrol >> 0x0c) & 03;
 
-	fcrash_render_layer(screen->machine, bitmap, cliprect, l0, 0);
+	fcrash_render_layer(screen->machine(), bitmap, cliprect, l0, 0);
 
 	if (l1 == 0)
-		fcrash_render_high_layer(screen->machine, bitmap, cliprect, l0);
+		fcrash_render_high_layer(screen->machine(), bitmap, cliprect, l0);
 
-	fcrash_render_layer(screen->machine, bitmap, cliprect, l1, 0);
+	fcrash_render_layer(screen->machine(), bitmap, cliprect, l1, 0);
 
 	if (l2 == 0)
-		fcrash_render_high_layer(screen->machine, bitmap, cliprect, l1);
+		fcrash_render_high_layer(screen->machine(), bitmap, cliprect, l1);
 
-	fcrash_render_layer(screen->machine, bitmap, cliprect, l2, 0);
+	fcrash_render_layer(screen->machine(), bitmap, cliprect, l2, 0);
 
 	if (l3 == 0)
-		fcrash_render_high_layer(screen->machine, bitmap, cliprect, l2);
+		fcrash_render_high_layer(screen->machine(), bitmap, cliprect, l2);
 
-	fcrash_render_layer(screen->machine, bitmap, cliprect, l3, 0);
+	fcrash_render_layer(screen->machine(), bitmap, cliprect, l3, 0);
 
 	return 0;
 }
@@ -299,21 +299,21 @@ static SCREEN_UPDATE( fcrash )
 // doesn't have the scroll offsets like fcrash
 static SCREEN_UPDATE( kodb )
 {
-	cps_state *state = screen->machine->driver_data<cps_state>();
+	cps_state *state = screen->machine().driver_data<cps_state>();
 	int layercontrol, l0, l1, l2, l3;
 	int videocontrol = state->cps_a_regs[0x22 / 2];
 
-	flip_screen_set(screen->machine, videocontrol & 0x8000);
+	flip_screen_set(screen->machine(), videocontrol & 0x8000);
 
 	layercontrol = state->cps_b_regs[0x20 / 2];
 
 	/* Get video memory base registers */
-	cps1_get_video_base(screen->machine);
+	cps1_get_video_base(screen->machine());
 
 	/* Build palette */
-	fcrash_build_palette(screen->machine);
+	fcrash_build_palette(screen->machine());
 
-	fcrash_update_transmasks(screen->machine);
+	fcrash_update_transmasks(screen->machine());
 
 	tilemap_set_scrollx(state->bg_tilemap[0], 0, state->scroll1x);
 	tilemap_set_scrolly(state->bg_tilemap[0], 0, state->scroll1y);
@@ -351,28 +351,28 @@ static SCREEN_UPDATE( kodb )
 	/* Blank screen */
 	bitmap_fill(bitmap, cliprect, 0xbff);
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	l0 = (layercontrol >> 0x06) & 03;
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;
 	l3 = (layercontrol >> 0x0c) & 03;
 
-	fcrash_render_layer(screen->machine, bitmap, cliprect, l0, 0);
+	fcrash_render_layer(screen->machine(), bitmap, cliprect, l0, 0);
 
 	if (l1 == 0)
-		fcrash_render_high_layer(screen->machine, bitmap, cliprect, l0);
+		fcrash_render_high_layer(screen->machine(), bitmap, cliprect, l0);
 
-	fcrash_render_layer(screen->machine, bitmap, cliprect, l1, 0);
+	fcrash_render_layer(screen->machine(), bitmap, cliprect, l1, 0);
 
 	if (l2 == 0)
-		fcrash_render_high_layer(screen->machine, bitmap, cliprect, l1);
+		fcrash_render_high_layer(screen->machine(), bitmap, cliprect, l1);
 
-	fcrash_render_layer(screen->machine, bitmap, cliprect, l2, 0);
+	fcrash_render_layer(screen->machine(), bitmap, cliprect, l2, 0);
 
 	if (l3 == 0)
-		fcrash_render_high_layer(screen->machine, bitmap, cliprect, l2);
+		fcrash_render_high_layer(screen->machine(), bitmap, cliprect, l2);
 
-	fcrash_render_layer(screen->machine, bitmap, cliprect, l3, 0);
+	fcrash_render_layer(screen->machine(), bitmap, cliprect, l3, 0);
 
 	return 0;
 }
@@ -691,15 +691,15 @@ static const msm5205_interface msm5205_interface2 =
 
 static MACHINE_START( fcrash )
 {
-	cps_state *state = machine->driver_data<cps_state>();
-	UINT8 *ROM = machine->region("soundcpu")->base();
+	cps_state *state = machine.driver_data<cps_state>();
+	UINT8 *ROM = machine.region("soundcpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("soundcpu");
-	state->msm_1 = machine->device<msm5205_device>("msm1");
-	state->msm_2 = machine->device<msm5205_device>("msm2");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("soundcpu");
+	state->msm_1 = machine.device<msm5205_device>("msm1");
+	state->msm_2 = machine.device<msm5205_device>("msm2");
 
 	state->save_item(NAME(state->sample_buffer1));
 	state->save_item(NAME(state->sample_buffer2));
@@ -709,15 +709,15 @@ static MACHINE_START( fcrash )
 
 static MACHINE_START( kodb )
 {
-	cps_state *state = machine->driver_data<cps_state>();
+	cps_state *state = machine.driver_data<cps_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("soundcpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("soundcpu");
 }
 
 static MACHINE_RESET( fcrash )
 {
-	cps_state *state = machine->driver_data<cps_state>();
+	cps_state *state = machine.driver_data<cps_state>();
 
 	state->sample_buffer1 = 0;
 	state->sample_buffer2 = 0;

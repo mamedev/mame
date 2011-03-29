@@ -83,27 +83,27 @@ voice.ic82     CRC32 abc61f3d   SHA1 c6f123d16a26c4d77c635617dd97bb4b906c463a
 static WRITE8_HANDLER( wc90_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 
 
 	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );
-	memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress] );
+	memory_set_bankptr(space->machine(), "bank1", &RAM[bankaddress] );
 }
 
 static WRITE8_HANDLER( wc90_bankswitch1_w )
 {
 	int bankaddress;
-	UINT8 *RAM = space->machine->region("sub")->base();
+	UINT8 *RAM = space->machine().region("sub")->base();
 
 
 	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );
-	memory_set_bankptr(space->machine, "bank2", &RAM[bankaddress] );
+	memory_set_bankptr(space->machine(), "bank2", &RAM[bankaddress] );
 }
 
 static WRITE8_HANDLER( wc90_sound_command_w )
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -293,7 +293,7 @@ GFXDECODE_END
 /* handler called by the 2608 emulator when the internal timers cause an IRQ */
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2608_interface ym2608_config =

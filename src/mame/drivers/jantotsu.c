@@ -127,14 +127,14 @@ public:
 
 static VIDEO_START(jantotsu)
 {
-	jantotsu_state *state = machine->driver_data<jantotsu_state>();
+	jantotsu_state *state = machine.driver_data<jantotsu_state>();
 
 	state->save_item(NAME(state->bitmap));
 }
 
 static SCREEN_UPDATE(jantotsu)
 {
-	jantotsu_state *state = screen->machine->driver_data<jantotsu_state>();
+	jantotsu_state *state = screen->machine().driver_data<jantotsu_state>();
 	int x, y, i;
 	int count = 0;
 
@@ -161,7 +161,7 @@ static SCREEN_UPDATE(jantotsu)
 				color |= state->col_bank;
 
 				if ((x + i) <= screen->visible_area().max_x && (y + 0) < screen->visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, x + i) = screen->machine->pens[color];
+					*BITMAP_ADDR32(bitmap, y, x + i) = screen->machine().pens[color];
 			}
 
 			count++;
@@ -174,19 +174,19 @@ static SCREEN_UPDATE(jantotsu)
 /* banked vram */
 static READ8_HANDLER( jantotsu_bitmap_r )
 {
-	jantotsu_state *state = space->machine->driver_data<jantotsu_state>();
+	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
 	return state->bitmap[offset + ((state->vram_bank & 3) * 0x2000)];
 }
 
 static WRITE8_HANDLER( jantotsu_bitmap_w )
 {
-	jantotsu_state *state = space->machine->driver_data<jantotsu_state>();
+	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
 	state->bitmap[offset + ((state->vram_bank & 3) * 0x2000)] = data;
 }
 
 static WRITE8_HANDLER( bankaddr_w )
 {
-	jantotsu_state *state = space->machine->driver_data<jantotsu_state>();
+	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
 
 	state->vram_bank = ((data & 0xc0) >> 6);
 
@@ -231,21 +231,21 @@ static PALETTE_INIT( jantotsu )
 /*Multiplexer is mapped as 6-bits reads,bits 6 & 7 are always connected to the coin mechs.*/
 static READ8_HANDLER( jantotsu_mux_r )
 {
-	jantotsu_state *state = space->machine->driver_data<jantotsu_state>();
-	UINT8 coin_port = input_port_read(space->machine, "COINS");
+	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
+	UINT8 coin_port = input_port_read(space->machine(), "COINS");
 
 	//  printf("%02x\n", state->mux_data);
 
 	switch (state->mux_data)
 	{
-		case 0x01: return input_port_read(space->machine, "PL1_1") | coin_port;
-		case 0x02: return input_port_read(space->machine, "PL1_2") | coin_port;
-		case 0x04: return input_port_read(space->machine, "PL1_3") | coin_port;
-		case 0x08: return input_port_read(space->machine, "PL1_4") | coin_port;
-		case 0x10: return input_port_read(space->machine, "PL2_1") | coin_port;
-		case 0x20: return input_port_read(space->machine, "PL2_2") | coin_port;
-		case 0x40: return input_port_read(space->machine, "PL2_3") | coin_port;
-		case 0x80: return input_port_read(space->machine, "PL2_4") | coin_port;
+		case 0x01: return input_port_read(space->machine(), "PL1_1") | coin_port;
+		case 0x02: return input_port_read(space->machine(), "PL1_2") | coin_port;
+		case 0x04: return input_port_read(space->machine(), "PL1_3") | coin_port;
+		case 0x08: return input_port_read(space->machine(), "PL1_4") | coin_port;
+		case 0x10: return input_port_read(space->machine(), "PL2_1") | coin_port;
+		case 0x20: return input_port_read(space->machine(), "PL2_2") | coin_port;
+		case 0x40: return input_port_read(space->machine(), "PL2_3") | coin_port;
+		case 0x80: return input_port_read(space->machine(), "PL2_4") | coin_port;
 	}
 
 	return coin_port;
@@ -253,7 +253,7 @@ static READ8_HANDLER( jantotsu_mux_r )
 
 static WRITE8_HANDLER( jantotsu_mux_w )
 {
-	jantotsu_state *state = space->machine->driver_data<jantotsu_state>();
+	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
 	state->mux_data = ~data;
 }
 
@@ -263,12 +263,12 @@ static WRITE8_HANDLER( jantotsu_mux_w )
   a side-by-side test (to know if the background colors really works) to be sure. */
 static READ8_HANDLER( jantotsu_dsw2_r )
 {
-	return (input_port_read(space->machine, "DSW2") & 0x3f) | 0x80;
+	return (input_port_read(space->machine(), "DSW2") & 0x3f) | 0x80;
 }
 
 static WRITE8_DEVICE_HANDLER( jan_adpcm_w )
 {
-	jantotsu_state *state = device->machine->driver_data<jantotsu_state>();
+	jantotsu_state *state = device->machine().driver_data<jantotsu_state>();
 
 	switch (offset)
 	{
@@ -293,7 +293,7 @@ static WRITE8_DEVICE_HANDLER( jan_adpcm_w )
 
 static void jan_adpcm_int( device_t *device )
 {
-	jantotsu_state *state = device->machine->driver_data<jantotsu_state>();
+	jantotsu_state *state = device->machine().driver_data<jantotsu_state>();
 
 	if (state->adpcm_pos >= 0x10000 || state->adpcm_idle)
 	{
@@ -303,7 +303,7 @@ static void jan_adpcm_int( device_t *device )
 	}
 	else
 	{
-		UINT8 *ROM = device->machine->region("adpcm")->base();
+		UINT8 *ROM = device->machine().region("adpcm")->base();
 
 		state->adpcm_data = ((state->adpcm_trigger ? (ROM[state->adpcm_pos] & 0x0f) : (ROM[state->adpcm_pos] & 0xf0) >> 4));
 		msm5205_data_w(device, state->adpcm_data & 0xf);
@@ -478,7 +478,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( jantotsu )
 {
-	jantotsu_state *state = machine->driver_data<jantotsu_state>();
+	jantotsu_state *state = machine.driver_data<jantotsu_state>();
 
 	state->save_item(NAME(state->vram_bank));
 	state->save_item(NAME(state->mux_data));
@@ -490,7 +490,7 @@ static MACHINE_START( jantotsu )
 
 static MACHINE_RESET( jantotsu )
 {
-	jantotsu_state *state = machine->driver_data<jantotsu_state>();
+	jantotsu_state *state = machine.driver_data<jantotsu_state>();
 
 	/*Load hard-wired background color.*/
 	state->col_bank = (input_port_read(machine, "DSW2") & 0xc0) >> 3;

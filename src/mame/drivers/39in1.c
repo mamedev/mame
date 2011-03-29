@@ -57,20 +57,20 @@ public:
 };
 
 
-static void pxa255_dma_irq_check(running_machine* machine);
+static void pxa255_dma_irq_check(running_machine& machine);
 static READ32_HANDLER( pxa255_dma_r );
 static WRITE32_HANDLER( pxa255_dma_w );
 
 static READ32_HANDLER( pxa255_i2s_r );
 static WRITE32_HANDLER( pxa255_i2s_w );
 
-static void pxa255_ostimer_irq_check(running_machine* machine);
+static void pxa255_ostimer_irq_check(running_machine& machine);
 static TIMER_CALLBACK( pxa255_ostimer_match );
 static READ32_HANDLER( pxa255_ostimer_r );
 static WRITE32_HANDLER( pxa255_ostimer_w );
 
-static void pxa255_update_interrupts(running_machine* machine);
-static void pxa255_set_irq_line(running_machine* machine, UINT32 line, int state);
+static void pxa255_update_interrupts(running_machine& machine);
+static void pxa255_set_irq_line(running_machine& machine, UINT32 line, int state);
 static READ32_HANDLER( pxa255_intc_r );
 static WRITE32_HANDLER( pxa255_intc_w );
 
@@ -78,15 +78,15 @@ static READ32_HANDLER( pxa255_gpio_r );
 static WRITE32_HANDLER( pxa255_gpio_w );
 
 static void pxa255_lcd_load_dma_descriptor(address_space* space, UINT32 address, int channel);
-static void pxa255_lcd_irq_check(running_machine* machine);
-static void pxa255_lcd_dma_kickoff(running_machine* machine, int channel);
-static void pxa255_lcd_check_load_next_branch(running_machine* machine, int channel);
+static void pxa255_lcd_irq_check(running_machine& machine);
+static void pxa255_lcd_dma_kickoff(running_machine& machine, int channel);
+static void pxa255_lcd_check_load_next_branch(running_machine& machine, int channel);
 static READ32_HANDLER( pxa255_lcd_r );
 static WRITE32_HANDLER( pxa255_lcd_w );
 
 #define VERBOSE_LEVEL ( 3 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine* machine, int n_level, const char* s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, const char* s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -95,8 +95,8 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine* machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", machine->describe_context(), buf );
-		//printf( "%s: %s", machine->describe_context(), buf );
+		logerror( "%s: %s", machine.describe_context(), buf );
+		//printf( "%s: %s", machine.describe_context(), buf );
 	}
 }
 
@@ -110,34 +110,34 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine* machine, int n_level, 
 
 static READ32_HANDLER( pxa255_i2s_r )
 {
-	_39in1_state *state = space->machine->driver_data<_39in1_state>();
+	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 	PXA255_I2S_Regs *i2s_regs = &state->i2s_regs;
 
 	switch(PXA255_I2S_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_SACR0:
-			verboselog( space->machine, 3, "pxa255_i2s_r: Serial Audio Controller Global Control Register: %08x & %08x\n", i2s_regs->sacr0, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_i2s_r: Serial Audio Controller Global Control Register: %08x & %08x\n", i2s_regs->sacr0, mem_mask );
 			return i2s_regs->sacr0;
 		case PXA255_SACR1:
-			verboselog( space->machine, 3, "pxa255_i2s_r: Serial Audio Controller I2S/MSB-Justified Control Register: %08x & %08x\n", i2s_regs->sacr1, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_i2s_r: Serial Audio Controller I2S/MSB-Justified Control Register: %08x & %08x\n", i2s_regs->sacr1, mem_mask );
 			return i2s_regs->sacr1;
 		case PXA255_SASR0:
-			verboselog( space->machine, 3, "pxa255_i2s_r: Serial Audio Controller I2S/MSB-Justified Status Register: %08x & %08x\n", i2s_regs->sasr0, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_i2s_r: Serial Audio Controller I2S/MSB-Justified Status Register: %08x & %08x\n", i2s_regs->sasr0, mem_mask );
 			return i2s_regs->sasr0;
 		case PXA255_SAIMR:
-			verboselog( space->machine, 3, "pxa255_i2s_r: Serial Audio Interrupt Mask Register: %08x & %08x\n", i2s_regs->saimr, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_i2s_r: Serial Audio Interrupt Mask Register: %08x & %08x\n", i2s_regs->saimr, mem_mask );
 			return i2s_regs->saimr;
 		case PXA255_SAICR:
-			verboselog( space->machine, 3, "pxa255_i2s_r: Serial Audio Interrupt Clear Register: %08x & %08x\n", i2s_regs->saicr, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_i2s_r: Serial Audio Interrupt Clear Register: %08x & %08x\n", i2s_regs->saicr, mem_mask );
 			return i2s_regs->saicr;
 		case PXA255_SADIV:
-			verboselog( space->machine, 3, "pxa255_i2s_r: Serial Audio Clock Divider Register: %08x & %08x\n", i2s_regs->sadiv, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_i2s_r: Serial Audio Clock Divider Register: %08x & %08x\n", i2s_regs->sadiv, mem_mask );
 			return i2s_regs->sadiv;
 		case PXA255_SADR:
-			verboselog( space->machine, 5, "pxa255_i2s_r: Serial Audio Data Register: %08x & %08x\n", i2s_regs->sadr, mem_mask );
+			verboselog( space->machine(), 5, "pxa255_i2s_r: Serial Audio Data Register: %08x & %08x\n", i2s_regs->sadr, mem_mask );
 			return i2s_regs->sadr;
 		default:
-			verboselog( space->machine, 0, "pxa255_i2s_r: Unknown address: %08x\n", PXA255_I2S_BASE_ADDR | (offset << 2));
+			verboselog( space->machine(), 0, "pxa255_i2s_r: Unknown address: %08x\n", PXA255_I2S_BASE_ADDR | (offset << 2));
 			break;
 	}
 	return 0;
@@ -145,7 +145,7 @@ static READ32_HANDLER( pxa255_i2s_r )
 
 static WRITE32_HANDLER( pxa255_i2s_w )
 {
-	_39in1_state *state = space->machine->driver_data<_39in1_state>();
+	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 	PXA255_I2S_Regs *i2s_regs = &state->i2s_regs;
 
 #if 0
@@ -166,23 +166,23 @@ static WRITE32_HANDLER( pxa255_i2s_w )
 	switch(PXA255_I2S_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_SACR0:
-			verboselog( space->machine, 3, "pxa255_i2s_w: Serial Audio Controller Global Control Register: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_i2s_w: Serial Audio Controller Global Control Register: %08x & %08x\n", data, mem_mask );
 			i2s_regs->sacr0 = data & 0x0000ff3d;
 			break;
 		case PXA255_SACR1:
-			verboselog( space->machine, 3, "pxa255_i2s_w: Serial Audio Controller I2S/MSB-Justified Control Register: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_i2s_w: Serial Audio Controller I2S/MSB-Justified Control Register: %08x & %08x\n", data, mem_mask );
 			i2s_regs->sacr1 = data & 0x00000039;
 			break;
 		case PXA255_SASR0:
-			verboselog( space->machine, 3, "pxa255_i2s_w: Serial Audio Controller I2S/MSB-Justified Status Register: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_i2s_w: Serial Audio Controller I2S/MSB-Justified Status Register: %08x & %08x\n", data, mem_mask );
 			i2s_regs->sasr0 = data & 0x0000ff7f;
 			break;
 		case PXA255_SAIMR:
-			verboselog( space->machine, 3, "pxa255_i2s_w: Serial Audio Interrupt Mask Register: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_i2s_w: Serial Audio Interrupt Mask Register: %08x & %08x\n", data, mem_mask );
 			i2s_regs->saimr = data & 0x00000078;
 			break;
 		case PXA255_SAICR:
-			verboselog( space->machine, 3, "pxa255_i2s_w: Serial Audio Interrupt Clear Register: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_i2s_w: Serial Audio Interrupt Clear Register: %08x & %08x\n", data, mem_mask );
 			if(i2s_regs->saicr & PXA255_SAICR_ROR)
 			{
 				i2s_regs->sasr0 &= ~PXA255_SASR0_ROR;
@@ -193,13 +193,13 @@ static WRITE32_HANDLER( pxa255_i2s_w )
 			}
 			break;
 		case PXA255_SADIV:
-			verboselog( space->machine, 3, "pxa255_i2s_w: Serial Audio Clock Divider Register: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_i2s_w: Serial Audio Clock Divider Register: %08x & %08x\n", data, mem_mask );
 			i2s_regs->sadiv = data & 0x0000007f;
 			dmadac_set_frequency(&state->dmadac[0], 2, ((double)147600000 / (double)i2s_regs->sadiv) / 256.0);
 			dmadac_enable(&state->dmadac[0], 2, 1);
 			break;
 		case PXA255_SADR:
-			verboselog( space->machine, 4, "pxa255_i2s_w: Serial Audio Data Register: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 4, "pxa255_i2s_w: Serial Audio Data Register: %08x & %08x\n", data, mem_mask );
 			i2s_regs->sadr = data;
 #if 0
 			if(audio_dump)
@@ -209,7 +209,7 @@ static WRITE32_HANDLER( pxa255_i2s_w )
 #endif
 			break;
 		default:
-			verboselog( space->machine, 0, "pxa255_i2s_w: Unknown address: %08x = %08x & %08x\n", PXA255_I2S_BASE_ADDR | (offset << 2), data, mem_mask);
+			verboselog( space->machine(), 0, "pxa255_i2s_w: Unknown address: %08x = %08x & %08x\n", PXA255_I2S_BASE_ADDR | (offset << 2), data, mem_mask);
 			break;
 	}
 }
@@ -222,9 +222,9 @@ static WRITE32_HANDLER( pxa255_i2s_w )
 
 */
 
-static void pxa255_dma_irq_check(running_machine* machine)
+static void pxa255_dma_irq_check(running_machine& machine)
 {
-	_39in1_state *state = machine->driver_data<_39in1_state>();
+	_39in1_state *state = machine.driver_data<_39in1_state>();
 	PXA255_DMA_Regs *dma_regs = &state->dma_regs;
 	int channel = 0;
 	int set_intr = 0;
@@ -245,9 +245,9 @@ static void pxa255_dma_irq_check(running_machine* machine)
 	pxa255_set_irq_line(machine, PXA255_INT_DMA, set_intr);
 }
 
-static void pxa255_dma_load_descriptor_and_start(running_machine* machine, int channel)
+static void pxa255_dma_load_descriptor_and_start(running_machine& machine, int channel)
 {
-	_39in1_state *state = machine->driver_data<_39in1_state>();
+	_39in1_state *state = machine.driver_data<_39in1_state>();
 	PXA255_DMA_Regs *dma_regs = &state->dma_regs;
 	attotime period;
 
@@ -260,7 +260,7 @@ static void pxa255_dma_load_descriptor_and_start(running_machine* machine, int c
 
 	// Load the next descriptor
 
-	address_space *space = machine->device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+	address_space *space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 	dma_regs->dsadr[channel] = space->read_dword(dma_regs->ddadr[channel] + 0x4);
 	dma_regs->dtadr[channel] = space->read_dword(dma_regs->ddadr[channel] + 0x8);
 	dma_regs->dcmd[channel]  = space->read_dword(dma_regs->ddadr[channel] + 0xc);
@@ -290,7 +290,7 @@ static void pxa255_dma_load_descriptor_and_start(running_machine* machine, int c
 
 static TIMER_CALLBACK( pxa255_dma_dma_end )
 {
-	_39in1_state *state = machine->driver_data<_39in1_state>();
+	_39in1_state *state = machine.driver_data<_39in1_state>();
 	PXA255_DMA_Regs *dma_regs = &state->dma_regs;
 	UINT32 sadr = dma_regs->dsadr[param];
 	UINT32 tadr = dma_regs->dtadr[param];
@@ -300,7 +300,7 @@ static TIMER_CALLBACK( pxa255_dma_dma_end )
 	UINT16 temp16;
 	UINT32 temp32;
 
-	address_space *space = machine->device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+	address_space *space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 	switch(param)
 	{
 		case 3:
@@ -401,7 +401,7 @@ static TIMER_CALLBACK( pxa255_dma_dma_end )
 
 static READ32_HANDLER( pxa255_dma_r )
 {
-	_39in1_state *state = space->machine->driver_data<_39in1_state>();
+	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 	PXA255_DMA_Regs *dma_regs = &state->dma_regs;
 
 	switch(PXA255_DMA_BASE_ADDR | (offset << 2))
@@ -410,10 +410,10 @@ static READ32_HANDLER( pxa255_dma_r )
 		case PXA255_DCSR4:		case PXA255_DCSR5:		case PXA255_DCSR6:		case PXA255_DCSR7:
 		case PXA255_DCSR8:		case PXA255_DCSR9:		case PXA255_DCSR10:		case PXA255_DCSR11:
 		case PXA255_DCSR12:		case PXA255_DCSR13:		case PXA255_DCSR14:		case PXA255_DCSR15:
-			verboselog( space->machine, 4, "pxa255_dma_r: DMA Channel Control/Status Register %d: %08x & %08x\n", offset, dma_regs->dcsr[offset], mem_mask );
+			verboselog( space->machine(), 4, "pxa255_dma_r: DMA Channel Control/Status Register %d: %08x & %08x\n", offset, dma_regs->dcsr[offset], mem_mask );
 			return dma_regs->dcsr[offset];
 		case PXA255_DINT:
-			if (0) verboselog( space->machine, 3, "pxa255_dma_r: DMA Interrupt Register: %08x & %08x\n", dma_regs->dint, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_dma_r: DMA Interrupt Register: %08x & %08x\n", dma_regs->dint, mem_mask );
 			return dma_regs->dint;
 		case PXA255_DRCMR0:		case PXA255_DRCMR1:		case PXA255_DRCMR2:		case PXA255_DRCMR3:
 		case PXA255_DRCMR4:		case PXA255_DRCMR5:		case PXA255_DRCMR6:		case PXA255_DRCMR7:
@@ -425,34 +425,34 @@ static READ32_HANDLER( pxa255_dma_r )
 		case PXA255_DRCMR28:	case PXA255_DRCMR29:	case PXA255_DRCMR30:	case PXA255_DRCMR31:
 		case PXA255_DRCMR32:	case PXA255_DRCMR33:	case PXA255_DRCMR34:	case PXA255_DRCMR35:
 		case PXA255_DRCMR36:	case PXA255_DRCMR37:	case PXA255_DRCMR38:	case PXA255_DRCMR39:
-			verboselog( space->machine, 3, "pxa255_dma_r: DMA Request to Channel Map Register %d: %08x & %08x\n", offset - (0x100 >> 2), 0, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_dma_r: DMA Request to Channel Map Register %d: %08x & %08x\n", offset - (0x100 >> 2), 0, mem_mask );
 			return dma_regs->drcmr[offset - (0x100 >> 2)];
 		case PXA255_DDADR0:		case PXA255_DDADR1:		case PXA255_DDADR2:		case PXA255_DDADR3:
 		case PXA255_DDADR4:		case PXA255_DDADR5:		case PXA255_DDADR6:		case PXA255_DDADR7:
 		case PXA255_DDADR8:		case PXA255_DDADR9:		case PXA255_DDADR10:	case PXA255_DDADR11:
 		case PXA255_DDADR12:	case PXA255_DDADR13:	case PXA255_DDADR14:	case PXA255_DDADR15:
-			verboselog( space->machine, 3, "pxa255_dma_r: DMA Descriptor Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_dma_r: DMA Descriptor Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
 			return dma_regs->ddadr[(offset - (0x200 >> 2)) >> 2];
 		case PXA255_DSADR0:		case PXA255_DSADR1:		case PXA255_DSADR2:		case PXA255_DSADR3:
 		case PXA255_DSADR4:		case PXA255_DSADR5:		case PXA255_DSADR6:		case PXA255_DSADR7:
 		case PXA255_DSADR8:		case PXA255_DSADR9:		case PXA255_DSADR10:	case PXA255_DSADR11:
 		case PXA255_DSADR12:	case PXA255_DSADR13:	case PXA255_DSADR14:	case PXA255_DSADR15:
-			verboselog( space->machine, 3, "pxa255_dma_r: DMA Source Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_dma_r: DMA Source Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
 			return dma_regs->dsadr[(offset - (0x200 >> 2)) >> 2];
 		case PXA255_DTADR0:		case PXA255_DTADR1:		case PXA255_DTADR2:		case PXA255_DTADR3:
 		case PXA255_DTADR4:		case PXA255_DTADR5:		case PXA255_DTADR6:		case PXA255_DTADR7:
 		case PXA255_DTADR8:		case PXA255_DTADR9:		case PXA255_DTADR10:	case PXA255_DTADR11:
 		case PXA255_DTADR12:	case PXA255_DTADR13:	case PXA255_DTADR14:	case PXA255_DTADR15:
-			verboselog( space->machine, 3, "pxa255_dma_r: DMA Target Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_dma_r: DMA Target Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
 			return dma_regs->dtadr[(offset - (0x200 >> 2)) >> 2];
 		case PXA255_DCMD0:		case PXA255_DCMD1:		case PXA255_DCMD2:		case PXA255_DCMD3:
 		case PXA255_DCMD4:		case PXA255_DCMD5:		case PXA255_DCMD6:		case PXA255_DCMD7:
 		case PXA255_DCMD8:		case PXA255_DCMD9:		case PXA255_DCMD10:		case PXA255_DCMD11:
 		case PXA255_DCMD12:		case PXA255_DCMD13:		case PXA255_DCMD14:		case PXA255_DCMD15:
-			verboselog( space->machine, 3, "pxa255_dma_r: DMA Command Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_dma_r: DMA Command Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
 			return dma_regs->dcmd[(offset - (0x200 >> 2)) >> 2];
 		default:
-			verboselog( space->machine, 0, "pxa255_dma_r: Unknown address: %08x\n", PXA255_DMA_BASE_ADDR | (offset << 2));
+			verboselog( space->machine(), 0, "pxa255_dma_r: Unknown address: %08x\n", PXA255_DMA_BASE_ADDR | (offset << 2));
 			break;
 	}
 	return 0;
@@ -460,7 +460,7 @@ static READ32_HANDLER( pxa255_dma_r )
 
 static WRITE32_HANDLER( pxa255_dma_w )
 {
-	_39in1_state *state = space->machine->driver_data<_39in1_state>();
+	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 	PXA255_DMA_Regs *dma_regs = &state->dma_regs;
 
 	switch(PXA255_DMA_BASE_ADDR | (offset << 2))
@@ -469,7 +469,7 @@ static WRITE32_HANDLER( pxa255_dma_w )
 		case PXA255_DCSR4:		case PXA255_DCSR5:		case PXA255_DCSR6:		case PXA255_DCSR7:
 		case PXA255_DCSR8:		case PXA255_DCSR9:		case PXA255_DCSR10:		case PXA255_DCSR11:
 		case PXA255_DCSR12:		case PXA255_DCSR13:		case PXA255_DCSR14:		case PXA255_DCSR15:
-			if (0) verboselog( space->machine, 3, "pxa255_dma_w: DMA Channel Control/Status Register %d: %08x & %08x\n", offset, data, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_dma_w: DMA Channel Control/Status Register %d: %08x & %08x\n", offset, data, mem_mask );
 			dma_regs->dcsr[offset] &= ~(data & 0x00000007);
 			dma_regs->dcsr[offset] &= ~0x60000000;
 			dma_regs->dcsr[offset] |= data & 0x60000000;
@@ -478,21 +478,21 @@ static WRITE32_HANDLER( pxa255_dma_w )
 				dma_regs->dcsr[offset] |= PXA255_DCSR_RUN;
 				if(data & PXA255_DCSR_NODESCFETCH)
 				{
-					verboselog( space->machine, 0, "              No-Descriptor-Fetch mode is not supported.\n" );
+					verboselog( space->machine(), 0, "              No-Descriptor-Fetch mode is not supported.\n" );
 					break;
 				}
 
-				pxa255_dma_load_descriptor_and_start(space->machine, offset);
+				pxa255_dma_load_descriptor_and_start(space->machine(), offset);
 			}
 			else if(!(data & PXA255_DCSR_RUN))
 			{
 				dma_regs->dcsr[offset] &= ~PXA255_DCSR_RUN;
 			}
 
-			pxa255_dma_irq_check(space->machine);
+			pxa255_dma_irq_check(space->machine());
 			break;
 		case PXA255_DINT:
-			verboselog( space->machine, 3, "pxa255_dma_w: DMA Interrupt Register: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_dma_w: DMA Interrupt Register: %08x & %08x\n", data, mem_mask );
 			dma_regs->dint &= ~data;
 			break;
 		case PXA255_DRCMR0:		case PXA255_DRCMR1:		case PXA255_DRCMR2:		case PXA255_DRCMR3:
@@ -505,39 +505,39 @@ static WRITE32_HANDLER( pxa255_dma_w )
 		case PXA255_DRCMR28:	case PXA255_DRCMR29:	case PXA255_DRCMR30:	case PXA255_DRCMR31:
 		case PXA255_DRCMR32:	case PXA255_DRCMR33:	case PXA255_DRCMR34:	case PXA255_DRCMR35:
 		case PXA255_DRCMR36:	case PXA255_DRCMR37:	case PXA255_DRCMR38:	case PXA255_DRCMR39:
-			verboselog( space->machine, 3, "pxa255_dma_w: DMA Request to Channel Map Register %d: %08x & %08x\n", offset - (0x100 >> 2), data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_dma_w: DMA Request to Channel Map Register %d: %08x & %08x\n", offset - (0x100 >> 2), data, mem_mask );
 			dma_regs->drcmr[offset - (0x100 >> 2)] = data & 0x0000008f;
 			break;
 		case PXA255_DDADR0:		case PXA255_DDADR1:		case PXA255_DDADR2:		case PXA255_DDADR3:
 		case PXA255_DDADR4:		case PXA255_DDADR5:		case PXA255_DDADR6:		case PXA255_DDADR7:
 		case PXA255_DDADR8:		case PXA255_DDADR9:		case PXA255_DDADR10:	case PXA255_DDADR11:
 		case PXA255_DDADR12:	case PXA255_DDADR13:	case PXA255_DDADR14:	case PXA255_DDADR15:
-			verboselog( space->machine, 3, "pxa255_dma_w: DMA Descriptor Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_dma_w: DMA Descriptor Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
 			dma_regs->ddadr[(offset - (0x200 >> 2)) >> 2] = data & 0xfffffff1;
 			break;
 		case PXA255_DSADR0:		case PXA255_DSADR1:		case PXA255_DSADR2:		case PXA255_DSADR3:
 		case PXA255_DSADR4:		case PXA255_DSADR5:		case PXA255_DSADR6:		case PXA255_DSADR7:
 		case PXA255_DSADR8:		case PXA255_DSADR9:		case PXA255_DSADR10:	case PXA255_DSADR11:
 		case PXA255_DSADR12:	case PXA255_DSADR13:	case PXA255_DSADR14:	case PXA255_DSADR15:
-			verboselog( space->machine, 3, "pxa255_dma_w: DMA Source Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_dma_w: DMA Source Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
 			dma_regs->dsadr[(offset - (0x200 >> 2)) >> 2] = data & 0xfffffffc;
 			break;
 		case PXA255_DTADR0:		case PXA255_DTADR1:		case PXA255_DTADR2:		case PXA255_DTADR3:
 		case PXA255_DTADR4:		case PXA255_DTADR5:		case PXA255_DTADR6:		case PXA255_DTADR7:
 		case PXA255_DTADR8:		case PXA255_DTADR9:		case PXA255_DTADR10:	case PXA255_DTADR11:
 		case PXA255_DTADR12:	case PXA255_DTADR13:	case PXA255_DTADR14:	case PXA255_DTADR15:
-			verboselog( space->machine, 3, "pxa255_dma_w: DMA Target Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_dma_w: DMA Target Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
 			dma_regs->dtadr[(offset - (0x200 >> 2)) >> 2] = data & 0xfffffffc;
 			break;
 		case PXA255_DCMD0:		case PXA255_DCMD1:		case PXA255_DCMD2:		case PXA255_DCMD3:
 		case PXA255_DCMD4:		case PXA255_DCMD5:		case PXA255_DCMD6:		case PXA255_DCMD7:
 		case PXA255_DCMD8:		case PXA255_DCMD9:		case PXA255_DCMD10:		case PXA255_DCMD11:
 		case PXA255_DCMD12:		case PXA255_DCMD13:		case PXA255_DCMD14:		case PXA255_DCMD15:
-			verboselog( space->machine, 3, "pxa255_dma_w: DMA Command Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_dma_w: DMA Command Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
 			dma_regs->dcmd[(offset - (0x200 >> 2)) >> 2] = data & 0xf067dfff;
 			break;
 		default:
-			verboselog( space->machine, 0, "pxa255_dma_w: Unknown address: %08x = %08x & %08x\n", PXA255_DMA_BASE_ADDR | (offset << 2), data, mem_mask);
+			verboselog( space->machine(), 0, "pxa255_dma_w: Unknown address: %08x = %08x & %08x\n", PXA255_DMA_BASE_ADDR | (offset << 2), data, mem_mask);
 			break;
 	}
 }
@@ -550,9 +550,9 @@ static WRITE32_HANDLER( pxa255_dma_w )
 
 */
 
-static void pxa255_ostimer_irq_check(running_machine* machine)
+static void pxa255_ostimer_irq_check(running_machine& machine)
 {
-	_39in1_state *state = machine->driver_data<_39in1_state>();
+	_39in1_state *state = machine.driver_data<_39in1_state>();
 	PXA255_OSTMR_Regs *ostimer_regs = &state->ostimer_regs;
 
 	pxa255_set_irq_line(machine, PXA255_INT_OSTIMER0, (ostimer_regs->oier & PXA255_OIER_E0) ? ((ostimer_regs->ossr & PXA255_OSSR_M0) ? 1 : 0) : 0);
@@ -563,7 +563,7 @@ static void pxa255_ostimer_irq_check(running_machine* machine)
 
 static TIMER_CALLBACK( pxa255_ostimer_match )
 {
-	_39in1_state *state = machine->driver_data<_39in1_state>();
+	_39in1_state *state = machine.driver_data<_39in1_state>();
 	PXA255_OSTMR_Regs *ostimer_regs = &state->ostimer_regs;
 
 	if (0) verboselog(machine, 3, "pxa255_ostimer_match channel %d\n", param);
@@ -574,39 +574,39 @@ static TIMER_CALLBACK( pxa255_ostimer_match )
 
 static READ32_HANDLER( pxa255_ostimer_r )
 {
-	_39in1_state *state = space->machine->driver_data<_39in1_state>();
+	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 	PXA255_OSTMR_Regs *ostimer_regs = &state->ostimer_regs;
 
 	switch(PXA255_OSTMR_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_OSMR0:
-			if (0) verboselog( space->machine, 3, "pxa255_ostimer_r: OS Timer Match Register 0: %08x & %08x\n", ostimer_regs->osmr[0], mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_ostimer_r: OS Timer Match Register 0: %08x & %08x\n", ostimer_regs->osmr[0], mem_mask );
 			return ostimer_regs->osmr[0];
 		case PXA255_OSMR1:
-			if (0) verboselog( space->machine, 3, "pxa255_ostimer_r: OS Timer Match Register 1: %08x & %08x\n", ostimer_regs->osmr[1], mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_ostimer_r: OS Timer Match Register 1: %08x & %08x\n", ostimer_regs->osmr[1], mem_mask );
 			return ostimer_regs->osmr[1];
 		case PXA255_OSMR2:
-			if (0) verboselog( space->machine, 3, "pxa255_ostimer_r: OS Timer Match Register 2: %08x & %08x\n", ostimer_regs->osmr[2], mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_ostimer_r: OS Timer Match Register 2: %08x & %08x\n", ostimer_regs->osmr[2], mem_mask );
 			return ostimer_regs->osmr[2];
 		case PXA255_OSMR3:
-			if (0) verboselog( space->machine, 3, "pxa255_ostimer_r: OS Timer Match Register 3: %08x & %08x\n", ostimer_regs->osmr[3], mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_ostimer_r: OS Timer Match Register 3: %08x & %08x\n", ostimer_regs->osmr[3], mem_mask );
 			return ostimer_regs->osmr[3];
 		case PXA255_OSCR:
-			if (0) verboselog( space->machine, 4, "pxa255_ostimer_r: OS Timer Count Register: %08x & %08x\n", ostimer_regs->oscr, mem_mask );
+			if (0) verboselog( space->machine(), 4, "pxa255_ostimer_r: OS Timer Count Register: %08x & %08x\n", ostimer_regs->oscr, mem_mask );
 			// free-running 3.something MHz counter.  this is a complete hack.
 			ostimer_regs->oscr += 0x300;
 			return ostimer_regs->oscr;
 		case PXA255_OSSR:
-			if (0) verboselog( space->machine, 3, "pxa255_ostimer_r: OS Timer Status Register: %08x & %08x\n", ostimer_regs->ossr, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_ostimer_r: OS Timer Status Register: %08x & %08x\n", ostimer_regs->ossr, mem_mask );
 			return ostimer_regs->ossr;
 		case PXA255_OWER:
-			if (0) verboselog( space->machine, 3, "pxa255_ostimer_r: OS Timer Watchdog Match Enable Register: %08x & %08x\n", ostimer_regs->ower, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_ostimer_r: OS Timer Watchdog Match Enable Register: %08x & %08x\n", ostimer_regs->ower, mem_mask );
 			return ostimer_regs->ower;
 		case PXA255_OIER:
-			if (0) verboselog( space->machine, 3, "pxa255_ostimer_r: OS Timer Interrupt Enable Register: %08x & %08x\n", ostimer_regs->oier, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_ostimer_r: OS Timer Interrupt Enable Register: %08x & %08x\n", ostimer_regs->oier, mem_mask );
 			return ostimer_regs->oier;
 		default:
-			if (0) verboselog( space->machine, 0, "pxa255_ostimer_r: Unknown address: %08x\n", PXA255_OSTMR_BASE_ADDR | (offset << 2));
+			if (0) verboselog( space->machine(), 0, "pxa255_ostimer_r: Unknown address: %08x\n", PXA255_OSTMR_BASE_ADDR | (offset << 2));
 			break;
 	}
 	return 0;
@@ -614,13 +614,13 @@ static READ32_HANDLER( pxa255_ostimer_r )
 
 static WRITE32_HANDLER( pxa255_ostimer_w )
 {
-	_39in1_state *state = space->machine->driver_data<_39in1_state>();
+	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 	PXA255_OSTMR_Regs *ostimer_regs = &state->ostimer_regs;
 
 	switch(PXA255_OSTMR_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_OSMR0:
-			if (0) verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Match Register 0: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_ostimer_w: OS Timer Match Register 0: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->osmr[0] = data;
 			if(ostimer_regs->oier & PXA255_OIER_E0)
 			{
@@ -631,7 +631,7 @@ static WRITE32_HANDLER( pxa255_ostimer_w )
 			}
 			break;
 		case PXA255_OSMR1:
-			if (0) verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Match Register 1: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_ostimer_w: OS Timer Match Register 1: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->osmr[1] = data;
 			if(ostimer_regs->oier & PXA255_OIER_E1)
 			{
@@ -641,7 +641,7 @@ static WRITE32_HANDLER( pxa255_ostimer_w )
 			}
 			break;
 		case PXA255_OSMR2:
-			if (0) verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Match Register 2: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_ostimer_w: OS Timer Match Register 2: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->osmr[2] = data;
 			if(ostimer_regs->oier & PXA255_OIER_E2)
 			{
@@ -651,7 +651,7 @@ static WRITE32_HANDLER( pxa255_ostimer_w )
 			}
 			break;
 		case PXA255_OSMR3:
-			if (0) verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Match Register 3: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_ostimer_w: OS Timer Match Register 3: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->osmr[3] = data;
 			if(ostimer_regs->oier & PXA255_OIER_E3)
 			{
@@ -661,22 +661,22 @@ static WRITE32_HANDLER( pxa255_ostimer_w )
 			}
 			break;
 		case PXA255_OSCR:
-			if (0) verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Count Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_ostimer_w: OS Timer Count Register: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->oscr = data;
 			break;
 		case PXA255_OSSR:
-			if (0) verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Status Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_ostimer_w: OS Timer Status Register: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->ossr &= ~data;
-			pxa255_ostimer_irq_check(space->machine);
+			pxa255_ostimer_irq_check(space->machine());
 			break;
 		case PXA255_OWER:
-			if (0) verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Watchdog Enable Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_ostimer_w: OS Timer Watchdog Enable Register: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->ower = data & 0x00000001;
 			break;
 		case PXA255_OIER:
 		{
 			int index = 0;
-			if (0) verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Interrupt Enable Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_ostimer_w: OS Timer Interrupt Enable Register: %08x & %08x\n", data, mem_mask );
 			ostimer_regs->oier = data & 0x0000000f;
 			for(index = 0; index < 4; index++)
 			{
@@ -691,7 +691,7 @@ static WRITE32_HANDLER( pxa255_ostimer_w )
 			break;
 		}
 		default:
-			verboselog( space->machine, 0, "pxa255_ostimer_w: Unknown address: %08x = %08x & %08x\n", PXA255_OSTMR_BASE_ADDR | (offset << 2), data, mem_mask);
+			verboselog( space->machine(), 0, "pxa255_ostimer_w: Unknown address: %08x = %08x & %08x\n", PXA255_OSTMR_BASE_ADDR | (offset << 2), data, mem_mask);
 			break;
 	}
 }
@@ -704,9 +704,9 @@ static WRITE32_HANDLER( pxa255_ostimer_w )
 
 */
 
-static void pxa255_update_interrupts(running_machine* machine)
+static void pxa255_update_interrupts(running_machine& machine)
 {
-	_39in1_state *state = machine->driver_data<_39in1_state>();
+	_39in1_state *state = machine.driver_data<_39in1_state>();
 	PXA255_INTC_Regs *intc_regs = &state->intc_regs;
 
 	intc_regs->icfp = (intc_regs->icpr & intc_regs->icmr) & intc_regs->iclr;
@@ -715,9 +715,9 @@ static void pxa255_update_interrupts(running_machine* machine)
 	cputag_set_input_line(machine, "maincpu", ARM7_IRQ_LINE,  intc_regs->icip ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void pxa255_set_irq_line(running_machine* machine, UINT32 line, int irq_state)
+static void pxa255_set_irq_line(running_machine& machine, UINT32 line, int irq_state)
 {
-	_39in1_state *state = machine->driver_data<_39in1_state>();
+	_39in1_state *state = machine.driver_data<_39in1_state>();
 	PXA255_INTC_Regs *intc_regs = &state->intc_regs;
 
 	intc_regs->icpr &= ~line;
@@ -728,31 +728,31 @@ static void pxa255_set_irq_line(running_machine* machine, UINT32 line, int irq_s
 
 static READ32_HANDLER( pxa255_intc_r )
 {
-	_39in1_state *state = space->machine->driver_data<_39in1_state>();
+	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 	PXA255_INTC_Regs *intc_regs = &state->intc_regs;
 
 	switch(PXA255_INTC_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_ICIP:
-			if (0) verboselog( space->machine, 3, "pxa255_intc_r: Interrupt Controller IRQ Pending Register: %08x & %08x\n", intc_regs->icip, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_intc_r: Interrupt Controller IRQ Pending Register: %08x & %08x\n", intc_regs->icip, mem_mask );
 			return intc_regs->icip;
 		case PXA255_ICMR:
-			if (0) verboselog( space->machine, 3, "pxa255_intc_r: Interrupt Controller Mask Register: %08x & %08x\n", intc_regs->icmr, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_intc_r: Interrupt Controller Mask Register: %08x & %08x\n", intc_regs->icmr, mem_mask );
 			return intc_regs->icmr;
 		case PXA255_ICLR:
-			if (0) verboselog( space->machine, 3, "pxa255_intc_r: Interrupt Controller Level Register: %08x & %08x\n", intc_regs->iclr, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_intc_r: Interrupt Controller Level Register: %08x & %08x\n", intc_regs->iclr, mem_mask );
 			return intc_regs->iclr;
 		case PXA255_ICFP:
-			if (0) verboselog( space->machine, 3, "pxa255_intc_r: Interrupt Controller FIQ Pending Register: %08x & %08x\n", intc_regs->icfp, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_intc_r: Interrupt Controller FIQ Pending Register: %08x & %08x\n", intc_regs->icfp, mem_mask );
 			return intc_regs->icfp;
 		case PXA255_ICPR:
-			if (0) verboselog( space->machine, 3, "pxa255_intc_r: Interrupt Controller Pending Register: %08x & %08x\n", intc_regs->icpr, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_intc_r: Interrupt Controller Pending Register: %08x & %08x\n", intc_regs->icpr, mem_mask );
 			return intc_regs->icpr;
 		case PXA255_ICCR:
-			if (0) verboselog( space->machine, 3, "pxa255_intc_r: Interrupt Controller Control Register: %08x & %08x\n", intc_regs->iccr, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_intc_r: Interrupt Controller Control Register: %08x & %08x\n", intc_regs->iccr, mem_mask );
 			return intc_regs->iccr;
 		default:
-			verboselog( space->machine, 0, "pxa255_intc_r: Unknown address: %08x\n", PXA255_INTC_BASE_ADDR | (offset << 2));
+			verboselog( space->machine(), 0, "pxa255_intc_r: Unknown address: %08x\n", PXA255_INTC_BASE_ADDR | (offset << 2));
 			break;
 	}
 	return 0;
@@ -760,34 +760,34 @@ static READ32_HANDLER( pxa255_intc_r )
 
 static WRITE32_HANDLER( pxa255_intc_w )
 {
-	_39in1_state *state = space->machine->driver_data<_39in1_state>();
+	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 	PXA255_INTC_Regs *intc_regs = &state->intc_regs;
 
 	switch(PXA255_INTC_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_ICIP:
-			verboselog( space->machine, 3, "pxa255_intc_w: (Invalid Write) Interrupt Controller IRQ Pending Register: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_intc_w: (Invalid Write) Interrupt Controller IRQ Pending Register: %08x & %08x\n", data, mem_mask );
 			break;
 		case PXA255_ICMR:
-			if (0) verboselog( space->machine, 3, "pxa255_intc_w: Interrupt Controller Mask Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_intc_w: Interrupt Controller Mask Register: %08x & %08x\n", data, mem_mask );
 			intc_regs->icmr = data & 0xfffe7f00;
 			break;
 		case PXA255_ICLR:
-			if (0) verboselog( space->machine, 3, "pxa255_intc_w: Interrupt Controller Level Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_intc_w: Interrupt Controller Level Register: %08x & %08x\n", data, mem_mask );
 			intc_regs->iclr = data & 0xfffe7f00;
 			break;
 		case PXA255_ICFP:
-			if (0) verboselog( space->machine, 3, "pxa255_intc_w: (Invalid Write) Interrupt Controller FIQ Pending Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_intc_w: (Invalid Write) Interrupt Controller FIQ Pending Register: %08x & %08x\n", data, mem_mask );
 			break;
 		case PXA255_ICPR:
-			if (0) verboselog( space->machine, 3, "pxa255_intc_w: (Invalid Write) Interrupt Controller Pending Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_intc_w: (Invalid Write) Interrupt Controller Pending Register: %08x & %08x\n", data, mem_mask );
 			break;
 		case PXA255_ICCR:
-			if (0) verboselog( space->machine, 3, "pxa255_intc_w: Interrupt Controller Control Register: %08x & %08x\n", data, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_intc_w: Interrupt Controller Control Register: %08x & %08x\n", data, mem_mask );
 			intc_regs->iccr = data & 0x00000001;
 			break;
 		default:
-			verboselog( space->machine, 0, "pxa255_intc_w: Unknown address: %08x = %08x & %08x\n", PXA255_INTC_BASE_ADDR | (offset << 2), data, mem_mask);
+			verboselog( space->machine(), 0, "pxa255_intc_w: Unknown address: %08x = %08x & %08x\n", PXA255_INTC_BASE_ADDR | (offset << 2), data, mem_mask);
 			break;
 	}
 }
@@ -802,97 +802,97 @@ static WRITE32_HANDLER( pxa255_intc_w )
 
 static READ32_HANDLER( pxa255_gpio_r )
 {
-	_39in1_state *state = space->machine->driver_data<_39in1_state>();
+	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 	PXA255_GPIO_Regs *gpio_regs = &state->gpio_regs;
 
 	switch(PXA255_GPIO_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_GPLR0:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Pin-Level Register 0: %08x & %08x\n", gpio_regs->gplr0 | (1 << 1), mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Pin-Level Register 0: %08x & %08x\n", gpio_regs->gplr0 | (1 << 1), mem_mask );
 			return gpio_regs->gplr0 | (1 << 1) | (eeprom_read_bit(state->eeprom) << 5); // Must be on.  Probably a DIP switch.
 		case PXA255_GPLR1:
-			verboselog( space->machine, 3, "pxa255_gpio_r: *Not Yet Implemented* GPIO Pin-Level Register 1: %08x & %08x\n", gpio_regs->gplr1, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: *Not Yet Implemented* GPIO Pin-Level Register 1: %08x & %08x\n", gpio_regs->gplr1, mem_mask );
 			return 0xff9fffff;
 		/*
             0x200000 = flip screen
         */
 		case PXA255_GPLR2:
-			verboselog( space->machine, 3, "pxa255_gpio_r: *Not Yet Implemented* GPIO Pin-Level Register 2: %08x & %08x\n", gpio_regs->gplr2, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: *Not Yet Implemented* GPIO Pin-Level Register 2: %08x & %08x\n", gpio_regs->gplr2, mem_mask );
 			return gpio_regs->gplr2;
 		case PXA255_GPDR0:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Pin Direction Register 0: %08x & %08x\n", gpio_regs->gpdr0, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Pin Direction Register 0: %08x & %08x\n", gpio_regs->gpdr0, mem_mask );
 			return gpio_regs->gpdr0;
 		case PXA255_GPDR1:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Pin Direction Register 1: %08x & %08x\n", gpio_regs->gpdr1, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Pin Direction Register 1: %08x & %08x\n", gpio_regs->gpdr1, mem_mask );
 			return gpio_regs->gpdr1;
 		case PXA255_GPDR2:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Pin Direction Register 2: %08x & %08x\n", gpio_regs->gpdr2, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Pin Direction Register 2: %08x & %08x\n", gpio_regs->gpdr2, mem_mask );
 			return gpio_regs->gpdr2;
 		case PXA255_GPSR0:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 0: %08x & %08x\n", space->machine->rand(), mem_mask );
-			return space->machine->rand();
+			verboselog( space->machine(), 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 0: %08x & %08x\n", space->machine().rand(), mem_mask );
+			return space->machine().rand();
 		case PXA255_GPSR1:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 1: %08x & %08x\n", space->machine->rand(), mem_mask );
-			return space->machine->rand();
+			verboselog( space->machine(), 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 1: %08x & %08x\n", space->machine().rand(), mem_mask );
+			return space->machine().rand();
 		case PXA255_GPSR2:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 2: %08x & %08x\n", space->machine->rand(), mem_mask );
-			return space->machine->rand();
+			verboselog( space->machine(), 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 2: %08x & %08x\n", space->machine().rand(), mem_mask );
+			return space->machine().rand();
 		case PXA255_GPCR0:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 0: %08x & %08x\n", space->machine->rand(), mem_mask );
-			return space->machine->rand();
+			verboselog( space->machine(), 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 0: %08x & %08x\n", space->machine().rand(), mem_mask );
+			return space->machine().rand();
 		case PXA255_GPCR1:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 1: %08x & %08x\n", space->machine->rand(), mem_mask );
-			return space->machine->rand();
+			verboselog( space->machine(), 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 1: %08x & %08x\n", space->machine().rand(), mem_mask );
+			return space->machine().rand();
 		case PXA255_GPCR2:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 2: %08x & %08x\n", space->machine->rand(), mem_mask );
-			return space->machine->rand();
+			verboselog( space->machine(), 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 2: %08x & %08x\n", space->machine().rand(), mem_mask );
+			return space->machine().rand();
 		case PXA255_GRER0:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Rising Edge Detect Enable Register 0: %08x & %08x\n", gpio_regs->grer0, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Rising Edge Detect Enable Register 0: %08x & %08x\n", gpio_regs->grer0, mem_mask );
 			return gpio_regs->grer0;
 		case PXA255_GRER1:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Rising Edge Detect Enable Register 1: %08x & %08x\n", gpio_regs->grer1, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Rising Edge Detect Enable Register 1: %08x & %08x\n", gpio_regs->grer1, mem_mask );
 			return gpio_regs->grer1;
 		case PXA255_GRER2:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Rising Edge Detect Enable Register 2: %08x & %08x\n", gpio_regs->grer2, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Rising Edge Detect Enable Register 2: %08x & %08x\n", gpio_regs->grer2, mem_mask );
 			return gpio_regs->grer2;
 		case PXA255_GFER0:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Falling Edge Detect Enable Register 0: %08x & %08x\n", gpio_regs->gfer0, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Falling Edge Detect Enable Register 0: %08x & %08x\n", gpio_regs->gfer0, mem_mask );
 			return gpio_regs->gfer0;
 		case PXA255_GFER1:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Falling Edge Detect Enable Register 1: %08x & %08x\n", gpio_regs->gfer1, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Falling Edge Detect Enable Register 1: %08x & %08x\n", gpio_regs->gfer1, mem_mask );
 			return gpio_regs->gfer1;
 		case PXA255_GFER2:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Falling Edge Detect Enable Register 2: %08x & %08x\n", gpio_regs->gfer2, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Falling Edge Detect Enable Register 2: %08x & %08x\n", gpio_regs->gfer2, mem_mask );
 			return gpio_regs->gfer2;
 		case PXA255_GEDR0:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Edge Detect Status Register 0: %08x & %08x\n", gpio_regs->gedr0, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Edge Detect Status Register 0: %08x & %08x\n", gpio_regs->gedr0, mem_mask );
 			return gpio_regs->gedr0;
 		case PXA255_GEDR1:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Edge Detect Status Register 1: %08x & %08x\n", gpio_regs->gedr1, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Edge Detect Status Register 1: %08x & %08x\n", gpio_regs->gedr1, mem_mask );
 			return gpio_regs->gedr1;
 		case PXA255_GEDR2:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Edge Detect Status Register 2: %08x & %08x\n", gpio_regs->gedr2, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Edge Detect Status Register 2: %08x & %08x\n", gpio_regs->gedr2, mem_mask );
 			return gpio_regs->gedr2;
 		case PXA255_GAFR0_L:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Alternate Function Register 0 Lower: %08x & %08x\n", gpio_regs->gafr0l, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Alternate Function Register 0 Lower: %08x & %08x\n", gpio_regs->gafr0l, mem_mask );
 			return gpio_regs->gafr0l;
 		case PXA255_GAFR0_U:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Alternate Function Register 0 Upper: %08x & %08x\n", gpio_regs->gafr0u, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Alternate Function Register 0 Upper: %08x & %08x\n", gpio_regs->gafr0u, mem_mask );
 			return gpio_regs->gafr0u;
 		case PXA255_GAFR1_L:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Alternate Function Register 1 Lower: %08x & %08x\n", gpio_regs->gafr1l, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Alternate Function Register 1 Lower: %08x & %08x\n", gpio_regs->gafr1l, mem_mask );
 			return gpio_regs->gafr1l;
 		case PXA255_GAFR1_U:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Alternate Function Register 1 Upper: %08x & %08x\n", gpio_regs->gafr1u, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Alternate Function Register 1 Upper: %08x & %08x\n", gpio_regs->gafr1u, mem_mask );
 			return gpio_regs->gafr1u;
 		case PXA255_GAFR2_L:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Alternate Function Register 2 Lower: %08x & %08x\n", gpio_regs->gafr2l, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Alternate Function Register 2 Lower: %08x & %08x\n", gpio_regs->gafr2l, mem_mask );
 			return gpio_regs->gafr2l;
 		case PXA255_GAFR2_U:
-			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Alternate Function Register 2 Upper: %08x & %08x\n", gpio_regs->gafr2u, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_r: GPIO Alternate Function Register 2 Upper: %08x & %08x\n", gpio_regs->gafr2u, mem_mask );
 			return gpio_regs->gafr2u;
 		default:
-			verboselog( space->machine, 0, "pxa255_gpio_r: Unknown address: %08x\n", PXA255_GPIO_BASE_ADDR | (offset << 2));
+			verboselog( space->machine(), 0, "pxa255_gpio_r: Unknown address: %08x\n", PXA255_GPIO_BASE_ADDR | (offset << 2));
 			break;
 	}
 	return 0;
@@ -900,34 +900,34 @@ static READ32_HANDLER( pxa255_gpio_r )
 
 static WRITE32_HANDLER( pxa255_gpio_w )
 {
-	_39in1_state *state = space->machine->driver_data<_39in1_state>();
+	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 	PXA255_GPIO_Regs *gpio_regs = &state->gpio_regs;
 
 	switch(PXA255_GPIO_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_GPLR0:
-			verboselog( space->machine, 3, "pxa255_gpio_w: (Invalid Write) GPIO Pin-Level Register 0: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: (Invalid Write) GPIO Pin-Level Register 0: %08x & %08x\n", data, mem_mask );
 			break;
 		case PXA255_GPLR1:
-			verboselog( space->machine, 3, "pxa255_gpio_w: (Invalid Write) GPIO Pin-Level Register 1: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: (Invalid Write) GPIO Pin-Level Register 1: %08x & %08x\n", data, mem_mask );
 			break;
 		case PXA255_GPLR2:
-			verboselog( space->machine, 3, "pxa255_gpio_w: (Invalid Write) GPIO Pin-Level Register 2: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: (Invalid Write) GPIO Pin-Level Register 2: %08x & %08x\n", data, mem_mask );
 			break;
 		case PXA255_GPDR0:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Direction Register 0: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Pin Direction Register 0: %08x & %08x\n", data, mem_mask );
 			gpio_regs->gpdr0 = data;
 			break;
 		case PXA255_GPDR1:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Direction Register 1: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Pin Direction Register 1: %08x & %08x\n", data, mem_mask );
 			gpio_regs->gpdr1 = data;
 			break;
 		case PXA255_GPDR2:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Direction Register 2: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Pin Direction Register 2: %08x & %08x\n", data, mem_mask );
 			gpio_regs->gpdr2 = data;
 			break;
 		case PXA255_GPSR0:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Output Set Register 0: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Pin Output Set Register 0: %08x & %08x\n", data, mem_mask );
 			gpio_regs->gpsr0 |= data & gpio_regs->gpdr0;
 			if(data & 0x00000004)
 			{
@@ -943,15 +943,15 @@ static WRITE32_HANDLER( pxa255_gpio_w )
 			}
 			break;
 		case PXA255_GPSR1:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Output Set Register 1: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Pin Output Set Register 1: %08x & %08x\n", data, mem_mask );
 			gpio_regs->gpsr1 |= data & gpio_regs->gpdr1;
 			break;
 		case PXA255_GPSR2:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Output Set Register 2: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Pin Output Set Register 2: %08x & %08x\n", data, mem_mask );
 			gpio_regs->gpsr2 |= data & gpio_regs->gpdr2;
 			break;
 		case PXA255_GPCR0:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Output Clear Register 0: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Pin Output Clear Register 0: %08x & %08x\n", data, mem_mask );
 			gpio_regs->gpsr0 &= ~(data & gpio_regs->gpdr0);
 			if(data & 0x00000004)
 			{
@@ -967,75 +967,75 @@ static WRITE32_HANDLER( pxa255_gpio_w )
 			}
 			break;
 		case PXA255_GPCR1:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Output Clear Register 1: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Pin Output Clear Register 1: %08x & %08x\n", data, mem_mask );
 			gpio_regs->gpsr1 &= ~(data & gpio_regs->gpdr1);
 			break;
 		case PXA255_GPCR2:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Output Clear Register 2: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Pin Output Clear Register 2: %08x & %08x\n", data, mem_mask );
 			gpio_regs->gpsr2 &= ~(data & gpio_regs->gpdr2);
 			break;
 		case PXA255_GRER0:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Rising Edge Detect Enable Register 0: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Rising Edge Detect Enable Register 0: %08x & %08x\n", data, mem_mask );
 			gpio_regs->grer0 = data;
 			break;
 		case PXA255_GRER1:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Rising Edge Detect Enable Register 1: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Rising Edge Detect Enable Register 1: %08x & %08x\n", data, mem_mask );
 			gpio_regs->grer1 = data;
 			break;
 		case PXA255_GRER2:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Rising Edge Detect Enable Register 2: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Rising Edge Detect Enable Register 2: %08x & %08x\n", data, mem_mask );
 			gpio_regs->grer2 = data;
 			break;
 		case PXA255_GFER0:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Falling Edge Detect Enable Register 0: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Falling Edge Detect Enable Register 0: %08x & %08x\n", data, mem_mask );
 			gpio_regs->gfer0 = data;
 			break;
 		case PXA255_GFER1:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Falling Edge Detect Enable Register 1: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Falling Edge Detect Enable Register 1: %08x & %08x\n", data, mem_mask );
 			gpio_regs->gfer1 = data;
 			break;
 		case PXA255_GFER2:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Falling Edge Detect Enable Register 2: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Falling Edge Detect Enable Register 2: %08x & %08x\n", data, mem_mask );
 			gpio_regs->gfer2 = data;
 			break;
 		case PXA255_GEDR0:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Edge Detect Status Register 0: %08x & %08x\n", gpio_regs->gedr0, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Edge Detect Status Register 0: %08x & %08x\n", gpio_regs->gedr0, mem_mask );
 			gpio_regs->gedr0 &= ~data;
 			break;
 		case PXA255_GEDR1:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Edge Detect Status Register 1: %08x & %08x\n", gpio_regs->gedr1, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Edge Detect Status Register 1: %08x & %08x\n", gpio_regs->gedr1, mem_mask );
 			gpio_regs->gedr1 &= ~data;
 			break;
 		case PXA255_GEDR2:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Edge Detect Status Register 2: %08x & %08x\n", gpio_regs->gedr2, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Edge Detect Status Register 2: %08x & %08x\n", gpio_regs->gedr2, mem_mask );
 			gpio_regs->gedr2 &= ~data;
 			break;
 		case PXA255_GAFR0_L:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Alternate Function Register 0 Lower: %08x & %08x\n", gpio_regs->gafr0l, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Alternate Function Register 0 Lower: %08x & %08x\n", gpio_regs->gafr0l, mem_mask );
 			gpio_regs->gafr0l = data;
 			break;
 		case PXA255_GAFR0_U:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Alternate Function Register 0 Upper: %08x & %08x\n", gpio_regs->gafr0u, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Alternate Function Register 0 Upper: %08x & %08x\n", gpio_regs->gafr0u, mem_mask );
 			gpio_regs->gafr0u = data;
 			break;
 		case PXA255_GAFR1_L:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Alternate Function Register 1 Lower: %08x & %08x\n", gpio_regs->gafr1l, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Alternate Function Register 1 Lower: %08x & %08x\n", gpio_regs->gafr1l, mem_mask );
 			gpio_regs->gafr1l = data;
 			break;
 		case PXA255_GAFR1_U:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Alternate Function Register 1 Upper: %08x & %08x\n", gpio_regs->gafr1u, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Alternate Function Register 1 Upper: %08x & %08x\n", gpio_regs->gafr1u, mem_mask );
 			gpio_regs->gafr1u = data;
 			break;
 		case PXA255_GAFR2_L:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Alternate Function Register 2 Lower: %08x & %08x\n", gpio_regs->gafr2l, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Alternate Function Register 2 Lower: %08x & %08x\n", gpio_regs->gafr2l, mem_mask );
 			gpio_regs->gafr2l = data;
 			break;
 		case PXA255_GAFR2_U:
-			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Alternate Function Register 2 Upper: %08x & %08x\n", gpio_regs->gafr2u, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_gpio_w: GPIO Alternate Function Register 2 Upper: %08x & %08x\n", gpio_regs->gafr2u, mem_mask );
 			gpio_regs->gafr2u = data;
 			break;
 		default:
-			verboselog( space->machine, 0, "pxa255_gpio_w: Unknown address: %08x = %08x & %08x\n", PXA255_GPIO_BASE_ADDR | (offset << 2), data, mem_mask);
+			verboselog( space->machine(), 0, "pxa255_gpio_w: Unknown address: %08x = %08x & %08x\n", PXA255_GPIO_BASE_ADDR | (offset << 2), data, mem_mask);
 			break;
 	}
 }
@@ -1050,23 +1050,23 @@ static WRITE32_HANDLER( pxa255_gpio_w )
 
 static void pxa255_lcd_load_dma_descriptor(address_space* space, UINT32 address, int channel)
 {
-	_39in1_state *state = space->machine->driver_data<_39in1_state>();
+	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->lcd_regs;
 
 	lcd_regs->dma[channel].fdadr = space->read_dword(address);
 	lcd_regs->dma[channel].fsadr = space->read_dword(address + 0x04);
 	lcd_regs->dma[channel].fidr  = space->read_dword(address + 0x08);
 	lcd_regs->dma[channel].ldcmd = space->read_dword(address + 0x0c);
-	verboselog( space->machine, 4, "pxa255_lcd_load_dma_descriptor, address = %08x, channel = %d\n", address, channel);
-	verboselog( space->machine, 4, "    DMA Frame Descriptor: %08x\n", lcd_regs->dma[channel].fdadr );
-	verboselog( space->machine, 4, "    DMA Frame Source Address: %08x\n", lcd_regs->dma[channel].fsadr );
-	verboselog( space->machine, 4, "    DMA Frame ID: %08x\n", lcd_regs->dma[channel].fidr );
-	verboselog( space->machine, 4, "    DMA Command: %08x\n", lcd_regs->dma[channel].ldcmd );
+	verboselog( space->machine(), 4, "pxa255_lcd_load_dma_descriptor, address = %08x, channel = %d\n", address, channel);
+	verboselog( space->machine(), 4, "    DMA Frame Descriptor: %08x\n", lcd_regs->dma[channel].fdadr );
+	verboselog( space->machine(), 4, "    DMA Frame Source Address: %08x\n", lcd_regs->dma[channel].fsadr );
+	verboselog( space->machine(), 4, "    DMA Frame ID: %08x\n", lcd_regs->dma[channel].fidr );
+	verboselog( space->machine(), 4, "    DMA Command: %08x\n", lcd_regs->dma[channel].ldcmd );
 }
 
-static void pxa255_lcd_irq_check(running_machine* machine)
+static void pxa255_lcd_irq_check(running_machine& machine)
 {
-	_39in1_state *state = machine->driver_data<_39in1_state>();
+	_39in1_state *state = machine.driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->lcd_regs;
 
 	if(((lcd_regs->lcsr & PXA255_LCSR_BS)  != 0 && (lcd_regs->lccr0 & PXA255_LCCR0_BM)  == 0) ||
@@ -1081,9 +1081,9 @@ static void pxa255_lcd_irq_check(running_machine* machine)
 	}
 }
 
-static void pxa255_lcd_dma_kickoff(running_machine* machine, int channel)
+static void pxa255_lcd_dma_kickoff(running_machine& machine, int channel)
 {
-	_39in1_state *state = machine->driver_data<_39in1_state>();
+	_39in1_state *state = machine.driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->lcd_regs;
 
 	if(lcd_regs->dma[channel].fdadr != 0)
@@ -1101,7 +1101,7 @@ static void pxa255_lcd_dma_kickoff(running_machine* machine, int channel)
 
 		if(lcd_regs->dma[channel].ldcmd & PXA255_LDCMD_PAL)
 		{
-			address_space *space = machine->device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+			address_space *space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 			int length = lcd_regs->dma[channel].ldcmd & 0x000fffff;
 			int index = 0;
 			for(index = 0; index < length; index += 2)
@@ -1113,7 +1113,7 @@ static void pxa255_lcd_dma_kickoff(running_machine* machine, int channel)
 		}
 		else
 		{
-			address_space *space = machine->device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+			address_space *space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 			int length = lcd_regs->dma[channel].ldcmd & 0x000fffff;
 			int index = 0;
 			for(index = 0; index < length; index++)
@@ -1124,16 +1124,16 @@ static void pxa255_lcd_dma_kickoff(running_machine* machine, int channel)
 	}
 }
 
-static void pxa255_lcd_check_load_next_branch(running_machine* machine, int channel)
+static void pxa255_lcd_check_load_next_branch(running_machine& machine, int channel)
 {
-	_39in1_state *state = machine->driver_data<_39in1_state>();
+	_39in1_state *state = machine.driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->lcd_regs;
 
 	if(lcd_regs->fbr[channel] & 1)
 	{
 		verboselog( machine, 4, "pxa255_lcd_check_load_next_branch: Taking branch\n" );
 		lcd_regs->fbr[channel] &= ~1;
-		address_space *space = machine->device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+		address_space *space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 		//lcd_regs->fbr[channel] = (space->read_dword(lcd_regs->fbr[channel] & 0xfffffff0) & 0xfffffff0) | (lcd_regs->fbr[channel] & 0x00000003);
 		//printf( "%08x\n", lcd_regs->fbr[channel] );
 		pxa255_lcd_load_dma_descriptor(space, lcd_regs->fbr[channel] & 0xfffffff0, 0);
@@ -1156,7 +1156,7 @@ static void pxa255_lcd_check_load_next_branch(running_machine* machine, int chan
 
 static TIMER_CALLBACK( pxa255_lcd_dma_eof )
 {
-	_39in1_state *state = machine->driver_data<_39in1_state>();
+	_39in1_state *state = machine.driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->lcd_regs;
 
 	if (0) verboselog( machine, 3, "End of frame callback\n" );
@@ -1171,67 +1171,67 @@ static TIMER_CALLBACK( pxa255_lcd_dma_eof )
 
 static READ32_HANDLER( pxa255_lcd_r )
 {
-	_39in1_state *state = space->machine->driver_data<_39in1_state>();
+	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->lcd_regs;
 
 	switch(PXA255_LCD_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_LCCR0:		// 0x44000000
-			verboselog( space->machine, 3, "pxa255_lcd_r: LCD Control 0: %08x & %08x\n", lcd_regs->lccr0, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_r: LCD Control 0: %08x & %08x\n", lcd_regs->lccr0, mem_mask );
 			return lcd_regs->lccr0;
 		case PXA255_LCCR1:		// 0x44000004
-			verboselog( space->machine, 3, "pxa255_lcd_r: LCD Control 1: %08x & %08x\n", lcd_regs->lccr1, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_r: LCD Control 1: %08x & %08x\n", lcd_regs->lccr1, mem_mask );
 			return lcd_regs->lccr1;
 		case PXA255_LCCR2:		// 0x44000008
-			verboselog( space->machine, 3, "pxa255_lcd_r: LCD Control 2: %08x & %08x\n", lcd_regs->lccr2, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_r: LCD Control 2: %08x & %08x\n", lcd_regs->lccr2, mem_mask );
 			return lcd_regs->lccr2;
 		case PXA255_LCCR3:		// 0x4400000c
-			verboselog( space->machine, 3, "pxa255_lcd_r: LCD Control 3: %08x & %08x\n", lcd_regs->lccr3, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_r: LCD Control 3: %08x & %08x\n", lcd_regs->lccr3, mem_mask );
 			return lcd_regs->lccr3;
 		case PXA255_FBR0:		// 0x44000020
-			verboselog( space->machine, 4, "pxa255_lcd_r: LCD Frame Branch Register 0: %08x & %08x\n", lcd_regs->fbr[0], mem_mask );
+			verboselog( space->machine(), 4, "pxa255_lcd_r: LCD Frame Branch Register 0: %08x & %08x\n", lcd_regs->fbr[0], mem_mask );
 			return lcd_regs->fbr[0];
 		case PXA255_FBR1:		// 0x44000024
-			verboselog( space->machine, 3, "pxa255_lcd_r: LCD Frame Branch Register 1: %08x & %08x\n", lcd_regs->fbr[1], mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_r: LCD Frame Branch Register 1: %08x & %08x\n", lcd_regs->fbr[1], mem_mask );
 			return lcd_regs->fbr[1];
 		case PXA255_LCSR:		// 0x44000038
-			verboselog( space->machine, 4, "pxa255_lcd_r: LCD Status Register: %08x & %08x\n", lcd_regs->lcsr, mem_mask );
+			verboselog( space->machine(), 4, "pxa255_lcd_r: LCD Status Register: %08x & %08x\n", lcd_regs->lcsr, mem_mask );
 			return lcd_regs->lcsr;
 		case PXA255_LIIDR:		// 0x4400003c
-			verboselog( space->machine, 3, "pxa255_lcd_r: LCD Interrupt ID Register: %08x & %08x\n", lcd_regs->liidr, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_r: LCD Interrupt ID Register: %08x & %08x\n", lcd_regs->liidr, mem_mask );
 			return lcd_regs->liidr;
 		case PXA255_TRGBR:		// 0x44000040
-			verboselog( space->machine, 3, "pxa255_lcd_r: TMED RGB Seed Register: %08x & %08x\n", lcd_regs->trgbr, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_r: TMED RGB Seed Register: %08x & %08x\n", lcd_regs->trgbr, mem_mask );
 			return lcd_regs->trgbr;
 		case PXA255_TCR:		// 0x44000044
-			verboselog( space->machine, 3, "pxa255_lcd_r: TMED RGB Seed Register: %08x & %08x\n", lcd_regs->tcr, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_r: TMED RGB Seed Register: %08x & %08x\n", lcd_regs->tcr, mem_mask );
 			return lcd_regs->tcr;
 		case PXA255_FDADR0:		// 0x44000200
-			if (0) verboselog( space->machine, 3, "pxa255_lcd_r: LCD DMA Frame Descriptor Address Register 0: %08x & %08x\n", lcd_regs->dma[0].fdadr, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_lcd_r: LCD DMA Frame Descriptor Address Register 0: %08x & %08x\n", lcd_regs->dma[0].fdadr, mem_mask );
 			return lcd_regs->dma[0].fdadr;
 		case PXA255_FSADR0:		// 0x44000204
-			verboselog( space->machine, 3, "pxa255_lcd_r: LCD DMA Frame Source Address Register 0: %08x & %08x\n", lcd_regs->dma[0].fsadr, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_r: LCD DMA Frame Source Address Register 0: %08x & %08x\n", lcd_regs->dma[0].fsadr, mem_mask );
 			return lcd_regs->dma[0].fsadr;
 		case PXA255_FIDR0:		// 0x44000208
-			verboselog( space->machine, 3, "pxa255_lcd_r: LCD DMA Frame ID Register 0: %08x & %08x\n", lcd_regs->dma[0].fidr, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_r: LCD DMA Frame ID Register 0: %08x & %08x\n", lcd_regs->dma[0].fidr, mem_mask );
 			return lcd_regs->dma[0].fidr;
 		case PXA255_LDCMD0:		// 0x4400020c
-			if (0) verboselog( space->machine, 3, "pxa255_lcd_r: LCD DMA Command Register 0: %08x & %08x\n", lcd_regs->dma[0].ldcmd & 0xfff00000, mem_mask );
+			if (0) verboselog( space->machine(), 3, "pxa255_lcd_r: LCD DMA Command Register 0: %08x & %08x\n", lcd_regs->dma[0].ldcmd & 0xfff00000, mem_mask );
 			return lcd_regs->dma[0].ldcmd & 0xfff00000;
 		case PXA255_FDADR1:		// 0x44000210
-			verboselog( space->machine, 3, "pxa255_lcd_r: LCD DMA Frame Descriptor Address Register 1: %08x & %08x\n", lcd_regs->dma[1].fdadr, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_r: LCD DMA Frame Descriptor Address Register 1: %08x & %08x\n", lcd_regs->dma[1].fdadr, mem_mask );
 			return lcd_regs->dma[1].fdadr;
 		case PXA255_FSADR1:		// 0x44000214
-			verboselog( space->machine, 3, "pxa255_lcd_r: LCD DMA Frame Source Address Register 1: %08x & %08x\n", lcd_regs->dma[1].fsadr, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_r: LCD DMA Frame Source Address Register 1: %08x & %08x\n", lcd_regs->dma[1].fsadr, mem_mask );
 			return lcd_regs->dma[1].fsadr;
 		case PXA255_FIDR1:		// 0x44000218
-			verboselog( space->machine, 3, "pxa255_lcd_r: LCD DMA Frame ID Register 1: %08x & %08x\n", lcd_regs->dma[1].fidr, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_r: LCD DMA Frame ID Register 1: %08x & %08x\n", lcd_regs->dma[1].fidr, mem_mask );
 			return lcd_regs->dma[1].fidr;
 		case PXA255_LDCMD1:		// 0x4400021c
-			verboselog( space->machine, 3, "pxa255_lcd_r: LCD DMA Command Register 1: %08x & %08x\n", lcd_regs->dma[1].ldcmd & 0xfff00000, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_r: LCD DMA Command Register 1: %08x & %08x\n", lcd_regs->dma[1].ldcmd & 0xfff00000, mem_mask );
 			return lcd_regs->dma[1].ldcmd & 0xfff00000;
 		default:
-			verboselog( space->machine, 0, "pxa255_lcd_r: Unknown address: %08x\n", PXA255_LCD_BASE_ADDR | (offset << 2));
+			verboselog( space->machine(), 0, "pxa255_lcd_r: Unknown address: %08x\n", PXA255_LCD_BASE_ADDR | (offset << 2));
 			break;
 	}
 	return 0;
@@ -1239,65 +1239,65 @@ static READ32_HANDLER( pxa255_lcd_r )
 
 static WRITE32_HANDLER( pxa255_lcd_w )
 {
-	_39in1_state *state = space->machine->driver_data<_39in1_state>();
+	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->lcd_regs;
 
 	switch(PXA255_LCD_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_LCCR0:		// 0x44000000
-			verboselog( space->machine, 3, "pxa255_lcd_w: LCD Control 0: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_w: LCD Control 0: %08x & %08x\n", data, mem_mask );
 			lcd_regs->lccr0 = data & 0x00fffeff;
 			break;
 		case PXA255_LCCR1:		// 0x44000004
-			verboselog( space->machine, 3, "pxa255_lcd_w: LCD Control 1: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_w: LCD Control 1: %08x & %08x\n", data, mem_mask );
 			lcd_regs->lccr1 = data;
 			break;
 		case PXA255_LCCR2:		// 0x44000008
-			verboselog( space->machine, 3, "pxa255_lcd_w: LCD Control 2: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_w: LCD Control 2: %08x & %08x\n", data, mem_mask );
 			lcd_regs->lccr2 = data;
 			break;
 		case PXA255_LCCR3:		// 0x4400000c
-			verboselog( space->machine, 3, "pxa255_lcd_w: LCD Control 3: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_w: LCD Control 3: %08x & %08x\n", data, mem_mask );
 			lcd_regs->lccr3 = data;
 			break;
 		case PXA255_FBR0:		// 0x44000020
-			verboselog( space->machine, 4l, "pxa255_lcd_w: LCD Frame Branch Register 0: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 4l, "pxa255_lcd_w: LCD Frame Branch Register 0: %08x & %08x\n", data, mem_mask );
 			lcd_regs->fbr[0] = data & 0xfffffff3;
 			if(!lcd_regs->dma[0].eof->enabled())
 			{
-				if (0) verboselog( space->machine, 3, "ch0 EOF timer is not enabled, taking branch now\n" );
-				pxa255_lcd_check_load_next_branch(space->machine, 0);
-				pxa255_lcd_irq_check(space->machine);
+				if (0) verboselog( space->machine(), 3, "ch0 EOF timer is not enabled, taking branch now\n" );
+				pxa255_lcd_check_load_next_branch(space->machine(), 0);
+				pxa255_lcd_irq_check(space->machine());
 			}
 			break;
 		case PXA255_FBR1:		// 0x44000024
-			verboselog( space->machine, 3, "pxa255_lcd_w: LCD Frame Branch Register 1: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_w: LCD Frame Branch Register 1: %08x & %08x\n", data, mem_mask );
 			lcd_regs->fbr[1] = data & 0xfffffff3;
 			if(!lcd_regs->dma[1].eof->enabled())
 			{
-				verboselog( space->machine, 3, "ch1 EOF timer is not enabled, taking branch now\n" );
-				pxa255_lcd_check_load_next_branch(space->machine, 1);
-				pxa255_lcd_irq_check(space->machine);
+				verboselog( space->machine(), 3, "ch1 EOF timer is not enabled, taking branch now\n" );
+				pxa255_lcd_check_load_next_branch(space->machine(), 1);
+				pxa255_lcd_irq_check(space->machine());
 			}
 			break;
 		case PXA255_LCSR:		// 0x44000038
-			verboselog( space->machine, 4, "pxa255_lcd_w: LCD Controller Status Register: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 4, "pxa255_lcd_w: LCD Controller Status Register: %08x & %08x\n", data, mem_mask );
 			lcd_regs->lcsr &= ~data;
-			pxa255_lcd_irq_check(space->machine);
+			pxa255_lcd_irq_check(space->machine());
 			break;
 		case PXA255_LIIDR:		// 0x4400003c
-			verboselog( space->machine, 3, "pxa255_lcd_w: LCD Controller Interrupt ID Register: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_w: LCD Controller Interrupt ID Register: %08x & %08x\n", data, mem_mask );
 			break;
 		case PXA255_TRGBR:		// 0x44000040
-			verboselog( space->machine, 3, "pxa255_lcd_w: TMED RGB Seed Register: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_w: TMED RGB Seed Register: %08x & %08x\n", data, mem_mask );
 			lcd_regs->trgbr = data & 0x00ffffff;
 			break;
 		case PXA255_TCR:		// 0x44000044
-			verboselog( space->machine, 3, "pxa255_lcd_w: TMED Control Register: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 3, "pxa255_lcd_w: TMED Control Register: %08x & %08x\n", data, mem_mask );
 			lcd_regs->tcr = data & 0x00004fff;
 			break;
 		case PXA255_FDADR0:		// 0x44000200
-			verboselog( space->machine, 4, "pxa255_lcd_w: LCD DMA Frame Descriptor Address Register 0: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 4, "pxa255_lcd_w: LCD DMA Frame Descriptor Address Register 0: %08x & %08x\n", data, mem_mask );
 			if(!lcd_regs->dma[0].eof->enabled())
 			{
 				pxa255_lcd_load_dma_descriptor(space, data & 0xfffffff0, 0);
@@ -1309,16 +1309,16 @@ static WRITE32_HANDLER( pxa255_lcd_w )
 			}
 			break;
 		case PXA255_FSADR0:		// 0x44000204
-			verboselog( space->machine, 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Frame Source Address Register 0: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Frame Source Address Register 0: %08x & %08x\n", data, mem_mask );
 			break;
 		case PXA255_FIDR0:		// 0x44000208
-			verboselog( space->machine, 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Frame ID Register 0: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Frame ID Register 0: %08x & %08x\n", data, mem_mask );
 			break;
 		case PXA255_LDCMD0:		// 0x4400020c
-			verboselog( space->machine, 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Command Register 0: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Command Register 0: %08x & %08x\n", data, mem_mask );
 			break;
 		case PXA255_FDADR1:		// 0x44000210
-			verboselog( space->machine, 4, "pxa255_lcd_w: LCD DMA Frame Descriptor Address Register 1: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 4, "pxa255_lcd_w: LCD DMA Frame Descriptor Address Register 1: %08x & %08x\n", data, mem_mask );
 			if(!lcd_regs->dma[1].eof->enabled())
 			{
 				pxa255_lcd_load_dma_descriptor(space, data & 0xfffffff0, 1);
@@ -1330,16 +1330,16 @@ static WRITE32_HANDLER( pxa255_lcd_w )
 			}
 			break;
 		case PXA255_FSADR1:		// 0x44000214
-			verboselog( space->machine, 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Frame Source Address Register 1: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Frame Source Address Register 1: %08x & %08x\n", data, mem_mask );
 			break;
 		case PXA255_FIDR1:		// 0x44000218
-			verboselog( space->machine, 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Frame ID Register 1: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Frame ID Register 1: %08x & %08x\n", data, mem_mask );
 			break;
 		case PXA255_LDCMD1:		// 0x4400021c
-			verboselog( space->machine, 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Command Register 1: %08x & %08x\n", data, mem_mask );
+			verboselog( space->machine(), 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Command Register 1: %08x & %08x\n", data, mem_mask );
 			break;
 		default:
-			verboselog( space->machine, 0, "pxa255_lcd_w: Unknown address: %08x = %08x & %08x\n", PXA255_LCD_BASE_ADDR | (offset << 2), data, mem_mask);
+			verboselog( space->machine(), 0, "pxa255_lcd_w: Unknown address: %08x = %08x & %08x\n", PXA255_LCD_BASE_ADDR | (offset << 2), data, mem_mask);
 			break;
 	}
 }
@@ -1362,7 +1362,7 @@ static READ32_HANDLER( unknown_r )
 
 static READ32_HANDLER( cpld_r )
 {
-	_39in1_state *state = space->machine->driver_data<_39in1_state>();
+	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 
 	//if (cpu_get_pc(space->cpu) != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, cpu_get_pc(space->cpu), state);
 
@@ -1372,7 +1372,7 @@ static READ32_HANDLER( cpld_r )
 	}
 	else if (cpu_get_pc(space->cpu) == 0xe3af4)
 	{
-		return input_port_read(space->machine, "MCUIPT");
+		return input_port_read(space->machine(), "MCUIPT");
 	}
 	else
 	{
@@ -1419,7 +1419,7 @@ static READ32_HANDLER( cpld_r )
 
 static WRITE32_HANDLER( cpld_w )
 {
-	_39in1_state *state = space->machine->driver_data<_39in1_state>();
+	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 
 	if (mem_mask == 0xffff)
 	{
@@ -1453,13 +1453,13 @@ static READ32_HANDLER( prot_cheater_r )
 
 static DRIVER_INIT( 39in1 )
 {
-	_39in1_state *state = machine->driver_data<_39in1_state>();
+	_39in1_state *state = machine.driver_data<_39in1_state>();
 
-	state->dmadac[0] = machine->device<dmadac_sound_device>("dac1");
-	state->dmadac[1] = machine->device<dmadac_sound_device>("dac2");
-	state->eeprom = machine->device<eeprom_device>("eeprom");
+	state->dmadac[0] = machine.device<dmadac_sound_device>("dac1");
+	state->dmadac[1] = machine.device<dmadac_sound_device>("dac2");
+	state->eeprom = machine.device<eeprom_device>("eeprom");
 
-	address_space *space = machine->device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+	address_space *space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 	space->install_legacy_read_handler (0xa0151648, 0xa015164b, FUNC(prot_cheater_r));
 }
 
@@ -1514,7 +1514,7 @@ INPUT_PORTS_END
 
 static SCREEN_UPDATE( 39in1 )
 {
-	_39in1_state *state = screen->machine->driver_data<_39in1_state>();
+	_39in1_state *state = screen->machine().driver_data<_39in1_state>();
 	int x = 0;
 	int y = 0;
 
@@ -1530,9 +1530,9 @@ static SCREEN_UPDATE( 39in1 )
 }
 
 /* To be moved to DEVICE_START( pxa255 ) upon completion */
-static void pxa255_start(running_machine* machine)
+static void pxa255_start(running_machine& machine)
 {
-	_39in1_state *state = machine->driver_data<_39in1_state>();
+	_39in1_state *state = machine.driver_data<_39in1_state>();
 	int index = 0;
 
 	//pxa255_t* pxa255 = pxa255_get_safe_token( device );
@@ -1542,21 +1542,21 @@ static void pxa255_start(running_machine* machine)
 	for(index = 0; index < 16; index++)
 	{
 		state->dma_regs.dcsr[index] = 0x00000008;
-		state->dma_regs.timer[index] = machine->scheduler().timer_alloc(FUNC(pxa255_dma_dma_end));
+		state->dma_regs.timer[index] = machine.scheduler().timer_alloc(FUNC(pxa255_dma_dma_end));
 	}
 
 	memset(&state->ostimer_regs, 0, sizeof(state->ostimer_regs));
 	for(index = 0; index < 4; index++)
 	{
 		state->ostimer_regs.osmr[index] = 0;
-		state->ostimer_regs.timer[index] = machine->scheduler().timer_alloc(FUNC(pxa255_ostimer_match));
+		state->ostimer_regs.timer[index] = machine.scheduler().timer_alloc(FUNC(pxa255_ostimer_match));
 	}
 
 	memset(&state->intc_regs, 0, sizeof(state->intc_regs));
 
 	memset(&state->lcd_regs, 0, sizeof(state->lcd_regs));
-	state->lcd_regs.dma[0].eof = machine->scheduler().timer_alloc(FUNC(pxa255_lcd_dma_eof));
-	state->lcd_regs.dma[1].eof = machine->scheduler().timer_alloc(FUNC(pxa255_lcd_dma_eof));
+	state->lcd_regs.dma[0].eof = machine.scheduler().timer_alloc(FUNC(pxa255_lcd_dma_eof));
+	state->lcd_regs.dma[1].eof = machine.scheduler().timer_alloc(FUNC(pxa255_lcd_dma_eof));
 	state->lcd_regs.trgbr = 0x00aa5500;
 	state->lcd_regs.tcr = 0x0000754f;
 
@@ -1565,7 +1565,7 @@ static void pxa255_start(running_machine* machine)
 
 static MACHINE_START(39in1)
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x80000; i += 2)

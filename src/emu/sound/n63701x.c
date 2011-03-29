@@ -114,7 +114,7 @@ static DEVICE_START( namco_63701x )
 
 	chip->rom = *device->region();
 
-	chip->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock()/1000, chip, namco_63701x_update);
+	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock()/1000, chip, namco_63701x_update);
 }
 
 

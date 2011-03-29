@@ -235,7 +235,7 @@ static VIDEO_START( m2 )
 
 static SCREEN_UPDATE( m2 )
 {
-	konamim2_state *state = screen->machine->driver_data<konamim2_state>();
+	konamim2_state *state = screen->machine().driver_data<konamim2_state>();
 	int i, j;
 
 	UINT32 fb_start = 0xffffffff;
@@ -266,7 +266,7 @@ static SCREEN_UPDATE( m2 )
 
 static READ64_HANDLER(irq_enable_r)
 {
-	konamim2_state *state = space->machine->driver_data<konamim2_state>();
+	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	UINT64 r = 0;
 
 	if (ACCESSING_BITS_32_63)
@@ -279,7 +279,7 @@ static READ64_HANDLER(irq_enable_r)
 
 static WRITE64_HANDLER(irq_enable_w)
 {
-	konamim2_state *state = space->machine->driver_data<konamim2_state>();
+	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	if (ACCESSING_BITS_32_63)
 	{
 		state->irq_enable |= (UINT32)(data >> 32);
@@ -288,7 +288,7 @@ static WRITE64_HANDLER(irq_enable_w)
 
 static READ64_HANDLER(irq_active_r)
 {
-	konamim2_state *state = space->machine->driver_data<konamim2_state>();
+	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	UINT64 r = 0;
 
 	if (ACCESSING_BITS_32_63)
@@ -320,14 +320,14 @@ static READ64_HANDLER(unk2_r)
 
 static READ64_HANDLER(unk3_r)
 {
-	konamim2_state *state = space->machine->driver_data<konamim2_state>();
+	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	//return U64(0xffffffffffffffff);
 	return state->unk3;
 }
 
 static READ64_HANDLER(unk4_r)
 {
-	konamim2_state *state = space->machine->driver_data<konamim2_state>();
+	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	UINT64 r = 0;
 //  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), cpu_get_pc(space->cpu));
 
@@ -345,7 +345,7 @@ static READ64_HANDLER(unk4_r)
 
 static WRITE64_HANDLER(unk4_w)
 {
-	konamim2_state *state = space->machine->driver_data<konamim2_state>();
+	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 //  logerror("unk4_w: %08X%08X, %08X, %08X%08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data),
 //      offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), cpu_get_pc(space->cpu));
 
@@ -354,7 +354,7 @@ static WRITE64_HANDLER(unk4_w)
 		if (data & 0x800000)
 		{
 			mame_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", space->cpu->tag(), cpu_get_pc(space->cpu));
-			cputag_set_input_line(space->machine, "sub", INPUT_LINE_IRQ0, ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "sub", INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 
 		state->unk20004 = (UINT32)(data);
@@ -364,7 +364,7 @@ static WRITE64_HANDLER(unk4_w)
 
 static READ64_HANDLER(unk30000_r)
 {
-	konamim2_state *state = space->machine->driver_data<konamim2_state>();
+	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	state->counter1++;
 	return (UINT64)(state->counter1 & 0x7f) << 32;
 }
@@ -380,7 +380,7 @@ static READ64_HANDLER(unk30030_r)
 
 static WRITE64_HANDLER(video_w)
 {
-	konamim2_state *state = space->machine->driver_data<konamim2_state>();
+	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	if (ACCESSING_BITS_32_63)
 	{
 		state->vdl0_address = (UINT32)(data >> 32);
@@ -393,7 +393,7 @@ static WRITE64_HANDLER(video_w)
 
 static WRITE64_HANDLER(video_irq_ack_w)
 {
-	konamim2_state *state = space->machine->driver_data<konamim2_state>();
+	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	if (ACCESSING_BITS_32_63)
 	{
 		if ((data >> 32) & 0x8000)
@@ -447,12 +447,12 @@ static WRITE64_HANDLER(unk4000418_w)
 
 static WRITE64_HANDLER(reset_w)
 {
-	konamim2_state *state = space->machine->driver_data<konamim2_state>();
+	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	if (ACCESSING_BITS_32_63)
 	{
 		if (data & U64(0x100000000))
 		{
-			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+			cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 			state->unk3 = 0;
 		}
 	}
@@ -473,9 +473,9 @@ static WRITE64_HANDLER(reset_w)
 
 
 
-static void cde_init(running_machine *machine)
+static void cde_init(running_machine &machine)
 {
-	konamim2_state *state = machine->driver_data<konamim2_state>();
+	konamim2_state *state = machine.driver_data<konamim2_state>();
 	cdrom_file *cd = cdrom_open(get_disk_handle(machine, "cdrom"));
 	const cdrom_toc *toc = cdrom_get_toc(cd);
 
@@ -513,9 +513,9 @@ static void cde_init(running_machine *machine)
 	state->cde_qchannel_offset = 0;
 }
 
-static void cde_handle_command(running_machine *machine)
+static void cde_handle_command(running_machine &machine)
 {
-	konamim2_state *state = machine->driver_data<konamim2_state>();
+	konamim2_state *state = machine.driver_data<konamim2_state>();
 	switch (state->cde_command_bytes[0])
 	{
 		case 0x04:		// Set Speed
@@ -688,9 +688,9 @@ static void cde_handle_command(running_machine *machine)
 	}
 }
 
-static void cde_handle_reports(running_machine *machine)
+static void cde_handle_reports(running_machine &machine)
 {
-	konamim2_state *state = machine->driver_data<konamim2_state>();
+	konamim2_state *state = machine.driver_data<konamim2_state>();
 	switch (state->cde_command_bytes[0])
 	{
 		case 0x09:
@@ -809,7 +809,7 @@ static void cde_handle_reports(running_machine *machine)
 
 static void cde_dma_transfer(address_space *space, int channel, int next)
 {
-	konamim2_state *state = space->machine->driver_data<konamim2_state>();
+	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	UINT32 address;
 	//int length;
 	int i;
@@ -834,7 +834,7 @@ static void cde_dma_transfer(address_space *space, int channel, int next)
 
 static READ64_HANDLER(cde_r)
 {
-	konamim2_state *state = space->machine->driver_data<konamim2_state>();
+	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	UINT32 r = 0;
 	int reg = offset * 2;
 
@@ -872,7 +872,7 @@ static READ64_HANDLER(cde_r)
 
 				if (!state->cde_response)
 				{
-					cde_handle_reports(space->machine);
+					cde_handle_reports(space->machine());
 
 			//      state->cde_command_byte_ptr = 0;
 			//      state->cde_command_bytes[state->cde_command_byte_ptr++] = 0x1c;
@@ -910,7 +910,7 @@ static READ64_HANDLER(cde_r)
 
 static WRITE64_HANDLER(cde_w)
 {
-	konamim2_state *state = space->machine->driver_data<konamim2_state>();
+	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	int reg = offset * 2;
 	UINT32 d;
 
@@ -934,7 +934,7 @@ static WRITE64_HANDLER(cde_w)
 			{
 				if (state->cde_response)
 				{
-					cde_handle_command(space->machine);
+					cde_handle_command(space->machine());
 
 					state->cde_response = 0;
 				}
@@ -1099,7 +1099,7 @@ static READ64_HANDLER(cpu_r)
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r = (UINT64)((space->cpu != space->machine->device("maincpu")) ? 0x80000000 : 0);
+		r = (UINT64)((space->cpu != space->machine().device("maincpu")) ? 0x80000000 : 0);
 		//r |= 0x40000000;  // sets Video-LowRes !?
 		return r << 32;
 	}
@@ -1141,7 +1141,7 @@ static const powerpc_config ppc602_config =
 
 static INTERRUPT_GEN(m2)
 {
-	konamim2_state *state = device->machine->driver_data<konamim2_state>();
+	konamim2_state *state = device->machine().driver_data<konamim2_state>();
 	if (state->irq_enable & 0x800000)
 	{
 		state->irq_active |= 0x800000;
@@ -1282,7 +1282,7 @@ ROM_END
 
 static DRIVER_INIT( m2 )
 {
-	konamim2_state *state = machine->driver_data<konamim2_state>();
+	konamim2_state *state = machine.driver_data<konamim2_state>();
 	state->unk3 = U64(0xffffffffffffffff);
 	state->unk20004 = 0;
 	cde_init(machine);

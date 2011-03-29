@@ -183,12 +183,12 @@ static WRITE16_HANDLER( dec0_control_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				soundlatch_w(space, 0, data & 0xff);
-				cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
 			break;
 
 		case 6: /* Intel 8751 microcontroller - Bad Dudes, Heavy Barrel, Birdy Try only */
-			dec0_i8751_write(space->machine, data);
+			dec0_i8751_write(space->machine(), data);
 			break;
 
 		case 8: /* Interrupt ack (VBL - IRQ 6) */
@@ -202,7 +202,7 @@ static WRITE16_HANDLER( dec0_control_w )
 			break;
 
 		case 0xe: /* Reset Intel 8751? - not sure, all the games write here at startup */
-			dec0_i8751_reset(space->machine);
+			dec0_i8751_reset(space->machine());
 			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+(offset<<1));
 			break;
 
@@ -221,7 +221,7 @@ static WRITE16_HANDLER( automat_control_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				soundlatch_w(space, 0, data & 0xff);
-				cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+				cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 			}
 			break;
 
@@ -254,7 +254,7 @@ static WRITE16_HANDLER( slyspy_control_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				soundlatch_w(space, 0, data & 0xff);
-				cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
 			break;
 		case 2:
@@ -268,7 +268,7 @@ static WRITE16_HANDLER( midres_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -330,13 +330,13 @@ READ16_HANDLER( slyspy_controls_r )
 	switch (offset<<1)
 	{
 		case 0: /* Dip Switches */
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 
 		case 2: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(space->machine, "INPUTS");
+			return input_port_read(space->machine(), "INPUTS");
 
 		case 4: /* Credits */
-			return input_port_read(space->machine, "SYSTEM");
+			return input_port_read(space->machine(), "SYSTEM");
 	}
 
 	logerror("Unknown control read at 30c000 %d\n", offset);
@@ -394,35 +394,35 @@ READ16_HANDLER( slyspy_protection_r )
 static WRITE16_HANDLER( unmapped_w )
 {
 	// fall through for unmapped protection areas
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 	logerror("unmapped memory write to %04x = %04x in mode %d\n", 0x240000+offset*2, data, state->slyspy_state);		
 }
 
-void slyspy_set_protection_map(running_machine* machine, int type);
+void slyspy_set_protection_map(running_machine& machine, int type);
 
 WRITE16_HANDLER( slyspy_state_w )
 {
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 	state->slyspy_state=0;
-	slyspy_set_protection_map(space->machine, state->slyspy_state);
+	slyspy_set_protection_map(space->machine(), state->slyspy_state);
 }
 
 READ16_HANDLER( slyspy_state_r )
 {
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 	state->slyspy_state++;
 	state->slyspy_state=state->slyspy_state%4;
-	slyspy_set_protection_map(space->machine, state->slyspy_state);
+	slyspy_set_protection_map(space->machine(), state->slyspy_state);
 
 	return 0; /* Value doesn't mater */
 }
 
-void slyspy_set_protection_map(running_machine* machine, int type)
+void slyspy_set_protection_map(running_machine& machine, int type)
 {
-	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	
-	deco_bac06_device *tilegen1 = (deco_bac06_device*)space->machine->device<deco_bac06_device>("tilegen1");
-	deco_bac06_device *tilegen2 = (deco_bac06_device*)space->machine->device<deco_bac06_device>("tilegen2");
+	deco_bac06_device *tilegen1 = (deco_bac06_device*)space->machine().device<deco_bac06_device>("tilegen1");
+	deco_bac06_device *tilegen2 = (deco_bac06_device*)space->machine().device<deco_bac06_device>("tilegen2");
 
 	space->install_legacy_write_handler( 0x240000, 0x24ffff, FUNC(unmapped_w));
 
@@ -640,7 +640,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( automat_adpcm_w )
 {
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 	state->automat_adpcm_byte = data;
 }
 
@@ -1254,12 +1254,12 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, linestate); /* IRQ */
+	cputag_set_input_line(device->machine(), "audiocpu", 0, linestate); /* IRQ */
 }
 
 static void sound_irq2(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 1, linestate); /* IRQ2 */
+	cputag_set_input_line(device->machine(), "audiocpu", 1, linestate); /* IRQ2 */
 }
 
 static const ym3812_interface ym3812_config =
@@ -1277,7 +1277,7 @@ static const ym3812_interface ym3812b_interface =
 
 static void automat_vclk_cb(device_t *device)
 {
-	dec0_state *state = device->machine->driver_data<dec0_state>();
+	dec0_state *state = device->machine().driver_data<dec0_state>();
 	if (state->automat_msm5205_vclk_toggle == 0)
 	{
 		msm5205_data_w(device, state->automat_adpcm_byte & 0xf);
@@ -1285,7 +1285,7 @@ static void automat_vclk_cb(device_t *device)
 	else
 	{
 		msm5205_data_w(device, state->automat_adpcm_byte >> 4);
-		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	state->automat_msm5205_vclk_toggle ^= 1;
@@ -2906,12 +2906,12 @@ ROM_END
 
 // helper function
 #if 0
-static void dump_to_file(running_machine* machine, UINT8* ROM, int offset, int size)
+static void dump_to_file(running_machine& machine, UINT8* ROM, int offset, int size)
 {
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"%s_%08x_%08x", machine->system().name, offset, size);
+		sprintf(filename,"%s_%08x_%08x", machine.system().name, offset, size);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
@@ -2924,7 +2924,7 @@ static void dump_to_file(running_machine* machine, UINT8* ROM, int offset, int s
 
 static DRIVER_INIT( convert_robocop_gfx4_to_automat )
 {
-	UINT8* R = machine->region("gfx4")->base();
+	UINT8* R = machine.region("gfx4")->base();
 	int i;
 
 	for (i=0;i<0x80000;i++)
@@ -2945,10 +2945,10 @@ static DRIVER_INIT( convert_robocop_gfx4_to_automat )
 
 static DRIVER_INIT( midresb )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00180000, 0x0018000f, FUNC(dec0_controls_r) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x001a0000, 0x001a000f, FUNC(dec0_rotary_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00180000, 0x0018000f, FUNC(dec0_controls_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x001a0000, 0x001a000f, FUNC(dec0_rotary_r) );
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00180014, 0x00180015, FUNC(midres_sound_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00180014, 0x00180015, FUNC(midres_sound_w) );
 }
 
 /******************************************************************************/

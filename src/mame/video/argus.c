@@ -124,7 +124,7 @@ BG0 palette intensity ( $C47F, $C4FF )
 
 static TILE_GET_INFO( argus_get_tx_tile_info )
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 hi, lo;
 
 	tile_index <<= 1;
@@ -141,7 +141,7 @@ static TILE_GET_INFO( argus_get_tx_tile_info )
 
 static TILE_GET_INFO( argus_get_bg0_tile_info )
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 hi, lo;
 
 	tile_index <<= 1;
@@ -158,7 +158,7 @@ static TILE_GET_INFO( argus_get_bg0_tile_info )
 
 static TILE_GET_INFO( argus_get_bg1_tile_info )
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 hi, lo;
 
 	tile_index <<= 1;
@@ -175,7 +175,7 @@ static TILE_GET_INFO( argus_get_bg1_tile_info )
 
 static TILE_GET_INFO( valtric_get_tx_tile_info )
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 hi, lo;
 
 	tile_index <<= 1;
@@ -192,7 +192,7 @@ static TILE_GET_INFO( valtric_get_tx_tile_info )
 
 static TILE_GET_INFO( valtric_get_bg_tile_info )
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 hi, lo;
 
 	tile_index <<= 1;
@@ -209,7 +209,7 @@ static TILE_GET_INFO( valtric_get_bg_tile_info )
 
 static TILE_GET_INFO( butasan_get_tx_tile_info )
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 hi, lo;
 
 	tile_index ^= 0x3e0;
@@ -227,7 +227,7 @@ static TILE_GET_INFO( butasan_get_tx_tile_info )
 
 static TILE_GET_INFO( butasan_get_bg0_tile_info )
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 hi, lo;
 	int attrib;
 
@@ -247,7 +247,7 @@ static TILE_GET_INFO( butasan_get_bg0_tile_info )
 
 static TILE_GET_INFO( butasan_get_bg1_tile_info )
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	int attrib, tile;
 
 	attrib = (tile_index & 0x00f) | ((tile_index & 0x3e0) >> 1) | ((tile_index & 0x010) << 5);
@@ -267,9 +267,9 @@ static TILE_GET_INFO( butasan_get_bg1_tile_info )
   Initialize and destroy video hardware emulation
 ***************************************************************************/
 
-static void reset_common(running_machine *machine)
+static void reset_common(running_machine &machine)
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	state->bg_status = 0x01;
 	state->flipscreen = 0;
 	state->palette_intensity = 0;
@@ -277,7 +277,7 @@ static void reset_common(running_machine *machine)
 
 VIDEO_START( argus )
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	/*                           info                     offset             w   h  col  row */
 	state->bg0_tilemap = tilemap_create(machine, argus_get_bg0_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
 	state->bg1_tilemap = tilemap_create(machine, argus_get_bg1_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
@@ -294,7 +294,7 @@ VIDEO_START( argus )
 
 VIDEO_RESET( argus )
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	state->lowbitscroll = 0;
 	state->prvscrollx = 0;
 	state->bg0_scrollx[0] = 0;
@@ -305,28 +305,28 @@ VIDEO_RESET( argus )
 
 VIDEO_START( valtric )
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	/*                           info                      offset             w   h  col  row */
 	state->bg1_tilemap = tilemap_create(machine, valtric_get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
 	state->tx_tilemap  = tilemap_create(machine, valtric_get_tx_tile_info, tilemap_scan_cols,  8,  8, 32, 32);
 
 	tilemap_set_transparent_pen(state->tx_tilemap,  15);
 
-	state->mosaicbitmap = machine->primary_screen->alloc_compatible_bitmap();
+	state->mosaicbitmap = machine.primary_screen->alloc_compatible_bitmap();
 
 	jal_blend_init(machine, 1);
 }
 
 VIDEO_RESET( valtric )
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	state->valtric_mosaic = 0x0f;
 	reset_common(machine);
 }
 
 VIDEO_START( butasan )
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	/*                           info                       offset             w   h  col  row */
 	state->bg0_tilemap = tilemap_create(machine, butasan_get_bg0_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->bg1_tilemap = tilemap_create(machine, butasan_get_bg1_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
@@ -348,7 +348,7 @@ VIDEO_START( butasan )
 
 VIDEO_RESET( butasan )
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	state->butasan_page_latch = 0;
 	state->butasan_bg1_status = 0x01;
 	memset(state->butasan_pagedram[0], 0, 0x1000);
@@ -362,15 +362,15 @@ VIDEO_RESET( butasan )
 ***************************************************************************/
 
 /* Write bg0 pattern data to dummy bg0 ram */
-static void argus_write_dummy_rams(running_machine *machine, int dramoffs, int vromoffs)
+static void argus_write_dummy_rams(running_machine &machine, int dramoffs, int vromoffs)
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	int i;
 	int voffs;
 	int offs;
 
-	UINT8 *VROM1 = machine->region("user1")->base();		/* "ag_15.bin" */
-	UINT8 *VROM2 = machine->region("user2")->base();		/* "ag_16.bin" */
+	UINT8 *VROM1 = machine.region("user1")->base();		/* "ag_15.bin" */
+	UINT8 *VROM2 = machine.region("user2")->base();		/* "ag_16.bin" */
 
 	/* offset in pattern data */
 	offs = VROM1[vromoffs] | (VROM1[vromoffs + 1] << 8);
@@ -387,18 +387,18 @@ static void argus_write_dummy_rams(running_machine *machine, int dramoffs, int v
 	}
 }
 
-static void argus_change_palette(running_machine *machine, int color, int lo_offs, int hi_offs)
+static void argus_change_palette(running_machine &machine, int color, int lo_offs, int hi_offs)
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 lo = state->paletteram[lo_offs];
 	UINT8 hi = state->paletteram[hi_offs];
 	jal_blend_set(color, hi & 0x0f);
 	palette_set_color_rgb(machine, color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
 }
 
-static void argus_change_bg_palette(running_machine *machine, int color, int lo_offs, int hi_offs)
+static void argus_change_bg_palette(running_machine &machine, int color, int lo_offs, int hi_offs)
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 r,g,b,lo,hi,ir,ig,ib,ix;
 	rgb_t rgb,irgb;
 
@@ -441,39 +441,39 @@ static void argus_change_bg_palette(running_machine *machine, int color, int lo_
 
 WRITE8_HANDLER( valtric_mosaic_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	state->valtric_mosaic = data;
 }
 
 READ8_HANDLER( argus_txram_r )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	return state->txram[offset];
 }
 
 WRITE8_HANDLER( argus_txram_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	state->txram[offset] = data;
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset >> 1);
 }
 
 READ8_HANDLER( argus_bg1ram_r )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	return state->bg1ram[offset];
 }
 
 WRITE8_HANDLER( argus_bg1ram_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	state->bg1ram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg1_tilemap, offset >> 1);
 }
 
 WRITE8_HANDLER( argus_bg_status_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	if (state->bg_status != data)
 	{
 		state->bg_status = data;
@@ -485,7 +485,7 @@ WRITE8_HANDLER( argus_bg_status_w )
 
 			for (offs = 0x400; offs < 0x500; offs++)
 			{
-				argus_change_bg_palette(space->machine, (offs - 0x400) + 0x080, offs, offs + 0x400);
+				argus_change_bg_palette(space->machine(), (offs - 0x400) + 0x080, offs, offs + 0x400);
 			}
 		}
 	}
@@ -493,7 +493,7 @@ WRITE8_HANDLER( argus_bg_status_w )
 
 WRITE8_HANDLER( valtric_bg_status_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	if (state->bg_status != data)
 	{
 		state->bg_status = data;
@@ -505,7 +505,7 @@ WRITE8_HANDLER( valtric_bg_status_w )
 
 			for (offs = 0x400; offs < 0x600; offs += 2)
 			{
-				argus_change_bg_palette(space->machine, ((offs - 0x400) >> 1) + 0x100, offs & ~1, offs | 1);
+				argus_change_bg_palette(space->machine(), ((offs - 0x400) >> 1) + 0x100, offs & ~1, offs | 1);
 			}
 		}
 	}
@@ -513,13 +513,13 @@ WRITE8_HANDLER( valtric_bg_status_w )
 
 WRITE8_HANDLER( butasan_bg0_status_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	state->bg_status = data;
 }
 
 WRITE8_HANDLER( butasan_bg1_status_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	if (state->butasan_bg1_status != data)
 	{
 		state->butasan_bg1_status = data;
@@ -531,19 +531,19 @@ WRITE8_HANDLER( butasan_bg1_status_w )
 
 WRITE8_HANDLER( argus_flipscreen_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	state->flipscreen = data & 0x80;
 }
 
 READ8_HANDLER( argus_paletteram_r )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	return state->paletteram[offset];
 }
 
 WRITE8_HANDLER( argus_paletteram_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	int offs;
 
 	state->paletteram[offset] = data;
@@ -552,14 +552,14 @@ WRITE8_HANDLER( argus_paletteram_w )
 	{
 		offset &= 0x07f;
 
-		argus_change_palette(space->machine, offset, offset, offset + 0x080);
+		argus_change_palette(space->machine(), offset, offset, offset + 0x080);
 
 		if (offset == 0x07f || offset == 0x0ff)
 		{
 			state->palette_intensity = state->paletteram[0x0ff] | (state->paletteram[0x07f] << 8);
 
 			for (offs = 0x400; offs < 0x500; offs++)
-				argus_change_bg_palette(space->machine, (offs & 0xff) + 0x080, offs, offs + 0x400);
+				argus_change_bg_palette(space->machine(), (offs & 0xff) + 0x080, offs, offs + 0x400);
 		}
 	}
 	else if ((offset >= 0x400 && offset <= 0x4ff) ||
@@ -568,7 +568,7 @@ WRITE8_HANDLER( argus_paletteram_w )
 		offs = offset & 0xff;
 		offset = offs | 0x400;
 
-		argus_change_bg_palette(space->machine, offs + 0x080, offset, offset + 0x400);
+		argus_change_bg_palette(space->machine(), offs + 0x080, offset, offset + 0x400);
 	}
 	else if ((offset >= 0x500 && offset <= 0x5ff) ||
 			 (offset >= 0x900 && offset <= 0x9ff))		/* BG1 color */
@@ -576,7 +576,7 @@ WRITE8_HANDLER( argus_paletteram_w )
 		offs = offset & 0xff;
 		offset = offs | 0x500;
 
-		argus_change_palette(space->machine, offs + 0x180, offset, offset + 0x400);
+		argus_change_palette(space->machine(), offs + 0x180, offset, offset + 0x400);
 	}
 	else if ((offset >= 0x700 && offset <= 0x7ff) ||
 			 (offset >= 0xb00 && offset <= 0xbff))		/* text color */
@@ -584,18 +584,18 @@ WRITE8_HANDLER( argus_paletteram_w )
 		offs = offset & 0xff;
 		offset = offs | 0x700;
 
-		argus_change_palette(space->machine, offs + 0x280, offset, offset + 0x400);
+		argus_change_palette(space->machine(), offs + 0x280, offset, offset + 0x400);
 	}
 }
 
 WRITE8_HANDLER( valtric_paletteram_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	state->paletteram[offset] = data;
 
 	if (offset <= 0x1ff)							/* Sprite color */
 	{
-		argus_change_palette(space->machine, offset >> 1, offset & ~1, offset | 1);
+		argus_change_palette(space->machine(), offset >> 1, offset & ~1, offset | 1);
 
 		if (offset == 0x1fe || offset == 0x1ff)
 		{
@@ -604,62 +604,62 @@ WRITE8_HANDLER( valtric_paletteram_w )
 			state->palette_intensity = state->paletteram[0x1ff] | (state->paletteram[0x1fe] << 8);
 
 			for (offs = 0x400; offs < 0x600; offs += 2)
-				argus_change_bg_palette(space->machine, ((offs & 0x1ff) >> 1) + 0x100, offs & ~1, offs | 1);
+				argus_change_bg_palette(space->machine(), ((offs & 0x1ff) >> 1) + 0x100, offs & ~1, offs | 1);
 		}
 	}
 	else if (offset >= 0x400 && offset <= 0x5ff)		/* BG color */
 	{
-		argus_change_bg_palette(space->machine, ((offset & 0x1ff) >> 1) + 0x100, offset & ~1, offset | 1);
+		argus_change_bg_palette(space->machine(), ((offset & 0x1ff) >> 1) + 0x100, offset & ~1, offset | 1);
 	}
 	else if (offset >= 0x600 && offset <= 0x7ff)		/* Text color */
 	{
-		argus_change_palette(space->machine, ((offset & 0x1ff) >> 1) + 0x200, offset & ~1, offset | 1);
+		argus_change_palette(space->machine(), ((offset & 0x1ff) >> 1) + 0x200, offset & ~1, offset | 1);
 	}
 }
 
 WRITE8_HANDLER( butasan_paletteram_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	state->paletteram[offset] = data;
 
 	if (offset <= 0x1ff)							/* BG0 color */
 	{
-		argus_change_palette(space->machine, (offset >> 1) + 0x100, offset & ~1, offset | 1);
+		argus_change_palette(space->machine(), (offset >> 1) + 0x100, offset & ~1, offset | 1);
 	}
 	else if (offset <= 0x23f)						/* BG1 color */
 	{
-		argus_change_palette(space->machine, ((offset & 0x3f) >> 1) + 0x0c0, offset & ~1, offset | 1);
+		argus_change_palette(space->machine(), ((offset & 0x3f) >> 1) + 0x0c0, offset & ~1, offset | 1);
 	}
 	else if (offset >= 0x400 && offset <= 0x47f)	/* Sprite color */
 	{												/* 16 colors */
-		argus_change_palette(space->machine, (offset & 0x7f) >> 1, offset & ~1, offset | 1);
+		argus_change_palette(space->machine(), (offset & 0x7f) >> 1, offset & ~1, offset | 1);
 	}
 	else if (offset >= 0x480 && offset <= 0x4ff)	/* Sprite color */
 	{												/* 8  colors */
 		int offs = (offset & 0x070) | ((offset & 0x00f) >> 1);
 
-		argus_change_palette(space->machine, offs + 0x040, offset & ~1, offset | 1);
-		argus_change_palette(space->machine, offs + 0x048, offset & ~1, offset | 1);
+		argus_change_palette(space->machine(), offs + 0x040, offset & ~1, offset | 1);
+		argus_change_palette(space->machine(), offs + 0x048, offset & ~1, offset | 1);
 	}
 	else if (offset >= 0x600 && offset <= 0x7ff)	/* Text color */
 	{
-		argus_change_palette(space->machine, ((offset & 0x1ff) >> 1) + 0x200, offset & ~1, offset | 1);
+		argus_change_palette(space->machine(), ((offset & 0x1ff) >> 1) + 0x200, offset & ~1, offset | 1);
 	}
 	else if (offset >= 0x240 && offset <= 0x25f)	// dummy
-		argus_change_palette(space->machine, ((offset & 0x1f) >> 1) + 0xe0, offset & ~1, offset | 1);
+		argus_change_palette(space->machine(), ((offset & 0x1f) >> 1) + 0xe0, offset & ~1, offset | 1);
 	else if (offset >= 0x500 && offset <= 0x51f)	// dummy
-		argus_change_palette(space->machine, ((offset & 0x1f) >> 1) + 0xf0, offset & ~1, offset | 1);
+		argus_change_palette(space->machine(), ((offset & 0x1f) >> 1) + 0xf0, offset & ~1, offset | 1);
 }
 
 READ8_HANDLER( butasan_bg1ram_r )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	return state->butasan_bg1ram[offset];
 }
 
 WRITE8_HANDLER( butasan_bg1ram_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	int idx;
 
 	state->butasan_bg1ram[offset] = data;
@@ -672,19 +672,19 @@ WRITE8_HANDLER( butasan_bg1ram_w )
 
 WRITE8_HANDLER( butasan_pageselect_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	state->butasan_page_latch = data & 1;
 }
 
 READ8_HANDLER( butasan_pagedram_r )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	return state->butasan_pagedram[state->butasan_page_latch][offset];
 }
 
 WRITE8_HANDLER( butasan_pagedram_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	state->butasan_pagedram[state->butasan_page_latch][offset] = data;
 
 	if (!state->butasan_page_latch)
@@ -706,13 +706,13 @@ WRITE8_HANDLER( butasan_pagedram_w )
 
 WRITE8_HANDLER( valtric_unknown_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	state->valtric_unknown = data;
 }
 
 WRITE8_HANDLER( butasan_unknown_w )
 {
-	argus_state *state = space->machine->driver_data<argus_state>();
+	argus_state *state = space->machine().driver_data<argus_state>();
 	state->butasan_unknown = data;
 }
 
@@ -726,9 +726,9 @@ WRITE8_HANDLER( butasan_unknown_w )
 #define bg1_scrollx (state->bg1_scrollx[0] | (state->bg1_scrollx[1] << 8))
 #define bg1_scrolly (state->bg1_scrolly[0] | (state->bg1_scrolly[1] << 8))
 
-static void bg_setting(running_machine *machine)
+static void bg_setting(running_machine &machine)
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	tilemap_set_flip_all(machine, state->flipscreen ? TILEMAP_FLIPY|TILEMAP_FLIPX : 0);
 
 	if (!state->flipscreen)
@@ -753,9 +753,9 @@ static void bg_setting(running_machine *machine)
 	}
 }
 
-static void argus_bg0_scroll_handle(running_machine *machine)
+static void argus_bg0_scroll_handle(running_machine &machine)
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	int delta;
 	int dcolumn;
 
@@ -848,9 +848,9 @@ static void argus_bg0_scroll_handle(running_machine *machine)
 	}
 }
 
-static void argus_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void argus_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -880,7 +880,7 @@ static void argus_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 			if (priority != pri)
 				jal_blend_drawgfx(
-							bitmap,cliprect,machine->gfx[0],
+							bitmap,cliprect,machine.gfx[0],
 							tile,
 							color,
 							flipx, flipy,
@@ -893,7 +893,7 @@ static void argus_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 #if 1
 static void valtric_draw_mosaic(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	argus_state *state = screen.machine->driver_data<argus_state>();
+	argus_state *state = screen.machine().driver_data<argus_state>();
 
 	if (state->valtric_mosaic!=0x80)
 	{
@@ -942,7 +942,7 @@ static void valtric_draw_mosaic(screen_device &screen, bitmap_t *bitmap, const r
 #else
 static void valtric_draw_mosaic(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	argus_state *state = screen.machine->driver_data<argus_state>();
+	argus_state *state = screen.machine().driver_data<argus_state>();
 	int step = 0x10 - (state->valtric_mosaic & 0x0f);
 
 	if (step == 1)
@@ -981,9 +981,9 @@ static void valtric_draw_mosaic(screen_device &screen, bitmap_t *bitmap, const r
 }
 #endif
 
-static void valtric_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void valtric_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -1011,7 +1011,7 @@ static void valtric_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 			}
 
 			jal_blend_drawgfx(
-						bitmap,cliprect,machine->gfx[0],
+						bitmap,cliprect,machine.gfx[0],
 						tile,
 						color,
 						flipx, flipy,
@@ -1021,9 +1021,9 @@ static void valtric_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 	}
 }
 
-static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void butasan_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -1063,7 +1063,7 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 			if ((offs >= 0x100 && offs <= 0x2ff) || (offs >= 0x400 && offs <= 0x57f))
 			{
 				jal_blend_drawgfx(
-							bitmap,cliprect,machine->gfx[0],
+							bitmap,cliprect,machine.gfx[0],
 							tile,
 							color,
 							flipx, flipy,
@@ -1077,7 +1077,7 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 					td = (fx) ? (1 - i) : i;
 
 					jal_blend_drawgfx(
-								bitmap,cliprect,machine->gfx[0],
+								bitmap,cliprect,machine.gfx[0],
 								tile + td,
 								color,
 								flipx, flipy,
@@ -1097,7 +1097,7 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 							td = (fx) ? (i * 2) + 1 - j : i * 2 + j;
 
 						jal_blend_drawgfx(
-									bitmap,cliprect,machine->gfx[0],
+									bitmap,cliprect,machine.gfx[0],
 									tile + td,
 									color,
 									flipx, flipy,
@@ -1118,7 +1118,7 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 							td = (fx) ? (i * 4) + 3 - j : i * 4 + j;
 
 						jal_blend_drawgfx(
-									bitmap,cliprect,machine->gfx[0],
+									bitmap,cliprect,machine.gfx[0],
 									tile + td,
 									color,
 									flipx, flipy,
@@ -1132,10 +1132,10 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 }
 
 
-static void butasan_log_vram(running_machine *machine)
+static void butasan_log_vram(running_machine &machine)
 {
 #ifdef MAME_DEBUG
-	argus_state *state = machine->driver_data<argus_state>();
+	argus_state *state = machine.driver_data<argus_state>();
 	int offs;
 
 	if (input_code_pressed(machine, KEYCODE_M))
@@ -1188,48 +1188,48 @@ static void butasan_log_vram(running_machine *machine)
 
 SCREEN_UPDATE( argus )
 {
-	argus_state *state = screen->machine->driver_data<argus_state>();
-	bg_setting(screen->machine);
+	argus_state *state = screen->machine().driver_data<argus_state>();
+	bg_setting(screen->machine());
 
 	/* scroll BG0 and render tile at proper position */
-	argus_bg0_scroll_handle(screen->machine);
+	argus_bg0_scroll_handle(screen->machine());
 
 	tilemap_draw(bitmap, cliprect, state->bg0_tilemap, 0, 0);
-	argus_draw_sprites(screen->machine, bitmap, cliprect, 0);
+	argus_draw_sprites(screen->machine(), bitmap, cliprect, 0);
 	if (state->bg_status & 1)	/* Backgound enable */
 		tilemap_draw(bitmap, cliprect, state->bg1_tilemap, 0, 0);
-	argus_draw_sprites(screen->machine, bitmap, cliprect, 1);
+	argus_draw_sprites(screen->machine(), bitmap, cliprect, 1);
 	tilemap_draw(bitmap, cliprect, state->tx_tilemap,  0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE( valtric )
 {
-	argus_state *state = screen->machine->driver_data<argus_state>();
-	bg_setting(screen->machine);
+	argus_state *state = screen->machine().driver_data<argus_state>();
+	bg_setting(screen->machine());
 
 	if (state->bg_status & 1)	/* Backgound enable */
 		valtric_draw_mosaic(*screen, bitmap, cliprect);
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
-	valtric_draw_sprites(screen->machine, bitmap, cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	valtric_draw_sprites(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->tx_tilemap,  0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE( butasan )
 {
-	argus_state *state = screen->machine->driver_data<argus_state>();
-	bg_setting(screen->machine);
+	argus_state *state = screen->machine().driver_data<argus_state>();
+	bg_setting(screen->machine());
 
 	if (state->bg_status & 1)	/* Backgound enable */
 		tilemap_draw(bitmap, cliprect, state->bg0_tilemap, 0, 0);
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	if (state->butasan_bg1_status & 1) tilemap_draw(bitmap, cliprect, state->bg1_tilemap, 0, 0);
-	butasan_draw_sprites(screen->machine, bitmap, cliprect);
+	butasan_draw_sprites(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->tx_tilemap,  0, 0);
 
-	butasan_log_vram(screen->machine);
+	butasan_log_vram(screen->machine());
 	return 0;
 }

@@ -14,8 +14,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	//palno = (tile_index - (tile_index / 32 * 16) * 32 * 16) / 32;
 
-	tileno = machine->region("user1")->base()[tile_index];
-	palno = 0x18; //machine->region("user2")->base()[tile_index] >> 3;
+	tileno = machine.region("user1")->base()[tile_index];
+	palno = 0x18; //machine.region("user2")->base()[tile_index] >> 3;
 	SET_TILE_INFO(2, tileno, palno, 0);
 }
 
@@ -42,7 +42,7 @@ PALETTE_INIT( fcombat )
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x20);
+	machine.colortable = colortable_alloc(machine, 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -68,7 +68,7 @@ PALETTE_INIT( fcombat )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -78,7 +78,7 @@ PALETTE_INIT( fcombat )
 	for (i = 0; i < 0x200; i++)
 	{
 		UINT8 ctabentry = (color_prom[(i & 0x1c0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 
 	/* bg chars (this is not the full story... there are four layers mixed */
@@ -86,7 +86,7 @@ PALETTE_INIT( fcombat )
 	for (i = 0x200; i < 0x300; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 }
 
@@ -100,7 +100,7 @@ PALETTE_INIT( fcombat )
 
 VIDEO_START( fcombat )
 {
-	fcombat_state *state = machine->driver_data<fcombat_state>();
+	fcombat_state *state = machine.driver_data<fcombat_state>();
 	state->bgmap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32 * 8 * 2, 32);
 }
 
@@ -114,7 +114,7 @@ VIDEO_START( fcombat )
 
 WRITE8_HANDLER( fcombat_videoreg_w )
 {
-	fcombat_state *state = space->machine->driver_data<fcombat_state>();
+	fcombat_state *state = space->machine().driver_data<fcombat_state>();
 
 	/* bit 0 = flip screen and joystick input multiplexor */
 	state->cocktail_flip = data & 1;
@@ -136,7 +136,7 @@ WRITE8_HANDLER( fcombat_videoreg_w )
 
 SCREEN_UPDATE( fcombat )
 {
-	fcombat_state *state = screen->machine->driver_data<fcombat_state>();
+	fcombat_state *state = screen->machine().driver_data<fcombat_state>();
 	int sx, sy, offs, i;
 
 	/* draw background */
@@ -162,7 +162,7 @@ SCREEN_UPDATE( fcombat )
 		int code2 = code;
 
 		int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (state->sprite_palette * 16);
-				const gfx_element *gfx = screen->machine->gfx[1];
+				const gfx_element *gfx = screen->machine().gfx[1];
 
 		if (state->cocktail_flip)
 		{
@@ -204,7 +204,7 @@ SCREEN_UPDATE( fcombat )
 			int y = state->cocktail_flip ? (31 * 8 - 8 * sy) : 8 * sy;
 
 			offs = sx + sy * 64;
-			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0],
+			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0],
 				state->videoram[offs] + 256 * state->char_bank,
 				((state->videoram[offs] & 0xf0) >> 4) + state->char_palette * 16,
 				state->cocktail_flip, state->cocktail_flip, x, y, 0);

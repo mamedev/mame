@@ -459,10 +459,10 @@ static VIDEO_START(bingor)
 
 static SCREEN_UPDATE(bingor)
 {
-	bingor_state *state = screen->machine->driver_data<bingor_state>();
+	bingor_state *state = screen->machine().driver_data<bingor_state>();
 	int x,y,count;
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
 	count = (0x2000/2);
 
@@ -475,22 +475,22 @@ static SCREEN_UPDATE(bingor)
 			color = (state->blit_ram[count] & 0xf000)>>12;
 
 			if((x+3)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-				*BITMAP_ADDR32(bitmap, y, x+3) = screen->machine->pens[color];
+				*BITMAP_ADDR32(bitmap, y, x+3) = screen->machine().pens[color];
 
 			color = (state->blit_ram[count] & 0x0f00)>>8;
 
 			if((x+2)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-				*BITMAP_ADDR32(bitmap, y, x+2) = screen->machine->pens[color];
+				*BITMAP_ADDR32(bitmap, y, x+2) = screen->machine().pens[color];
 
 			color = (state->blit_ram[count] & 0x00f0)>>4;
 
 			if((x+1)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-				*BITMAP_ADDR32(bitmap, y, x+1) = screen->machine->pens[color];
+				*BITMAP_ADDR32(bitmap, y, x+1) = screen->machine().pens[color];
 
 			color = (state->blit_ram[count] & 0x000f)>>0;
 
 			if((x+0)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-				*BITMAP_ADDR32(bitmap, y, x+0) = screen->machine->pens[color];
+				*BITMAP_ADDR32(bitmap, y, x+0) = screen->machine().pens[color];
 
 			count++;
 		}
@@ -502,7 +502,7 @@ static SCREEN_UPDATE(bingor)
 #if 0
 static READ16_HANDLER( test_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 #endif
 
@@ -523,7 +523,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( test8_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static ADDRESS_MAP_START( pic_io_map, AS_IO, 8 )

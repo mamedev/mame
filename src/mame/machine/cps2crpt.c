@@ -630,11 +630,11 @@ static void optimise_sboxes(struct optimised_sbox* out, const struct sbox* in)
 
 
 
-static void cps2_decrypt(running_machine *machine, const UINT32 *master_key, UINT32 upper_limit)
+static void cps2_decrypt(running_machine &machine, const UINT32 *master_key, UINT32 upper_limit)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
-	int length = machine->region("maincpu")->bytes();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+	int length = machine.region("maincpu")->bytes();
 	UINT16 *dec = auto_alloc_array(machine, UINT16, length/2);
 	int i;
 	UINT32 key1[4];
@@ -721,7 +721,7 @@ static void cps2_decrypt(running_machine *machine, const UINT32 *master_key, UIN
 	}
 
 	space->set_decrypted_region(0x000000, length - 1, dec);
-	m68k_set_encrypted_opcode_range(machine->device("maincpu"), 0, length);
+	m68k_set_encrypted_opcode_range(machine.device("maincpu"), 0, length);
 }
 
 
@@ -989,7 +989,7 @@ static const struct game_keys keys_table[] =
 
 DRIVER_INIT( cps2crpt )
 {
-	const char *gamename = machine->system().name;
+	const char *gamename = machine.system().name;
 	const struct game_keys *k = &keys_table[0];
 
 	while (k->name)

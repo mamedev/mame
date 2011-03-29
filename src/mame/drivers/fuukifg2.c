@@ -53,26 +53,26 @@ To Do:
 
 static WRITE16_HANDLER( fuuki16_vregs_w )
 {
-	fuuki16_state *state = space->machine->driver_data<fuuki16_state>();
+	fuuki16_state *state = space->machine().driver_data<fuuki16_state>();
 	UINT16 old_data = state->vregs[offset];
 	UINT16 new_data = COMBINE_DATA(&state->vregs[offset]);
 	if ((offset == 0x1c/2) && old_data != new_data)
 	{
-		const rectangle &visarea = space->machine->primary_screen->visible_area();
-		attotime period = space->machine->primary_screen->frame_period();
-		state->raster_interrupt_timer->adjust(space->machine->primary_screen->time_until_pos(new_data, visarea.max_x + 1), 0, period);
+		const rectangle &visarea = space->machine().primary_screen->visible_area();
+		attotime period = space->machine().primary_screen->frame_period();
+		state->raster_interrupt_timer->adjust(space->machine().primary_screen->time_until_pos(new_data, visarea.max_x + 1), 0, period);
 	}
 }
 
 static WRITE16_HANDLER( fuuki16_sound_command_w )
 {
-	fuuki16_state *state = space->machine->driver_data<fuuki16_state>();
+	fuuki16_state *state = space->machine().driver_data<fuuki16_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space,0,data & 0xff);
 		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 //      device_spin_until_time(space->cpu, attotime::from_usec(50));   // Allow the other CPU to reply
-		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
+		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
 	}
 }
 
@@ -106,7 +106,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( fuuki16_sound_rombank_w )
 {
 	if (data <= 2)
-		memory_set_bank(space->machine, "bank1", data);
+		memory_set_bank(space->machine(), "bank1", data);
 	else
 		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(space->cpu), data);
 }
@@ -376,7 +376,7 @@ GFXDECODE_END
 
 static void soundirq( device_t *device, int state )
 {
-	fuuki16_state *fuuki16 = device->machine->driver_data<fuuki16_state>();
+	fuuki16_state *fuuki16 = device->machine().driver_data<fuuki16_state>();
 	device_set_input_line(fuuki16->audiocpu, 0, state);
 }
 
@@ -399,51 +399,51 @@ static const ym3812_interface fuuki16_ym3812_intf =
 
 static TIMER_CALLBACK( level_1_interrupt_callback )
 {
-	fuuki16_state *state = machine->driver_data<fuuki16_state>();
+	fuuki16_state *state = machine.driver_data<fuuki16_state>();
 	device_set_input_line(state->maincpu, 1, HOLD_LINE);
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
-	fuuki16_state *state = machine->driver_data<fuuki16_state>();
+	fuuki16_state *state = machine.driver_data<fuuki16_state>();
 	device_set_input_line(state->maincpu, 3, HOLD_LINE);	// VBlank IRQ
-	machine->scheduler().timer_set(machine->primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
+	machine.scheduler().timer_set(machine.primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
 }
 
 
 static TIMER_CALLBACK( raster_interrupt_callback )
 {
-	fuuki16_state *state = machine->driver_data<fuuki16_state>();
+	fuuki16_state *state = machine.driver_data<fuuki16_state>();
 	device_set_input_line(state->maincpu, 5, HOLD_LINE);	// Raster Line IRQ
-	machine->primary_screen->update_partial(machine->primary_screen->vpos());
-	state->raster_interrupt_timer->adjust(machine->primary_screen->frame_period());
+	machine.primary_screen->update_partial(machine.primary_screen->vpos());
+	state->raster_interrupt_timer->adjust(machine.primary_screen->frame_period());
 }
 
 
 static MACHINE_START( fuuki16 )
 {
-	fuuki16_state *state = machine->driver_data<fuuki16_state>();
-	UINT8 *ROM = machine->region("audiocpu")->base();
+	fuuki16_state *state = machine.driver_data<fuuki16_state>();
+	UINT8 *ROM = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x10000], 0x8000);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 
-	state->raster_interrupt_timer = machine->scheduler().timer_alloc(FUNC(raster_interrupt_callback));
+	state->raster_interrupt_timer = machine.scheduler().timer_alloc(FUNC(raster_interrupt_callback));
 }
 
 
 static MACHINE_RESET( fuuki16 )
 {
-	fuuki16_state *state = machine->driver_data<fuuki16_state>();
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	fuuki16_state *state = machine.driver_data<fuuki16_state>();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
-	machine->scheduler().timer_set(machine->primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
-	state->raster_interrupt_timer->adjust(machine->primary_screen->time_until_pos(0, visarea.max_x + 1));
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
+	machine.scheduler().timer_set(machine.primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
+	state->raster_interrupt_timer->adjust(machine.primary_screen->time_until_pos(0, visarea.max_x + 1));
 }
 
 

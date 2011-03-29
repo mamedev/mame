@@ -43,7 +43,7 @@ static WRITE16_HANDLER( blmbycar_okibank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = space->machine->region("oki")->base();
+		UINT8 *RAM = space->machine().region("oki")->base();
 		memcpy(&RAM[0x30000], &RAM[0x40000 + 0x10000 * (data & 0xf)], 0x10000);
 	}
 }
@@ -60,15 +60,15 @@ static WRITE16_HANDLER( blmbycar_okibank_w )
 
 static WRITE16_HANDLER( blmbycar_pot_wheel_reset_w )
 {
-	blmbycar_state *state = space->machine->driver_data<blmbycar_state>();
+	blmbycar_state *state = space->machine().driver_data<blmbycar_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->pot_wheel = ~input_port_read(space->machine, "WHEEL") & 0xff;
+		state->pot_wheel = ~input_port_read(space->machine(), "WHEEL") & 0xff;
 }
 
 static WRITE16_HANDLER( blmbycar_pot_wheel_shift_w )
 {
-	blmbycar_state *state = space->machine->driver_data<blmbycar_state>();
+	blmbycar_state *state = space->machine().driver_data<blmbycar_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -80,8 +80,8 @@ static WRITE16_HANDLER( blmbycar_pot_wheel_shift_w )
 
 static READ16_HANDLER( blmbycar_pot_wheel_r )
 {
-	blmbycar_state *state = space->machine->driver_data<blmbycar_state>();
-	return ((state->pot_wheel & 0x80) ? 0x04 : 0) | (space->machine->rand() & 0x08);
+	blmbycar_state *state = space->machine().driver_data<blmbycar_state>();
+	return ((state->pot_wheel & 0x80) ? 0x04 : 0) | (space->machine().rand() & 0x08);
 }
 
 
@@ -89,7 +89,7 @@ static READ16_HANDLER( blmbycar_pot_wheel_r )
 
 static READ16_HANDLER( blmbycar_opt_wheel_r )
 {
-	return (~input_port_read(space->machine, "WHEEL") & 0xff) << 8;
+	return (~input_port_read(space->machine(), "WHEEL") & 0xff) << 8;
 }
 
 
@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( waterball_unk_r )
 {
-	blmbycar_state *state = space->machine->driver_data<blmbycar_state>();
+	blmbycar_state *state = space->machine().driver_data<blmbycar_state>();
 
 	state->retvalue ^= 0x0008; // must toggle.. but not vblank?
 	return state->retvalue;
@@ -341,7 +341,7 @@ GFXDECODE_END
 
 static MACHINE_START( blmbycar )
 {
-	blmbycar_state *state = machine->driver_data<blmbycar_state>();
+	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 
 	state->save_item(NAME(state->pot_wheel));
 	state->save_item(NAME(state->old_val));
@@ -349,7 +349,7 @@ static MACHINE_START( blmbycar )
 
 static MACHINE_RESET( blmbycar )
 {
-	blmbycar_state *state = machine->driver_data<blmbycar_state>();
+	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 
 	state->pot_wheel = 0;
 	state->old_val = 0;
@@ -391,14 +391,14 @@ MACHINE_CONFIG_END
 
 static MACHINE_START( watrball )
 {
-	blmbycar_state *state = machine->driver_data<blmbycar_state>();
+	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 
 	state->save_item(NAME(state->retvalue));
 }
 
 static MACHINE_RESET( watrball )
 {
-	blmbycar_state *state = machine->driver_data<blmbycar_state>();
+	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 
 	state->retvalue = 0;
 }
@@ -527,8 +527,8 @@ ROM_END
 
 static DRIVER_INIT( blmbycar )
 {
-	UINT16 *RAM  = (UINT16 *) machine->region("maincpu")->base();
-	size_t size = machine->region("maincpu")->bytes() / 2;
+	UINT16 *RAM  = (UINT16 *) machine.region("maincpu")->base();
+	size_t size = machine.region("maincpu")->bytes() / 2;
 	int i;
 
 	for (i = 0; i < size; i++)

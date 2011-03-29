@@ -22,7 +22,7 @@ VIDEO_START( hotstuff )
 
 SCREEN_UPDATE( hotstuff )
 {
-	hotstuff_state *state = screen->machine->driver_data<hotstuff_state>();
+	hotstuff_state *state = screen->machine().driver_data<hotstuff_state>();
 	int count, y,yyy,x,xxx;
 	UINT16 row_palette_data[0x10];
 	rgb_t row_palette_data_as_rgb32_pen_data[0x10];

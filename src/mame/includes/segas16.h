@@ -29,7 +29,7 @@ public:
 	UINT8 vblank_irq_state;		// segaorun, segaxbd & segaybd
 	UINT8 misc_io_data[0x10];	// system18 & segaybd
 
-	void (*i8751_vblank_hook)(running_machine *machine);
+	void (*i8751_vblank_hook)(running_machine &machine);
 	const UINT8 *i8751_initial_config;
 
 	read16_space_func custom_io_r;
@@ -51,7 +51,7 @@ public:
 	UINT8 last_buttons2;
 	int read_port;
 
-	void (*lamp_changed_w)(running_machine *machine, UINT8 changed, UINT8 newval);
+	void (*lamp_changed_w)(running_machine &machine, UINT8 changed, UINT8 newval);
 
 	/* misc system 18 */
 	UINT8 mcu_data;
@@ -121,9 +121,9 @@ SCREEN_UPDATE( system16b );
 VIDEO_START( system18 );
 SCREEN_UPDATE( system18 );
 
-void system18_set_grayscale(running_machine *machine, int enable);
-void system18_set_vdp_enable(running_machine *machine, int eanble);
-void system18_set_vdp_mixing(running_machine *machine, int mixing);
+void system18_set_grayscale(running_machine &machine, int enable);
+void system18_set_vdp_enable(running_machine &machine, int eanble);
+void system18_set_vdp_mixing(running_machine &machine, int mixing);
 
 /*----------- defined in video/segaorun.c -----------*/
 
@@ -147,4 +147,4 @@ SCREEN_UPDATE( yboard );
 
 void *fd1094_get_decrypted_base(void);
 void fd1094_machine_init(device_t *device);
-void fd1094_driver_init(running_machine *machine, const char* tag, void (*set_decrypted)(running_machine *, UINT8 *));
+void fd1094_driver_init(running_machine &machine, const char* tag, void (*set_decrypted)(running_machine &, UINT8 *));

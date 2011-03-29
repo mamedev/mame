@@ -362,14 +362,14 @@ Notes:
 
 static READ32_HANDLER( taitojc_palette_r )
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	return state->palette_ram[offset];
 }
 
 static WRITE32_HANDLER( taitojc_palette_w )
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 	int r, g, b;
 	UINT32 color;
 
@@ -380,7 +380,7 @@ static WRITE32_HANDLER( taitojc_palette_w )
 	g = (color >> 16) & 0xff;
 	b = (color >>  0) & 0xff;
 
-	palette_set_color(space->machine,offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(),offset, MAKE_RGB(r, g, b));
 }
 
 static READ32_HANDLER ( jc_control_r )
@@ -393,7 +393,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= ((input_port_read(space->machine, "COINS") & 0x2) << 2) << 24;
+				r |= ((input_port_read(space->machine(), "COINS") & 0x2) << 2) << 24;
 			}
 			return r;
 		}
@@ -401,7 +401,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= input_port_read(space->machine, "COINS") << 24;
+				r |= input_port_read(space->machine(), "COINS") << 24;
 			}
 			return r;
 		}
@@ -409,7 +409,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= input_port_read(space->machine, "START") << 24;
+				r |= input_port_read(space->machine(), "START") << 24;
 			}
 			return r;
 		}
@@ -417,7 +417,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= input_port_read(space->machine, "UNUSED") << 24;
+				r |= input_port_read(space->machine(), "UNUSED") << 24;
 			}
 			return r;
 		}
@@ -425,7 +425,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				//r |= (space->machine->rand() & 0xff) << 24;
+				//r |= (space->machine().rand() & 0xff) << 24;
 			}
 			return r;
 		}
@@ -433,7 +433,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= input_port_read(space->machine, "BUTTONS") << 24;
+				r |= input_port_read(space->machine(), "BUTTONS") << 24;
 			}
 			return r;
 		}
@@ -455,7 +455,7 @@ static WRITE32_HANDLER ( jc_control_w )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				input_port_write(space->machine, "EEPROMOUT", data >> 24, 0xff);
+				input_port_write(space->machine(), "EEPROMOUT", data >> 24, 0xff);
 			}
 			return;
 		}
@@ -478,7 +478,7 @@ static WRITE32_HANDLER (jc_control1_w)
 
 static UINT8 mcu_comm_reg_r(address_space *space, int reg)
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 	UINT8 r = 0;
 
 	switch (reg)
@@ -505,7 +505,7 @@ static UINT8 mcu_comm_reg_r(address_space *space, int reg)
 
 static void mcu_comm_reg_w(address_space *space, int reg, UINT8 data)
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	switch (reg)
 	{
@@ -582,7 +582,7 @@ static READ32_HANDLER(jc_unknown1_r)
 
 static READ32_HANDLER(dsp_shared_r)
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	return state->dsp_shared_ram[offset] << 16;
 }
@@ -594,7 +594,7 @@ static READ32_HANDLER(dsp_shared_r)
 
 static void debug_dsp_command(void)
 {
-	taitojc_state *state = machine->driver_data<taitojc_state>();
+	taitojc_state *state = machine.driver_data<taitojc_state>();
 	UINT16 *cmd = &dsp_shared_ram[0x7f0];
 
 	switch (cmd[0])
@@ -723,7 +723,7 @@ static void debug_dsp_command(void)
 
 static WRITE32_HANDLER(dsp_shared_w)
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	//mame_printf_debug("dsp_shared_ram: %08X, %04X at %08X\n", offset, data >> 16, cpu_get_pc(space->cpu));
 	if (ACCESSING_BITS_24_31)
@@ -750,20 +750,20 @@ static WRITE32_HANDLER(dsp_shared_w)
 		{
 			if (!state->first_dsp_reset)
 			{
-				cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, CLEAR_LINE);
+				cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_RESET, CLEAR_LINE);
 			}
 			state->first_dsp_reset = 0;
 		}
 		else
 		{
-			cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 		}
 	}
 }
 
 static READ32_HANDLER(f3_share_r)
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 	switch (offset & 3)
 	{
 		case 0: return (state->f3_shared_ram[(offset/4)] <<  0) & 0xff000000;
@@ -777,7 +777,7 @@ static READ32_HANDLER(f3_share_r)
 
 static WRITE32_HANDLER(f3_share_w)
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 	UINT32 d = (data >> 24) & 0xff;
 
 	switch (offset & 3)
@@ -824,7 +824,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(hc11_comm_r)
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	return state->mcu_comm_hc11;
 }
@@ -835,7 +835,7 @@ static WRITE8_HANDLER(hc11_comm_w)
 
 static READ8_HANDLER(hc11_data_r)
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	state->mcu_comm_hc11 |= 0x04;
 	state->mcu_comm_main |= 0x20;
@@ -844,7 +844,7 @@ static READ8_HANDLER(hc11_data_r)
 
 static WRITE8_HANDLER(hc11_data_w)
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	state->mcu_data_main = data;
 }
@@ -854,7 +854,7 @@ static READ8_HANDLER(hc11_analog_r)
 	static const char *const portnames[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4",
 										"ANALOG5", "ANALOG6", "ANALOG7", "ANALOG8" };
 
-	return input_port_read_safe(space->machine, portnames[offset], 0);
+	return input_port_read_safe(space->machine(), portnames[offset], 0);
 }
 
 
@@ -875,8 +875,8 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( dsp_rom_r )
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
-	UINT16 *rom = (UINT16*)space->machine->region("gfx2")->base();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
+	UINT16 *rom = (UINT16*)space->machine().region("gfx2")->base();
 	UINT16 data = rom[state->dsp_rom_pos++];
 
 	//mame_printf_debug("dsp_rom_r:  %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
@@ -885,7 +885,7 @@ static READ16_HANDLER( dsp_rom_r )
 
 static WRITE16_HANDLER( dsp_rom_w )
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	if (offset == 0)
 	{
@@ -901,7 +901,7 @@ static WRITE16_HANDLER( dsp_rom_w )
 
 static WRITE16_HANDLER( dsp_texture_w )
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 	int index;
 	int x, y;
 	//mame_printf_debug("texture write %08X, %04X\n", dsp_addr1, data);
@@ -920,14 +920,14 @@ static WRITE16_HANDLER( dsp_texture_w )
 
 static READ16_HANDLER( dsp_texaddr_r )
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	return state->dsp_tex_address;
 }
 
 static WRITE16_HANDLER( dsp_texaddr_w )
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	state->dsp_tex_address = data;
 //  mame_printf_debug("texaddr = %08X at %08X\n", data, cpu_get_pc(space->cpu));
@@ -940,7 +940,7 @@ static WRITE16_HANDLER( dsp_texaddr_w )
 
 static WRITE16_HANDLER( dsp_polygon_fifo_w )
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 	state->polygon_fifo[state->polygon_fifo_ptr++] = data;
 
 	if (state->polygon_fifo_ptr >= POLYGON_FIFO_SIZE)
@@ -958,14 +958,14 @@ static READ16_HANDLER(dsp_unk_r)
 
 static WRITE16_HANDLER(dsp_viewport_w)
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	state->viewport_data[offset] = (INT16)(data);
 }
 
 static WRITE16_HANDLER(dsp_projection_w)
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	state->projection_data[offset] = (INT16)(data);
 
@@ -986,7 +986,7 @@ static WRITE16_HANDLER(dsp_projection_w)
 
 static READ16_HANDLER(dsp_projection_r)
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	if (offset == 0)
 	{
@@ -1002,12 +1002,12 @@ static READ16_HANDLER(dsp_projection_r)
 
 static WRITE16_HANDLER(dsp_unk2_w)
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	if (offset == 0)
 	{
-		taitojc_clear_frame(space->machine);
-		taitojc_render_polygons(space->machine, state->polygon_fifo, state->polygon_fifo_ptr);
+		taitojc_clear_frame(space->machine());
+		taitojc_render_polygons(space->machine(), state->polygon_fifo, state->polygon_fifo_ptr);
 
 		state->polygon_fifo_ptr = 0;
 	}
@@ -1015,14 +1015,14 @@ static WRITE16_HANDLER(dsp_unk2_w)
 
 static WRITE16_HANDLER(dsp_intersection_w)
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	state->intersection_data[offset] = (INT32)(INT16)(data);
 }
 
 static READ16_HANDLER(dsp_intersection_r)
 {
-	taitojc_state *state = space->machine->driver_data<taitojc_state>();
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	return (INT16)((state->intersection_data[0] * state->intersection_data[1]) / state->intersection_data[2]);
 }
@@ -1269,7 +1269,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( taitojc )
 {
-	taitojc_state *state = machine->driver_data<taitojc_state>();
+	taitojc_state *state = machine.driver_data<taitojc_state>();
 
 	state->first_dsp_reset = 1;
 
@@ -1352,7 +1352,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( taitojc )
 {
-	taitojc_state *state = machine->driver_data<taitojc_state>();
+	taitojc_state *state = machine.driver_data<taitojc_state>();
 
 	state->polygon_fifo = auto_alloc_array(machine, UINT16, POLYGON_FIFO_SIZE);
 }

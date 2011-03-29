@@ -131,7 +131,7 @@ public:
 
 static WRITE16_HANDLER( igs011_priority_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	COMBINE_DATA(&state->priority);
 
 //  logerror("%06x: priority = %02x\n", cpu_get_pc(space->cpu), state->priority);
@@ -143,7 +143,7 @@ static WRITE16_HANDLER( igs011_priority_w )
 
 static VIDEO_START( igs011 )
 {
-	igs011_state *state = machine->driver_data<igs011_state>();
+	igs011_state *state = machine.driver_data<igs011_state>();
 	int i;
 
 	for (i = 0; i < 8; i++)
@@ -156,7 +156,7 @@ static VIDEO_START( igs011 )
 
 static SCREEN_UPDATE( igs011 )
 {
-	igs011_state *state = screen->machine->driver_data<igs011_state>();
+	igs011_state *state = screen->machine().driver_data<igs011_state>();
 #ifdef MAME_DEBUG
 	int layer_enable = -1;
 #endif
@@ -165,17 +165,17 @@ static SCREEN_UPDATE( igs011 )
 	UINT16 *pri_ram;
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed(screen->machine, KEYCODE_Z))
+	if (input_code_pressed(screen->machine(), KEYCODE_Z))
 	{
 		int mask = 0;
-		if (input_code_pressed(screen->machine, KEYCODE_Q))	mask |= 0x01;
-		if (input_code_pressed(screen->machine, KEYCODE_W))	mask |= 0x02;
-		if (input_code_pressed(screen->machine, KEYCODE_E))	mask |= 0x04;
-		if (input_code_pressed(screen->machine, KEYCODE_R))	mask |= 0x08;
-		if (input_code_pressed(screen->machine, KEYCODE_A))	mask |= 0x10;
-		if (input_code_pressed(screen->machine, KEYCODE_S))	mask |= 0x20;
-		if (input_code_pressed(screen->machine, KEYCODE_D))	mask |= 0x40;
-		if (input_code_pressed(screen->machine, KEYCODE_F))	mask |= 0x80;
+		if (input_code_pressed(screen->machine(), KEYCODE_Q))	mask |= 0x01;
+		if (input_code_pressed(screen->machine(), KEYCODE_W))	mask |= 0x02;
+		if (input_code_pressed(screen->machine(), KEYCODE_E))	mask |= 0x04;
+		if (input_code_pressed(screen->machine(), KEYCODE_R))	mask |= 0x08;
+		if (input_code_pressed(screen->machine(), KEYCODE_A))	mask |= 0x10;
+		if (input_code_pressed(screen->machine(), KEYCODE_S))	mask |= 0x20;
+		if (input_code_pressed(screen->machine(), KEYCODE_D))	mask |= 0x40;
+		if (input_code_pressed(screen->machine(), KEYCODE_F))	mask |= 0x80;
 		if (mask)	layer_enable &= mask;
 	}
 #endif
@@ -204,7 +204,7 @@ static SCREEN_UPDATE( igs011 )
 
 #ifdef MAME_DEBUG
 			if ((layer_enable != -1) && (pri_addr == 0xff))
-				*BITMAP_ADDR16(bitmap, y, x) = get_black_pen(screen->machine);
+				*BITMAP_ADDR16(bitmap, y, x) = get_black_pen(screen->machine());
 			else
 #endif
 				*BITMAP_ADDR16(bitmap, y, x) = state->layer[l][scr_addr] | (l << 8);
@@ -233,7 +233,7 @@ static SCREEN_UPDATE( igs011 )
 
 static READ16_HANDLER( igs011_layers_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	int layer0 = ((offset & (0x80000/2)) ? 4 : 0) + ((offset & 1) ? 0 : 2);
 
 	UINT8 *l0 = state->layer[layer0];
@@ -247,7 +247,7 @@ static READ16_HANDLER( igs011_layers_r )
 
 static WRITE16_HANDLER( igs011_layers_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	UINT16 word;
 
 	int layer0 = ((offset & (0x80000/2)) ? 4 : 0) + ((offset & 1) ? 0 : 2);
@@ -277,10 +277,10 @@ static WRITE16_HANDLER( igs011_palette )
 {
 	int rgb;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 
-	rgb = (space->machine->generic.paletteram.u16[offset & 0x7ff] & 0xff) | ((space->machine->generic.paletteram.u16[offset | 0x800] & 0xff) << 8);
-	palette_set_color_rgb(space->machine,offset & 0x7ff,pal5bit(rgb >> 0),pal5bit(rgb >> 5),pal5bit(rgb >> 10));
+	rgb = (space->machine().generic.paletteram.u16[offset & 0x7ff] & 0xff) | ((space->machine().generic.paletteram.u16[offset | 0x800] & 0xff) << 8);
+	palette_set_color_rgb(space->machine(),offset & 0x7ff,pal5bit(rgb >> 0),pal5bit(rgb >> 5),pal5bit(rgb >> 10));
 }
 
 /***************************************************************************
@@ -292,56 +292,56 @@ static WRITE16_HANDLER( igs011_palette )
 
 static WRITE16_HANDLER( igs011_blit_x_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	struct blitter_t &blitter = state->blitter;
 	COMBINE_DATA(&blitter.x);
 }
 
 static WRITE16_HANDLER( igs011_blit_y_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	struct blitter_t &blitter = state->blitter;
 	COMBINE_DATA(&blitter.y);
 }
 
 static WRITE16_HANDLER( igs011_blit_gfx_lo_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	struct blitter_t &blitter = state->blitter;
 	COMBINE_DATA(&blitter.gfx_lo);
 }
 
 static WRITE16_HANDLER( igs011_blit_gfx_hi_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	struct blitter_t &blitter = state->blitter;
 	COMBINE_DATA(&blitter.gfx_hi);
 }
 
 static WRITE16_HANDLER( igs011_blit_w_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	struct blitter_t &blitter = state->blitter;
 	COMBINE_DATA(&blitter.w);
 }
 
 static WRITE16_HANDLER( igs011_blit_h_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	struct blitter_t &blitter = state->blitter;
 	COMBINE_DATA(&blitter.h);
 }
 
 static WRITE16_HANDLER( igs011_blit_depth_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	struct blitter_t &blitter = state->blitter;
 	COMBINE_DATA(&blitter.depth);
 }
 
 static WRITE16_HANDLER( igs011_blit_pen_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	struct blitter_t &blitter = state->blitter;
 	COMBINE_DATA(&blitter.pen);
 }
@@ -349,7 +349,7 @@ static WRITE16_HANDLER( igs011_blit_pen_w )
 
 static WRITE16_HANDLER( igs011_blit_flags_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	struct blitter_t &blitter = state->blitter;
 	int x, xstart, xend, xinc, flipx;
 	int y, ystart, yend, yinc, flipy;
@@ -357,12 +357,12 @@ static WRITE16_HANDLER( igs011_blit_flags_w )
 	UINT8 trans_pen, clear_pen, pen_hi, *dest;
 	UINT8 pen = 0;
 
-	UINT8 *gfx		=	space->machine->region("blitter")->base();
-	UINT8 *gfx2		=	space->machine->region("blitter_hi")->base();
-	int gfx_size	=	space->machine->region("blitter")->bytes();
-	int gfx2_size	=	space->machine->region("blitter_hi")->bytes();
+	UINT8 *gfx		=	space->machine().region("blitter")->base();
+	UINT8 *gfx2		=	space->machine().region("blitter_hi")->base();
+	int gfx_size	=	space->machine().region("blitter")->bytes();
+	int gfx2_size	=	space->machine().region("blitter_hi")->bytes();
 
-	const rectangle &clip = space->machine->primary_screen->visible_area();
+	const rectangle &clip = space->machine().primary_screen->visible_area();
 
 	COMBINE_DATA(&blitter.flags);
 
@@ -446,7 +446,7 @@ static WRITE16_HANDLER( igs011_blit_flags_w )
 
 	#ifdef MAME_DEBUG
 #if 1
-	if (input_code_pressed(space->machine, KEYCODE_Z))
+	if (input_code_pressed(space->machine(), KEYCODE_Z))
 	{	char buf[20];
 		sprintf(buf, "%02X%02X",blitter.depth,blitter.flags&0xff);
 //      ui_draw_text(buf, blitter.x, blitter.y);    // crashes mame!
@@ -466,27 +466,27 @@ static WRITE16_HANDLER( igs011_blit_flags_w )
 
 static CUSTOM_INPUT( igs_hopper_r )
 {
-	igs011_state *state = field->port->machine->driver_data<igs011_state>();
-	return (state->igs_hopper && ((field->port->machine->primary_screen->frame_number()/5)&1)) ? 0x0000 : 0x0001;
+	igs011_state *state = field->port->machine().driver_data<igs011_state>();
+	return (state->igs_hopper && ((field->port->machine().primary_screen->frame_number()/5)&1)) ? 0x0000 : 0x0001;
 }
 
 static WRITE16_HANDLER( igs_dips_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	COMBINE_DATA(&state->igs_dips_sel);
 }
 
 #define IGS_DIPS_R( NUM )																\
 static READ16_HANDLER( igs_##NUM##_dips_r )												\
 { \
-	igs011_state *state = space->machine->driver_data<igs011_state>();																						\
+	igs011_state *state = space->machine().driver_data<igs011_state>();																						\
 	int i;																				\
 	UINT16 ret=0;																		\
 	static const char *const dipnames[] = { "DSW1", "DSW2", "DSW3", "DSW4", "DSW5" };	\
 																						\
 	for (i = 0; i < NUM; i++)															\
 		if ((~state->igs_dips_sel) & (1 << i) )												\
-			ret = input_port_read(space->machine, dipnames[i]);							\
+			ret = input_port_read(space->machine(), dipnames[i]);							\
 																						\
 	/* 0x0100 is blitter busy */														\
 	return	(ret & 0xff) | 0x0000;														\
@@ -503,10 +503,10 @@ IGS_DIPS_R( 5 )
 
 ***************************************************************************/
 
-static void wlcc_decrypt(running_machine *machine)
+static void wlcc_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
+	UINT16 *src = (UINT16 *) (machine.region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -527,10 +527,10 @@ static void wlcc_decrypt(running_machine *machine)
 }
 
 
-static void lhb_decrypt(running_machine *machine)
+static void lhb_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
+	UINT16 *src = (UINT16 *) (machine.region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -552,10 +552,10 @@ static void lhb_decrypt(running_machine *machine)
 }
 
 
-static void drgnwrld_type3_decrypt(running_machine *machine)
+static void drgnwrld_type3_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
+	UINT16 *src = (UINT16 *) (machine.region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -580,10 +580,10 @@ static void drgnwrld_type3_decrypt(running_machine *machine)
 	}
 }
 
-static void drgnwrld_type2_decrypt(running_machine *machine)
+static void drgnwrld_type2_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
+	UINT16 *src = (UINT16 *) (machine.region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -613,10 +613,10 @@ static void drgnwrld_type2_decrypt(running_machine *machine)
 	}
 }
 
-static void drgnwrld_type1_decrypt(running_machine *machine)
+static void drgnwrld_type1_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
+	UINT16 *src = (UINT16 *) (machine.region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -642,11 +642,11 @@ static void drgnwrld_type1_decrypt(running_machine *machine)
 }
 
 
-static void lhb2_decrypt(running_machine *machine)
+static void lhb2_decrypt(running_machine &machine)
 {
 	int i,j;
 	int rom_size = 0x80000;
-	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
+	UINT16 *src = (UINT16 *) (machine.region("maincpu")->base());
 	UINT16 *result_data = auto_alloc_array(machine, UINT16, rom_size/2);
 
 	for (i=0; i<rom_size/2; i++)
@@ -674,7 +674,7 @@ static void lhb2_decrypt(running_machine *machine)
 
 
 // To be done (similar to lhb2?)
-static void nkishusp_decrypt(running_machine *machine)
+static void nkishusp_decrypt(running_machine &machine)
 {
 //  lhb_decrypt(machine);
 //  dbc_decrypt(machine);
@@ -687,7 +687,7 @@ static void nkishusp_decrypt(running_machine *machine)
 
 	int i,j;
 	int rom_size = 0x80000;
-	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
+	UINT16 *src = (UINT16 *) (machine.region("maincpu")->base());
 	UINT16 *result_data = auto_alloc_array(machine, UINT16, rom_size/2);
 
 	for (i=0; i<rom_size/2; i++)
@@ -714,10 +714,10 @@ static void nkishusp_decrypt(running_machine *machine)
 }
 
 
-static void vbowlj_decrypt(running_machine *machine)
+static void vbowlj_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
+	UINT16 *src = (UINT16 *) (machine.region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -748,10 +748,10 @@ static void vbowlj_decrypt(running_machine *machine)
 }
 
 
-static void dbc_decrypt(running_machine *machine)
+static void dbc_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
+	UINT16 *src = (UINT16 *) (machine.region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -798,10 +798,10 @@ static void dbc_decrypt(running_machine *machine)
 }
 
 
-static void ryukobou_decrypt(running_machine *machine)
+static void ryukobou_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) machine->region("maincpu")->base();
+	UINT16 *src = (UINT16 *) machine.region("maincpu")->base();
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
@@ -829,11 +829,11 @@ static void ryukobou_decrypt(running_machine *machine)
 ***************************************************************************/
 
 
-static void lhb2_decrypt_gfx(running_machine *machine)
+static void lhb2_decrypt_gfx(running_machine &machine)
 {
 	int i;
 	unsigned rom_size = 0x200000;
-	UINT8 *src = (UINT8 *) (machine->region("blitter")->base());
+	UINT8 *src = (UINT8 *) (machine.region("blitter")->base());
 	UINT8 *result_data = auto_alloc_array(machine, UINT8, rom_size);
 
 	for (i=0; i<rom_size; i++)
@@ -844,11 +844,11 @@ static void lhb2_decrypt_gfx(running_machine *machine)
 	auto_free(machine, result_data);
 }
 
-static void drgnwrld_gfx_decrypt(running_machine *machine)
+static void drgnwrld_gfx_decrypt(running_machine &machine)
 {
 	int i;
 	unsigned rom_size = 0x400000;
-	UINT8 *src = (UINT8 *) (machine->region("blitter")->base());
+	UINT8 *src = (UINT8 *) (machine.region("blitter")->base());
 	UINT8 *result_data = auto_alloc_array(machine, UINT8, rom_size);
 
 	for (i=0; i<rom_size; i++)
@@ -904,7 +904,7 @@ static void drgnwrld_gfx_decrypt(running_machine *machine)
 
 static WRITE16_HANDLER( igs011_prot1_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	offset *= 2;
 
 	switch (offset)
@@ -944,11 +944,11 @@ static WRITE16_HANDLER( igs011_prot1_w )
 			break;
 	}
 
-	logerror("%s: warning, unknown igs011_prot1_w( %04x, %04x )\n", space->machine->describe_context(), offset, data);
+	logerror("%s: warning, unknown igs011_prot1_w( %04x, %04x )\n", space->machine().describe_context(), offset, data);
 }
 static READ16_HANDLER( igs011_prot1_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// !(b1&b2) . 0 . 0 . (b0^b3) . 0 . 0
 	UINT8 x = state->prot1;
 	return (((BIT(x,1)&BIT(x,2))^1)<<5) | ((BIT(x,0)^BIT(x,3))<<2);
@@ -957,14 +957,14 @@ static READ16_HANDLER( igs011_prot1_r )
 
 static WRITE16_HANDLER( igs011_prot_addr_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	state->prot1 = 0x00;
 	state->prot1_swap = 0x00;
 
 //  state->prot2 = 0x00;
 
-	address_space *sp = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = space->machine->region("maincpu")->base();
+	address_space *sp = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = space->machine().region("maincpu")->base();
 
 	// Plug previous address range with ROM access
 	sp->install_rom(state->prot1_addr + 0, state->prot1_addr + 9, rom + state->prot1_addr);
@@ -978,7 +978,7 @@ static WRITE16_HANDLER( igs011_prot_addr_w )
 /*
 static READ16_HANDLER( igs011_prot_fake_r )
 {
-    igs011_state *state = space->machine->driver_data<igs011_state>();
+    igs011_state *state = space->machine().driver_data<igs011_state>();
     switch (offset)
     {
         case 0: return state->prot1;
@@ -999,14 +999,14 @@ static READ16_HANDLER( igs011_prot_fake_r )
 // drgnwrld (33)
 static WRITE16_HANDLER( igs011_prot2_reset_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	state->prot2 = 0x00;
 }
 
 // wlcc
 static READ16_HANDLER( igs011_prot2_reset_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	state->prot2 = 0x00;
 	return 0;
 }
@@ -1016,32 +1016,32 @@ static READ16_HANDLER( igs011_prot2_reset_r )
 // lhb2 (55), lhb/dbc/ryukobou (33)
 static WRITE16_HANDLER( igs011_prot2_inc_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x5500) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0055)) )
 	{
 		state->prot2++;
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_inc_w( %04x, %04x )\n", space->machine->describe_context(), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_inc_w( %04x, %04x )\n", space->machine().describe_context(), offset, data);
 }
 
 // vbowl (33)
 static WRITE16_HANDLER( igs011_prot2_dec_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
 	{
 		state->prot2--;
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_dec_w( %04x, %04x )\n", space->machine->describe_context(), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_dec_w( %04x, %04x )\n", space->machine().describe_context(), offset, data);
 }
 
 
 
 static WRITE16_HANDLER( drgnwrld_igs011_prot2_swap_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	offset *= 2;
 
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
@@ -1051,13 +1051,13 @@ static WRITE16_HANDLER( drgnwrld_igs011_prot2_swap_w )
 		state->prot2 = ((BIT(x,3)&BIT(x,0))<<4) | (BIT(x,2)<<3) | ((BIT(x,0)|BIT(x,1))<<2) | ((BIT(x,2)^BIT(x,4)^1)<<1) | (BIT(x,1)^1^BIT(x,3));
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine->describe_context(), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine().describe_context(), offset, data);
 }
 
 // lhb, xymg, lhb2
 static WRITE16_HANDLER( lhb_igs011_prot2_swap_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	offset *= 2;
 
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
@@ -1067,13 +1067,13 @@ static WRITE16_HANDLER( lhb_igs011_prot2_swap_w )
 		state->prot2 = (((BIT(x,0)^1)|BIT(x,1))<<2) | (BIT(x,2)<<1) | (BIT(x,0)&BIT(x,1));
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine->describe_context(), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine().describe_context(), offset, data);
 }
 
 // wlcc
 static WRITE16_HANDLER( wlcc_igs011_prot2_swap_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	offset *= 2;
 
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
@@ -1083,13 +1083,13 @@ static WRITE16_HANDLER( wlcc_igs011_prot2_swap_w )
 		state->prot2 = ((BIT(x,3)^BIT(x,2))<<4) | ((BIT(x,2)^BIT(x,1))<<3) | ((BIT(x,1)^BIT(x,0))<<2) | ((BIT(x,4)^BIT(x,0)^1)<<1) | (BIT(x,4)^BIT(x,3)^1);
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine->describe_context(), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine().describe_context(), offset, data);
 }
 
 // vbowl
 static WRITE16_HANDLER( vbowl_igs011_prot2_swap_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	offset *= 2;
 
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
@@ -1099,7 +1099,7 @@ static WRITE16_HANDLER( vbowl_igs011_prot2_swap_w )
 		state->prot2 = ((BIT(x,3)^BIT(x,2))<<4) | ((BIT(x,2)^BIT(x,1))<<3) | ((BIT(x,1)^BIT(x,0))<<2) | ((BIT(x,4)^BIT(x,0))<<1) | (BIT(x,4)^BIT(x,3));
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine->describe_context(), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine().describe_context(), offset, data);
 }
 
 
@@ -1107,7 +1107,7 @@ static WRITE16_HANDLER( vbowl_igs011_prot2_swap_w )
 // drgnwrld
 static READ16_HANDLER( drgnwrldv21_igs011_prot2_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// b9 = (!b4) | (!b0 & b2) | (!(b3 ^ b1) & !(!(b4 & b0) | b2))
 	UINT8 x = state->prot2;
 	UINT8 b9 = (BIT(x,4)^1) | ((BIT(x,0)^1) & BIT(x,2)) | ( (BIT(x,3)^BIT(x,1)^1) & ((((BIT(x,4)^1) & BIT(x,0)) | BIT(x,2))^1) );
@@ -1115,7 +1115,7 @@ static READ16_HANDLER( drgnwrldv21_igs011_prot2_r )
 }
 static READ16_HANDLER( drgnwrldv20j_igs011_prot2_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// b9 = (!b4 | !b0) | !(b3 | b1) | !(b2 & b0)
 	UINT8 x = state->prot2;
 	UINT8 b9 = ((BIT(x,4)^1) | (BIT(x,0)^1)) | ((BIT(x,3) | BIT(x,1))^1) | ((BIT(x,2) & BIT(x,0))^1);
@@ -1125,7 +1125,7 @@ static READ16_HANDLER( drgnwrldv20j_igs011_prot2_r )
 // lhb, xymg
 static READ16_HANDLER( lhb_igs011_prot2_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// b9 = !b2 | (b1 & b0)
 	UINT8 x = state->prot2;
 	UINT8 b9 = (BIT(x,2)^1) | (BIT(x,1) & BIT(x,0));
@@ -1135,7 +1135,7 @@ static READ16_HANDLER( lhb_igs011_prot2_r )
 // dbc
 static READ16_HANDLER( dbc_igs011_prot2_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// b9 = !b1 | (!b0 & b2)
 	UINT8 x = state->prot2;
 	UINT8 b9 = (BIT(x,1)^1) | ((BIT(x,0)^1) & BIT(x,2));
@@ -1145,7 +1145,7 @@ static READ16_HANDLER( dbc_igs011_prot2_r )
 // ryukobou
 static READ16_HANDLER( ryukobou_igs011_prot2_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// b9 = (!b1 | b2) & b0
 	UINT8 x = state->prot2;
 	UINT8 b9 = ((BIT(x,1)^1) | BIT(x,2)) & BIT(x,0);
@@ -1155,7 +1155,7 @@ static READ16_HANDLER( ryukobou_igs011_prot2_r )
 // lhb2
 static READ16_HANDLER( lhb2_igs011_prot2_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// b3 = !b2 | !b1 | b0
 	UINT8 x = state->prot2;
 	UINT8 b3 = (BIT(x,2)^1) | (BIT(x,1)^1) | BIT(x,0);
@@ -1165,7 +1165,7 @@ static READ16_HANDLER( lhb2_igs011_prot2_r )
 // vbowl
 static READ16_HANDLER( vbowl_igs011_prot2_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	UINT8 x = state->prot2;
 	UINT8 b9 = ((BIT(x,4)^1) & (BIT(x,3)^1)) | ((BIT(x,2) & BIT(x,1))^1) | ((BIT(x,4) | BIT(x,0))^1);
 	return (b9 << 9);
@@ -1195,7 +1195,7 @@ static READ16_HANDLER( vbowl_igs011_prot2_r )
 
 static WRITE16_HANDLER( igs012_prot_reset_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	state->igs012_prot = 0x00;
 	state->igs012_prot_swap = 0x00;
 
@@ -1204,7 +1204,7 @@ static WRITE16_HANDLER( igs012_prot_reset_w )
 /*
 static READ16_HANDLER( igs012_prot_fake_r )
 {
-    igs011_state *state = space->machine->driver_data<igs011_state>();
+    igs011_state *state = space->machine().driver_data<igs011_state>();
     switch (offset)
     {
         case 0: return state->igs012_prot;
@@ -1220,29 +1220,29 @@ static READ16_HANDLER( igs012_prot_fake_r )
 
 static WRITE16_HANDLER( igs012_prot_mode_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	if ( MODE_AND_DATA(0, 0xcc) || MODE_AND_DATA(1, 0xdd) )
 	{
 		state->igs012_prot_mode = state->igs012_prot_mode ^ 1;
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_mode_w( %04x, %04x ), mode %x\n", space->machine->describe_context(), offset, data, state->igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_mode_w( %04x, %04x ), mode %x\n", space->machine().describe_context(), offset, data, state->igs012_prot_mode);
 }
 
 static WRITE16_HANDLER( igs012_prot_inc_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	if ( MODE_AND_DATA(0, 0xff) )
 	{
 		state->igs012_prot = (state->igs012_prot + 1) & 0x1f;
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_inc_w( %04x, %04x ), mode %x\n", space->machine->describe_context(), offset, data, state->igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_inc_w( %04x, %04x ), mode %x\n", space->machine().describe_context(), offset, data, state->igs012_prot_mode);
 }
 
 static WRITE16_HANDLER( igs012_prot_dec_inc_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	if ( MODE_AND_DATA(0, 0xaa) )
 	{
 		state->igs012_prot = (state->igs012_prot - 1) & 0x1f;
@@ -1252,12 +1252,12 @@ static WRITE16_HANDLER( igs012_prot_dec_inc_w )
 		state->igs012_prot = (state->igs012_prot + 1) & 0x1f;
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_dec_inc_w( %04x, %04x ), mode %x\n", space->machine->describe_context(), offset, data, state->igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_dec_inc_w( %04x, %04x ), mode %x\n", space->machine().describe_context(), offset, data, state->igs012_prot_mode);
 }
 
 static WRITE16_HANDLER( igs012_prot_dec_copy_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	if ( MODE_AND_DATA(0, 0x33) )
 	{
 		state->igs012_prot = state->igs012_prot_swap;
@@ -1267,23 +1267,23 @@ static WRITE16_HANDLER( igs012_prot_dec_copy_w )
 		state->igs012_prot = (state->igs012_prot - 1) & 0x1f;
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_dec_copy_w( %04x, %04x ), mode %x\n", space->machine->describe_context(), offset, data, state->igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_dec_copy_w( %04x, %04x ), mode %x\n", space->machine().describe_context(), offset, data, state->igs012_prot_mode);
 }
 
 static WRITE16_HANDLER( igs012_prot_copy_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	if ( MODE_AND_DATA(1, 0x22) )
 	{
 		state->igs012_prot = state->igs012_prot_swap;
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_copy_w( %04x, %04x ), mode %x\n", space->machine->describe_context(), offset, data, state->igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_copy_w( %04x, %04x ), mode %x\n", space->machine().describe_context(), offset, data, state->igs012_prot_mode);
 }
 
 static WRITE16_HANDLER( igs012_prot_swap_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	if ( MODE_AND_DATA(0, 0x55) || MODE_AND_DATA(1, 0xa5) )
 	{
 		// !(3 | 1)..(2 & 1)..(3 ^ 0)..(!2)
@@ -1291,12 +1291,12 @@ static WRITE16_HANDLER( igs012_prot_swap_w )
 		state->igs012_prot_swap = (((BIT(x,3)|BIT(x,1))^1)<<3) | ((BIT(x,2)&BIT(x,1))<<2) | ((BIT(x,3)^BIT(x,0))<<1) | (BIT(x,2)^1);
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_swap_w( %04x, %04x ), mode %x\n", space->machine->describe_context(), offset, data, state->igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_swap_w( %04x, %04x ), mode %x\n", space->machine().describe_context(), offset, data, state->igs012_prot_mode);
 }
 
 static READ16_HANDLER( igs012_prot_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// FIXME: mode 0 and mode 1 are mapped to different memory ranges
 	UINT8 x = state->igs012_prot;
 
@@ -1315,7 +1315,7 @@ static READ16_HANDLER( igs012_prot_r )
 
 static WRITE16_HANDLER( drgnwrld_igs003_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	COMBINE_DATA(&state->igs003_reg[offset]);
 
 	if (offset == 0)
@@ -1326,7 +1326,7 @@ static WRITE16_HANDLER( drgnwrld_igs003_w )
 
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
-				coin_counter_w(space->machine, 0,data & 2);
+				coin_counter_w(space->machine(), 0,data & 2);
 
 			if (data & ~0x2)
 				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(space->cpu), data);
@@ -1347,12 +1347,12 @@ static WRITE16_HANDLER( drgnwrld_igs003_w )
 }
 static READ16_HANDLER( drgnwrld_igs003_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	switch(state->igs003_reg[0])
 	{
-		case 0x00:	return input_port_read(space->machine, "IN0");
-		case 0x01:	return input_port_read(space->machine, "IN1");
-		case 0x02:	return input_port_read(space->machine, "IN2");
+		case 0x00:	return input_port_read(space->machine(), "IN0");
+		case 0x01:	return input_port_read(space->machine(), "IN1");
+		case 0x02:	return input_port_read(space->machine(), "IN2");
 
 		case 0x20:	return 0x49;
 		case 0x21:	return 0x47;
@@ -1387,12 +1387,12 @@ static READ16_HANDLER( drgnwrld_igs003_r )
 
 static WRITE16_HANDLER( lhb_inputs_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	COMBINE_DATA(&state->igs_input_sel);
 
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0,	data & 0x20	);
+		coin_counter_w(space->machine(), 0,	data & 0x20	);
 		//  coin out        data & 0x40
 		state->igs_hopper		=	data & 0x80;
 	}
@@ -1404,17 +1404,17 @@ static WRITE16_HANDLER( lhb_inputs_w )
 }
 static READ16_HANDLER( lhb_inputs_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	switch(offset)
 	{
 		case 0:		return state->igs_input_sel;
 
 		case 1:
-			if (~state->igs_input_sel & 0x01)	return input_port_read(space->machine, "KEY0");
-			if (~state->igs_input_sel & 0x02)	return input_port_read(space->machine, "KEY1");
-			if (~state->igs_input_sel & 0x04)	return input_port_read(space->machine, "KEY2");
-			if (~state->igs_input_sel & 0x08)	return input_port_read(space->machine, "KEY3");
-			if (~state->igs_input_sel & 0x10)	return input_port_read(space->machine, "KEY4");
+			if (~state->igs_input_sel & 0x01)	return input_port_read(space->machine(), "KEY0");
+			if (~state->igs_input_sel & 0x02)	return input_port_read(space->machine(), "KEY1");
+			if (~state->igs_input_sel & 0x04)	return input_port_read(space->machine(), "KEY2");
+			if (~state->igs_input_sel & 0x08)	return input_port_read(space->machine(), "KEY3");
+			if (~state->igs_input_sel & 0x10)	return input_port_read(space->machine(), "KEY4");
 
 			logerror("%06x: warning, reading with igs_input_sel = %02x\n", cpu_get_pc(space->cpu), state->igs_input_sel);
 			break;
@@ -1426,7 +1426,7 @@ static READ16_HANDLER( lhb_inputs_r )
 
 static WRITE16_HANDLER( lhb2_igs003_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	COMBINE_DATA(&state->igs003_reg[offset]);
 
 	if (offset == 0)
@@ -1439,7 +1439,7 @@ static WRITE16_HANDLER( lhb2_igs003_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(space->machine, 0,	data & 0x20);
+				coin_counter_w(space->machine(), 0,	data & 0x20);
 				//  coin out        data & 0x40
 				state->igs_hopper		=	data & 0x80;
 			}
@@ -1455,7 +1455,7 @@ static WRITE16_HANDLER( lhb2_igs003_w )
 			{
 				state->lhb2_pen_hi = data & 0x07;
 
-				okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+				okim6295_device *oki = space->machine().device<okim6295_device>("oki");
 				oki->set_bank_base((data & 0x08) ? 0x40000 : 0);
 			}
 
@@ -1471,15 +1471,15 @@ static WRITE16_HANDLER( lhb2_igs003_w )
 }
 static READ16_HANDLER( lhb2_igs003_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	switch(state->igs003_reg[0])
 	{
 		case 0x01:
-			if (~state->igs_input_sel & 0x01)	return input_port_read(space->machine, "KEY0");
-			if (~state->igs_input_sel & 0x02)	return input_port_read(space->machine, "KEY1");
-			if (~state->igs_input_sel & 0x04)	return input_port_read(space->machine, "KEY2");
-			if (~state->igs_input_sel & 0x08)	return input_port_read(space->machine, "KEY3");
-			if (~state->igs_input_sel & 0x10)	return input_port_read(space->machine, "KEY4");
+			if (~state->igs_input_sel & 0x01)	return input_port_read(space->machine(), "KEY0");
+			if (~state->igs_input_sel & 0x02)	return input_port_read(space->machine(), "KEY1");
+			if (~state->igs_input_sel & 0x04)	return input_port_read(space->machine(), "KEY2");
+			if (~state->igs_input_sel & 0x08)	return input_port_read(space->machine(), "KEY3");
+			if (~state->igs_input_sel & 0x10)	return input_port_read(space->machine(), "KEY4");
 			/* fall through */
 		default:
 			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(space->cpu), state->igs003_reg[0]);
@@ -1522,7 +1522,7 @@ static READ16_HANDLER( lhb2_igs003_r )
 
 static WRITE16_HANDLER( wlcc_igs003_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	COMBINE_DATA(&state->igs003_reg[offset]);
 
 	if (offset == 0)
@@ -1533,10 +1533,10 @@ static WRITE16_HANDLER( wlcc_igs003_w )
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(space->machine, 0,	data & 0x01);
+				coin_counter_w(space->machine(), 0,	data & 0x01);
 				//  coin out        data & 0x02
 
-				okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+				okim6295_device *oki = space->machine().device<okim6295_device>("oki");
 				oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
 				state->igs_hopper		=	data & 0x20;
 			}
@@ -1553,10 +1553,10 @@ static WRITE16_HANDLER( wlcc_igs003_w )
 }
 static READ16_HANDLER( wlcc_igs003_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	switch(state->igs003_reg[0])
 	{
-		case 0x00:	return input_port_read(space->machine, "IN0");
+		case 0x00:	return input_port_read(space->machine(), "IN0");
 
 		case 0x20:	return 0x49;
 		case 0x21:	return 0x47;
@@ -1591,7 +1591,7 @@ static READ16_HANDLER( wlcc_igs003_r )
 
 static WRITE16_HANDLER( xymg_igs003_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	COMBINE_DATA(&state->igs003_reg[offset]);
 
 	if (offset == 0)
@@ -1604,7 +1604,7 @@ static WRITE16_HANDLER( xymg_igs003_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(space->machine, 0,	data & 0x20);
+				coin_counter_w(space->machine(), 0,	data & 0x20);
 				//  coin out        data & 0x40
 				state->igs_hopper		=	data & 0x80;
 			}
@@ -1621,17 +1621,17 @@ static WRITE16_HANDLER( xymg_igs003_w )
 }
 static READ16_HANDLER( xymg_igs003_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	switch(state->igs003_reg[0])
 	{
-		case 0x00:	return input_port_read(space->machine, "COIN");
+		case 0x00:	return input_port_read(space->machine(), "COIN");
 
 		case 0x02:
-			if (~state->igs_input_sel & 0x01)	return input_port_read(space->machine, "KEY0");
-			if (~state->igs_input_sel & 0x02)	return input_port_read(space->machine, "KEY1");
-			if (~state->igs_input_sel & 0x04)	return input_port_read(space->machine, "KEY2");
-			if (~state->igs_input_sel & 0x08)	return input_port_read(space->machine, "KEY3");
-			if (~state->igs_input_sel & 0x10)	return input_port_read(space->machine, "KEY4");
+			if (~state->igs_input_sel & 0x01)	return input_port_read(space->machine(), "KEY0");
+			if (~state->igs_input_sel & 0x02)	return input_port_read(space->machine(), "KEY1");
+			if (~state->igs_input_sel & 0x04)	return input_port_read(space->machine(), "KEY2");
+			if (~state->igs_input_sel & 0x08)	return input_port_read(space->machine(), "KEY3");
+			if (~state->igs_input_sel & 0x10)	return input_port_read(space->machine(), "KEY4");
 			/* fall through */
 
 		case 0x20:	return 0x49;
@@ -1668,7 +1668,7 @@ static READ16_HANDLER( xymg_igs003_r )
 
 static WRITE16_HANDLER( vbowl_igs003_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	COMBINE_DATA(&state->igs003_reg[offset]);
 
 	if (offset == 0)
@@ -1679,8 +1679,8 @@ static WRITE16_HANDLER( vbowl_igs003_w )
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(space->machine, 0, data & 1);
-				coin_counter_w(space->machine, 1, data & 2);
+				coin_counter_w(space->machine(), 0, data & 1);
+				coin_counter_w(space->machine(), 1, data & 2);
 			}
 
 			if (data & ~0x3)
@@ -1695,11 +1695,11 @@ static WRITE16_HANDLER( vbowl_igs003_w )
 }
 static READ16_HANDLER( vbowl_igs003_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	switch(state->igs003_reg[0])
 	{
-		case 0x00:	return input_port_read(space->machine, "IN0");
-		case 0x01:	return input_port_read(space->machine, "IN1");
+		case 0x00:	return input_port_read(space->machine(), "IN0");
+		case 0x01:	return input_port_read(space->machine(), "IN1");
 
 //      case 0x03:
 //          return 0xff;    // parametric bitswaps?
@@ -1744,7 +1744,7 @@ static READ16_HANDLER( vbowl_igs003_r )
 // V0400O
 static DRIVER_INIT( drgnwrld )
 {
-//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
 
 	drgnwrld_type1_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
@@ -1770,7 +1770,7 @@ static DRIVER_INIT( drgnwrld )
 
 static DRIVER_INIT( drgnwrldv30 )
 {
-//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
 
 	drgnwrld_type1_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
@@ -1795,12 +1795,12 @@ static DRIVER_INIT( drgnwrldv30 )
 
 static DRIVER_INIT( drgnwrldv21 )
 {
-//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
 
 	drgnwrld_type2_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd4c0, 0xd4ff, FUNC(drgnwrldv21_igs011_prot2_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd4c0, 0xd4ff, FUNC(drgnwrldv21_igs011_prot2_r));
 /*
     // PROTECTION CHECKS
     // bp 32ee; bp 11ca8; bp 23d5e; bp 23fd0; bp 24170; bp 24348; bp 2454e; bp 246cc; bp 24922; bp 24b66; bp 24de2; bp 2502a; bp 25556; bp 269de; bp 2766a; bp 2a830
@@ -1825,7 +1825,7 @@ static DRIVER_INIT( drgnwrldv21 )
 
 static DRIVER_INIT( drgnwrldv21j )
 {
-//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
 
 	drgnwrld_type3_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
@@ -1852,7 +1852,7 @@ static DRIVER_INIT( drgnwrldv21j )
 
 static DRIVER_INIT( drgnwrldv20j )
 {
-//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
 
 	drgnwrld_type3_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
@@ -1890,7 +1890,7 @@ static DRIVER_INIT( drgnwrldv11h )
 
 static DRIVER_INIT( drgnwrldv10c )
 {
-//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
 
 	drgnwrld_type1_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
@@ -1916,7 +1916,7 @@ static DRIVER_INIT( drgnwrldv10c )
 
 static DRIVER_INIT( lhb )
 {
-//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
 
 	lhb_decrypt(machine);
 
@@ -1926,7 +1926,7 @@ static DRIVER_INIT( lhb )
 
 static DRIVER_INIT( lhbv33c )
 {
-//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
 
 	lhb_decrypt(machine);
 
@@ -1936,11 +1936,11 @@ static DRIVER_INIT( lhbv33c )
 
 static DRIVER_INIT( dbc )
 {
-//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
 
 	dbc_decrypt(machine);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x10600, 0x107ff, FUNC(dbc_igs011_prot2_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x10600, 0x107ff, FUNC(dbc_igs011_prot2_r));
 /*
     // PROTECTION CHECKS
     rom[0x04c42/2]  =   0x602e;     // 004C42: 6604         bne 4c48  (rom test error otherwise)
@@ -1965,11 +1965,11 @@ static DRIVER_INIT( dbc )
 
 static DRIVER_INIT( ryukobou )
 {
-//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
 
 	ryukobou_decrypt(machine);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x10600, 0x107ff, FUNC(ryukobou_igs011_prot2_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x10600, 0x107ff, FUNC(ryukobou_igs011_prot2_r));
 
 	// PROTECTION CHECKS
 //  rom[0x2df68/2]  =   0x4e75;     // 02DF68: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
@@ -1978,7 +1978,7 @@ static DRIVER_INIT( ryukobou )
 
 static DRIVER_INIT( xymg )
 {
-//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
 
 	lhb_decrypt(machine);
 /*
@@ -2012,7 +2012,7 @@ static DRIVER_INIT( xymg )
 
 static DRIVER_INIT( wlcc )
 {
-//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
 
 	wlcc_decrypt(machine);
 /*
@@ -2036,7 +2036,7 @@ static DRIVER_INIT( wlcc )
 
 static DRIVER_INIT( lhb2 )
 {
-	UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
 
 	lhb2_decrypt(machine);
 	lhb2_decrypt_gfx(machine);
@@ -2058,8 +2058,8 @@ static DRIVER_INIT( lhb2 )
 
 static DRIVER_INIT( vbowl )
 {
-	UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
-	UINT8  *gfx = (UINT8 *)  machine->region("blitter")->base();
+	UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
+	UINT8  *gfx = (UINT8 *)  machine.region("blitter")->base();
 	int i;
 
 	vbowlj_decrypt(machine);
@@ -2083,8 +2083,8 @@ static DRIVER_INIT( vbowl )
 
 static DRIVER_INIT( vbowlj )
 {
-	UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
-	UINT8  *gfx = (UINT8 *)  machine->region("blitter")->base();
+	UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
+	UINT8  *gfx = (UINT8 *)  machine.region("blitter")->base();
 	int i;
 
 	vbowlj_decrypt(machine);
@@ -2178,7 +2178,7 @@ ADDRESS_MAP_END
 // Only values 0 and 7 are written (1 bit per irq source?)
 static WRITE16_HANDLER( lhb_irq_enable_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	COMBINE_DATA( &state->lhb_irq_enable );
 }
 
@@ -2191,7 +2191,7 @@ static WRITE16_DEVICE_HANDLER( lhb_okibank_w )
 	}
 
 	if ( data & (~0x200) )
-		logerror("%s: warning, unknown bits written in oki bank = %02x\n", device->machine->describe_context(), data);
+		logerror("%s: warning, unknown bits written in oki bank = %02x\n", device->machine().describe_context(), data);
 
 //  popmessage("oki %04x",data);
 }
@@ -2357,7 +2357,7 @@ ADDRESS_MAP_END
  */
 static READ16_DEVICE_HANDLER( ics2115_word_r )
 {
-	ics2115_device* ics2115 = device->machine->device<ics2115_device>("ics");
+	ics2115_device* ics2115 = device->machine().device<ics2115_device>("ics");
 	switch(offset)
 	{
 		case 0:	return ics2115_device::read(ics2115, (offs_t)0);
@@ -2369,7 +2369,7 @@ static READ16_DEVICE_HANDLER( ics2115_word_r )
 
 static WRITE16_DEVICE_HANDLER( ics2115_word_w )
 {
-	ics2115_device* ics2115 = device->machine->device<ics2115_device>("ics");
+	ics2115_device* ics2115 = device->machine().device<ics2115_device>("ics");
 	switch(offset)
 	{
 		case 1:
@@ -2389,14 +2389,14 @@ static READ16_HANDLER( vbowl_unk_r )
 
 static SCREEN_EOF( vbowl )
 {
-	igs011_state *state = machine->driver_data<igs011_state>();
+	igs011_state *state = machine.driver_data<igs011_state>();
 	state->vbowl_trackball[0] = state->vbowl_trackball[1];
 	state->vbowl_trackball[1] = (input_port_read(machine, "AN1") << 8) | input_port_read(machine, "AN0");
 }
 
 static WRITE16_HANDLER( vbowl_pen_hi_w )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+	igs011_state *state = space->machine().driver_data<igs011_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->lhb2_pen_hi = data & 0x07;
@@ -3617,7 +3617,7 @@ MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( lhb_interrupt )
 {
-	igs011_state *state = device->machine->driver_data<igs011_state>();
+	igs011_state *state = device->machine().driver_data<igs011_state>();
 	if (!state->lhb_irq_enable)
 		return;
 

@@ -103,19 +103,19 @@ Dip Locations and factory settings verified with manual
 
 static TIMER_CALLBACK( soundlatch_callback )
 {
-	bombjack_state *state = machine->driver_data<bombjack_state>();
+	bombjack_state *state = machine.driver_data<bombjack_state>();
 	state->latch = param;
 }
 
 static WRITE8_HANDLER( bombjack_soundlatch_w )
 {
 	/* make all the CPUs synchronize, and only AFTER that write the new command to the latch */
-	space->machine->scheduler().synchronize(FUNC(soundlatch_callback), data);
+	space->machine().scheduler().synchronize(FUNC(soundlatch_callback), data);
 }
 
 static READ8_HANDLER( bombjack_soundlatch_r )
 {
-	bombjack_state *state = space->machine->driver_data<bombjack_state>();
+	bombjack_state *state = space->machine().driver_data<bombjack_state>();
 	int res;
 
 	res = state->latch;
@@ -328,7 +328,7 @@ GFXDECODE_END
 
 static MACHINE_START( bombjack )
 {
-	bombjack_state *state = machine->driver_data<bombjack_state>();
+	bombjack_state *state = machine.driver_data<bombjack_state>();
 
 	state->save_item(NAME(state->latch));
 	state->save_item(NAME(state->background_image));
@@ -337,7 +337,7 @@ static MACHINE_START( bombjack )
 
 static MACHINE_RESET( bombjack )
 {
-	bombjack_state *state = machine->driver_data<bombjack_state>();
+	bombjack_state *state = machine.driver_data<bombjack_state>();
 
 	state->latch = 0;
 	state->background_image = 0;

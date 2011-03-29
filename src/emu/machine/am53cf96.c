@@ -159,10 +159,10 @@ WRITE32_HANDLER( am53cf96_w )
 			case 3:	// reset SCSI bus
 				scsi_regs[REG_INTSTATE] = 4;	// command sent OK
 				xfer_state = 0;
-				space->machine->scheduler().timer_set( attotime::from_hz( 16384 ), FUNC(am53cf96_irq ));
+				space->machine().scheduler().timer_set( attotime::from_hz( 16384 ), FUNC(am53cf96_irq ));
 				break;
 			case 0x42:  	// select with ATN steps
-				space->machine->scheduler().timer_set( attotime::from_hz( 16384 ), FUNC(am53cf96_irq ));
+				space->machine().scheduler().timer_set( attotime::from_hz( 16384 ), FUNC(am53cf96_irq ));
 				if ((fifo[1] == 0) || (fifo[1] == 0x48) || (fifo[1] == 0x4b))
 				{
 					scsi_regs[REG_INTSTATE] = 6;
@@ -192,7 +192,7 @@ WRITE32_HANDLER( am53cf96_w )
 			case 0x10:	// information transfer (must not change xfer_state)
 			case 0x11:	// second phase of information transfer
 			case 0x12:	// message accepted
-				space->machine->scheduler().timer_set( attotime::from_hz( 16384 ), FUNC(am53cf96_irq ));
+				space->machine().scheduler().timer_set( attotime::from_hz( 16384 ), FUNC(am53cf96_irq ));
 				scsi_regs[REG_INTSTATE] = 6;	// command sent OK
 				break;
 			default:
@@ -208,7 +208,7 @@ WRITE32_HANDLER( am53cf96_w )
 	}
 }
 
-void am53cf96_init( running_machine *machine, const struct AM53CF96interface *interface )
+void am53cf96_init( running_machine &machine, const struct AM53CF96interface *interface )
 {
 	int i;
 

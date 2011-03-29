@@ -17,7 +17,7 @@
 
 WRITE8_HANDLER( battlane_palette_w )
 {
-	battlane_state *state = space->machine->driver_data<battlane_state>();
+	battlane_state *state = space->machine().driver_data<battlane_state>();
 	int r, g, b;
 	int bit0, bit1, bit2;
 
@@ -42,37 +42,37 @@ WRITE8_HANDLER( battlane_palette_w )
 	bit2 = (~data >> 7) & 0x01;
 	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
 }
 
 WRITE8_HANDLER( battlane_scrollx_w )
 {
-	battlane_state *state = space->machine->driver_data<battlane_state>();
+	battlane_state *state = space->machine().driver_data<battlane_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, ((state->video_ctrl & 0x01) << 8) + data);
 }
 
 WRITE8_HANDLER( battlane_scrolly_w )
 {
-	battlane_state *state = space->machine->driver_data<battlane_state>();
+	battlane_state *state = space->machine().driver_data<battlane_state>();
 	tilemap_set_scrolly(state->bg_tilemap, 0, ((state->cpu_control & 0x01) << 8) + data);
 }
 
 WRITE8_HANDLER( battlane_tileram_w )
 {
-	battlane_state *state = space->machine->driver_data<battlane_state>();
+	battlane_state *state = space->machine().driver_data<battlane_state>();
 	state->tileram[offset] = data;
 	//tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( battlane_spriteram_w )
 {
-	battlane_state *state = space->machine->driver_data<battlane_state>();
+	battlane_state *state = space->machine().driver_data<battlane_state>();
 	state->spriteram[offset] = data;
 }
 
 WRITE8_HANDLER( battlane_bitmap_w )
 {
-	battlane_state *state = space->machine->driver_data<battlane_state>();
+	battlane_state *state = space->machine().driver_data<battlane_state>();
 	int i, orval;
 
 	orval = (~state->video_ctrl >> 1) & 0x07;
@@ -95,13 +95,13 @@ WRITE8_HANDLER( battlane_bitmap_w )
 
 WRITE8_HANDLER( battlane_video_ctrl_w )
 {
-	battlane_state *state = space->machine->driver_data<battlane_state>();
+	battlane_state *state = space->machine().driver_data<battlane_state>();
 	state->video_ctrl = data;
 }
 
 static TILE_GET_INFO( get_tile_info_bg )
 {
-	battlane_state *state = machine->driver_data<battlane_state>();
+	battlane_state *state = machine.driver_data<battlane_state>();
 	int code = state->tileram[tile_index];
 	int attr = state->tileram[tile_index + 0x400];
 	int gfxn = (attr & 0x01) + 1;
@@ -143,14 +143,14 @@ static TILEMAP_MAPPER( battlane_tilemap_scan_rows_2x2 )
 
 VIDEO_START( battlane )
 {
-	battlane_state *state = machine->driver_data<battlane_state>();
+	battlane_state *state = machine.driver_data<battlane_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info_bg, battlane_tilemap_scan_rows_2x2, 16, 16, 32, 32);
 	state->screen_bitmap = auto_bitmap_alloc(machine, 32 * 8, 32 * 8, BITMAP_FORMAT_INDEXED8);
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	battlane_state *state = machine->driver_data<battlane_state>();
+	battlane_state *state = machine.driver_data<battlane_state>();
 	int offs, attr, code, color, sx, sy, flipx, flipy, dy;
 
 	for (offs = 0; offs < 0x100; offs += 4)
@@ -191,7 +191,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			}
 
 			drawgfx_transpen(bitmap,cliprect,
-				machine->gfx[0],
+				machine.gfx[0],
 				code,
 				color,
 				flipx, flipy,
@@ -202,7 +202,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 				dy = flipy ? 16 : -16;
 
 				drawgfx_transpen(bitmap,cliprect,
-					machine->gfx[0],
+					machine.gfx[0],
 					code + 1,
 					color,
 					flipx, flipy,
@@ -212,9 +212,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static void draw_fg_bitmap( running_machine *machine, bitmap_t *bitmap )
+static void draw_fg_bitmap( running_machine &machine, bitmap_t *bitmap )
 {
-	battlane_state *state = machine->driver_data<battlane_state>();
+	battlane_state *state = machine.driver_data<battlane_state>();
 	int x, y, data;
 
 	for (y = 0; y < 32 * 8; y++)
@@ -236,12 +236,12 @@ static void draw_fg_bitmap( running_machine *machine, bitmap_t *bitmap )
 
 SCREEN_UPDATE( battlane )
 {
-	battlane_state *state = screen->machine->driver_data<battlane_state>();
+	battlane_state *state = screen->machine().driver_data<battlane_state>();
 
 	tilemap_mark_all_tiles_dirty(state->bg_tilemap); // HACK
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
-	draw_fg_bitmap(screen->machine, bitmap);
+	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_fg_bitmap(screen->machine(), bitmap);
 	return 0;
 }

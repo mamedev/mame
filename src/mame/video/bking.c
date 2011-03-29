@@ -41,7 +41,7 @@ PALETTE_INIT( bking )
 			3, &resistances_rg[0], gweights, 0, 0,
 			2, &resistances_b[0],  bweights, 0, 0);
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		UINT16 pen;
 		int bit0, bit1, bit2, r, g, b;
@@ -84,44 +84,44 @@ PALETTE_INIT( bking )
 
 WRITE8_HANDLER( bking_xld1_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->xld1 = -data;
 }
 
 WRITE8_HANDLER( bking_yld1_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->yld1 = -data;
 }
 
 WRITE8_HANDLER( bking_xld2_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->xld2 = -data;
 }
 
 WRITE8_HANDLER( bking_yld2_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->yld2 = -data;
 }
 
 WRITE8_HANDLER( bking_xld3_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->xld3 = -data;
 }
 
 WRITE8_HANDLER( bking_yld3_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->yld3 = -data;
 }
 
 
 WRITE8_HANDLER( bking_cont1_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 
 	/* D0 = COIN LOCK */
 	/* D1 = BALL 5 (Controller selection) */
@@ -129,11 +129,11 @@ WRITE8_HANDLER( bking_cont1_w )
 	/* D3 = Not Connected */
 	/* D4-D7 = CROW0-CROW3 (selects crow picture) */
 
-	coin_lockout_global_w(space->machine, ~data & 0x01);
+	coin_lockout_global_w(space->machine(), ~data & 0x01);
 
-	flip_screen_set_no_update(space->machine, data & 0x04);
+	flip_screen_set_no_update(space->machine(), data & 0x04);
 
-	tilemap_set_flip_all(space->machine, flip_screen_get(space->machine) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_set_flip_all(space->machine(), flip_screen_get(space->machine()) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	state->controller = data & 0x02;
 
@@ -142,7 +142,7 @@ WRITE8_HANDLER( bking_cont1_w )
 
 WRITE8_HANDLER( bking_cont2_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 
 	/* D0-D2 = BALL10 - BALL12 (Selects player 1 ball picture) */
 	/* D3-D5 = BALL20 - BALL22 (Selects player 2 ball picture) */
@@ -157,7 +157,7 @@ WRITE8_HANDLER( bking_cont2_w )
 
 WRITE8_HANDLER( bking_cont3_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 
 	/* D0 = CROW INV (inverts Crow picture and coordinates) */
 	/* D1-D2 = COLOR 0 - COLOR 1 (switches 4 color palettes, global across all graphics) */
@@ -172,20 +172,20 @@ WRITE8_HANDLER( bking_cont3_w )
 
 	state->palette_bank = (data >> 1) & 0x03;
 
-	space->machine->sound().system_mute(data & 0x08);
+	space->machine().sound().system_mute(data & 0x08);
 }
 
 
 WRITE8_HANDLER( bking_msk_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->pc3259_mask++;
 }
 
 
 WRITE8_HANDLER( bking_hitclr_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->pc3259_mask = 0;
 
 	state->pc3259_output[0] = 0;
@@ -197,7 +197,7 @@ WRITE8_HANDLER( bking_hitclr_w )
 
 WRITE8_HANDLER( bking_playfield_w )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	state->playfield_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
@@ -205,26 +205,26 @@ WRITE8_HANDLER( bking_playfield_w )
 
 READ8_HANDLER( bking_input_port_5_r )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
-	return input_port_read(space->machine, state->controller ? "TRACK1_X" : "TRACK0_X");
+	bking_state *state = space->machine().driver_data<bking_state>();
+	return input_port_read(space->machine(), state->controller ? "TRACK1_X" : "TRACK0_X");
 }
 
 READ8_HANDLER( bking_input_port_6_r )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
-	return input_port_read(space->machine, state->controller ? "TRACK1_Y" : "TRACK0_Y");
+	bking_state *state = space->machine().driver_data<bking_state>();
+	return input_port_read(space->machine(), state->controller ? "TRACK1_Y" : "TRACK0_Y");
 }
 
 READ8_HANDLER( bking_pos_r )
 {
-	bking_state *state = space->machine->driver_data<bking_state>();
+	bking_state *state = space->machine().driver_data<bking_state>();
 	return state->pc3259_output[offset / 8] << 4;
 }
 
 
 static TILE_GET_INFO( get_tile_info )
 {
-	bking_state *state = machine->driver_data<bking_state>();
+	bking_state *state = machine.driver_data<bking_state>();
 	UINT8 code0 = state->playfield_ram[2 * tile_index + 0];
 	UINT8 code1 = state->playfield_ram[2 * tile_index + 1];
 
@@ -239,10 +239,10 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( bking )
 {
-	bking_state *state = machine->driver_data<bking_state>();
+	bking_state *state = machine.driver_data<bking_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->tmp_bitmap1 = machine->primary_screen->alloc_compatible_bitmap();
-	state->tmp_bitmap2 = machine->primary_screen->alloc_compatible_bitmap();
+	state->tmp_bitmap1 = machine.primary_screen->alloc_compatible_bitmap();
+	state->tmp_bitmap2 = machine.primary_screen->alloc_compatible_bitmap();
 
 	state->save_item(NAME(*state->tmp_bitmap1));
 	state->save_item(NAME(*state->tmp_bitmap2));
@@ -251,25 +251,25 @@ VIDEO_START( bking )
 
 SCREEN_UPDATE( bking )
 {
-	bking_state *state = screen->machine->driver_data<bking_state>();
+	bking_state *state = screen->machine().driver_data<bking_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* draw the balls */
-	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2],
+	drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[2],
 		state->ball1_pic,
 		state->palette_bank,
 		0, 0,
 		state->xld1, state->yld1, 0);
 
-	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[3],
+	drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[3],
 		state->ball2_pic,
 		state->palette_bank,
 		0, 0,
 		state->xld2, state->yld2, 0);
 
 	/* draw the crow */
-	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
+	drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
 		state->crow_pic,
 		state->palette_bank,
 		state->crow_flip, state->crow_flip,
@@ -280,7 +280,7 @@ SCREEN_UPDATE( bking )
 
 SCREEN_EOF( bking )
 {
-	bking_state *state = machine->driver_data<bking_state>();
+	bking_state *state = machine.driver_data<bking_state>();
 	static const rectangle rect = { 0, 7, 0, 15 };
 
 	int xld = 0;
@@ -293,7 +293,7 @@ SCREEN_EOF( bking )
 		xld = state->xld1;
 		yld = state->yld1;
 
-		drawgfx_opaque(state->tmp_bitmap2, &rect, machine->gfx[2],
+		drawgfx_opaque(state->tmp_bitmap2, &rect, machine.gfx[2],
 			state->ball1_pic,
 			0,
 			0, 0,
@@ -307,7 +307,7 @@ SCREEN_EOF( bking )
 		xld = state->xld2;
 		yld = state->yld2;
 
-		drawgfx_opaque(state->tmp_bitmap2, &rect, machine->gfx[3],
+		drawgfx_opaque(state->tmp_bitmap2, &rect, machine.gfx[3],
 			state->ball2_pic,
 			0,
 			0, 0,
@@ -326,7 +326,7 @@ SCREEN_EOF( bking )
 
 	if (latch != 0)
 	{
-		const UINT8* MASK = machine->region("user1")->base() + 8 * state->hit;
+		const UINT8* MASK = machine.region("user1")->base() + 8 * state->hit;
 
 		int x;
 		int y;

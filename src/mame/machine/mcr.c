@@ -137,7 +137,7 @@ Z80PIO_INTERFACE( nflfoot_pio_intf )
 
 static WRITE_LINE_DEVICE_HANDLER( ipu_ctc_interrupt )
 {
-	cputag_set_input_line(device->machine, "ipu", 0, state);
+	cputag_set_input_line(device->machine(), "ipu", 0, state);
 }
 
 
@@ -167,7 +167,7 @@ MACHINE_START( mcr )
 MACHINE_START( nflfoot )
 {
 	/* allocate a timer for the IPU watchdog */
-	ipu_watchdog_timer = machine->scheduler().timer_alloc(FUNC(ipu_watchdog_reset));
+	ipu_watchdog_timer = machine.scheduler().timer_alloc(FUNC(ipu_watchdog_reset));
 }
 
 
@@ -190,7 +190,7 @@ MACHINE_RESET( mcr )
 
 INTERRUPT_GEN( mcr_interrupt )
 {
-	device_t *ctc = device->machine->device("ctc");
+	device_t *ctc = device->machine().device("ctc");
 
 	/* CTC line 2 is connected to VBLANK, which is once every 1/2 frame */
 	/* for the 30Hz interlaced display */
@@ -209,7 +209,7 @@ INTERRUPT_GEN( mcr_interrupt )
 
 INTERRUPT_GEN( mcr_ipu_interrupt )
 {
-	device_t *ctc = device->machine->device("ipu_ctc");
+	device_t *ctc = device->machine().device("ipu_ctc");
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
@@ -241,9 +241,9 @@ WRITE8_HANDLER( mcr_control_port_w )
             D0 = coin meter 1
     */
 
-	coin_counter_w(space->machine, 0, (data >> 0) & 1);
-	coin_counter_w(space->machine, 1, (data >> 1) & 1);
-	coin_counter_w(space->machine, 2, (data >> 2) & 1);
+	coin_counter_w(space->machine(), 0, (data >> 0) & 1);
+	coin_counter_w(space->machine(), 1, (data >> 1) & 1);
+	coin_counter_w(space->machine(), 2, (data >> 2) & 1);
 	mcr_cocktail_flip = (data >> 6) & 1;
 }
 

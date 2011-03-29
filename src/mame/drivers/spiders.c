@@ -223,26 +223,26 @@ static READ8_DEVICE_HANDLER( gfx_rom_r );
 
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 {
-	device_t *pia1 = device->machine->device("pia1");
-	device_t *pia2 = device->machine->device("pia2");
-	device_t *pia3 = device->machine->device("pia3");
+	device_t *pia1 = device->machine().device("pia1");
+	device_t *pia2 = device->machine().device("pia2");
+	device_t *pia3 = device->machine().device("pia3");
 	int combined_state = pia6821_get_irq_a(pia1) | pia6821_get_irq_b(pia1) |
 											      pia6821_get_irq_b(pia2) |
 						 pia6821_get_irq_a(pia3) | pia6821_get_irq_b(pia3);
 
-	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_firq )
 {
-	cputag_set_input_line(device->machine, "maincpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( audio_cpu_irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", M6800_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", M6800_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -271,17 +271,17 @@ static const pia6821_interface pia_1_intf =
 
 static INTERRUPT_GEN( update_pia_1 )
 {
-	device_t *pia1 = device->machine->device("pia1");
+	device_t *pia1 = device->machine().device("pia1");
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
-	pia6821_ca1_w(pia1, input_port_read(device->machine, "IN0") & 0x02);
+	pia6821_ca1_w(pia1, input_port_read(device->machine(), "IN0") & 0x02);
 
 	/* CA2 - copy of PA0 (SERVICE1) */
-	pia6821_ca2_w(pia1, input_port_read(device->machine, "IN0") & 0x01);
+	pia6821_ca2_w(pia1, input_port_read(device->machine(), "IN0") & 0x01);
 
 	/* CB1 - (crosshatch) */
-	pia6821_cb1_w(pia1, input_port_read(device->machine, "XHATCH"));
+	pia6821_cb1_w(pia1, input_port_read(device->machine(), "XHATCH"));
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -374,7 +374,7 @@ static const pia6821_interface pia_4_intf =
 
 static WRITE8_DEVICE_HANDLER( ic60_74123_output_changed)
 {
-	device_t *pia2 = device->machine->device("pia2");
+	device_t *pia2 = device->machine().device("pia2");
 	pia6821_ca1_w(pia2, data);
 }
 
@@ -400,7 +400,7 @@ static const ttl74123_interface ic60_intf =
 
 static MACHINE_START( spiders )
 {
-	spiders_state *state = machine->driver_data<spiders_state>();
+	spiders_state *state = machine.driver_data<spiders_state>();
 	/* setup for save states */
 	state_save_register_global(machine, state->flipscreen);
 	state_save_register_global(machine, state->gfx_rom_address);
@@ -420,14 +420,14 @@ static MACHINE_START( spiders )
 
 static WRITE_LINE_DEVICE_HANDLER( flipscreen_w )
 {
-	spiders_state *drvstate = device->machine->driver_data<spiders_state>();
+	spiders_state *drvstate = device->machine().driver_data<spiders_state>();
 	drvstate->flipscreen = state;
 }
 
 
 static MC6845_BEGIN_UPDATE( begin_update )
 {
-	spiders_state *state = device->machine->driver_data<spiders_state>();
+	spiders_state *state = device->machine().driver_data<spiders_state>();
 	/* create the pens */
 	offs_t i;
 
@@ -442,7 +442,7 @@ static MC6845_BEGIN_UPDATE( begin_update )
 
 static MC6845_UPDATE_ROW( update_row )
 {
-	spiders_state *state = device->machine->driver_data<spiders_state>();
+	spiders_state *state = device->machine().driver_data<spiders_state>();
 	UINT8 cx;
 
 	pen_t *pens = (pen_t *)param;
@@ -502,7 +502,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( display_enable_changed )
 {
-	ttl74123_a_w(device->machine->device("ic60"), 0, state);
+	ttl74123_a_w(device->machine().device("ic60"), 0, state);
 }
 
 
@@ -523,7 +523,7 @@ static const mc6845_interface mc6845_intf =
 
 static SCREEN_UPDATE( spiders )
 {
-	device_t *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine().device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
@@ -540,7 +540,7 @@ static SCREEN_UPDATE( spiders )
 
 static WRITE8_DEVICE_HANDLER( gfx_rom_intf_w )
 {
-	spiders_state *state = device->machine->driver_data<spiders_state>();
+	spiders_state *state = device->machine().driver_data<spiders_state>();
 	state->gfx_rom_ctrl_mode  = ( data >> 7) & 0x01;
 	state->gfx_rom_ctrl_latch = ( data >> 4) & 0x03;
 	state->gfx_rom_ctrl_data  = (~data >> 0) & 0x0f;
@@ -549,12 +549,12 @@ static WRITE8_DEVICE_HANDLER( gfx_rom_intf_w )
 
 static READ8_DEVICE_HANDLER( gfx_rom_r )
 {
-	spiders_state *state = device->machine->driver_data<spiders_state>();
+	spiders_state *state = device->machine().driver_data<spiders_state>();
 	UINT8 ret;
 
 	if (state->gfx_rom_ctrl_mode)
 	{
-		UINT8 *rom = device->machine->region("gfx1")->base();
+		UINT8 *rom = device->machine().region("gfx1")->base();
 
 		ret = rom[state->gfx_rom_address];
 

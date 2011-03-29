@@ -48,7 +48,7 @@ public:
 
 /*----------- defined in video/exidy.c -----------*/
 
-void exidy_video_config(running_machine *machine, UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
+void exidy_video_config(running_machine &machine, UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
 VIDEO_START( exidy );
 SCREEN_UPDATE( exidy );
 

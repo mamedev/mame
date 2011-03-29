@@ -221,7 +221,7 @@ static DEVICE_START( k053260 )
 
 	ic->mode = 0;
 
-	const memory_region *region = (ic->intf->rgnoverride != NULL) ? device->machine->region(ic->intf->rgnoverride) : device->region();
+	const memory_region *region = (ic->intf->rgnoverride != NULL) ? device->machine().region(ic->intf->rgnoverride) : device->region();
 
 	ic->rom = *region;
 	ic->rom_size = region->bytes();
@@ -231,9 +231,9 @@ static DEVICE_START( k053260 )
 	for ( i = 0; i < 0x30; i++ )
 		ic->regs[i] = 0;
 
-	ic->delta_table = auto_alloc_array( device->machine, UINT32, 0x1000 );
+	ic->delta_table = auto_alloc_array( device->machine(), UINT32, 0x1000 );
 
-	ic->channel = device->machine->sound().stream_alloc( *device, 0, 2, rate, ic, k053260_update );
+	ic->channel = device->machine().sound().stream_alloc( *device, 0, 2, rate, ic, k053260_update );
 
 	InitDeltaTable( ic, rate, device->clock() );
 
@@ -258,7 +258,7 @@ static DEVICE_START( k053260 )
 
 	/* setup SH1 timer if necessary */
 	if ( ic->intf->irq )
-		device->machine->scheduler().timer_pulse( attotime::from_hz(device->clock()) * 32, FUNC(ic->intf->irq ));
+		device->machine().scheduler().timer_pulse( attotime::from_hz(device->clock()) * 32, FUNC(ic->intf->irq ));
 }
 
 INLINE void check_bounds( k053260_state *ic, int channel )
@@ -424,7 +424,7 @@ READ8_DEVICE_HANDLER( k053260_r )
 				ic->channels[0].pos += ( 1 << 16 );
 
 				if ( offs > ic->rom_size ) {
-					logerror("%s: K53260: Attempting to read past ROM size in ROM Read Mode (offs = %06x, size = %06x).\n", device->machine->describe_context(),offs,ic->rom_size );
+					logerror("%s: K53260: Attempting to read past ROM size in ROM Read Mode (offs = %06x, size = %06x).\n", device->machine().describe_context(),offs,ic->rom_size );
 
 					return 0;
 				}

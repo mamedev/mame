@@ -32,7 +32,7 @@ public:
 
 static SCREEN_UPDATE( tgtpanic )
 {
-	tgtpanic_state *state = screen->machine->driver_data<tgtpanic_state>();
+	tgtpanic_state *state = screen->machine().driver_data<tgtpanic_state>();
 	UINT32 colors[4];
 	UINT32 offs;
 	UINT32 x, y;
@@ -68,8 +68,8 @@ static SCREEN_UPDATE( tgtpanic )
 
 static WRITE8_HANDLER( color_w )
 {
-	tgtpanic_state *state = space->machine->driver_data<tgtpanic_state>();
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+	tgtpanic_state *state = space->machine().driver_data<tgtpanic_state>();
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 	state->color = data;
 }
 

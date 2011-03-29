@@ -50,8 +50,8 @@ static TIMER_CALLBACK( dac_irq )
 
 static WRITE8_DEVICE_HANDLER( audio_dac_w )
 {
-	trucocl_state *state = device->machine->driver_data<trucocl_state>();
-	UINT8 *rom = device->machine->region("maincpu")->base();
+	trucocl_state *state = device->machine().driver_data<trucocl_state>();
+	UINT8 *rom = device->machine().region("maincpu")->base();
 	int	dac_address = ( data & 0xf0 ) << 8;
 	int	sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
 
@@ -75,7 +75,7 @@ static WRITE8_DEVICE_HANDLER( audio_dac_w )
 
 	dac_data_w( device, rom[dac_address+state->cur_dac_address_index] );
 
-	device->machine->scheduler().timer_set( attotime::from_hz( 16000 ), FUNC(dac_irq ));
+	device->machine().scheduler().timer_set( attotime::from_hz( 16000 ), FUNC(dac_irq ));
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
@@ -181,7 +181,7 @@ ROM_END
 
 static DRIVER_INIT( trucocl )
 {
-	trucocl_state *state = machine->driver_data<trucocl_state>();
+	trucocl_state *state = machine.driver_data<trucocl_state>();
 	state->cur_dac_address = -1;
 	state->cur_dac_address_index = 0;
 }

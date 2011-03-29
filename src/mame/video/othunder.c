@@ -8,7 +8,7 @@ VIDEO_START( othunder )
 	/* Up to $800/8 big sprites, requires 0x100 * sizeof(*spritelist)
        Multiply this by 32 to give room for the number of small sprites,
        which are what actually get put in the structure. */
-	othunder_state *state = machine->driver_data<othunder_state>();
+	othunder_state *state = machine.driver_data<othunder_state>();
 	state->spritelist = auto_alloc_array(machine, struct othunder_tempsprite, 0x2000);
 }
 
@@ -63,11 +63,11 @@ spriteram is being tested, take no notice of that.]
 ********************************************************/
 
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const int *primasks, int y_offs )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, const int *primasks, int y_offs )
 {
-	othunder_state *state = machine->driver_data<othunder_state>();
-	UINT16 *spritemap = (UINT16 *)machine->region("user1")->base();
-	UINT16 tile_mask = (machine->gfx[0]->total_elements) - 1;
+	othunder_state *state = machine.driver_data<othunder_state>();
+	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
+	UINT16 tile_mask = (machine.gfx[0]->total_elements) - 1;
 	UINT16 *spriteram16 = state->spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -167,7 +167,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			}
 			else
 			{
-				drawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
+				drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[0],
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
@@ -185,13 +185,13 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	{
 		sprite_ptr--;
 
-		pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
+		pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[0],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				machine->priority_bitmap,sprite_ptr->primask,0);
+				machine.priority_bitmap,sprite_ptr->primask,0);
 	}
 }
 
@@ -202,7 +202,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 SCREEN_UPDATE( othunder )
 {
-	othunder_state *state = screen->machine->driver_data<othunder_state>();
+	othunder_state *state = screen->machine().driver_data<othunder_state>();
 	int layer[3];
 
 	tc0100scn_tilemap_update(state->tc0100scn);
@@ -211,7 +211,7 @@ SCREEN_UPDATE( othunder )
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -223,7 +223,7 @@ SCREEN_UPDATE( othunder )
 	/* Sprites can be under/over the layer below text layer */
 	{
 		static const int primasks[2] = {0xf0, 0xfc};
-		draw_sprites(screen->machine, bitmap, cliprect, primasks, 3);
+		draw_sprites(screen->machine(), bitmap, cliprect, primasks, 3);
 	}
 
 	return 0;

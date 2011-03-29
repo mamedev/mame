@@ -74,19 +74,19 @@ zooming might be wrong
 
 static READ16_HANDLER( pending_command_r )
 {
-	taotaido_state *state = space->machine->driver_data<taotaido_state>();
+	taotaido_state *state = space->machine().driver_data<taotaido_state>();
 	/* Only bit 0 is tested */
 	return state->pending_command;
 }
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	taotaido_state *state = space->machine->driver_data<taotaido_state>();
+	taotaido_state *state = space->machine().driver_data<taotaido_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->pending_command = 1;
 		soundlatch_w(space, offset, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
@@ -120,15 +120,15 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	taotaido_state *state = space->machine->driver_data<taotaido_state>();
+	taotaido_state *state = space->machine().driver_data<taotaido_state>();
 	state->pending_command = 0;
 }
 
 static WRITE8_HANDLER( taotaido_sh_bankswitch_w )
 {
-	UINT8 *rom = space->machine->region("audiocpu")->base() + 0x10000;
+	UINT8 *rom = space->machine().region("audiocpu")->base() + 0x10000;
 
-	memory_set_bankptr(space->machine, "bank1",rom + (data & 0x03) * 0x8000);
+	memory_set_bankptr(space->machine(), "bank1",rom + (data & 0x03) * 0x8000);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
@@ -324,7 +324,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

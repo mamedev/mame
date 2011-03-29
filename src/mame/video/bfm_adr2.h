@@ -6,7 +6,7 @@ void adder2_send(int data);
 int adder2_status(void);
 
 GFXDECODE_EXTERN( adder2 );
-void adder2_decode_char_roms(running_machine *machine);
+void adder2_decode_char_roms(running_machine &machine);
 
 MACHINE_RESET( adder2 );
 INTERRUPT_GEN( adder2_vbl );

@@ -67,7 +67,7 @@ WRITE32_HANDLER( n64_mi_reg_w )
             if (data & MI_SET_RDRAM)    mi_mode |=  MI_MODE_RDRAM;
             if (data & MI_CLR_DP_INTR)
 			{
-				clear_rcp_interrupt(space->machine, DP_INTERRUPT);
+				clear_rcp_interrupt(space->machine(), DP_INTERRUPT);
 			}
 			break;
 
@@ -136,7 +136,7 @@ WRITE32_HANDLER( n64_mi_reg_w )
 
 static dmadac_sound_device *dmadac[2];
 
-void signal_rcp_interrupt(running_machine *machine, int interrupt)
+void signal_rcp_interrupt(running_machine &machine, int interrupt)
 {
 	if (mi_intr_mask & interrupt)
 	{
@@ -146,7 +146,7 @@ void signal_rcp_interrupt(running_machine *machine, int interrupt)
 	}
 }
 
-void clear_rcp_interrupt(running_machine *machine, int interrupt)
+void clear_rcp_interrupt(running_machine &machine, int interrupt)
 {
 	mi_interrupt &= ~interrupt;
 
@@ -334,9 +334,9 @@ static int sp_dma_skip;
 static UINT32 sp_semaphore;
 static UINT32 dp_clock = 0;
 
-static void sp_dma(running_machine *machine, int direction)
+static void sp_dma(running_machine &machine, int direction)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i, c;
 
 	if (sp_dma_length == 0)
@@ -430,7 +430,7 @@ static void sp_set_status(device_t *device, UINT32 status)
 {
 	if (status & 0x1)
 	{
-		//device->machine->scheduler().trigger(6789);
+		//device->machine().scheduler().trigger(6789);
 
 		device_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
         cpu_set_reg(device, RSP_SR, cpu_get_reg(device, RSP_SR) | RSP_STATUS_HALT);
@@ -443,7 +443,7 @@ static void sp_set_status(device_t *device, UINT32 status)
 
         if (cpu_get_reg(device, RSP_SR) & RSP_STATUS_INTR_BREAK)
 		{
-			signal_rcp_interrupt(device->machine, SP_INTERRUPT);
+			signal_rcp_interrupt(device->machine(), SP_INTERRUPT);
 		}
 	}
 }
@@ -524,14 +524,14 @@ WRITE32_DEVICE_HANDLER( n64_sp_reg_w )
 				sp_dma_length = data & 0xfff;
 				sp_dma_count = (data >> 12) & 0xff;
 				sp_dma_skip = (data >> 20) & 0xfff;
-				sp_dma(device->machine, 0);
+				sp_dma(device->machine(), 0);
 				break;
 
 			case 0x0c/4:		// SP_WR_LEN_REG
 				sp_dma_length = data & 0xfff;
 				sp_dma_count = (data >> 12) & 0xff;
 				sp_dma_skip = (data >> 20) & 0xfff;
-				sp_dma(device->machine, 1);
+				sp_dma(device->machine(), 1);
 				break;
 
             case 0x10/4:        // RSP_STATUS_REG
@@ -571,11 +571,11 @@ WRITE32_DEVICE_HANDLER( n64_sp_reg_w )
                 }
                 if (data & 0x00000008)      // clear interrupt
                 {
-                    clear_rcp_interrupt(device->machine, SP_INTERRUPT);
+                    clear_rcp_interrupt(device->machine(), SP_INTERRUPT);
                 }
                 if (data & 0x00000010)      // set interrupt
                 {
-                    signal_rcp_interrupt(device->machine, SP_INTERRUPT);
+                    signal_rcp_interrupt(device->machine(), SP_INTERRUPT);
                 }
                 if (data & 0x00000020)
                 {
@@ -725,14 +725,14 @@ WRITE32_DEVICE_HANDLER( n64_sp_reg_w )
 
 // RDP Interface
 
-void dp_full_sync(running_machine *machine)
+void dp_full_sync(running_machine &machine)
 {
 	signal_rcp_interrupt(machine, DP_INTERRUPT);
 }
 
 READ32_DEVICE_HANDLER( n64_dp_reg_r )
 {
-	_n64_state *state = device->machine->driver_data<_n64_state>();
+	_n64_state *state = device->machine().driver_data<_n64_state>();
 
 	//printf("%08x\n", offset);
 	switch (offset)
@@ -759,7 +759,7 @@ READ32_DEVICE_HANDLER( n64_dp_reg_r )
 
 WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 {
-	_n64_state *state = device->machine->driver_data<_n64_state>();
+	_n64_state *state = device->machine().driver_data<_n64_state>();
 
 	//printf("%08x: %08x\n", offset, data);
 	switch (offset)
@@ -819,9 +819,9 @@ static UINT32 n64_vi_burst, n64_vi_vsync,  n64_vi_hsync,  n64_vi_leap;
 static UINT32 n64_vi_intr,  n64_vi_vburst;
 
 
-static void n64_vi_recalculate_resolution(running_machine *machine)
+static void n64_vi_recalculate_resolution(running_machine &machine)
 {
-	_n64_state *state = machine->driver_data<_n64_state>();
+	_n64_state *state = machine.driver_data<_n64_state>();
 
     int x_start = (n64_vi_hstart & 0x03ff0000) >> 16;
     int x_end = n64_vi_hstart & 0x000003ff;
@@ -829,8 +829,8 @@ static void n64_vi_recalculate_resolution(running_machine *machine)
     int y_end = (n64_vi_vstart & 0x000003ff) / 2;
     int width = ((n64_vi_xscale & 0x00000fff) * (x_end - x_start)) / 0x400;
     int height = ((n64_vi_yscale & 0x00000fff) * (y_end - y_start)) / 0x400;
-    rectangle visarea = machine->primary_screen->visible_area();
-    attoseconds_t period = machine->primary_screen->frame_period().attoseconds;
+    rectangle visarea = machine.primary_screen->visible_area();
+    attoseconds_t period = machine.primary_screen->frame_period().attoseconds;
 
     if (width == 0 || height == 0)
     {
@@ -862,7 +862,7 @@ static void n64_vi_recalculate_resolution(running_machine *machine)
 
     visarea.max_x = width - 1;
     visarea.max_y = height - 1;
-    machine->primary_screen->configure(width, 525, visarea, period);
+    machine.primary_screen->configure(width, 525, visarea, period);
 }
 
 READ32_HANDLER( n64_vi_reg_r )
@@ -882,7 +882,7 @@ READ32_HANDLER( n64_vi_reg_r )
             return n64_vi_intr;
 
 		case 0x10/4:		// VI_CURRENT_REG
-			return space->machine->primary_screen->vpos();
+			return space->machine().primary_screen->vpos();
 
 		case 0x14/4:		// VI_BURST_REG
             return n64_vi_burst;
@@ -920,13 +920,13 @@ READ32_HANDLER( n64_vi_reg_r )
 
 WRITE32_HANDLER( n64_vi_reg_w )
 {
-	_n64_state *state = space->machine->driver_data<_n64_state>();
+	_n64_state *state = space->machine().driver_data<_n64_state>();
 
 	switch (offset)
 	{
 		case 0x00/4:		// VI_CONTROL_REG
             n64_vi_control = data;
-            n64_vi_recalculate_resolution(space->machine);
+            n64_vi_recalculate_resolution(space->machine());
 			break;
 
 		case 0x04/4:		// VI_ORIGIN_REG
@@ -936,7 +936,7 @@ WRITE32_HANDLER( n64_vi_reg_w )
 		case 0x08/4:		// VI_WIDTH_REG
             if (n64_vi_width != data && data > 0)
 			{
-                n64_vi_recalculate_resolution(space->machine);
+                n64_vi_recalculate_resolution(space->machine());
 			}
             n64_vi_width = data;
 		    state->m_rdp.GetMiscState()->m_fb_width = data;
@@ -947,7 +947,7 @@ WRITE32_HANDLER( n64_vi_reg_w )
 			break;
 
 		case 0x10/4:		// VI_CURRENT_REG
-			clear_rcp_interrupt(space->machine, VI_INTERRUPT);
+			clear_rcp_interrupt(space->machine(), VI_INTERRUPT);
 			break;
 
 		case 0x14/4:		// VI_BURST_REG
@@ -968,12 +968,12 @@ WRITE32_HANDLER( n64_vi_reg_w )
 
 		case 0x24/4:		// VI_H_START_REG
             n64_vi_hstart = data;
-            n64_vi_recalculate_resolution(space->machine);
+            n64_vi_recalculate_resolution(space->machine());
 			break;
 
 		case 0x28/4:		// VI_V_START_REG
             n64_vi_vstart = data;
-            n64_vi_recalculate_resolution(space->machine);
+            n64_vi_recalculate_resolution(space->machine());
 			break;
 
 		case 0x2c/4:		// VI_V_BURST_REG
@@ -982,12 +982,12 @@ WRITE32_HANDLER( n64_vi_reg_w )
 
 		case 0x30/4:		// VI_X_SCALE_REG
             n64_vi_xscale = data;
-            n64_vi_recalculate_resolution(space->machine);
+            n64_vi_recalculate_resolution(space->machine());
 			break;
 
 		case 0x34/4:		// VI_Y_SCALE_REG
             n64_vi_yscale = data;
-            n64_vi_recalculate_resolution(space->machine);
+            n64_vi_recalculate_resolution(space->machine());
 			break;
 
         /*
@@ -1016,7 +1016,7 @@ static emu_timer *audio_timer;
 
 #define AUDIO_DMA_DEPTH     2
 
-static void start_audio_dma(running_machine *machine);
+static void start_audio_dma(running_machine &machine);
 
 typedef struct
 {
@@ -1029,7 +1029,7 @@ static int audio_fifo_wpos = 0;
 static int audio_fifo_rpos = 0;
 static int audio_fifo_num = 0;
 
-static void audio_fifo_push(running_machine *machine, UINT32 address, UINT32 length)
+static void audio_fifo_push(running_machine &machine, UINT32 address, UINT32 length)
 {
     AUDIO_DMA *current;
 
@@ -1064,7 +1064,7 @@ static void audio_fifo_push(running_machine *machine, UINT32 address, UINT32 len
     }
 }
 
-static void audio_fifo_pop(running_machine *machine)
+static void audio_fifo_pop(running_machine &machine)
 {
     audio_fifo_rpos++;
     audio_fifo_num--;
@@ -1100,7 +1100,7 @@ static AUDIO_DMA *audio_fifo_get_top(void)
 
 #define N64_ATTOTIME_NORMALIZE(a)   do { while ((a).attoseconds >= ATTOSECONDS_PER_SECOND) { (a).seconds++; (a).attoseconds -= ATTOSECONDS_PER_SECOND; } } while (0)
 
-static void start_audio_dma(running_machine *machine)
+static void start_audio_dma(running_machine &machine)
 {
     INT16 *ram = (INT16*)rdram;
     AUDIO_DMA *current = audio_fifo_get_top();
@@ -1117,8 +1117,8 @@ static void start_audio_dma(running_machine *machine)
 
 //  mame_printf_debug("DACDMA: %x for %x bytes\n", current->address, current->length);
 
-	dmadac[0] = machine->device<dmadac_sound_device>("dac1");
-	dmadac[1] = machine->device<dmadac_sound_device>("dac2");
+	dmadac[0] = machine.device<dmadac_sound_device>("dac1");
+	dmadac[1] = machine.device<dmadac_sound_device>("dac2");
     dmadac_transfer(&dmadac[0], 2, 1, 2, current->length/4, ram);
 
     ai_status |= 0x40000000;
@@ -1156,7 +1156,7 @@ READ32_HANDLER( n64_ai_reg_r )
             }
             else if (ai_status & 0x40000000)
             {
-                double secs_left = (audio_timer->expire() - space->machine->time()).as_double();
+                double secs_left = (audio_timer->expire() - space->machine().time()).as_double();
                 unsigned int samples_left = secs_left * DACRATE_NTSC / (ai_dacrate + 1);
                 return samples_left * 4;
             }
@@ -1188,7 +1188,7 @@ WRITE32_HANDLER( n64_ai_reg_w )
         case 0x04/4:        // AI_LEN_REG
 //          mame_printf_debug("ai_len = %08X at %08X\n", data, cpu_get_pc(space->cpu));
             ai_len = data & 0x3ffff;        // Hardware v2.0 has 18 bits, v1.0 has 15 bits
-            audio_fifo_push(space->machine, ai_dram_addr, ai_len);
+            audio_fifo_push(space->machine(), ai_dram_addr, ai_len);
             break;
 
         case 0x08/4:        // AI_CONTROL_REG
@@ -1197,7 +1197,7 @@ WRITE32_HANDLER( n64_ai_reg_w )
             break;
 
         case 0x0c/4:
-            clear_rcp_interrupt(space->machine, AI_INTERRUPT);
+            clear_rcp_interrupt(space->machine(), AI_INTERRUPT);
             break;
 
         case 0x10/4:        // AI_DACRATE_REG
@@ -1319,7 +1319,7 @@ WRITE32_HANDLER( n64_pi_reg_w )
 				}
 			}
 
-			signal_rcp_interrupt(space->machine, PI_INTERRUPT);
+			signal_rcp_interrupt(space->machine(), PI_INTERRUPT);
 			break;
 		}
 
@@ -1351,7 +1351,7 @@ WRITE32_HANDLER( n64_pi_reg_w )
 					pi_dram_addr += 1;
 				}
 			}
-			signal_rcp_interrupt(space->machine, PI_INTERRUPT);
+			signal_rcp_interrupt(space->machine(), PI_INTERRUPT);
 
 			if (pi_first_dma)
 			{
@@ -1368,7 +1368,7 @@ WRITE32_HANDLER( n64_pi_reg_w )
 		{
 			if (data & 0x2)
 			{
-				clear_rcp_interrupt(space->machine, PI_INTERRUPT);
+				clear_rcp_interrupt(space->machine(), PI_INTERRUPT);
 			}
 			break;
 		}
@@ -1553,7 +1553,7 @@ static UINT8 calc_mempack_crc(UINT8 *buffer, int length)
 	return crc;
 }
 
-static int pif_channel_handle_command(running_machine *machine, int channel, int slength, UINT8 *sdata, int rlength, UINT8 *rdata)
+static int pif_channel_handle_command(running_machine &machine, int channel, int slength, UINT8 *sdata, int rlength, UINT8 *rdata)
 {
 	int i;
 	UINT8 command = sdata[0];
@@ -1783,7 +1783,7 @@ static int pif_channel_handle_command(running_machine *machine, int channel, int
 	return 0;
 }
 
-static void handle_pif(running_machine *machine)
+static void handle_pif(running_machine &machine)
 {
 	int j;
 
@@ -1875,7 +1875,7 @@ static void handle_pif(running_machine *machine)
     */
 }
 
-static void pif_dma(running_machine *machine, int direction)
+static void pif_dma(running_machine &machine, int direction)
 {
 	int i;
 	UINT32 *src, *dst;
@@ -1948,19 +1948,19 @@ WRITE32_HANDLER( n64_si_reg_w )
 			// PIF RAM -> RDRAM
 			si_pif_addr = data;
             si_pif_addr_rd64b = data;
-            pif_dma(space->machine, 0);
+            pif_dma(space->machine(), 0);
 			break;
 
 		case 0x10/4:		// SI_PIF_ADDR_WR64B_REG
 			// RDRAM -> PIF RAM
 			si_pif_addr = data;
             si_pif_addr_wr64b = data;
-            pif_dma(space->machine, 1);
+            pif_dma(space->machine(), 1);
 			break;
 
 		case 0x18/4:		// SI_STATUS_REG
 			si_status &= ~0x1000;
-			clear_rcp_interrupt(space->machine, SI_INTERRUPT);
+			clear_rcp_interrupt(space->machine(), SI_INTERRUPT);
 			break;
 
 		default:
@@ -2008,28 +2008,28 @@ WRITE32_HANDLER( n64_pif_ram_w )
         pif_ram[offset*4+3] = ( data >>  0 ) & 0x000000ff;
     }
 
-    signal_rcp_interrupt(space->machine, SI_INTERRUPT);
+    signal_rcp_interrupt(space->machine(), SI_INTERRUPT);
 }
 
 //static UINT16 crc_seed = 0x3f;
 
 MACHINE_START( n64 )
 {
-	mips3drc_set_options(machine->device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine->device("maincpu"), 0x00000000, 0x007fffff, FALSE, rdram);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x007fffff, FALSE, rdram);
 
-	rspdrc_set_options(machine->device("rsp"), RSPDRC_STRICT_VERIFY);
-	rspdrc_flush_drc_cache(machine->device("rsp"));
+	rspdrc_set_options(machine.device("rsp"), RSPDRC_STRICT_VERIFY);
+	rspdrc_flush_drc_cache(machine.device("rsp"));
 
-	audio_timer = machine->scheduler().timer_alloc(FUNC(audio_timer_callback));
+	audio_timer = machine.scheduler().timer_alloc(FUNC(audio_timer_callback));
 }
 
 MACHINE_RESET( n64 )
 {
 	int i;
-	UINT32 *cart = (UINT32*)machine->region("user2")->base();
+	UINT32 *cart = (UINT32*)machine.region("user2")->base();
 	UINT64 boot_checksum;
 
 	mi_version = 0;

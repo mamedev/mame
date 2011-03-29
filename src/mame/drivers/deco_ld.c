@@ -124,9 +124,9 @@ public:
 
 static SCREEN_UPDATE( rblaster )
 {
-	deco_ld_state *state = screen->machine->driver_data<deco_ld_state>();
+	deco_ld_state *state = screen->machine().driver_data<deco_ld_state>();
 	UINT8 *videoram = state->videoram;
-	const gfx_element *gfx = screen->machine->gfx[0];
+	const gfx_element *gfx = screen->machine().gfx[0];
 	int count = 0x0000;
 
 	int y,x;
@@ -150,19 +150,19 @@ static SCREEN_UPDATE( rblaster )
 static WRITE8_HANDLER( rblaster_sound_w )
 {
 	soundlatch_w(space,0,data);
-	device_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	device_set_input_line(space->machine().cpu[1], 0, HOLD_LINE);
 }
 #endif
 
 static WRITE8_HANDLER( rblaster_vram_bank_w )
 {
-	deco_ld_state *state = space->machine->driver_data<deco_ld_state>();
+	deco_ld_state *state = space->machine().driver_data<deco_ld_state>();
 	state->vram_bank = data;
 }
 
 static READ8_HANDLER( laserdisc_r )
 {
-	deco_ld_state *state = space->machine->driver_data<deco_ld_state>();
+	deco_ld_state *state = space->machine().driver_data<deco_ld_state>();
 	UINT8 result = laserdisc_data_r(state->laserdisc);
 	mame_printf_debug("laserdisc_r = %02X\n", result);
 	return result;
@@ -171,13 +171,13 @@ static READ8_HANDLER( laserdisc_r )
 
 static WRITE8_HANDLER( laserdisc_w )
 {
-	deco_ld_state *state = space->machine->driver_data<deco_ld_state>();
+	deco_ld_state *state = space->machine().driver_data<deco_ld_state>();
 	state->laserdisc_data = data;
 }
 
 static READ8_HANDLER( test_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static ADDRESS_MAP_START( begas_map, AS_PROGRAM, 8 )
@@ -237,14 +237,14 @@ ADDRESS_MAP_END
 #ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( nmimask_w )
 {
-	deco_ld_state *state = space->machine->driver_data<deco_ld_state>();
+	deco_ld_state *state = space->machine().driver_data<deco_ld_state>();
 	state->nmimask = data & 0x80;
 }
 #endif
 
 static INTERRUPT_GEN ( sound_interrupt )
 {
-	deco_ld_state *state = device->machine->driver_data<deco_ld_state>();
+	deco_ld_state *state = device->machine().driver_data<deco_ld_state>();
 	if (!state->nmimask) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -510,8 +510,8 @@ GFXDECODE_END
 
 static MACHINE_START( rblaster )
 {
-	deco_ld_state *state = machine->driver_data<deco_ld_state>();
-	state->laserdisc = machine->device("laserdisc");
+	deco_ld_state *state = machine.driver_data<deco_ld_state>();
+	state->laserdisc = machine.device("laserdisc");
 }
 
 static MACHINE_CONFIG_START( rblaster, deco_ld_state )

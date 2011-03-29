@@ -95,7 +95,7 @@ INLINE void WRITE32(ssem_state *cpustate, UINT32 address, UINT32 data)
 
 static void unimplemented_opcode(ssem_state *cpustate, UINT32 op)
 {
-    if((cpustate->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+    if((cpustate->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
     {
         char string[200];
         ssem_dasm_one(string, cpustate->pc-1, op);

@@ -27,11 +27,11 @@ SCREEN_UPDATE(system24)
 	int order[12], spri[4];
 
 	if(sys24_mixer_get_reg(13) & 1) {
-		bitmap_fill(bitmap, 0, get_black_pen(screen->machine));
+		bitmap_fill(bitmap, 0, get_black_pen(screen->machine()));
 		return 0;
 	}
 
-	bitmap_fill(screen->machine->priority_bitmap, 0, 0);
+	bitmap_fill(screen->machine().priority_bitmap, 0, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 	for(i=0; i<12; i++)
@@ -41,12 +41,12 @@ SCREEN_UPDATE(system24)
 	level = 0;
 	for(i=0; i<12; i++)
 		if(order[i] < 8)
-			sys24_tile_draw(screen->machine, bitmap, cliprect, order[i], level, 0);
+			sys24_tile_draw(screen->machine(), bitmap, cliprect, order[i], level, 0);
 		else {
 			spri[order[i]-8] = level;
 			level++;
 		}
 
-	sys24_sprite_draw(screen->machine, bitmap, cliprect, spri);
+	sys24_sprite_draw(screen->machine(), bitmap, cliprect, spri);
 	return 0;
 }

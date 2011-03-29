@@ -78,7 +78,7 @@ READ16_HANDLER( dbzvrvs_protection_r );
 WRITE16_HANDLER( dbzvrvs_protection_w );
 
 extern const UINT8 ga2_v25_opcode_table[];
-void decrypt_ga2_protrom(running_machine *machine);
+void decrypt_ga2_protrom(running_machine &machine);
 READ16_HANDLER( ga2_dpram_r );
 WRITE16_HANDLER( ga2_dpram_w );
 
@@ -94,7 +94,7 @@ VIDEO_START(system32);
 VIDEO_START(multi32);
 SCREEN_UPDATE(system32);
 SCREEN_UPDATE(multi32);
-void system32_set_vblank(running_machine *machine, int state);
+void system32_set_vblank(running_machine &machine, int state);
 
 READ16_HANDLER( system32_videoram_r );
 WRITE16_HANDLER( system32_videoram_w );

@@ -88,5 +88,5 @@ SCREEN_UPDATE( irobot );
 
 WRITE8_HANDLER( irobot_paletteram_w );
 
-void irobot_poly_clear(running_machine *machine);
-void irobot_run_video(running_machine *machine);
+void irobot_poly_clear(running_machine &machine);
+void irobot_run_video(running_machine &machine);

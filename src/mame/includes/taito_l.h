@@ -19,7 +19,7 @@ public:
 	int flipscreen;
 
 	/* misc */
-	void (*current_notifier[4])(running_machine *, int);
+	void (*current_notifier[4])(running_machine &, int);
 	UINT8 *current_base[4];
 
 	int cur_rombank, cur_rombank2, cur_rambank[4];
@@ -60,18 +60,18 @@ SCREEN_EOF( taitol );
 VIDEO_START( taitol );
 SCREEN_UPDATE( taitol );
 
-void taitol_chardef14_m(running_machine *machine, int offset);
-void taitol_chardef15_m(running_machine *machine, int offset);
-void taitol_chardef16_m(running_machine *machine, int offset);
-void taitol_chardef17_m(running_machine *machine, int offset);
-void taitol_chardef1c_m(running_machine *machine, int offset);
-void taitol_chardef1d_m(running_machine *machine, int offset);
-void taitol_chardef1e_m(running_machine *machine, int offset);
-void taitol_chardef1f_m(running_machine *machine, int offset);
-void taitol_bg18_m(running_machine *machine, int offset);
-void taitol_bg19_m(running_machine *machine, int offset);
-void taitol_char1a_m(running_machine *machine, int offset);
-void taitol_obj1b_m(running_machine *machine, int offset);
+void taitol_chardef14_m(running_machine &machine, int offset);
+void taitol_chardef15_m(running_machine &machine, int offset);
+void taitol_chardef16_m(running_machine &machine, int offset);
+void taitol_chardef17_m(running_machine &machine, int offset);
+void taitol_chardef1c_m(running_machine &machine, int offset);
+void taitol_chardef1d_m(running_machine &machine, int offset);
+void taitol_chardef1e_m(running_machine &machine, int offset);
+void taitol_chardef1f_m(running_machine &machine, int offset);
+void taitol_bg18_m(running_machine &machine, int offset);
+void taitol_bg19_m(running_machine &machine, int offset);
+void taitol_char1a_m(running_machine &machine, int offset);
+void taitol_obj1b_m(running_machine &machine, int offset);
 
 WRITE8_HANDLER( taitol_control_w );
 READ8_HANDLER( taitol_control_r );

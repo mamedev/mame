@@ -19,7 +19,7 @@
 
 static INTERRUPT_GEN( labyrunr_interrupt )
 {
-	labyrunr_state *state = device->machine->driver_data<labyrunr_state>();
+	labyrunr_state *state = device->machine().driver_data<labyrunr_state>();
 
 	if (cpu_getiloops(device) == 0)
 	{
@@ -38,11 +38,11 @@ static WRITE8_HANDLER( labyrunr_bankswitch_w )
 	if (data & 0xe0) popmessage("bankswitch %02x", data);
 
 	/* bits 0-2 = bank number */
-	memory_set_bank(space->machine, "bank1", data & 0x07);	// shall we check if data&7 > #banks?
+	memory_set_bank(space->machine(), "bank1", data & 0x07);	// shall we check if data&7 > #banks?
 
 	/* bits 3 and 4 are coin counters */
-	coin_counter_w(space->machine, 0, data & 0x08);
-	coin_counter_w(space->machine, 1, data & 0x10);
+	coin_counter_w(space->machine(), 0, data & 0x08);
+	coin_counter_w(space->machine(), 1, data & 0x10);
 }
 
 static ADDRESS_MAP_START( labyrunr_map, AS_PROGRAM, 8 )
@@ -185,12 +185,12 @@ static const ym2203_interface ym2203_interface_2 =
 
 static MACHINE_START( labyrunr )
 {
-	labyrunr_state *state = machine->driver_data<labyrunr_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	labyrunr_state *state = machine.driver_data<labyrunr_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
 
-	state->k007121 = machine->device("k007121");
+	state->k007121 = machine.device("k007121");
 }
 
 static MACHINE_CONFIG_START( labyrunr, labyrunr_state )

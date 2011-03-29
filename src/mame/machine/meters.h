@@ -19,7 +19,7 @@
 
 #define METERREACTTIME 0.025 // number of seconds meter has to be active to tick
 
-void MechMtr_config(running_machine *machine, int number);
+void MechMtr_config(running_machine &machine, int number);
 
 int  MechMtr_GetNumberMeters(void);
 

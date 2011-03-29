@@ -108,7 +108,7 @@ static void draw_mode3 (device_t *screen, bitmap_t *bitmap, const rectangle *cli
 static void draw_mode23 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
 static void draw_modebogus (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
 static void draw_sprites (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void change_register (running_machine *machine, int reg, UINT8 data);
+static void change_register (running_machine &machine, int reg, UINT8 data);
 
 static void (*const ModeHandlers[])(device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) = {
         draw_mode0, draw_mode1, draw_mode2,  draw_mode12,
@@ -139,7 +139,7 @@ typedef struct {
     INT32 Addr;
     int colour,pattern,nametbl,spriteattribute,spritepattern;
     int colourmask,patternmask;
-    void (*INTCallback)(running_machine *, int);
+    void (*INTCallback)(running_machine &, int);
     /* memory */
     UINT8 *vMem, *dBackMem;
     bitmap_t *tmpbmp;
@@ -176,7 +176,7 @@ void TMS9928A_reset () {
 	tms.latch = 0;
 }
 
-static void TMS9928A_start (running_machine *machine, const TMS9928a_interface *intf)
+static void TMS9928A_start (running_machine &machine, const TMS9928a_interface *intf)
 {
     assert_always(((intf->vram == 0x1000) || (intf->vram == 0x2000) || (intf->vram == 0x4000)), "4, 8 or 16 kB vram please");
 
@@ -194,9 +194,9 @@ static void TMS9928A_start (running_machine *machine, const TMS9928a_interface *
 	tms.visarea.max_y = tms.top_border + 24*8 - 1 + MIN(intf->bordery, tms.bottom_border);
 
 	/* configure the screen if we weren't overridden */
-	if (machine->primary_screen->width() == LEFT_BORDER+32*8+RIGHT_BORDER &&
-	    machine->primary_screen->height() == TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ)
-		machine->primary_screen->configure(LEFT_BORDER + 32*8 + RIGHT_BORDER, tms.top_border + 24*8 + tms.bottom_border, tms.visarea, machine->primary_screen->frame_period().attoseconds);
+	if (machine.primary_screen->width() == LEFT_BORDER+32*8+RIGHT_BORDER &&
+	    machine.primary_screen->height() == TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ)
+		machine.primary_screen->configure(LEFT_BORDER + 32*8 + RIGHT_BORDER, tms.top_border + 24*8 + tms.bottom_border, tms.visarea, machine.primary_screen->frame_period().attoseconds);
 
     /* Video RAM */
     tms.vramsize = intf->vram;
@@ -206,7 +206,7 @@ static void TMS9928A_start (running_machine *machine, const TMS9928a_interface *
     tms.dBackMem = auto_alloc_array(machine, UINT8, IMAGE_SIZE);
 
     /* back bitmap */
-    tms.tmpbmp = auto_bitmap_alloc (machine, 256, 192, machine->primary_screen->format());
+    tms.tmpbmp = auto_bitmap_alloc (machine, 256, 192, machine.primary_screen->format());
 
     TMS9928A_reset ();
     tms.LimitSprites = 1;
@@ -233,7 +233,7 @@ const rectangle *TMS9928A_get_visarea (void)
 }
 
 
-void TMS9928A_post_load (running_machine *machine) {
+void TMS9928A_post_load (running_machine &machine) {
 	int i;
 
 	/* all registers need to be re-written, so tables are recalculated */
@@ -271,7 +271,7 @@ READ8_HANDLER (TMS9928A_register_r) {
     tms.StatusReg = 0x1f;
     if (tms.INT) {
         tms.INT = 0;
-        if (tms.INTCallback) tms.INTCallback (space->machine, tms.INT);
+        if (tms.INTCallback) tms.INTCallback (space->machine(), tms.INT);
     }
     tms.latch = 0;
     return b;
@@ -287,7 +287,7 @@ WRITE8_HANDLER (TMS9928A_register_w) {
 		if (data & 0x80) {
 			/* register write */
 			reg = data & 7;
-			change_register (space->machine, reg, tms.Addr & 0xff);
+			change_register (space->machine(), reg, tms.Addr & 0xff);
 		} else {
 			if ( !(data & 0x40) ) {
 				/* read ahead */
@@ -302,7 +302,7 @@ WRITE8_HANDLER (TMS9928A_register_w) {
 	}
 }
 
-static void change_register (running_machine *machine, int reg, UINT8 val) {
+static void change_register (running_machine &machine, int reg, UINT8 val) {
     static const UINT8 Mask[8] =
         { 0x03, 0xfb, 0x0f, 0xff, 0x07, 0x7f, 0x07, 0xff };
     static const char *const modes[] = {
@@ -393,15 +393,15 @@ void TMS9928A_set_spriteslimit (int limit) {
 SCREEN_UPDATE( tms9928a )
 {
     INT32 BackColour = tms.Regs[7] & 15;
-    rgb_t oldcolor = palette_get_color(screen->machine, 0);
+    rgb_t oldcolor = palette_get_color(screen->machine(), 0);
 
 	if (!BackColour) BackColour=1;
 	/* note we preserve the alpha here; this is so that it can be controlled independently */
 	/* see cliffhgr.c for an example */
-    palette_set_color(screen->machine, 0, (TMS9928A_palette[BackColour] & MAKE_ARGB(0,255,255,255)) | (oldcolor & MAKE_ARGB(255,0,0,0)));
+    palette_set_color(screen->machine(), 0, (TMS9928A_palette[BackColour] & MAKE_ARGB(0,255,255,255)) | (oldcolor & MAKE_ARGB(255,0,0,0)));
 
 	if (! (tms.Regs[1] & 0x40))
-		bitmap_fill(bitmap, cliprect, screen->machine->pens[BackColour]);
+		bitmap_fill(bitmap, cliprect, screen->machine().pens[BackColour]);
 	else
 	{
 		(*ModeHandlers[TMS_MODE])(screen, tms.tmpbmp, cliprect);
@@ -430,13 +430,13 @@ SCREEN_UPDATE( tms9928a )
 	return 0;
 }
 
-int TMS9928A_interrupt(running_machine *machine) {
+int TMS9928A_interrupt(running_machine &machine) {
     int b;
 
     /* when skipping frames, calculate sprite collision */
-    if (machine->video().skip_this_frame()) {
+    if (machine.video().skip_this_frame()) {
 		if (TMS_SPRITES_ENABLED) {
-			draw_sprites (machine->primary_screen, NULL, NULL);
+			draw_sprites (machine.primary_screen, NULL, NULL);
 		}
     }
 
@@ -456,7 +456,7 @@ static void draw_mode1 (device_t *screen, bitmap_t *bitmap, const rectangle *cli
     rectangle rt;
     const pen_t *pens;
 
-    pens = screen->machine->pens;
+    pens = screen->machine().pens;
     fg = pens[tms.Regs[7] / 16];
     bg = pens[tms.Regs[7] & 15];
 
@@ -491,7 +491,7 @@ static void draw_mode12 (device_t *screen, bitmap_t *bitmap, const rectangle *cl
     const pen_t *pens;
     rectangle rt;
 
-    pens = screen->machine->pens;
+    pens = screen->machine().pens;
     fg = pens[tms.Regs[7] / 16];
     bg = pens[tms.Regs[7] & 15];
 
@@ -525,7 +525,7 @@ static void draw_mode0 (device_t *screen, bitmap_t *bitmap, const rectangle *cli
     UINT8 fg,bg,*patternptr;
     const pen_t *pens;
 
-    pens = screen->machine->pens;
+    pens = screen->machine().pens;
     name = 0;
     for (y=0;y<24;y++) {
         for (x=0;x<32;x++) {
@@ -552,7 +552,7 @@ static void draw_mode2 (device_t *screen, bitmap_t *bitmap, const rectangle *cli
     const pen_t *pens;
     UINT8 *colourptr,*patternptr;
 
-    pens = screen->machine->pens;
+    pens = screen->machine().pens;
     name = 0;
     for (y=0;y<24;y++) {
         for (x=0;x<32;x++) {
@@ -581,7 +581,7 @@ static void draw_mode3 (device_t *screen, bitmap_t *bitmap, const rectangle *cli
     UINT8 fg,bg,*patternptr;
     const pen_t *pens;
 
-    pens = screen->machine->pens;
+    pens = screen->machine().pens;
     name = 0;
     for (y=0;y<24;y++) {
         for (x=0;x<32;x++) {
@@ -611,7 +611,7 @@ static void draw_mode23 (device_t *screen, bitmap_t *bitmap, const rectangle *cl
     UINT8 fg,bg,*patternptr;
     const pen_t *pens;
 
-    pens = screen->machine->pens;
+    pens = screen->machine().pens;
     name = 0;
     for (y=0;y<24;y++) {
         for (x=0;x<32;x++) {
@@ -642,7 +642,7 @@ static void draw_modebogus (device_t *screen, bitmap_t *bitmap, const rectangle 
     int x,y,n,xx;
     const pen_t *pens;
 
-    pens = screen->machine->pens;
+    pens = screen->machine().pens;
     fg = pens[tms.Regs[7] / 16];
     bg = pens[tms.Regs[7] & 15];
 
@@ -673,7 +673,7 @@ static void draw_sprites (device_t *screen, bitmap_t *bitmap, const rectangle *c
     UINT16 line,line2;
     const pen_t *pens;
 
-    pens = screen->machine->pens;
+    pens = screen->machine().pens;
     attributeptr = tms.vMem + tms.spriteattribute;
     size = (tms.Regs[1] & 2) ? 16 : 8;
     large = (int)(tms.Regs[1] & 1);

@@ -17,7 +17,7 @@ public:
 	UINT8 *  ddenlovr_pixmap[8];
 
 	/* irq */
-	void (*update_irq_func)(running_machine *machine);	// some games trigger IRQ at blitter end, some don't
+	void (*update_irq_func)(running_machine &machine);	// some games trigger IRQ at blitter end, some don't
 	UINT8 sound_irq;
 	UINT8 vblank_irq;
 	UINT8 blitter_irq, blitter2_irq;
@@ -129,10 +129,10 @@ public:
 
 //----------- defined in drivers/dynax.c -----------
 
-void sprtmtch_update_irq(running_machine *machine);
-void jantouki_update_irq(running_machine *machine);
-void mjelctrn_update_irq(running_machine *machine);
-void neruton_update_irq(running_machine *machine);
+void sprtmtch_update_irq(running_machine &machine);
+void jantouki_update_irq(running_machine &machine);
+void mjelctrn_update_irq(running_machine &machine);
+void neruton_update_irq(running_machine &machine);
 
 //----------- defined in video/dynax.c -----------
 

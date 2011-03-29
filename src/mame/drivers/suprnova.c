@@ -332,7 +332,7 @@ static READ32_HANDLER( skns_hit_r )
 	switch(adr) {
 	case 0x28:
 	case 0x2a:
-		return (UINT16)space->machine->rand();
+		return (UINT16)space->machine().rand();
 	case 0x00:
 	case 0x10:
 		return (UINT16)hit.x_in;
@@ -414,12 +414,12 @@ static READ32_HANDLER( skns_hit_r )
 
 static TIMER_DEVICE_CALLBACK( interrupt_callback )
 {
-	cputag_set_input_line(timer.machine, "maincpu", param, HOLD_LINE);
+	cputag_set_input_line(timer.machine(), "maincpu", param, HOLD_LINE);
 }
 
 static MACHINE_RESET(skns)
 {
-	memory_set_bankptr(machine, "bank1",machine->region("user1")->base());
+	memory_set_bankptr(machine, "bank1",machine.region("user1")->base());
 }
 
 
@@ -450,7 +450,7 @@ static INTERRUPT_GEN(skns_interrupt)
 static CUSTOM_INPUT( paddle_r )
 {
 	const char *tag = (const char *)param;
-	return input_port_read(field->port->machine, tag);
+	return input_port_read(field->port->machine(), tag);
 }
 
 static INPUT_PORTS_START( skns )		/* 3 buttons, 2 players */
@@ -610,10 +610,10 @@ static WRITE32_HANDLER( skns_io_w )
 	case 2:
 		if(ACCESSING_BITS_24_31)
 		{ /* Coin Lock/Count */
-//          coin_counter_w(space->machine, 0, data & 0x01000000);
-//          coin_counter_w(space->machine, 1, data & 0x02000000);
-//          coin_lockout_w(space->machine, 0, ~data & 0x04000000);
-//          coin_lockout_w(space->machine, 1, ~data & 0x08000000); // Works in puzzloop, others behave strange.
+//          coin_counter_w(space->machine(), 0, data & 0x01000000);
+//          coin_counter_w(space->machine(), 1, data & 0x02000000);
+//          coin_lockout_w(space->machine(), 0, ~data & 0x04000000);
+//          coin_lockout_w(space->machine(), 1, ~data & 0x08000000); // Works in puzzloop, others behave strange.
 		}
 		if(ACCESSING_BITS_16_23)
 		{ /* Analogue Input Select */
@@ -629,27 +629,27 @@ static WRITE32_HANDLER( skns_io_w )
 		if(ACCESSING_BITS_8_15)
 		{ /* Interrupt Clear, do we need these? */
 /*          if(data&0x01)
-                cputag_set_input_line(space->machine, "maincpu",1,CLEAR_LINE);
+                cputag_set_input_line(space->machine(), "maincpu",1,CLEAR_LINE);
             if(data&0x02)
-                cputag_set_input_line(space->machine, "maincpu",3,CLEAR_LINE);
+                cputag_set_input_line(space->machine(), "maincpu",3,CLEAR_LINE);
             if(data&0x04)
-                cputag_set_input_line(space->machine, "maincpu",5,CLEAR_LINE);
+                cputag_set_input_line(space->machine(), "maincpu",5,CLEAR_LINE);
             if(data&0x08)
-                cputag_set_input_line(space->machine, "maincpu",7,CLEAR_LINE);
+                cputag_set_input_line(space->machine(), "maincpu",7,CLEAR_LINE);
             if(data&0x10)
-                cputag_set_input_line(space->machine, "maincpu",9,CLEAR_LINE);
+                cputag_set_input_line(space->machine(), "maincpu",9,CLEAR_LINE);
             if(data&0x20)
-                cputag_set_input_line(space->machine, "maincpu",0xb,CLEAR_LINE);
+                cputag_set_input_line(space->machine(), "maincpu",0xb,CLEAR_LINE);
             if(data&0x40)
-                cputag_set_input_line(space->machine, "maincpu",0xd,CLEAR_LINE);
+                cputag_set_input_line(space->machine(), "maincpu",0xd,CLEAR_LINE);
             if(data&0x80)
-                cputag_set_input_line(space->machine, "maincpu",0xf,CLEAR_LINE);*/
+                cputag_set_input_line(space->machine(), "maincpu",0xf,CLEAR_LINE);*/
 
 			/* idle skip for vblokbrk/sarukani, i can't find a better place to put it :-( but i think it works ok unless its making the game too fast */
 			if (cpu_get_pc(space->cpu)==0x04013B42)
 			{
-				if (!strcmp(space->machine->system().name,"vblokbrk") ||
-					!strcmp(space->machine->system().name,"sarukani"))
+				if (!strcmp(space->machine().system().name,"vblokbrk") ||
+					!strcmp(space->machine().system().name,"sarukani"))
 					device_spin_until_interrupt(space->cpu);
 			}
 
@@ -671,7 +671,7 @@ static READ32_HANDLER( skns_msm6242_r )
 	system_time systime;
 	long value;
 
-	space->machine->base_datetime(systime);
+	space->machine().base_datetime(systime);
 	// The clock is not y2k-compatible, wrap back 10 years, screw the leap years
 	//  tm->tm_year -= 10;
 
@@ -709,12 +709,12 @@ static READ32_HANDLER( skns_msm6242_r )
 
 static WRITE32_HANDLER( skns_v3t_w )
 {
-	UINT8 *btiles = space->machine->region("gfx3")->base();
+	UINT8 *btiles = space->machine().region("gfx3")->base();
 
 	COMBINE_DATA(&skns_v3t_ram[offset]);
 
-	gfx_element_mark_dirty(space->machine->gfx[1], offset/0x40);
-	gfx_element_mark_dirty(space->machine->gfx[3], offset/0x20);
+	gfx_element_mark_dirty(space->machine().gfx[1], offset/0x40);
+	gfx_element_mark_dirty(space->machine().gfx[3], offset/0x20);
 
 	data = skns_v3t_ram[offset];
 // i think we need to swap around to decode .. endian issues?
@@ -960,39 +960,39 @@ static READ32_HANDLER( sengekij_speedup_r ) // 60006ee  600308e
 	return skns_main_ram[0xb7380/4];
 }
 
-static void init_skns(running_machine *machine)
+static void init_skns(running_machine &machine)
 {
 	// init DRC to fastest options
-	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 
-	sh2drc_add_pcflush(machine->device("maincpu"), 0x6f8);
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6000028, 0x600002b, FUNC(bios_skip_r) );
+	sh2drc_add_pcflush(machine.device("maincpu"), 0x6f8);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6000028, 0x600002b, FUNC(bios_skip_r) );
 }
 
-static void set_drc_pcflush(running_machine *machine, UINT32 addr)
+static void set_drc_pcflush(running_machine &machine, UINT32 addr)
 {
-	sh2drc_add_pcflush(machine->device("maincpu"), addr);
+	sh2drc_add_pcflush(machine.device("maincpu"), addr);
 }
 
-static DRIVER_INIT( galpani4 ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-5,-1); init_skns(machine);  }
-static DRIVER_INIT( galpanis ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-5,-1); init_skns(machine);  }
-static DRIVER_INIT( cyvern )   { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+0,+2); init_skns(machine); machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x604d3c8, 0x604d3cb, FUNC(cyvern_speedup_r) );  set_drc_pcflush(machine, 0x402ebd2);  }
-static DRIVER_INIT( galpans2 ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns(machine); machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60fb6bc, 0x60fb6bf, FUNC(galpans2_speedup_r) ); set_drc_pcflush(machine, 0x4049ae2); }
-static DRIVER_INIT( gutsn )    { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+0,+0); init_skns(machine); machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x600c780, 0x600c783, FUNC(gutsn_speedup_r) ); set_drc_pcflush(machine, 0x402206e); }
-static DRIVER_INIT( panicstr ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns(machine); machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60f19e4, 0x60f19e7, FUNC(panicstr_speedup_r) ); set_drc_pcflush(machine, 0x404e68a);  }
-static DRIVER_INIT( senknow )  { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+1,+1); init_skns(machine); machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60000dc, 0x60000df, FUNC(senknow_speedup_r) ); set_drc_pcflush(machine, 0x4017dce);  }
-static DRIVER_INIT( puzzloop ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6081d38, 0x6081d3b, FUNC(puzzloop_speedup_r) ); set_drc_pcflush(machine, 0x401da14); }
-static DRIVER_INIT( puzzloopj ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6086714, 0x6086717, FUNC(puzzloopj_speedup_r) ); set_drc_pcflush(machine, 0x401dca0); }
-static DRIVER_INIT( puzzloopa ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6085bcc, 0x6085bcf, FUNC(puzzloopa_speedup_r) ); set_drc_pcflush(machine, 0x401d9d4); }
-static DRIVER_INIT( puzzloopu ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6085cec, 0x6085cef, FUNC(puzzloopu_speedup_r) ); set_drc_pcflush(machine, 0x401dab0); }
-static DRIVER_INIT( jjparads ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6000994, 0x6000997, FUNC(jjparads_speedup_r) ); set_drc_pcflush(machine, 0x4015e84); }
-static DRIVER_INIT( jjparad2 ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6000984, 0x6000987, FUNC(jjparad2_speedup_r) ); set_drc_pcflush(machine, 0x401620a); }
-static DRIVER_INIT( ryouran )  { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6000a14, 0x6000a17, FUNC(ryouran_speedup_r) );  set_drc_pcflush(machine, 0x40182ce); }
-static DRIVER_INIT( teljan )   { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6002fb4, 0x6002fb7, FUNC(teljan_speedup_r) ); set_drc_pcflush(machine, 0x401ba32); }
-static DRIVER_INIT( sengekis ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-192,-272); init_skns(machine); machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60b74bc, 0x60b74bf, FUNC(sengekis_speedup_r) ); set_drc_pcflush(machine, 0x60006ec); }
-static DRIVER_INIT( sengekij ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-192,-272); init_skns(machine); machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60b7380, 0x60b7383, FUNC(sengekij_speedup_r) ); set_drc_pcflush(machine, 0x60006ec); }
-static DRIVER_INIT( sarukani ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns(machine); set_drc_pcflush(machine, 0x4013b42); } // Speedup is in skns_io_w()
-static DRIVER_INIT( galpans3 ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns(machine);  }
+static DRIVER_INIT( galpani4 ) { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(-5,-1); init_skns(machine);  }
+static DRIVER_INIT( galpanis ) { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(-5,-1); init_skns(machine);  }
+static DRIVER_INIT( cyvern )   { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(+0,+2); init_skns(machine); machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x604d3c8, 0x604d3cb, FUNC(cyvern_speedup_r) );  set_drc_pcflush(machine, 0x402ebd2);  }
+static DRIVER_INIT( galpans2 ) { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns(machine); machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60fb6bc, 0x60fb6bf, FUNC(galpans2_speedup_r) ); set_drc_pcflush(machine, 0x4049ae2); }
+static DRIVER_INIT( gutsn )    { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(+0,+0); init_skns(machine); machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x600c780, 0x600c783, FUNC(gutsn_speedup_r) ); set_drc_pcflush(machine, 0x402206e); }
+static DRIVER_INIT( panicstr ) { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns(machine); machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60f19e4, 0x60f19e7, FUNC(panicstr_speedup_r) ); set_drc_pcflush(machine, 0x404e68a);  }
+static DRIVER_INIT( senknow )  { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(+1,+1); init_skns(machine); machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60000dc, 0x60000df, FUNC(senknow_speedup_r) ); set_drc_pcflush(machine, 0x4017dce);  }
+static DRIVER_INIT( puzzloop ) { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6081d38, 0x6081d3b, FUNC(puzzloop_speedup_r) ); set_drc_pcflush(machine, 0x401da14); }
+static DRIVER_INIT( puzzloopj ) { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6086714, 0x6086717, FUNC(puzzloopj_speedup_r) ); set_drc_pcflush(machine, 0x401dca0); }
+static DRIVER_INIT( puzzloopa ) { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6085bcc, 0x6085bcf, FUNC(puzzloopa_speedup_r) ); set_drc_pcflush(machine, 0x401d9d4); }
+static DRIVER_INIT( puzzloopu ) { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6085cec, 0x6085cef, FUNC(puzzloopu_speedup_r) ); set_drc_pcflush(machine, 0x401dab0); }
+static DRIVER_INIT( jjparads ) { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6000994, 0x6000997, FUNC(jjparads_speedup_r) ); set_drc_pcflush(machine, 0x4015e84); }
+static DRIVER_INIT( jjparad2 ) { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6000984, 0x6000987, FUNC(jjparad2_speedup_r) ); set_drc_pcflush(machine, 0x401620a); }
+static DRIVER_INIT( ryouran )  { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6000a14, 0x6000a17, FUNC(ryouran_speedup_r) );  set_drc_pcflush(machine, 0x40182ce); }
+static DRIVER_INIT( teljan )   { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6002fb4, 0x6002fb7, FUNC(teljan_speedup_r) ); set_drc_pcflush(machine, 0x401ba32); }
+static DRIVER_INIT( sengekis ) { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(-192,-272); init_skns(machine); machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60b74bc, 0x60b74bf, FUNC(sengekis_speedup_r) ); set_drc_pcflush(machine, 0x60006ec); }
+static DRIVER_INIT( sengekij ) { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(-192,-272); init_skns(machine); machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60b7380, 0x60b7383, FUNC(sengekij_speedup_r) ); set_drc_pcflush(machine, 0x60006ec); }
+static DRIVER_INIT( sarukani ) { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns(machine); set_drc_pcflush(machine, 0x4013b42); } // Speedup is in skns_io_w()
+static DRIVER_INIT( galpans3 ) { machine.device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns(machine);  }
 
 
 

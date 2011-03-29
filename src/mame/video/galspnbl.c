@@ -29,9 +29,9 @@ PALETTE_INIT( galspnbl )
  *    4    | xxxxxxxxxxxxxxxx | x position
  *    5,6,7|                  | unused
  */
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	galspnbl_state *state = machine->driver_data<galspnbl_state>();
+	galspnbl_state *state = machine.driver_data<galspnbl_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 	static const UINT8 layout[8][8] =
@@ -52,7 +52,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int col, row;
 
 		attr = spriteram[offs];
-		if ((attr & 0x0004) && ((attr & 0x0040) == 0 || (machine->primary_screen->frame_number() & 1))
+		if ((attr & 0x0004) && ((attr & 0x0040) == 0 || (machine.primary_screen->frame_number() & 1))
 //              && ((attr & 0x0030) >> 4) == priority)
 				&& ((attr & 0x0020) >> 5) == priority)
 		{
@@ -72,7 +72,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 				{
 					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
 					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
-					drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+					drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 						code + layout[row][col],
 						color,
 						flipx,flipy,
@@ -84,9 +84,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 
-static void draw_background( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	galspnbl_state *state = machine->driver_data<galspnbl_state>();
+	galspnbl_state *state = machine.driver_data<galspnbl_state>();
 	offs_t offs;
 
 //  int screenscroll = 4 - (state->scroll[0] & 0xff);
@@ -103,12 +103,12 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 
 SCREEN_UPDATE( galspnbl )
 {
-	galspnbl_state *state = screen->machine->driver_data<galspnbl_state>();
+	galspnbl_state *state = screen->machine().driver_data<galspnbl_state>();
 	int offs;
 
-	draw_background(screen->machine, bitmap, cliprect);
+	draw_background(screen->machine(), bitmap, cliprect);
 
-	draw_sprites(screen->machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0);
 
 	for (offs = 0; offs < 0x1000 / 2; offs++)
 	{
@@ -123,7 +123,7 @@ SCREEN_UPDATE( galspnbl )
 		/* What is this? A priority/half transparency marker? */
 		if (!(attr & 0x0008))
 		{
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
 					code,
 					color,
 					0,0,
@@ -132,6 +132,6 @@ SCREEN_UPDATE( galspnbl )
 		}
 	}
 
-	draw_sprites(screen->machine, bitmap, cliprect, 1);
+	draw_sprites(screen->machine(), bitmap, cliprect, 1);
 	return 0;
 }

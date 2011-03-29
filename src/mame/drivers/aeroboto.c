@@ -30,7 +30,7 @@ Revisions:
 
 static READ8_HANDLER( aeroboto_201_r )
 {
-	aeroboto_state *state = space->machine->driver_data<aeroboto_state>();
+	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 	/* if you keep a button pressed during boot, the game will expect this */
 	/* serie of values to be returned from 3004, and display "PASS 201" if it is */
 	static const UINT8 res[4] = { 0xff, 0x9f, 0x1b, 0x03 };
@@ -42,7 +42,7 @@ static READ8_HANDLER( aeroboto_201_r )
 
 static INTERRUPT_GEN( aeroboto_interrupt )
 {
-	aeroboto_state *state = device->machine->driver_data<aeroboto_state>();
+	aeroboto_state *state = device->machine().driver_data<aeroboto_state>();
 
 	if (!state->disable_irq)
 		device_set_input_line(device, 0, ASSERT_LINE);
@@ -52,13 +52,13 @@ static INTERRUPT_GEN( aeroboto_interrupt )
 
 static READ8_HANDLER( aeroboto_irq_ack_r )
 {
-	cputag_set_input_line(space->machine,"maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(),"maincpu", 0, CLEAR_LINE);
 	return 0xff;
 }
 
 static READ8_HANDLER( aeroboto_2973_r )
 {
-	aeroboto_state *state = space->machine->driver_data<aeroboto_state>();
+	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
 	state->mainram[0x02be] = 0;
 	return 0xff;
@@ -66,7 +66,7 @@ static READ8_HANDLER( aeroboto_2973_r )
 
 static WRITE8_HANDLER ( aeroboto_1a2_w )
 {
-	aeroboto_state *state = space->machine->driver_data<aeroboto_state>();
+	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
 	state->mainram[0x01a2] = data;
 	if (data)
@@ -228,10 +228,10 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( formatz )
 {
-	aeroboto_state *state = machine->driver_data<aeroboto_state>();
+	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 
-	state->stars_rom = machine->region("gfx2")->base();
-	state->stars_length = machine->region("gfx2")->bytes();
+	state->stars_rom = machine.region("gfx2")->base();
+	state->stars_length = machine.region("gfx2")->bytes();
 
 	state->save_item(NAME(state->disable_irq));
 	state->save_item(NAME(state->count));
@@ -239,7 +239,7 @@ static MACHINE_START( formatz )
 
 static MACHINE_RESET( formatz )
 {
-	aeroboto_state *state = machine->driver_data<aeroboto_state>();
+	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 
 	state->disable_irq = 0;
 	state->count = 0;

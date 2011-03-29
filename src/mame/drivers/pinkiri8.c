@@ -122,7 +122,7 @@ device_config *janshi_vdp_device_config::static_alloc_device_config(const machin
 
 device_t *janshi_vdp_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, janshi_vdp_device(machine, *this));
+	return auto_alloc(machine, janshi_vdp_device(machine, *this));
 }
 
 void janshi_vdp_device_config::device_config_complete()
@@ -205,15 +205,15 @@ ronjan
 
 static SCREEN_UPDATE( pinkiri8 )
 {
-	pinkiri8_state *state = screen->machine->driver_data<pinkiri8_state>();
+	pinkiri8_state *state = screen->machine().driver_data<pinkiri8_state>();
 	int col_bank;
-	const gfx_element *gfx = screen->machine->gfx[0];
+	const gfx_element *gfx = screen->machine().gfx[0];
 
 	int game_type_hack = 0;
 
-	if (!strcmp(screen->machine->system().name,"janshi")) game_type_hack = 1;
+	if (!strcmp(screen->machine().system().name,"janshi")) game_type_hack = 1;
 
-	if ( input_code_pressed_once(screen->machine, KEYCODE_W) )
+	if ( input_code_pressed_once(screen->machine(), KEYCODE_W) )
 	{
 		int i;
 		int count2;
@@ -243,7 +243,7 @@ static SCREEN_UPDATE( pinkiri8 )
 	//popmessage("%02x",state->janshi_crtc_regs[0x0a]);
 	col_bank = (state->janshi_crtc_regs[0x0a] & 0x40) >> 6;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	/* FIXME: color is a bit of a mystery */
 	{
@@ -317,7 +317,7 @@ static SCREEN_UPDATE( pinkiri8 )
 
 			if (bit)
 			{
-				//col = screen->machine->rand();
+				//col = screen->machine().rand();
 				width = 2;
 			}
 			else
@@ -417,7 +417,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( output_regs_w )
 {
 	if(data & 0x40)
-		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	//data & 0x80 is probably NMI mask
 }
 
@@ -426,7 +426,7 @@ static WRITE8_HANDLER( output_regs_w )
 
 static WRITE8_HANDLER( pinkiri8_vram_w )
 {
-	pinkiri8_state *state = space->machine->driver_data<pinkiri8_state>();
+	pinkiri8_state *state = space->machine().driver_data<pinkiri8_state>();
 	switch(offset)
 	{
 		case 0:
@@ -447,7 +447,7 @@ static WRITE8_HANDLER( pinkiri8_vram_w )
 
 		case 3:
 
-			address_space *vdp_space = space->machine->device<janshi_vdp_device>("janshivdp")->space();
+			address_space *vdp_space = space->machine().device<janshi_vdp_device>("janshivdp")->space();
 
 			if (LOG_VRAM) printf("%02x ", data);
 			state->prev_writes++;
@@ -461,20 +461,20 @@ static WRITE8_HANDLER( pinkiri8_vram_w )
 
 static WRITE8_HANDLER( mux_w )
 {
-	pinkiri8_state *state = space->machine->driver_data<pinkiri8_state>();
+	pinkiri8_state *state = space->machine().driver_data<pinkiri8_state>();
 	state->mux_data = data;
 }
 
 static READ8_HANDLER( mux_p2_r )
 {
-	pinkiri8_state *state = space->machine->driver_data<pinkiri8_state>();
+	pinkiri8_state *state = space->machine().driver_data<pinkiri8_state>();
 	switch(state->mux_data)
 	{
-		case 0x01: return input_port_read(space->machine, "PL2_01");
-		case 0x02: return input_port_read(space->machine, "PL2_02");
-		case 0x04: return input_port_read(space->machine, "PL2_03");
-		case 0x08: return input_port_read(space->machine, "PL2_04");
-		case 0x10: return input_port_read(space->machine, "PL2_05");
+		case 0x01: return input_port_read(space->machine(), "PL2_01");
+		case 0x02: return input_port_read(space->machine(), "PL2_02");
+		case 0x04: return input_port_read(space->machine(), "PL2_03");
+		case 0x08: return input_port_read(space->machine(), "PL2_04");
+		case 0x10: return input_port_read(space->machine(), "PL2_05");
 	}
 
 	return 0xff;
@@ -482,14 +482,14 @@ static READ8_HANDLER( mux_p2_r )
 
 static READ8_HANDLER( mux_p1_r )
 {
-	pinkiri8_state *state = space->machine->driver_data<pinkiri8_state>();
+	pinkiri8_state *state = space->machine().driver_data<pinkiri8_state>();
 	switch(state->mux_data)
 	{
-		case 0x01: return input_port_read(space->machine, "PL1_01");
-		case 0x02: return input_port_read(space->machine, "PL1_02");
-		case 0x04: return input_port_read(space->machine, "PL1_03");
-		case 0x08: return input_port_read(space->machine, "PL1_04");
-		case 0x10: return input_port_read(space->machine, "PL1_05");
+		case 0x01: return input_port_read(space->machine(), "PL1_01");
+		case 0x02: return input_port_read(space->machine(), "PL1_02");
+		case 0x04: return input_port_read(space->machine(), "PL1_03");
+		case 0x08: return input_port_read(space->machine(), "PL1_04");
+		case 0x10: return input_port_read(space->machine(), "PL1_05");
 	}
 
 	return 0xff;
@@ -1209,7 +1209,7 @@ ROM_END
 
 static READ8_HANDLER( ronjan_prot_r )
 {
-	pinkiri8_state *state = space->machine->driver_data<pinkiri8_state>();
+	pinkiri8_state *state = space->machine().driver_data<pinkiri8_state>();
 	static const char wing_str[6] = { 'W', 'I', 'N', 'G', '8', '9' };
 
 	state->prot_read_index++;
@@ -1222,7 +1222,7 @@ static READ8_HANDLER( ronjan_prot_r )
 
 static WRITE8_HANDLER( ronjan_prot_w )
 {
-	pinkiri8_state *state = space->machine->driver_data<pinkiri8_state>();
+	pinkiri8_state *state = space->machine().driver_data<pinkiri8_state>();
 
 	if(data == 0)
 	{
@@ -1250,9 +1250,9 @@ static READ8_HANDLER( ronjan_patched_prot_r )
 
 static DRIVER_INIT( ronjan )
 {
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_readwrite_handler(0x90, 0x90, FUNC(ronjan_prot_r), FUNC(ronjan_prot_w));
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x66, 0x66, FUNC(ronjan_prot_status_r));
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x9f, 0x9f, FUNC(ronjan_patched_prot_r));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_readwrite_handler(0x90, 0x90, FUNC(ronjan_prot_r), FUNC(ronjan_prot_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x66, 0x66, FUNC(ronjan_prot_status_r));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x9f, 0x9f, FUNC(ronjan_patched_prot_r));
 }
 
 GAME( 1992,  janshi,    0,   pinkiri8, janshi,    0,      ROT0, "Eagle",         "Janshi",          GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

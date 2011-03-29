@@ -32,20 +32,20 @@
 
 static READ8_HANDLER( hanaawas_input_port_0_r )
 {
-	hanaawas_state *state = space->machine->driver_data<hanaawas_state>();
+	hanaawas_state *state = space->machine().driver_data<hanaawas_state>();
 	int i, ordinal = 0;
 	UINT16 buttons = 0;
 
 	switch (state->mux)
 	{
 	case 1: /* start buttons */
-		buttons = input_port_read(space->machine, "START");
+		buttons = input_port_read(space->machine(), "START");
 		break;
 	case 2: /* player 1 buttons */
-		buttons = input_port_read(space->machine, "P1");
+		buttons = input_port_read(space->machine(), "P1");
 		break;
 	case 4: /* player 2 buttons */
-		buttons = input_port_read(space->machine, "P2");
+		buttons = input_port_read(space->machine(), "P2");
 		break;
 	}
 
@@ -61,12 +61,12 @@ static READ8_HANDLER( hanaawas_input_port_0_r )
 		}
 	}
 
-	return (input_port_read(space->machine, "IN0") & 0xf0) | ordinal;
+	return (input_port_read(space->machine(), "IN0") & 0xf0) | ordinal;
 }
 
 static WRITE8_HANDLER( hanaawas_inputs_mux_w )
 {
-	hanaawas_state *state = space->machine->driver_data<hanaawas_state>();
+	hanaawas_state *state = space->machine().driver_data<hanaawas_state>();
 	state->mux = data;
 }
 
@@ -186,14 +186,14 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( hanaawas )
 {
-	hanaawas_state *state = machine->driver_data<hanaawas_state>();
+	hanaawas_state *state = machine.driver_data<hanaawas_state>();
 
 	state->save_item(NAME(state->mux));
 }
 
 static MACHINE_RESET( hanaawas )
 {
-	hanaawas_state *state = machine->driver_data<hanaawas_state>();
+	hanaawas_state *state = machine.driver_data<hanaawas_state>();
 
 	state->mux = 0;
 }

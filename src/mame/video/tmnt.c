@@ -4,8 +4,8 @@
 
 static TILE_GET_INFO( glfgreat_get_roz_tile_info )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
-	UINT8 *rom = machine->region("user1")->base();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
+	UINT8 *rom = machine.region("user1")->base();
 	int code;
 
 	tile_index += 0x40000 * state->glfgreat_roz_rom_bank;
@@ -17,7 +17,7 @@ static TILE_GET_INFO( glfgreat_get_roz_tile_info )
 
 static TILE_GET_INFO( prmrsocr_get_roz_tile_info )
 {
-	UINT8 *rom = machine->region("user1")->base();
+	UINT8 *rom = machine.region("user1")->base();
 	int code = rom[tile_index + 0x20000] + 256 * rom[tile_index];
 
 	SET_TILE_INFO(0, code & 0x1fff, code >> 13, 0);
@@ -33,9 +33,9 @@ static TILE_GET_INFO( prmrsocr_get_roz_tile_info )
 
 /* Missing in Action */
 
-void mia_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+void mia_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 	*flags = (*color & 0x04) ? TILE_FLIPX : 0;
 	if (layer == 0)
 	{
@@ -49,9 +49,9 @@ void mia_tile_callback( running_machine *machine, int layer, int bank, int *code
 	}
 }
 
-void cuebrick_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+void cuebrick_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 
 	if ((k052109_get_rmrd_line(state->k052109) == CLEAR_LINE) && (layer == 0))
 	{
@@ -65,16 +65,16 @@ void cuebrick_tile_callback( running_machine *machine, int layer, int bank, int 
 	}
 }
 
-void tmnt_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+void tmnt_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
 	*color = state->layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
-void ssbl_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+void ssbl_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 	if (layer == 0)
 	{
 		*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
@@ -88,9 +88,9 @@ void ssbl_tile_callback( running_machine *machine, int layer, int bank, int *cod
 	*color = state->layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
-void blswhstl_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+void blswhstl_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x10) << 5) | ((*color & 0x0c) << 8) | (bank << 12) | state->blswhstl_rombank << 14;
@@ -105,22 +105,22 @@ void blswhstl_tile_callback( running_machine *machine, int layer, int bank, int 
 
 ***************************************************************************/
 
-void mia_sprite_callback( running_machine *machine, int *code, int *color, int *priority, int *shadow )
+void mia_sprite_callback( running_machine &machine, int *code, int *color, int *priority, int *shadow )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 	*color = state->sprite_colorbase + (*color & 0x0f);
 }
 
-void tmnt_sprite_callback( running_machine *machine, int *code, int *color, int *priority, int *shadow )
+void tmnt_sprite_callback( running_machine &machine, int *code, int *color, int *priority, int *shadow )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 	*code |= (*color & 0x10) << 9;
 	*color = state->sprite_colorbase + (*color & 0x0f);
 }
 
-void punkshot_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask, int *shadow )
+void punkshot_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask, int *shadow )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= state->layerpri[2])
 		*priority_mask = 0;
@@ -135,9 +135,9 @@ void punkshot_sprite_callback( running_machine *machine, int *code, int *color, 
 	*color = state->sprite_colorbase + (*color & 0x0f);
 }
 
-void thndrx2_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask, int *shadow )
+void thndrx2_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask, int *shadow )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= state->layerpri[2])
 		*priority_mask = 0;
@@ -158,9 +158,9 @@ void thndrx2_sprite_callback( running_machine *machine, int *code, int *color, i
 
 ***************************************************************************/
 
-void lgtnfght_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
+void lgtnfght_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= state->layerpri[2])
 		*priority_mask = 0;
@@ -174,9 +174,9 @@ void lgtnfght_sprite_callback( running_machine *machine, int *code, int *color, 
 	*color = state->sprite_colorbase + (*color & 0x1f);
 }
 
-void blswhstl_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
+void blswhstl_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 #if 0
 if (input_code_pressed(machine, KEYCODE_Q) && (*color & 0x20)) *color = rand();
 if (input_code_pressed(machine, KEYCODE_W) && (*color & 0x40)) *color = rand();
@@ -195,9 +195,9 @@ if (input_code_pressed(machine, KEYCODE_E) && (*color & 0x80)) *color = rand();
 	*color = state->sprite_colorbase + (*color & 0x1f);
 }
 
-void prmrsocr_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
+void prmrsocr_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= state->layerpri[2])
 		*priority_mask = 0;
@@ -223,7 +223,7 @@ void prmrsocr_sprite_callback( running_machine *machine, int *code, int *color, 
 
 VIDEO_START( cuebrick )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 	state->layer_colorbase[0] = 0;
 	state->layer_colorbase[1] = 32;
 	state->layer_colorbase[2] = 40;
@@ -232,7 +232,7 @@ VIDEO_START( cuebrick )
 
 VIDEO_START( mia )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 	state->layer_colorbase[0] = 0;
 	state->layer_colorbase[1] = 32;
 	state->layer_colorbase[2] = 40;
@@ -244,7 +244,7 @@ VIDEO_START( mia )
 
 VIDEO_START( tmnt )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 	state->layer_colorbase[0] = 0;
 	state->layer_colorbase[1] = 32;
 	state->layer_colorbase[2] = 40;
@@ -258,7 +258,7 @@ VIDEO_START( tmnt )
 
 VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 
 	k05324x_set_z_rejection(state->k053245, 0);
 
@@ -272,7 +272,7 @@ VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
 
 VIDEO_START( glfgreat )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 
 	state->roz_tilemap = tilemap_create(machine, glfgreat_get_roz_tile_info, tilemap_scan_rows, 16, 16, 512, 512);
 	tilemap_set_transparent_pen(state->roz_tilemap,0);
@@ -287,7 +287,7 @@ VIDEO_START( glfgreat )
 
 VIDEO_START( prmrsocr )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 
 	state->roz_tilemap = tilemap_create(machine, prmrsocr_get_roz_tile_info, tilemap_scan_rows, 16, 16, 512, 256);
 	tilemap_set_transparent_pen(state->roz_tilemap,0);
@@ -300,7 +300,7 @@ VIDEO_START( prmrsocr )
 
 VIDEO_START( blswhstl )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 
 	state->blswhstl_rombank = -1;
 	state->save_item(NAME(state->blswhstl_rombank));
@@ -315,24 +315,24 @@ VIDEO_START( blswhstl )
 
 WRITE16_HANDLER( tmnt_paletteram_word_w )
 {
-	COMBINE_DATA(space->machine->generic.paletteram.u16 + offset);
+	COMBINE_DATA(space->machine().generic.paletteram.u16 + offset);
 	offset &= ~1;
 
-	data = (space->machine->generic.paletteram.u16[offset] << 8) | space->machine->generic.paletteram.u16[offset + 1];
-	palette_set_color_rgb(space->machine, offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+	data = (space->machine().generic.paletteram.u16[offset] << 8) | space->machine().generic.paletteram.u16[offset + 1];
+	palette_set_color_rgb(space->machine(), offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
 
 
 WRITE16_HANDLER( tmnt_0a0000_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0/1 = coin counters */
-		coin_counter_w(space->machine, 0, data & 0x01);
-		coin_counter_w(space->machine, 1, data & 0x02);	/* 2 players version */
+		coin_counter_w(space->machine(), 0, data & 0x01);
+		coin_counter_w(space->machine(), 1, data & 0x02);	/* 2 players version */
 
 		/* bit 3 high then low triggers irq on sound CPU */
 		if (state->last == 0x08 && (data & 0x08) == 0)
@@ -352,12 +352,12 @@ WRITE16_HANDLER( tmnt_0a0000_w )
 
 WRITE16_HANDLER( punkshot_0a0020_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = coin counter */
-		coin_counter_w(space->machine, 0, data & 0x01);
+		coin_counter_w(space->machine(), 0, data & 0x01);
 
 		/* bit 2 = trigger irq on sound CPU */
 		if (state->last == 0x04 && (data & 0x04) == 0)
@@ -372,13 +372,13 @@ WRITE16_HANDLER( punkshot_0a0020_w )
 
 WRITE16_HANDLER( lgtnfght_0a0018_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
-		coin_counter_w(space->machine, 0, data & 0x01);
-		coin_counter_w(space->machine, 1, data & 0x02);
+		coin_counter_w(space->machine(), 0, data & 0x01);
+		coin_counter_w(space->machine(), 1, data & 0x02);
 
 		/* bit 2 = trigger irq on sound CPU */
 		if (state->last == 0x00 && (data & 0x04) == 0x04)
@@ -393,13 +393,13 @@ WRITE16_HANDLER( lgtnfght_0a0018_w )
 
 WRITE16_HANDLER( blswhstl_700300_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
-		coin_counter_w(space->machine, 0,data & 0x01);
-		coin_counter_w(space->machine, 1,data & 0x02);
+		coin_counter_w(space->machine(), 0,data & 0x01);
+		coin_counter_w(space->machine(), 1,data & 0x02);
 
 		/* bit 3 = enable char ROM reading through the video RAM */
 		k052109_set_rmrd_line(state->k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
@@ -408,7 +408,7 @@ WRITE16_HANDLER( blswhstl_700300_w )
 		if (state->blswhstl_rombank != ((data & 0x80) >> 7))
 		{
 			state->blswhstl_rombank = (data & 0x80) >> 7;
-			tilemap_mark_all_tiles_dirty_all(space->machine);
+			tilemap_mark_all_tiles_dirty_all(space->machine());
 		}
 
 		/* other bits unknown */
@@ -418,28 +418,28 @@ WRITE16_HANDLER( blswhstl_700300_w )
 
 READ16_HANDLER( glfgreat_rom_r )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (state->glfgreat_roz_rom_mode)
-		return space->machine->region("gfx3")->base()[state->glfgreat_roz_char_bank * 0x80000 + offset];
+		return space->machine().region("gfx3")->base()[state->glfgreat_roz_char_bank * 0x80000 + offset];
 	else if (offset < 0x40000)
 	{
-		UINT8 *usr = space->machine->region("user1")->base();
+		UINT8 *usr = space->machine().region("user1")->base();
 		return usr[offset + 0x80000 + state->glfgreat_roz_rom_bank * 0x40000] + 256 * usr[offset + state->glfgreat_roz_rom_bank * 0x40000];
 	}
 	else
-		return space->machine->region("user1")->base()[((offset & 0x3ffff) >> 2) + 0x100000 + state->glfgreat_roz_rom_bank * 0x10000];
+		return space->machine().region("user1")->base()[((offset & 0x3ffff) >> 2) + 0x100000 + state->glfgreat_roz_rom_bank * 0x10000];
 }
 
 WRITE16_HANDLER( glfgreat_122000_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
-		coin_counter_w(space->machine, 0, data & 0x01);
-		coin_counter_w(space->machine, 1, data & 0x02);
+		coin_counter_w(space->machine(), 0, data & 0x01);
+		coin_counter_w(space->machine(), 1, data & 0x02);
 
 		/* bit 4 = enable char ROM reading through the video RAM */
 		k052109_set_rmrd_line(state->k052109, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
@@ -466,14 +466,14 @@ WRITE16_HANDLER( glfgreat_122000_w )
 
 WRITE16_HANDLER( ssriders_eeprom_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 
 		/* bits 3-4 control palette dimming */
 		/* 4 = DIMPOL = when set, negate SHAD */
@@ -487,13 +487,13 @@ WRITE16_HANDLER( ssriders_eeprom_w )
 
 WRITE16_HANDLER( ssriders_1c0300_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
-		coin_counter_w(space->machine, 0, data & 0x01);
-		coin_counter_w(space->machine, 1, data & 0x02);
+		coin_counter_w(space->machine(), 0, data & 0x01);
+		coin_counter_w(space->machine(), 1, data & 0x02);
 
 		/* bit 3 = enable char ROM reading through the video RAM */
 		k052109_set_rmrd_line(state->k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
@@ -505,13 +505,13 @@ WRITE16_HANDLER( ssriders_1c0300_w )
 
 WRITE16_HANDLER( prmrsocr_122000_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
-		coin_counter_w(space->machine, 0, data & 0x01);
-		coin_counter_w(space->machine, 1, data & 0x02);
+		coin_counter_w(space->machine(), 0, data & 0x01);
+		coin_counter_w(space->machine(), 1, data & 0x02);
 
 		/* bit 4 = enable char ROM reading through the video RAM */
 		k052109_set_rmrd_line(state->k052109, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
@@ -529,20 +529,20 @@ WRITE16_HANDLER( prmrsocr_122000_w )
 
 READ16_HANDLER( prmrsocr_rom_r )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if(state->glfgreat_roz_char_bank)
-		return space->machine->region("gfx3")->base()[offset];
+		return space->machine().region("gfx3")->base()[offset];
 	else
 	{
-		UINT8 *usr = space->machine->region("user1")->base();
+		UINT8 *usr = space->machine().region("user1")->base();
 		return 256 * usr[offset] + usr[offset + 0x020000];
 	}
 }
 
 WRITE16_HANDLER( tmnt_priority_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -578,7 +578,7 @@ WRITE16_HANDLER( tmnt_priority_w )
 
 SCREEN_UPDATE( mia )
 {
-	tmnt_state *state = screen->machine->driver_data<tmnt_state>();
+	tmnt_state *state = screen->machine().driver_data<tmnt_state>();
 
 	k052109_tilemap_update(state->k052109);
 
@@ -593,7 +593,7 @@ SCREEN_UPDATE( mia )
 
 SCREEN_UPDATE( tmnt )
 {
-	tmnt_state *state = screen->machine->driver_data<tmnt_state>();
+	tmnt_state *state = screen->machine().driver_data<tmnt_state>();
 
 	k052109_tilemap_update(state->k052109);
 
@@ -609,7 +609,7 @@ SCREEN_UPDATE( tmnt )
 
 SCREEN_UPDATE( punkshot )
 {
-	tmnt_state *state = screen->machine->driver_data<tmnt_state>();
+	tmnt_state *state = screen->machine().driver_data<tmnt_state>();
 
 	state->sprite_colorbase = k053251_get_palette_index(state->k053251, K053251_CI1);
 	state->layer_colorbase[0] = k053251_get_palette_index(state->k053251, K053251_CI2);
@@ -627,7 +627,7 @@ SCREEN_UPDATE( punkshot )
 
 	konami_sortlayers3(state->sorted_layer, state->layerpri);
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	k052109_tilemap_draw(state->k052109, bitmap, cliprect, state->sorted_layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	k052109_tilemap_draw(state->k052109, bitmap, cliprect, state->sorted_layer[1], 0, 2);
 	k052109_tilemap_draw(state->k052109, bitmap, cliprect, state->sorted_layer[2], 0, 4);
@@ -639,7 +639,7 @@ SCREEN_UPDATE( punkshot )
 
 SCREEN_UPDATE( lgtnfght )
 {
-	tmnt_state *state = screen->machine->driver_data<tmnt_state>();
+	tmnt_state *state = screen->machine().driver_data<tmnt_state>();
 	int bg_colorbase;
 
 	bg_colorbase = k053251_get_palette_index(state->k053251, K053251_CI0);
@@ -659,7 +659,7 @@ SCREEN_UPDATE( lgtnfght )
 
 	konami_sortlayers3(state->sorted_layer, state->layerpri);
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 16 * bg_colorbase);
 	k052109_tilemap_draw(state->k052109, bitmap, cliprect, state->sorted_layer[0], 0, 1);
 	k052109_tilemap_draw(state->k052109, bitmap, cliprect, state->sorted_layer[1], 0, 2);
@@ -672,7 +672,7 @@ SCREEN_UPDATE( lgtnfght )
 
 READ16_HANDLER( glfgreat_ball_r )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 #ifdef MAME_DEBUG
 popmessage("%04x", state->glfgreat_pixel);
@@ -686,7 +686,7 @@ popmessage("%04x", state->glfgreat_pixel);
 
 SCREEN_UPDATE( glfgreat )
 {
-	tmnt_state *state = screen->machine->driver_data<tmnt_state>();
+	tmnt_state *state = screen->machine().driver_data<tmnt_state>();
 	int bg_colorbase;
 
 	bg_colorbase = k053251_get_palette_index(state->k053251, K053251_CI0);
@@ -708,7 +708,7 @@ SCREEN_UPDATE( glfgreat )
 
 	/* not sure about the 053936 priority, but it seems to work */
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect,16 * bg_colorbase);
 	k052109_tilemap_draw(state->k052109, bitmap, cliprect, state->sorted_layer[0], 0, 1);
 
@@ -740,7 +740,7 @@ SCREEN_UPDATE( glfgreat )
 
 SCREEN_UPDATE( tmnt2 )
 {
-	tmnt_state *state = screen->machine->driver_data<tmnt_state>();
+	tmnt_state *state = screen->machine().driver_data<tmnt_state>();
 	double brt;
 	int i, newdim, newen, cb, ce;
 
@@ -769,21 +769,21 @@ SCREEN_UPDATE( tmnt2 )
 
 		// dim all colors before it
 		for (i = 0; i < cb; i++)
-			palette_set_pen_contrast(screen->machine, i, brt);
+			palette_set_pen_contrast(screen->machine(), i, brt);
 
 		// reset all colors in range
 		for (i = cb; i < ce; i++)
-			palette_set_pen_contrast(screen->machine, i, 1.0);
+			palette_set_pen_contrast(screen->machine(), i, 1.0);
 
 		// dim all colors after it
 		for (i = ce; i < 2048; i++)
-			palette_set_pen_contrast(screen->machine, i, brt);
+			palette_set_pen_contrast(screen->machine(), i, brt);
 
 		// toggle shadow/highlight
 		if (~state->dim_c & 0x10)
-			palette_set_shadow_mode(screen->machine, 1);
+			palette_set_shadow_mode(screen->machine(), 1);
 		else
-			palette_set_shadow_mode(screen->machine, 0);
+			palette_set_shadow_mode(screen->machine(), 0);
 	}
 
 	SCREEN_UPDATE_CALL(lgtnfght);
@@ -793,7 +793,7 @@ SCREEN_UPDATE( tmnt2 )
 
 SCREEN_UPDATE( thndrx2 )
 {
-	tmnt_state *state = screen->machine->driver_data<tmnt_state>();
+	tmnt_state *state = screen->machine().driver_data<tmnt_state>();
 	int bg_colorbase;
 
 	bg_colorbase = k053251_get_palette_index(state->k053251, K053251_CI0);
@@ -813,7 +813,7 @@ SCREEN_UPDATE( thndrx2 )
 
 	konami_sortlayers3(state->sorted_layer, state->layerpri);
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 16 * bg_colorbase);
 	k052109_tilemap_draw(state->k052109, bitmap, cliprect, state->sorted_layer[0], 0, 1);
 	k052109_tilemap_draw(state->k052109, bitmap, cliprect, state->sorted_layer[1], 0, 2);
@@ -833,6 +833,6 @@ SCREEN_UPDATE( thndrx2 )
 
 SCREEN_EOF( blswhstl )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 	k053245_clear_buffer(state->k053245);
 }

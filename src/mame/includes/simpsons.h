@@ -40,8 +40,8 @@ MACHINE_START( simpsons );
 
 /*----------- defined in video/simpsons.c -----------*/
 
-void simpsons_video_banking( running_machine *machine, int select );
+void simpsons_video_banking( running_machine &machine, int select );
 SCREEN_UPDATE( simpsons );
 
-extern void simpsons_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void simpsons_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
+extern void simpsons_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void simpsons_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);

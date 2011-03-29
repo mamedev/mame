@@ -73,7 +73,7 @@ struct ioasic_state
 	UINT8	shuffle_type;
 	UINT8	shuffle_active;
 	const UINT8 *	shuffle_map;
-	void	(*irq_callback)(running_machine *, int);
+	void	(*irq_callback)(running_machine &, int);
 	UINT8	irq_state;
 	UINT16	sound_irq_state;
 	UINT8	auto_ack;
@@ -107,9 +107,9 @@ static struct ioasic_state ioasic;
  *
  *************************************/
 
-static void generate_serial_data(running_machine *machine, int upper)
+static void generate_serial_data(running_machine &machine, int upper)
 {
-	int year = atoi(machine->system().year), month = 12, day = 11;
+	int year = atoi(machine.system().year), month = 12, day = 11;
 	UINT32 serial_number, temp;
 	UINT8 serial_digit[9];
 
@@ -126,8 +126,8 @@ static void generate_serial_data(running_machine *machine, int upper)
 	serial_digit[7] = (serial_number / 10) % 10;
 	serial_digit[8] = (serial_number / 1) % 10;
 
-	serial.data[12] = machine->rand() & 0xff;
-	serial.data[13] = machine->rand() & 0xff;
+	serial.data[12] = machine.rand() & 0xff;
+	serial.data[13] = machine.rand() & 0xff;
 
 	serial.data[14] = 0; /* ??? */
 	serial.data[15] = 0; /* ??? */
@@ -170,7 +170,7 @@ static void generate_serial_data(running_machine *machine, int upper)
  *
  *************************************/
 
-static void serial_register_state(running_machine *machine)
+static void serial_register_state(running_machine &machine)
 {
 	state_save_register_global_array(machine, serial.data);
 	state_save_register_global(machine, serial.buffer);
@@ -181,7 +181,7 @@ static void serial_register_state(running_machine *machine)
 }
 
 
-void midway_serial_pic_init(running_machine *machine, int upper)
+void midway_serial_pic_init(running_machine &machine, int upper)
 {
 	serial_register_state(machine);
 	generate_serial_data(machine, upper);
@@ -207,7 +207,7 @@ UINT8 midway_serial_pic_status_r(void)
 
 UINT8 midway_serial_pic_r(address_space *space)
 {
-	logerror("%s:security R = %04X\n", space->machine->describe_context(), serial.buffer);
+	logerror("%s:security R = %04X\n", space->machine().describe_context(), serial.buffer);
 	serial.status = 1;
 	return serial.buffer;
 }
@@ -215,7 +215,7 @@ UINT8 midway_serial_pic_r(address_space *space)
 
 void midway_serial_pic_w(address_space *space, UINT8 data)
 {
-	logerror("%s:security W = %04X\n", space->machine->describe_context(), data);
+	logerror("%s:security W = %04X\n", space->machine().describe_context(), data);
 
 	/* status seems to reflect the clock bit */
 	serial.status = (data >> 4) & 1;
@@ -255,7 +255,7 @@ static TIMER_CALLBACK( reset_timer )
 }
 
 
-static void pic_register_state(running_machine *machine)
+static void pic_register_state(running_machine &machine)
 {
 	state_save_register_global(machine, pic.latch);
 	state_save_register_global(machine, pic.latch_expire_time);
@@ -273,14 +273,14 @@ static void pic_register_state(running_machine *machine)
 }
 
 
-void midway_serial_pic2_init(running_machine *machine, int upper, int yearoffs)
+void midway_serial_pic2_init(running_machine &machine, int upper, int yearoffs)
 {
 	serial_register_state(machine);
 	pic_register_state(machine);
 
 	pic.yearoffs = yearoffs;
 	pic.time_just_written = 0;
-	pic.time_write_timer = machine->scheduler().timer_alloc(FUNC(reset_timer));
+	pic.time_write_timer = machine.scheduler().timer_alloc(FUNC(reset_timer));
 	memset(pic.default_nvram, 0xff, sizeof(pic.default_nvram));
 	generate_serial_data(machine, upper);
 }
@@ -299,14 +299,14 @@ UINT8 midway_serial_pic2_status_r(address_space *space)
 	/* if we're still holding the data ready bit high, do it */
 	if (pic.latch & 0xf00)
 	{
-		if (space->machine->time() > pic.latch_expire_time)
+		if (space->machine().time() > pic.latch_expire_time)
 			pic.latch &= 0xff;
 		else
 			pic.latch -= 0x100;
 		result = 1;
 	}
 
-	logerror("%s:PIC status %d\n", space->machine->describe_context(), result);
+	logerror("%s:PIC status %d\n", space->machine().describe_context(), result);
 	return result;
 }
 
@@ -316,7 +316,7 @@ UINT8 midway_serial_pic2_r(address_space *space)
 	UINT8 result = 0;
 
 	/* PIC data register */
-	logerror("%s:PIC data read (index=%d total=%d latch=%03X) =", space->machine->describe_context(), pic.index, pic.total, pic.latch);
+	logerror("%s:PIC data read (index=%d total=%d latch=%03X) =", space->machine().describe_context(), pic.index, pic.total, pic.latch);
 
 	/* return the current result */
 	if (pic.latch & 0xf00)
@@ -333,20 +333,20 @@ UINT8 midway_serial_pic2_r(address_space *space)
 
 void midway_serial_pic2_w(address_space *space, UINT8 data)
 {
-	running_machine *machine = space->machine;
+	running_machine &machine = space->machine();
 	static FILE *nvramlog;
 	if (LOG_NVRAM && !nvramlog)
 		nvramlog = fopen("nvram.log", "w");
 
 	/* PIC command register */
 	if (pic.state == 0)
-		logerror("%s:PIC command %02X\n", machine->describe_context(), data);
+		logerror("%s:PIC command %02X\n", machine.describe_context(), data);
 	else
-		logerror("%s:PIC data %02X\n", machine->describe_context(), data);
+		logerror("%s:PIC data %02X\n", machine.describe_context(), data);
 
 	/* store in the latch, along with a bit to indicate we have data */
 	pic.latch = (data & 0x00f) | 0x480;
-	pic.latch_expire_time = machine->time() + attotime::from_msec(1);
+	pic.latch_expire_time = machine.time() + attotime::from_msec(1);
 	if (data & 0x10)
 	{
 		int cmd = pic.state ? (pic.state & 0x0f) : (pic.latch & 0x0f);
@@ -383,7 +383,7 @@ void midway_serial_pic2_w(address_space *space, UINT8 data)
 				if (!pic.time_just_written)
 				{
 					system_time systime;
-					machine->base_datetime(systime);
+					machine.base_datetime(systime);
 
 					pic.buffer[pic.total++] = make_bcd(systime.local_time.second);
 					pic.buffer[pic.total++] = make_bcd(systime.local_time.minute);
@@ -559,13 +559,13 @@ enum
 
 static UINT16 ioasic_fifo_r(device_t *device);
 static UINT16 ioasic_fifo_status_r(device_t *device);
-static void ioasic_input_empty(running_machine *machine, int state);
-static void ioasic_output_full(running_machine *machine, int state);
-static void update_ioasic_irq(running_machine *machine);
-static void cage_irq_handler(running_machine *machine, int state);
+static void ioasic_input_empty(running_machine &machine, int state);
+static void ioasic_output_full(running_machine &machine, int state);
+static void update_ioasic_irq(running_machine &machine);
+static void cage_irq_handler(running_machine &machine, int state);
 
 
-static void ioasic_register_state(running_machine *machine)
+static void ioasic_register_state(running_machine &machine)
 {
 	state_save_register_global_array(machine, ioasic.reg);
 	state_save_register_global(machine, ioasic.shuffle_active);
@@ -581,7 +581,7 @@ static void ioasic_register_state(running_machine *machine)
 }
 
 
-void midway_ioasic_init(running_machine *machine, int shuffle, int upper, int yearoffs, void (*irq_callback)(running_machine *, int))
+void midway_ioasic_init(running_machine &machine, int shuffle, int upper, int yearoffs, void (*irq_callback)(running_machine &, int))
 {
 	static const UINT8 shuffle_maps[][16] =
 	{
@@ -599,13 +599,13 @@ void midway_ioasic_init(running_machine *machine, int shuffle, int upper, int ye
 	ioasic_register_state(machine);
 
 	/* do we have a DCS2 sound chip connected? (most likely) */
-	ioasic.has_dcs = (machine->device("dcs2") != NULL || machine->device("dsio") != NULL || machine->device("denver") != NULL);
-	ioasic.has_cage = (machine->device("cage") != NULL);
-	ioasic.dcs_cpu = machine->device("dcs2");
+	ioasic.has_dcs = (machine.device("dcs2") != NULL || machine.device("dsio") != NULL || machine.device("denver") != NULL);
+	ioasic.has_cage = (machine.device("cage") != NULL);
+	ioasic.dcs_cpu = machine.device("dcs2");
 	if (ioasic.dcs_cpu == NULL)
-		ioasic.dcs_cpu = machine->device("dsio");
+		ioasic.dcs_cpu = machine.device("dsio");
 	if (ioasic.dcs_cpu == NULL)
-		ioasic.dcs_cpu = machine->device("denver");
+		ioasic.dcs_cpu = machine.device("denver");
 	ioasic.shuffle_type = shuffle;
 	ioasic.shuffle_map = &shuffle_maps[shuffle][0];
 	ioasic.auto_ack = 0;
@@ -644,7 +644,7 @@ void midway_ioasic_set_shuffle_state(int state)
 }
 
 
-void midway_ioasic_reset(running_machine *machine)
+void midway_ioasic_reset(running_machine &machine)
 {
 	ioasic.shuffle_active = 0;
 	ioasic.sound_irq_state = 0x0080;
@@ -656,7 +656,7 @@ void midway_ioasic_reset(running_machine *machine)
 }
 
 
-static void update_ioasic_irq(running_machine *machine)
+static void update_ioasic_irq(running_machine &machine)
 {
 	UINT16 fifo_state = ioasic_fifo_status_r(NULL);
 	UINT16 irqbits = 0x2000;
@@ -682,7 +682,7 @@ static void update_ioasic_irq(running_machine *machine)
 }
 
 
-static void cage_irq_handler(running_machine *machine, int reason)
+static void cage_irq_handler(running_machine &machine, int reason)
 {
 	logerror("CAGE irq handler: %d\n", reason);
 	ioasic.sound_irq_state = 0;
@@ -694,7 +694,7 @@ static void cage_irq_handler(running_machine *machine, int reason)
 }
 
 
-static void ioasic_input_empty(running_machine *machine, int state)
+static void ioasic_input_empty(running_machine &machine, int state)
 {
 //  logerror("ioasic_input_empty(%d)\n", state);
 	if (state)
@@ -705,7 +705,7 @@ static void ioasic_input_empty(running_machine *machine, int state)
 }
 
 
-static void ioasic_output_full(running_machine *machine, int state)
+static void ioasic_output_full(running_machine &machine, int state)
 {
 //  logerror("ioasic_output_full(%d)\n", state);
 	if (state)
@@ -733,7 +733,7 @@ static UINT16 ioasic_fifo_r(device_t *device)
 		/* fetch the data from the buffer and update the IOASIC state */
 		result = ioasic.fifo[ioasic.fifo_out++ % FIFO_SIZE];
 		ioasic.fifo_bytes--;
-		update_ioasic_irq(device->machine);
+		update_ioasic_irq(device->machine());
 
 		if (LOG_FIFO && (ioasic.fifo_bytes < 4 || ioasic.fifo_bytes >= FIFO_SIZE - 4))
 			logerror("fifo_r(%04X): FIFO bytes = %d!\n", result, ioasic.fifo_bytes);
@@ -788,7 +788,7 @@ static UINT16 ioasic_fifo_status_r(device_t *device)
 }
 
 
-void midway_ioasic_fifo_reset_w(running_machine *machine, int state)
+void midway_ioasic_fifo_reset_w(running_machine &machine, int state)
 {
 	/* on the high state, reset the FIFO data */
 	if (state)
@@ -800,11 +800,11 @@ void midway_ioasic_fifo_reset_w(running_machine *machine, int state)
 		update_ioasic_irq(machine);
 	}
 	if (LOG_FIFO)
-		logerror("%s:fifo_reset(%d)\n", machine->describe_context(), state);
+		logerror("%s:fifo_reset(%d)\n", machine.describe_context(), state);
 }
 
 
-void midway_ioasic_fifo_w(running_machine *machine, UINT16 data)
+void midway_ioasic_fifo_w(running_machine &machine, UINT16 data)
 {
 	/* if we have room, add it to the FIFO buffer */
 	if (ioasic.fifo_bytes < FIFO_SIZE)
@@ -824,7 +824,7 @@ void midway_ioasic_fifo_w(running_machine *machine, UINT16 data)
 }
 
 
-void midway_ioasic_fifo_full_w(running_machine *machine, UINT16 data)
+void midway_ioasic_fifo_full_w(running_machine &machine, UINT16 data)
 {
 	if (LOG_FIFO)
 		logerror("fifo_full_w(%04X)\n", data);
@@ -862,7 +862,7 @@ READ32_HANDLER( midway_ioasic_r )
 	switch (offset)
 	{
 		case IOASIC_PORT0:
-			result = input_port_read(space->machine, "DIPS");
+			result = input_port_read(space->machine(), "DIPS");
 			/* bit 0 seems to be a ready flag before shuffling happens */
 			if (!ioasic.shuffle_active)
 			{
@@ -874,15 +874,15 @@ READ32_HANDLER( midway_ioasic_r )
 			break;
 
 		case IOASIC_PORT1:
-			result = input_port_read(space->machine, "SYSTEM");
+			result = input_port_read(space->machine(), "SYSTEM");
 			break;
 
 		case IOASIC_PORT2:
-			result = input_port_read(space->machine, "IN1");
+			result = input_port_read(space->machine(), "IN1");
 			break;
 
 		case IOASIC_PORT3:
-			result = input_port_read(space->machine, "IN2");
+			result = input_port_read(space->machine(), "IN2");
 			break;
 
 		case IOASIC_UARTIN:
@@ -984,7 +984,7 @@ WRITE32_HANDLER( midway_ioasic_w )
 			{
 				/* we're in loopback mode -- copy to the input */
 				ioasic.reg[IOASIC_UARTIN] = (newreg & 0x00ff) | 0x1000;
-				update_ioasic_irq(space->machine);
+				update_ioasic_irq(space->machine());
 			}
 			else if (PRINTF_DEBUG)
 				mame_printf_debug("%c", data & 0xff);
@@ -1000,14 +1000,14 @@ WRITE32_HANDLER( midway_ioasic_w )
 			{
 				if ((oldreg ^ newreg) & 1)
 				{
-					cage_control_w(space->machine, 0);
+					cage_control_w(space->machine(), 0);
 					if (!(~newreg & 1))
-						cage_control_w(space->machine, 3);
+						cage_control_w(space->machine(), 3);
 				}
 			}
 
 			/* FIFO reset? */
-			midway_ioasic_fifo_reset_w(space->machine, ~newreg & 4);
+			midway_ioasic_fifo_reset_w(space->machine(), ~newreg & 4);
 			break;
 
 		case IOASIC_SOUNDOUT:
@@ -1040,7 +1040,7 @@ WRITE32_HANDLER( midway_ioasic_w )
 			/* bit 14 = LED? */
 			if ((oldreg ^ newreg) & 0x3ff6)
 				logerror("IOASIC int control = %04X\n", data);
-			update_ioasic_irq(space->machine);
+			update_ioasic_irq(space->machine());
 			break;
 
 		default:

@@ -77,9 +77,9 @@ void namcoc7x_sound_write16(UINT16 command, UINT32 offset)
 	namcoc7x_mcuram[offset] = command;
 }
 
-void namcoc7x_on_driver_init(running_machine *machine)
+void namcoc7x_on_driver_init(running_machine &machine)
 {
-	UINT8 *pROM = (UINT8 *)machine->region("c7x")->base();
+	UINT8 *pROM = (UINT8 *)machine.region("c7x")->base();
 	device_t *cpu;
 
 	// clear the two 16-bits magic values at the start of the rom
@@ -88,7 +88,7 @@ void namcoc7x_on_driver_init(running_machine *machine)
 	memset(pROM, 0, 4);
 
 	// install speedup cheat
-	for (cpu = machine->device("maincpu"); cpu != NULL; cpu = cpu->typenext())
+	for (cpu = machine.device("maincpu"); cpu != NULL; cpu = cpu->typenext())
 		if (cpu->type() == M37702)
 			cpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(speedup_r), FUNC(speedup_w));
 }

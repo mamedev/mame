@@ -6,7 +6,7 @@
 #include "devlegcy.h"
 
 void cdda_set_cdrom(device_t *device, void *file);
-device_t *cdda_from_cdrom(running_machine *machine, void *file);
+device_t *cdda_from_cdrom(running_machine &machine, void *file);
 
 void cdda_start_audio(device_t *device, UINT32 startlba, UINT32 numblocks);
 void cdda_stop_audio(device_t *device);

@@ -32,9 +32,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	atarig1_state *state = machine->driver_data<atarig1_state>();
+	atarig1_state *state = machine.driver_data<atarig1_state>();
 	cputag_set_input_line(machine, "maincpu", 1, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 2, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -42,7 +42,7 @@ static void update_interrupts(running_machine *machine)
 
 static MACHINE_START( atarig1 )
 {
-	atarig1_state *state = machine->driver_data<atarig1_state>();
+	atarig1_state *state = machine.driver_data<atarig1_state>();
 	atarigen_init(machine);
 	state->save_item(NAME(state->which_input));
 }
@@ -50,12 +50,12 @@ static MACHINE_START( atarig1 )
 
 static MACHINE_RESET( atarig1 )
 {
-	atarig1_state *state = machine->driver_data<atarig1_state>();
+	atarig1_state *state = machine.driver_data<atarig1_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_slapstic_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine->primary_screen, atarig1_scanline_update, 8);
+	atarigen_scanline_timer_reset(*machine.primary_screen, atarig1_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -71,7 +71,7 @@ static WRITE16_HANDLER( mo_control_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		atarig1_state *state = space->machine->driver_data<atarig1_state>();
+		atarig1_state *state = space->machine().driver_data<atarig1_state>();
 		atarirle_control_w(state->rle, data & 7);
 	}
 }
@@ -79,7 +79,7 @@ static WRITE16_HANDLER( mo_control_w )
 
 static WRITE16_HANDLER( mo_command_w )
 {
-	atarig1_state *state = space->machine->driver_data<atarig1_state>();
+	atarig1_state *state = space->machine().driver_data<atarig1_state>();
 	COMBINE_DATA(state->mo_command);
 	atarirle_command_w(state->rle, (data == 0 && state->is_pitfight) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
@@ -94,8 +94,8 @@ static WRITE16_HANDLER( mo_command_w )
 
 static READ16_HANDLER( special_port0_r )
 {
-	atarig1_state *state = space->machine->driver_data<atarig1_state>();
-	int temp = input_port_read(space->machine, "IN0");
+	atarig1_state *state = space->machine().driver_data<atarig1_state>();
+	int temp = input_port_read(space->machine(), "IN0");
 	if (state->cpu_to_sound_ready) temp ^= 0x1000;
 	temp ^= 0x2000;		/* A2DOK always high for now */
 	return temp;
@@ -104,7 +104,7 @@ static READ16_HANDLER( special_port0_r )
 
 static WRITE16_HANDLER( a2d_select_w )
 {
-	atarig1_state *state = space->machine->driver_data<atarig1_state>();
+	atarig1_state *state = space->machine().driver_data<atarig1_state>();
 	state->which_input = offset;
 }
 
@@ -112,15 +112,15 @@ static WRITE16_HANDLER( a2d_select_w )
 static READ16_HANDLER( a2d_data_r )
 {
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2" };
-	atarig1_state *state = space->machine->driver_data<atarig1_state>();
+	atarig1_state *state = space->machine().driver_data<atarig1_state>();
 
 	/* Pit Fighter has no A2D, just another input port */
 	if (state->is_pitfight)
-		return input_port_read(space->machine, "ADC0");
+		return input_port_read(space->machine(), "ADC0");
 
 	/* otherwise, assume it's hydra */
 	if (state->which_input < 3)
-		return input_port_read(space->machine, adcnames[state->which_input]) << 8;
+		return input_port_read(space->machine(), adcnames[state->which_input]) << 8;
 
 	return 0;
 }
@@ -152,7 +152,7 @@ INLINE void update_bank(atarig1_state *state, int bank)
 
 static STATE_POSTLOAD( pitfightb_state_postload )
 {
-	atarig1_state *state = machine->driver_data<atarig1_state>();
+	atarig1_state *state = machine.driver_data<atarig1_state>();
 	int bank = state->bslapstic_bank;
 	state->bslapstic_bank = -1;
 	update_bank(state, bank);
@@ -161,7 +161,7 @@ static STATE_POSTLOAD( pitfightb_state_postload )
 
 static READ16_HANDLER( pitfightb_cheap_slapstic_r )
 {
-	atarig1_state *state = space->machine->driver_data<atarig1_state>();
+	atarig1_state *state = space->machine().driver_data<atarig1_state>();
 	int result = state->bslapstic_base[offset & 0xfff];
 
 	/* the cheap replacement slapstic just triggers on the simple banking */
@@ -187,12 +187,12 @@ static READ16_HANDLER( pitfightb_cheap_slapstic_r )
 }
 
 
-static void pitfightb_cheap_slapstic_init(running_machine *machine)
+static void pitfightb_cheap_slapstic_init(running_machine &machine)
 {
-	atarig1_state *state = machine->driver_data<atarig1_state>();
+	atarig1_state *state = machine.driver_data<atarig1_state>();
 
 	/* install a read handler */
-	state->bslapstic_base = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x038000, 0x03ffff, FUNC(pitfightb_cheap_slapstic_r));
+	state->bslapstic_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x038000, 0x03ffff, FUNC(pitfightb_cheap_slapstic_r));
 
 	/* allocate memory for a copy of bank 0 */
 	state->bslapstic_bank0 = auto_alloc_array(machine, UINT8, 0x2000);
@@ -1218,9 +1218,9 @@ ROM_END
  *
  *************************************/
 
-static void init_g1_common(running_machine *machine, offs_t slapstic_base, int slapstic, int is_pitfight)
+static void init_g1_common(running_machine &machine, offs_t slapstic_base, int slapstic, int is_pitfight)
 {
-	atarig1_state *state = machine->driver_data<atarig1_state>();
+	atarig1_state *state = machine.driver_data<atarig1_state>();
 
 	state->eeprom_default = NULL;
 	if (slapstic == -1)
@@ -1228,10 +1228,10 @@ static void init_g1_common(running_machine *machine, offs_t slapstic_base, int s
 		pitfightb_cheap_slapstic_init(machine);
 		state->save_item(NAME(state->bslapstic_bank));
 		state->save_item(NAME(state->bslapstic_primed));
-		machine->state().register_postload(pitfightb_state_postload, NULL);
+		machine.state().register_postload(pitfightb_state_postload, NULL);
 	}
 	else if (slapstic != 0)
-		atarigen_slapstic_init(machine->device("maincpu"), slapstic_base, 0, slapstic);
+		atarigen_slapstic_init(machine.device("maincpu"), slapstic_base, 0, slapstic);
 	atarijsa_init(machine, "IN0", 0x4000);
 
 	state->is_pitfight = is_pitfight;

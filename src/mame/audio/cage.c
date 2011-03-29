@@ -39,7 +39,7 @@ static attotime cage_cpu_h1_clock_period;
 static UINT8 cpu_to_cage_ready;
 static UINT8 cage_to_cpu_ready;
 
-static void (*cage_irqhandler)(running_machine *, int);
+static void (*cage_irqhandler)(running_machine &, int);
 
 static attotime serial_period_per_word;
 
@@ -153,23 +153,23 @@ static WRITE32_HANDLER( speedup_w );
  *
  *************************************/
 
-void cage_init(running_machine *machine, offs_t speedup)
+void cage_init(running_machine &machine, offs_t speedup)
 {
 	attotime cage_cpu_clock_period;
 	int chan;
 
 	cage_irqhandler = NULL;
 
-	memory_set_bankptr(machine, "bank10", machine->region("cageboot")->base());
-	memory_set_bankptr(machine, "bank11", machine->region("cage")->base());
+	memory_set_bankptr(machine, "bank10", machine.region("cageboot")->base());
+	memory_set_bankptr(machine, "bank11", machine.region("cage")->base());
 
-	cage_cpu = machine->device<cpu_device>("cage");
+	cage_cpu = machine.device<cpu_device>("cage");
 	cage_cpu_clock_period = attotime::from_hz(cage_cpu->clock());
 	cage_cpu_h1_clock_period = cage_cpu_clock_period * 2;
 
-	dma_timer = machine->device<timer_device>("cage_dma_timer");
-	timer[0] = machine->device<timer_device>("cage_timer0");
-	timer[1] = machine->device<timer_device>("cage_timer1");
+	dma_timer = machine.device<timer_device>("cage_dma_timer");
+	timer[0] = machine.device<timer_device>("cage_timer0");
+	timer[1] = machine.device<timer_device>("cage_timer1");
 
 	if (speedup)
 		speedup_ram = cage_cpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(speedup, speedup, FUNC(speedup_w));
@@ -178,7 +178,7 @@ void cage_init(running_machine *machine, offs_t speedup)
 	{
 		char buffer[10];
 		sprintf(buffer, "dac%d", chan + 1);
-		dmadac[chan] = machine->device<dmadac_sound_device>(buffer);
+		dmadac[chan] = machine.device<dmadac_sound_device>(buffer);
 	}
 
 	state_save_register_global(machine, cpu_to_cage_ready);
@@ -192,7 +192,7 @@ void cage_init(running_machine *machine, offs_t speedup)
 }
 
 
-void cage_set_irq_handler(void (*irqhandler)(running_machine *, int))
+void cage_set_irq_handler(void (*irqhandler)(running_machine &, int))
 {
 	cage_irqhandler = irqhandler;
 }
@@ -201,7 +201,7 @@ void cage_set_irq_handler(void (*irqhandler)(running_machine *, int))
 void cage_reset_w(int state)
 {
 	if (state)
-		cage_control_w(cage_cpu->machine, 0);
+		cage_control_w(cage_cpu->machine(), 0);
 	device_set_input_line(cage_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -342,7 +342,7 @@ static void update_timer(int which)
  *
  *************************************/
 
-static void update_serial(running_machine *machine)
+static void update_serial(running_machine &machine)
 {
 	attotime serial_clock_period, bit_clock_period;
 	UINT32 freq;
@@ -438,7 +438,7 @@ static WRITE32_HANDLER( tms32031_io_w )
 		case SPORT_GLOBAL_CTL:
 		case SPORT_TIMER_CTL:
 		case SPORT_TIMER_PERIOD:
-			update_serial(space->machine);
+			update_serial(space->machine());
 			break;
 	}
 }
@@ -451,7 +451,7 @@ static WRITE32_HANDLER( tms32031_io_w )
  *
  *************************************/
 
-static void update_control_lines(running_machine *machine)
+static void update_control_lines(running_machine &machine)
 {
 	int val;
 
@@ -482,7 +482,7 @@ static READ32_HANDLER( cage_from_main_r )
 	if (LOG_COMM)
 		logerror("%06X:CAGE read command = %04X\n", cpu_get_pc(space->cpu), cage_from_main);
 	cpu_to_cage_ready = 0;
-	update_control_lines(space->machine);
+	update_control_lines(space->machine());
 	device_set_input_line(cage_cpu, TMS3203X_IRQ0, CLEAR_LINE);
 	return cage_from_main;
 }
@@ -501,7 +501,7 @@ static WRITE32_HANDLER( cage_to_main_w )
 		logerror("%06X:Data from CAGE = %04X\n", cpu_get_pc(space->cpu), data);
 	soundlatch_word_w(space, 0, data, mem_mask);
 	cage_to_cpu_ready = 1;
-	update_control_lines(space->machine);
+	update_control_lines(space->machine());
 }
 
 
@@ -519,9 +519,9 @@ static READ32_HANDLER( cage_io_status_r )
 UINT16 main_from_cage_r(address_space *space)
 {
 	if (LOG_COMM)
-		logerror("%s:main read data = %04X\n", space->machine->describe_context(), soundlatch_word_r(space, 0, 0));
+		logerror("%s:main read data = %04X\n", space->machine().describe_context(), soundlatch_word_r(space, 0, 0));
 	cage_to_cpu_ready = 0;
-	update_control_lines(space->machine);
+	update_control_lines(space->machine());
 	return soundlatch_word_r(space, 0, 0xffff);
 }
 
@@ -537,10 +537,10 @@ static TIMER_CALLBACK( deferred_cage_w )
 
 void main_to_cage_w(UINT16 data)
 {
-	running_machine *machine = cage_cpu->machine;
+	running_machine &machine = cage_cpu->machine();
 	if (LOG_COMM)
-		logerror("%s:Command to CAGE = %04X\n", machine->describe_context(), data);
-	machine->scheduler().synchronize(FUNC(deferred_cage_w), data);
+		logerror("%s:Command to CAGE = %04X\n", machine.describe_context(), data);
+	machine.scheduler().synchronize(FUNC(deferred_cage_w), data);
 }
 
 
@@ -557,7 +557,7 @@ UINT16 cage_control_r(void)
 }
 
 
-void cage_control_w(running_machine *machine, UINT16 data)
+void cage_control_w(running_machine &machine, UINT16 data)
 {
 	cage_control = data;
 

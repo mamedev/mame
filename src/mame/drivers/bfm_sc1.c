@@ -156,14 +156,14 @@ static int Scorpion1_GetSwitchState(bfm_sc1_state *drvstate, int strobe, int dat
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(space->machine,"bank1",data & 0x03);
+	memory_set_bank(space->machine(),"bank1",data & 0x03);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 static INTERRUPT_GEN( timer_irq )
 {
-	bfm_sc1_state *state = device->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = device->machine().driver_data<bfm_sc1_state>();
 	if ( state->watchdog_kicked )
 	{
 		state->watchdog_cnt    = 0;
@@ -174,7 +174,7 @@ static INTERRUPT_GEN( timer_irq )
 		state->watchdog_cnt++;
 		if ( state->watchdog_cnt > 2 )	// this is a hack, i don't know what the watchdog timeout is, 3 IRQ's works fine
 		{  // reset board
-			device->machine->schedule_soft_reset();// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
+			device->machine().schedule_soft_reset();// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
 			return;
 		}
 	}
@@ -183,9 +183,9 @@ static INTERRUPT_GEN( timer_irq )
 	{
 		state->irq_status = 0x01 |0x02; //0xff;
 
-	    state->sc1_Inputs[2] = input_port_read(device->machine,"STROBE0");
+	    state->sc1_Inputs[2] = input_port_read(device->machine(),"STROBE0");
 
-		generic_pulse_irq_line(device->machine->device("maincpu"), M6809_IRQ_LINE);
+		generic_pulse_irq_line(device->machine().device("maincpu"), M6809_IRQ_LINE);
 	}
 }
 
@@ -193,7 +193,7 @@ static INTERRUPT_GEN( timer_irq )
 
 static READ8_HANDLER( irqlatch_r )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	int result = state->irq_status | 0x02;
 
 	state->irq_status = 0;
@@ -205,7 +205,7 @@ static READ8_HANDLER( irqlatch_r )
 
 static WRITE8_HANDLER( reel12_w )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	if ( state->locked & 0x01 )
 	{	// hardware is still state->locked,
 		if ( data == 0x46 ) state->locked &= ~0x01;
@@ -228,7 +228,7 @@ static WRITE8_HANDLER( reel12_w )
 
 static WRITE8_HANDLER( reel34_w )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	if ( state->locked & 0x02 )
 	{	// hardware is still state->locked,
 		if ( data == 0x42 ) state->locked &= ~0x02;
@@ -251,7 +251,7 @@ static WRITE8_HANDLER( reel34_w )
 
 static WRITE8_HANDLER( reel56_w )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	if ( stepper_update(4, (data>>4)&0x0f) ) state->reel_changed |= 0x10;
 	if ( stepper_update(5, data&0x0f   ) ) state->reel_changed |= 0x20;
 
@@ -269,7 +269,7 @@ static WRITE8_HANDLER( reel56_w )
 
 static WRITE8_HANDLER( mmtr_w )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	int i;
 	if ( state->locked & 0x04 )
 	{	// hardware is still state->locked,
@@ -286,7 +286,7 @@ static WRITE8_HANDLER( mmtr_w )
 			if ( changed & (1 << i) )
 			{
 				MechMtr_update(i, data & (1 << i) );
-				generic_pulse_irq_line(space->machine->device("maincpu"), M6809_FIRQ_LINE);
+				generic_pulse_irq_line(space->machine().device("maincpu"), M6809_FIRQ_LINE);
 			}
 		}
 	}
@@ -296,7 +296,7 @@ static WRITE8_HANDLER( mmtr_w )
 
 static READ8_HANDLER( mmtr_r )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	return state->mmtr_latch;
 }
 
@@ -304,7 +304,7 @@ static READ8_HANDLER( mmtr_r )
 
 static READ8_HANDLER( dipcoin_r )
 {
-	return input_port_read(space->machine,"STROBE0") & 0x1F;
+	return input_port_read(space->machine(),"STROBE0") & 0x1F;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -318,7 +318,7 @@ static READ8_DEVICE_HANDLER( nec_r )
 
 static WRITE8_HANDLER( vfd_w )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	int changed = state->vfd_latch ^ data;
 
 	state->vfd_latch = data;
@@ -380,7 +380,7 @@ static const UINT8 BFM_strcnv[] =
 
 static READ8_HANDLER( mux1latch_r )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	return state->mux1_input;
 }
 
@@ -402,7 +402,7 @@ static READ8_HANDLER( mux1dathi_r )
 
 static WRITE8_HANDLER( mux1latch_w )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	int changed = state->mux1_outputlatch ^ data;
 	static const char *const portnames[] = { "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7" };
 	state->mux1_outputlatch = data;
@@ -438,7 +438,7 @@ static WRITE8_HANDLER( mux1latch_w )
 
 		if ( !(data & 0x08) )
 		{
-			state->sc1_Inputs[ input_strobe ] = input_port_read(space->machine,portnames[input_strobe]);
+			state->sc1_Inputs[ input_strobe ] = input_port_read(space->machine(),portnames[input_strobe]);
 
 			state->mux1_input = state->sc1_Inputs[ input_strobe ];
 		}
@@ -449,7 +449,7 @@ static WRITE8_HANDLER( mux1latch_w )
 
 static WRITE8_HANDLER( mux1datlo_w )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	state->mux1_datalo = data;
 }
 
@@ -457,7 +457,7 @@ static WRITE8_HANDLER( mux1datlo_w )
 
 static WRITE8_HANDLER( mux1dathi_w )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	state->mux1_datahi = data;
 }
 
@@ -465,7 +465,7 @@ static WRITE8_HANDLER( mux1dathi_w )
 
 static READ8_HANDLER( mux2latch_r )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	return state->mux2_input;
 }
 
@@ -487,7 +487,7 @@ static READ8_HANDLER( mux2dathi_r )
 
 static WRITE8_HANDLER( mux2latch_w )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	int changed = state->mux2_outputlatch ^ data;
 
 	state->mux2_outputlatch = data;
@@ -523,7 +523,7 @@ static WRITE8_HANDLER( mux2latch_w )
 
 static WRITE8_HANDLER( mux2datlo_w )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	state->mux2_datalo = data;
 }
 
@@ -531,7 +531,7 @@ static WRITE8_HANDLER( mux2datlo_w )
 
 static WRITE8_HANDLER( mux2dathi_w )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	state->mux2_datahi = data;
 }
 
@@ -539,7 +539,7 @@ static WRITE8_HANDLER( mux2dathi_w )
 
 static WRITE8_HANDLER( watchdog_w )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	state->watchdog_kicked = 1;
 }
 
@@ -561,7 +561,7 @@ static WRITE8_HANDLER( aciadata_w )
 
 static READ8_HANDLER( aciastat_r )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	return state->acia_status;
 }
 
@@ -578,7 +578,7 @@ static READ8_HANDLER( aciadata_r )
 
 static WRITE8_HANDLER( triac_w )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	state->triac_latch = data;
 }
 
@@ -586,7 +586,7 @@ static WRITE8_HANDLER( triac_w )
 
 static READ8_HANDLER( triac_r )
 {
-	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	return state->triac_latch;
 }
 
@@ -611,7 +611,7 @@ static WRITE8_DEVICE_HANDLER( nec_latch_w )
 static WRITE8_HANDLER( vid_uart_tx_w )
 {
 	adder2_send(data);
-	cputag_set_input_line(space->machine, "adder2", M6809_IRQ_LINE, ASSERT_LINE );//HOLD_LINE);// trigger IRQ
+	cputag_set_input_line(space->machine(), "adder2", M6809_IRQ_LINE, ASSERT_LINE );//HOLD_LINE);// trigger IRQ
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -653,12 +653,12 @@ static const UINT8 DataDecode[]=
 
 
 
-static void decode_sc1(running_machine *machine,const char *rom_region)
+static void decode_sc1(running_machine &machine,const char *rom_region)
 {
-	bfm_sc1_state *state = machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = machine.driver_data<bfm_sc1_state>();
 	UINT8 *tmp, *rom;
 
-	rom = machine->region(rom_region)->base();
+	rom = machine.region(rom_region)->base();
 
 	tmp = auto_alloc_array(machine, UINT8, 0x10000);
 
@@ -709,7 +709,7 @@ static void decode_sc1(running_machine *machine,const char *rom_region)
 
 static MACHINE_RESET( bfm_sc1 )
 {
-	bfm_sc1_state *state = machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = machine.driver_data<bfm_sc1_state>();
 	BFM_BD1_init(0);
 	state->vfd_latch         = 0;
 	state->mmtr_latch        = 0;
@@ -749,7 +749,7 @@ static MACHINE_RESET( bfm_sc1 )
 
 // init rom bank ////////////////////////////////////////////////////////////////////
 	{
-		UINT8 *rom = machine->region("maincpu")->base();
+		UINT8 *rom = machine.region("maincpu")->base();
 
 		memory_configure_bank(machine,"bank1", 0, 1, &rom[0x10000], 0);
 		memory_configure_bank(machine,"bank1", 1, 3, &rom[0x02000], 0x02000);
@@ -1332,12 +1332,12 @@ ROM_END
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-static void sc1_common_init(running_machine *machine, int reels, int decrypt)
+static void sc1_common_init(running_machine &machine, int reels, int decrypt)
 {
-	bfm_sc1_state *state = machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = machine.driver_data<bfm_sc1_state>();
 	UINT8 *rom, i;
 
-	rom = machine->region("maincpu")->base();
+	rom = machine.region("maincpu")->base();
 	if ( rom )
 	{
 		memcpy(&rom[0x10000], &rom[0x00000], 0x2000);
@@ -1389,7 +1389,7 @@ static DRIVER_INIT(rou029)
 
 static DRIVER_INIT(clatt)
 {
-	bfm_sc1_state *state = machine->driver_data<bfm_sc1_state>();
+	bfm_sc1_state *state = machine.driver_data<bfm_sc1_state>();
 	sc1_common_init(machine,6,1);
 	MechMtr_config(machine,8);
 

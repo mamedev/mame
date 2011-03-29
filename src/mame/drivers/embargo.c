@@ -33,7 +33,7 @@ public:
 
 static SCREEN_UPDATE( embargo )
 {
-	embargo_state *state = screen->machine->driver_data<embargo_state>();
+	embargo_state *state = screen->machine().driver_data<embargo_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->videoram_size; offs++)
@@ -67,14 +67,14 @@ static SCREEN_UPDATE( embargo )
 
 static READ8_HANDLER( input_port_bit_r )
 {
-	embargo_state *state = space->machine->driver_data<embargo_state>();
-	return (input_port_read(space->machine, "IN1") << (7 - state->input_select)) & 0x80;
+	embargo_state *state = space->machine().driver_data<embargo_state>();
+	return (input_port_read(space->machine(), "IN1") << (7 - state->input_select)) & 0x80;
 }
 
 
 static READ8_HANDLER( dial_r )
 {
-	embargo_state *state = space->machine->driver_data<embargo_state>();
+	embargo_state *state = space->machine().driver_data<embargo_state>();
 
 	UINT8 lo = 0;
 	UINT8 hi = 0;
@@ -94,14 +94,14 @@ static READ8_HANDLER( dial_r )
 
 	if (state->dial_enable_1 && !state->dial_enable_2)
 	{
-		lo = input_port_read(space->machine, "DIAL0");
-		hi = input_port_read(space->machine, "DIAL1");
+		lo = input_port_read(space->machine(), "DIAL0");
+		hi = input_port_read(space->machine(), "DIAL1");
 	}
 
 	if (state->dial_enable_2 && !state->dial_enable_1)
 	{
-		lo = input_port_read(space->machine, "DIAL2");
-		hi = input_port_read(space->machine, "DIAL3");
+		lo = input_port_read(space->machine(), "DIAL2");
+		hi = input_port_read(space->machine(), "DIAL3");
 	}
 
 	lo = 12 * lo / 256;
@@ -126,21 +126,21 @@ static READ8_HANDLER( dial_r )
 
 static WRITE8_HANDLER( port_1_w )
 {
-	embargo_state *state = space->machine->driver_data<embargo_state>();
+	embargo_state *state = space->machine().driver_data<embargo_state>();
 	state->dial_enable_1 = data & 0x01; /* other bits unknown */
 }
 
 
 static WRITE8_HANDLER( port_2_w )
 {
-	embargo_state *state = space->machine->driver_data<embargo_state>();
+	embargo_state *state = space->machine().driver_data<embargo_state>();
 	state->dial_enable_2 = data & 0x01; /* other bits unknown */
 }
 
 
 static WRITE8_HANDLER( input_select_w )
 {
-	embargo_state *state = space->machine->driver_data<embargo_state>();
+	embargo_state *state = space->machine().driver_data<embargo_state>();
 	state->input_select = data & 0x07;
 }
 
@@ -228,7 +228,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( embargo )
 {
-	embargo_state *state = machine->driver_data<embargo_state>();
+	embargo_state *state = machine.driver_data<embargo_state>();
 
 	/* register for state saving */
 	state->save_item(NAME(state->dial_enable_1));
@@ -239,7 +239,7 @@ static MACHINE_START( embargo )
 
 static MACHINE_RESET( embargo )
 {
-	embargo_state *state = machine->driver_data<embargo_state>();
+	embargo_state *state = machine.driver_data<embargo_state>();
 
 	state->dial_enable_1 = 0;
 	state->dial_enable_2 = 0;

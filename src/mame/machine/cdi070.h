@@ -238,15 +238,15 @@ READ16_HANDLER( scc68070_periphs_r );
 WRITE16_HANDLER( scc68070_periphs_w );
 //READ16_HANDLER( uart_loopback_enable );
 
-void scc68070_init(running_machine *machine, scc68070_regs_t *scc68070);
-void scc68070_uart_rx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
-void scc68070_uart_tx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
-void scc68070_register_globals(running_machine *machine, scc68070_regs_t *scc68070);
+void scc68070_init(running_machine &machine, scc68070_regs_t *scc68070);
+void scc68070_uart_rx(running_machine &machine, scc68070_regs_t *scc68070, UINT8 data);
+void scc68070_uart_tx(running_machine &machine, scc68070_regs_t *scc68070, UINT8 data);
+void scc68070_register_globals(running_machine &machine, scc68070_regs_t *scc68070);
 
 // UART Access for Quizard
-void scc68070_set_quizard_mcu_value(running_machine *machine, UINT16 value);
-void scc68070_set_quizard_mcu_ack(running_machine *machine, UINT8 ack);
-void scc68070_quizard_rx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
+void scc68070_set_quizard_mcu_value(running_machine &machine, UINT16 value);
+void scc68070_set_quizard_mcu_ack(running_machine &machine, UINT8 ack);
+void scc68070_quizard_rx(running_machine &machine, scc68070_regs_t *scc68070, UINT8 data);
 
 INTERRUPT_GEN( scc68070_mcu_frame );
 

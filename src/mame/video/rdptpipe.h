@@ -37,7 +37,7 @@ class TexturePipe
 		void				LOD2Cycle(INT32* sss, INT32* sst, INT32 s, INT32 t, INT32 w, INT32 dsinc, INT32 dtinc, INT32 dwinc, INT32 prim_tile, INT32* t1, INT32* t2);
 		void				LOD2CycleLimited(INT32* sss, INT32* sst, INT32 s, INT32 t, INT32 w, INT32 dsinc, INT32 dtinc, INT32 dwinc, INT32 prim_tile, INT32* t1);
 
-		void				SetMachine(running_machine* machine);
+		void				SetMachine(running_machine& machine);
 
 		bool				m_start_span;
 		INT32				m_precomp_s;

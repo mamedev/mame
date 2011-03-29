@@ -30,7 +30,7 @@ public:
 
 /*----------- defined in video/surpratk.c -----------*/
 
-extern void surpratk_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void surpratk_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
+extern void surpratk_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void surpratk_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
 
 SCREEN_UPDATE( surpratk );

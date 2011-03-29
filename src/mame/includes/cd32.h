@@ -17,7 +17,7 @@ public:
 
 	UINT16 potgo_value;
 	int cd32_shifter[2];
-	void (*input_hack)(running_machine *machine);
+	void (*input_hack)(running_machine &machine);
 	int oldstate[2];
 };
 

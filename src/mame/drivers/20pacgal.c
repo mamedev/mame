@@ -76,7 +76,7 @@
 
 static WRITE8_HANDLER( irqack_w )
 {
-	_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
+	_20pacgal_state *state = space->machine().driver_data<_20pacgal_state>();
 	int bit = data & 1;
 
 	cpu_interrupt_enable(state->maincpu, bit);
@@ -87,7 +87,7 @@ static WRITE8_HANDLER( irqack_w )
 
 static WRITE8_HANDLER( timer_pulse_w )
 {
-	//_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
+	//_20pacgal_state *state = space->machine().driver_data<_20pacgal_state>();
 	//printf("timer pulse %02x\n", data);
 }
 
@@ -131,7 +131,7 @@ static const eeprom_interface _20pacgal_eeprom_intf =
 
 static WRITE8_HANDLER( _20pacgal_coin_counter_w )
 {
-	coin_counter_w(space->machine, 0, data & 1);
+	coin_counter_w(space->machine(), 0, data & 1);
 }
 
 
@@ -142,12 +142,12 @@ static WRITE8_HANDLER( _20pacgal_coin_counter_w )
  *
  *************************************/
 
-static void set_bankptr(running_machine *machine)
+static void set_bankptr(running_machine &machine)
 {
-	_20pacgal_state *state =  machine->driver_data<_20pacgal_state>();
+	_20pacgal_state *state =  machine.driver_data<_20pacgal_state>();
 	if (state->game_selected == 0)
 	{
-		UINT8 *rom = machine->region("maincpu")->base();
+		UINT8 *rom = machine.region("maincpu")->base();
 		memory_set_bankptr(machine, "bank1", rom + 0x08000);
 	}
 	else
@@ -156,15 +156,15 @@ static void set_bankptr(running_machine *machine)
 
 static WRITE8_HANDLER( ram_bank_select_w )
 {
-	_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
+	_20pacgal_state *state = space->machine().driver_data<_20pacgal_state>();
 
 	state->game_selected = data & 1;
-	set_bankptr(space->machine);
+	set_bankptr(space->machine());
 }
 
 static WRITE8_HANDLER( ram_48000_w )
 {
-	_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
+	_20pacgal_state *state = space->machine().driver_data<_20pacgal_state>();
 
 	if (state->game_selected)
 	{
@@ -188,19 +188,19 @@ static STATE_POSTLOAD( postload_20pacgal )
 
 static WRITE8_HANDLER( sprite_gfx_w )
 {
-	_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
+	_20pacgal_state *state = space->machine().driver_data<_20pacgal_state>();
 	state->sprite_gfx_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( sprite_ram_w )
 {
-	_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
+	_20pacgal_state *state = space->machine().driver_data<_20pacgal_state>();
 	state->sprite_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( sprite_lookup_w )
 {
-	_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
+	_20pacgal_state *state = space->machine().driver_data<_20pacgal_state>();
 	state->sprite_color_lookup[offset] = data;
 }
 
@@ -331,19 +331,19 @@ INPUT_PORTS_END
 
 static MACHINE_START( 20pacgal )
 {
-	_20pacgal_state *state = machine->driver_data<_20pacgal_state>();
+	_20pacgal_state *state = machine.driver_data<_20pacgal_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->eeprom = machine->device("eeprom");
+	state->maincpu = machine.device("maincpu");
+	state->eeprom = machine.device("eeprom");
 
 	state->save_item(NAME(state->game_selected));
 	state->save_item(NAME(state->ram_48000));
-	machine->state().register_postload(postload_20pacgal, NULL);
+	machine.state().register_postload(postload_20pacgal, NULL);
 }
 
 static MACHINE_RESET( 20pacgal )
 {
-	_20pacgal_state *state = machine->driver_data<_20pacgal_state>();
+	_20pacgal_state *state = machine.driver_data<_20pacgal_state>();
 
 	state->game_selected = 0;
 }
@@ -451,14 +451,14 @@ ROM_END
 
 static DRIVER_INIT(20pacgal)
 {
-	_20pacgal_state *state = machine->driver_data<_20pacgal_state>();
+	_20pacgal_state *state = machine.driver_data<_20pacgal_state>();
 	state->sprite_pal_base = 0x00<<2;
 }
 
 static DRIVER_INIT(25pacman)
 
 {
-	_20pacgal_state *state = machine->driver_data<_20pacgal_state>();
+	_20pacgal_state *state = machine.driver_data<_20pacgal_state>();
 	state->sprite_pal_base = 0x20<<2;
 }
 

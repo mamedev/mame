@@ -2,10 +2,10 @@
 #include "machine/jalcrpt.h"
 
 
-void phantasm_rom_decode(running_machine *machine, const char *region)
+void phantasm_rom_decode(running_machine &machine, const char *region)
 {
-	UINT16	*RAM	=	(UINT16 *) machine->region(region)->base();
-	int i,		size	=	machine->region(region)->bytes();
+	UINT16	*RAM	=	(UINT16 *) machine.region(region)->base();
+	int i,		size	=	machine.region(region)->bytes();
 	if (size > 0x40000)	size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
@@ -36,10 +36,10 @@ void phantasm_rom_decode(running_machine *machine, const char *region)
 
 }
 
-void astyanax_rom_decode(running_machine *machine, const char *region)
+void astyanax_rom_decode(running_machine &machine, const char *region)
 {
-	UINT16	*RAM	=	(UINT16 *) machine->region(region)->base();
-	int i,		size	=	machine->region(region)->bytes();
+	UINT16	*RAM	=	(UINT16 *) machine.region(region)->base();
+	int i,		size	=	machine.region(region)->bytes();
 	if (size > 0x40000)	size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
@@ -70,10 +70,10 @@ void astyanax_rom_decode(running_machine *machine, const char *region)
 	}
 }
 
-void rodland_rom_decode(running_machine *machine, const char *region)
+void rodland_rom_decode(running_machine &machine, const char *region)
 {
-	UINT16	*RAM	=	(UINT16 *) machine->region(region)->base();
-	int i,		size	=	machine->region(region)->bytes();
+	UINT16	*RAM	=	(UINT16 *) machine.region(region)->base();
+	int i,		size	=	machine.region(region)->bytes();
 	if (size > 0x40000)	size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
@@ -116,7 +116,7 @@ void rodland_rom_decode(running_machine *machine, const char *region)
 
 /* SS92048-01: p47aces, 47pie2, 47pie2o */
 
-void ms32_rearrange_sprites(running_machine *machine, const char *region)
+void ms32_rearrange_sprites(running_machine &machine, const char *region)
 {
 	/* sprites are not encrypted, but we need to move the data around to handle them as 256x256 tiles */
 	int i;
@@ -125,8 +125,8 @@ void ms32_rearrange_sprites(running_machine *machine, const char *region)
 
 	UINT8 *result_data;
 
-	source_data = machine->region       ( region )->base();
-	source_size = machine->region( region )->bytes();
+	source_data = machine.region       ( region )->base();
+	source_size = machine.region( region )->bytes();
 
 	result_data = auto_alloc_array(machine, UINT8, source_size);
 
@@ -142,7 +142,7 @@ void ms32_rearrange_sprites(running_machine *machine, const char *region)
 }
 
 
-void decrypt_ms32_tx(running_machine *machine, int addr_xor,int data_xor, const char *region)
+void decrypt_ms32_tx(running_machine &machine, int addr_xor,int data_xor, const char *region)
 {
 	int i;
 	UINT8 *source_data;
@@ -150,8 +150,8 @@ void decrypt_ms32_tx(running_machine *machine, int addr_xor,int data_xor, const 
 
 	UINT8 *result_data;
 
-	source_data = machine->region       ( region )->base();
-	source_size = machine->region( region )->bytes();
+	source_data = machine.region       ( region )->base();
+	source_size = machine.region( region )->bytes();
 
 	result_data = auto_alloc_array(machine, UINT8, source_size);
 
@@ -196,7 +196,7 @@ void decrypt_ms32_tx(running_machine *machine, int addr_xor,int data_xor, const 
 	auto_free (machine, result_data);
 }
 
-void decrypt_ms32_bg(running_machine *machine, int addr_xor,int data_xor, const char *region)
+void decrypt_ms32_bg(running_machine &machine, int addr_xor,int data_xor, const char *region)
 {
 	int i;
 	UINT8 *source_data;
@@ -204,8 +204,8 @@ void decrypt_ms32_bg(running_machine *machine, int addr_xor,int data_xor, const 
 
 	UINT8 *result_data;
 
-	source_data = machine->region       ( region )->base();
-	source_size = machine->region( region )->bytes();
+	source_data = machine.region       ( region )->base();
+	source_size = machine.region( region )->bytes();
 
 	result_data = auto_alloc_array(machine, UINT8, source_size);
 

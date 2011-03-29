@@ -60,7 +60,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void   (*driver_init_func)(running_machine *machine);
+typedef void   (*driver_init_func)(running_machine &machine);
 
 
 struct game_driver
@@ -73,7 +73,7 @@ struct game_driver
 	const char *		manufacturer;				/* manufacturer of the game */
 	machine_config_constructor machine_config;		/* machine driver tokens */
 	const input_port_token *ipt;					/* pointer to array of input port tokens */
-	void				(*driver_init)(running_machine *machine); /* DRIVER_INIT callback */
+	void				(*driver_init)(running_machine &machine); /* DRIVER_INIT callback */
 	const rom_entry *	rom;						/* pointer to list of ROMs for the game */
 	const char *		compatible_with;
 	UINT32				flags;						/* orientation and other flags; see defines below */
@@ -88,7 +88,7 @@ struct game_driver
 
 
 #define DRIVER_INIT_NAME(name)		driver_init_##name
-#define DRIVER_INIT(name)			void DRIVER_INIT_NAME(name)(running_machine *machine)
+#define DRIVER_INIT(name)			void DRIVER_INIT_NAME(name)(running_machine &machine)
 #define DRIVER_INIT_CALL(name)		DRIVER_INIT_NAME(name)(machine)
 
 #define driver_init_0				NULL

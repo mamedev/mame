@@ -209,14 +209,14 @@ public:
 
 ***************************************************************************/
 
-static void jchan_mcu_run(running_machine *machine)
+static void jchan_mcu_run(running_machine &machine)
 {
-	jchan_state *state = machine->driver_data<jchan_state>();
+	jchan_state *state = machine.driver_data<jchan_state>();
 	UINT16 mcu_command = state->mcu_ram[0x0010/2];		/* command nb */
 	UINT16 mcu_offset  = state->mcu_ram[0x0012/2] / 2;	/* offset in shared RAM where MCU will write */
 	UINT16 mcu_subcmd  = state->mcu_ram[0x0014/2];		/* sub-command parameter, happens only for command #4 */
 
-	logerror("%s : MCU executed command: %04X %04X %04X ",machine->describe_context(),mcu_command,mcu_offset*2,mcu_subcmd);
+	logerror("%s : MCU executed command: %04X %04X %04X ",machine.describe_context(),mcu_command,mcu_offset*2,mcu_subcmd);
 
 /*
     the only MCU commands found in program code are:
@@ -237,7 +237,7 @@ static void jchan_mcu_run(running_machine *machine)
 		case 0x03:	// DSW
 		{
 			state->mcu_ram[mcu_offset] = input_port_read(machine, "DSW");
-			logerror("%s : MCU executed command: %04X %04X (read DSW)\n",machine->describe_context(),mcu_command,mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (read DSW)\n",machine.describe_context(),mcu_command,mcu_offset*2);
 		}
 		break;
 
@@ -263,7 +263,7 @@ static void jchan_mcu_run(running_machine *machine)
 #define JCHAN_MCU_COM_W(_n_) \
 static WRITE16_HANDLER( jchan_mcu_com##_n_##_w ) \
 { \
-	jchan_state *state = space->machine->driver_data<jchan_state>(); \
+	jchan_state *state = space->machine().driver_data<jchan_state>(); \
 	COMBINE_DATA(&state->mcu_com[_n_]); \
 	if (state->mcu_com[0] != 0xFFFF)	return; \
 	if (state->mcu_com[1] != 0xFFFF)	return; \
@@ -271,7 +271,7 @@ static WRITE16_HANDLER( jchan_mcu_com##_n_##_w ) \
 	if (state->mcu_com[3] != 0xFFFF)	return; \
 \
 	memset(state->mcu_com, 0, 4 * sizeof( UINT16 ) ); \
-	jchan_mcu_run(space->machine); \
+	jchan_mcu_run(space->machine()); \
 }
 
 JCHAN_MCU_COM_W(0)
@@ -300,7 +300,7 @@ static READ16_HANDLER( jchan_mcu_status_r )
 //  move was performed
 static INTERRUPT_GEN( jchan_vblank )
 {
-	jchan_state *state = device->machine->driver_data<jchan_state>();
+	jchan_state *state = device->machine().driver_data<jchan_state>();
 	int i = cpu_getiloops(device);
 	switch (i)
 	{
@@ -321,15 +321,15 @@ static INTERRUPT_GEN( jchan_vblank )
 		{
 
 			case 0:
-				cputag_set_input_line(device->machine, "sub", 1, HOLD_LINE);
+				cputag_set_input_line(device->machine(), "sub", 1, HOLD_LINE);
 				break;
 
 			case 220:
-				cputag_set_input_line(device->machine, "sub", 2, HOLD_LINE);
+				cputag_set_input_line(device->machine(), "sub", 2, HOLD_LINE);
 				break;
 
 			case 100:
-				cputag_set_input_line(device->machine, "sub", 3, HOLD_LINE);
+				cputag_set_input_line(device->machine(), "sub", 3, HOLD_LINE);
 				break;
 
 		}
@@ -341,20 +341,20 @@ static INTERRUPT_GEN( jchan_vblank )
 
 static VIDEO_START(jchan)
 {
-	jchan_state *state = machine->driver_data<jchan_state>();
+	jchan_state *state = machine.driver_data<jchan_state>();
 	/* so we can use suprnova.c */
 	state->sprite_ram32_1 = auto_alloc_array(machine, UINT32, 0x4000/4);
 	state->sprite_ram32_2 = auto_alloc_array(machine, UINT32, 0x4000/4);
 
-	machine->generic.spriteram_size = 0x4000;
+	machine.generic.spriteram_size = 0x4000;
 	state->sprite_regs32_1 = auto_alloc_array(machine, UINT32, 0x40/4);
 	state->sprite_regs32_2 = auto_alloc_array(machine, UINT32, 0x40/4);
 
 	state->sprite_bitmap_1 = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_INDEXED16);
 	state->sprite_bitmap_2 = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_INDEXED16);
 
-	state->spritegen1 = machine->device<sknsspr_device>("spritegen1");
-	state->spritegen2 = machine->device<sknsspr_device>("spritegen2");
+	state->spritegen1 = machine.device<sknsspr_device>("spritegen1");
+	state->spritegen2 = machine.device<sknsspr_device>("spritegen2");
 
 
 	state->spritegen1->skns_sprite_kludge(0,0);
@@ -371,7 +371,7 @@ static VIDEO_START(jchan)
 
 static SCREEN_UPDATE(jchan)
 {
-	jchan_state *state = screen->machine->driver_data<jchan_state>();
+	jchan_state *state = screen->machine().driver_data<jchan_state>();
 	int x,y;
 	UINT16* src1;
 	UINT16* src2;
@@ -379,15 +379,15 @@ static SCREEN_UPDATE(jchan)
 	UINT16 pixdata1;
 	UINT16 pixdata2;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	SCREEN_UPDATE_CALL(jchan_view2);
 
 	bitmap_fill(state->sprite_bitmap_1, cliprect, 0x0000);
 	bitmap_fill(state->sprite_bitmap_2, cliprect, 0x0000);
 
-	state->spritegen1->skns_draw_sprites(screen->machine, state->sprite_bitmap_1, cliprect, state->sprite_ram32_1, 0x4000, screen->machine->region("gfx1")->base(), screen->machine->region ("gfx1")->bytes(), state->sprite_regs32_1 );
-	state->spritegen2->skns_draw_sprites(screen->machine, state->sprite_bitmap_2, cliprect, state->sprite_ram32_2, 0x4000, screen->machine->region("gfx2")->base(), screen->machine->region ("gfx2")->bytes(), state->sprite_regs32_2 );
+	state->spritegen1->skns_draw_sprites(screen->machine(), state->sprite_bitmap_1, cliprect, state->sprite_ram32_1, 0x4000, screen->machine().region("gfx1")->base(), screen->machine().region ("gfx1")->bytes(), state->sprite_regs32_1 );
+	state->spritegen2->skns_draw_sprites(screen->machine(), state->sprite_bitmap_2, cliprect, state->sprite_ram32_2, 0x4000, screen->machine().region("gfx2")->base(), screen->machine().region ("gfx2")->bytes(), state->sprite_regs32_2 );
 
 	// ignoring priority bits for now - might use alpha too, check 0x8000 of palette writes
 	for (y=0;y<240;y++)
@@ -430,19 +430,19 @@ static SCREEN_UPDATE(jchan)
 
 static WRITE16_HANDLER( jchan_ctrl_w )
 {
-	jchan_state *state = space->machine->driver_data<jchan_state>();
+	jchan_state *state = space->machine().driver_data<jchan_state>();
 	state->irq_sub_enable = data & 0x8000; // hack / guess!
 }
 
 static READ16_HANDLER ( jchan_ctrl_r )
 {
-	jchan_state *state = space->machine->driver_data<jchan_state>();
+	jchan_state *state = space->machine().driver_data<jchan_state>();
 	switch(offset)
 	{
-		case 0/2: return input_port_read(space->machine, "P1");
-		case 2/2: return input_port_read(space->machine, "P2");
-		case 4/2: return input_port_read(space->machine, "SYSTEM");
-		case 6/2: return input_port_read(space->machine, "EXTRA");
+		case 0/2: return input_port_read(space->machine(), "P1");
+		case 2/2: return input_port_read(space->machine(), "P2");
+		case 4/2: return input_port_read(space->machine(), "SYSTEM");
+		case 6/2: return input_port_read(space->machine(), "EXTRA");
 		default: logerror("jchan_ctrl_r unknown!"); break;
 	}
 	return state->ctrl[offset];
@@ -457,23 +457,23 @@ static READ16_HANDLER ( jchan_ctrl_r )
 /* communications - hacky! */
 static WRITE16_HANDLER( main2sub_cmd_w )
 {
-	jchan_state *state = space->machine->driver_data<jchan_state>();
+	jchan_state *state = space->machine().driver_data<jchan_state>();
 	COMBINE_DATA(&state->mainsub_shared_ram[0x03ffe/2]);
-	cputag_set_input_line(space->machine, "sub", 4, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "sub", 4, HOLD_LINE);
 }
 
 // is this called?
 static WRITE16_HANDLER( sub2main_cmd_w )
 {
-	jchan_state *state = space->machine->driver_data<jchan_state>();
+	jchan_state *state = space->machine().driver_data<jchan_state>();
 	COMBINE_DATA(&state->mainsub_shared_ram[0x0000/2]);
-	cputag_set_input_line(space->machine, "maincpu", 3, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 3, HOLD_LINE);
 }
 
 /* ram convert for suprnova (requires 32-bit stuff) */
 static WRITE16_HANDLER( jchan_suprnova_sprite32_1_w )
 {
-	jchan_state *state = space->machine->driver_data<jchan_state>();
+	jchan_state *state = space->machine().driver_data<jchan_state>();
 	COMBINE_DATA(&state->spriteram_1[offset]);
 	offset>>=1;
 	state->sprite_ram32_1[offset]=(state->spriteram_1[offset*2+1]<<16) | (state->spriteram_1[offset*2]);
@@ -481,7 +481,7 @@ static WRITE16_HANDLER( jchan_suprnova_sprite32_1_w )
 
 static WRITE16_HANDLER( jchan_suprnova_sprite32regs_1_w )
 {
-	jchan_state *state = space->machine->driver_data<jchan_state>();
+	jchan_state *state = space->machine().driver_data<jchan_state>();
 	COMBINE_DATA(&state->sprregs_1[offset]);
 	offset>>=1;
 	state->sprite_regs32_1[offset]=(state->sprregs_1[offset*2+1]<<16) | (state->sprregs_1[offset*2]);
@@ -489,7 +489,7 @@ static WRITE16_HANDLER( jchan_suprnova_sprite32regs_1_w )
 
 static WRITE16_HANDLER( jchan_suprnova_sprite32_2_w )
 {
-	jchan_state *state = space->machine->driver_data<jchan_state>();
+	jchan_state *state = space->machine().driver_data<jchan_state>();
 	COMBINE_DATA(&state->spriteram_2[offset]);
 	offset>>=1;
 	state->sprite_ram32_2[offset]=(state->spriteram_2[offset*2+1]<<16) | (state->spriteram_2[offset*2]);
@@ -497,7 +497,7 @@ static WRITE16_HANDLER( jchan_suprnova_sprite32_2_w )
 
 static WRITE16_HANDLER( jchan_suprnova_sprite32regs_2_w )
 {
-	jchan_state *state = space->machine->driver_data<jchan_state>();
+	jchan_state *state = space->machine().driver_data<jchan_state>();
 	COMBINE_DATA(&state->sprregs_2[offset]);
 	offset>>=1;
 	state->sprite_regs32_2[offset]=(state->sprregs_2[offset*2+1]<<16) | (state->sprregs_2[offset*2]);
@@ -786,16 +786,16 @@ ROM_END
 
 static DRIVER_INIT( jchan )
 {
-	jchan_state *state = machine->driver_data<jchan_state>();
+	jchan_state *state = machine.driver_data<jchan_state>();
 	DRIVER_INIT_CALL( decrypt_toybox_rom );
 	// install these here, putting them in the memory map causes issues
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x403ffe, 0x403fff, FUNC(main2sub_cmd_w) );
-	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x400000, 0x400001, FUNC(sub2main_cmd_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x403ffe, 0x403fff, FUNC(main2sub_cmd_w) );
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x400000, 0x400001, FUNC(sub2main_cmd_w) );
 
 
 	memset(state->mcu_com, 0, 4 * sizeof( UINT16 ) );
 
-	machine->device<nvram_device>("nvram")->set_base(state->nvram_data, sizeof(state->nvram_data));
+	machine.device<nvram_device>("nvram")->set_base(state->nvram_data, sizeof(state->nvram_data));
 }
 
 

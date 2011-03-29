@@ -97,7 +97,7 @@ TODO:
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	lkage_state *state = machine->driver_data<lkage_state>();
+	lkage_state *state = machine.driver_data<lkage_state>();
 	if (state->sound_nmi_enable)
 		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
@@ -107,18 +107,18 @@ static TIMER_CALLBACK( nmi_callback )
 static WRITE8_HANDLER( lkage_sound_command_w )
 {
 	soundlatch_w(space, offset, data);
-	space->machine->scheduler().synchronize(FUNC(nmi_callback), data);
+	space->machine().scheduler().synchronize(FUNC(nmi_callback), data);
 }
 
 static WRITE8_HANDLER( lkage_sh_nmi_disable_w )
 {
-	lkage_state *state = space->machine->driver_data<lkage_state>();
+	lkage_state *state = space->machine().driver_data<lkage_state>();
 	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( lkage_sh_nmi_enable_w )
 {
-	lkage_state *state = space->machine->driver_data<lkage_state>();
+	lkage_state *state = space->machine().driver_data<lkage_state>();
 
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
@@ -161,7 +161,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( port_fetch_r )
 {
-	return space->machine->region("user1")->base()[offset];
+	return space->machine().region("user1")->base()[offset];
 }
 
 static ADDRESS_MAP_START( lkage_io_map, AS_IO, 8 )
@@ -480,7 +480,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	lkage_state *state = device->machine->driver_data<lkage_state>();
+	lkage_state *state = device->machine().driver_data<lkage_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -496,11 +496,11 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( lkage )
 {
-	lkage_state *state = machine->driver_data<lkage_state>();
+	lkage_state *state = machine.driver_data<lkage_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->mcu = machine->device("mcu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->mcu = machine.device("mcu");
 
 	state->save_item(NAME(state->bg_tile_bank));
 	state->save_item(NAME(state->fg_tile_bank));
@@ -530,7 +530,7 @@ static MACHINE_START( lkage )
 
 static MACHINE_RESET( lkage )
 {
-	lkage_state *state = machine->driver_data<lkage_state>();
+	lkage_state *state = machine.driver_data<lkage_state>();
 
 	state->bg_tile_bank = state->fg_tile_bank = state->tx_tile_bank =0;
 
@@ -922,7 +922,7 @@ ROM_END
 
 static READ8_HANDLER( fake_mcu_r )
 {
-	lkage_state *state = space->machine->driver_data<lkage_state>();
+	lkage_state *state = space->machine().driver_data<lkage_state>();
 	int result = 0;
 
 	switch (state->mcu_val)
@@ -958,34 +958,34 @@ static READ8_HANDLER( fake_mcu_r )
 
 static WRITE8_HANDLER( fake_mcu_w )
 {
-	lkage_state *state = space->machine->driver_data<lkage_state>();
+	lkage_state *state = space->machine().driver_data<lkage_state>();
 	state->mcu_val = data;
 }
 
 static READ8_HANDLER( fake_status_r )
 {
-	lkage_state *state = space->machine->driver_data<lkage_state>();
+	lkage_state *state = space->machine().driver_data<lkage_state>();
 	return state->mcu_ready;
 }
 
 static DRIVER_INIT( lkage )
 {
-	lkage_state *state = machine->driver_data<lkage_state>();
+	lkage_state *state = machine.driver_data<lkage_state>();
 	state->sprite_dx=0;
 }
 
 static DRIVER_INIT( lkageb )
 {
-	lkage_state *state = machine->driver_data<lkage_state>();
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf062, 0xf062, FUNC(fake_mcu_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf087, 0xf087, FUNC(fake_status_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf062, 0xf062, FUNC(fake_mcu_w) );
+	lkage_state *state = machine.driver_data<lkage_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf062, 0xf062, FUNC(fake_mcu_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf087, 0xf087, FUNC(fake_status_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf062, 0xf062, FUNC(fake_mcu_w) );
 	state->sprite_dx=0;
 }
 
 static DRIVER_INIT( bygone )
 {
-	lkage_state *state = machine->driver_data<lkage_state>();
+	lkage_state *state = machine.driver_data<lkage_state>();
 	state->sprite_dx=1;
 }
 

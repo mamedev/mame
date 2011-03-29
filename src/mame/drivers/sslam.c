@@ -216,9 +216,9 @@ static const UINT8 sslam_snd_loop[8][20] =
 
 static TIMER_CALLBACK( music_playback )
 {
-	sslam_state *state = machine->driver_data<sslam_state>();
+	sslam_state *state = machine.driver_data<sslam_state>();
 	int pattern = 0;
-	okim6295_device *device = machine->device<okim6295_device>("oki");
+	okim6295_device *device = machine.device<okim6295_device>("oki");
 
 	if ((device->read_status() & 0x08) == 0)
 	{
@@ -256,7 +256,7 @@ static TIMER_CALLBACK( music_playback )
 
 static void sslam_play(device_t *device, int track, int data)
 {
-	sslam_state *state = device->machine->driver_data<sslam_state>();
+	sslam_state *state = device->machine().driver_data<sslam_state>();
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	int status = oki->read_status();
 
@@ -303,9 +303,9 @@ static WRITE16_DEVICE_HANDLER( sslam_snd_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		sslam_state *state = device->machine->driver_data<sslam_state>();
+		sslam_state *state = device->machine().driver_data<sslam_state>();
 
-		logerror("%s Writing %04x to Sound CPU\n",device->machine->describe_context(),data);
+		logerror("%s Writing %04x to Sound CPU\n",device->machine().describe_context(),data);
 		if (data >= 0x40) {
 			if (data == 0xfe) {
 				/* This should reset the sound MCU and stop audio playback, but here, it */
@@ -379,7 +379,7 @@ static WRITE16_DEVICE_HANDLER( sslam_snd_w )
 static WRITE16_HANDLER( powerbls_sound_w )
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", MCS51_INT1_LINE, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", MCS51_INT1_LINE, HOLD_LINE);
 }
 
 /* Memory Maps */
@@ -434,14 +434,14 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( playmark_snd_command_r )
 {
-	sslam_state *state = space->machine->driver_data<sslam_state>();
+	sslam_state *state = space->machine().driver_data<sslam_state>();
 	UINT8 data = 0;
 
 	if ((state->oki_control & 0x38) == 0x30) {
 		data = soundlatch_r(space,0);
 	}
 	else if ((state->oki_control & 0x38) == 0x28) {
-		data = (space->machine->device<okim6295_device>("oki")->read(*space,0) & 0x0f);
+		data = (space->machine().device<okim6295_device>("oki")->read(*space,0) & 0x0f);
 	}
 
 	return data;
@@ -449,14 +449,14 @@ static READ8_HANDLER( playmark_snd_command_r )
 
 static WRITE8_HANDLER( playmark_oki_w )
 {
-	sslam_state *state = space->machine->driver_data<sslam_state>();
+	sslam_state *state = space->machine().driver_data<sslam_state>();
 
 	state->oki_command = data;
 }
 
 static WRITE8_HANDLER( playmark_snd_control_w )
 {
-	sslam_state *state = space->machine->driver_data<sslam_state>();
+	sslam_state *state = space->machine().driver_data<sslam_state>();
 
 	state->oki_control = data;
 
@@ -465,13 +465,13 @@ static WRITE8_HANDLER( playmark_snd_control_w )
 		if (state->oki_bank != ((data & 3) - 1))
 		{
 			state->oki_bank = (data & 3) - 1;
-			space->machine->device<okim6295_device>("oki")->set_bank_base(0x40000 * state->oki_bank);
+			space->machine().device<okim6295_device>("oki")->set_bank_base(0x40000 * state->oki_bank);
 		}
 	}
 
 	if ((data & 0x38) == 0x18)
 	{
-		space->machine->device<okim6295_device>("oki")->write(*space, 0, state->oki_command);
+		space->machine().device<okim6295_device>("oki")->write(*space, 0, state->oki_command);
 	}
 
 //  !(data & 0x80) -> sound enable
@@ -927,7 +927,7 @@ ROM_END
 
 static DRIVER_INIT( sslam )
 {
-	sslam_state *state = machine->driver_data<sslam_state>();
+	sslam_state *state = machine.driver_data<sslam_state>();
 	state->track = 0;
 	state->melody = 0;
 	state->bar = 0;
@@ -937,12 +937,12 @@ static DRIVER_INIT( sslam )
 	state->save_item(NAME(state->bar));
 	state->save_item(NAME(state->snd_bank));
 
-	state->music_timer = machine->scheduler().timer_alloc(FUNC(music_playback));
+	state->music_timer = machine.scheduler().timer_alloc(FUNC(music_playback));
 }
 
 static DRIVER_INIT( powerbls )
 {
-	sslam_state *state = machine->driver_data<sslam_state>();
+	sslam_state *state = machine.driver_data<sslam_state>();
 
 	state->save_item(NAME(state->oki_control));
 	state->save_item(NAME(state->oki_command));

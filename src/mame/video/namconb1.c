@@ -41,16 +41,16 @@ nth_byte32( const UINT32 *pSource, int which )
 } /* nth_byte32 */
 
 static void
-NB1TilemapCB(running_machine *machine, UINT16 code, int *tile, int *mask )
+NB1TilemapCB(running_machine &machine, UINT16 code, int *tile, int *mask )
 {
 	*tile = code;
 	*mask = code;
 } /* NB1TilemapCB */
 
 static void
-NB2TilemapCB(running_machine *machine, UINT16 code, int *tile, int *mask )
+NB2TilemapCB(running_machine &machine, UINT16 code, int *tile, int *mask )
 {
-	namconb1_state *state = machine->driver_data<namconb1_state>();
+	namconb1_state *state = machine.driver_data<namconb1_state>();
 	int mangle;
 
 	if( namcos2_gametype == NAMCONB2_MACH_BREAKERS )
@@ -73,7 +73,7 @@ NB2TilemapCB(running_machine *machine, UINT16 code, int *tile, int *mask )
 	}
 } /* NB2TilemapCB */
 
-static void namconb1_install_palette(running_machine *machine)
+static void namconb1_install_palette(running_machine &machine)
 {
 	int pen, page, dword_offset, byte_offset;
 	UINT32 r,g,b;
@@ -86,7 +86,7 @@ static void namconb1_install_palette(running_machine *machine)
 	pen = 0;
 	for( page=0; page<4; page++ )
 	{
-		pSource = &machine->generic.paletteram.u32[page*0x2000/4];
+		pSource = &machine.generic.paletteram.u32[page*0x2000/4];
 		for( dword_offset=0; dword_offset<0x800/4; dword_offset++ )
 		{
 			r = pSource[dword_offset+0x0000/4];
@@ -103,7 +103,7 @@ static void namconb1_install_palette(running_machine *machine)
 } /* namconb1_install_palette */
 
 static void
-video_update_common(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bROZ )
+video_update_common(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bROZ )
 {
 	int pri;
 	namconb1_install_palette(machine);
@@ -137,8 +137,8 @@ SCREEN_UPDATE( namconb1 )
 	/* compute window for custom screen blanking */
 	rectangle clip;
 	//004a 016a 0021 0101 0144 0020 (nebulas ray)
-	UINT32 xclip = screen->machine->generic.paletteram.u32[0x1800/4];
-	UINT32 yclip = screen->machine->generic.paletteram.u32[0x1804/4];
+	UINT32 xclip = screen->machine().generic.paletteram.u32[0x1800/4];
+	UINT32 yclip = screen->machine().generic.paletteram.u32[0x1804/4];
 	clip.min_x = (xclip>>16)    - 0x4a;
 	clip.max_x = (xclip&0xffff) - 0x4a - 1;
 	clip.min_y = (yclip>>16)    - 0x21;
@@ -149,24 +149,24 @@ SCREEN_UPDATE( namconb1 )
 	if( clip.max_x > cliprect->max_x ){ clip.max_x = cliprect->max_x; }
 	if( clip.max_y > cliprect->max_y ){ clip.max_y = cliprect->max_y; }
 
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine()));
 
-	video_update_common( screen->machine, bitmap, &clip, 0 );
+	video_update_common( screen->machine(), bitmap, &clip, 0 );
 
 	return 0;
 }
 
 static int
-NB1objcode2tile( running_machine *machine, int code )
+NB1objcode2tile( running_machine &machine, int code )
 {
-	namconb1_state *state = machine->driver_data<namconb1_state>();
+	namconb1_state *state = machine.driver_data<namconb1_state>();
 	int bank = nth_word32( state->spritebank32, code>>11 );
 	return (code&0x7ff) + bank*0x800;
 }
 
 VIDEO_START( namconb1 )
 {
-	namco_tilemap_init( machine, NAMCONB1_TILEGFX, machine->region(NAMCONB1_TILEMASKREGION)->base(), NB1TilemapCB );
+	namco_tilemap_init( machine, NAMCONB1_TILEGFX, machine.region(NAMCONB1_TILEMASKREGION)->base(), NB1TilemapCB );
 	namco_obj_init(machine,NAMCONB1_SPRITEGFX,0x0,NB1objcode2tile);
 } /* namconb1 */
 
@@ -174,12 +174,12 @@ VIDEO_START( namconb1 )
 
 SCREEN_UPDATE( namconb2 )
 {
-	namconb1_state *state = screen->machine->driver_data<namconb1_state>();
+	namconb1_state *state = screen->machine().driver_data<namconb1_state>();
 	/* compute window for custom screen blanking */
 	rectangle clip;
 	//004a016a 00210101 01440020
-	UINT32 xclip = screen->machine->generic.paletteram.u32[0x1800/4];
-	UINT32 yclip = screen->machine->generic.paletteram.u32[0x1804/4];
+	UINT32 xclip = screen->machine().generic.paletteram.u32[0x1800/4];
+	UINT32 yclip = screen->machine().generic.paletteram.u32[0x1804/4];
 	clip.min_x = (xclip>>16)    - 0x4b;
 	clip.max_x = (xclip&0xffff) - 0x4b - 1;
 	clip.min_y = (yclip>>16)    - 0x21;
@@ -190,21 +190,21 @@ SCREEN_UPDATE( namconb2 )
 	if( clip.max_x > cliprect->max_x ){ clip.max_x = cliprect->max_x; }
 	if( clip.max_y > cliprect->max_y ){ clip.max_y = cliprect->max_y; }
 
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine()));
 
 	if( memcmp(state->tilemap_tile_bank,state->tilebank32,sizeof(state->tilemap_tile_bank))!=0 )
 	{
 		namco_tilemap_invalidate();
 		memcpy(state->tilemap_tile_bank,state->tilebank32,sizeof(state->tilemap_tile_bank));
 	}
-	video_update_common( screen->machine, bitmap, &clip, 1 );
+	video_update_common( screen->machine(), bitmap, &clip, 1 );
 	return 0;
 }
 
 static int
-NB2objcode2tile( running_machine *machine, int code )
+NB2objcode2tile( running_machine &machine, int code )
 {
-	namconb1_state *state = machine->driver_data<namconb1_state>();
+	namconb1_state *state = machine.driver_data<namconb1_state>();
 	int bank = nth_byte32( state->spritebank32, (code>>11)&0xf );
 	code &= 0x7ff;
 	if( namcos2_gametype == NAMCONB2_MACH_BREAKERS )
@@ -230,7 +230,7 @@ NB2objcode2tile( running_machine *machine, int code )
 
 VIDEO_START( namconb2 )
 {
-	namco_tilemap_init(machine, NAMCONB1_TILEGFX, machine->region(NAMCONB1_TILEMASKREGION)->base(), NB2TilemapCB );
+	namco_tilemap_init(machine, NAMCONB1_TILEGFX, machine.region(NAMCONB1_TILEMASKREGION)->base(), NB2TilemapCB );
 	namco_obj_init(machine,NAMCONB1_SPRITEGFX,0x0,NB2objcode2tile);
 	namco_roz_init(machine, NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
 } /* namconb2_vh_start */

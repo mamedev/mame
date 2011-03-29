@@ -28,7 +28,7 @@ note:
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	tankbust_state *state = machine->driver_data<tankbust_state>();
+	tankbust_state *state = machine.driver_data<tankbust_state>();
 	int code = state->videoram[tile_index];
 	int attr = state->colorram[tile_index];
 
@@ -59,7 +59,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_txt_tile_info )
 {
-	tankbust_state *state = machine->driver_data<tankbust_state>();
+	tankbust_state *state = machine.driver_data<tankbust_state>();
 	int code = state->txtram[tile_index];
 	int color = ((code>>6) & 0x03);
 
@@ -78,7 +78,7 @@ static TILE_GET_INFO( get_txt_tile_info )
 
 VIDEO_START( tankbust )
 {
-	tankbust_state *state = machine->driver_data<tankbust_state>();
+	tankbust_state *state = machine.driver_data<tankbust_state>();
 	/* not scrollable */
 	state->txt_tilemap = tilemap_create(machine, get_txt_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 
@@ -98,37 +98,37 @@ VIDEO_START( tankbust )
 
 WRITE8_HANDLER( tankbust_background_videoram_w )
 {
-	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	tankbust_state *state = space->machine().driver_data<tankbust_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 READ8_HANDLER( tankbust_background_videoram_r )
 {
-	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	tankbust_state *state = space->machine().driver_data<tankbust_state>();
 	return state->videoram[offset];
 }
 
 WRITE8_HANDLER( tankbust_background_colorram_w )
 {
-	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	tankbust_state *state = space->machine().driver_data<tankbust_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 READ8_HANDLER( tankbust_background_colorram_r )
 {
-	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	tankbust_state *state = space->machine().driver_data<tankbust_state>();
 	return state->colorram[offset];
 }
 
 WRITE8_HANDLER( tankbust_txtram_w )
 {
-	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	tankbust_state *state = space->machine().driver_data<tankbust_state>();
 	state->txtram[offset] = data;
 	tilemap_mark_tile_dirty(state->txt_tilemap, offset);
 }
 READ8_HANDLER( tankbust_txtram_r )
 {
-	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	tankbust_state *state = space->machine().driver_data<tankbust_state>();
 	return state->txtram[offset];
 }
 
@@ -136,7 +136,7 @@ READ8_HANDLER( tankbust_txtram_r )
 
 WRITE8_HANDLER( tankbust_xscroll_w )
 {
-	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	tankbust_state *state = space->machine().driver_data<tankbust_state>();
 	if( state->xscroll[offset] != data )
 	{
 		int x;
@@ -153,7 +153,7 @@ WRITE8_HANDLER( tankbust_xscroll_w )
 
 WRITE8_HANDLER( tankbust_yscroll_w )
 {
-	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	tankbust_state *state = space->machine().driver_data<tankbust_state>();
 	if( state->yscroll[offset] != data )
 	{
 		int y;
@@ -187,9 +187,9 @@ spriteram format (4 bytes per sprite):
     offset  3   xxxxxxxx    x position (8 LSB bits)
 */
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	tankbust_state *state = machine->driver_data<tankbust_state>();
+	tankbust_state *state = machine.driver_data<tankbust_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -223,7 +223,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if ((spriteram[offs+1]!=4))	//otherwise - ghost sprites
 		{
 
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				code, color,
 				flipx,flipy,
 				sx,sy,0);
@@ -234,7 +234,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( tankbust )
 {
-	tankbust_state *state = screen->machine->driver_data<tankbust_state>();
+	tankbust_state *state = screen->machine().driver_data<tankbust_state>();
 #if 0
 	int i;
 
@@ -250,7 +250,7 @@ SCREEN_UPDATE( tankbust )
 #endif
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 1, 0);
 
 	tilemap_draw(bitmap, cliprect, state->txt_tilemap, 0,0);

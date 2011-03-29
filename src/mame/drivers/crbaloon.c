@@ -50,36 +50,36 @@ static void pc3092_reset(void)
 }
 
 
-static void pc3092_update(running_machine *machine)
+static void pc3092_update(running_machine &machine)
 {
-	crbaloon_state *state = machine->driver_data<crbaloon_state>();
+	crbaloon_state *state = machine.driver_data<crbaloon_state>();
 	flip_screen_set(machine, (state->pc3092_data[1] & 0x01) ? TRUE : FALSE);
 }
 
 
 static WRITE8_HANDLER( pc3092_w )
 {
-	crbaloon_state *state = space->machine->driver_data<crbaloon_state>();
+	crbaloon_state *state = space->machine().driver_data<crbaloon_state>();
 	state->pc3092_data[offset] = data & 0x0f;
 
 	if (LOG_PC3092) logerror("%04X:  write PC3092 #%d = 0x%02x\n", cpu_get_pc(space->cpu), offset, state->pc3092_data[offset]);
 
-	pc3092_update(space->machine);
+	pc3092_update(space->machine());
 }
 
 
 static CUSTOM_INPUT( pc3092_r )
 {
-	crbaloon_state *state = field->port->machine->driver_data<crbaloon_state>();
+	crbaloon_state *state = field->port->machine().driver_data<crbaloon_state>();
 	UINT32 ret;
 
 	/* enable coin & start input? Wild guess!!! */
 	if (state->pc3092_data[1] & 0x02)
-		ret = input_port_read(field->port->machine, "PC3092");
+		ret = input_port_read(field->port->machine(), "PC3092");
 	else
 		ret = 0x00;
 
-	if (LOG_PC3092) logerror("%s:  read  PC3092 = 0x%02x\n", field->port->machine->describe_context(), ret);
+	if (LOG_PC3092) logerror("%s:  read  PC3092 = 0x%02x\n", field->port->machine().describe_context(), ret);
 
 	return ret;
 }
@@ -120,7 +120,7 @@ static READ8_HANDLER( pc3259_r )
 	UINT8 ret = 0;
 	UINT8 reg = offset >> 2;
 
-	UINT16 collision_address = crbaloon_get_collision_address(space->machine);
+	UINT16 collision_address = crbaloon_get_collision_address(space->machine());
 	int collided = (collision_address != 0xffff);
 
 	switch (reg)
@@ -145,7 +145,7 @@ static READ8_HANDLER( pc3259_r )
 
 	if (LOG_PC3259) logerror("%04X:  read PC3259 #%d = 0x%02x\n", cpu_get_pc(space->cpu), reg, ret);
 
-	return ret | (input_port_read(space->machine, "DSW1") & 0xf0);
+	return ret | (input_port_read(space->machine(), "DSW1") & 0xf0);
 }
 
 
@@ -158,15 +158,15 @@ static READ8_HANDLER( pc3259_r )
 
 static WRITE8_HANDLER( port_sound_w )
 {
-	device_t *discrete = space->machine->device("discrete");
-	device_t *sn = space->machine->device("snsnd");
+	device_t *discrete = space->machine().device("discrete");
+	device_t *sn = space->machine().device("snsnd");
 
 	/* D0 - interrupt enable - also goes to PC3259 as /HTCTRL */
-	cpu_interrupt_enable(space->machine->device("maincpu"), (data & 0x01) ? TRUE : FALSE);
-	crbaloon_set_clear_collision_address(space->machine, (data & 0x01) ? TRUE : FALSE);
+	cpu_interrupt_enable(space->machine().device("maincpu"), (data & 0x01) ? TRUE : FALSE);
+	crbaloon_set_clear_collision_address(space->machine(), (data & 0x01) ? TRUE : FALSE);
 
 	/* D1 - SOUND STOP */
-	space->machine->sound().system_enable((data & 0x02) ? TRUE : FALSE);
+	space->machine().sound().system_enable((data & 0x02) ? TRUE : FALSE);
 
 	/* D2 - unlabeled - music enable */
 	crbaloon_audio_set_music_enable(discrete, 0, (data & 0x04) ? TRUE : FALSE);
@@ -341,8 +341,8 @@ GFXDECODE_END
 
 static MACHINE_RESET( crballoon )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_IO);
-	device_t *discrete = machine->device("discrete");
+	address_space *space = machine.device("maincpu")->memory().space(AS_IO);
+	device_t *discrete = machine.device("discrete");
 
 	pc3092_reset();
 	port_sound_w(space, 0, 0);

@@ -130,14 +130,14 @@ Notes (couriersud)
 
 static WRITE8_DEVICE_HANDLER( ic8j1_output_changed )
 {
-	m10_state *state = device->machine->driver_data<m10_state>();
-	LOG(("ic8j1: %d %d\n", data, device->machine->primary_screen->vpos()));
+	m10_state *state = device->machine().driver_data<m10_state>();
+	LOG(("ic8j1: %d %d\n", data, device->machine().primary_screen->vpos()));
 	device_set_input_line(state->maincpu, 0, !data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( ic8j2_output_changed )
 {
-	m10_state *state = device->machine->driver_data<m10_state>();
+	m10_state *state = device->machine().driver_data<m10_state>();
 
 	/* written from /Q to A with slight delight */
 	LOG(("ic8j2: %d\n", data));
@@ -194,12 +194,12 @@ static PALETTE_INIT( m10 )
 
 static MACHINE_START( m10 )
 {
-	m10_state *state = machine->driver_data<m10_state>();
+	m10_state *state = machine.driver_data<m10_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->ic8j1 = machine->device("ic8j1");
-	state->ic8j2 = machine->device("ic8j2");
-	state->samples = machine->device("samples");
+	state->maincpu = machine.device("maincpu");
+	state->ic8j1 = machine.device("ic8j1");
+	state->ic8j2 = machine.device("ic8j2");
+	state->samples = machine.device("samples");
 
 	state->save_item(NAME(state->bottomline));
 	state->save_item(NAME(state->flip));
@@ -208,7 +208,7 @@ static MACHINE_START( m10 )
 
 static MACHINE_RESET( m10 )
 {
-	m10_state *state = machine->driver_data<m10_state>();
+	m10_state *state = machine.driver_data<m10_state>();
 
 	state->bottomline = 0;
 	state->flip = 0;
@@ -242,7 +242,7 @@ static MACHINE_RESET( m10 )
 
 static WRITE8_HANDLER( m10_ctrl_w )
 {
-	m10_state *state = space->machine->driver_data<m10_state>();
+	m10_state *state = space->machine().driver_data<m10_state>();
 
 #if DEBUG
 	if (data & 0x40)
@@ -252,11 +252,11 @@ static WRITE8_HANDLER( m10_ctrl_w )
 	/* I have NO IDEA if this is correct or not */
 	state->bottomline = ~data & 0x20;
 
-	if (input_port_read(space->machine, "CAB") & 0x01)
+	if (input_port_read(space->machine(), "CAB") & 0x01)
 		state->flip = ~data & 0x10;
 
-	if (!(input_port_read(space->machine, "CAB") & 0x02))
-		space->machine->sound().system_mute(data & 0x80);
+	if (!(input_port_read(space->machine(), "CAB") & 0x02))
+		space->machine().sound().system_mute(data & 0x80);
 
 	/* sound command in lower 4 bytes */
 	switch (data & 0x07)
@@ -319,7 +319,7 @@ static WRITE8_HANDLER( m10_ctrl_w )
 
 static WRITE8_HANDLER( m11_ctrl_w )
 {
-	m10_state *state = space->machine->driver_data<m10_state>();
+	m10_state *state = space->machine().driver_data<m10_state>();
 
 #if DEBUG
 	if (data & 0x4c)
@@ -328,11 +328,11 @@ static WRITE8_HANDLER( m11_ctrl_w )
 
 	state->bottomline = ~data & 0x20;
 
-	if (input_port_read(space->machine, "CAB") & 0x01)
+	if (input_port_read(space->machine(), "CAB") & 0x01)
 		state->flip = ~data & 0x10;
 
-	if (!(input_port_read(space->machine, "CAB") & 0x02))
-		space->machine->sound().system_mute(data & 0x80);
+	if (!(input_port_read(space->machine(), "CAB") & 0x02))
+		space->machine().sound().system_mute(data & 0x80);
 }
 
 /*
@@ -352,16 +352,16 @@ static WRITE8_HANDLER( m11_ctrl_w )
 
 static WRITE8_HANDLER( m15_ctrl_w )
 {
-	m10_state *state = space->machine->driver_data<m10_state>();
+	m10_state *state = space->machine().driver_data<m10_state>();
 
 #if DEBUG
 	if (data & 0xf0)
 		popmessage("M15 ctrl: %02x",data);
 #endif
-	if (input_port_read(space->machine, "CAB") & 0x01)
+	if (input_port_read(space->machine(), "CAB") & 0x01)
 		state->flip = ~data & 0x04;
-	if (!(input_port_read(space->machine, "CAB") & 0x02))
-		space->machine->sound().system_mute(data & 0x08);
+	if (!(input_port_read(space->machine(), "CAB") & 0x02))
+		space->machine().sound().system_mute(data & 0x08);
 }
 
 
@@ -388,7 +388,7 @@ static WRITE8_HANDLER( m10_a500_w )
 
 static WRITE8_HANDLER( m11_a100_w )
 {
-	m10_state *state = space->machine->driver_data<m10_state>();
+	m10_state *state = space->machine().driver_data<m10_state>();
 	int raising_bits = data & ~state->last;
 	//int falling_bits = ~data & state->last;
 
@@ -423,7 +423,7 @@ static WRITE8_HANDLER( m11_a100_w )
 
 static WRITE8_HANDLER( m15_a100_w )
 {
-	m10_state *state = space->machine->driver_data<m10_state>();
+	m10_state *state = space->machine().driver_data<m10_state>();
 	//int raising_bits = data & ~state->last;
 	int falling_bits = ~data & state->last;
 
@@ -481,8 +481,8 @@ static WRITE8_HANDLER( m15_a100_w )
 
 static READ8_HANDLER( m10_a700_r )
 {
-	m10_state *state = space->machine->driver_data<m10_state>();
-	//LOG(("rd:%d\n",space->machine->primary_screen->vpos()));
+	m10_state *state = space->machine().driver_data<m10_state>();
+	//LOG(("rd:%d\n",space->machine().primary_screen->vpos()));
 	LOG(("clear\n"));
 	ttl74123_clear_w(state->ic8j1, 0, 0);
 	ttl74123_clear_w(state->ic8j1, 0, 1);
@@ -491,8 +491,8 @@ static READ8_HANDLER( m10_a700_r )
 
 static READ8_HANDLER( m11_a700_r )
 {
-	m10_state *state = space->machine->driver_data<m10_state>();
-	//LOG(("rd:%d\n",space->machine->primary_screen->vpos()));
+	m10_state *state = space->machine().driver_data<m10_state>();
+	//LOG(("rd:%d\n",space->machine().primary_screen->vpos()));
 	//device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 	LOG(("clear\n"));
 	ttl74123_clear_w(state->ic8j1, 0, 0);
@@ -508,7 +508,7 @@ static READ8_HANDLER( m11_a700_r )
 
 static INPUT_CHANGED( coin_inserted )
 {
-	m10_state *state = field->port->machine->driver_data<m10_state>();
+	m10_state *state = field->port->machine().driver_data<m10_state>();
 	/* coin insertion causes an NMI */
 	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -516,16 +516,16 @@ static INPUT_CHANGED( coin_inserted )
 
 static TIMER_CALLBACK( interrupt_callback )
 {
-	m10_state *state = machine->driver_data<m10_state>();
+	m10_state *state = machine.driver_data<m10_state>();
 	if (param == 0)
 	{
 		device_set_input_line(state->maincpu, 0, ASSERT_LINE);
-		machine->scheduler().timer_set(machine->primary_screen->time_until_pos(IREMM10_VBSTART + 16), FUNC(interrupt_callback), 1);
+		machine.scheduler().timer_set(machine.primary_screen->time_until_pos(IREMM10_VBSTART + 16), FUNC(interrupt_callback), 1);
 	}
 	if (param == 1)
 	{
 		device_set_input_line(state->maincpu, 0, ASSERT_LINE);
-		machine->scheduler().timer_set(machine->primary_screen->time_until_pos(IREMM10_VBSTART + 24), FUNC(interrupt_callback), 2);
+		machine.scheduler().timer_set(machine.primary_screen->time_until_pos(IREMM10_VBSTART + 24), FUNC(interrupt_callback), 2);
 	}
 	if (param == -1)
 		device_set_input_line(state->maincpu, 0, CLEAR_LINE);
@@ -536,7 +536,7 @@ static TIMER_CALLBACK( interrupt_callback )
 static INTERRUPT_GEN( m11_interrupt )
 {
 	device_set_input_line(device, 0, ASSERT_LINE);
-	//device->machine->scheduler().timer_set(machine->primary_screen->time_until_pos(IREMM10_VBEND), FUNC(interrupt_callback), -1);
+	//device->machine().scheduler().timer_set(machine.primary_screen->time_until_pos(IREMM10_VBEND), FUNC(interrupt_callback), -1);
 }
 
 static INTERRUPT_GEN( m10_interrupt )
@@ -548,7 +548,7 @@ static INTERRUPT_GEN( m10_interrupt )
 static INTERRUPT_GEN( m15_interrupt )
 {
 	device_set_input_line(device, 0, ASSERT_LINE);
-	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_pos(IREMM10_VBSTART + 1, 80), FUNC(interrupt_callback), -1);
+	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(IREMM10_VBSTART + 1, 80), FUNC(interrupt_callback), -1);
 }
 
 /*************************************
@@ -930,7 +930,7 @@ MACHINE_CONFIG_END
 static DRIVER_INIT( andromed )
 {
 	int i;
-	m10_state *state = machine->driver_data<m10_state>();
+	m10_state *state = machine.driver_data<m10_state>();
 
 	for (i = 0x1c00; i < 0x2000; i++)
 		state->rom[i] = 0x60;
@@ -939,7 +939,7 @@ static DRIVER_INIT( andromed )
 static DRIVER_INIT( ipminva1 )
 {
 	int i;
-	m10_state *state = machine->driver_data<m10_state>();
+	m10_state *state = machine.driver_data<m10_state>();
 
 	for (i = 0x1400; i < 0x17ff; i++)
 		state->rom[i] = 0x60;

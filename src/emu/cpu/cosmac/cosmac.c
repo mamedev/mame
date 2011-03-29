@@ -214,7 +214,7 @@ device_config *cosmac_device_config::static_alloc_device_config(const machine_co
 
 device_t *cosmac_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, cosmac_device(machine, *this));
+	return auto_alloc(machine, cosmac_device(machine, *this));
 }
 
 

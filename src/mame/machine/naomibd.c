@@ -793,7 +793,7 @@ static void init_save_state(device_t *device)
 {
 	naomibd_state *v = get_safe_token(device);
 
-	device->machine->state().register_postload(naomibd_postload, v);
+	device->machine().state().register_postload(naomibd_postload, v);
 
 	/* register states */
 	device->save_item(NAME(v->rom_offset));
@@ -945,13 +945,13 @@ READ64_DEVICE_HANDLER( naomibd_r )
 	{
 		UINT64 ret;
 
-		ret = device->machine->device<x76f100_device>("naomibd_eeprom")->sda_r() << 15;
+		ret = device->machine().device<x76f100_device>("naomibd_eeprom")->sda_r() << 15;
 
 		return ret << 32;
 	}
 	else
 	{
-		//mame_printf_verbose("%s:ROM: read mask %" I64FMT "x @ %x\n", machine->describe_context(), mem_mask, offset);
+		//mame_printf_verbose("%s:ROM: read mask %" I64FMT "x @ %x\n", machine.describe_context(), mem_mask, offset);
 	}
 
 	return U64(0xffffffffffffffff);
@@ -1098,7 +1098,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 						v->prot_key = data;
 
 						#if NAOMIBD_PRINTF_PROTECTION
-						printf("Protection: set up read @ %x, key %x (PIO %x DMA %x) [%s]\n", v->prot_offset*2, v->prot_key, v->rom_offset, v->dma_offset, device->machine->describe_context());
+						printf("Protection: set up read @ %x, key %x (PIO %x DMA %x) [%s]\n", v->prot_offset*2, v->prot_key, v->rom_offset, v->dma_offset, device->machine().describe_context());
 						#endif
 
 						// if dc_gamekey isn't -1, we can live-decrypt this one
@@ -1197,7 +1197,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 		{
 			if(ACCESSING_BITS_0_15)
 			{
-				x76f100_device *x76f100 = device->machine->device<x76f100_device>("naomibd_eeprom");
+				x76f100_device *x76f100 = device->machine().device<x76f100_device>("naomibd_eeprom");
 				// NAOMI_BOARDID_WRITE
 				x76f100->cs_w((data >> 2) & 1);
 				x76f100->rst_w((data >> 3) & 1);
@@ -1207,7 +1207,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 		}
 		break;
 		default:
-			mame_printf_verbose("%s: ROM: write %" I64FMT "x to %x, mask %" I64FMT "x\n", device->machine->describe_context(), data, offset, mem_mask);
+			mame_printf_verbose("%s: ROM: write %" I64FMT "x to %x, mask %" I64FMT "x\n", device->machine().describe_context(), data, offset, mem_mask);
 			break;
 	}
 }
@@ -1222,7 +1222,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 
 #define FILENAME_LENGTH 24
 
-static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
+static void load_rom_gdrom(running_machine& machine, naomibd_state *v)
 {
 	UINT32 result;
 	cdrom_file *gdromfile;
@@ -1236,7 +1236,7 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 
 	memset(name,'\0',128);
 
-	realpic = machine->region("pic")->base();
+	realpic = machine.region("pic")->base();
 
 	if (realpic)
 	{
@@ -1397,7 +1397,7 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 		}
 	}
 	// get des key
-	realpic = machine->region("pic")->base();
+	realpic = machine.region("pic")->base();
 
 	if (realpic)
 	{
@@ -2014,7 +2014,6 @@ static DEVICE_START( naomibd )
 	/* validate some basic stuff */
 	assert(device->baseconfig().static_config() == NULL);
 	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
-	assert(device->machine != NULL);
 
 	/* validate configuration */
 	assert(config->type >= ROM_BOARD && config->type < MAX_NAOMIBD_TYPES);
@@ -2026,7 +2025,7 @@ static DEVICE_START( naomibd )
 
 	for (i=0; i<ARRAY_LENGTH(naomibd_translate_tbl); i++)
 	{
-		if (!strcmp(device->machine->system().name, naomibd_translate_tbl[i].name))
+		if (!strcmp(device->machine().system().name, naomibd_translate_tbl[i].name))
 		{
             v->dc_gamekey = naomibd_translate_tbl[i].m2m3_key;
             v->dc_dmakey = naomibd_translate_tbl[i].m1_key;
@@ -2038,19 +2037,19 @@ static DEVICE_START( naomibd )
 	switch (config->type)
 	{
 		case ROM_BOARD:
-			v->memory = (UINT8 *)device->machine->region(config->regiontag)->base();
+			v->memory = (UINT8 *)device->machine().region(config->regiontag)->base();
 			break;
 
 		case AW_ROM_BOARD:
-			v->memory = (UINT8 *)device->machine->region(config->regiontag)->base();
+			v->memory = (UINT8 *)device->machine().region(config->regiontag)->base();
 			break;
 
 		case DIMM_BOARD:
-			v->memory = (UINT8 *)auto_alloc_array_clear(device->machine, UINT8, 0x40000000); // 0x40000000 is needed for some Chihiro sets, Naomi should be less, we should pass as device param
-			v->gdromchd = get_disk_handle(device->machine, config->gdromregiontag);
-			v->picdata = (UINT8 *)device->machine->region(config->picregiontag)->base();
+			v->memory = (UINT8 *)auto_alloc_array_clear(device->machine(), UINT8, 0x40000000); // 0x40000000 is needed for some Chihiro sets, Naomi should be less, we should pass as device param
+			v->gdromchd = get_disk_handle(device->machine(), config->gdromregiontag);
+			v->picdata = (UINT8 *)device->machine().region(config->picregiontag)->base();
 			if (v->memory != NULL && v->gdromchd != NULL && v->picdata != NULL)
-				load_rom_gdrom(device->machine, v);
+				load_rom_gdrom(device->machine(), v);
 			break;
 
 		default:
@@ -2059,7 +2058,7 @@ static DEVICE_START( naomibd )
 	}
 
 	/* set the type */
-	v->index = device->machine->m_devicelist.indexof(device->type(), device->tag());
+	v->index = device->machine().m_devicelist.indexof(device->type(), device->tag());
 	v->type = config->type;
 
 	/* initialize some registers */

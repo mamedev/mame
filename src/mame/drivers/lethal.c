@@ -178,8 +178,8 @@ maybe some priority issues / sprite placement issues..
 static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
 
 /* a = 1, 2 = player # */
-#define GUNX( a ) (( ( input_port_read(space->machine, gunnames[2 * (a - 1)]) * 287 ) / 0xff ) + 16)
-#define GUNY( a ) (( ( input_port_read(space->machine, gunnames[2 * (a - 1) + 1]) * 223 ) / 0xff ) + 10)
+#define GUNX( a ) (( ( input_port_read(space->machine(), gunnames[2 * (a - 1)]) * 287 ) / 0xff ) + 16)
+#define GUNY( a ) (( ( input_port_read(space->machine(), gunnames[2 * (a - 1) + 1]) * 223 ) / 0xff ) + 10)
 
 
 /* Default Eeprom for the parent.. otherwise it will always complain first boot */
@@ -210,16 +210,16 @@ static WRITE8_HANDLER( control2_w )
 	/* bit 4 bankswitches the 4800-4fff region: 0 = registers, 1 = RAM ("CBNK" on schematics) */
 	/* bit 6 is "SHD0" (some kind of shadow control) */
 	/* bit 7 is "SHD1" (ditto) */
-	lethal_state *state = space->machine->driver_data<lethal_state>();
+	lethal_state *state = space->machine().driver_data<lethal_state>();
 
 	state->cur_control2 = data;
 
-	input_port_write(space->machine, "EEPROMOUT", state->cur_control2, 0xff);
+	input_port_write(space->machine(), "EEPROMOUT", state->cur_control2, 0xff);
 }
 
 static INTERRUPT_GEN(lethalen_interrupt)
 {
-	lethal_state *state = device->machine->driver_data<lethal_state>();
+	lethal_state *state = device->machine().driver_data<lethal_state>();
 
 	if (k056832_is_irq_enabled(state->k056832, 0))
 		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
@@ -232,7 +232,7 @@ static WRITE8_HANDLER( sound_cmd_w )
 
 static WRITE8_HANDLER( sound_irq_w )
 {
-	lethal_state *state = space->machine->driver_data<lethal_state>();
+	lethal_state *state = space->machine().driver_data<lethal_state>();
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
@@ -243,22 +243,22 @@ static READ8_HANDLER( sound_status_r )
 
 static void sound_nmi( device_t *device )
 {
-	lethal_state *state = device->machine->driver_data<lethal_state>();
+	lethal_state *state = device->machine().driver_data<lethal_state>();
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( le_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data);
+	memory_set_bank(space->machine(), "bank1", data);
 }
 
 static READ8_HANDLER( le_4800_r )
 {
-	lethal_state *state = space->machine->driver_data<lethal_state>();
+	lethal_state *state = space->machine().driver_data<lethal_state>();
 
 	if (state->cur_control2 & 0x10)	// RAM enable
 	{
-		return space->machine->generic.paletteram.u8[offset];
+		return space->machine().generic.paletteram.u8[offset];
 	}
 	else
 	{
@@ -339,7 +339,7 @@ static READ8_HANDLER( le_4800_r )
 
 static WRITE8_HANDLER( le_4800_w )
 {
-	lethal_state *state = space->machine->driver_data<lethal_state>();
+	lethal_state *state = space->machine().driver_data<lethal_state>();
 
 	if (state->cur_control2 & 0x10)	// RAM enable
 	{
@@ -595,37 +595,37 @@ static const k054539_interface k054539_config =
 
 static MACHINE_START( lethalen )
 {
-	lethal_state *state = machine->driver_data<lethal_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	lethal_state *state = machine.driver_data<lethal_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 0x20, &ROM[0x10000], 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
-	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x3800 + 0x02);
+	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x3800 + 0x02);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("soundcpu");
-	state->k054539 = machine->device("k054539");
-	state->k053244 = machine->device("k053244");
-	state->k056832 = machine->device("k056832");
-	state->k054000 = machine->device("k054000");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("soundcpu");
+	state->k054539 = machine.device("k054539");
+	state->k053244 = machine.device("k053244");
+	state->k056832 = machine.device("k056832");
+	state->k054000 = machine.device("k054000");
 
 	state->save_item(NAME(state->cur_control2));
 	state->save_item(NAME(state->sprite_colorbase));
 	state->save_item(NAME(state->layer_colorbase));
 
-	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x3800 + 0x02);
+	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x3800 + 0x02);
 }
 
 static MACHINE_RESET( lethalen )
 {
-	lethal_state *state = machine->driver_data<lethal_state>();
-	UINT8 *prgrom = (UINT8 *)machine->region("maincpu")->base();
+	lethal_state *state = machine.driver_data<lethal_state>();
+	UINT8 *prgrom = (UINT8 *)machine.region("maincpu")->base();
 	int i;
 
 	memory_set_bankptr(machine, "bank2", &prgrom[0x48000]);
 	/* force reset again to read proper reset vector */
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 
 	for (i = 0; i < 4; i++)
 		state->layer_colorbase[i] = 0;

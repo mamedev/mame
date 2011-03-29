@@ -44,7 +44,7 @@
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	atarigt_state *state = machine->driver_data<atarigt_state>();
+	atarigt_state *state = machine.driver_data<atarigt_state>();
 	UINT16 data = state->alpha32[tile_index / 2] >> (16 * (~tile_index & 1));
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	atarigt_state *state = machine->driver_data<atarigt_state>();
+	atarigt_state *state = machine.driver_data<atarigt_state>();
 	UINT16 data = state->playfield32[tile_index / 2] >> (16 * (~tile_index & 1));
 	int code = (state->playfield_tile_bank << 12) | (data & 0xfff);
 	int color = (data >> 12) & 7;
@@ -78,7 +78,7 @@ static TILEMAP_MAPPER( atarigt_playfield_scan )
 
 VIDEO_START( atarigt )
 {
-	atarigt_state *state = machine->driver_data<atarigt_state>();
+	atarigt_state *state = machine.driver_data<atarigt_state>();
 	pen_t *substitute_pens;
 	int i, width, height;
 
@@ -89,23 +89,23 @@ VIDEO_START( atarigt )
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, atarigt_playfield_scan,  8,8, 128,64);
 
 	/* initialize the motion objects */
-	state->rle = machine->device("rle");
+	state->rle = machine.device("rle");
 
 	/* initialize the alphanumerics */
 	state->alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
 
 	/* allocate temp bitmaps */
-	width = machine->primary_screen->width();
-	height = machine->primary_screen->height();
+	width = machine.primary_screen->width();
+	height = machine.primary_screen->height();
 
 	state->pf_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 	state->an_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	/* map pens 1:1 */
 	substitute_pens = auto_alloc_array(machine, pen_t, 65536);
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 		substitute_pens[i] = i;
-	machine->pens = substitute_pens;
+	machine.pens = substitute_pens;
 
 	/* reset statics */
 	memset(state->colorram, 0, 0x80000);
@@ -167,7 +167,7 @@ UINT16 atarigt_colorram_r(atarigt_state *state, offs_t address)
 
 void atarigt_scanline_update(screen_device &screen, int scanline)
 {
-	atarigt_state *state = screen.machine->driver_data<atarigt_state>();
+	atarigt_state *state = screen.machine().driver_data<atarigt_state>();
 	UINT32 *base = &state->alpha32[(scanline / 8) * 32 + 24];
 	int i;
 
@@ -508,7 +508,7 @@ PrimRage GALs:
 
 SCREEN_UPDATE( atarigt )
 {
-	atarigt_state *state = screen->machine->driver_data<atarigt_state>();
+	atarigt_state *state = screen->machine().driver_data<atarigt_state>();
 	bitmap_t *mo_bitmap = atarirle_get_vram(state->rle, 0);
 	bitmap_t *tm_bitmap = atarirle_get_vram(state->rle, 1);
 	UINT16 *cram, *tram;
@@ -634,7 +634,7 @@ SCREEN_UPDATE( atarigt )
 
 SCREEN_EOF( atarigt )
 {
-	atarigt_state *state = machine->driver_data<atarigt_state>();
+	atarigt_state *state = machine.driver_data<atarigt_state>();
 
 	atarirle_eof(state->rle);
 }

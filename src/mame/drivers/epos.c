@@ -36,7 +36,7 @@
 
 static WRITE8_HANDLER( dealer_decrypt_rom )
 {
-	epos_state *state = space->machine->driver_data<epos_state>();
+	epos_state *state = space->machine().driver_data<epos_state>();
 
 	if (offset & 0x04)
 		state->counter = (state->counter + 1) & 0x03;
@@ -45,7 +45,7 @@ static WRITE8_HANDLER( dealer_decrypt_rom )
 
 //  logerror("PC %08x: ctr=%04x\n",cpu_get_pc(space->cpu), state->counter);
 
-	memory_set_bank(space->machine, "bank1", state->counter);
+	memory_set_bank(space->machine(), "bank1", state->counter);
 
 	// is the 2nd bank changed by the counter or it always uses the 1st key?
 }
@@ -102,7 +102,7 @@ ADDRESS_MAP_END
 */
 static WRITE8_DEVICE_HANDLER( write_prtc )
 {
-	memory_set_bank(device->machine, "bank2", data & 0x01);
+	memory_set_bank(device->machine(), "bank2", data & 0x01);
 }
 
 static const ppi8255_interface ppi8255_intf =
@@ -365,7 +365,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( epos )
 {
-	epos_state *state = machine->driver_data<epos_state>();
+	epos_state *state = machine.driver_data<epos_state>();
 
 	state->save_item(NAME(state->palette));
 	state->save_item(NAME(state->counter));
@@ -373,7 +373,7 @@ static MACHINE_START( epos )
 
 static MACHINE_RESET( epos )
 {
-	epos_state *state = machine->driver_data<epos_state>();
+	epos_state *state = machine.driver_data<epos_state>();
 
 	state->palette = 0;
 	state->counter = 0;
@@ -382,7 +382,7 @@ static MACHINE_RESET( epos )
 
 static MACHINE_START( dealer )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x0000], 0x10000);
 	memory_configure_bank(machine, "bank2", 0, 2, &ROM[0x6000], 0x1000);
 
@@ -610,7 +610,7 @@ ROM_END
 
 static DRIVER_INIT( dealer )
 {
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	int A;
 
 	/* Key 0 */

@@ -541,14 +541,14 @@ READ8_DEVICE_HANDLER(duart68681_r)
 				{
 					r = 0xff;
 #if 0
-					if (input_code_pressed(device->machine, KEYCODE_1)) r ^= 0x0001;
-					if (input_code_pressed(device->machine, KEYCODE_2)) r ^= 0x0002;
-					if (input_code_pressed(device->machine, KEYCODE_3)) r ^= 0x0004;
-					if (input_code_pressed(device->machine, KEYCODE_4)) r ^= 0x0008;
-					if (input_code_pressed(device->machine, KEYCODE_5)) r ^= 0x0010;
-					if (input_code_pressed(device->machine, KEYCODE_6)) r ^= 0x0020;
-					if (input_code_pressed(device->machine, KEYCODE_7)) r ^= 0x0040;
-					if (input_code_pressed(device->machine, KEYCODE_8)) r ^= 0x0080;
+					if (input_code_pressed(device->machine(), KEYCODE_1)) r ^= 0x0001;
+					if (input_code_pressed(device->machine(), KEYCODE_2)) r ^= 0x0002;
+					if (input_code_pressed(device->machine(), KEYCODE_3)) r ^= 0x0004;
+					if (input_code_pressed(device->machine(), KEYCODE_4)) r ^= 0x0008;
+					if (input_code_pressed(device->machine(), KEYCODE_5)) r ^= 0x0010;
+					if (input_code_pressed(device->machine(), KEYCODE_6)) r ^= 0x0020;
+					if (input_code_pressed(device->machine(), KEYCODE_7)) r ^= 0x0040;
+					if (input_code_pressed(device->machine(), KEYCODE_8)) r ^= 0x0080;
 #endif
 				}
 			break;
@@ -710,9 +710,9 @@ static DEVICE_START(duart68681)
 	duart68681->duart_config = (const duart68681_config *)device->baseconfig().static_config();
 	duart68681->device = device;
 
-	duart68681->channel[0].tx_timer = device->machine->scheduler().timer_alloc(FUNC(tx_timer_callback), (void*)device);
-	duart68681->channel[1].tx_timer = device->machine->scheduler().timer_alloc(FUNC(tx_timer_callback), (void*)device);
-	duart68681->duart_timer = device->machine->scheduler().timer_alloc(FUNC(duart_timer_callback), (void*)device);
+	duart68681->channel[0].tx_timer = device->machine().scheduler().timer_alloc(FUNC(tx_timer_callback), (void*)device);
+	duart68681->channel[1].tx_timer = device->machine().scheduler().timer_alloc(FUNC(tx_timer_callback), (void*)device);
+	duart68681->duart_timer = device->machine().scheduler().timer_alloc(FUNC(duart_timer_callback), (void*)device);
 
 	device->save_item(NAME(duart68681->ACR));
 	device->save_item(NAME(duart68681->IMR));

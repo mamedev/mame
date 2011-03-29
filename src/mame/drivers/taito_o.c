@@ -42,7 +42,7 @@ static WRITE16_HANDLER(io_w)
 {
 	switch(offset)
 	{
-		case 2: watchdog_reset(space->machine); break;
+		case 2: watchdog_reset(space->machine()); break;
 
 		default: logerror("IO W %x %x %x\n", offset, data, mem_mask);
 	}
@@ -54,8 +54,8 @@ static READ16_HANDLER(io_r)
 
 	switch(offset)
 	{
-		case 0: retval = input_port_read(space->machine, "IN0") & (clear_hack ? 0xf7ff : 0xffff); break;
-		case 1: retval = input_port_read(space->machine, "IN1") & (clear_hack ? 0xfff7 : 0xffff); break;
+		case 0: retval = input_port_read(space->machine(), "IN0") & (clear_hack ? 0xf7ff : 0xffff); break;
+		case 1: retval = input_port_read(space->machine(), "IN1") & (clear_hack ? 0xfff7 : 0xffff); break;
 		default: logerror("IO R %x %x = %x @ %x\n", offset, mem_mask, retval, cpu_get_pc(space->cpu));
 	}
 	return retval;
@@ -240,10 +240,10 @@ static const tc0080vco_interface parentj_intf =
 
 static MACHINE_START( taitoo )
 {
-	taitoo_state *state = machine->driver_data<taitoo_state>();
+	taitoo_state *state = machine.driver_data<taitoo_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->tc0080vco = machine->device("tc0080vco");
+	state->maincpu = machine.device("maincpu");
+	state->tc0080vco = machine.device("tc0080vco");
 }
 
 static MACHINE_CONFIG_START( parentj, taitoo_state )

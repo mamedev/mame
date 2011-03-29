@@ -78,7 +78,7 @@ extern const device_type SCREEN;
 // callback that is called to notify of a change in the VBLANK state
 typedef void (*vblank_state_changed_func)(screen_device &device, void *param, bool vblank_state);
 typedef UINT32 (*screen_update_func)(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-typedef void (*screen_eof_func)(screen_device *screen, running_machine *machine);
+typedef void (*screen_eof_func)(screen_device *screen, running_machine &machine);
 
 
 // ======================> screen_device_config
@@ -175,14 +175,14 @@ public:
 	// beam positioning and state
 	int vpos() const;
 	int hpos() const;
-	bool vblank() const { return (machine->time() < m_vblank_end_time); }
+	bool vblank() const { return (m_machine.time() < m_vblank_end_time); }
 	bool hblank() const { int curpos = hpos(); return (curpos < m_visarea.min_x || curpos > m_visarea.max_x); }
 
 	// timing
 	attotime time_until_pos(int vpos, int hpos = 0) const;
 	attotime time_until_vblank_start() const { return time_until_pos(m_visarea.max_y + 1); }
 	attotime time_until_vblank_end() const;
-	attotime time_until_update() const { return (machine->config().m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
+	attotime time_until_update() const { return (m_machine.config().m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
 	attotime scan_period() const { return attotime(0, m_scantime); }
 	attotime frame_period() const { return (this == NULL || !started()) ? DEFAULT_FRAME_PERIOD : attotime(0, m_frame_period); };
 	UINT64 frame_number() const { return m_frame_number; }
@@ -194,7 +194,7 @@ public:
 
 	// additional helpers
 	void register_vblank_callback(vblank_state_changed_func vblank_callback, void *param);
-	bitmap_t *alloc_compatible_bitmap(int width = 0, int height = 0) { return auto_bitmap_alloc(machine, (width == 0) ? m_width : width, (height == 0) ? m_height : height, m_config.m_format); }
+	bitmap_t *alloc_compatible_bitmap(int width = 0, int height = 0) { return auto_bitmap_alloc(m_machine, (width == 0) ? m_width : width, (height == 0) ? m_height : height, m_config.m_format); }
 
 	// internal to the video system
 	bool update_quads();
@@ -283,7 +283,7 @@ private:
 #define SCREEN_UPDATE_CALL(name)		SCREEN_UPDATE_NAME(name)(screen, bitmap, cliprect)
 
 #define SCREEN_EOF_NAME(name)			screen_eof_##name
-#define SCREEN_EOF(name)				void SCREEN_EOF_NAME(name)(screen_device *screen, running_machine *machine)
+#define SCREEN_EOF(name)				void SCREEN_EOF_NAME(name)(screen_device *screen, running_machine &machine)
 #define SCREEN_EOF_CALL(name)			SCREEN_EOF_NAME(name)(screen, machine)
 
 #define screen_eof_0					NULL

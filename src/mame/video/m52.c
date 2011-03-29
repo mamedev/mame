@@ -28,7 +28,7 @@ PALETTE_INIT( m52 )
 	double weights_r[3], weights_g[3], weights_b[3], scale;
 	int i;
 
-	machine->colortable = colortable_alloc(machine, 512 + 32 + 32);
+	machine.colortable = colortable_alloc(machine, 512 + 32 + 32);
 
 	/* compute palette information for characters/backgrounds */
 	scale = compute_resistor_weights(0,	255, -1.0,
@@ -44,7 +44,7 @@ PALETTE_INIT( m52 )
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r,g,b));
 	}
 
 	/* background palette */
@@ -55,7 +55,7 @@ PALETTE_INIT( m52 )
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
 
-		colortable_palette_set_color(machine->colortable, 512+i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine.colortable, 512+i, MAKE_RGB(r,g,b));
 	}
 
 	/* compute palette information for sprites */
@@ -72,18 +72,18 @@ PALETTE_INIT( m52 )
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		colortable_palette_set_color(machine->colortable, 512 + 32 + i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine.colortable, 512 + 32 + i, MAKE_RGB(r,g,b));
 	}
 
 	/* character lookup table */
 	for (i = 0; i < 512; i++)
-		colortable_entry_set_value(machine->colortable, i, i);
+		colortable_entry_set_value(machine.colortable, i, i);
 
 	/* sprite lookup table */
 	for (i = 0; i < 16 * 4; i++)
 	{
 		UINT8 promval = sprite_table[(i & 3) | ((i & ~3) << 1)];
-		colortable_entry_set_value(machine->colortable, 512 + i, 512 + 32 + promval);
+		colortable_entry_set_value(machine.colortable, 512 + i, 512 + 32 + promval);
 	}
 
 	/* background */
@@ -92,18 +92,18 @@ PALETTE_INIT( m52 )
 	/* xbb00: mountains */
 	/* 0xxbb: hills */
 	/* 1xxbb: city */
-	colortable_entry_set_value(machine->colortable, 512+16*4+0*4+0, 512);
-	colortable_entry_set_value(machine->colortable, 512+16*4+0*4+1, 512+4);
-	colortable_entry_set_value(machine->colortable, 512+16*4+0*4+2, 512+8);
-	colortable_entry_set_value(machine->colortable, 512+16*4+0*4+3, 512+12);
-	colortable_entry_set_value(machine->colortable, 512+16*4+1*4+0, 512);
-	colortable_entry_set_value(machine->colortable, 512+16*4+1*4+1, 512+1);
-	colortable_entry_set_value(machine->colortable, 512+16*4+1*4+2, 512+2);
-	colortable_entry_set_value(machine->colortable, 512+16*4+1*4+3, 512+3);
-	colortable_entry_set_value(machine->colortable, 512+16*4+2*4+0, 512);
-	colortable_entry_set_value(machine->colortable, 512+16*4+2*4+1, 512+16+1);
-	colortable_entry_set_value(machine->colortable, 512+16*4+2*4+2, 512+16+2);
-	colortable_entry_set_value(machine->colortable, 512+16*4+2*4+3, 512+16+3);
+	colortable_entry_set_value(machine.colortable, 512+16*4+0*4+0, 512);
+	colortable_entry_set_value(machine.colortable, 512+16*4+0*4+1, 512+4);
+	colortable_entry_set_value(machine.colortable, 512+16*4+0*4+2, 512+8);
+	colortable_entry_set_value(machine.colortable, 512+16*4+0*4+3, 512+12);
+	colortable_entry_set_value(machine.colortable, 512+16*4+1*4+0, 512);
+	colortable_entry_set_value(machine.colortable, 512+16*4+1*4+1, 512+1);
+	colortable_entry_set_value(machine.colortable, 512+16*4+1*4+2, 512+2);
+	colortable_entry_set_value(machine.colortable, 512+16*4+1*4+3, 512+3);
+	colortable_entry_set_value(machine.colortable, 512+16*4+2*4+0, 512);
+	colortable_entry_set_value(machine.colortable, 512+16*4+2*4+1, 512+16+1);
+	colortable_entry_set_value(machine.colortable, 512+16*4+2*4+2, 512+16+2);
+	colortable_entry_set_value(machine.colortable, 512+16*4+2*4+3, 512+16+3);
 }
 
 
@@ -116,7 +116,7 @@ PALETTE_INIT( m52 )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	m52_state *state = machine->driver_data<m52_state>();
+	m52_state *state = machine.driver_data<m52_state>();
 	UINT8 video = state->videoram[tile_index];
 	UINT8 color = state->colorram[tile_index];
 
@@ -148,7 +148,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( m52 )
 {
-	m52_state *state = machine->driver_data<m52_state>();
+	m52_state *state = machine.driver_data<m52_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 
@@ -174,7 +174,7 @@ VIDEO_START( m52 )
 
 WRITE8_HANDLER( m52_scroll_w )
 {
-	m52_state *state = space->machine->driver_data<m52_state>();
+	m52_state *state = space->machine().driver_data<m52_state>();
 /*
     According to the schematics there is only one video register that holds the X scroll value
     with a NAND gate on the V64 and V128 lines to control when it's read, and when
@@ -198,7 +198,7 @@ WRITE8_HANDLER( m52_scroll_w )
 
 WRITE8_HANDLER( m52_videoram_w )
 {
-	m52_state *state = space->machine->driver_data<m52_state>();
+	m52_state *state = space->machine().driver_data<m52_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -207,7 +207,7 @@ WRITE8_HANDLER( m52_videoram_w )
 
 WRITE8_HANDLER( m52_colorram_w )
 {
-	m52_state *state = space->machine->driver_data<m52_state>();
+	m52_state *state = space->machine().driver_data<m52_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -226,7 +226,7 @@ WRITE8_HANDLER( m52_colorram_w )
    follows: result = popcount(value & 0x7f) ^ (value >> 7) */
 READ8_HANDLER( m52_protection_r )
 {
-	m52_state *state = space->machine->driver_data<m52_state>();
+	m52_state *state = space->machine().driver_data<m52_state>();
 	int popcount = 0;
 	int temp;
 
@@ -245,31 +245,31 @@ READ8_HANDLER( m52_protection_r )
 
 WRITE8_HANDLER( m52_bg1ypos_w )
 {
-	m52_state *state = space->machine->driver_data<m52_state>();
+	m52_state *state = space->machine().driver_data<m52_state>();
 	state->bg1ypos = data;
 }
 
 WRITE8_HANDLER( m52_bg1xpos_w )
 {
-	m52_state *state = space->machine->driver_data<m52_state>();
+	m52_state *state = space->machine().driver_data<m52_state>();
 	state->bg1xpos = data;
 }
 
 WRITE8_HANDLER( m52_bg2xpos_w )
 {
-	m52_state *state = space->machine->driver_data<m52_state>();
+	m52_state *state = space->machine().driver_data<m52_state>();
 	state->bg2xpos = data;
 }
 
 WRITE8_HANDLER( m52_bg2ypos_w )
 {
-	m52_state *state = space->machine->driver_data<m52_state>();
+	m52_state *state = space->machine().driver_data<m52_state>();
 	state->bg2ypos = data;
 }
 
 WRITE8_HANDLER( m52_bgcontrol_w )
 {
-	m52_state *state = space->machine->driver_data<m52_state>();
+	m52_state *state = space->machine().driver_data<m52_state>();
 	state->bgcontrol = data;
 }
 
@@ -284,15 +284,15 @@ WRITE8_HANDLER( m52_bgcontrol_w )
 WRITE8_HANDLER( m52_flipscreen_w )
 {
 	/* screen flip is handled both by software and hardware */
-	flip_screen_set(space->machine, (data & 0x01) ^ (~input_port_read(space->machine, "DSW2") & 0x01));
+	flip_screen_set(space->machine(), (data & 0x01) ^ (~input_port_read(space->machine(), "DSW2") & 0x01));
 
-	coin_counter_w(space->machine, 0, data & 0x02);
-	coin_counter_w(space->machine, 1, data & 0x20);
+	coin_counter_w(space->machine(), 0, data & 0x02);
+	coin_counter_w(space->machine(), 1, data & 0x20);
 }
 
 WRITE8_HANDLER( alpha1v_flipscreen_w )
 {
-	flip_screen_set(space->machine, data & 0x01);
+	flip_screen_set(space->machine(), data & 0x01);
 }
 
 
@@ -303,10 +303,10 @@ WRITE8_HANDLER( alpha1v_flipscreen_w )
  *
  *************************************/
 
-static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xpos, int ypos, int image)
+static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int xpos, int ypos, int image)
 {
 	rectangle rect;
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	if (flip_screen_get(machine))
 	{
@@ -320,7 +320,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 	ypos = ypos + (22 - 8);
 
 	drawgfx_transpen(bitmap, cliprect,
-		machine->gfx[image],
+		machine.gfx[image],
 		0, 0,
 		flip_screen_get(machine),
 		flip_screen_get(machine),
@@ -328,7 +328,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		ypos, 0);
 
 	drawgfx_transpen(bitmap, cliprect,
-		machine->gfx[image],
+		machine.gfx[image],
 		0, 0,
 		flip_screen_get(machine),
 		flip_screen_get(machine),
@@ -349,7 +349,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		rect.max_y = ypos + 2 * BGHEIGHT - 1;
 	}
 
-	bitmap_fill(bitmap, &rect, machine->gfx[image]->color_base + 3);
+	bitmap_fill(bitmap, &rect, machine.gfx[image]->color_base + 3);
 }
 
 
@@ -362,7 +362,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 
 SCREEN_UPDATE( m52 )
 {
-	m52_state *state = screen->machine->driver_data<m52_state>();
+	m52_state *state = screen->machine().driver_data<m52_state>();
 	int offs;
 
 	bitmap_fill(bitmap, cliprect, 0);
@@ -370,16 +370,16 @@ SCREEN_UPDATE( m52 )
 	if (!(state->bgcontrol & 0x20))
 	{
 		if (!(state->bgcontrol & 0x10))
-			draw_background(screen->machine, bitmap, cliprect, state->bg2xpos, state->bg2ypos, 2); /* distant mountains */
+			draw_background(screen->machine(), bitmap, cliprect, state->bg2xpos, state->bg2ypos, 2); /* distant mountains */
 
 		if (!(state->bgcontrol & 0x02))
-			draw_background(screen->machine, bitmap, cliprect, state->bg1xpos, state->bg1ypos, 3); /* hills */
+			draw_background(screen->machine(), bitmap, cliprect, state->bg1xpos, state->bg1ypos, 3); /* hills */
 
 		if (!(state->bgcontrol & 0x04))
-			draw_background(screen->machine, bitmap, cliprect, state->bg1xpos, state->bg1ypos, 4); /* cityscape */
+			draw_background(screen->machine(), bitmap, cliprect, state->bg1xpos, state->bg1ypos, 4); /* cityscape */
 	}
 
-	tilemap_set_flip(state->bg_tilemap, flip_screen_get(screen->machine) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_set_flip(state->bg_tilemap, flip_screen_get(screen->machine()) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
@@ -403,7 +403,7 @@ SCREEN_UPDATE( m52 )
 			clip.min_y = 128, clip.max_y = 255;
 
 		/* adjust for flipping */
-		if (flip_screen_get(screen->machine))
+		if (flip_screen_get(screen->machine()))
 		{
 			int temp = clip.min_y;
 			clip.min_y = 255 - clip.max_y;
@@ -423,9 +423,9 @@ SCREEN_UPDATE( m52 )
 		clip = *cliprect;
 #endif
 
-		drawgfx_transmask(bitmap, &clip, screen->machine->gfx[1],
+		drawgfx_transmask(bitmap, &clip, screen->machine().gfx[1],
 			code, color, flipx, flipy, sx, sy,
-			colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color, 512 + 32));
+			colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[1], color, 512 + 32));
 	}
 	return 0;
 }

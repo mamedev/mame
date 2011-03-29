@@ -20,7 +20,7 @@ To enter service mode, keep 1&2 pressed on reset
 
 static READ8_DEVICE_HANDLER( megazone_port_a_r )
 {
-	megazone_state *state = device->machine->driver_data<megazone_state>();
+	megazone_state *state = device->machine().driver_data<megazone_state>();
 	int clock, timer;
 
 
@@ -52,19 +52,19 @@ static WRITE8_DEVICE_HANDLER( megazone_port_b_w )
 			C += 220000;	/* 220000pF = 0.22uF */
 
 		data >>= 2;
-		filter_rc_set_RC(device->machine->device(fltname[i]),FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
+		filter_rc_set_RC(device->machine().device(fltname[i]),FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
 	}
 }
 
 static WRITE8_HANDLER( megazone_i8039_irq_w )
 {
-	megazone_state *state = space->machine->driver_data<megazone_state>();
+	megazone_state *state = space->machine().driver_data<megazone_state>();
 	device_set_input_line(state->daccpu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
-	megazone_state *state = space->machine->driver_data<megazone_state>();
+	megazone_state *state = space->machine().driver_data<megazone_state>();
 
 	if ((data & 0x80) == 0)
 		device_set_input_line(state->daccpu, 0, CLEAR_LINE);
@@ -73,7 +73,7 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 
 static WRITE8_HANDLER( megazone_coin_counter_w )
 {
-	coin_counter_w(space->machine, 1 - offset, data);		/* 1-offset, because coin counters are in reversed order */
+	coin_counter_w(space->machine(), 1 - offset, data);		/* 1-offset, because coin counters are in reversed order */
 }
 
 
@@ -226,11 +226,11 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( megazone )
 {
-	megazone_state *state = machine->driver_data<megazone_state>();
+	megazone_state *state = machine.driver_data<megazone_state>();
 
-	state->maincpu = machine->device<cpu_device>("maincpu");
-	state->audiocpu = machine->device<cpu_device>("audiocpu");
-	state->daccpu = machine->device<cpu_device>("daccpu");
+	state->maincpu = machine.device<cpu_device>("maincpu");
+	state->audiocpu = machine.device<cpu_device>("audiocpu");
+	state->daccpu = machine.device<cpu_device>("daccpu");
 
 	state->save_item(NAME(state->flipscreen));
 	state->save_item(NAME(state->i8039_status));
@@ -238,7 +238,7 @@ static MACHINE_START( megazone )
 
 static MACHINE_RESET( megazone )
 {
-	megazone_state *state = machine->driver_data<megazone_state>();
+	megazone_state *state = machine.driver_data<megazone_state>();
 
 	state->flipscreen = 0;
 	state->i8039_status = 0;

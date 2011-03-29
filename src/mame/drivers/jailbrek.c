@@ -94,16 +94,16 @@ Notes:
 
 static WRITE8_HANDLER( ctrl_w )
 {
-	jailbrek_state *state = space->machine->driver_data<jailbrek_state>();
+	jailbrek_state *state = space->machine().driver_data<jailbrek_state>();
 
 	state->nmi_enable = data & 0x01;
 	state->irq_enable = data & 0x02;
-	flip_screen_set(space->machine, data & 0x08);
+	flip_screen_set(space->machine(), data & 0x08);
 }
 
 static INTERRUPT_GEN( jb_interrupt )
 {
-	jailbrek_state *state = device->machine->driver_data<jailbrek_state>();
+	jailbrek_state *state = device->machine().driver_data<jailbrek_state>();
 
 	if (state->irq_enable)
 		device_set_input_line(device, 0, HOLD_LINE);
@@ -111,7 +111,7 @@ static INTERRUPT_GEN( jb_interrupt )
 
 static INTERRUPT_GEN( jb_interrupt_nmi )
 {
-	jailbrek_state *state = device->machine->driver_data<jailbrek_state>();
+	jailbrek_state *state = device->machine().driver_data<jailbrek_state>();
 
 	if (state->nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
@@ -239,14 +239,14 @@ GFXDECODE_END
 
 static MACHINE_START( jailbrek )
 {
-	jailbrek_state *state = machine->driver_data<jailbrek_state>();
+	jailbrek_state *state = machine.driver_data<jailbrek_state>();
 	state->save_item(NAME(state->irq_enable));
 	state->save_item(NAME(state->nmi_enable));
 }
 
 static MACHINE_RESET( jailbrek )
 {
-	jailbrek_state *state = machine->driver_data<jailbrek_state>();
+	jailbrek_state *state = machine.driver_data<jailbrek_state>();
 	state->irq_enable = 0;
 	state->nmi_enable = 0;
 }
@@ -406,7 +406,7 @@ ROM_END
 
 static DRIVER_INIT( jailbrek )
 {
-	UINT8 *SPEECH_ROM = machine->region("vlm")->base();
+	UINT8 *SPEECH_ROM = machine.region("vlm")->base();
 	int ind;
 
     /*
@@ -418,7 +418,7 @@ static DRIVER_INIT( jailbrek )
        represents address line A13.)
     */
 
-    if (machine->region("vlm")->bytes() == 0x4000)
+    if (machine.region("vlm")->bytes() == 0x4000)
     {
         for (ind = 0; ind < 0x2000; ++ind)
         {

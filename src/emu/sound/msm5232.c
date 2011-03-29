@@ -796,10 +796,10 @@ static DEVICE_START( msm5232 )
 
 	msm5232_init(chip, intf, device->clock(), rate);
 
-	chip->stream = device->machine->sound().stream_alloc(*device, 0, 11, rate, chip, MSM5232_update_one);
+	chip->stream = device->machine().sound().stream_alloc(*device, 0, 11, rate, chip, MSM5232_update_one);
 
 	/* register with the save state system */
-	device->machine->state().register_postload(msm5232_postload, chip);
+	device->machine().state().register_postload(msm5232_postload, chip);
 	device->save_item(NAME(chip->EN_out16));
 	device->save_item(NAME(chip->EN_out8));
 	device->save_item(NAME(chip->EN_out4));

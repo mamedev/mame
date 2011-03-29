@@ -329,9 +329,9 @@ static const rectangle visible3 = { 0*8, (14+48)*8-1, 17*8, (17+7)*8-1 };
 
 static SCREEN_UPDATE(cb2001)
 {
-	cb2001_state *state = screen->machine->driver_data<cb2001_state>();
+	cb2001_state *state = screen->machine().driver_data<cb2001_state>();
 	int count,x,y;
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
 	count = 0x0000;
 
@@ -352,7 +352,7 @@ static SCREEN_UPDATE(cb2001)
 					tile += state->videobank*0x2000;
 
 
-					drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,colour,0,0,x*8,y*8);
+					drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tile,colour,0,0,x*8,y*8);
 
 					count++;
 				}
@@ -413,7 +413,7 @@ static SCREEN_UPDATE(cb2001)
 				tile += 0x1000;
 			}
 
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tile,colour,0,0,x*8,y*8,0);
+			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],tile,colour,0,0,x*8,y*8,0);
 			count++;
 		}
 	}
@@ -429,7 +429,7 @@ static SCREEN_UPDATE(cb2001)
    is being executed incorrectly */
 WRITE16_HANDLER( cb2001_vidctrl_w )
 {
-	cb2001_state *state = space->machine->driver_data<cb2001_state>();
+	cb2001_state *state = space->machine().driver_data<cb2001_state>();
 	if (mem_mask&0xff00) // video control?
 	{
 		printf("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
@@ -441,7 +441,7 @@ WRITE16_HANDLER( cb2001_vidctrl_w )
 
 WRITE16_HANDLER( cb2001_vidctrl2_w )
 {
-	cb2001_state *state = space->machine->driver_data<cb2001_state>();
+	cb2001_state *state = space->machine().driver_data<cb2001_state>();
 	if (mem_mask&0xff00) // video control?
 	{
 		printf("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // i think this switches to 'reels' mode
@@ -456,7 +456,7 @@ WRITE16_HANDLER( cb2001_vidctrl2_w )
 
 static TILE_GET_INFO( get_cb2001_reel1_tile_info )
 {
-	cb2001_state *state = machine->driver_data<cb2001_state>();
+	cb2001_state *state = machine.driver_data<cb2001_state>();
 	int code = state->vram_bg[(0x0000/2) + tile_index/2];
 
 	if (tile_index&1)
@@ -475,7 +475,7 @@ static TILE_GET_INFO( get_cb2001_reel1_tile_info )
 
 static TILE_GET_INFO( get_cb2001_reel2_tile_info )
 {
-	cb2001_state *state = machine->driver_data<cb2001_state>();
+	cb2001_state *state = machine.driver_data<cb2001_state>();
 	int code = state->vram_bg[(0x0200/2) + tile_index/2];
 
 	if (tile_index&1)
@@ -495,7 +495,7 @@ static TILE_GET_INFO( get_cb2001_reel2_tile_info )
 
 static TILE_GET_INFO( get_cb2001_reel3_tile_info )
 {
-	cb2001_state *state = machine->driver_data<cb2001_state>();
+	cb2001_state *state = machine.driver_data<cb2001_state>();
 	int code = state->vram_bg[(0x0400/2) + tile_index/2];
 	int colour = 0;//(cb2001_out_c&0x7) + 8;
 
@@ -514,7 +514,7 @@ static TILE_GET_INFO( get_cb2001_reel3_tile_info )
 
 static VIDEO_START(cb2001)
 {
-	cb2001_state *state = machine->driver_data<cb2001_state>();
+	cb2001_state *state = machine.driver_data<cb2001_state>();
 	state->reel1_tilemap = tilemap_create(machine,get_cb2001_reel1_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
 	state->reel2_tilemap = tilemap_create(machine,get_cb2001_reel2_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
 	state->reel3_tilemap = tilemap_create(machine,get_cb2001_reel3_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
@@ -526,7 +526,7 @@ static VIDEO_START(cb2001)
 
 WRITE16_HANDLER( cb2001_bg_w )
 {
-	cb2001_state *state = space->machine->driver_data<cb2001_state>();
+	cb2001_state *state = space->machine().driver_data<cb2001_state>();
 	COMBINE_DATA(&state->vram_bg[offset]);
 
 	// also used for the reel tilemaps in a different mode
@@ -778,8 +778,8 @@ static PALETTE_INIT(cb2001)
 	{
 		int r,g,b;
 
-		UINT8*proms = machine->region("proms")->base();
-		int length = machine->region("proms")->bytes();
+		UINT8*proms = machine.region("proms")->base();
+		int length = machine.region("proms")->bytes();
 		UINT16 dat;
 
 		dat = (proms[0x000+i] << 8) | proms[0x200+i];

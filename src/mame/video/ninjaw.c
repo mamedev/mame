@@ -6,7 +6,7 @@
 
 VIDEO_START( ninjaw )
 {
-	ninjaw_state *state = machine->driver_data<ninjaw_state>();
+	ninjaw_state *state = machine.driver_data<ninjaw_state>();
 
 	/* Ensure palette from correct TC0110PCR used for each screen */
 	tc0100scn_set_colbanks(state->tc0100scn_1, 0x0, 0x100, 0x200);
@@ -16,9 +16,9 @@ VIDEO_START( ninjaw )
             SPRITE DRAW ROUTINE
 ************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int primask, int x_offs, int y_offs )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int primask, int x_offs, int y_offs )
 {
-	ninjaw_state *state = machine->driver_data<ninjaw_state>();
+	ninjaw_state *state = machine.driver_data<ninjaw_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -80,7 +80,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		cury = y;
 		code = tilenum;
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				code, color,
 				flipx, flipy,
 				curx, cury, 0);
@@ -99,7 +99,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( ninjaw )
 {
-	ninjaw_state *state = screen->machine->driver_data<ninjaw_state>();
+	ninjaw_state *state = screen->machine().driver_data<ninjaw_state>();
 	int xoffs = 0;
 	UINT8 layer[3], nodraw;
 	device_t *tc0100scn = NULL;
@@ -132,15 +132,15 @@ SCREEN_UPDATE( ninjaw )
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	/* Sprites can be under/over the layer below text layer */
-	draw_sprites(screen->machine, bitmap, cliprect, 1, xoffs, 8); // draw sprites with priority 1 which are under the mid layer
+	draw_sprites(screen->machine(), bitmap, cliprect, 1, xoffs, 8); // draw sprites with priority 1 which are under the mid layer
 
 	// draw middle layer
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[1], 0, 0);
 
-	draw_sprites(screen->machine,bitmap,cliprect,0,xoffs,8); // draw sprites with priority 0 which are over the mid layer
+	draw_sprites(screen->machine(),bitmap,cliprect,0,xoffs,8); // draw sprites with priority 0 which are over the mid layer
 
 	// draw top(text) layer
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[2], 0, 0);

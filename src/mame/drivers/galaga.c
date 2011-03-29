@@ -717,49 +717,49 @@ static READ8_HANDLER( bosco_dsw_r )
 {
 	int bit0,bit1;
 
-	bit0 = (input_port_read(space->machine, "DSWB") >> offset) & 1;
-	bit1 = (input_port_read(space->machine, "DSWA") >> offset) & 1;
+	bit0 = (input_port_read(space->machine(), "DSWB") >> offset) & 1;
+	bit1 = (input_port_read(space->machine(), "DSWA") >> offset) & 1;
 
 	return bit0 | (bit1 << 1);
 }
 
 static WRITE8_HANDLER( galaga_flip_screen_w )
 {
-	flip_screen_set(space->machine, data & 1);
+	flip_screen_set(space->machine(), data & 1);
 }
 
 static WRITE8_HANDLER( bosco_flip_screen_w )
 {
-	flip_screen_set(space->machine, ~data & 1);
+	flip_screen_set(space->machine(), ~data & 1);
 }
 
 
 static WRITE8_HANDLER( bosco_latch_w )
 {
-	galaga_state *state = space->machine->driver_data<galaga_state>();
+	galaga_state *state = space->machine().driver_data<galaga_state>();
 	int bit = data & 1;
 
 	switch (offset)
 	{
 		case 0x00:	/* IRQ1 */
-			cpu_interrupt_enable(space->machine->device("maincpu"), bit);
+			cpu_interrupt_enable(space->machine().device("maincpu"), bit);
 			if (!bit)
-				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IRQ2 */
-			cpu_interrupt_enable(space->machine->device("sub"), bit);
+			cpu_interrupt_enable(space->machine().device("sub"), bit);
 			if (!bit)
-				cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
+				cputag_set_input_line(space->machine(), "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* NMION */
-			cpu_interrupt_enable(space->machine->device("sub2"), !bit);
+			cpu_interrupt_enable(space->machine().device("sub2"), !bit);
 			break;
 
 		case 0x03:	/* RESET */
-			cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-			cputag_set_input_line(space->machine, "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x04:	/* n.c. */
@@ -779,19 +779,19 @@ static WRITE8_HANDLER( bosco_latch_w )
 	}
 }
 
-static CUSTOM_INPUT( shifted_port_r ) { return input_port_read(field->port->machine, (const char *)param) >> 4; }
+static CUSTOM_INPUT( shifted_port_r ) { return input_port_read(field->port->machine(), (const char *)param) >> 4; }
 
 static WRITE8_DEVICE_HANDLER( out_0 )
 {
-	set_led_status(device->machine, 1,data & 1);
-	set_led_status(device->machine, 0,data & 2);
-	coin_counter_w(device->machine, 1,~data & 4);
-	coin_counter_w(device->machine, 0,~data & 8);
+	set_led_status(device->machine(), 1,data & 1);
+	set_led_status(device->machine(), 0,data & 2);
+	coin_counter_w(device->machine(), 1,~data & 4);
+	coin_counter_w(device->machine(), 0,~data & 8);
 }
 
 static WRITE8_DEVICE_HANDLER( out_1 )
 {
-	coin_lockout_global_w(device->machine, data & 1);
+	coin_lockout_global_w(device->machine(), data & 1);
 }
 
 static const namco_51xx_interface namco_51xx_intf =
@@ -811,7 +811,7 @@ static const namco_51xx_interface namco_51xx_intf =
 
 static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
 {
-	UINT32 length = device->machine->region("52xx")->bytes();
+	UINT32 length = device->machine().region("52xx")->bytes();
 //printf("ROM read %04X\n", offset);
 	if (!(offset & 0x1000))
 		offset = (offset & 0xfff) | 0x0000;
@@ -821,7 +821,7 @@ static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
 		offset = (offset & 0xfff) | 0x2000;
 	else if (!(offset & 0x8000))
 		offset = (offset & 0xfff) | 0x3000;
-	return (offset < length) ? device->machine->region("52xx")->base()[offset] : 0xff;
+	return (offset < length) ? device->machine().region("52xx")->base()[offset] : 0xff;
 }
 
 static READ8_DEVICE_HANDLER( namco_52xx_si_r )
@@ -842,7 +842,7 @@ static const namco_52xx_interface namco_52xx_intf =
 
 static READ8_DEVICE_HANDLER( custom_mod_r )
 {
-	galaga_state *state = device->machine->driver_data<galaga_state>();
+	galaga_state *state = device->machine().driver_data<galaga_state>();
 	/* MOD0-2 is connected to K1-3; K0 is left unconnected */
 	return state->custom_mod << 1;
 }
@@ -862,33 +862,33 @@ static const namco_53xx_interface namco_53xx_intf =
 
 static TIMER_CALLBACK( cpu3_interrupt_callback )
 {
-	galaga_state *state = machine->driver_data<galaga_state>();
+	galaga_state *state = machine.driver_data<galaga_state>();
 	int scanline = param;
 
-	nmi_line_pulse(machine->device("sub2"));
+	nmi_line_pulse(machine.device("sub2"));
 
 	scanline = scanline + 128;
 	if (scanline >= 272)
 		scanline = 64;
 
 	/* the vertical synch chain is clocked by H256 -- this is probably not important, but oh well */
-	state->cpu3_interrupt_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
+	state->cpu3_interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
 
 static MACHINE_START( galaga )
 {
-	galaga_state *state = machine->driver_data<galaga_state>();
+	galaga_state *state = machine.driver_data<galaga_state>();
 
 	/* create the interrupt timer */
-	state->cpu3_interrupt_timer = machine->scheduler().timer_alloc(FUNC(cpu3_interrupt_callback));
+	state->cpu3_interrupt_timer = machine.scheduler().timer_alloc(FUNC(cpu3_interrupt_callback));
 	state->custom_mod = 0;
 	state_save_register_global(machine, state->custom_mod);
 }
 
-static void bosco_latch_reset(running_machine *machine)
+static void bosco_latch_reset(running_machine &machine)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -898,12 +898,12 @@ static void bosco_latch_reset(running_machine *machine)
 
 static MACHINE_RESET( galaga )
 {
-	galaga_state *state = machine->driver_data<galaga_state>();
+	galaga_state *state = machine.driver_data<galaga_state>();
 
 	/* Reset all latches */
 	bosco_latch_reset(machine);
 
-	state->cpu3_interrupt_timer->adjust(machine->primary_screen->time_until_pos(64), 64);
+	state->cpu3_interrupt_timer->adjust(machine.primary_screen->time_until_pos(64), 64);
 }
 
 static MACHINE_RESET( battles )
@@ -3193,8 +3193,8 @@ ROM_END
 static DRIVER_INIT (galaga)
 {
 	/* swap bytes for flipped character so we can decode them together with normal characters */
-	UINT8 *rom = machine->region("gfx1")->base();
-	int i, len = machine->region("gfx1")->bytes();
+	UINT8 *rom = machine.region("gfx1")->base();
+	int i, len = machine.region("gfx1")->bytes();
 
 	for (i = 0;i < len;i++)
 	{
@@ -3212,7 +3212,7 @@ static DRIVER_INIT (gatsbee)
 	DRIVER_INIT_CALL(galaga);
 
 	/* Gatsbee has a larger character ROM, we need a handler for banking */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1000, 0x1000, FUNC(gatsbee_bank_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1000, 0x1000, FUNC(gatsbee_bank_w));
 }
 
 
@@ -3221,7 +3221,7 @@ static DRIVER_INIT( xevious )
 	UINT8 *rom;
 	int i;
 
-	rom = machine->region("gfx3")->base() + 0x5000;
+	rom = machine.region("gfx3")->base() + 0x5000;
 	for (i = 0;i < 0x2000;i++)
 		rom[i + 0x2000] = rom[i] >> 4;
 }
@@ -3233,14 +3233,14 @@ static DRIVER_INIT( xevios )
 
 
 	/* convert one of the sprite ROMs to the format used by Xevious */
-	rom = machine->region("gfx3")->base();
+	rom = machine.region("gfx3")->base();
 	for (A = 0x5000;A < 0x7000;A++)
 	{
 		rom[A] = BITSWAP8(rom[A],1,3,5,7,0,2,4,6);
 	}
 
 	/* convert one of tile map ROMs to the format used by Xevious */
-	rom = machine->region("gfx4")->base();
+	rom = machine.region("gfx4")->base();
 	for (A = 0x0000;A < 0x1000;A++)
 	{
 		rom[A] = BITSWAP8(rom[A],3,7,5,1,2,6,4,0);
@@ -3253,8 +3253,8 @@ static DRIVER_INIT( xevios )
 static DRIVER_INIT( battles )
 {
 	/* replace the Namco I/O handlers with interface to the 4th CPU */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x7000, 0x700f, FUNC(battles_customio_data0_r), FUNC(battles_customio_data0_w) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x7100, 0x7100, FUNC(battles_customio0_r), FUNC(battles_customio0_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x7000, 0x700f, FUNC(battles_customio_data0_r), FUNC(battles_customio_data0_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x7100, 0x7100, FUNC(battles_customio0_r), FUNC(battles_customio0_w) );
 
 	DRIVER_INIT_CALL(xevious);
 }

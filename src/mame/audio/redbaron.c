@@ -189,7 +189,7 @@ static DEVICE_START( redbaron_sound )
 	redbaron_sound_state *state = get_safe_token(device);
 	int i;
 
-	state->vol_lookup = auto_alloc_array(device->machine, INT16, 32768);
+	state->vol_lookup = auto_alloc_array(device->machine(), INT16, 32768);
 	for( i = 0; i < 0x8000; i++ )
 		state->vol_lookup[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 
@@ -223,7 +223,7 @@ static DEVICE_START( redbaron_sound )
 		state->vol_crash[i] = 32767 * r0 / (r0 + r1);
 	}
 
-	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, 0, redbaron_sound_update);
+	state->channel = device->machine().sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, 0, redbaron_sound_update);
 }
 
 

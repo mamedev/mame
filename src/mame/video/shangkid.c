@@ -6,7 +6,7 @@
 
 
 static TILE_GET_INFO( get_bg_tile_info ){
-	shangkid_state *state = machine->driver_data<shangkid_state>();
+	shangkid_state *state = machine.driver_data<shangkid_state>();
 	UINT8 *videoram = state->videoram;
 	int attributes = videoram[tile_index+0x800];
 	int tile_number = videoram[tile_index]+0x100*(attributes&0x3);
@@ -43,26 +43,26 @@ static TILE_GET_INFO( get_bg_tile_info ){
 	}
 
 	tileinfo->category =
-		(machine->region( "proms" )->base()[0x800+color*4]==2)?1:0;
+		(machine.region( "proms" )->base()[0x800+color*4]==2)?1:0;
 }
 
 VIDEO_START( shangkid )
 {
-	shangkid_state *state = machine->driver_data<shangkid_state>();
+	shangkid_state *state = machine.driver_data<shangkid_state>();
 	state->background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32);
 }
 
 WRITE8_HANDLER( shangkid_videoram_w )
 {
-	shangkid_state *state = space->machine->driver_data<shangkid_state>();
+	shangkid_state *state = space->machine().driver_data<shangkid_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty( state->background, offset&0x7ff );
 }
 
-static void draw_sprite(running_machine *machine, const UINT8 *source, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprite(running_machine &machine, const UINT8 *source, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	shangkid_state *state = machine->driver_data<shangkid_state>();
+	shangkid_state *state = machine.driver_data<shangkid_state>();
 	const gfx_element *gfx;
 	int transparent_pen;
 	int bank_index;
@@ -133,7 +133,7 @@ static void draw_sprite(running_machine *machine, const UINT8 *source, bitmap_t 
 		transparent_pen = 7;
 	}
 
-	gfx = machine->gfx[1+bank_index];
+	gfx = machine.gfx[1+bank_index];
 
 	width = (xscale+1)*2;
 	height = (yscale+1)*2;
@@ -172,9 +172,9 @@ static void draw_sprite(running_machine *machine, const UINT8 *source, bitmap_t 
 	}
 }
 
-static void shangkid_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void shangkid_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	shangkid_state *state = machine->driver_data<shangkid_state>();
+	shangkid_state *state = machine.driver_data<shangkid_state>();
 	const UINT8 *source, *finish;
 
 	finish = state->spriteram;
@@ -187,14 +187,14 @@ static void shangkid_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 SCREEN_UPDATE( shangkid )
 {
-	shangkid_state *state = screen->machine->driver_data<shangkid_state>();
+	shangkid_state *state = screen->machine().driver_data<shangkid_state>();
 	int flipscreen = state->videoreg[1]&0x80;
 	tilemap_set_flip( state->background, flipscreen?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
 	tilemap_set_scrollx( state->background,0,state->videoreg[0]-40 );
 	tilemap_set_scrolly( state->background,0,state->videoreg[2]+0x10 );
 
 	tilemap_draw( bitmap,cliprect,state->background,0,0 );
-	shangkid_draw_sprites(screen->machine, bitmap,cliprect );
+	shangkid_draw_sprites(screen->machine(), bitmap,cliprect );
 	tilemap_draw( bitmap,cliprect,state->background,1,0 ); /* high priority tiles */
 	return 0;
 }
@@ -205,7 +205,7 @@ PALETTE_INIT( dynamski )
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x20);
+	machine.colortable = colortable_alloc(machine, 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -213,7 +213,7 @@ PALETTE_INIT( dynamski )
 		UINT16 data = (color_prom[i | 0x20] << 8) | color_prom[i];
 		rgb_t color = MAKE_RGB(pal5bit(data >> 1), pal5bit(data >> 6), pal5bit(data >> 11));
 
-		colortable_palette_set_color(machine->colortable, i, color);
+		colortable_palette_set_color(machine.colortable, i, color);
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -223,21 +223,21 @@ PALETTE_INIT( dynamski )
 	for (i = 0; i < 0x40; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 
 	/* sprites */
 	for (i = 0x40; i < 0x80; i++)
 	{
 		UINT8 ctabentry = (color_prom[(i - 0x40) + 0x100] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 }
 
 
-static void dynamski_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+static void dynamski_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
-	shangkid_state *state = machine->driver_data<shangkid_state>();
+	shangkid_state *state = machine.driver_data<shangkid_state>();
 	UINT8 *videoram = state->videoram;
 	int i;
 	int sx,sy;
@@ -279,7 +279,7 @@ static void dynamski_draw_background(running_machine *machine, bitmap_t *bitmap,
 			drawgfx_transpen(
 				bitmap,
 				cliprect,
-				machine->gfx[0],
+				machine.gfx[0],
 				tile,
 				attr & 0x0f,
 				0,0,//xflip,yflip,
@@ -289,9 +289,9 @@ static void dynamski_draw_background(running_machine *machine, bitmap_t *bitmap,
 	}
 }
 
-static void dynamski_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void dynamski_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	shangkid_state *state = machine->driver_data<shangkid_state>();
+	shangkid_state *state = machine.driver_data<shangkid_state>();
 	UINT8 *videoram = state->videoram;
 	int i;
 	int sx,sy;
@@ -313,7 +313,7 @@ static void dynamski_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		drawgfx_transpen(
 				bitmap,
 				cliprect,
-				machine->gfx[1],
+				machine.gfx[1],
 				bank*0x40 + (tile&0x3f),
 				color,
 				tile&0x80,tile&0x40, /* flipx,flipy */
@@ -323,8 +323,8 @@ static void dynamski_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 SCREEN_UPDATE( dynamski )
 {
-	dynamski_draw_background(screen->machine, bitmap,cliprect, 0 );
-	dynamski_draw_sprites(screen->machine, bitmap,cliprect );
-	dynamski_draw_background(screen->machine, bitmap,cliprect, 1 );
+	dynamski_draw_background(screen->machine(), bitmap,cliprect, 0 );
+	dynamski_draw_sprites(screen->machine(), bitmap,cliprect );
+	dynamski_draw_background(screen->machine(), bitmap,cliprect, 1 );
 	return 0;
 }

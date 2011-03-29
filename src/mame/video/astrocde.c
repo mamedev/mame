@@ -90,9 +90,9 @@ static UINT8 profpac_vw;
  *
  *************************************/
 
-static void init_savestate(running_machine *machine);
+static void init_savestate(running_machine &machine);
 static TIMER_CALLBACK( scanline_callback );
-static void init_sparklestar(running_machine *machine);
+static void init_sparklestar(running_machine &machine);
 
 
 
@@ -222,8 +222,8 @@ PALETTE_INIT( profpac )
 VIDEO_START( astrocde )
 {
 	/* allocate a per-scanline timer */
-	scanline_timer = machine->scheduler().timer_alloc(FUNC(scanline_callback));
-	scanline_timer->adjust(machine->primary_screen->time_until_pos(1), 1);
+	scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_callback));
+	scanline_timer->adjust(machine.primary_screen->time_until_pos(1), 1);
 
 	/* register for save states */
 	init_savestate(machine);
@@ -237,8 +237,8 @@ VIDEO_START( astrocde )
 VIDEO_START( profpac )
 {
 	/* allocate a per-scanline timer */
-	scanline_timer = machine->scheduler().timer_alloc(FUNC(scanline_callback));
-	scanline_timer->adjust(machine->primary_screen->time_until_pos(1), 1);
+	scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_callback));
+	scanline_timer->adjust(machine.primary_screen->time_until_pos(1), 1);
 
 	/* allocate videoram */
 	profpac_videoram = auto_alloc_array(machine, UINT16, 0x4000 * 4);
@@ -261,7 +261,7 @@ VIDEO_START( profpac )
 }
 
 
-static void init_savestate(running_machine *machine)
+static void init_savestate(running_machine &machine)
 {
 	state_save_register_global_array(machine, astrocade_sparkle);
 
@@ -303,7 +303,7 @@ static void init_savestate(running_machine *machine)
 
 SCREEN_UPDATE( astrocde )
 {
-	astrocde_state *state = screen->machine->driver_data<astrocde_state>();
+	astrocde_state *state = screen->machine().driver_data<astrocde_state>();
 	UINT8 *videoram = state->videoram;
 	UINT32 sparklebase = 0;
 	const int colormask = (astrocade_video_config & AC_MONITOR_BW) ? 0 : 0x1f0;
@@ -434,7 +434,7 @@ static TIMER_CALLBACK( interrupt_off )
 }
 
 
-static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback, UINT8 hfeedback)
+static void astrocade_trigger_lightpen(running_machine &machine, UINT8 vfeedback, UINT8 hfeedback)
 {
 	/* both bits 1 and 4 enable lightpen interrupts; bit 4 enables them even in horizontal */
 	/* blanking regions; we treat them both the same here */
@@ -444,14 +444,14 @@ static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback
 		if ((interrupt_enable & 0x01) == 0)
 		{
 			cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, interrupt_vector & 0xf0);
-			machine->scheduler().timer_set(machine->primary_screen->time_until_pos(vfeedback), FUNC(interrupt_off));
+			machine.scheduler().timer_set(machine.primary_screen->time_until_pos(vfeedback), FUNC(interrupt_off));
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
 			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, interrupt_vector & 0xf0);
-			machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(interrupt_off));
+			machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(interrupt_off));
 		}
 
 		/* latch the feedback registers */
@@ -475,7 +475,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* force an update against the current scanline */
 	if (scanline > 0)
-		machine->primary_screen->update_partial(scanline - 1);
+		machine.primary_screen->update_partial(scanline - 1);
 
 	/* generate a scanline interrupt if it's time */
 	if (astrocade_scanline == interrupt_scanline && (interrupt_enable & 0x08) != 0)
@@ -484,14 +484,14 @@ static TIMER_CALLBACK( scanline_callback )
 		if ((interrupt_enable & 0x04) == 0)
 		{
 			cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, interrupt_vector);
-			machine->scheduler().timer_set(machine->primary_screen->time_until_vblank_end(), FUNC(interrupt_off));
+			machine.scheduler().timer_set(machine.primary_screen->time_until_vblank_end(), FUNC(interrupt_off));
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
 			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, interrupt_vector);
-			machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(interrupt_off));
+			machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(interrupt_off));
 		}
 	}
 
@@ -501,9 +501,9 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* advance to the next scanline */
 	scanline++;
-	if (scanline >= machine->primary_screen->height())
+	if (scanline >= machine.primary_screen->height())
 		scanline = 0;
-	scanline_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
+	scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -535,51 +535,51 @@ READ8_HANDLER( astrocade_data_chip_register_r )
 			break;
 
 		case 0x10:	/* player 1 handle */
-			result = input_port_read_safe(space->machine, "P1HANDLE", 0xff);
+			result = input_port_read_safe(space->machine(), "P1HANDLE", 0xff);
 			break;
 
 		case 0x11:	/* player 2 handle */
-			result = input_port_read_safe(space->machine, "P2HANDLE", 0xff);
+			result = input_port_read_safe(space->machine(), "P2HANDLE", 0xff);
 			break;
 
 		case 0x12:	/* player 3 handle */
-			result = input_port_read_safe(space->machine, "P3HANDLE", 0xff);
+			result = input_port_read_safe(space->machine(), "P3HANDLE", 0xff);
 			break;
 
 		case 0x13:	/* player 4 handle */
-			result = input_port_read_safe(space->machine, "P4HANDLE", 0xff);
+			result = input_port_read_safe(space->machine(), "P4HANDLE", 0xff);
 			break;
 
 		case 0x14:	/* keypad column 0 */
-			result = input_port_read_safe(space->machine, "KEYPAD0", 0xff);
+			result = input_port_read_safe(space->machine(), "KEYPAD0", 0xff);
 			break;
 
 		case 0x15:	/* keypad column 1 */
-			result = input_port_read_safe(space->machine, "KEYPAD1", 0xff);
+			result = input_port_read_safe(space->machine(), "KEYPAD1", 0xff);
 			break;
 
 		case 0x16:	/* keypad column 2 */
-			result = input_port_read_safe(space->machine, "KEYPAD2", 0xff);
+			result = input_port_read_safe(space->machine(), "KEYPAD2", 0xff);
 			break;
 
 		case 0x17:	/* keypad column 3 */
-			result = input_port_read_safe(space->machine, "KEYPAD3", 0xff);
+			result = input_port_read_safe(space->machine(), "KEYPAD3", 0xff);
 			break;
 
 		case 0x1c:	/* player 1 knob */
-			result = input_port_read_safe(space->machine, "P1_KNOB", 0xff);
+			result = input_port_read_safe(space->machine(), "P1_KNOB", 0xff);
 			break;
 
 		case 0x1d:	/* player 2 knob */
-			result = input_port_read_safe(space->machine, "P2_KNOB", 0xff);
+			result = input_port_read_safe(space->machine(), "P2_KNOB", 0xff);
 			break;
 
 		case 0x1e:	/* player 3 knob */
-			result = input_port_read_safe(space->machine, "P3_KNOB", 0xff);
+			result = input_port_read_safe(space->machine(), "P3_KNOB", 0xff);
 			break;
 
 		case 0x1f:	/* player 4 knob */
-			result = input_port_read_safe(space->machine, "P4_KNOB", 0xff);
+			result = input_port_read_safe(space->machine(), "P4_KNOB", 0xff);
 			break;
 	}
 
@@ -649,7 +649,7 @@ WRITE8_HANDLER( astrocade_data_chip_register_w )
 		case 0x17:	/* noise volume register */
 		case 0x18:	/* sound block transfer */
 			if (astrocade_video_config & AC_SOUND_PRESENT)
-				astrocade_sound_w(space->machine->device("astrocade1"), offset, data);
+				astrocade_sound_w(space->machine().device("astrocade1"), offset, data);
 			break;
 
 		case 0x19:	/* expand register */
@@ -960,7 +960,7 @@ WRITE8_HANDLER( astrocade_pattern_board_w )
     relative to the beginning of time and use that, mod RNG_PERIOD.
 */
 
-static void init_sparklestar(running_machine *machine)
+static void init_sparklestar(running_machine &machine)
 {
 	UINT32 shiftreg;
 	int i;

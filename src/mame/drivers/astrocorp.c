@@ -60,9 +60,9 @@ public:
 
 static VIDEO_START( astrocorp )
 {
-	astrocorp_state *state = machine->driver_data<astrocorp_state>();
+	astrocorp_state *state = machine.driver_data<astrocorp_state>();
 
-	state->bitmap = machine->primary_screen->alloc_compatible_bitmap();
+	state->bitmap = machine.primary_screen->alloc_compatible_bitmap();
 
 	state->save_item(NAME(*state->bitmap));
 	state->save_item       (NAME(state->screen_enable));
@@ -91,9 +91,9 @@ static VIDEO_START( astrocorp )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	astrocorp_state *state = machine->driver_data<astrocorp_state>();
+	astrocorp_state *state = machine.driver_data<astrocorp_state>();
 	UINT16 *source = state->spriteram;
 	UINT16 *finish = state->spriteram + state->spriteram_size / 2;
 
@@ -127,7 +127,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 				{
 					for (xwrap = 0 ; xwrap <= 0x200 ; xwrap += 0x200)
 					{
-						drawgfx_transpen(bitmap,cliprect, machine->gfx[0],
+						drawgfx_transpen(bitmap,cliprect, machine.gfx[0],
 								code, 0,
 								0, 0,
 								sx + x * 16 - xwrap, sy + y * 16 - ywrap, 0xff);
@@ -141,12 +141,12 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static SCREEN_UPDATE(astrocorp)
 {
-	astrocorp_state *state = screen->machine->driver_data<astrocorp_state>();
+	astrocorp_state *state = screen->machine().driver_data<astrocorp_state>();
 
 	if (state->screen_enable & 1)
 		copybitmap(bitmap, state->bitmap, 0,0,0,0, cliprect);
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	return 0;
 }
@@ -158,20 +158,20 @@ static SCREEN_UPDATE(astrocorp)
 
 static WRITE16_HANDLER( astrocorp_draw_sprites_w )
 {
-	astrocorp_state *state = space->machine->driver_data<astrocorp_state>();
+	astrocorp_state *state = space->machine().driver_data<astrocorp_state>();
 
 	UINT16 old = state->draw_sprites;
 	UINT16 now = COMBINE_DATA(&state->draw_sprites);
 
 	if (!old && now)
-		draw_sprites(space->machine, state->bitmap, &space->machine->primary_screen->visible_area());
+		draw_sprites(space->machine(), state->bitmap, &space->machine().primary_screen->visible_area());
 }
 
 static WRITE16_HANDLER( astrocorp_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 	}
 }
 
@@ -199,18 +199,18 @@ static WRITE16_HANDLER( showhand_outputs_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0,	(data & 0x0004));	// coin counter
-		set_led_status(space->machine, 0,	(data & 0x0008));	// you win
-		if ((data & 0x0010)) increment_dispensed_tickets(space->machine, 1); // coin out
-		set_led_status(space->machine, 1,	(data & 0x0020));	// coin/hopper jam
+		coin_counter_w(space->machine(), 0,	(data & 0x0004));	// coin counter
+		set_led_status(space->machine(), 0,	(data & 0x0008));	// you win
+		if ((data & 0x0010)) increment_dispensed_tickets(space->machine(), 1); // coin out
+		set_led_status(space->machine(), 1,	(data & 0x0020));	// coin/hopper jam
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(space->machine, 2,	(data & 0x0100));	// bet
-		set_led_status(space->machine, 3,	(data & 0x0800));	// start
-		set_led_status(space->machine, 4,	(data & 0x1000));	// ? select/choose
-		set_led_status(space->machine, 5,	(data & 0x2000));	// ? select/choose
-		set_led_status(space->machine, 6,	(data & 0x4000));	// look
+		set_led_status(space->machine(), 2,	(data & 0x0100));	// bet
+		set_led_status(space->machine(), 3,	(data & 0x0800));	// start
+		set_led_status(space->machine(), 4,	(data & 0x1000));	// ? select/choose
+		set_led_status(space->machine(), 5,	(data & 0x2000));	// ? select/choose
+		set_led_status(space->machine(), 6,	(data & 0x4000));	// look
 	}
 //  popmessage("%04X",data);
 }
@@ -235,23 +235,23 @@ static WRITE16_HANDLER( skilldrp_outputs_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0,	(data & 0x0001));	// key in  |
-		coin_counter_w(space->machine, 0,	(data & 0x0002));	// coin in |- manual shows 1 in- and 1 out- counter
-		coin_counter_w(space->machine, 1,	(data & 0x0004));	// key out |
-		ticket_dispenser_w(space->machine->device("hopper"), 0, (data & 0x0008)<<4);	// hopper motor?
+		coin_counter_w(space->machine(), 0,	(data & 0x0001));	// key in  |
+		coin_counter_w(space->machine(), 0,	(data & 0x0002));	// coin in |- manual shows 1 in- and 1 out- counter
+		coin_counter_w(space->machine(), 1,	(data & 0x0004));	// key out |
+		ticket_dispenser_w(space->machine().device("hopper"), 0, (data & 0x0008)<<4);	// hopper motor?
 		//                                  (data & 0x0010)     // hopper?
-		set_led_status(space->machine, 0,	(data & 0x0020));	// error lamp (coin/hopper jam: "call attendant")
-		ticket_dispenser_w(space->machine->device("ticket"), 0, data & 0x0080);	// ticket motor?
+		set_led_status(space->machine(), 0,	(data & 0x0020));	// error lamp (coin/hopper jam: "call attendant")
+		ticket_dispenser_w(space->machine().device("ticket"), 0, data & 0x0080);	// ticket motor?
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		// lamps:
-		set_led_status(space->machine, 1,	(data & 0x0100));	// select
-		set_led_status(space->machine, 2,	(data & 0x0400));	// take
-		set_led_status(space->machine, 3,	(data & 0x0800));	// bet
-		set_led_status(space->machine, 4,	(data & 0x1000));	// start
-		set_led_status(space->machine, 5,	(data & 0x4000));	// win / test
-		set_led_status(space->machine, 6,	(data & 0x8000));	// ticket?
+		set_led_status(space->machine(), 1,	(data & 0x0100));	// select
+		set_led_status(space->machine(), 2,	(data & 0x0400));	// take
+		set_led_status(space->machine(), 3,	(data & 0x0800));	// bet
+		set_led_status(space->machine(), 4,	(data & 0x1000));	// start
+		set_led_status(space->machine(), 5,	(data & 0x4000));	// win / test
+		set_led_status(space->machine(), 6,	(data & 0x8000));	// ticket?
 	}
 
 //  popmessage("%04X",data);
@@ -259,7 +259,7 @@ static WRITE16_HANDLER( skilldrp_outputs_w )
 
 static WRITE16_HANDLER( astrocorp_screen_enable_w )
 {
-	astrocorp_state *state = space->machine->driver_data<astrocorp_state>();
+	astrocorp_state *state = space->machine().driver_data<astrocorp_state>();
 	COMBINE_DATA(&state->screen_enable);
 //  popmessage("%04X",data);
 	if (state->screen_enable & (~1))
@@ -274,9 +274,9 @@ static READ16_HANDLER( astrocorp_unk_r )
 // 5-6-5 Palette: BBBBB-GGGGGG-RRRRR
 static WRITE16_HANDLER( astrocorp_palette_w )
 {
-	astrocorp_state *state = space->machine->driver_data<astrocorp_state>();
+	astrocorp_state *state = space->machine().driver_data<astrocorp_state>();
 	COMBINE_DATA(&state->paletteram[offset]);
-	palette_set_color_rgb(space->machine, offset,
+	palette_set_color_rgb(space->machine(), offset,
 		pal5bit((state->paletteram[offset] >>  0) & 0x1f),
 		pal6bit((state->paletteram[offset] >>  5) & 0x3f),
 		pal5bit((state->paletteram[offset] >> 11) & 0x1f)
@@ -1004,7 +1004,7 @@ ROM_END
 static DRIVER_INIT( showhand )
 {
 #if 0
-	UINT16 *rom = (UINT16*)machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16*)machine.region("maincpu")->base();
 
 	rom[0x0a1a/2] = 0x6000;	// hopper jam
 
@@ -1020,7 +1020,7 @@ static DRIVER_INIT( showhand )
 static DRIVER_INIT( showhanc )
 {
 #if 0
-	UINT16 *rom = (UINT16*)machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16*)machine.region("maincpu")->base();
 
 	rom[0x14d4/2] = 0x4e71;	// enable full test mode
 	rom[0x14d6/2] = 0x4e71;	// ""

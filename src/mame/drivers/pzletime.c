@@ -44,7 +44,7 @@ public:
 
 static TILE_GET_INFO( get_mid_tile_info )
 {
-	pzletime_state *state = machine->driver_data<pzletime_state>();
+	pzletime_state *state = machine.driver_data<pzletime_state>();
 	int tileno = state->mid_videoram[tile_index] & 0x0fff;
 	int colour = state->mid_videoram[tile_index] & 0xf000;
 	colour = colour >> 12;
@@ -53,7 +53,7 @@ static TILE_GET_INFO( get_mid_tile_info )
 
 static TILE_GET_INFO( get_txt_tile_info )
 {
-	pzletime_state *state = machine->driver_data<pzletime_state>();
+	pzletime_state *state = machine.driver_data<pzletime_state>();
 	int tileno = state->txt_videoram[tile_index] & 0x0fff;
 	int colour = state->txt_videoram[tile_index] & 0xf000;
 	colour = colour >> 12;
@@ -65,7 +65,7 @@ static TILE_GET_INFO( get_txt_tile_info )
 
 static VIDEO_START( pzletime )
 {
-	pzletime_state *state = machine->driver_data<pzletime_state>();
+	pzletime_state *state = machine.driver_data<pzletime_state>();
 
 	state->mid_tilemap = tilemap_create(machine, get_mid_tile_info, tilemap_scan_cols, 16, 16, 64, 16);
 	state->txt_tilemap = tilemap_create(machine, get_txt_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
@@ -76,11 +76,11 @@ static VIDEO_START( pzletime )
 
 static SCREEN_UPDATE( pzletime )
 {
-	pzletime_state *state = screen->machine->driver_data<pzletime_state>();
+	pzletime_state *state = screen->machine().driver_data<pzletime_state>();
 	int count;
 	int y, x;
 
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]); //bg pen
+	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]); //bg pen
 
 	tilemap_set_scrolly(state->txt_tilemap, 0, state->tilemap_regs[0] - 3);
 	tilemap_set_scrollx(state->txt_tilemap, 0, state->tilemap_regs[1]);
@@ -122,7 +122,7 @@ static SCREEN_UPDATE( pzletime )
 
 			// is spriteram[offs + 0] & 0x200 flipy? it's always set
 
-			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], spr_offs, colour, 0, 1, sx, sy, 0);
+			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1], spr_offs, colour, 0, 1, sx, sy, 0);
 		}
 	}
 
@@ -135,14 +135,14 @@ static SCREEN_UPDATE( pzletime )
 
 static WRITE16_HANDLER( mid_videoram_w )
 {
-	pzletime_state *state = space->machine->driver_data<pzletime_state>();
+	pzletime_state *state = space->machine().driver_data<pzletime_state>();
 	COMBINE_DATA(&state->mid_videoram[offset]);
 	tilemap_mark_tile_dirty(state->mid_tilemap, offset);
 }
 
 static WRITE16_HANDLER( txt_videoram_w )
 {
-	pzletime_state *state = space->machine->driver_data<pzletime_state>();
+	pzletime_state *state = space->machine().driver_data<pzletime_state>();
 	COMBINE_DATA(&state->txt_videoram[offset]);
 	tilemap_mark_tile_dirty(state->txt_tilemap, offset);
 }
@@ -159,7 +159,7 @@ static WRITE16_DEVICE_HANDLER( eeprom_w )
 
 static WRITE16_HANDLER( ticket_w )
 {
-	pzletime_state *state = space->machine->driver_data<pzletime_state>();
+	pzletime_state *state = space->machine().driver_data<pzletime_state>();
 
 	if (ACCESSING_BITS_0_7)
 		state->ticket = data & 1;
@@ -167,7 +167,7 @@ static WRITE16_HANDLER( ticket_w )
 
 static WRITE16_HANDLER( video_regs_w )
 {
-	pzletime_state *state = space->machine->driver_data<pzletime_state>();
+	pzletime_state *state = space->machine().driver_data<pzletime_state>();
 	int i;
 
 	COMBINE_DATA(&state->video_regs[offset]);
@@ -178,7 +178,7 @@ static WRITE16_HANDLER( video_regs_w )
 		{
 			for (i = 0; i < 0x300; i++)
 			{
-				palette_set_pen_contrast(space->machine, i, (double)0x8000/(double)state->video_regs[0]);
+				palette_set_pen_contrast(space->machine(), i, (double)0x8000/(double)state->video_regs[0]);
 			}
 		}
 	}
@@ -188,7 +188,7 @@ static WRITE16_HANDLER( video_regs_w )
 		{
 			for (i = 0x300; i < 32768 + 0x300; i++)
 			{
-				palette_set_pen_contrast(space->machine, i, (double)0x8000/(double)state->video_regs[1]);
+				palette_set_pen_contrast(space->machine(), i, (double)0x8000/(double)state->video_regs[1]);
 			}
 		}
 	}
@@ -201,8 +201,8 @@ static WRITE16_DEVICE_HANDLER( oki_bank_w )
 
 static CUSTOM_INPUT( ticket_status_r )
 {
-	pzletime_state *state = field->port->machine->driver_data<pzletime_state>();
-	return (state->ticket && !(field->port->machine->primary_screen->frame_number() % 128));
+	pzletime_state *state = field->port->machine().driver_data<pzletime_state>();
+	return (state->ticket && !(field->port->machine().primary_screen->frame_number() % 128));
 }
 
 static ADDRESS_MAP_START( pzletime_map, AS_PROGRAM, 16 )
@@ -294,14 +294,14 @@ static PALETTE_INIT( pzletime )
 
 static MACHINE_START( pzletime )
 {
-	pzletime_state *state = machine->driver_data<pzletime_state>();
+	pzletime_state *state = machine.driver_data<pzletime_state>();
 
 	state->save_item(NAME(state->ticket));
 }
 
 static MACHINE_RESET( pzletime )
 {
-	pzletime_state *state = machine->driver_data<pzletime_state>();
+	pzletime_state *state = machine.driver_data<pzletime_state>();
 
 	state->ticket = 0;
 }

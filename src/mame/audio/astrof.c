@@ -34,7 +34,7 @@
 
 WRITE8_HANDLER( astrof_audio_1_w )
 {
-	astrof_state *state = space->machine->driver_data<astrof_state>();
+	astrof_state *state = space->machine().driver_data<astrof_state>();
 	UINT8 rising_bits = data & ~state->port_1_last;
 
 	if (state->astrof_death_playing)
@@ -72,7 +72,7 @@ WRITE8_HANDLER( astrof_audio_1_w )
 	/* D6 - don't know. Probably something to do with the explosion sounds */
 
 	/* D7 - sound enable bit */
-	space->machine->sound().system_enable(data & 0x80);
+	space->machine().sound().system_enable(data & 0x80);
 
 	state->port_1_last = data;
 }
@@ -80,7 +80,7 @@ WRITE8_HANDLER( astrof_audio_1_w )
 
 WRITE8_HANDLER( astrof_audio_2_w )
 {
-	astrof_state *state = space->machine->driver_data<astrof_state>();
+	astrof_state *state = space->machine().driver_data<astrof_state>();
 	UINT8 rising_bits = data & ~state->port_2_last;
 
 	/* D0-D2 - explosion select (triggered by D2 of the other port */
@@ -184,7 +184,7 @@ MACHINE_CONFIG_END
 
 WRITE8_HANDLER( tomahawk_audio_w )
 {
-	astrof_state *state = space->machine->driver_data<astrof_state>();
+	astrof_state *state = space->machine().driver_data<astrof_state>();
 
 	/* D0 - sonar */
 
@@ -202,7 +202,7 @@ WRITE8_HANDLER( tomahawk_audio_w )
 	/* D6 - explosion */
 
 	/* D7 - sound enable bit */
-	space->machine->sound().system_enable(data & 0x80);
+	space->machine().sound().system_enable(data & 0x80);
 }
 
 

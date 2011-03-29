@@ -53,11 +53,11 @@ xxxx xxxx xxxx xxxx [2] scroll Y, signed
 ---- ---- --?? ??xx [6] map register
 */
 
-static void draw_layer(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int layer,int data_shift)
+static void draw_layer(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int layer,int data_shift)
 {
-	neoprint_state *state = machine->driver_data<neoprint_state>();
+	neoprint_state *state = machine.driver_data<neoprint_state>();
 	int i, y, x;
-	const gfx_element *gfx = machine->gfx[0];
+	const gfx_element *gfx = machine.gfx[0];
 	INT16 scrollx, scrolly;
 
 	i = (state->npvidregs[((layer*8)+0x06)/2] & 7) * 0x1000/4;
@@ -95,8 +95,8 @@ SCREEN_UPDATE(neoprint)
 {
 	bitmap_fill(bitmap, cliprect, 0);
 
-	draw_layer(screen->machine,bitmap,cliprect,1,2);
-	draw_layer(screen->machine,bitmap,cliprect,0,2);
+	draw_layer(screen->machine(),bitmap,cliprect,1,2);
+	draw_layer(screen->machine(),bitmap,cliprect,0,2);
 
 	return 0;
 }
@@ -105,9 +105,9 @@ SCREEN_UPDATE(nprsp)
 {
 	bitmap_fill(bitmap, cliprect, 0);
 
-	draw_layer(screen->machine,bitmap,cliprect,1,0);
-	draw_layer(screen->machine,bitmap,cliprect,2,0);
-	draw_layer(screen->machine,bitmap,cliprect,0,0);
+	draw_layer(screen->machine(),bitmap,cliprect,1,0);
+	draw_layer(screen->machine(),bitmap,cliprect,2,0);
+	draw_layer(screen->machine(),bitmap,cliprect,0,0);
 
 	return 0;
 }
@@ -118,23 +118,23 @@ static READ16_HANDLER( neoprint_calendar_r )
 	//if(cpu_get_pc(space->cpu) != 0x4b38 )//&& cpu_get_pc(space->cpu) != 0x5f86 && cpu_get_pc(space->cpu) != 0x5f90)
 	//  printf("%08x\n",cpu_get_pc(space->cpu));
 
-	return (upd4990a_databit_r(space->machine->device("upd4990a"), 0) << 15);
+	return (upd4990a_databit_r(space->machine().device("upd4990a"), 0) << 15);
 }
 
 static WRITE16_HANDLER( neoprint_calendar_w )
 {
-	 upd4990a_control_16_w(space->machine->device("upd4990a"), 0, ((data >> 8) & 7), mem_mask);
+	 upd4990a_control_16_w(space->machine().device("upd4990a"), 0, ((data >> 8) & 7), mem_mask);
 }
 
 static READ8_HANDLER( neoprint_unk_r )
 {
-	neoprint_state *state = space->machine->driver_data<neoprint_state>();
+	neoprint_state *state = space->machine().driver_data<neoprint_state>();
 
 	/* ---x ---- tested in irq routine, odd/even field number? */
 	/* ---- xx-- one of these two must be high */
 	/* ---- --xx checked right before entering into attract mode, presumably printer/camera related */
 
-	state->vblank = (space->machine->primary_screen->frame_number() & 0x1) ? 0x10 : 0x00;
+	state->vblank = (space->machine().primary_screen->frame_number() & 0x1) ? 0x10 : 0x00;
 
 	//if(cpu_get_pc(space->cpu) != 0x1504 && cpu_get_pc(space->cpu) != 0x5f86 && cpu_get_pc(space->cpu) != 0x5f90)
 	//  printf("%08x\n",cpu_get_pc(space->cpu));
@@ -144,11 +144,11 @@ static READ8_HANDLER( neoprint_unk_r )
 
 static READ16_HANDLER( neoprint_audio_result_r )
 {
-	neoprint_state *state = space->machine->driver_data<neoprint_state>();
+	neoprint_state *state = space->machine().driver_data<neoprint_state>();
 	return (state->audio_result << 8) | 0x00;
 }
 
-static void audio_cpu_assert_nmi(running_machine *machine)
+static void audio_cpu_assert_nmi(running_machine &machine)
 {
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
@@ -156,7 +156,7 @@ static void audio_cpu_assert_nmi(running_machine *machine)
 
 static WRITE8_HANDLER( audio_cpu_clear_nmi_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( audio_command_w )
@@ -166,10 +166,10 @@ static WRITE16_HANDLER( audio_command_w )
 	{
 		soundlatch_w(space, 0, data >> 8);
 
-		audio_cpu_assert_nmi(space->machine);
+		audio_cpu_assert_nmi(space->machine());
 
 		/* boost the interleave to let the audio CPU read the command */
-		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
+		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 
 		//if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", cpu_get_pc(space->cpu), data, mem_mask);
 	}
@@ -192,8 +192,8 @@ static READ8_HANDLER( audio_command_r )
 
 static WRITE8_HANDLER( audio_result_w )
 {
-	neoprint_state *state = space->machine->driver_data<neoprint_state>();
-	//neogeo_state *state = space->machine->driver_data<neogeo_state>();
+	neoprint_state *state = space->machine().driver_data<neoprint_state>();
+	//neogeo_state *state = space->machine().driver_data<neogeo_state>();
 
 	//if (LOG_CPU_COMM && (state->audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", cpu_get_pc(space->cpu), data);
 
@@ -225,12 +225,12 @@ static WRITE16_HANDLER( nprsp_palette_w )
 {
 	UINT8 r,g,b,i;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 
-	g = (space->machine->generic.paletteram.u16[offset & ~1] & 0xf800) >> 8;
-	r = (space->machine->generic.paletteram.u16[offset & ~1] & 0x00f8) >> 0;
-	i = (space->machine->generic.paletteram.u16[offset | 1] & 0x1c00) >> 10;
-	b = (space->machine->generic.paletteram.u16[offset | 1] & 0x00f8) >> 0;
+	g = (space->machine().generic.paletteram.u16[offset & ~1] & 0xf800) >> 8;
+	r = (space->machine().generic.paletteram.u16[offset & ~1] & 0x00f8) >> 0;
+	i = (space->machine().generic.paletteram.u16[offset | 1] & 0x1c00) >> 10;
+	b = (space->machine().generic.paletteram.u16[offset | 1] & 0x00f8) >> 0;
 	r |= i;
 	g |= i;
 	b |= i;
@@ -244,13 +244,13 @@ static WRITE16_HANDLER( nprsp_palette_w )
 
 		pal_entry = ((offset & 0xfffe) >> 1) + ((offset & 0x20000) ? 0x8000 : 0);
 
-		palette_set_color(space->machine, pal_entry, MAKE_RGB(r,g,b));
+		palette_set_color(space->machine(), pal_entry, MAKE_RGB(r,g,b));
 	}
 }
 
 static WRITE8_HANDLER( nprsp_bank_w )
 {
-	neoprint_state *state = space->machine->driver_data<neoprint_state>();
+	neoprint_state *state = space->machine().driver_data<neoprint_state>();
 	/* this register seems flip-flop based ... */
 
 	if((data & 0xf0) == 0x20)
@@ -264,8 +264,8 @@ static WRITE8_HANDLER( nprsp_bank_w )
 
 static READ16_HANDLER( rom_window_r )
 {
-	neoprint_state *state = space->machine->driver_data<neoprint_state>();
-	UINT16 *rom = (UINT16 *)space->machine->region("maincpu")->base();
+	neoprint_state *state = space->machine().driver_data<neoprint_state>();
+	UINT16 *rom = (UINT16 *)space->machine().region("maincpu")->base();
 
 	return rom[offset | 0x80000/2 | state->bank_val*0x40000/2];
 }
@@ -437,7 +437,7 @@ GFXDECODE_END
 
 static void audio_cpu_irq(device_t *device, int assert)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, assert ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, assert ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -485,7 +485,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_RESET( nprsp )
 {
-	neoprint_state *state = machine->driver_data<neoprint_state>();
+	neoprint_state *state = machine.driver_data<neoprint_state>();
 	state->bank_val = 0;
 }
 
@@ -586,7 +586,7 @@ ROM_END
 /* FIXME: get rid of these two, probably something to do with irq3 and camera / printer devices */
 static DRIVER_INIT( npcartv1 )
 {
-	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	ROM[0x1260/2] = 0x4e71;
 
@@ -596,14 +596,14 @@ static DRIVER_INIT( npcartv1 )
 
 static DRIVER_INIT( 98best44 )
 {
-	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	ROM[0x1312/2] = 0x4e71;
 }
 
 static DRIVER_INIT( nprsp )
 {
-	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	ROM[0x13a4/2] = 0x4e71;
 	ROM[0x13bc/2] = 0x4e71;

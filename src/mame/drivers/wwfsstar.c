@@ -194,7 +194,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER ( wwfsstar_scrollwrite )
 {
-	wwfsstar_state *state = space->machine->driver_data<wwfsstar_state>();
+	wwfsstar_state *state = space->machine().driver_data<wwfsstar_state>();
 
 	switch (offset)
 	{
@@ -210,21 +210,21 @@ static WRITE16_HANDLER ( wwfsstar_scrollwrite )
 static WRITE16_HANDLER ( wwfsstar_soundwrite )
 {
 	soundlatch_w(space, 1, data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE16_HANDLER( wwfsstar_flipscreen_w )
 {
-	flip_screen_set(space->machine, data & 1);
+	flip_screen_set(space->machine(), data & 1);
 }
 
 static WRITE16_HANDLER( wwfsstar_irqack_w )
 {
 	if (offset == 0)
-		cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", 6, CLEAR_LINE);
 
 	else
-		cputag_set_input_line(space->machine, "maincpu", 5, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", 5, CLEAR_LINE);
 }
 
 /*
@@ -242,7 +242,7 @@ static WRITE16_HANDLER( wwfsstar_irqack_w )
 
 static TIMER_DEVICE_CALLBACK( wwfsstar_scanline )
 {
-	wwfsstar_state *state = timer.machine->driver_data<wwfsstar_state>();
+	wwfsstar_state *state = timer.machine().driver_data<wwfsstar_state>();
 	int scanline = param;
 
 	/* Vblank is lowered on scanline 0 */
@@ -260,21 +260,21 @@ static TIMER_DEVICE_CALLBACK( wwfsstar_scanline )
 	if (scanline % 16 == 0)
 	{
 		if (scanline > 0)
-			timer.machine->primary_screen->update_partial(scanline - 1);
-		cputag_set_input_line(timer.machine, "maincpu", 5, ASSERT_LINE);
+			timer.machine().primary_screen->update_partial(scanline - 1);
+		cputag_set_input_line(timer.machine(), "maincpu", 5, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 240 */
 	if (scanline == 240)
 	{
-		timer.machine->primary_screen->update_partial(scanline - 1);
-		cputag_set_input_line(timer.machine, "maincpu", 6, ASSERT_LINE);
+		timer.machine().primary_screen->update_partial(scanline - 1);
+		cputag_set_input_line(timer.machine(), "maincpu", 6, ASSERT_LINE);
 	}
 }
 
 static CUSTOM_INPUT( wwfsstar_vblank_r )
 {
-	wwfsstar_state *state = field->port->machine->driver_data<wwfsstar_state>();
+	wwfsstar_state *state = field->port->machine().driver_data<wwfsstar_state>();
 
 	return state->vblank;
 }
@@ -415,7 +415,7 @@ GFXDECODE_END
 
 static void wwfsstar_ymirq_handler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(device->machine(), "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =

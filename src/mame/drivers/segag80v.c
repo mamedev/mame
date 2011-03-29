@@ -162,13 +162,13 @@ static INPUT_CHANGED( service_switch )
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static MACHINE_START( g80v )
 {
-	segag80v_state *state = machine->driver_data<segag80v_state>();
+	segag80v_state *state = machine.driver_data<segag80v_state>();
 	/* register for save states */
 	state_save_register_global_array(machine, state->mult_data);
 	state_save_register_global(machine, state->mult_result);
@@ -180,7 +180,7 @@ static MACHINE_START( g80v )
 
 static MACHINE_RESET( g80v )
 {
-	segag80v_state *state = machine->driver_data<segag80v_state>();
+	segag80v_state *state = machine.driver_data<segag80v_state>();
 	/* if we have a Universal Sound Board, reset it here */
 	if (state->has_usb)
 		sega_usb_reset(machine, 0x10);
@@ -196,7 +196,7 @@ static MACHINE_RESET( g80v )
 
 static offs_t decrypt_offset(address_space *space, offs_t offset)
 {
-	segag80v_state *state = space->machine->driver_data<segag80v_state>();
+	segag80v_state *state = space->machine().driver_data<segag80v_state>();
 
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
 	offs_t pc = cpu_get_previouspc(space->cpu);
@@ -209,7 +209,7 @@ static offs_t decrypt_offset(address_space *space, offs_t offset)
 
 static WRITE8_HANDLER( mainram_w )
 {
-	segag80v_state *state = space->machine->driver_data<segag80v_state>();
+	segag80v_state *state = space->machine().driver_data<segag80v_state>();
 	state->mainram[decrypt_offset(space, offset)] = data;
 }
 
@@ -217,7 +217,7 @@ static WRITE8_HANDLER( usb_ram_w ) { sega_usb_ram_w(space, decrypt_offset(space,
 
 static WRITE8_HANDLER( vectorram_w )
 {
-	segag80v_state *state = space->machine->driver_data<segag80v_state>();
+	segag80v_state *state = space->machine().driver_data<segag80v_state>();
 	state->vectorram[decrypt_offset(space, offset)] = data;
 }
 
@@ -245,10 +245,10 @@ static READ8_HANDLER( mangled_ports_r )
 	/* read as two bits from each of 4 ports. For this reason, the input   */
 	/* ports have been organized logically, and are demangled at runtime.  */
 	/* 4 input ports each provide 8 bits of information. */
-	UINT8 d7d6 = input_port_read(space->machine, "D7D6");
-	UINT8 d5d4 = input_port_read(space->machine, "D5D4");
-	UINT8 d3d2 = input_port_read(space->machine, "D3D2");
-	UINT8 d1d0 = input_port_read(space->machine, "D1D0");
+	UINT8 d7d6 = input_port_read(space->machine(), "D7D6");
+	UINT8 d5d4 = input_port_read(space->machine(), "D5D4");
+	UINT8 d3d2 = input_port_read(space->machine(), "D3D2");
+	UINT8 d1d0 = input_port_read(space->machine(), "D1D0");
 	int shift = offset & 3;
 	return demangle(d7d6 >> shift, d5d4 >> shift, d3d2 >> shift, d1d0 >> shift);
 }
@@ -263,18 +263,18 @@ static READ8_HANDLER( mangled_ports_r )
 
 static WRITE8_HANDLER( spinner_select_w )
 {
-	segag80v_state *state = space->machine->driver_data<segag80v_state>();
+	segag80v_state *state = space->machine().driver_data<segag80v_state>();
 	state->spinner_select = data;
 }
 
 
 static READ8_HANDLER( spinner_input_r )
 {
-	segag80v_state *state = space->machine->driver_data<segag80v_state>();
+	segag80v_state *state = space->machine().driver_data<segag80v_state>();
 	INT8 delta;
 
 	if (state->spinner_select & 1)
-		return input_port_read(space->machine, "FC");
+		return input_port_read(space->machine(), "FC");
 
 /*
  * The values returned are always increasing.  That is, regardless of whether
@@ -284,7 +284,7 @@ static READ8_HANDLER( spinner_input_r )
  */
 
 	/* I'm sure this can be further simplified ;-) BW */
-	delta = input_port_read(space->machine, "SPINNER");
+	delta = input_port_read(space->machine(), "SPINNER");
 	if (delta != 0)
 	{
 		state->spinner_sign = (delta >> 7) & 1;
@@ -303,13 +303,13 @@ static READ8_HANDLER( spinner_input_r )
 
 static CUSTOM_INPUT( elim4_joint_coin_r )
 {
-	return (input_port_read(field->port->machine, "COINS") & 0xf) != 0xf;
+	return (input_port_read(field->port->machine(), "COINS") & 0xf) != 0xf;
 }
 
 
 static READ8_HANDLER( elim4_input_r )
 {
-	segag80v_state *state = space->machine->driver_data<segag80v_state>();
+	segag80v_state *state = space->machine().driver_data<segag80v_state>();
 	UINT8 result = 0;
 
 	/* bit 3 enables demux */
@@ -320,11 +320,11 @@ static READ8_HANDLER( elim4_input_r )
 		{
 			case 6:
 				/* player 3 & 4 controls */
-				result = input_port_read(space->machine, "FC");
+				result = input_port_read(space->machine(), "FC");
 				break;
 			case 7:
 				/* the 4 coin inputs */
-				result = input_port_read(space->machine, "COINS");
+				result = input_port_read(space->machine(), "COINS");
 				break;
 		}
 	}
@@ -343,7 +343,7 @@ static READ8_HANDLER( elim4_input_r )
 
 static WRITE8_HANDLER( multiply_w )
 {
-	segag80v_state *state = space->machine->driver_data<segag80v_state>();
+	segag80v_state *state = space->machine().driver_data<segag80v_state>();
 	state->mult_data[offset] = data;
 	if (offset == 1)
 		state->mult_result = state->mult_data[0] * state->mult_data[1];
@@ -352,7 +352,7 @@ static WRITE8_HANDLER( multiply_w )
 
 static READ8_HANDLER( multiply_r )
 {
-	segag80v_state *state = space->machine->driver_data<segag80v_state>();
+	segag80v_state *state = space->machine().driver_data<segag80v_state>();
 	UINT8 result = state->mult_result;
 	state->mult_result >>= 8;
 	return result;
@@ -368,8 +368,8 @@ static READ8_HANDLER( multiply_r )
 
 static WRITE8_HANDLER( coin_count_w )
 {
-	coin_counter_w(space->machine, 0, (data >> 7) & 1);
-	coin_counter_w(space->machine, 1, (data >> 6) & 1);
+	coin_counter_w(space->machine(), 0, (data >> 7) & 1);
+	coin_counter_w(space->machine(), 1, (data >> 6) & 1);
 }
 
 
@@ -1311,8 +1311,8 @@ ROM_END
 
 static DRIVER_INIT( elim2 )
 {
-	segag80v_state *state = machine->driver_data<segag80v_state>();
-	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
+	segag80v_state *state = machine.driver_data<segag80v_state>();
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
 
 	/* configure security */
 	state->decrypt = segag80_security(70);
@@ -1326,8 +1326,8 @@ static DRIVER_INIT( elim2 )
 
 static DRIVER_INIT( elim4 )
 {
-	segag80v_state *state = machine->driver_data<segag80v_state>();
-	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
+	segag80v_state *state = machine.driver_data<segag80v_state>();
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
 
 	/* configure security */
 	state->decrypt = segag80_security(76);
@@ -1345,8 +1345,8 @@ static DRIVER_INIT( elim4 )
 
 static DRIVER_INIT( spacfury )
 {
-	segag80v_state *state = machine->driver_data<segag80v_state>();
-	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
+	segag80v_state *state = machine.driver_data<segag80v_state>();
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
 
 	/* configure security */
 	state->decrypt = segag80_security(64);
@@ -1362,9 +1362,9 @@ static DRIVER_INIT( spacfury )
 
 static DRIVER_INIT( zektor )
 {
-	segag80v_state *state = machine->driver_data<segag80v_state>();
-	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
-	device_t *ay = machine->device("aysnd");
+	segag80v_state *state = machine.driver_data<segag80v_state>();
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
+	device_t *ay = machine.device("aysnd");
 
 	/* configure security */
 	state->decrypt = segag80_security(82);
@@ -1385,9 +1385,9 @@ static DRIVER_INIT( zektor )
 
 static DRIVER_INIT( tacscan )
 {
-	segag80v_state *state = machine->driver_data<segag80v_state>();
-	address_space *pgmspace = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
+	segag80v_state *state = machine.driver_data<segag80v_state>();
+	address_space *pgmspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
 
 	/* configure security */
 	state->decrypt = segag80_security(76);
@@ -1405,9 +1405,9 @@ static DRIVER_INIT( tacscan )
 
 static DRIVER_INIT( startrek )
 {
-	segag80v_state *state = machine->driver_data<segag80v_state>();
-	address_space *pgmspace = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
+	segag80v_state *state = machine.driver_data<segag80v_state>();
+	address_space *pgmspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
 
 	/* configure security */
 	state->decrypt = segag80_security(64);

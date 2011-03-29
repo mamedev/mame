@@ -129,12 +129,12 @@
 
 static WRITE8_HANDLER( cloak_led_w )
 {
-	set_led_status(space->machine, 1 - offset, ~data & 0x80);
+	set_led_status(space->machine(), 1 - offset, ~data & 0x80);
 }
 
 static WRITE8_HANDLER( cloak_coin_counter_w )
 {
-	coin_counter_w(space->machine, 1 - offset, data & 0x80);
+	coin_counter_w(space->machine(), 1 - offset, data & 0x80);
 }
 
 static WRITE8_HANDLER( cloak_custom_w )
@@ -143,17 +143,17 @@ static WRITE8_HANDLER( cloak_custom_w )
 
 static WRITE8_HANDLER( cloak_irq_reset_0_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( cloak_irq_reset_1_w )
 {
-	cputag_set_input_line(space->machine, "slave", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "slave", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( cloak_nvram_enable_w )
 {
-	cloak_state *state = space->machine->driver_data<cloak_state>();
+	cloak_state *state = space->machine().driver_data<cloak_state>();
 	state->nvram_enabled = data & 0x01;
 }
 

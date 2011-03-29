@@ -52,7 +52,7 @@ Notes:
 
 static WRITE16_HANDLER( tetrisp2_systemregs_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->systemregs[offset] = data;
@@ -63,7 +63,7 @@ static WRITE16_HANDLER( tetrisp2_systemregs_w )
 
 static WRITE16_HANDLER( rockn_systemregs_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->systemregs[offset] = data;
@@ -78,7 +78,7 @@ static WRITE16_HANDLER( rockn_systemregs_w )
 
 static WRITE16_HANDLER( rocknms_sub_systemregs_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->rocknms_sub_systemregs[offset] = data;
@@ -101,14 +101,14 @@ static WRITE16_HANDLER( rocknms_sub_systemregs_w )
 
 static READ16_HANDLER( rockn_adpcmbank_r )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	return ((state->rockn_adpcmbank & 0xf0ff) | (state->rockn_protectdata << 8));
 }
 
 static WRITE16_HANDLER( rockn_adpcmbank_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
-	UINT8 *SNDROM = space->machine->region("ymz")->base();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
+	UINT8 *SNDROM = space->machine().region("ymz")->base();
 	int bank;
 
 	state->rockn_adpcmbank = data;
@@ -125,8 +125,8 @@ static WRITE16_HANDLER( rockn_adpcmbank_w )
 
 static WRITE16_HANDLER( rockn2_adpcmbank_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
-	UINT8 *SNDROM = space->machine->region("ymz")->base();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
+	UINT8 *SNDROM = space->machine().region("ymz")->base();
 	int bank;
 
 	char banktable[9][3]=
@@ -164,24 +164,24 @@ static READ16_HANDLER( rockn_soundvolume_r )
 
 static WRITE16_HANDLER( rockn_soundvolume_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	state->rockn_soundvolume = data;
 }
 
 
 static WRITE16_HANDLER( nndmseal_sound_bank_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *rom = space->machine->region("okisource")->base();
+		UINT8 *rom = space->machine().region("okisource")->base();
 
 		if (data & 0x04)
 		{
 			state->bank_lo = data & 0x03;
 
-			memcpy(space->machine->region("oki")->base(), rom + (state->bank_lo * 0x80000), 0x20000);
+			memcpy(space->machine().region("oki")->base(), rom + (state->bank_lo * 0x80000), 0x20000);
 
 //          logerror("PC:%06X sound bank_lo = %02X\n",cpu_get_pc(space->cpu),state->bank_lo);
 		}
@@ -189,7 +189,7 @@ static WRITE16_HANDLER( nndmseal_sound_bank_w )
 		{
 			state->bank_hi = data & 0x03;
 
-			memcpy(space->machine->region("oki")->base() + 0x20000, rom + (state->bank_lo * 0x80000) + (state->bank_hi * 0x20000), 0x20000);
+			memcpy(space->machine().region("oki")->base() + 0x20000, rom + (state->bank_lo * 0x80000) + (state->bank_hi * 0x20000), 0x20000);
 
 //          logerror("PC:%06X sound bank_hi = %02X\n",cpu_get_pc(space->cpu),state->bank_hi);
 		}
@@ -206,9 +206,9 @@ static WRITE16_HANDLER( nndmseal_sound_bank_w )
 
 static READ16_HANDLER( tetrisp2_ip_1_word_r )
 {
-	return	( input_port_read(space->machine, "SYSTEM") &  0xfcff ) |
-			(           space->machine->rand() & ~0xfcff ) |
-			(      1 << (8 + (space->machine->rand()&1)) );
+	return	( input_port_read(space->machine(), "SYSTEM") &  0xfcff ) |
+			(           space->machine().rand() & ~0xfcff ) |
+			(      1 << (8 + (space->machine().rand()&1)) );
 }
 
 
@@ -225,20 +225,20 @@ static READ16_HANDLER( tetrisp2_ip_1_word_r )
 /* The game only ever writes even bytes and reads odd bytes */
 static READ16_HANDLER( tetrisp2_nvram_r )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	return	( (state->nvram[offset] >> 8) & 0x00ff ) |
 			( (state->nvram[offset] << 8) & 0xff00 ) ;
 }
 
 static WRITE16_HANDLER( tetrisp2_nvram_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	COMBINE_DATA(&state->nvram[offset]);
 }
 
 static READ16_HANDLER( rockn_nvram_r )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	return	state->nvram[offset];
 }
 
@@ -254,26 +254,26 @@ static READ16_HANDLER( rockn_nvram_r )
 
 static READ16_HANDLER( rocknms_main2sub_r )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	return state->rocknms_main2sub;
 }
 
 static WRITE16_HANDLER( rocknms_main2sub_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	if (ACCESSING_BITS_0_7)
 		state->rocknms_main2sub = (data ^ 0xffff);
 }
 
 static CUSTOM_INPUT( rocknms_main2sub_status_r )
 {
-	tetrisp2_state *state = field->port->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = field->port->machine().driver_data<tetrisp2_state>();
 	return  state->rocknms_sub2main & 0x0003;
 }
 
 static WRITE16_HANDLER( rocknms_sub2main_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	if (ACCESSING_BITS_0_7)
 		state->rocknms_sub2main = (data ^ 0xffff);
 }
@@ -281,7 +281,7 @@ static WRITE16_HANDLER( rocknms_sub2main_w )
 
 static WRITE16_HANDLER( tetrisp2_coincounter_w )
 {
-	coin_counter_w( space->machine, 0, (data & 0x0001));
+	coin_counter_w( space->machine(), 0, (data & 0x0001));
 }
 
 
@@ -331,16 +331,16 @@ static WRITE16_HANDLER( nndmseal_coincounter_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w( space->machine, 0,  data  & 0x0001 );
+		coin_counter_w( space->machine(), 0,  data  & 0x0001 );
 		//                  data  & 0x0004 ?
-		coin_lockout_w( space->machine, 0,(~data) & 0x0008 );
+		coin_lockout_w( space->machine(), 0,(~data) & 0x0008 );
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status( space->machine, 0, data & 0x1000 );	// +
-		set_led_status( space->machine, 1, data & 0x2000 );	// -
-		set_led_status( space->machine, 2, data & 0x4000 );	// Cancel
-		set_led_status( space->machine, 3, data & 0x8000 );	// OK
+		set_led_status( space->machine(), 0, data & 0x1000 );	// +
+		set_led_status( space->machine(), 1, data & 0x2000 );	// -
+		set_led_status( space->machine(), 2, data & 0x4000 );	// Cancel
+		set_led_status( space->machine(), 3, data & 0x8000 );	// OK
 	}
 //  popmessage("%04x",data);
 }
@@ -1046,11 +1046,11 @@ static TIMER_CALLBACK( rockn_timer_sub_level1_callback )
 	cputag_set_input_line(machine, "sub", 1, HOLD_LINE);
 }
 
-static void init_rockn_timer(running_machine *machine)
+static void init_rockn_timer(running_machine &machine)
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
-	machine->scheduler().timer_pulse(attotime::from_msec(32), FUNC(rockn_timer_level1_callback));
-	state->rockn_timer_l4 = machine->scheduler().timer_alloc(FUNC(rockn_timer_level4_callback));
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
+	machine.scheduler().timer_pulse(attotime::from_msec(32), FUNC(rockn_timer_level1_callback));
+	state->rockn_timer_l4 = machine.scheduler().timer_alloc(FUNC(rockn_timer_level4_callback));
 
 	state_save_register_global_array(machine, state->systemregs);
 	state_save_register_global_array(machine, state->rocknms_sub_systemregs);
@@ -1061,32 +1061,32 @@ static void init_rockn_timer(running_machine *machine)
 
 static DRIVER_INIT( rockn )
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	init_rockn_timer(machine);
 	state->rockn_protectdata = 1;
 }
 
 static DRIVER_INIT( rockn1 )
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	init_rockn_timer(machine);
 	state->rockn_protectdata = 1;
 }
 
 static DRIVER_INIT( rockn2 )
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	init_rockn_timer(machine);
 	state->rockn_protectdata = 2;
 }
 
 static DRIVER_INIT( rocknms )
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	init_rockn_timer(machine);
 
-	machine->scheduler().timer_pulse(attotime::from_msec(32), FUNC(rockn_timer_sub_level1_callback));
-	state->rockn_timer_sub_l4 = machine->scheduler().timer_alloc(FUNC(rockn_timer_sub_level4_callback));
+	machine.scheduler().timer_pulse(attotime::from_msec(32), FUNC(rockn_timer_sub_level1_callback));
+	state->rockn_timer_sub_l4 = machine.scheduler().timer_alloc(FUNC(rockn_timer_sub_level4_callback));
 
 	state->rockn_protectdata = 3;
 
@@ -1094,7 +1094,7 @@ static DRIVER_INIT( rocknms )
 
 static DRIVER_INIT( rockn3 )
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	init_rockn_timer(machine);
 	state->rockn_protectdata = 4;
 }

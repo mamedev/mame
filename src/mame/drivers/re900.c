@@ -104,7 +104,7 @@ public:
 
 static READ8_DEVICE_HANDLER (re_psg_portA_r)
 {
-	if ((input_port_read(device->machine, "IN0") & 0x01) == 0)
+	if ((input_port_read(device->machine(), "IN0") & 0x01) == 0)
 	{
 		output_set_lamp_value(0,1);		// Operator Key ON
 	}
@@ -114,19 +114,19 @@ static READ8_DEVICE_HANDLER (re_psg_portA_r)
 		output_set_lamp_value(0,0);		// Operator Key OFF
 	}
 
-	return input_port_read(device->machine, "IN0");
+	return input_port_read(device->machine(), "IN0");
 }
 
 static READ8_DEVICE_HANDLER (re_psg_portB_r)
 {
-	re900_state *state = device->machine->driver_data<re900_state>();
+	re900_state *state = device->machine().driver_data<re900_state>();
 	UINT8 retval = 0xff;
 	logerror("llamada a re_psg_portB_r\n");
 	/* This is a hack to select the active player due to Keyboard size restrictions  */
 
 	output_set_lamp_value(state->player,1);
 
-	if (input_port_read(device->machine, "IN_S"))
+	if (input_port_read(device->machine(), "IN_S"))
 	{
 		if (!state->stat_a)
 		{
@@ -157,12 +157,12 @@ static READ8_DEVICE_HANDLER (re_psg_portB_r)
 	/* "INA": Unified port to share the player Keys among all players - Key In & Key Out have their own buttons on keyboard. */
 	switch( state->mux_data )
 	{
-		case 0x01: retval = (input_port_read(device->machine, "IN6") | 0x80 ) - (( state->player == 6 ) ? (input_port_read(device->machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 6 */
-		case 0x02: retval = (input_port_read(device->machine, "IN5") | 0x80 ) - (( state->player == 5 ) ? (input_port_read(device->machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 5 */
-		case 0x04: retval = (input_port_read(device->machine, "IN4") | 0x80 ) - (( state->player == 4 ) ? (input_port_read(device->machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 4 */
-		case 0x08: retval = (input_port_read(device->machine, "IN3") | 0x80 ) - (( state->player == 3 ) ? (input_port_read(device->machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 3 */
-		case 0x10: retval = (input_port_read(device->machine, "IN2") | 0x80 ) - (( state->player == 2 ) ? (input_port_read(device->machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 2 */
-		case 0x20: retval = (input_port_read(device->machine, "IN1") | 0x80 ) - (( state->player == 1 ) ? (input_port_read(device->machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 1 */
+		case 0x01: retval = (input_port_read(device->machine(), "IN6") | 0x80 ) - (( state->player == 6 ) ? (input_port_read(device->machine(), "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 6 */
+		case 0x02: retval = (input_port_read(device->machine(), "IN5") | 0x80 ) - (( state->player == 5 ) ? (input_port_read(device->machine(), "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 5 */
+		case 0x04: retval = (input_port_read(device->machine(), "IN4") | 0x80 ) - (( state->player == 4 ) ? (input_port_read(device->machine(), "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 4 */
+		case 0x08: retval = (input_port_read(device->machine(), "IN3") | 0x80 ) - (( state->player == 3 ) ? (input_port_read(device->machine(), "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 3 */
+		case 0x10: retval = (input_port_read(device->machine(), "IN2") | 0x80 ) - (( state->player == 2 ) ? (input_port_read(device->machine(), "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 2 */
+		case 0x20: retval = (input_port_read(device->machine(), "IN1") | 0x80 ) - (( state->player == 1 ) ? (input_port_read(device->machine(), "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 1 */
 	}
 
 	return retval;
@@ -170,7 +170,7 @@ static READ8_DEVICE_HANDLER (re_psg_portB_r)
 
 static READ8_HANDLER (rom_r)
 {
-	re900_state *state = space->machine->driver_data<re900_state>();
+	re900_state *state = space->machine().driver_data<re900_state>();
 	return state->rom[offset];
 }
 
@@ -181,14 +181,14 @@ static READ8_HANDLER (rom_r)
 
 static WRITE8_DEVICE_HANDLER (re_mux_port_A_w)
 {
-	re900_state *state = device->machine->driver_data<re900_state>();
+	re900_state *state = device->machine().driver_data<re900_state>();
 	state->psg_pa = data;
 	state->mux_data = ((data >> 2) & 0x3f) ^ 0x3f;
 }
 
 static WRITE8_DEVICE_HANDLER (re_mux_port_B_w)
 {
-	re900_state *state = device->machine->driver_data<re900_state>();
+	re900_state *state = device->machine().driver_data<re900_state>();
 	UINT8 led;
 	state->psg_pb = data;
 	led = (state->psg_pa >> 2) & 0x3f;
@@ -241,10 +241,10 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( re900_video_interrupt )
 {
-	TMS9928A_interrupt(device->machine);
+	TMS9928A_interrupt(device->machine());
 }
 
-static void vdp_interrupt (running_machine *machine, int state)
+static void vdp_interrupt (running_machine &machine, int state)
 {
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
 }
@@ -457,7 +457,7 @@ ROM_END
 
 static DRIVER_INIT( re900 )
 {
-	re900_state *state = machine->driver_data<re900_state>();
+	re900_state *state = machine.driver_data<re900_state>();
 	TMS9928A_configure(&tms9928a_interface);
 	state->player = 1;
 	state->stat_a = 1;

@@ -9,9 +9,9 @@
 
 ***************************************************************************/
 
-void spy_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+void spy_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	spy_state *state = machine->driver_data<spy_state>();
+	spy_state *state = machine.driver_data<spy_state>();
 	*flags = (*color & 0x20) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
 	*color = state->layer_colorbase[layer] + ((*color & 0xc0) >> 6);
@@ -24,9 +24,9 @@ void spy_tile_callback( running_machine *machine, int layer, int bank, int *code
 
 ***************************************************************************/
 
-void spy_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask, int *shadow )
+void spy_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask, int *shadow )
 {
-	spy_state *state = machine->driver_data<spy_state>();
+	spy_state *state = machine.driver_data<spy_state>();
 
 	/* bit 4 = priority over layer A (0 = have priority) */
 	/* bit 5 = priority over layer B (1 = have priority) */
@@ -46,7 +46,7 @@ void spy_sprite_callback( running_machine *machine, int *code, int *color, int *
 
 VIDEO_START( spy )
 {
-	spy_state *state = machine->driver_data<spy_state>();
+	spy_state *state = machine.driver_data<spy_state>();
 
 	state->layer_colorbase[0] = 48;
 	state->layer_colorbase[1] = 0;
@@ -64,11 +64,11 @@ VIDEO_START( spy )
 
 SCREEN_UPDATE( spy )
 {
-	spy_state *state = screen->machine->driver_data<spy_state>();
+	spy_state *state = screen->machine().driver_data<spy_state>();
 
 	k052109_tilemap_update(state->k052109);
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	if (!state->video_enable)
 		bitmap_fill(bitmap, cliprect, 16 * state->layer_colorbase[0]);

@@ -890,26 +890,26 @@ J1100256A VIDEO PCB
 #include "contcirc.lh"
 #include "dblaxle.lh"
 
-static void parse_control( running_machine *machine )
+static void parse_control( running_machine &machine )
 {
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	taitoz_state *state = machine->driver_data<taitoz_state>();
+	taitoz_state *state = machine.driver_data<taitoz_state>();
 	device_set_input_line(state->subcpu, INPUT_LINE_RESET, (state->cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
 static WRITE16_HANDLER( cpua_ctrl_w )
 {
-	taitoz_state *state = space->machine->driver_data<taitoz_state>();
+	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 
 	if ((data & 0xff00) && ((data & 0xff) == 0))
 		data = data >> 8;	/* for Wgp */
 
 	state->cpua_ctrl = data;
 
-	parse_control(space->machine);
+	parse_control(space->machine());
 
 	// Chase HQ: handle the lights
 	if (state->chasehq_lamps)
@@ -931,7 +931,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 
 static TIMER_CALLBACK( taitoz_interrupt6 )
 {
-	taitoz_state *state = machine->driver_data<taitoz_state>();
+	taitoz_state *state = machine.driver_data<taitoz_state>();
 	device_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
@@ -939,14 +939,14 @@ static TIMER_CALLBACK( taitoz_interrupt6 )
 
 static TIMER_CALLBACK( taitoz_cpub_interrupt5 )
 {
-	taitoz_state *state = machine->driver_data<taitoz_state>();
+	taitoz_state *state = machine.driver_data<taitoz_state>();
 	device_set_input_line(state->subcpu, 5, HOLD_LINE);
 }
 
 #if 0
 static TIMER_CALLBACK( taitoz_cpub_interrupt6 )
 {
-	taitoz_state *state = machine->driver_data<taitoz_state>();
+	taitoz_state *state = machine.driver_data<taitoz_state>();
 	device_set_input_line(state->subcpu, 6, HOLD_LINE);
 }
 #endif
@@ -961,11 +961,11 @@ static INTERRUPT_GEN( sci_interrupt )
        causes all sprites to vanish! Spriteram has areas for 2 frames
        so in theory only needs updating every other frame. */
 
-	taitoz_state *state = device->machine->driver_data<taitoz_state>();
+	taitoz_state *state = device->machine().driver_data<taitoz_state>();
 	state->sci_int6 = !state->sci_int6;
 
 	if (state->sci_int6)
-		device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
+		device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
 
 	device_set_input_line(device, 4, HOLD_LINE);
 }
@@ -979,11 +979,11 @@ static INTERRUPT_GEN( dblaxle_interrupt )
 {
 	// Unsure how many int6's per frame, copy SCI for now
 
-	taitoz_state *state = device->machine->driver_data<taitoz_state>();
+	taitoz_state *state = device->machine().driver_data<taitoz_state>();
 	state->dblaxle_int6 = !state->dblaxle_int6;
 
 	if (state->dblaxle_int6)
-		device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
+		device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
 
 	device_set_input_line(device, 4, HOLD_LINE);
 }
@@ -991,7 +991,7 @@ static INTERRUPT_GEN( dblaxle_interrupt )
 static INTERRUPT_GEN( dblaxle_cpub_interrupt )
 {
 	// Unsure how many int6's per frame
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
 	device_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -1029,14 +1029,14 @@ static const eeprom_interface spacegun_eeprom_intf =
 #if 0
 static READ16_HANDLER( eep_latch_r )
 {
-	taitoz_state *state = space->machine->driver_data<taitoz_state>();
+	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 	return state->eep_latch;
 }
 #endif
 
 static WRITE16_HANDLER( spacegun_output_bypass_w )
 {
-	taitoz_state *state = space->machine->driver_data<taitoz_state>();
+	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 
 	switch (offset)
 	{
@@ -1049,7 +1049,7 @@ static WRITE16_HANDLER( spacegun_output_bypass_w )
             x0000000    (unused)                  */
 
 			COMBINE_DATA(&state->eep_latch);
-			input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+			input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 			break;
 
 		default:
@@ -1066,15 +1066,15 @@ static READ8_HANDLER( contcirc_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	taitoz_state *state = space->machine->driver_data<taitoz_state>();
+	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 	UINT8 port = tc0220ioc_port_r(state->tc0220ioc, 0);	/* read port number */
 	int steer = 0;
-	int fake = input_port_read(space->machine, "FAKE");
+	int fake = input_port_read(space->machine(), "FAKE");
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero and reduce span to 0xc0 */
-		steer = ((input_port_read(space->machine, "STEER") - 0x80) * 0xc0) / 0x100;
+		steer = ((input_port_read(space->machine(), "STEER") - 0x80) * 0xc0) / 0x100;
 
 	}
 	else	/* Digital steer */
@@ -1107,15 +1107,15 @@ static READ8_HANDLER( chasehq_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for extra inputs */
 
-	taitoz_state *state = space->machine->driver_data<taitoz_state>();
+	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 	UINT8 port = tc0220ioc_port_r(state->tc0220ioc, 0);	/* read port number */
 	int steer = 0;
-	int fake = input_port_read(space->machine, "FAKE");
+	int fake = input_port_read(space->machine(), "FAKE");
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero */
-		steer = input_port_read(space->machine, "STEER") - 0x80;
+		steer = input_port_read(space->machine(), "STEER") - 0x80;
 	}
 	else	/* Digital steer */
 	{
@@ -1132,16 +1132,16 @@ static READ8_HANDLER( chasehq_input_bypass_r )
 	switch (port)
 	{
 		case 0x08:
-			return input_port_read(space->machine, "UNK1");
+			return input_port_read(space->machine(), "UNK1");
 
 		case 0x09:
-			return input_port_read(space->machine, "UNK2");
+			return input_port_read(space->machine(), "UNK2");
 
 		case 0x0a:
-			return input_port_read(space->machine, "UNK3");
+			return input_port_read(space->machine(), "UNK3");
 
 		case 0x0b:
-			return input_port_read(space->machine, "UNK4");
+			return input_port_read(space->machine(), "UNK4");
 
 		case 0x0c:
 			return steer & 0xff;
@@ -1160,16 +1160,16 @@ static READ16_HANDLER( bshark_stick_r )
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_read(space->machine, "STICKX");
+			return input_port_read(space->machine(), "STICKX");
 
 		case 0x01:
-			return input_port_read(space->machine, "X_ADJUST");
+			return input_port_read(space->machine(), "X_ADJUST");
 
 		case 0x02:
-			return input_port_read(space->machine, "STICKY");
+			return input_port_read(space->machine(), "STICKY");
 
 		case 0x03:
-			return input_port_read(space->machine, "Y_ADJUST");
+			return input_port_read(space->machine(), "Y_ADJUST");
 	}
 
 	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", cpu_get_pc(space->cpu), offset);
@@ -1183,16 +1183,16 @@ static READ16_HANDLER( nightstr_stick_r )
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_read(space->machine, "STICKX");
+			return input_port_read(space->machine(), "STICKX");
 
 		case 0x01:
-			return input_port_read(space->machine, "STICKY");
+			return input_port_read(space->machine(), "STICKY");
 
 		case 0x02:
-			return input_port_read(space->machine, "X_ADJUST");
+			return input_port_read(space->machine(), "X_ADJUST");
 
 		case 0x03:
-			return input_port_read(space->machine, "Y_ADJUST");
+			return input_port_read(space->machine(), "Y_ADJUST");
 	}
 
 	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", cpu_get_pc(space->cpu), offset);
@@ -1208,19 +1208,19 @@ static WRITE16_HANDLER( bshark_stick_w )
        but we don't want CPUA to have an int6 before int4 is over (?)
     */
 
-	space->machine->scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(10000), FUNC(taitoz_interrupt6));
+	space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(10000), FUNC(taitoz_interrupt6));
 }
 
 
 static READ16_HANDLER( sci_steer_input_r )
 {
 	int steer = 0;
-	int fake = input_port_read(space->machine, "FAKE");
+	int fake = input_port_read(space->machine(), "FAKE");
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero and reduce span to 0xc0 */
-		steer = ((input_port_read(space->machine, "STEER") - 0x80) * 0xc0) / 0x100;
+		steer = ((input_port_read(space->machine(), "STEER") - 0x80) * 0xc0) / 0x100;
 	}
 	else	/* Digital steer */
 	{
@@ -1251,7 +1251,7 @@ static READ16_HANDLER( sci_steer_input_r )
 
 static READ16_HANDLER( spacegun_input_bypass_r )
 {
-	taitoz_state *state = space->machine->driver_data<taitoz_state>();
+	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 
 	switch (offset)
 	{
@@ -1268,16 +1268,16 @@ static READ16_HANDLER( spacegun_lightgun_r )
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_read(space->machine, "STICKX1");
+			return input_port_read(space->machine(), "STICKX1");
 
 		case 0x01:
-			return input_port_read(space->machine, "STICKY1");
+			return input_port_read(space->machine(), "STICKY1");
 
 		case 0x02:
-			return input_port_read(space->machine, "STICKX2");
+			return input_port_read(space->machine(), "STICKX2");
 
 		case 0x03:
-			return input_port_read(space->machine, "STICKY2");
+			return input_port_read(space->machine(), "STICKY2");
 	}
 
 	return 0x00;
@@ -1293,7 +1293,7 @@ static WRITE16_HANDLER( spacegun_lightgun_w )
        Four lightgun interrupts happen before the collected coords
        are moved to shared ram where CPUA can use them. */
 
-	space->machine->scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(10000), FUNC(taitoz_cpub_interrupt5));
+	space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(10000), FUNC(taitoz_cpub_interrupt5));
 }
 
 static WRITE16_HANDLER( spacegun_gun_output_w )
@@ -1306,12 +1306,12 @@ static WRITE16_HANDLER( spacegun_gun_output_w )
 static READ16_HANDLER( dblaxle_steer_input_r )
 {
 	int steer = 0;
-	int fake = input_port_read(space->machine, "FAKE");
+	int fake = input_port_read(space->machine(), "FAKE");
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero and reduce span to 0x80 */
-		steer = ((input_port_read(space->machine, "STEER") - 0x80) * 0x80) / 0x100;
+		steer = ((input_port_read(space->machine(), "STEER") - 0x80) * 0x80) / 0x100;
 	}
 	else	/* Digital steer */
 	{
@@ -1345,7 +1345,7 @@ static READ16_HANDLER( chasehq_motor_r )
 	switch (offset)
 	{
 		case 0x0:
-			return (space->machine->rand() &0xff);	/* motor status ?? */
+			return (space->machine().rand() &0xff);	/* motor status ?? */
 
 		case 0x101:
 			return 0x55;	/* motor cpu status ? */
@@ -1420,23 +1420,23 @@ static READ16_HANDLER( aquajack_unknown_r )
                         SOUND
 *****************************************************/
 
-static void reset_sound_region( running_machine *machine )
+static void reset_sound_region( running_machine &machine )
 {
-	taitoz_state *state = machine->driver_data<taitoz_state>();
+	taitoz_state *state = machine.driver_data<taitoz_state>();
 	memory_set_bank(machine,  "bank10", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	taitoz_state *state = space->machine->driver_data<taitoz_state>();
+	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 
 	state->banknum = data & 7;
-	reset_sound_region(space->machine);
+	reset_sound_region(space->machine());
 }
 
 static WRITE16_HANDLER( taitoz_sound_w )
 {
-	taitoz_state *state = space->machine->driver_data<taitoz_state>();
+	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 
 	if (offset == 0)
 		tc0140syt_port_w(state->tc0140syt, 0, data & 0xff);
@@ -1456,7 +1456,7 @@ static WRITE16_HANDLER( taitoz_sound_w )
 
 static READ16_HANDLER( taitoz_sound_r )
 {
-	taitoz_state *state = space->machine->driver_data<taitoz_state>();
+	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 
 	if (offset == 1)
 		return (tc0140syt_comm_r(state->tc0140syt, 0) & 0xff);
@@ -1467,7 +1467,7 @@ static READ16_HANDLER( taitoz_sound_r )
 #if 0
 static WRITE16_HANDLER( taitoz_msb_sound_w )
 {
-	taitoz_state *state = space->machine->driver_data<taitoz_state>();
+	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 
 	if (offset == 0)
 		tc0140syt_port_w(state->tc0140syt, 0, (data >> 8) & 0xff);
@@ -1487,7 +1487,7 @@ static WRITE16_HANDLER( taitoz_msb_sound_w )
 
 static READ16_HANDLER( taitoz_msb_sound_r )
 {
-	taitoz_state *state = space->machine->driver_data<taitoz_state>();
+	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 
 	if (offset == 1)
 		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff) << 8);
@@ -1500,7 +1500,7 @@ static READ16_HANDLER( taitoz_msb_sound_r )
 /**** sound pan control ****/
 static WRITE8_HANDLER( taitoz_pancontrol )
 {
-//  taitoz_state *state = space->machine->driver_data<taitoz_state>();
+//  taitoz_state *state = space->machine().driver_data<taitoz_state>();
 	static const char *const fltname[] = { "2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l" };
 
 	offset = offset & 3;
@@ -1508,7 +1508,7 @@ static WRITE8_HANDLER( taitoz_pancontrol )
 //  state->pandata[offset] = data;
 //  popmessage(" pan %02x %02x %02x %02x", state->pandata[0], state->pandata[1], state->pandata[2], state->pandata[3] );
 
-	flt_volume_set_volume(space->machine->device(fltname[offset & 3]), data / 255.0f);
+	flt_volume_set_volume(space->machine().device(fltname[offset & 3]), data / 255.0f);
 }
 
 static WRITE16_HANDLER( spacegun_pancontrol )
@@ -2804,7 +2804,7 @@ Interface B is for games which lack a Z80 (Spacegun, Bshark).
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler(device_t *device, int irq)
 {
-	taitoz_state *state = device->machine->driver_data<taitoz_state>();
+	taitoz_state *state = device->machine().driver_data<taitoz_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -2812,7 +2812,7 @@ static void irqhandler(device_t *device, int irq)
 static void irqhandlerb(device_t *device, int irq)
 {
 	// DG: this is probably specific to Z80 and wrong?
-//  taitoz_state *state = device->machine->driver_data<taitoz_state>();
+//  taitoz_state *state = device->machine().driver_data<taitoz_state>();
 //  device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -2966,17 +2966,17 @@ static STATE_POSTLOAD( taitoz_postload )
 
 static MACHINE_START( bshark )
 {
-	taitoz_state *state = machine->driver_data<taitoz_state>();
+	taitoz_state *state = machine.driver_data<taitoz_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->subcpu = machine->device("sub");
-	state->audiocpu = machine->device("audiocpu");
-	state->eeprom = machine->device("eeprom");
-	state->tc0100scn = machine->device("tc0100scn");
-	state->tc0150rod = machine->device("tc0150rod");
-	state->tc0480scp = machine->device("tc0480scp");
-	state->tc0220ioc = machine->device("tc0220ioc");
-	state->tc0140syt = machine->device("tc0140syt");
+	state->maincpu = machine.device("maincpu");
+	state->subcpu = machine.device("sub");
+	state->audiocpu = machine.device("audiocpu");
+	state->eeprom = machine.device("eeprom");
+	state->tc0100scn = machine.device("tc0100scn");
+	state->tc0150rod = machine.device("tc0150rod");
+	state->tc0480scp = machine.device("tc0480scp");
+	state->tc0220ioc = machine.device("tc0220ioc");
+	state->tc0140syt = machine.device("tc0140syt");
 
 	state->save_item(NAME(state->cpua_ctrl));
 
@@ -2990,18 +2990,18 @@ static MACHINE_START( bshark )
 
 static MACHINE_START( taitoz )
 {
-	int banks = (machine->region("audiocpu")->bytes() - 0xc000) / 0x4000;
+	int banks = (machine.region("audiocpu")->bytes() - 0xc000) / 0x4000;
 
-	memory_configure_bank(machine, "bank10", 0, banks, machine->region("audiocpu")->base() + 0xc000, 0x4000);
+	memory_configure_bank(machine, "bank10", 0, banks, machine.region("audiocpu")->base() + 0xc000, 0x4000);
 
-	machine->state().register_postload(taitoz_postload, NULL);
+	machine.state().register_postload(taitoz_postload, NULL);
 
 	MACHINE_START_CALL(bshark);
 }
 
 static MACHINE_RESET( taitoz )
 {
-	taitoz_state *state = machine->driver_data<taitoz_state>();
+	taitoz_state *state = machine.driver_data<taitoz_state>();
 
 	state->banknum = -1;
 	state->cpua_ctrl = 0xff;
@@ -4864,14 +4864,14 @@ ROM_END
 
 static DRIVER_INIT( taitoz )
 {
-	taitoz_state *state = machine->driver_data<taitoz_state>();
+	taitoz_state *state = machine.driver_data<taitoz_state>();
 	state->chasehq_lamps = 0;
 	state->dblaxle_vibration = 0;
 }
 
 static DRIVER_INIT( dblaxle )
 {
-	taitoz_state *state = machine->driver_data<taitoz_state>();
+	taitoz_state *state = machine.driver_data<taitoz_state>();
 	state->chasehq_lamps = 0;
 	state->dblaxle_vibration = 1;
 }
@@ -4883,18 +4883,18 @@ static STATE_POSTLOAD( bshark_postload )
 
 static DRIVER_INIT( bshark )
 {
-	taitoz_state *state = machine->driver_data<taitoz_state>();
+	taitoz_state *state = machine.driver_data<taitoz_state>();
 	state->chasehq_lamps = 0;
 	state->dblaxle_vibration = 0;
 	state->eep_latch = 0;
 
-	machine->state().register_postload(bshark_postload, NULL);
+	machine.state().register_postload(bshark_postload, NULL);
 	state->save_item(NAME(state->eep_latch));
 }
 
 static DRIVER_INIT( chasehq )
 {
-	taitoz_state *state = machine->driver_data<taitoz_state>();
+	taitoz_state *state = machine.driver_data<taitoz_state>();
 	state->chasehq_lamps = 1;
 	state->dblaxle_vibration = 0;
 }

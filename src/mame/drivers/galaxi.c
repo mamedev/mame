@@ -75,77 +75,77 @@ public:
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	galaxi_state *state = machine->driver_data<galaxi_state>();
+	galaxi_state *state = machine.driver_data<galaxi_state>();
 	UINT16 code = state->bg1_ram[tile_index];
 	SET_TILE_INFO(0, code, 0x10 + (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	galaxi_state *state = machine->driver_data<galaxi_state>();
+	galaxi_state *state = machine.driver_data<galaxi_state>();
 	UINT16 code = state->bg2_ram[tile_index];
 	SET_TILE_INFO(0, code, 0x10 + (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_bg3_tile_info )
 {
-	galaxi_state *state = machine->driver_data<galaxi_state>();
+	galaxi_state *state = machine.driver_data<galaxi_state>();
 	UINT16 code = state->bg3_ram[tile_index];
 	SET_TILE_INFO(0, code, (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_bg4_tile_info )
 {
-	galaxi_state *state = machine->driver_data<galaxi_state>();
+	galaxi_state *state = machine.driver_data<galaxi_state>();
 	UINT16 code = state->bg4_ram[tile_index];
 	SET_TILE_INFO(0, code, (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	galaxi_state *state = machine->driver_data<galaxi_state>();
+	galaxi_state *state = machine.driver_data<galaxi_state>();
 	UINT16 code = state->fg_ram[tile_index];
 	SET_TILE_INFO(1, code, 0x20 + (code >> 12), 0);
 }
 
 static WRITE16_HANDLER( galaxi_bg1_w )
 {
-	galaxi_state *state = space->machine->driver_data<galaxi_state>();
+	galaxi_state *state = space->machine().driver_data<galaxi_state>();
 	COMBINE_DATA(&state->bg1_ram[offset]);
 	tilemap_mark_tile_dirty(state->bg1_tmap, offset);
 }
 
 static WRITE16_HANDLER( galaxi_bg2_w )
 {
-	galaxi_state *state = space->machine->driver_data<galaxi_state>();
+	galaxi_state *state = space->machine().driver_data<galaxi_state>();
 	COMBINE_DATA(&state->bg2_ram[offset]);
 	tilemap_mark_tile_dirty(state->bg2_tmap, offset);
 }
 
 static WRITE16_HANDLER( galaxi_bg3_w )
 {
-	galaxi_state *state = space->machine->driver_data<galaxi_state>();
+	galaxi_state *state = space->machine().driver_data<galaxi_state>();
 	COMBINE_DATA(&state->bg3_ram[offset]);
 	tilemap_mark_tile_dirty(state->bg3_tmap, offset);
 }
 
 static WRITE16_HANDLER( galaxi_bg4_w )
 {
-	galaxi_state *state = space->machine->driver_data<galaxi_state>();
+	galaxi_state *state = space->machine().driver_data<galaxi_state>();
 	COMBINE_DATA(&state->bg4_ram[offset]);
 	tilemap_mark_tile_dirty(state->bg4_tmap, offset);
 }
 
 static WRITE16_HANDLER( galaxi_fg_w )
 {
-	galaxi_state *state = space->machine->driver_data<galaxi_state>();
+	galaxi_state *state = space->machine().driver_data<galaxi_state>();
 	COMBINE_DATA(&state->fg_ram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tmap, offset);
 }
 
 static VIDEO_START(galaxi)
 {
-	galaxi_state *state = machine->driver_data<galaxi_state>();
+	galaxi_state *state = machine.driver_data<galaxi_state>();
 
 	state->bg1_tmap = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows, 16, 16, 0x20, 0x10);
 	state->bg2_tmap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows, 16, 16, 0x20, 0x10);
@@ -166,24 +166,24 @@ static VIDEO_START(galaxi)
 
 static SCREEN_UPDATE(galaxi)
 {
-	galaxi_state *state = screen->machine->driver_data<galaxi_state>();
+	galaxi_state *state = screen->machine().driver_data<galaxi_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed(screen->machine, KEYCODE_R))	// remapped due to inputs changes.
+	if (input_code_pressed(screen->machine(), KEYCODE_R))	// remapped due to inputs changes.
 	{
 		int msk = 0;
-		if (input_code_pressed(screen->machine, KEYCODE_T))	msk |= 1;
-		if (input_code_pressed(screen->machine, KEYCODE_Y))	msk |= 2;
-		if (input_code_pressed(screen->machine, KEYCODE_U))	msk |= 4;
-		if (input_code_pressed(screen->machine, KEYCODE_I))	msk |= 8;
-		if (input_code_pressed(screen->machine, KEYCODE_O))	msk |= 16;
+		if (input_code_pressed(screen->machine(), KEYCODE_T))	msk |= 1;
+		if (input_code_pressed(screen->machine(), KEYCODE_Y))	msk |= 2;
+		if (input_code_pressed(screen->machine(), KEYCODE_U))	msk |= 4;
+		if (input_code_pressed(screen->machine(), KEYCODE_I))	msk |= 8;
+		if (input_code_pressed(screen->machine(), KEYCODE_O))	msk |= 16;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->bg1_tmap, TILEMAP_DRAW_OPAQUE, 0);
-	else				bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	else				bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->bg2_tmap, 0, 0);
 	if (layers_ctrl & 4)	tilemap_draw(bitmap, cliprect, state->bg3_tmap, 0, 0);
 	if (layers_ctrl & 8)	tilemap_draw(bitmap, cliprect, state->bg4_tmap, 0, 0);
@@ -197,29 +197,29 @@ static SCREEN_UPDATE(galaxi)
                             Memory Maps
 ***************************************************************************/
 
-static void show_out( running_machine *machine )
+static void show_out( running_machine &machine )
 {
-//  galaxi_state *state = machine->driver_data<galaxi_state>();
+//  galaxi_state *state = machine.driver_data<galaxi_state>();
 //  popmessage("%04x %04x %04x", state->out[0], state->out[1], state->out[2]);
 }
 
 static WRITE16_HANDLER( galaxi_500000_w )
 {
-	galaxi_state *state = space->machine->driver_data<galaxi_state>();
+	galaxi_state *state = space->machine().driver_data<galaxi_state>();
 	COMBINE_DATA(&state->out[0]);
-	show_out(space->machine);
+	show_out(space->machine());
 }
 
 static WRITE16_HANDLER( galaxi_500002_w )
 {
-	galaxi_state *state = space->machine->driver_data<galaxi_state>();
+	galaxi_state *state = space->machine().driver_data<galaxi_state>();
 	COMBINE_DATA(&state->out[1]);
-	show_out(space->machine);
+	show_out(space->machine());
 }
 
 static WRITE16_HANDLER( galaxi_500004_w )
 {
-	galaxi_state *state = space->machine->driver_data<galaxi_state>();
+	galaxi_state *state = space->machine().driver_data<galaxi_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -247,23 +247,23 @@ static WRITE16_HANDLER( galaxi_500004_w )
 	{
 		state->ticket = data & 0x0100;
 		state->hopper = data & 0x1000;
-		coin_counter_w(space->machine, 0, data & 0x2000);	// coins
+		coin_counter_w(space->machine(), 0, data & 0x2000);	// coins
 	}
 
 	COMBINE_DATA(&state->out[2]);
-	show_out(space->machine);
+	show_out(space->machine());
 }
 
 static CUSTOM_INPUT( ticket_r )
 {
-	galaxi_state *state = field->port->machine->driver_data<galaxi_state>();
-	return state->ticket && !(field->port->machine->primary_screen->frame_number() % 10);
+	galaxi_state *state = field->port->machine().driver_data<galaxi_state>();
+	return state->ticket && !(field->port->machine().primary_screen->frame_number() % 10);
 }
 
 static CUSTOM_INPUT( hopper_r )
 {
-	galaxi_state *state = field->port->machine->driver_data<galaxi_state>();
-	return state->hopper && !(field->port->machine->primary_screen->frame_number() % 10);
+	galaxi_state *state = field->port->machine().driver_data<galaxi_state>();
+	return state->hopper && !(field->port->machine().primary_screen->frame_number() % 10);
 }
 
 
@@ -373,7 +373,7 @@ GFXDECODE_END
 
 static MACHINE_START( galaxi )
 {
-	galaxi_state *state = machine->driver_data<galaxi_state>();
+	galaxi_state *state = machine.driver_data<galaxi_state>();
 
 	state->save_item(NAME(state->hopper));
 	state->save_item(NAME(state->ticket));
@@ -382,7 +382,7 @@ static MACHINE_START( galaxi )
 
 static MACHINE_RESET( galaxi )
 {
-	galaxi_state *state = machine->driver_data<galaxi_state>();
+	galaxi_state *state = machine.driver_data<galaxi_state>();
 
 	state->hopper = 0;
 	state->ticket = 0;

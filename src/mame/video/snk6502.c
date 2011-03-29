@@ -10,8 +10,8 @@
 #include "includes/snk6502.h"
 
 
-#define TOTAL_COLORS(m,gfxn) ((m)->gfx[gfxn]->total_colors * (m)->gfx[gfxn]->color_granularity)
-#define COLOR(m,gfxn,offs) ((m)->config().m_gfxdecodeinfo[gfxn].color_codes_start + offs)
+#define TOTAL_COLORS(m,gfxn) ((m).gfx[gfxn]->total_colors * (m).gfx[gfxn]->color_granularity)
+#define COLOR(m,gfxn,offs) ((m).config().m_gfxdecodeinfo[gfxn].color_codes_start + offs)
 
 
 
@@ -24,10 +24,10 @@
 ***************************************************************************/
 PALETTE_INIT( snk6502 )
 {
-	snk6502_state *state = machine->driver_data<snk6502_state>();
+	snk6502_state *state = machine.driver_data<snk6502_state>();
 	int i;
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -76,7 +76,7 @@ PALETTE_INIT( snk6502 )
 
 WRITE8_HANDLER( snk6502_videoram_w )
 {
-	snk6502_state *state = space->machine->driver_data<snk6502_state>();
+	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -84,7 +84,7 @@ WRITE8_HANDLER( snk6502_videoram_w )
 
 WRITE8_HANDLER( snk6502_videoram2_w )
 {
-	snk6502_state *state = space->machine->driver_data<snk6502_state>();
+	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
 	state->videoram2[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -92,7 +92,7 @@ WRITE8_HANDLER( snk6502_videoram2_w )
 
 WRITE8_HANDLER( snk6502_colorram_w )
 {
-	snk6502_state *state = space->machine->driver_data<snk6502_state>();
+	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -101,19 +101,19 @@ WRITE8_HANDLER( snk6502_colorram_w )
 
 WRITE8_HANDLER( snk6502_charram_w )
 {
-	snk6502_state *state = space->machine->driver_data<snk6502_state>();
+	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
 	if (state->charram[offset] != data)
 	{
 		state->charram[offset] = data;
-		gfx_element_mark_dirty(space->machine->gfx[0], (offset/8) % 256);
+		gfx_element_mark_dirty(space->machine().gfx[0], (offset/8) % 256);
 	}
 }
 
 
 WRITE8_HANDLER( snk6502_flipscreen_w )
 {
-	snk6502_state *state = space->machine->driver_data<snk6502_state>();
+	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 	int bank;
 
 	/* bits 0-2 select background color */
@@ -125,7 +125,7 @@ WRITE8_HANDLER( snk6502_flipscreen_w )
 		state->backcolor = data & 7;
 
 		for (i = 0;i < 32;i += 4)
-			palette_set_color(space->machine, COLOR(space->machine, 1, i), state->palette[4 * state->backcolor + 0x20]);
+			palette_set_color(space->machine(), COLOR(space->machine(), 1, i), state->palette[4 * state->backcolor + 0x20]);
 	}
 
 	/* bit 3 selects char bank */
@@ -135,28 +135,28 @@ WRITE8_HANDLER( snk6502_flipscreen_w )
 	if (state->charbank != bank)
 	{
 		state->charbank = bank;
-		tilemap_mark_all_tiles_dirty_all(space->machine);
+		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 
 	/* bit 7 flips screen */
 
-	if (flip_screen_get(space->machine) != (data & 0x80))
+	if (flip_screen_get(space->machine()) != (data & 0x80))
 	{
-		flip_screen_set(space->machine, data & 0x80);
-		tilemap_mark_all_tiles_dirty_all(space->machine);
+		flip_screen_set(space->machine(), data & 0x80);
+		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 }
 
 WRITE8_HANDLER( snk6502_scrollx_w )
 {
-	snk6502_state *state = space->machine->driver_data<snk6502_state>();
+	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
 	tilemap_set_scrollx(state->bg_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( snk6502_scrolly_w )
 {
-	snk6502_state *state = space->machine->driver_data<snk6502_state>();
+	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
 	tilemap_set_scrolly(state->bg_tilemap, 0, data);
 }
@@ -164,7 +164,7 @@ WRITE8_HANDLER( snk6502_scrolly_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	snk6502_state *state = machine->driver_data<snk6502_state>();
+	snk6502_state *state = machine.driver_data<snk6502_state>();
 	int code = state->videoram[tile_index] + 256 * state->charbank;
 	int color = (state->colorram[tile_index] & 0x38) >> 3;
 
@@ -173,7 +173,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	snk6502_state *state = machine->driver_data<snk6502_state>();
+	snk6502_state *state = machine.driver_data<snk6502_state>();
 	int code = state->videoram2[tile_index];
 	int color = state->colorram[tile_index] & 0x07;
 
@@ -182,19 +182,19 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( snk6502 )
 {
-	snk6502_state *state = machine->driver_data<snk6502_state>();
+	snk6502_state *state = machine.driver_data<snk6502_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
-	gfx_element_set_source(machine->gfx[0], state->charram);
+	gfx_element_set_source(machine.gfx[0], state->charram);
 }
 
 VIDEO_START( pballoon )
 {
-	snk6502_state *state = machine->driver_data<snk6502_state>();
+	snk6502_state *state = machine.driver_data<snk6502_state>();
 
 	VIDEO_START_CALL( snk6502 );
 
@@ -205,7 +205,7 @@ VIDEO_START( pballoon )
 
 SCREEN_UPDATE( snk6502 )
 {
-	snk6502_state *state = screen->machine->driver_data<snk6502_state>();
+	snk6502_state *state = screen->machine().driver_data<snk6502_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
@@ -216,10 +216,10 @@ SCREEN_UPDATE( snk6502 )
 
 PALETTE_INIT( satansat )
 {
-	snk6502_state *state = machine->driver_data<snk6502_state>();
+	snk6502_state *state = machine.driver_data<snk6502_state>();
 	int i;
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -270,10 +270,10 @@ WRITE8_HANDLER( satansat_b002_w )
 {
 	/* bit 0 flips screen */
 
-	if (flip_screen_get(space->machine) != (data & 0x01))
+	if (flip_screen_get(space->machine()) != (data & 0x01))
 	{
-		flip_screen_set(space->machine, data & 0x01);
-		tilemap_mark_all_tiles_dirty_all(space->machine);
+		flip_screen_set(space->machine(), data & 0x01);
+		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 
 	/* bit 1 enables interrups */
@@ -287,7 +287,7 @@ WRITE8_HANDLER( satansat_b002_w )
 
 WRITE8_HANDLER( satansat_backcolor_w )
 {
-	snk6502_state *state = space->machine->driver_data<snk6502_state>();
+	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
 	/* bits 0-1 select background color. Other bits unused. */
 
@@ -298,13 +298,13 @@ WRITE8_HANDLER( satansat_backcolor_w )
 		state->backcolor = data & 0x03;
 
 		for (i = 0; i < 16; i += 4)
-			palette_set_color(space->machine, COLOR(space->machine, 1, i), state->palette[state->backcolor + 0x10]);
+			palette_set_color(space->machine(), COLOR(space->machine(), 1, i), state->palette[state->backcolor + 0x10]);
 	}
 }
 
 static TILE_GET_INFO( satansat_get_bg_tile_info )
 {
-	snk6502_state *state = machine->driver_data<snk6502_state>();
+	snk6502_state *state = machine.driver_data<snk6502_state>();
 	int code = state->videoram[tile_index];
 	int color = (state->colorram[tile_index] & 0x0c) >> 2;
 
@@ -313,7 +313,7 @@ static TILE_GET_INFO( satansat_get_bg_tile_info )
 
 static TILE_GET_INFO( satansat_get_fg_tile_info )
 {
-	snk6502_state *state = machine->driver_data<snk6502_state>();
+	snk6502_state *state = machine.driver_data<snk6502_state>();
 	int code = state->videoram2[tile_index];
 	int color = state->colorram[tile_index] & 0x03;
 
@@ -322,12 +322,12 @@ static TILE_GET_INFO( satansat_get_fg_tile_info )
 
 VIDEO_START( satansat )
 {
-	snk6502_state *state = machine->driver_data<snk6502_state>();
+	snk6502_state *state = machine.driver_data<snk6502_state>();
 
 	state->bg_tilemap = tilemap_create(machine, satansat_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, satansat_get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
-	gfx_element_set_source(machine->gfx[0], state->charram);
+	gfx_element_set_source(machine.gfx[0], state->charram);
 }

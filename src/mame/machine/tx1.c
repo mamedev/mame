@@ -53,9 +53,9 @@ static const UINT8 state_table[16][8] =
 	{ -1, -1, -1, -1, -1, -1, -1, -1 },
 };
 
-static void sn_multiply(running_machine *machine)
+static void sn_multiply(running_machine &machine)
 {
-	tx1_state *state = machine->driver_data<tx1_state>();
+	tx1_state *state = machine.driver_data<tx1_state>();
 	sn74s516_t &SN74S516 = state->sn74s516;
 
 	switch (SN74S516.code)
@@ -125,16 +125,16 @@ static void sn_multiply(running_machine *machine)
 	SN74S516.ZWfl = 0;
 }
 
-static void sn_divide(running_machine *machine)
+static void sn_divide(running_machine &machine)
 {
-	tx1_state *state = machine->driver_data<tx1_state>();
+	tx1_state *state = machine.driver_data<tx1_state>();
 	sn74s516_t &SN74S516 = state->sn74s516;
 	INT32 Z = 0;
 	INT32 W = 0;
 
 	if (SN74S516.X == 0)
 	{
-		mame_printf_debug("%s:SN74S516 tried to divide by zero\n", machine->describe_context());
+		mame_printf_debug("%s:SN74S516 tried to divide by zero\n", machine.describe_context());
 		SN74S516.ZW.Z = (INT16)0xffff;
 		SN74S516.ZW.W = 0xffff;
 		SN74S516.ZWfl = 0;
@@ -176,9 +176,9 @@ static void sn_divide(running_machine *machine)
 	SN74S516.ZWfl = 0;
 }
 
-static void sn74s516_update(running_machine *machine, int ins)
+static void sn74s516_update(running_machine &machine, int ins)
 {
-	tx1_state *state = machine->driver_data<tx1_state>();
+	tx1_state *state = machine.driver_data<tx1_state>();
 	sn74s516_t &SN74S516 = state->sn74s516;
 	SN74S516.state = state_table[SN74S516.state][ins];
 
@@ -194,9 +194,9 @@ static void sn74s516_update(running_machine *machine, int ins)
 	}
 }
 
-static void kick_sn74s516(running_machine *machine, UINT16 *data, const int ins)
+static void kick_sn74s516(running_machine &machine, UINT16 *data, const int ins)
 {
-	tx1_state *state = machine->driver_data<tx1_state>();
+	tx1_state *state = machine.driver_data<tx1_state>();
 	sn74s516_t &SN74S516 = state->sn74s516;
 	math_t &math = state->math;
 
@@ -281,7 +281,7 @@ static void kick_sn74s516(running_machine *machine, UINT16 *data, const int ins)
 			if (SN74S516.code == 0x6666)
 			{
 				CLEAR_SEQUENCE;
-				mame_printf_debug("%s:Code 6666: PROMADDR:%x\n", machine->describe_context(), math.promaddr);
+				mame_printf_debug("%s:Code 6666: PROMADDR:%x\n", machine.describe_context(), math.promaddr);
 			}
 
 			UPDATE_SEQUENCE;
@@ -368,7 +368,7 @@ static void kick_sn74s516(running_machine *machine, UINT16 *data, const int ins)
 	}
 
 	math.dbgaddr = math.promaddr;
-	math.dbgpc = cpu_get_previouspc(machine->device("math_cpu"));
+	math.dbgpc = cpu_get_previouspc(machine.device("math_cpu"));
 }
 
 
@@ -413,15 +413,15 @@ INLINE UINT16 get_tx1_datarom_addr(math_t &math)
 	return addr & 0x3fff;
 }
 
-static void tx1_update_state(running_machine *machine)
+static void tx1_update_state(running_machine &machine)
 {
 #define LHIEN(a)	!(a & 0x80)
 #define LLOEN(a)	!(a & 0x40)
 #define GO_EN(a)	!(a & 0x4000)
 
-	tx1_state *state = machine->driver_data<tx1_state>();
+	tx1_state *state = machine.driver_data<tx1_state>();
 	math_t &math = state->math;
-	const UINT16 *prom = (UINT16*)machine->region("au_data")->base() + (0x8000 >> 1);
+	const UINT16 *prom = (UINT16*)machine.region("au_data")->base() + (0x8000 >> 1);
 
 	for (;;)
 	{
@@ -479,7 +479,7 @@ static void tx1_update_state(running_machine *machine)
 					data = math.muxlatch;
 				else if (dsel == 1)
 				{
-					UINT16 *romdata = (UINT16*)machine->region("au_data")->base();
+					UINT16 *romdata = (UINT16*)machine.region("au_data")->base();
 					UINT16 addr = get_tx1_datarom_addr(math);
 					data = romdata[addr];
 				}
@@ -599,7 +599,7 @@ static void tx1_update_state(running_machine *machine)
 
 READ16_HANDLER( tx1_math_r )
 {
-	tx1_state *state = space->machine->driver_data<tx1_state>();
+	tx1_state *state = space->machine().driver_data<tx1_state>();
 	math_t &math = state->math;
 	offset = offset << 1;
 
@@ -619,7 +619,7 @@ READ16_HANDLER( tx1_math_r )
 		}
 
 		/* TODO What do we return? */
-		kick_sn74s516(space->machine, &math.retval, ins);
+		kick_sn74s516(space->machine(), &math.retval, ins);
 	}
 	/* /PPSEN */
 	else if (offset < 0x800)
@@ -657,7 +657,7 @@ READ16_HANDLER( tx1_math_r )
                 TODO make this constant somewhere
                 e.g. math.retval =  math.romptr[ get_tx1_datarom_addr() ];
             */
-			UINT16 *romdata = (UINT16*)space->machine->region("au_data")->base();
+			UINT16 *romdata = (UINT16*)space->machine().region("au_data")->base();
 			UINT16 addr = get_tx1_datarom_addr(math);
 			math.retval = romdata[addr];
 		}
@@ -684,7 +684,7 @@ READ16_HANDLER( tx1_math_r )
 			if (math.mux != TX1_SEL_ILDEN)
 			{
 				INC_PROM_ADDR;
-				tx1_update_state(space->machine);
+				tx1_update_state(space->machine());
 
 				// MUST RETURN HERE?
 				return math.retval;
@@ -703,12 +703,12 @@ READ16_HANDLER( tx1_math_r )
 	if (offset & TX1_INSLD)
 	{
 		math.promaddr = (offset << 2) & 0x1ff;
-		tx1_update_state(space->machine);
+		tx1_update_state(space->machine());
 	}
 	else if (offset & TX1_CNTST)
 	{
 		INC_PROM_ADDR;
-		tx1_update_state(space->machine);
+		tx1_update_state(space->machine());
 	}
 
 	return math.retval;
@@ -716,7 +716,7 @@ READ16_HANDLER( tx1_math_r )
 
 WRITE16_HANDLER( tx1_math_w )
 {
-	tx1_state *state = space->machine->driver_data<tx1_state>();
+	tx1_state *state = space->machine().driver_data<tx1_state>();
 	math_t &math = state->math;
 	math.cpulatch = data;
 	offset <<= 1;
@@ -738,7 +738,7 @@ WRITE16_HANDLER( tx1_math_w )
 			ins = (offset >> 1) & 7;
 		}
 
-		kick_sn74s516(space->machine, &math.cpulatch, ins);
+		kick_sn74s516(space->machine(), &math.cpulatch, ins);
 	}
 	/* /PPSEN */
 	else if ((offset & 0xc00) == 0x400)
@@ -794,20 +794,20 @@ WRITE16_HANDLER( tx1_math_w )
 	if (offset & TX1_INSLD)
 	{
 		math.promaddr = (offset << 2) & 0x1ff;
-		tx1_update_state(space->machine);
+		tx1_update_state(space->machine());
 	}
 	else if (offset & TX1_CNTST)
 	{
 		INC_PROM_ADDR;
-		tx1_update_state(space->machine);
+		tx1_update_state(space->machine());
 	}
 }
 
 READ16_HANDLER( tx1_spcs_rom_r )
 {
-	tx1_state *state = space->machine->driver_data<tx1_state>();
+	tx1_state *state = space->machine().driver_data<tx1_state>();
 	math_t &math = state->math;
-	math.cpulatch = *(UINT16*)((UINT8*)space->machine->region("math_cpu")->base() + 0xfc000 + 0x1000 + offset*2);
+	math.cpulatch = *(UINT16*)((UINT8*)space->machine().region("math_cpu")->base() + 0xfc000 + 0x1000 + offset*2);
 
 	if (math.mux == TX1_SEL_ILDEN)
 	{
@@ -818,7 +818,7 @@ READ16_HANDLER( tx1_spcs_rom_r )
 		int ins = math.inslatch & 7;
 
 		TX1_SET_INS0_BIT;
-		kick_sn74s516(space->machine, &math.cpulatch, ins);
+		kick_sn74s516(space->machine(), &math.cpulatch, ins);
 	}
 	else if (math.mux == TX1_SEL_PPSEN)
 	{
@@ -860,7 +860,7 @@ READ16_HANDLER( tx1_spcs_rom_r )
 	if (math.mux != TX1_SEL_ILDEN)
 	{
 		INC_PROM_ADDR;
-		tx1_update_state(space->machine);
+		tx1_update_state(space->machine());
 	}
 
 	return math.cpulatch;
@@ -869,7 +869,7 @@ READ16_HANDLER( tx1_spcs_rom_r )
 
 READ16_HANDLER( tx1_spcs_ram_r )
 {
-	tx1_state *state = space->machine->driver_data<tx1_state>();
+	tx1_state *state = space->machine().driver_data<tx1_state>();
 	math_t &math = state->math;
 	math.cpulatch = state->math_ram[offset];
 
@@ -884,7 +884,7 @@ READ16_HANDLER( tx1_spcs_ram_r )
 		int ins = math.inslatch & 7;
 
 		TX1_SET_INS0_BIT;
-		kick_sn74s516(space->machine, &math.cpulatch, ins);
+		kick_sn74s516(space->machine(), &math.cpulatch, ins);
 	}
 	else if (math.mux == TX1_SEL_PPSEN)
 	{
@@ -924,7 +924,7 @@ READ16_HANDLER( tx1_spcs_ram_r )
 	if (math.mux != TX1_SEL_ILDEN)
 	{
 		INC_PROM_ADDR;
-		tx1_update_state(space->machine);
+		tx1_update_state(space->machine());
 	}
 
 	return math.cpulatch;
@@ -933,7 +933,7 @@ READ16_HANDLER( tx1_spcs_ram_r )
 /* Should never occur */
 WRITE16_HANDLER( tx1_spcs_ram_w )
 {
-	tx1_state *state = space->machine->driver_data<tx1_state>();
+	tx1_state *state = space->machine().driver_data<tx1_state>();
 	mame_printf_debug("Write to /SPCS RAM?");
 	COMBINE_DATA(&state->math_ram[offset]);
 }
@@ -981,15 +981,15 @@ INLINE UINT16 get_bb_datarom_addr(math_t &math)
 	return addr & 0x3fff;
 }
 
-static void buggyboy_update_state(running_machine *machine)
+static void buggyboy_update_state(running_machine &machine)
 {
 #define LHIEN(a)	!(a & 0x80)
 #define LLOEN(a)	!(a & 0x40)
 #define GO_EN(a)	!(a & 0x4000)
 
-	tx1_state *state = machine->driver_data<tx1_state>();
+	tx1_state *state = machine.driver_data<tx1_state>();
 	math_t &math = state->math;
-	const UINT16 *prom = (UINT16*)machine->region("au_data")->base() + (0x8000 >> 1);
+	const UINT16 *prom = (UINT16*)machine.region("au_data")->base() + (0x8000 >> 1);
 
 	for (;;)
 	{
@@ -1022,7 +1022,7 @@ static void buggyboy_update_state(running_machine *machine)
 
 			if (math.mux == BB_MUX_DPROE)
 			{
-				UINT16 *romdata = (UINT16*)machine->region("au_data")->base();
+				UINT16 *romdata = (UINT16*)machine.region("au_data")->base();
 				UINT16 addr = get_bb_datarom_addr(math);
 				kick_sn74s516(machine, &romdata[addr], ins);
 			}
@@ -1105,7 +1105,7 @@ static void buggyboy_update_state(running_machine *machine)
 
 READ16_HANDLER( buggyboy_math_r )
 {
-	tx1_state *state = space->machine->driver_data<tx1_state>();
+	tx1_state *state = space->machine().driver_data<tx1_state>();
 	math_t &math = state->math;
 	offset = offset << 1;
 
@@ -1125,7 +1125,7 @@ READ16_HANDLER( buggyboy_math_r )
 		}
 
 		/* TODO What do we return? */
-		kick_sn74s516(space->machine, &math.retval, ins);
+		kick_sn74s516(space->machine(), &math.retval, ins);
 
 		/* TODO */
 		//if (math.mux == BB_MUX_PPSEN)
@@ -1139,7 +1139,7 @@ READ16_HANDLER( buggyboy_math_r )
 	/* /DPROE */
 	else if ((offset & 0xc00) == 0xc00)
 	{
-		UINT16 *romdata = (UINT16*)space->machine->region("au_data")->base();
+		UINT16 *romdata = (UINT16*)space->machine().region("au_data")->base();
 		UINT16 addr = get_bb_datarom_addr(math);
 
 		math.retval = romdata[addr];
@@ -1154,7 +1154,7 @@ READ16_HANDLER( buggyboy_math_r )
 			if (math.mux != BB_MUX_ILDEN)
 			{
 				INC_PROM_ADDR;
-				buggyboy_update_state(space->machine);
+				buggyboy_update_state(space->machine());
 			}
 		}
 	}
@@ -1170,12 +1170,12 @@ READ16_HANDLER( buggyboy_math_r )
 	if (offset & BB_INSLD)
 	{
 		math.promaddr = (offset << 2) & 0x1ff;
-		buggyboy_update_state(space->machine);
+		buggyboy_update_state(space->machine());
 	}
 	else if (offset & BB_CNTST)
 	{
 		INC_PROM_ADDR;
-		buggyboy_update_state(space->machine);
+		buggyboy_update_state(space->machine());
 	}
 
 	return math.retval;
@@ -1183,7 +1183,7 @@ READ16_HANDLER( buggyboy_math_r )
 
 WRITE16_HANDLER( buggyboy_math_w )
 {
-	tx1_state *state = space->machine->driver_data<tx1_state>();
+	tx1_state *state = space->machine().driver_data<tx1_state>();
 	math_t &math = state->math;
 	math.cpulatch = data;
 
@@ -1204,7 +1204,7 @@ WRITE16_HANDLER( buggyboy_math_w )
 			ins = (offset >> 1) & 7;
 		}
 
-		kick_sn74s516(space->machine, &math.cpulatch, ins);
+		kick_sn74s516(space->machine(), &math.cpulatch, ins);
 	}
 	/* /PPSEN */
 	else if ((offset & 0xc00) == 0x400)
@@ -1246,24 +1246,24 @@ WRITE16_HANDLER( buggyboy_math_w )
 		else
 		{
 			mame_printf_debug("BB_DSEL was not 3 for P->S load!\n");
-			debugger_break(space->machine);
+			debugger_break(space->machine());
 		}
 	}
 	else
 	{
 		mame_printf_debug("Buggy Boy unknown math state!\n");
-		debugger_break(space->machine);
+		debugger_break(space->machine());
 	}
 
 	if (offset & BB_INSLD)
 	{
 		math.promaddr = (offset << 2) & 0x1ff;
-		buggyboy_update_state(space->machine);
+		buggyboy_update_state(space->machine());
 	}
 	else if (offset & BB_CNTST)
 	{
 		INC_PROM_ADDR;
-		buggyboy_update_state(space->machine);
+		buggyboy_update_state(space->machine());
 	}
 }
 
@@ -1272,9 +1272,9 @@ WRITE16_HANDLER( buggyboy_math_w )
 */
 READ16_HANDLER( buggyboy_spcs_rom_r )
 {
-	tx1_state *state = space->machine->driver_data<tx1_state>();
+	tx1_state *state = space->machine().driver_data<tx1_state>();
 	math_t &math = state->math;
-	math.cpulatch = *(UINT16*)((UINT8*)space->machine->region("math_cpu")->base() + 0xfc000 + 0x1000 + offset*2);
+	math.cpulatch = *(UINT16*)((UINT8*)space->machine().region("math_cpu")->base() + 0xfc000 + 0x1000 + offset*2);
 
 	if (math.mux == BB_MUX_ILDEN)
 	{
@@ -1285,7 +1285,7 @@ READ16_HANDLER( buggyboy_spcs_rom_r )
 		int ins = math.inslatch & 7;
 
 		BB_SET_INS0_BIT;
-		kick_sn74s516(space->machine, &math.cpulatch, ins);
+		kick_sn74s516(space->machine(), &math.cpulatch, ins);
 	}
 	else if (math.mux == BB_MUX_PPSEN)
 	{
@@ -1327,7 +1327,7 @@ READ16_HANDLER( buggyboy_spcs_rom_r )
 	if (math.mux != BB_MUX_ILDEN)
 	{
 		INC_PROM_ADDR;
-		buggyboy_update_state(space->machine);
+		buggyboy_update_state(space->machine());
 	}
 
 	return math.cpulatch;
@@ -1335,13 +1335,13 @@ READ16_HANDLER( buggyboy_spcs_rom_r )
 
 WRITE16_HANDLER( buggyboy_spcs_ram_w )
 {
-	tx1_state *state = space->machine->driver_data<tx1_state>();
+	tx1_state *state = space->machine().driver_data<tx1_state>();
 	COMBINE_DATA(&state->math_ram[offset]);
 }
 
 READ16_HANDLER( buggyboy_spcs_ram_r )
 {
-	tx1_state *state = space->machine->driver_data<tx1_state>();
+	tx1_state *state = space->machine().driver_data<tx1_state>();
 	math_t &math = state->math;
 	math.cpulatch = state->math_ram[offset];
 
@@ -1356,7 +1356,7 @@ READ16_HANDLER( buggyboy_spcs_ram_r )
 		int ins = math.inslatch & 7;
 
 		BB_SET_INS0_BIT;
-		kick_sn74s516(space->machine, &math.cpulatch, ins);
+		kick_sn74s516(space->machine(), &math.cpulatch, ins);
 	}
 	else if (math.mux == BB_MUX_PPSEN)
 	{
@@ -1398,7 +1398,7 @@ READ16_HANDLER( buggyboy_spcs_ram_r )
 	if (math.mux != BB_MUX_ILDEN)
 	{
 		INC_PROM_ADDR;
-		buggyboy_update_state(space->machine);
+		buggyboy_update_state(space->machine());
 	}
 
 	return math.cpulatch;
@@ -1414,12 +1414,12 @@ READ16_HANDLER( buggyboy_spcs_ram_r )
 
 MACHINE_RESET( buggyboy )
 {
-	tx1_state *state = machine->driver_data<tx1_state>();
+	tx1_state *state = machine.driver_data<tx1_state>();
 	memset(&state->math, 0, sizeof(state->math));
 }
 
 MACHINE_RESET( tx1 )
 {
-	tx1_state *state = machine->driver_data<tx1_state>();
+	tx1_state *state = machine.driver_data<tx1_state>();
 	memset(&state->math, 0, sizeof(state->math));
 }

@@ -24,7 +24,7 @@
 
 VIDEO_START( btoads )
 {
-	btoads_state *state = machine->driver_data<btoads_state>();
+	btoads_state *state = machine.driver_data<btoads_state>();
 	/* initialize the swapped pointers */
 	state->vram_fg_draw = (UINT8 *)state->vram_fg0;
 	state->vram_fg_display = (UINT8 *)state->vram_fg1;
@@ -50,23 +50,23 @@ VIDEO_START( btoads )
 
 WRITE16_HANDLER( btoads_misc_control_w )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	COMBINE_DATA(&state->misc_control);
 
 	/* bit 3 controls sound reset line */
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (state->misc_control & 8) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, (state->misc_control & 8) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 WRITE16_HANDLER( btoads_display_control_w )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		/* allow multiple changes during display */
-		int scanline = space->machine->primary_screen->vpos();
+		int scanline = space->machine().primary_screen->vpos();
 		if (scanline > 0)
-			space->machine->primary_screen->update_partial(scanline - 1);
+			space->machine().primary_screen->update_partial(scanline - 1);
 
 		/* bit 15 controls which page is rendered and which page is displayed */
 		if (data & 0x8000)
@@ -95,9 +95,9 @@ WRITE16_HANDLER( btoads_display_control_w )
 
 WRITE16_HANDLER( btoads_scroll0_w )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	/* allow multiple changes during display */
-	space->machine->primary_screen->update_now();
+	space->machine().primary_screen->update_now();
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_BITS_8_15)
@@ -109,9 +109,9 @@ WRITE16_HANDLER( btoads_scroll0_w )
 
 WRITE16_HANDLER( btoads_scroll1_w )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	/* allow multiple changes during display */
-	space->machine->primary_screen->update_now();
+	space->machine().primary_screen->update_now();
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_BITS_8_15)
@@ -130,13 +130,13 @@ WRITE16_HANDLER( btoads_scroll1_w )
 
 WRITE16_HANDLER( btoads_paletteram_w )
 {
-	tlc34076_w(space->machine->device("tlc34076"), offset/2, data);
+	tlc34076_w(space->machine().device("tlc34076"), offset/2, data);
 }
 
 
 READ16_HANDLER( btoads_paletteram_r )
 {
-	return tlc34076_r(space->machine->device("tlc34076"), offset/2);
+	return tlc34076_r(space->machine().device("tlc34076"), offset/2);
 }
 
 
@@ -149,28 +149,28 @@ READ16_HANDLER( btoads_paletteram_r )
 
 WRITE16_HANDLER( btoads_vram_bg0_w )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	COMBINE_DATA(&state->vram_bg0[offset & 0x3fcff]);
 }
 
 
 WRITE16_HANDLER( btoads_vram_bg1_w )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	COMBINE_DATA(&state->vram_bg1[offset & 0x3fcff]);
 }
 
 
 READ16_HANDLER( btoads_vram_bg0_r )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	return state->vram_bg0[offset & 0x3fcff];
 }
 
 
 READ16_HANDLER( btoads_vram_bg1_r )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	return state->vram_bg1[offset & 0x3fcff];
 }
 
@@ -184,7 +184,7 @@ READ16_HANDLER( btoads_vram_bg1_r )
 
 WRITE16_HANDLER( btoads_vram_fg_display_w )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	if (ACCESSING_BITS_0_7)
 		state->vram_fg_display[offset] = data;
 }
@@ -192,7 +192,7 @@ WRITE16_HANDLER( btoads_vram_fg_display_w )
 
 WRITE16_HANDLER( btoads_vram_fg_draw_w )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	if (ACCESSING_BITS_0_7)
 		state->vram_fg_draw[offset] = data;
 }
@@ -200,14 +200,14 @@ WRITE16_HANDLER( btoads_vram_fg_draw_w )
 
 READ16_HANDLER( btoads_vram_fg_display_r )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	return state->vram_fg_display[offset];
 }
 
 
 READ16_HANDLER( btoads_vram_fg_draw_r )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	return state->vram_fg_draw[offset];
 }
 
@@ -274,7 +274,7 @@ static void render_sprite_row(btoads_state *state, UINT16 *sprite_source, UINT32
 
 void btoads_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	address &= ~0x40000000;
 
 	/* reads from this first region are usual shift register reads */
@@ -296,13 +296,13 @@ void btoads_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 	}
 
 	else
-		logerror("%s:btoads_to_shiftreg(%08X)\n", space->machine->describe_context(), address);
+		logerror("%s:btoads_to_shiftreg(%08X)\n", space->machine().describe_context(), address);
 }
 
 
 void btoads_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	address &= ~0x40000000;
 
 	/* writes to this first region are usual shift register writes */
@@ -322,7 +322,7 @@ void btoads_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg
 		render_sprite_row(state, shiftreg, address);
 
 	else
-		logerror("%s:btoads_from_shiftreg(%08X)\n", space->machine->describe_context(), address);
+		logerror("%s:btoads_from_shiftreg(%08X)\n", space->machine().describe_context(), address);
 }
 
 
@@ -335,13 +335,13 @@ void btoads_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg
 
 void btoads_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	btoads_state *state = screen.machine->driver_data<btoads_state>();
+	btoads_state *state = screen.machine().driver_data<btoads_state>();
 	UINT32 fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 4;
 	UINT16 *bg0_base = &state->vram_bg0[(fulladdr + (state->yscroll0 << 10)) & 0x3fc00];
 	UINT16 *bg1_base = &state->vram_bg1[(fulladdr + (state->yscroll1 << 10)) & 0x3fc00];
 	UINT8 *spr_base = &state->vram_fg_display[fulladdr & 0x3fc00];
 	UINT32 *dst = BITMAP_ADDR32(bitmap, scanline, 0);
-	const rgb_t *pens = tlc34076_get_pens(screen.machine->device("tlc34076"));
+	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = fulladdr & 0x3ff;
 	int x;
 
@@ -515,13 +515,13 @@ void btoads_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanlin
 #if BT_DEBUG
 	popmessage("screen_control = %02X", state->screen_control & 0x7f);
 
-	if (input_code_pressed(screen.machine, KEYCODE_X))
+	if (input_code_pressed(screen.machine(), KEYCODE_X))
 	{
 		char name[10];
 		FILE *f;
 		int i;
 
-		while (input_code_pressed(screen.machine, KEYCODE_X)) ;
+		while (input_code_pressed(screen.machine(), KEYCODE_X)) ;
 
 		sprintf(name, "disp%d.log", state->xcount++);
 		f = fopen(name, "w");

@@ -72,9 +72,9 @@ static VIDEO_START( discoboy )
 {
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	discoboy_state *state = machine->driver_data<discoboy_state>();
+	discoboy_state *state = machine.driver_data<discoboy_state>();
 	int flipscreen = 0;
 	int offs, sx, sy;
 
@@ -107,11 +107,11 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			}
 			else
 			{
-				code = machine->rand();
+				code = machine.rand();
 			}
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				 code,
 				 color,
 				 flipscreen,0,
@@ -122,7 +122,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static SCREEN_UPDATE( discoboy )
 {
-	discoboy_state *state = screen->machine->driver_data<discoboy_state>();
+	discoboy_state *state = screen->machine().driver_data<discoboy_state>();
 	UINT16 x, y;
 	int i;
 	int count = 0;
@@ -137,7 +137,7 @@ static SCREEN_UPDATE( discoboy )
 		g = ((pal >> 4) & 0xf) << 4;
 		r = ((pal >> 8) & 0xf) << 4;
 
-		palette_set_color(screen->machine, i / 2, MAKE_RGB(r, g, b));
+		palette_set_color(screen->machine(), i / 2, MAKE_RGB(r, g, b));
 	}
 
 	for (i = 0; i < 0x800; i += 2)
@@ -150,7 +150,7 @@ static SCREEN_UPDATE( discoboy )
 		g = ((pal >> 4) & 0xf) << 4;
 		r = ((pal >> 8) & 0xf) << 4;
 
-		palette_set_color(screen->machine, (i / 2) + 0x400, MAKE_RGB(r, g, b));
+		palette_set_color(screen->machine(), (i / 2) + 0x400, MAKE_RGB(r, g, b));
 	}
 
 	bitmap_fill(bitmap, cliprect, 0x3ff);
@@ -169,54 +169,54 @@ static SCREEN_UPDATE( discoboy )
 					tileno = 0x2000 + (tileno & 0x1fff) + 0x0000;
 			}
 
-			drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[1], tileno, state->ram_att[count / 2], 0, 0, x*8, y*8);
+			drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[1], tileno, state->ram_att[count / 2], 0, 0, x*8, y*8);
 			count += 2;
 		}
 	}
 
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 
 	return 0;
 }
 
 #ifdef UNUSED_FUNCTION
-void discoboy_setrombank( running_machine *machine, UINT8 data )
+void discoboy_setrombank( running_machine &machine, UINT8 data )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	data &= 0x2f;
-	memory_set_bankptr(space->machine, "bank1", &ROM[0x6000 + (data * 0x1000)] );
+	memory_set_bankptr(space->machine(), "bank1", &ROM[0x6000 + (data * 0x1000)] );
 }
 #endif
 
 static WRITE8_HANDLER( rambank_select_w )
 {
-	discoboy_state *state = space->machine->driver_data<discoboy_state>();
+	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 	state->ram_bank = data;
 	if (data &= 0x83) logerror("rambank_select_w !!!!!");
 }
 
 static WRITE8_HANDLER( discoboy_port_00_w )
 {
-	discoboy_state *state = space->machine->driver_data<discoboy_state>();
+	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 	if (data & 0xfe) logerror("unk discoboy_port_00_w %02x\n",data);
 	state->port_00 = data;
 }
 
 static WRITE8_HANDLER( discoboy_port_01_w )
 {
-	discoboy_state *state = space->machine->driver_data<discoboy_state>();
+	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 
 	// 00 10 20 30 during gameplay  1,2,3 other times?? title screen bit 0x40 toggle
 	//printf("unk discoboy_port_01_w %02x\n",data);
 	// discoboy gfxbank
 	state->gfxbank = data & 0xf0;
 
-	memory_set_bank(space->machine, "bank1", data & 0x07);
+	memory_set_bank(space->machine(), "bank1", data & 0x07);
 }
 
 static WRITE8_HANDLER( discoboy_port_03_w ) // sfx? (to sound cpu)
 {
-	discoboy_state *state = space->machine->driver_data<discoboy_state>();
+	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 	//  printf("unk discoboy_port_03_w %02x\n", data);
 	//  device_set_input_line(state->audiocpu, INPUT_LINE_NMI, HOLD_LINE);
 	soundlatch_w(space, 0, data);
@@ -232,7 +232,7 @@ static WRITE8_HANDLER( discoboy_port_06_w )
 
 static WRITE8_HANDLER( rambank_w )
 {
-	discoboy_state *state = space->machine->driver_data<discoboy_state>();
+	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 
 	if (state->ram_bank & 0x20)
 		state->ram_2[offset] = data;
@@ -242,7 +242,7 @@ static WRITE8_HANDLER( rambank_w )
 
 static READ8_HANDLER( rambank_r )
 {
-	discoboy_state *state = space->machine->driver_data<discoboy_state>();
+	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 
 	if (state->ram_bank & 0x20)
 		return state->ram_2[offset];
@@ -252,7 +252,7 @@ static READ8_HANDLER( rambank_r )
 
 static READ8_HANDLER( rambank2_r )
 {
-	discoboy_state *state = space->machine->driver_data<discoboy_state>();
+	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 
 	if (state->port_00 == 0x00)
 		return state->ram_3[offset];
@@ -261,12 +261,12 @@ static READ8_HANDLER( rambank2_r )
 	else
 		printf("unk rb2_r\n");
 
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static WRITE8_HANDLER( rambank2_w )
 {
-	discoboy_state *state = space->machine->driver_data<discoboy_state>();
+	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 
 	if (state->port_00 == 0x00)
 		state->ram_3[offset] = data;
@@ -278,13 +278,13 @@ static WRITE8_HANDLER( rambank2_w )
 
 static READ8_HANDLER( discoboy_ram_att_r )
 {
-	discoboy_state *state = space->machine->driver_data<discoboy_state>();
+	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 	return state->ram_att[offset];
 }
 
 static WRITE8_HANDLER( discoboy_ram_att_w )
 {
-	discoboy_state *state = space->machine->driver_data<discoboy_state>();
+	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 	state->ram_att[offset] = data;
 }
 
@@ -323,7 +323,7 @@ ADDRESS_MAP_END
 
 static void splash_msm5205_int( device_t *device )
 {
-	discoboy_state *state = device->machine->driver_data<discoboy_state>();
+	discoboy_state *state = device->machine().driver_data<discoboy_state>();
 	msm5205_data_w(device, state->adpcm_data >> 4);
 //  state->adpcm_data = (state->adpcm_data << 4) & 0xf0;
 }
@@ -442,9 +442,9 @@ static const msm5205_interface discoboy_msm5205_interface =
 
 static MACHINE_START( discoboy )
 {
-	discoboy_state *state = machine->driver_data<discoboy_state>();
+	discoboy_state *state = machine.driver_data<discoboy_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->ram_bank));
 	state->save_item(NAME(state->port_00));
@@ -454,7 +454,7 @@ static MACHINE_START( discoboy )
 
 static MACHINE_RESET( discoboy )
 {
-	discoboy_state *state = machine->driver_data<discoboy_state>();
+	discoboy_state *state = machine.driver_data<discoboy_state>();
 
 	state->ram_bank = 0;
 	state->port_00 = 0;
@@ -535,8 +535,8 @@ ROM_END
 
 static DRIVER_INIT( discoboy )
 {
-	discoboy_state *state = machine->driver_data<discoboy_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	discoboy_state *state = machine.driver_data<discoboy_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memset(state->ram_1, 0, sizeof(state->ram_1));
 	memset(state->ram_2, 0, sizeof(state->ram_2));

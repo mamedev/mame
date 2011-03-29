@@ -25,7 +25,7 @@ WRITE32_HANDLER(namcoc7x_soundram32_w);
 READ32_HANDLER(namcoc7x_soundram32_r);
 
 void namcoc7x_sound_write16(UINT16 command, UINT32 offset);
-void namcoc7x_on_driver_init(running_machine *machine);
+void namcoc7x_on_driver_init(running_machine &machine);
 void namcoc7x_set_host_ram(UINT32 *hostram);
 
 /* BIOS from Prop Cycle used as a substitute until we can trojan the real BIOSes for these games */

@@ -25,7 +25,7 @@ TODO:
 #include "includes/cdi.h"
 
 #if ENABLE_VERBOSE_LOG
-INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
+INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
 {
     if( VERBOSE_LEVEL >= n_level )
     {
@@ -34,23 +34,23 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
         va_start( v, s_fmt );
         vsprintf( buf, s_fmt, v );
         va_end( v );
-        logerror( "%08x: %s", cpu_get_pc(machine->device("maincpu")), buf );
+        logerror( "%08x: %s", cpu_get_pc(machine.device("maincpu")), buf );
     }
 }
 #else
 #define verboselog(x,y,z,...)
 #endif
 
-static void cdi220_draw_lcd(running_machine *machine, int y);
+static void cdi220_draw_lcd(running_machine &machine, int y);
 static void mcd212_update_region_arrays(mcd212_regs_t *mcd212);
 static void mcd212_set_display_parameters(mcd212_regs_t *mcd212, int channel, UINT8 value);
-static void mcd212_update_visible_area(running_machine *machine);
+static void mcd212_update_visible_area(running_machine &machine);
 static void mcd212_set_vsr(mcd212_regs_t *mcd212, int channel, UINT32 value);
 static void mcd212_set_dcp(mcd212_regs_t *mcd212, int channel, UINT32 value);
 static UINT32 mcd212_get_vsr(mcd212_regs_t *mcd212, int channel);
 static UINT32 mcd212_get_dcp(mcd212_regs_t *mcd212, int channel);
 static UINT32 mcd212_get_screen_width(mcd212_regs_t *mcd212);
-static void mcd212_set_register(running_machine *machine, int channel, UINT8 reg, UINT32 value);
+static void mcd212_set_register(running_machine &machine, int channel, UINT8 reg, UINT32 value);
 static void mcd212_process_ica(mcd212_regs_t *mcd212, int channel);
 static void mcd212_process_dca(mcd212_regs_t *mcd212, int channel);
 static void mcd212_process_vsr(mcd212_regs_t *mcd212, int channel, UINT8 *pixels_r, UINT8 *pixels_g, UINT8 *pixels_b);
@@ -84,9 +84,9 @@ static const UINT16 cdi220_lcd_char[20*22] =
     0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400
 };
 
-static void cdi220_draw_lcd(running_machine *machine, int y)
+static void cdi220_draw_lcd(running_machine &machine, int y)
 {
-    cdi_state *state = machine->driver_data<cdi_state>();
+    cdi_state *state = machine.driver_data<cdi_state>();
     bitmap_t *bitmap = state->lcdbitmap;
     UINT32 *scanline = BITMAP_ADDR32(bitmap, y, 0);
     int x = 0;
@@ -94,7 +94,7 @@ static void cdi220_draw_lcd(running_machine *machine, int y)
 
     for(lcd = 0; lcd < 8; lcd++)
     {
-        cdislave_device *slave = downcast<cdislave_device *>(machine->device("slave"));
+        cdislave_device *slave = downcast<cdislave_device *>(machine.device("slave"));
         UINT16 data = (slave->get_lcd_state()[lcd*2] << 8) |
                        slave->get_lcd_state()[lcd*2 + 1];
         for(x = 0; x < 20; x++)
@@ -349,9 +349,9 @@ static void mcd212_set_vsr(mcd212_regs_t *mcd212, int channel, UINT32 value)
     mcd212->channel[channel].dcr |= (value >> 16) & 0x003f;
 }
 
-static void mcd212_set_register(running_machine *machine, int channel, UINT8 reg, UINT32 value)
+static void mcd212_set_register(running_machine &machine, int channel, UINT8 reg, UINT32 value)
 {
-    cdi_state *state = machine->driver_data<cdi_state>();
+    cdi_state *state = machine.driver_data<cdi_state>();
     mcd212_regs_t *mcd212 = &state->mcd212_regs;
 
     switch(reg)
@@ -534,13 +534,13 @@ static void mcd212_set_display_parameters(mcd212_regs_t *mcd212, int channel, UI
     mcd212->channel[channel].dcr |= (value & 0x10) << 7;
 }
 
-static void mcd212_update_visible_area(running_machine *machine)
+static void mcd212_update_visible_area(running_machine &machine)
 {
-    cdi_state *state = machine->driver_data<cdi_state>();
+    cdi_state *state = machine.driver_data<cdi_state>();
     mcd212_regs_t *mcd212 = &state->mcd212_regs;
-    const rectangle &visarea = machine->primary_screen->visible_area();
+    const rectangle &visarea = machine.primary_screen->visible_area();
     rectangle visarea1;
-    attoseconds_t period = machine->primary_screen->frame_period().attoseconds;
+    attoseconds_t period = machine.primary_screen->frame_period().attoseconds;
     int width = 0;
 
     if((mcd212->channel[0].dcr & (MCD212_DCR_CF | MCD212_DCR_FD)) && (mcd212->channel[0].csrw & MCD212_CSR1W_ST))
@@ -557,7 +557,7 @@ static void mcd212_update_visible_area(running_machine *machine)
     visarea1.min_y = visarea.min_y;
     visarea1.max_y = visarea.max_y;
 
-    machine->primary_screen->configure(width, 302, visarea1, period);
+    machine.primary_screen->configure(width, 302, visarea1, period);
 }
 
 static UINT32 mcd212_get_screen_width(mcd212_regs_t *mcd212)
@@ -571,8 +571,8 @@ static UINT32 mcd212_get_screen_width(mcd212_regs_t *mcd212)
 
 static void mcd212_process_ica(mcd212_regs_t *mcd212, int channel)
 {
-    running_machine *machine = mcd212->machine;
-    cdi_state *state = machine->driver_data<cdi_state>();
+    running_machine &machine = mcd212->machine();
+    cdi_state *state = machine.driver_data<cdi_state>();
     UINT16 *ica = channel ? state->planeb : state->planea;
     UINT32 addr = 0x000400/2;
     UINT32 cmd = 0;
@@ -623,7 +623,7 @@ static void mcd212_process_ica(mcd212_regs_t *mcd212, int channel)
                     UINT8 interrupt = (state->scc68070_regs.lir >> 4) & 7;
                     if(interrupt)
                     {
-                        device_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+                        device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
                         cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
                     }
                 }
@@ -633,7 +633,7 @@ static void mcd212_process_ica(mcd212_regs_t *mcd212, int channel)
                     UINT8 interrupt = state->scc68070_regs.lir & 7;
                     if(interrupt)
                     {
-                        device_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
+                        device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
                         cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
                     }
                 }
@@ -656,8 +656,8 @@ static void mcd212_process_ica(mcd212_regs_t *mcd212, int channel)
 
 static void mcd212_process_dca(mcd212_regs_t *mcd212, int channel)
 {
-    running_machine *machine = mcd212->machine;
-    cdi_state *state = machine->driver_data<cdi_state>();
+    running_machine &machine = mcd212->machine();
+    cdi_state *state = machine.driver_data<cdi_state>();
     UINT16 *dca = channel ? state->planeb : state->planea;
     UINT32 addr = (mcd212->channel[channel].dca & 0x0007ffff) / 2; //(mcd212_get_dcp(mcd212, channel) & 0x0007ffff) / 2; // mcd212->channel[channel].dca / 2;
     UINT32 cmd = 0;
@@ -714,7 +714,7 @@ static void mcd212_process_dca(mcd212_regs_t *mcd212, int channel)
                     UINT8 interrupt = (state->scc68070_regs.lir >> 4) & 7;
                     if(interrupt)
                     {
-                        device_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+                        device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
                         cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
                     }
                 }
@@ -724,7 +724,7 @@ static void mcd212_process_dca(mcd212_regs_t *mcd212, int channel)
                     UINT8 interrupt = state->scc68070_regs.lir & 7;
                     if(interrupt)
                     {
-                        device_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
+                        device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
                         cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
                     }
                 }
@@ -804,8 +804,8 @@ INLINE UINT8 BYTE_TO_CLUT(int channel, int icm, UINT8 byte)
 
 static void mcd212_process_vsr(mcd212_regs_t *mcd212, int channel, UINT8 *pixels_r, UINT8 *pixels_g, UINT8 *pixels_b)
 {
-    running_machine *machine = mcd212->machine;
-    cdi_state *state = machine->driver_data<cdi_state>();
+    running_machine &machine = mcd212->machine();
+    cdi_state *state = machine.driver_data<cdi_state>();
     UINT8 *data = channel ? (UINT8*)state->planeb : (UINT8*)state->planea;
     UINT32 vsr = mcd212_get_vsr(mcd212, channel) & 0x0007ffff;
     UINT8 done = 0;
@@ -1113,7 +1113,7 @@ static const UINT32 mcd212_4bpp_color[16] =
 
 static void mcd212_mix_lines(mcd212_regs_t *mcd212, UINT8 *plane_a_r, UINT8 *plane_a_g, UINT8 *plane_a_b, UINT8 *plane_b_r, UINT8 *plane_b_g, UINT8 *plane_b_b, UINT32 *out)
 {
-    running_machine *machine = mcd212->machine;
+    running_machine &machine = mcd212->machine();
     int x = 0;
     UINT8 debug_mode = input_port_read(machine, "DEBUG");
     UINT8 global_plane_a_disable = debug_mode & 1;
@@ -1331,8 +1331,8 @@ static void mcd212_draw_cursor(mcd212_regs_t *mcd212, UINT32 *scanline, int y)
 
 static void mcd212_draw_scanline(mcd212_regs_t *mcd212, int y)
 {
-    running_machine *machine = mcd212->machine;
-    bitmap_t *bitmap = machine->generic.tmpbitmap;
+    running_machine &machine = mcd212->machine();
+    bitmap_t *bitmap = machine.generic.tmpbitmap;
     UINT8 plane_a_r[768], plane_a_g[768], plane_a_b[768];
     UINT8 plane_b_r[768], plane_b_g[768], plane_b_b[768];
     UINT32 out[768];
@@ -1354,7 +1354,7 @@ static void mcd212_draw_scanline(mcd212_regs_t *mcd212, int y)
 
 READ16_HANDLER( mcd212_r )
 {
-    cdi_state *state = space->machine->driver_data<cdi_state>();
+    cdi_state *state = space->machine().driver_data<cdi_state>();
     mcd212_regs_t *mcd212 = &state->mcd212_regs;
     UINT8 channel = 1 - (offset / 8);
 
@@ -1364,7 +1364,7 @@ READ16_HANDLER( mcd212_r )
         case 0x10/2:
             if(ACCESSING_BITS_0_7)
             {
-                verboselog(space->machine, 12, "mcd212_r: Status Register %d: %02x & %04x\n", channel + 1, mcd212->channel[1 - (offset / 8)].csrr, mem_mask);
+                verboselog(space->machine(), 12, "mcd212_r: Status Register %d: %02x & %04x\n", channel + 1, mcd212->channel[1 - (offset / 8)].csrr, mem_mask);
                 if(channel == 0)
                 {
                     return mcd212->channel[0].csrr;
@@ -1377,38 +1377,38 @@ READ16_HANDLER( mcd212_r )
                     mcd212->channel[1].csrr &= ~(MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2);
                     if(interrupt1)
                     {
-                        cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_1 + (interrupt1 - 1), CLEAR_LINE);
+                        cputag_set_input_line(space->machine(), "maincpu", M68K_IRQ_1 + (interrupt1 - 1), CLEAR_LINE);
                     }
                     //if(interrupt2)
                     //{
-                    //  cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_1 + (interrupt2 - 1), CLEAR_LINE);
+                    //  cputag_set_input_line(space->machine(), "maincpu", M68K_IRQ_1 + (interrupt2 - 1), CLEAR_LINE);
                     //}
                     return old_csr;
                 }
             }
             else
             {
-                verboselog(space->machine, 2, "mcd212_r: Unknown Register %d: %04x\n", channel + 1, mem_mask);
+                verboselog(space->machine(), 2, "mcd212_r: Unknown Register %d: %04x\n", channel + 1, mem_mask);
             }
             break;
         case 0x02/2:
         case 0x12/2:
-            verboselog(space->machine, 2, "mcd212_r: Display Command Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].dcr, mem_mask);
+            verboselog(space->machine(), 2, "mcd212_r: Display Command Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].dcr, mem_mask);
             return mcd212->channel[1 - (offset / 8)].dcr;
         case 0x04/2:
         case 0x14/2:
-            verboselog(space->machine, 2, "mcd212_r: Video Start Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].vsr, mem_mask);
+            verboselog(space->machine(), 2, "mcd212_r: Video Start Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].vsr, mem_mask);
             return mcd212->channel[1 - (offset / 8)].vsr;
         case 0x08/2:
         case 0x18/2:
-            verboselog(space->machine, 2, "mcd212_r: Display Decoder Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].ddr, mem_mask);
+            verboselog(space->machine(), 2, "mcd212_r: Display Decoder Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].ddr, mem_mask);
             return mcd212->channel[1 - (offset / 8)].ddr;
         case 0x0a/2:
         case 0x1a/2:
-            verboselog(space->machine, 2, "mcd212_r: DCA Pointer Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].dcp, mem_mask);
+            verboselog(space->machine(), 2, "mcd212_r: DCA Pointer Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212->channel[1 - (offset / 8)].dcp, mem_mask);
             return mcd212->channel[1 - (offset / 8)].dcp;
         default:
-            verboselog(space->machine, 2, "mcd212_r: Unknown Register %d & %04x\n", (1 - (offset / 8)) + 1, mem_mask);
+            verboselog(space->machine(), 2, "mcd212_r: Unknown Register %d & %04x\n", (1 - (offset / 8)) + 1, mem_mask);
             break;
     }
 
@@ -1417,49 +1417,49 @@ READ16_HANDLER( mcd212_r )
 
 WRITE16_HANDLER( mcd212_w )
 {
-    cdi_state *state = space->machine->driver_data<cdi_state>();
+    cdi_state *state = space->machine().driver_data<cdi_state>();
     mcd212_regs_t *mcd212 = &state->mcd212_regs;
 
     switch(offset)
     {
         case 0x00/2:
         case 0x10/2:
-            verboselog(space->machine, 2, "mcd212_w: Status Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
+            verboselog(space->machine(), 2, "mcd212_w: Status Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
             COMBINE_DATA(&mcd212->channel[1 - (offset / 8)].csrw);
-            mcd212_update_visible_area(space->machine);
+            mcd212_update_visible_area(space->machine());
             break;
         case 0x02/2:
         case 0x12/2:
-            verboselog(space->machine, 2, "mcd212_w: Display Command Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
+            verboselog(space->machine(), 2, "mcd212_w: Display Command Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
             COMBINE_DATA(&mcd212->channel[1 - (offset / 8)].dcr);
-            mcd212_update_visible_area(space->machine);
+            mcd212_update_visible_area(space->machine());
             break;
         case 0x04/2:
         case 0x14/2:
-            verboselog(space->machine, 2, "mcd212_w: Video Start Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
+            verboselog(space->machine(), 2, "mcd212_w: Video Start Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
             COMBINE_DATA(&mcd212->channel[1 - (offset / 8)].vsr);
             break;
         case 0x08/2:
         case 0x18/2:
-            verboselog(space->machine, 2, "mcd212_w: Display Decoder Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
+            verboselog(space->machine(), 2, "mcd212_w: Display Decoder Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
             COMBINE_DATA(&mcd212->channel[1 - (offset / 8)].ddr);
             break;
         case 0x0a/2:
         case 0x1a/2:
-            verboselog(space->machine, 2, "mcd212_w: DCA Pointer Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
+            verboselog(space->machine(), 2, "mcd212_w: DCA Pointer Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
             COMBINE_DATA(&mcd212->channel[1 - (offset / 8)].dcp);
             break;
         default:
-            verboselog(space->machine, 2, "mcd212_w: Unknown Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
+            verboselog(space->machine(), 2, "mcd212_w: Unknown Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
             break;
     }
 }
 
 TIMER_CALLBACK( mcd212_perform_scan )
 {
-    cdi_state *state = machine->driver_data<cdi_state>();
+    cdi_state *state = machine.driver_data<cdi_state>();
     mcd212_regs_t *mcd212 = &state->mcd212_regs;
-    int scanline = machine->primary_screen->vpos();
+    int scanline = machine.primary_screen->vpos();
 
     if(/*mcd212->channel[0].dcr & MCD212_DCR_DE*/1)
     {
@@ -1506,12 +1506,12 @@ TIMER_CALLBACK( mcd212_perform_scan )
             }
         }
     }
-    mcd212->scan_timer->adjust(machine->primary_screen->time_until_pos(( scanline + 1 ) % 302, 0));
+    mcd212->scan_timer->adjust(machine.primary_screen->time_until_pos(( scanline + 1 ) % 302, 0));
 }
 
-void mcd212_init(running_machine *machine, mcd212_regs_t *mcd212)
+void mcd212_init(running_machine &machine, mcd212_regs_t *mcd212)
 {
-    mcd212->machine = machine;
+    mcd212->m_machine = &machine;
 
     int index = 0;
     for(index = 0; index < 2; index++)
@@ -1650,26 +1650,26 @@ void mcd212_ab_init(mcd212_ab_t *mcd212_ab)
 
 VIDEO_START( cdimono1 )
 {
-    cdi_state *state = machine->driver_data<cdi_state>();
+    cdi_state *state = machine.driver_data<cdi_state>();
 
     VIDEO_START_CALL(generic_bitmapped);
     mcd212_ab_init(&state->mcd212_ab);
     mcd212_init(machine, &state->mcd212_regs);
-    state->mcd212_regs.scan_timer = machine->scheduler().timer_alloc(FUNC(mcd212_perform_scan));
-    state->mcd212_regs.scan_timer->adjust(machine->primary_screen->time_until_pos(0, 0));
+    state->mcd212_regs.scan_timer = machine.scheduler().timer_alloc(FUNC(mcd212_perform_scan));
+    state->mcd212_regs.scan_timer->adjust(machine.primary_screen->time_until_pos(0, 0));
 
-    state->lcdbitmap = downcast<screen_device *>(machine->device("lcd"))->alloc_compatible_bitmap();
+    state->lcdbitmap = downcast<screen_device *>(machine.device("lcd"))->alloc_compatible_bitmap();
 }
 
 SCREEN_UPDATE( cdimono1 )
 {
-    copybitmap(bitmap, screen->machine->generic.tmpbitmap, 0, 0, 0, 0, cliprect);
+    copybitmap(bitmap, screen->machine().generic.tmpbitmap, 0, 0, 0, 0, cliprect);
     return 0;
 }
 
 SCREEN_UPDATE( cdimono1_lcd )
 {
-    cdi_state *state = screen->machine->driver_data<cdi_state>();
+    cdi_state *state = screen->machine().driver_data<cdi_state>();
     copybitmap(bitmap, state->lcdbitmap, 0, 0, 0, 0, cliprect);
     return 0;
 }

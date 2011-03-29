@@ -111,9 +111,9 @@ static void tecmosys_prot_reset(running_machine &machine)
 	state->device_value = 0xff;
 }
 
-void tecmosys_prot_init(running_machine *machine, int which)
+void tecmosys_prot_init(running_machine &machine, int which)
 {
-	tecmosys_state *state = machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 	switch (which)
 	{
 	case 0:	state->device_data = &deroon_data; break;
@@ -121,7 +121,7 @@ void tecmosys_prot_init(running_machine *machine, int which)
 	case 2: state->device_data = &tkdensha_data; break;
 	}
 
-	machine->add_notifier(MACHINE_NOTIFY_RESET, tecmosys_prot_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, tecmosys_prot_reset);
 }
 
 READ16_HANDLER(tecmosys_prot_status_r)
@@ -144,7 +144,7 @@ WRITE16_HANDLER(tecmosys_prot_status_w)
 
 READ16_HANDLER(tecmosys_prot_data_r)
 {
-	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	// prot appears to be read-ready for two consecutive reads
 	// but returns 0xff for subsequent reads.
 	UINT8 ret = state->device_value;
@@ -156,7 +156,7 @@ READ16_HANDLER(tecmosys_prot_data_r)
 
 WRITE16_HANDLER(tecmosys_prot_data_w)
 {
-	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	// Only LSB
 	data >>= 8;
 

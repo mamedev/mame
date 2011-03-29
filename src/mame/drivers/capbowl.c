@@ -107,7 +107,7 @@
 
 static INTERRUPT_GEN( capbowl_interrupt )
 {
-	if (input_port_read(device->machine, "SERVICE") & 1)						/* get status of the F2 key */
+	if (input_port_read(device->machine(), "SERVICE") & 1)						/* get status of the F2 key */
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);	/* trigger self test */
 }
 
@@ -123,10 +123,10 @@ static TIMER_CALLBACK( capbowl_update )
 {
 	int scanline = param;
 
-	machine->primary_screen->update_partial(scanline - 1);
+	machine.primary_screen->update_partial(scanline - 1);
 	scanline += 32;
 	if (scanline > 240) scanline = 32;
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(capbowl_update), scanline);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(capbowl_update), scanline);
 }
 
 
@@ -139,7 +139,7 @@ static TIMER_CALLBACK( capbowl_update )
 static WRITE8_HANDLER( capbowl_rom_select_w )
 {
 	// 2009-11 FP: shall we add a check to be sure that bank < 6?
-	memory_set_bank(space->machine, "bank1", ((data & 0x0c) >> 1) + (data & 0x01));
+	memory_set_bank(space->machine(), "bank1", ((data & 0x0c) >> 1) + (data & 0x01));
 }
 
 
@@ -152,25 +152,25 @@ static WRITE8_HANDLER( capbowl_rom_select_w )
 
 static READ8_HANDLER( track_0_r )
 {
-	capbowl_state *state = space->machine->driver_data<capbowl_state>();
-	return (input_port_read(space->machine, "IN0") & 0xf0) | ((input_port_read(space->machine, "TRACKY") - state->last_trackball_val[0]) & 0x0f);
+	capbowl_state *state = space->machine().driver_data<capbowl_state>();
+	return (input_port_read(space->machine(), "IN0") & 0xf0) | ((input_port_read(space->machine(), "TRACKY") - state->last_trackball_val[0]) & 0x0f);
 }
 
 
 static READ8_HANDLER( track_1_r )
 {
-	capbowl_state *state = space->machine->driver_data<capbowl_state>();
-	return (input_port_read(space->machine, "IN1") & 0xf0) | ((input_port_read(space->machine, "TRACKX") - state->last_trackball_val[1]) & 0x0f);
+	capbowl_state *state = space->machine().driver_data<capbowl_state>();
+	return (input_port_read(space->machine(), "IN1") & 0xf0) | ((input_port_read(space->machine(), "TRACKX") - state->last_trackball_val[1]) & 0x0f);
 }
 
 
 static WRITE8_HANDLER( track_reset_w )
 {
-	capbowl_state *state = space->machine->driver_data<capbowl_state>();
+	capbowl_state *state = space->machine().driver_data<capbowl_state>();
 
 	/* reset the trackball counters */
-	state->last_trackball_val[0] = input_port_read(space->machine, "TRACKY");
-	state->last_trackball_val[1] = input_port_read(space->machine, "TRACKX");
+	state->last_trackball_val[0] = input_port_read(space->machine(), "TRACKY");
+	state->last_trackball_val[1] = input_port_read(space->machine(), "TRACKX");
 
 	watchdog_reset_w(space, offset, data);
 }
@@ -185,7 +185,7 @@ static WRITE8_HANDLER( track_reset_w )
 
 static WRITE8_HANDLER( capbowl_sndcmd_w )
 {
-	capbowl_state *state = space->machine->driver_data<capbowl_state>();
+	capbowl_state *state = space->machine().driver_data<capbowl_state>();
 	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 	soundlatch_w(space, offset, data);
 }
@@ -201,7 +201,7 @@ static WRITE8_HANDLER( capbowl_sndcmd_w )
 
 static void firqhandler( device_t *device, int irq )
 {
-	capbowl_state *state = device->machine->driver_data<capbowl_state>();
+	capbowl_state *state = device->machine().driver_data<capbowl_state>();
 	device_set_input_line(state->audiocpu, 1, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -340,10 +340,10 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( capbowl )
 {
-	capbowl_state *state = machine->driver_data<capbowl_state>();
+	capbowl_state *state = machine.driver_data<capbowl_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->blitter_addr));
 	state->save_item(NAME(state->last_trackball_val[0]));
@@ -352,9 +352,9 @@ static MACHINE_START( capbowl )
 
 static MACHINE_RESET( capbowl )
 {
-	capbowl_state *state = machine->driver_data<capbowl_state>();
+	capbowl_state *state = machine.driver_data<capbowl_state>();
 
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(32), FUNC(capbowl_update), 32);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(32), FUNC(capbowl_update), 32);
 
 	state->blitter_addr = 0;
 	state->last_trackball_val[0] = 0;
@@ -504,7 +504,7 @@ ROM_END
 
 static DRIVER_INIT( capbowl )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	/* configure ROM banks in 0x0000-0x3fff */
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);

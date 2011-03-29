@@ -402,15 +402,15 @@ static void clear_decrypted(running_machine &machine)
 	decrypted = NULL;
 }
 
-static void sys16_decrypt(running_machine *machine, const UINT8 *key,int cputype)
+static void sys16_decrypt(running_machine &machine, const UINT8 *key,int cputype)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
-	int size = machine->region("maincpu")->bytes();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+	int size = machine.region("maincpu")->bytes();
 	int A;
 	decrypted = auto_alloc_array(machine, UINT16, size/2);
 
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, clear_decrypted);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, clear_decrypted);
 	space->set_decrypted_region(0x000000, size - 1, decrypted);
 
 	for (A = 0;A < size;A+=2)
@@ -430,13 +430,13 @@ void *fd1089_get_decrypted_base(void)
 	return decrypted;
 }
 
-void fd1089a_decrypt(running_machine *machine)
+void fd1089a_decrypt(running_machine &machine)
 {
-	sys16_decrypt(machine, machine->region("fd1089a")->base(), FD1089A);
+	sys16_decrypt(machine, machine.region("fd1089a")->base(), FD1089A);
 }
 
-void fd1089b_decrypt(running_machine *machine)
+void fd1089b_decrypt(running_machine &machine)
 {
-	sys16_decrypt(machine, machine->region("fd1089b")->base(), FD1089B);
+	sys16_decrypt(machine, machine.region("fd1089b")->base(), FD1089B);
 }
 

@@ -80,12 +80,12 @@ Stephh's notes (based on the games Z80 code and some tests) :
 static READ8_HANDLER( funkybee_input_port_0_r )
 {
 	watchdog_reset_r(space, 0);
-	return input_port_read(space->machine, "IN0");
+	return input_port_read(space->machine(), "IN0");
 }
 
 static WRITE8_HANDLER( funkybee_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset, data);
+	coin_counter_w(space->machine(), offset, data);
 }
 
 static ADDRESS_MAP_START( funkybee_map, AS_PROGRAM, 8 )
@@ -280,14 +280,14 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( funkybee )
 {
-	funkybee_state *state = machine->driver_data<funkybee_state>();
+	funkybee_state *state = machine.driver_data<funkybee_state>();
 
 	state->save_item(NAME(state->gfx_bank));
 }
 
 static MACHINE_RESET( funkybee )
 {
-	funkybee_state *state = machine->driver_data<funkybee_state>();
+	funkybee_state *state = machine.driver_data<funkybee_state>();
 
 	state->gfx_bank = 0;
 }

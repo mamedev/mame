@@ -55,18 +55,18 @@ public:
 
 /*----------- defined in video/tmnt.c -----------*/
 
-extern void mia_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void cuebrick_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void tmnt_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void ssbl_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void blswhstl_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void mia_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
-extern void tmnt_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
-extern void punkshot_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow);
-extern void thndrx2_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow);
-extern void lgtnfght_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
-extern void blswhstl_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
-extern void prmrsocr_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
+extern void mia_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void cuebrick_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void tmnt_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void ssbl_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void blswhstl_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void mia_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
+extern void tmnt_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
+extern void punkshot_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);
+extern void thndrx2_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);
+extern void lgtnfght_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
+extern void blswhstl_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
+extern void prmrsocr_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
 
 WRITE16_HANDLER( tmnt_paletteram_word_w );
 WRITE16_HANDLER( tmnt_0a0000_w );

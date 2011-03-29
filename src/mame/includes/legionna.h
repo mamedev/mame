@@ -26,8 +26,8 @@ public:
 
 /*----------- defined in video/legionna.c -----------*/
 
-void heatbrl_setgfxbank(running_machine *machine, UINT16 data);
-void denjinmk_setgfxbank(running_machine *machine, UINT16 data);
+void heatbrl_setgfxbank(running_machine &machine, UINT16 data);
+void denjinmk_setgfxbank(running_machine &machine, UINT16 data);
 WRITE16_HANDLER( legionna_background_w );
 WRITE16_HANDLER( legionna_foreground_w );
 WRITE16_HANDLER( legionna_midground_w );

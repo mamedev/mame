@@ -84,7 +84,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin_inserted )
 {
-	skyfox_state *state = field->port->machine->driver_data<skyfox_state>();
+	skyfox_state *state = field->port->machine().driver_data<skyfox_state>();
 	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -214,7 +214,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( skyfox_interrupt )
 {
-	skyfox_state *state = device->machine->driver_data<skyfox_state>();
+	skyfox_state *state = device->machine().driver_data<skyfox_state>();
 
 	/* Scroll the bg */
 	state->bg_pos += (state->bg_ctrl >> 1) & 0x7;	// maybe..
@@ -222,9 +222,9 @@ static INTERRUPT_GEN( skyfox_interrupt )
 
 static MACHINE_START( skyfox )
 {
-	skyfox_state *state = machine->driver_data<skyfox_state>();
+	skyfox_state *state = machine.driver_data<skyfox_state>();
 
-	state->maincpu = machine->device("maincpu");
+	state->maincpu = machine.device("maincpu");
 
 	state->save_item(NAME(state->bg_pos));
 	state->save_item(NAME(state->bg_ctrl));
@@ -232,7 +232,7 @@ static MACHINE_START( skyfox )
 
 static MACHINE_RESET( skyfox )
 {
-	skyfox_state *state = machine->driver_data<skyfox_state>();
+	skyfox_state *state = machine.driver_data<skyfox_state>();
 
 	state->bg_pos = 0;
 	state->bg_ctrl = 0;
@@ -434,8 +434,8 @@ ROM_END
 /* Untangle the graphics: cut each 32x32x8 tile in 16 8x8x8 tiles */
 static DRIVER_INIT( skyfox )
 {
-	UINT8 *RAM = machine->region("gfx1")->base();
-	UINT8 *end = RAM + machine->region("gfx1")->bytes();
+	UINT8 *RAM = machine.region("gfx1")->base();
+	UINT8 *end = RAM + machine.region("gfx1")->bytes();
 	UINT8 buf[32 * 32];
 
 	while (RAM < end)

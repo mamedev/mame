@@ -55,7 +55,7 @@ WRITE16_HANDLER( lordgun_vram_2_w );
 WRITE16_HANDLER( lordgun_vram_3_w );
 
 float lordgun_crosshair_mapper(const input_field_config *field, float linear_value);
-void lordgun_update_gun(running_machine *machine, int i);
+void lordgun_update_gun(running_machine &machine, int i);
 
 VIDEO_START( lordgun );
 SCREEN_UPDATE( lordgun );

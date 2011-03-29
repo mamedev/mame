@@ -22,10 +22,10 @@
  *
  *************************************/
 
-static void get_pens(running_machine *machine, const _20pacgal_state *state, pen_t *pens)
+static void get_pens(running_machine &machine, const _20pacgal_state *state, pen_t *pens)
 {
 	offs_t offs;
-	UINT8 *color_prom = machine->region("proms")->base() + (NUM_PENS * state->game_selected);
+	UINT8 *color_prom = machine.region("proms")->base() + (NUM_PENS * state->game_selected);
 
 	for (offs = 0; offs < NUM_PENS ;offs++)
 	{
@@ -73,7 +73,7 @@ static void get_pens(running_machine *machine, const _20pacgal_state *state, pen
 }
 
 
-static void do_pen_lookup(running_machine *machine, const _20pacgal_state *state, bitmap_t *bitmap, const rectangle *cliprect)
+static void do_pen_lookup(running_machine &machine, const _20pacgal_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int y, x;
 	pen_t pens[NUM_PENS + NUM_STAR_PENS];
@@ -93,7 +93,7 @@ static void do_pen_lookup(running_machine *machine, const _20pacgal_state *state
  *
  *************************************/
 
-static void draw_sprite(running_machine* machine, const _20pacgal_state *state, bitmap_t *bitmap, int y, int x,
+static void draw_sprite(running_machine& machine, const _20pacgal_state *state, bitmap_t *bitmap, int y, int x,
 						UINT8 code, UINT8 color, int flip_y, int flip_x)
 {
 	int sy;
@@ -163,7 +163,7 @@ static void draw_sprite(running_machine* machine, const _20pacgal_state *state, 
 }
 
 
-static void draw_sprites(running_machine* machine,const _20pacgal_state *state, bitmap_t *bitmap)
+static void draw_sprites(running_machine& machine,const _20pacgal_state *state, bitmap_t *bitmap)
 {
 	int offs;
 
@@ -408,13 +408,13 @@ static void draw_stars(_20pacgal_state *state, bitmap_t *bitmap, const rectangle
 
 static SCREEN_UPDATE( 20pacgal )
 {
-	_20pacgal_state *state = screen->machine->driver_data<_20pacgal_state>();
+	_20pacgal_state *state = screen->machine().driver_data<_20pacgal_state>();
 
 	bitmap_fill(bitmap,cliprect,0);
 	draw_stars(state, bitmap,cliprect);
 	draw_chars(state, bitmap);
-	draw_sprites(screen->machine,state, bitmap);
-	do_pen_lookup(screen->machine, state, bitmap, cliprect);
+	draw_sprites(screen->machine(),state, bitmap);
+	do_pen_lookup(screen->machine(), state, bitmap, cliprect);
 
 	return 0;
 }

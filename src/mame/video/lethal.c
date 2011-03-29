@@ -11,7 +11,7 @@
 #include "video/konicdev.h"
 #include "includes/lethal.h"
 
-void lethalen_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
+void lethalen_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
 {
 	int pri = (*color & 0xfff0);
 	*color = *color & 0x000f;
@@ -41,21 +41,21 @@ void lethalen_sprite_callback( running_machine *machine, int *code, int *color, 
 	*code = (*code & 0x3fff); // | spritebanks[(*code >> 12) & 3];
 }
 
-void lethalen_tile_callback( running_machine *machine, int layer, int *code, int *color, int *flags )
+void lethalen_tile_callback( running_machine &machine, int layer, int *code, int *color, int *flags )
 {
-	lethal_state *state = machine->driver_data<lethal_state>();
+	lethal_state *state = machine.driver_data<lethal_state>();
 	*color = state->layer_colorbase[layer] + ((*color & 0x3c) << 2);
 }
 
 VIDEO_START(lethalen)
 {
-	lethal_state *state = machine->driver_data<lethal_state>();
+	lethal_state *state = machine.driver_data<lethal_state>();
 
 	// this game uses external linescroll RAM
 	k056832_SetExtLinescroll(state->k056832);
 
 	// the US and Japanese cabinets apparently use different mirror setups
-	if (!strcmp(machine->system().name, "lethalenj"))
+	if (!strcmp(machine.system().name, "lethalenj"))
 	{
 		k056832_set_layer_offs(state->k056832, 0, -196, 0);
 		k056832_set_layer_offs(state->k056832, 1, -194, 0);
@@ -78,7 +78,7 @@ VIDEO_START(lethalen)
 
 WRITE8_HANDLER(lethalen_palette_control)
 {
-	lethal_state *state = space->machine->driver_data<lethal_state>();
+	lethal_state *state = space->machine().driver_data<lethal_state>();
 
 	switch (offset)
 	{
@@ -104,10 +104,10 @@ WRITE8_HANDLER(lethalen_palette_control)
 
 SCREEN_UPDATE(lethalen)
 {
-	lethal_state *state = screen->machine->driver_data<lethal_state>();
+	lethal_state *state = screen->machine().driver_data<lethal_state>();
 
 	bitmap_fill(bitmap, cliprect, 7168);
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	k056832_tilemap_draw(state->k056832, bitmap, cliprect, 3, 0, 1);
 	k056832_tilemap_draw(state->k056832, bitmap, cliprect, 2, 0, 2);

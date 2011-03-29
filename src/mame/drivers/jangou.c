@@ -86,7 +86,7 @@ static PALETTE_INIT( jangou )
 			2, resistances_b,  weights_b,  0, 0,
 			0, 0, 0, 0, 0);
 
-	for (i = 0;i < machine->total_colors(); i++)
+	for (i = 0;i < machine.total_colors(); i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;
@@ -114,14 +114,14 @@ static PALETTE_INIT( jangou )
 
 static VIDEO_START( jangou )
 {
-	jangou_state *state = machine->driver_data<jangou_state>();
+	jangou_state *state = machine.driver_data<jangou_state>();
 
 	state->save_item(NAME(state->blit_buffer));
 }
 
 static SCREEN_UPDATE( jangou )
 {
-	jangou_state *state = screen->machine->driver_data<jangou_state>();
+	jangou_state *state = screen->machine().driver_data<jangou_state>();
 	int x, y;
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
@@ -132,8 +132,8 @@ static SCREEN_UPDATE( jangou )
 		for (x = cliprect->min_x; x <= cliprect->max_x; x += 2)
 		{
 			UINT32 srcpix = *src++;
-			*dst++ = screen->machine->pens[srcpix & 0xf];
-			*dst++ = screen->machine->pens[(srcpix >> 4) & 0xf];
+			*dst++ = screen->machine().pens[srcpix & 0xf];
+			*dst++ = screen->machine().pens[(srcpix >> 4) & 0xf];
 		}
 	}
 
@@ -151,9 +151,9 @@ h [$16]
 w [$17]
 */
 
-static UINT8 jangou_gfx_nibble( running_machine *machine, UINT16 niboffset )
+static UINT8 jangou_gfx_nibble( running_machine &machine, UINT16 niboffset )
 {
-	const UINT8 *const blit_rom = machine->region("gfx")->base();
+	const UINT8 *const blit_rom = machine.region("gfx")->base();
 
 	if (niboffset & 1)
 		return (blit_rom[(niboffset >> 1) & 0xffff] & 0xf0) >> 4;
@@ -161,9 +161,9 @@ static UINT8 jangou_gfx_nibble( running_machine *machine, UINT16 niboffset )
 		return (blit_rom[(niboffset >> 1) & 0xffff] & 0x0f);
 }
 
-static void plot_jangou_gfx_pixel( running_machine *machine, UINT8 pix, int x, int y )
+static void plot_jangou_gfx_pixel( running_machine &machine, UINT8 pix, int x, int y )
 {
-	jangou_state *state = machine->driver_data<jangou_state>();
+	jangou_state *state = machine.driver_data<jangou_state>();
 	if (y < 0 || y >= 512)
 		return;
 	if (x < 0 || x >= 512)
@@ -177,7 +177,7 @@ static void plot_jangou_gfx_pixel( running_machine *machine, UINT8 pix, int x, i
 
 static WRITE8_HANDLER( blitter_process_w )
 {
-	jangou_state *state = space->machine->driver_data<jangou_state>();
+	jangou_state *state = space->machine().driver_data<jangou_state>();
 	int src, x, y, h, w, flipx;
 	state->blit_data[offset] = data;
 
@@ -208,14 +208,14 @@ static WRITE8_HANDLER( blitter_process_w )
 			{
 				int drawx = (x + xcount) & 0xff;
 				int drawy = (y + ycount) & 0xff;
-				UINT8 dat = jangou_gfx_nibble(space->machine, src + count);
+				UINT8 dat = jangou_gfx_nibble(space->machine(), src + count);
 				UINT8 cur_pen_hi = state->pen_data[(dat & 0xf0) >> 4];
 				UINT8 cur_pen_lo = state->pen_data[(dat & 0x0f) >> 0];
 
 				dat = cur_pen_lo | (cur_pen_hi << 4);
 
 				if ((dat & 0xff) != 0)
-					plot_jangou_gfx_pixel(space->machine, dat, drawx, drawy);
+					plot_jangou_gfx_pixel(space->machine(), dat, drawx, drawy);
 
 				if (!flipx)
 					count--;
@@ -229,7 +229,7 @@ static WRITE8_HANDLER( blitter_process_w )
 /* What is the bit 5 (0x20) for?*/
 static WRITE8_HANDLER( blit_vregs_w )
 {
-	jangou_state *state = space->machine->driver_data<jangou_state>();
+	jangou_state *state = space->machine().driver_data<jangou_state>();
 
 	//  printf("%02x %02x\n", offset, data);
 	state->pen_data[offset] = data & 0xf;
@@ -243,7 +243,7 @@ static WRITE8_HANDLER( blit_vregs_w )
 
 static WRITE8_HANDLER( mux_w )
 {
-	jangou_state *state = space->machine->driver_data<jangou_state>();
+	jangou_state *state = space->machine().driver_data<jangou_state>();
 	state->mux_data = ~data;
 }
 
@@ -255,30 +255,30 @@ static WRITE8_HANDLER( output_w )
     ---- ---x coin counter
     */
 //  printf("%02x\n", data);
-	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine(), 0, data & 0x01);
 //  flip_screen_set(data & 0x04);
-//  coin_lockout_w(space->machine, 0, ~data & 0x20);
+//  coin_lockout_w(space->machine(), 0, ~data & 0x20);
 }
 
 static READ8_DEVICE_HANDLER( input_mux_r )
 {
-	jangou_state *state = device->machine->driver_data<jangou_state>();
+	jangou_state *state = device->machine().driver_data<jangou_state>();
 	switch(state->mux_data)
 	{
-		case 0x01: return input_port_read(device->machine, "PL1_1");
-		case 0x02: return input_port_read(device->machine, "PL1_2");
-		case 0x04: return input_port_read(device->machine, "PL2_1");
-		case 0x08: return input_port_read(device->machine, "PL2_2");
-		case 0x10: return input_port_read(device->machine, "PL1_3");
-		case 0x20: return input_port_read(device->machine, "PL2_3");
+		case 0x01: return input_port_read(device->machine(), "PL1_1");
+		case 0x02: return input_port_read(device->machine(), "PL1_2");
+		case 0x04: return input_port_read(device->machine(), "PL2_1");
+		case 0x08: return input_port_read(device->machine(), "PL2_2");
+		case 0x10: return input_port_read(device->machine(), "PL1_3");
+		case 0x20: return input_port_read(device->machine(), "PL2_3");
 	}
 
-	return input_port_read(device->machine, "IN_NOMUX");
+	return input_port_read(device->machine(), "IN_NOMUX");
 }
 
 static READ8_DEVICE_HANDLER( input_system_r )
 {
-	return input_port_read(device->machine, "SYSTEM");
+	return input_port_read(device->machine(), "SYSTEM");
 }
 
 
@@ -290,14 +290,14 @@ static READ8_DEVICE_HANDLER( input_system_r )
 
 static WRITE8_HANDLER( sound_latch_w )
 {
-	jangou_state *state = space->machine->driver_data<jangou_state>();
+	jangou_state *state = space->machine().driver_data<jangou_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	device_set_input_line(state->cpu_1, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static READ8_HANDLER( sound_latch_r )
 {
-	jangou_state *state = space->machine->driver_data<jangou_state>();
+	jangou_state *state = space->machine().driver_data<jangou_state>();
 	device_set_input_line(state->cpu_1, INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
@@ -305,13 +305,13 @@ static READ8_HANDLER( sound_latch_r )
 /* Jangou HC-55516 CVSD */
 static WRITE8_HANDLER( cvsd_w )
 {
-	jangou_state *state = space->machine->driver_data<jangou_state>();
+	jangou_state *state = space->machine().driver_data<jangou_state>();
 	state->cvsd_shiftreg = data;
 }
 
 static TIMER_CALLBACK( cvsd_bit_timer_callback )
 {
-	jangou_state *state = machine->driver_data<jangou_state>();
+	jangou_state *state = machine.driver_data<jangou_state>();
 
 	/* Data is shifted out at the MSB */
 	hc55516_digit_w(state->cvsd, (state->cvsd_shiftreg >> 7) & 1);
@@ -326,13 +326,13 @@ static TIMER_CALLBACK( cvsd_bit_timer_callback )
 /* Jangou Lady MSM5218 (MSM5205-compatible) ADPCM */
 static WRITE8_HANDLER( adpcm_w )
 {
-	jangou_state *state = space->machine->driver_data<jangou_state>();
+	jangou_state *state = space->machine().driver_data<jangou_state>();
 	state->adpcm_byte = data;
 }
 
 static void jngolady_vclk_cb( device_t *device )
 {
-	jangou_state *state = device->machine->driver_data<jangou_state>();
+	jangou_state *state = device->machine().driver_data<jangou_state>();
 
 	if (state->msm5205_vclk_toggle == 0)
 		msm5205_data_w(device, state->adpcm_byte >> 4);
@@ -354,13 +354,13 @@ static void jngolady_vclk_cb( device_t *device )
 
 static READ8_HANDLER( master_com_r )
 {
-	jangou_state *state = space->machine->driver_data<jangou_state>();
+	jangou_state *state = space->machine().driver_data<jangou_state>();
 	return state->z80_latch;
 }
 
 static WRITE8_HANDLER( master_com_w )
 {
-	jangou_state *state = space->machine->driver_data<jangou_state>();
+	jangou_state *state = space->machine().driver_data<jangou_state>();
 
 	device_set_input_line(state->nsc, 0, HOLD_LINE);
 	state->nsc_latch = data;
@@ -368,13 +368,13 @@ static WRITE8_HANDLER( master_com_w )
 
 static READ8_HANDLER( slave_com_r )
 {
-	jangou_state *state = space->machine->driver_data<jangou_state>();
+	jangou_state *state = space->machine().driver_data<jangou_state>();
 	return state->nsc_latch;
 }
 
 static WRITE8_HANDLER( slave_com_w )
 {
-	jangou_state *state = space->machine->driver_data<jangou_state>();
+	jangou_state *state = space->machine().driver_data<jangou_state>();
 	state->z80_latch = data;
 }
 
@@ -890,10 +890,10 @@ static const msm5205_interface msm5205_config =
 
 static SOUND_START( jangou )
 {
-	jangou_state *state = machine->driver_data<jangou_state>();
+	jangou_state *state = machine.driver_data<jangou_state>();
 
 	/* Create a timer to feed the CVSD DAC with sample bits */
-	state->cvsd_bit_timer = machine->scheduler().timer_alloc(FUNC(cvsd_bit_timer_callback));
+	state->cvsd_bit_timer = machine.scheduler().timer_alloc(FUNC(cvsd_bit_timer_callback));
 	state->cvsd_bit_timer->adjust(attotime::from_hz(MASTER_CLOCK / 1024), 0, attotime::from_hz(MASTER_CLOCK / 1024));
 }
 
@@ -906,12 +906,12 @@ static SOUND_START( jangou )
 
 static MACHINE_START( common )
 {
-	jangou_state *state = machine->driver_data<jangou_state>();
+	jangou_state *state = machine.driver_data<jangou_state>();
 
-	state->cpu_0 = machine->device("cpu0");
-	state->cpu_1 = machine->device("cpu1");
-	state->cvsd = machine->device("cvsd");
-	state->nsc = machine->device("nsc");
+	state->cpu_0 = machine.device("cpu0");
+	state->cpu_1 = machine.device("cpu1");
+	state->cvsd = machine.device("cvsd");
+	state->nsc = machine.device("nsc");
 
 	state->save_item(NAME(state->pen_data));
 	state->save_item(NAME(state->blit_data));
@@ -920,7 +920,7 @@ static MACHINE_START( common )
 
 static MACHINE_START( jangou )
 {
-	jangou_state *state = machine->driver_data<jangou_state>();
+	jangou_state *state = machine.driver_data<jangou_state>();
 
 	MACHINE_START_CALL(common);
 
@@ -930,7 +930,7 @@ static MACHINE_START( jangou )
 
 static MACHINE_START( jngolady )
 {
-	jangou_state *state = machine->driver_data<jangou_state>();
+	jangou_state *state = machine.driver_data<jangou_state>();
 
 	MACHINE_START_CALL(common);
 
@@ -942,7 +942,7 @@ static MACHINE_START( jngolady )
 
 static MACHINE_RESET( common )
 {
-	jangou_state *state = machine->driver_data<jangou_state>();
+	jangou_state *state = machine.driver_data<jangou_state>();
 	int i;
 
 	state->mux_data = 0;
@@ -956,7 +956,7 @@ static MACHINE_RESET( common )
 
 static MACHINE_RESET( jangou )
 {
-	jangou_state *state = machine->driver_data<jangou_state>();
+	jangou_state *state = machine.driver_data<jangou_state>();
 
 	MACHINE_RESET_CALL(common);
 
@@ -966,7 +966,7 @@ static MACHINE_RESET( jangou )
 
 static MACHINE_RESET( jngolady )
 {
-	jangou_state *state = machine->driver_data<jangou_state>();
+	jangou_state *state = machine.driver_data<jangou_state>();
 
 	MACHINE_RESET_CALL(common);
 
@@ -1355,19 +1355,19 @@ ROM_END
 /*Temporary kludge for make the RNG work*/
 static READ8_HANDLER( jngolady_rng_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static DRIVER_INIT( jngolady )
 {
-	machine->device("nsc")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x08, 0x08, FUNC(jngolady_rng_r) );
+	machine.device("nsc")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x08, 0x08, FUNC(jngolady_rng_r) );
 }
 
 static DRIVER_INIT (luckygrl)
 {
 	// this is WRONG
 	int A;
-	UINT8 *ROM = machine->region("cpu0")->base();
+	UINT8 *ROM = machine.region("cpu0")->base();
 
 	unsigned char patn1[32] = {
 		0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0,
@@ -1393,7 +1393,7 @@ static DRIVER_INIT (luckygrl)
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"decrypted_%s", machine->system().name);
+		sprintf(filename,"decrypted_%s", machine.system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{

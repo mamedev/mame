@@ -18,9 +18,9 @@
 
 MACHINE_START( taitosj )
 {
-	taitosj_state *state = machine->driver_data<taitosj_state>();
-	memory_configure_bank(machine, "bank1", 0, 1, machine->region("maincpu")->base() + 0x6000, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("maincpu")->base() + 0x10000, 0);
+	taitosj_state *state = machine.driver_data<taitosj_state>();
+	memory_configure_bank(machine, "bank1", 0, 1, machine.region("maincpu")->base() + 0x6000, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine.region("maincpu")->base() + 0x10000, 0);
 
 	state->save_item(NAME(state->fromz80));
 	state->save_item(NAME(state->toz80));
@@ -37,8 +37,8 @@ MACHINE_START( taitosj )
 
 MACHINE_RESET( taitosj )
 {
-	taitosj_state *state = machine->driver_data<taitosj_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	taitosj_state *state = machine.driver_data<taitosj_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	/* set the default ROM bank (many games only have one bank and */
 	/* never write to the bank selector register) */
 	taitosj_bankswitch_w(space, 0, 0);
@@ -47,7 +47,7 @@ MACHINE_RESET( taitosj )
 	state->zaccept = 1;
 	state->zready = 0;
 	state->busreq = 0;
-	if (machine->device("mcu") != NULL)
+	if (machine.device("mcu") != NULL)
 		cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
 
 	state->spacecr_prot_value = 0;
@@ -56,10 +56,10 @@ MACHINE_RESET( taitosj )
 
 WRITE8_HANDLER( taitosj_bankswitch_w )
 {
-	coin_lockout_global_w(space->machine, ~data & 1);
+	coin_lockout_global_w(space->machine(), ~data & 1);
 
-	if(data & 0x80) memory_set_bank(space->machine, "bank1", 1);
-	else memory_set_bank(space->machine, "bank1", 0);
+	if(data & 0x80) memory_set_bank(space->machine(), "bank1", 1);
+	else memory_set_bank(space->machine(), "bank1", 0);
 }
 
 
@@ -98,7 +98,7 @@ READ8_HANDLER( taitosj_fake_status_r )
 /* timer callback : */
 READ8_HANDLER( taitosj_mcu_data_r )
 {
-	taitosj_state *state = space->machine->driver_data<taitosj_state>();
+	taitosj_state *state = space->machine().driver_data<taitosj_state>();
 	LOG(("%04x: protection read %02x\n",cpu_get_pc(space->cpu),state->toz80));
 	state->zaccept = 1;
 	return state->toz80;
@@ -107,7 +107,7 @@ READ8_HANDLER( taitosj_mcu_data_r )
 /* timer callback : */
 static TIMER_CALLBACK( taitosj_mcu_real_data_w )
 {
-	taitosj_state *state = machine->driver_data<taitosj_state>();
+	taitosj_state *state = machine.driver_data<taitosj_state>();
 	state->zready = 1;
 	cputag_set_input_line(machine, "mcu", 0, ASSERT_LINE);
 	state->fromz80 = param;
@@ -116,16 +116,16 @@ static TIMER_CALLBACK( taitosj_mcu_real_data_w )
 WRITE8_HANDLER( taitosj_mcu_data_w )
 {
 	LOG(("%04x: protection write %02x\n",cpu_get_pc(space->cpu),data));
-	space->machine->scheduler().synchronize(FUNC(taitosj_mcu_real_data_w), data);
+	space->machine().scheduler().synchronize(FUNC(taitosj_mcu_real_data_w), data);
 	/* temporarily boost the interleave to sync things up */
-	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
 READ8_HANDLER( taitosj_mcu_status_r )
 {
-	taitosj_state *state = space->machine->driver_data<taitosj_state>();
+	taitosj_state *state = space->machine().driver_data<taitosj_state>();
 	/* temporarily boost the interleave to sync things up */
-	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 
 	/* bit 0 = the 68705 has read data from the Z80 */
 	/* bit 1 = the 68705 has written data for the Z80 */
@@ -134,14 +134,14 @@ READ8_HANDLER( taitosj_mcu_status_r )
 
 READ8_HANDLER( taitosj_68705_portA_r )
 {
-	taitosj_state *state = space->machine->driver_data<taitosj_state>();
+	taitosj_state *state = space->machine().driver_data<taitosj_state>();
 	LOG(("%04x: 68705 port A read %02x\n",cpu_get_pc(space->cpu),state->portA_in));
 	return state->portA_in;
 }
 
 WRITE8_HANDLER( taitosj_68705_portA_w )
 {
-	taitosj_state *state = space->machine->driver_data<taitosj_state>();
+	taitosj_state *state = space->machine().driver_data<taitosj_state>();
 	LOG(("%04x: 68705 port A write %02x\n",cpu_get_pc(space->cpu),data));
 	state->portA_out = data;
 }
@@ -176,21 +176,21 @@ READ8_HANDLER( taitosj_68705_portB_r )
 /* timer callback : 68705 is going to read data from the Z80 */
 static TIMER_CALLBACK( taitosj_mcu_data_real_r )
 {
-	taitosj_state *state = machine->driver_data<taitosj_state>();
+	taitosj_state *state = machine.driver_data<taitosj_state>();
 	state->zready = 0;
 }
 
 /* timer callback : 68705 is writing data for the Z80 */
 static TIMER_CALLBACK( taitosj_mcu_status_real_w )
 {
-	taitosj_state *state = machine->driver_data<taitosj_state>();
+	taitosj_state *state = machine.driver_data<taitosj_state>();
 	state->toz80 = param;
 	state->zaccept = 0;
 }
 
 WRITE8_HANDLER( taitosj_68705_portB_w )
 {
-	taitosj_state *state = space->machine->driver_data<taitosj_state>();
+	taitosj_state *state = space->machine().driver_data<taitosj_state>();
 	LOG(("%04x: 68705 port B write %02x\n", cpu_get_pc(space->cpu), data));
 
 	if (~data & 0x01)
@@ -200,8 +200,8 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	if (~data & 0x02)
 	{
 		/* 68705 is going to read data from the Z80 */
-		space->machine->scheduler().synchronize(FUNC(taitosj_mcu_data_real_r));
-		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
+		space->machine().scheduler().synchronize(FUNC(taitosj_mcu_data_real_r));
+		cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
 		state->portA_in = state->fromz80;
 		LOG(("%04x: 68705 <- Z80 %02x\n", cpu_get_pc(space->cpu), state->portA_in));
 	}
@@ -214,11 +214,11 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 		LOG(("%04x: 68705 -> Z80 %02x\n", cpu_get_pc(space->cpu), state->portA_out));
 
 		/* 68705 is writing data for the Z80 */
-		space->machine->scheduler().synchronize(FUNC(taitosj_mcu_status_real_w), state->portA_out);
+		space->machine().scheduler().synchronize(FUNC(taitosj_mcu_status_real_w), state->portA_out);
 	}
 	if (~data & 0x10)
 	{
-		address_space *cpu0space = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *cpu0space = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 		LOG(("%04x: 68705 write %02x to address %04x\n",cpu_get_pc(space->cpu), state->portA_out, state->address));
 
 		cpu0space->write_byte(state->address, state->portA_out);
@@ -228,7 +228,7 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	}
 	if (~data & 0x20)
 	{
-		address_space *cpu0space = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *cpu0space = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 		state->portA_in = cpu0space->read_byte(state->address);
 		LOG(("%04x: 68705 read %02x from address %04x\n", cpu_get_pc(space->cpu), state->portA_in, state->address));
 	}
@@ -256,7 +256,7 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 
 READ8_HANDLER( taitosj_68705_portC_r )
 {
-	taitosj_state *state = space->machine->driver_data<taitosj_state>();
+	taitosj_state *state = space->machine().driver_data<taitosj_state>();
 	int res;
 
 	res = (state->zready << 0) | (state->zaccept << 1) | ((state->busreq^1) << 2);
@@ -269,7 +269,7 @@ READ8_HANDLER( taitosj_68705_portC_r )
 
 READ8_HANDLER( spacecr_prot_r )
 {
-	taitosj_state *state = space->machine->driver_data<taitosj_state>();
+	taitosj_state *state = space->machine().driver_data<taitosj_state>();
 	int pc = cpu_get_pc(space->cpu);
 
 	if( pc != 0x368A && pc != 0x36A6 )
@@ -285,7 +285,7 @@ READ8_HANDLER( spacecr_prot_r )
 
 WRITE8_HANDLER( alpine_protection_w )
 {
-	taitosj_state *state = space->machine->driver_data<taitosj_state>();
+	taitosj_state *state = space->machine().driver_data<taitosj_state>();
 	switch (data)
 	{
 	case 0x05:
@@ -310,13 +310,13 @@ WRITE8_HANDLER( alpine_protection_w )
 
 WRITE8_HANDLER( alpinea_bankswitch_w )
 {
-	taitosj_state *state = space->machine->driver_data<taitosj_state>();
+	taitosj_state *state = space->machine().driver_data<taitosj_state>();
     taitosj_bankswitch_w(space, offset, data);
 	state->protection_value = data >> 2;
 }
 
 READ8_HANDLER( alpine_port_2_r )
 {
-	taitosj_state *state = space->machine->driver_data<taitosj_state>();
-	return input_port_read(space->machine, "IN2") | state->protection_value;
+	taitosj_state *state = space->machine().driver_data<taitosj_state>();
+	return input_port_read(space->machine(), "IN2") | state->protection_value;
 }

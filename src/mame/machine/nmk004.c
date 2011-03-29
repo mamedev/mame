@@ -90,12 +90,14 @@ struct effects_control
 
 static struct
 {
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
 	const UINT8 *rom;	// NMK004 data ROM
 	UINT8 from_main;	// command from main CPU
 	UINT8 to_main;		// answer to main CPU
 	int protection_check;
 
-	running_machine *machine;
+	running_machine *m_machine;
 	device_t *ymdevice;
 	okim6295_device *oki1device;
 	okim6295_device *oki2device;
@@ -167,7 +169,7 @@ static void oki_play_sample(int sample_no)
 
 		if (sample != 0)
 		{
-			UINT8 *rom = NMK004_state.machine->region((chip == 0) ? "oki1" : "oki2")->base();
+			UINT8 *rom = NMK004_state.machine().region((chip == 0) ? "oki1" : "oki2")->base();
 			int bank = (byte2 & 0x0c) >> 2;
 			int vol = (byte2 & 0x70) >> 4;
 
@@ -1020,12 +1022,12 @@ static TIMER_CALLBACK( real_nmk004_init )
 
 	memset(&NMK004_state, 0, sizeof(NMK004_state));
 
-	NMK004_state.machine = machine;
-	NMK004_state.ymdevice = machine->device("ymsnd");
-	NMK004_state.oki1device = machine->device<okim6295_device>("oki1");
-	NMK004_state.oki2device = machine->device<okim6295_device>("oki2");
+	NMK004_state.m_machine = &machine;
+	NMK004_state.ymdevice = machine.device("ymsnd");
+	NMK004_state.oki1device = machine.device<okim6295_device>("oki1");
+	NMK004_state.oki2device = machine.device<okim6295_device>("oki2");
 
-	NMK004_state.rom = machine->region("audiocpu")->base();
+	NMK004_state.rom = machine.region("audiocpu")->base();
 
 	ym2203_control_port_w(NMK004_state.ymdevice, 0, 0x2f);
 
@@ -1043,10 +1045,10 @@ static TIMER_CALLBACK( real_nmk004_init )
 	NMK004_state.protection_check = 0;
 }
 
-void NMK004_init(running_machine *machine)
+void NMK004_init(running_machine &machine)
 {
 	/* we have to do this via a timer because we get called before the sound reset */
-	machine->scheduler().synchronize(FUNC(real_nmk004_init));
+	machine.scheduler().synchronize(FUNC(real_nmk004_init));
 }
 
 

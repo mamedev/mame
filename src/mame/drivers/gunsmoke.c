@@ -274,8 +274,8 @@ GFXDECODE_END
 
 static MACHINE_START( gunsmoke )
 {
-	gunsmoke_state *state = machine->driver_data<gunsmoke_state>();
-	UINT8 *rombase = machine->region("maincpu")->base();
+	gunsmoke_state *state = machine.driver_data<gunsmoke_state>();
+	UINT8 *rombase = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &rombase[0x10000], 0x4000);
 
@@ -287,7 +287,7 @@ static MACHINE_START( gunsmoke )
 
 static MACHINE_RESET( gunsmoke )
 {
-	gunsmoke_state *state = machine->driver_data<gunsmoke_state>();
+	gunsmoke_state *state = machine.driver_data<gunsmoke_state>();
 
 	state->chon = 0;
 	state->objon = 0;

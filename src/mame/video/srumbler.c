@@ -18,7 +18,7 @@
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	srumbler_state *state = machine->driver_data<srumbler_state>();
+	srumbler_state *state = machine.driver_data<srumbler_state>();
 	UINT8 attr = state->foregroundram[2*tile_index];
 	SET_TILE_INFO(
 			0,
@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	srumbler_state *state = machine->driver_data<srumbler_state>();
+	srumbler_state *state = machine.driver_data<srumbler_state>();
 	UINT8 attr = state->backgroundram[2*tile_index];
 	SET_TILE_INFO(
 			1,
@@ -49,7 +49,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( srumbler )
 {
-	srumbler_state *state = machine->driver_data<srumbler_state>();
+	srumbler_state *state = machine.driver_data<srumbler_state>();
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,8,8,64,32);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,    16,16,64,64);
 
@@ -69,14 +69,14 @@ VIDEO_START( srumbler )
 
 WRITE8_HANDLER( srumbler_foreground_w )
 {
-	srumbler_state *state = space->machine->driver_data<srumbler_state>();
+	srumbler_state *state = space->machine().driver_data<srumbler_state>();
 	state->foregroundram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset/2);
 }
 
 WRITE8_HANDLER( srumbler_background_w )
 {
-	srumbler_state *state = space->machine->driver_data<srumbler_state>();
+	srumbler_state *state = space->machine().driver_data<srumbler_state>();
 	state->backgroundram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset/2);
 }
@@ -85,19 +85,19 @@ WRITE8_HANDLER( srumbler_background_w )
 WRITE8_HANDLER( srumbler_4009_w )
 {
 	/* bit 0 flips screen */
-	flip_screen_set(space->machine, data & 1);
+	flip_screen_set(space->machine(), data & 1);
 
 	/* bits 4-5 used during attract mode, unknown */
 
 	/* bits 6-7 coin counters */
-	coin_counter_w(space->machine, 0,data & 0x40);
-	coin_counter_w(space->machine, 1,data & 0x80);
+	coin_counter_w(space->machine(), 0,data & 0x40);
+	coin_counter_w(space->machine(), 1,data & 0x80);
 }
 
 
 WRITE8_HANDLER( srumbler_scroll_w )
 {
-	srumbler_state *state = space->machine->driver_data<srumbler_state>();
+	srumbler_state *state = space->machine().driver_data<srumbler_state>();
 
 	state->scroll[offset] = data;
 
@@ -113,13 +113,13 @@ WRITE8_HANDLER( srumbler_scroll_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
+	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
 	int offs;
 
 	/* Draw the sprites. */
-	for (offs = machine->generic.spriteram_size-4; offs>=0;offs -= 4)
+	for (offs = machine.generic.spriteram_size-4; offs>=0;offs -= 4)
 	{
 		/* SPRITES
         =====
@@ -151,7 +151,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 				code,
 				colour,
 				flip_screen_get(machine),flipy,
@@ -162,9 +162,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( srumbler )
 {
-	srumbler_state *state = screen->machine->driver_data<srumbler_state>();
+	srumbler_state *state = screen->machine().driver_data<srumbler_state>();
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER1,0);
-	draw_sprites(screen->machine, bitmap,cliprect);
+	draw_sprites(screen->machine(), bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
 	return 0;
@@ -172,7 +172,7 @@ SCREEN_UPDATE( srumbler )
 
 SCREEN_EOF( srumbler )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	buffer_spriteram_w(space,0,0);
 }

@@ -242,8 +242,8 @@ static VIDEO_START( coinmvga )
 
 static SCREEN_UPDATE( coinmvga )
 {
-	coinmvga_state *state = screen->machine->driver_data<coinmvga_state>();
-	const gfx_element *gfx = screen->machine->gfx[0];
+	coinmvga_state *state = screen->machine().driver_data<coinmvga_state>();
+	const gfx_element *gfx = screen->machine().gfx[0];
 	int count = 0x04000/2;
 
 	int y,x;
@@ -283,7 +283,7 @@ static PALETTE_INIT( coinmvga )
 
 static WRITE16_HANDLER( ramdac_bg_w )
 {
-	coinmvga_state *state = space->machine->driver_data<coinmvga_state>();
+	coinmvga_state *state = space->machine().driver_data<coinmvga_state>();
 	if(ACCESSING_BITS_8_15)
 	{
 		state->bgpal.offs = data >> 8;
@@ -303,7 +303,7 @@ static WRITE16_HANDLER( ramdac_bg_w )
 				break;
 			case 2:
 				state->bgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(space->machine, state->bgpal.offs, MAKE_RGB(state->bgpal.r, state->bgpal.g, state->bgpal.b));
+				palette_set_color(space->machine(), state->bgpal.offs, MAKE_RGB(state->bgpal.r, state->bgpal.g, state->bgpal.b));
 				state->bgpal.offs_internal = 0;
 				state->bgpal.offs++;
 				break;
@@ -314,7 +314,7 @@ static WRITE16_HANDLER( ramdac_bg_w )
 
 static WRITE16_HANDLER( ramdac_fg_w )
 {
-	coinmvga_state *state = space->machine->driver_data<coinmvga_state>();
+	coinmvga_state *state = space->machine().driver_data<coinmvga_state>();
 	if(ACCESSING_BITS_8_15)
 	{
 		state->fgpal.offs = data >> 8;
@@ -334,7 +334,7 @@ static WRITE16_HANDLER( ramdac_fg_w )
 				break;
 			case 2:
 				state->fgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(space->machine, 0x100+state->fgpal.offs, MAKE_RGB(state->fgpal.r, state->fgpal.g, state->fgpal.b));
+				palette_set_color(space->machine(), 0x100+state->fgpal.offs, MAKE_RGB(state->fgpal.r, state->fgpal.g, state->fgpal.b));
 				state->fgpal.offs_internal = 0;
 				state->fgpal.offs++;
 				break;
@@ -345,7 +345,7 @@ static WRITE16_HANDLER( ramdac_fg_w )
 /*
 static READ16_HANDLER( test_r )
 {
-    return space->machine->rand();
+    return space->machine().rand();
 }*/
 
 /*************************
@@ -870,7 +870,7 @@ ROM_END
 static DRIVER_INIT( colorama )
 {
 	UINT16 *ROM;
-	ROM = (UINT16 *)machine->region("maincpu")->base();
+	ROM = (UINT16 *)machine.region("maincpu")->base();
 
 	// rte in non-irq routines? wtf? patch them to rts...
 	ROM[0x02B476/2] = 0x5470;
@@ -887,7 +887,7 @@ static DRIVER_INIT( colorama )
 static DRIVER_INIT( cmrltv75 )
 {
 	UINT16 *ROM;
-	ROM = (UINT16 *)machine->region("maincpu")->base();
+	ROM = (UINT16 *)machine.region("maincpu")->base();
 
 	// rte in non-irq routines? wtf? patch them to rts...
 	ROM[0x056fd6/2] = 0x5470;

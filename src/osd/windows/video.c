@@ -94,9 +94,9 @@ static void init_monitors(void);
 static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
 static win_monitor_info *pick_monitor(windows_options &options, int index);
 
-static void check_osd_inputs(running_machine *machine);
+static void check_osd_inputs(running_machine &machine);
 
-static void extract_video_config(running_machine *machine);
+static void extract_video_config(running_machine &machine);
 static float get_aspect(const char *defdata, const char *data, int report_error);
 static void get_resolution(const char *defdata, const char *data, win_window_config *config, int report_error);
 
@@ -106,12 +106,12 @@ static void get_resolution(const char *defdata, const char *data, win_window_con
 //  winvideo_init
 //============================================================
 
-void winvideo_init(running_machine *machine)
+void winvideo_init(running_machine &machine)
 {
 	int index;
 
 	// ensure we get called on the way out
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, winvideo_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, winvideo_exit);
 
 	// extract data from the options
 	extract_video_config(machine);
@@ -123,15 +123,15 @@ void winvideo_init(running_machine *machine)
 	winwindow_init(machine);
 
 	// create the windows
-	windows_options &options = downcast<windows_options &>(machine->options());
+	windows_options &options = downcast<windows_options &>(machine.options());
 	for (index = 0; index < video_config.numscreens; index++)
 		winwindow_video_window_create(machine, index, pick_monitor(options, index), &video_config.window[index]);
 	if (video_config.mode != VIDEO_MODE_NONE)
 		SetForegroundWindow(win_window_list->hwnd);
 
 	// possibly create the debug window, but don't show it yet
-	if (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
-		debugwin_init_windows(*machine);
+	if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
+		debugwin_init_windows(machine);
 }
 
 
@@ -220,9 +220,9 @@ void windows_osd_interface::update(bool skip_redraw)
 			winwindow_video_window_update(window);
 
 	// poll the joystick values here
-	winwindow_process_events(&machine(), TRUE);
-	wininput_poll(&machine());
-	check_osd_inputs(&machine());
+	winwindow_process_events(machine(), TRUE);
+	wininput_poll(machine());
+	check_osd_inputs(machine());
 }
 
 
@@ -359,7 +359,7 @@ finishit:
 //  check_osd_inputs
 //============================================================
 
-static void check_osd_inputs(running_machine *machine)
+static void check_osd_inputs(running_machine &machine)
 {
 	// check for toggling fullscreen mode
 	if (ui_input_pressed(machine, IPT_OSD_1))
@@ -372,9 +372,9 @@ static void check_osd_inputs(running_machine *machine)
 //  extract_video_config
 //============================================================
 
-static void extract_video_config(running_machine *machine)
+static void extract_video_config(running_machine &machine)
 {
-	windows_options &options = downcast<windows_options &>(machine->options());
+	windows_options &options = downcast<windows_options &>(machine.options());
 	const char *stemp;
 
 	// global options: extract the data
@@ -384,7 +384,7 @@ static void extract_video_config(running_machine *machine)
 	video_config.numscreens    = options.numscreens();
 
 	// if we are in debug mode, never go full screen
-	if (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
+	if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		video_config.windowed = TRUE;
 
 	// per-window options: extract the data

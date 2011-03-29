@@ -108,7 +108,7 @@ extern UINT16 *namcos2_sprite_ram;
 WRITE16_HANDLER( namcos2_sprite_ram_w );
 READ16_HANDLER( namcos2_sprite_ram_r );
 
-int namcos2_GetPosIrqScanline( running_machine *machine );
+int namcos2_GetPosIrqScanline( running_machine &machine );
 
 WRITE16_HANDLER( namcos2_gfx_ctrl_w );
 READ16_HANDLER( namcos2_gfx_ctrl_r );
@@ -136,7 +136,7 @@ extern UINT16 *namcos2_68k_roz_ram;
 
 /*----------- defined in machine/namcos2.c -----------*/
 
-extern void (*namcos2_kickstart)(running_machine *machine, int internal);
+extern void (*namcos2_kickstart)(running_machine &machine, int internal);
 extern int namcos2_gametype;
 
 MACHINE_START( namcos2 );
@@ -198,7 +198,7 @@ WRITE16_HANDLER( namcos2_68k_gpu_C148_w );
 READ16_HANDLER( namcos2_68k_gpu_C148_r );
 INTERRUPT_GEN( namcos2_68k_gpu_vblank );
 
-void namcos2_adjust_posirq_timer( running_machine *machine, int scanline );
+void namcos2_adjust_posirq_timer( running_machine &machine, int scanline );
 
 /**************************************************************/
 /* MASTER CPU RAM MEMORY                                      */

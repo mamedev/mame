@@ -75,14 +75,14 @@ static SCREEN_UPDATE( midas );
 
 static TILE_GET_INFO( get_tile_info )
 {
-	midas_state *state = machine->driver_data<midas_state>();
+	midas_state *state = machine.driver_data<midas_state>();
 	UINT16 code = state->gfxram[ tile_index + 0x7000 ];
 	SET_TILE_INFO(1, code & 0xfff, (code >> 12) & 0xf, TILE_FLIPXY( 0 ));
 }
 
 static VIDEO_START( midas )
 {
-	midas_state *state = machine->driver_data<midas_state>();
+	midas_state *state = machine.driver_data<midas_state>();
 	state->gfxram = auto_alloc_array(machine, UINT16, 0x20000/2);
 
 	state->tmap = tilemap_create(	machine, get_tile_info, tilemap_scan_cols,
@@ -91,9 +91,9 @@ static VIDEO_START( midas )
 	tilemap_set_transparent_pen(state->tmap, 0);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	midas_state *state = machine->driver_data<midas_state>();
+	midas_state *state = machine.driver_data<midas_state>();
 	UINT16 *s		=	state->gfxram + 0x8000;
 	UINT16 *codes	=	state->gfxram;
 
@@ -165,7 +165,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			UINT16 code		=	codes[y*2];
 			UINT16 attr		=	codes[y*2+1];
 
-			drawgfxzoom_transpen(	bitmap,	cliprect, machine->gfx[0],
+			drawgfxzoom_transpen(	bitmap,	cliprect, machine.gfx[0],
 							code,
 							attr >> 8,
 							attr & 1, attr & 2,
@@ -177,22 +177,22 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static SCREEN_UPDATE( midas )
 {
-	midas_state *state = screen->machine->driver_data<midas_state>();
+	midas_state *state = screen->machine().driver_data<midas_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if ( input_code_pressed(screen->machine, KEYCODE_Z) )
+	if ( input_code_pressed(screen->machine(), KEYCODE_Z) )
 	{
 		int msk = 0;
-		if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1 << 0;	// for state->tmap
-		if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 1 << 1;	// for sprites
+		if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1 << 0;	// for state->tmap
+		if (input_code_pressed(screen->machine(), KEYCODE_A))	msk |= 1 << 1;	// for sprites
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
 	bitmap_fill(bitmap,cliprect,4095);
 
-	if (layers_ctrl & 2)	draw_sprites(screen->machine, bitmap,cliprect);
+	if (layers_ctrl & 2)	draw_sprites(screen->machine(), bitmap,cliprect);
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, state->tmap, 0, 0);
 
 	return 0;
@@ -220,7 +220,7 @@ static READ16_HANDLER( ret_ffff )
 
 static WRITE16_HANDLER( midas_gfxregs_w )
 {
-	midas_state *state = space->machine->driver_data<midas_state>();
+	midas_state *state = space->machine().driver_data<midas_state>();
 	COMBINE_DATA( state->gfxregs + offset );
 
 	switch( offset )
@@ -246,7 +246,7 @@ static WRITE16_HANDLER( livequiz_coin_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0, data & 0x0001);
+		coin_counter_w(space->machine(), 0, data & 0x0001);
 	}
 #ifdef MAME_DEBUG
 //  popmessage("coin %04X", data);
@@ -291,18 +291,18 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( hammer_sensor_r )
 {
-	if (input_port_read(space->machine, "HAMMER") & 0x80)
+	if (input_port_read(space->machine(), "HAMMER") & 0x80)
 		return 0xffff;
 
-	return (input_port_read(space->machine, "SENSORY") << 8) | input_port_read(space->machine, "SENSORX");
+	return (input_port_read(space->machine(), "SENSORY") << 8) | input_port_read(space->machine(), "SENSORX");
 }
 
 static WRITE16_HANDLER( hammer_coin_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0, data & 0x0001);
-		coin_counter_w(space->machine, 1, data & 0x0002);
+		coin_counter_w(space->machine(), 0, data & 0x0001);
+		coin_counter_w(space->machine(), 1, data & 0x0002);
 	}
 #ifdef MAME_DEBUG
 //  popmessage("coin %04X", data);
@@ -313,9 +313,9 @@ static WRITE16_HANDLER( hammer_motor_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		ticket_dispenser_w(space->machine->device("prize1"), 0, (data & 0x0001) << 7);
-		ticket_dispenser_w(space->machine->device("prize2"), 0, (data & 0x0002) << 6);
-		ticket_dispenser_w(space->machine->device("ticket"), 0, (data & 0x0010) << 3);
+		ticket_dispenser_w(space->machine().device("prize1"), 0, (data & 0x0001) << 7);
+		ticket_dispenser_w(space->machine().device("prize2"), 0, (data & 0x0002) << 6);
+		ticket_dispenser_w(space->machine().device("ticket"), 0, (data & 0x0010) << 3);
 		// data & 0x0080 ?
 	}
 #ifdef MAME_DEBUG
@@ -864,7 +864,7 @@ ROM_END
 
 static DRIVER_INIT( livequiz )
 {
-	UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
 
 	// PROTECTION CHECKS
 	rom[0x13345a/2]	=	0x4e75;

@@ -34,7 +34,7 @@ public:
 
 static TILE_GET_INFO( get_ltcasino_tile_info )
 {
-	ltcasino_state *state = machine->driver_data<ltcasino_state>();
+	ltcasino_state *state = machine.driver_data<ltcasino_state>();
 	int tileno, colour;
 
 	tileno = state->tile_num_ram[tile_index];
@@ -47,21 +47,21 @@ static TILE_GET_INFO( get_ltcasino_tile_info )
 
 static VIDEO_START(ltcasino)
 {
-	ltcasino_state *state = machine->driver_data<ltcasino_state>();
+	ltcasino_state *state = machine.driver_data<ltcasino_state>();
 	state->tilemap = tilemap_create(machine, get_ltcasino_tile_info,tilemap_scan_rows,8, 8,64,32);
 }
 
 
 static WRITE8_HANDLER( ltcasino_tile_num_w )
 {
-	ltcasino_state *state = space->machine->driver_data<ltcasino_state>();
+	ltcasino_state *state = space->machine().driver_data<ltcasino_state>();
 	state->tile_num_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap,offset);
 }
 
 static WRITE8_HANDLER( ltcasino_tile_atr_w )
 {
-	ltcasino_state *state = space->machine->driver_data<ltcasino_state>();
+	ltcasino_state *state = space->machine().driver_data<ltcasino_state>();
 	state->tile_atr_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap,offset);
 }
@@ -634,7 +634,7 @@ GFXDECODE_END
 
 static SCREEN_UPDATE(ltcasino)
 {
-	ltcasino_state *state = screen->machine->driver_data<ltcasino_state>();
+	ltcasino_state *state = screen->machine().driver_data<ltcasino_state>();
 	tilemap_draw(bitmap,cliprect,state->tilemap,0,0);
 	return 0;
 }
@@ -711,7 +711,7 @@ ROM_END
 static DRIVER_INIT(mv4in1)
 {
 	int i;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	for(i=0;i<0x10000;i++)
 		rom[i]=BITSWAP8(rom[i],7,6,5,4,3,1,2,0);
 }

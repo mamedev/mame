@@ -246,10 +246,10 @@ static const mc6845_interface mc6845_intf =
 * Memory Copy *
 ***************/
 
-static void peplus_load_superdata(running_machine *machine, const char *bank_name)
+static void peplus_load_superdata(running_machine &machine, const char *bank_name)
 {
-	peplus_state *state = machine->driver_data<peplus_state>();
-    UINT8 *super_data = machine->region(bank_name)->base();
+	peplus_state *state = machine.driver_data<peplus_state>();
+    UINT8 *super_data = machine.region(bank_name)->base();
 
     /* Distribute Superboard Data */
     memcpy(state->s3000_ram, &super_data[0x3000], 0x1000);
@@ -269,7 +269,7 @@ static WRITE8_HANDLER( peplus_bgcolor_w )
 {
 	int i;
 
-	for (i = 0; i < space->machine->total_colors(); i++)
+	for (i = 0; i < space->machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -291,7 +291,7 @@ static WRITE8_HANDLER( peplus_bgcolor_w )
 		bit2 = 0;
 		b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
-		palette_set_color(space->machine, (15 + (i*16)), MAKE_RGB(r, g, b));
+		palette_set_color(space->machine(), (15 + (i*16)), MAKE_RGB(r, g, b));
 	}
 }
 
@@ -300,7 +300,7 @@ static WRITE8_HANDLER( peplus_bgcolor_w )
 
 static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr)
 {
-	peplus_state *state = device->machine->driver_data<peplus_state>();
+	peplus_state *state = device->machine().driver_data<peplus_state>();
 	state->vid_address = address;
 }
 
@@ -316,26 +316,26 @@ static TIMER_CALLBACK(assert_lp_cb)
 
 static void handle_lightpen( device_t *device )
 {
-    int x_val = input_port_read_safe(device->machine, "TOUCH_X",0x00);
-    int y_val = input_port_read_safe(device->machine, "TOUCH_Y",0x00);
-    const rectangle &vis_area = device->machine->primary_screen->visible_area();
+    int x_val = input_port_read_safe(device->machine(), "TOUCH_X",0x00);
+    int y_val = input_port_read_safe(device->machine(), "TOUCH_Y",0x00);
+    const rectangle &vis_area = device->machine().primary_screen->visible_area();
     int xt, yt;
 
     xt = x_val * (vis_area.max_x - vis_area.min_x) / 1024 + vis_area.min_x;
     yt = y_val * (vis_area.max_y - vis_area.min_y) / 1024 + vis_area.min_y;
 
-     device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_pos(yt, xt), FUNC(assert_lp_cb), 0, device);
+     device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(yt, xt), FUNC(assert_lp_cb), 0, device);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
 	handle_lightpen(device);
 }
 
 static WRITE8_DEVICE_HANDLER( peplus_crtc_display_w )
 {
-	peplus_state *state = device->machine->driver_data<peplus_state>();
+	peplus_state *state = device->machine().driver_data<peplus_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[state->vid_address] = data;
 	state->palette_ram[state->vid_address] = state->io_port[1];
@@ -349,7 +349,7 @@ static WRITE8_DEVICE_HANDLER( peplus_crtc_display_w )
 
 static WRITE8_HANDLER( peplus_io_w )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	state->io_port[offset] = data;
 }
 
@@ -360,14 +360,14 @@ static WRITE8_HANDLER( peplus_duart_w )
 
 static WRITE8_HANDLER( peplus_cmos_w )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	char bank_name[6];
 
 	/* Test for Wingboard PAL Trigger Condition */
 	if (offset == 0x1fff && state->wingboard && data < 5)
 	{
 		sprintf(bank_name, "user%d", data + 1);
-		peplus_load_superdata(space->machine, bank_name);
+		peplus_load_superdata(space->machine(), bank_name);
 	}
 
 	state->cmos_ram[offset] = data;
@@ -375,43 +375,43 @@ static WRITE8_HANDLER( peplus_cmos_w )
 
 static WRITE8_HANDLER( peplus_s3000_w )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	state->s3000_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_s5000_w )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	state->s5000_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_s7000_w )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	state->s7000_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_sb000_w )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	state->sb000_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_sd000_w )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	state->sd000_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_sf000_w )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	state->sf000_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_output_bank_a_w )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	output_set_value("pe_bnka0",(data >> 0) & 1); /* Coin Lockout */
 	output_set_value("pe_bnka1",(data >> 1) & 1); /* Diverter */
 	output_set_value("pe_bnka2",(data >> 2) & 1); /* Bell */
@@ -452,7 +452,7 @@ static WRITE8_HANDLER( peplus_output_bank_c_w )
 
 static WRITE8_DEVICE_HANDLER(i2c_nvram_w)
 {
-	peplus_state *state = device->machine->driver_data<peplus_state>();
+	peplus_state *state = device->machine().driver_data<peplus_state>();
 	i2cmem_scl_write(device,BIT(data, 2));
 	state->sda_dir = BIT(data, 1);
 	i2cmem_sda_write(device,BIT(data, 0));
@@ -465,7 +465,7 @@ static WRITE8_DEVICE_HANDLER(i2c_nvram_w)
 
 static READ8_HANDLER( peplus_io_r )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
     return state->io_port[offset];
 }
 
@@ -477,50 +477,50 @@ static READ8_HANDLER( peplus_duart_r )
 
 static READ8_HANDLER( peplus_cmos_r )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	return state->cmos_ram[offset];
 }
 
 static READ8_HANDLER( peplus_s3000_r )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	return state->s3000_ram[offset];
 }
 
 static READ8_HANDLER( peplus_s5000_r )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	return state->s5000_ram[offset];
 }
 
 static READ8_HANDLER( peplus_s7000_r )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	return state->s7000_ram[offset];
 }
 
 static READ8_HANDLER( peplus_sb000_r )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	return state->sb000_ram[offset];
 }
 
 static READ8_HANDLER( peplus_sd000_r )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	return state->sd000_ram[offset];
 }
 
 static READ8_HANDLER( peplus_sf000_r )
 {
-	peplus_state *state = space->machine->driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	return state->sf000_ram[offset];
 }
 
 /* Last Color in Every Palette is bgcolor */
 static READ8_HANDLER( peplus_bgcolor_r )
 {
-	return palette_get_color(space->machine, 15); // Return bgcolor from First Palette
+	return palette_get_color(space->machine(), 15); // Return bgcolor from First Palette
 }
 
 static READ8_HANDLER( peplus_dropdoor_r )
@@ -535,7 +535,7 @@ static READ8_HANDLER( peplus_watchdog_r )
 
 static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 {
-	peplus_state *state = device->machine->driver_data<peplus_state>();
+	peplus_state *state = device->machine().driver_data<peplus_state>();
 /*
         Bit 0 = COIN DETECTOR A
         Bit 1 = COIN DETECTOR B
@@ -549,7 +549,7 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 	UINT8 bank_a = 0x50; // Turn Off Low Battery and Hopper Full Statuses
 	UINT8 coin_optics = 0x00;
     UINT8 coin_out = 0x00;
-	UINT64 curr_cycles = device->machine->firstcpu->total_cycles();
+	UINT64 curr_cycles = device->machine().firstcpu->total_cycles();
 	UINT16 door_wait = 500;
 
 	UINT8 sda = 0;
@@ -558,16 +558,16 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 		sda = i2cmem_sda_read(device);
 	}
 
-	if ((input_port_read_safe(device->machine, "SENSOR",0x00) & 0x01) == 0x01 && state->coin_state == 0) {
+	if ((input_port_read_safe(device->machine(), "SENSOR",0x00) & 0x01) == 0x01 && state->coin_state == 0) {
 		state->coin_state = 1; // Start Coin Cycle
-		state->last_cycles = device->machine->firstcpu->total_cycles();
+		state->last_cycles = device->machine().firstcpu->total_cycles();
 	} else {
 		/* Process Next Coin Optic State */
 		if (curr_cycles - state->last_cycles > 600000/6 && state->coin_state != 0) {
 			state->coin_state++;
 			if (state->coin_state > 5)
 				state->coin_state = 0;
-			state->last_cycles = device->machine->firstcpu->total_cycles();
+			state->last_cycles = device->machine().firstcpu->total_cycles();
 		}
 	}
 
@@ -597,12 +597,12 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 		door_wait = 12345;
 
 	if (curr_cycles - state->last_door > door_wait) {
-		if ((input_port_read_safe(device->machine, "DOOR",0xff) & 0x01) == 0x01) {
+		if ((input_port_read_safe(device->machine(), "DOOR",0xff) & 0x01) == 0x01) {
 			state->door_open = (!state->door_open & 0x01);
 		} else {
 			state->door_open = 1;
 		}
-		state->last_door = device->machine->firstcpu->total_cycles();
+		state->last_door = device->machine().firstcpu->total_cycles();
 	}
 
 	if (curr_cycles - state->last_coin_out > 600000/12 && state->coin_out_state != 0) { // Guessing with 600000
@@ -612,7 +612,7 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
             state->coin_out_state = 3; // Coin-Out On
         }
 
-		state->last_coin_out = device->machine->firstcpu->total_cycles();
+		state->last_coin_out = device->machine().firstcpu->total_cycles();
 	}
 
     switch (state->coin_out_state)
@@ -643,7 +643,7 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	peplus_state *state = machine->driver_data<peplus_state>();
+	peplus_state *state = machine.driver_data<peplus_state>();
 	UINT8 *videoram = state->videoram;
 	int pr = state->palette_ram[tile_index];
 	int pr2 = state->palette_ram2[tile_index];
@@ -664,7 +664,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( peplus )
 {
-	peplus_state *state = machine->driver_data<peplus_state>();
+	peplus_state *state = machine.driver_data<peplus_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
 	state->palette_ram = auto_alloc_array(machine, UINT8, 0x3000);
 	memset(state->palette_ram, 0, 0x3000);
@@ -674,7 +674,7 @@ static VIDEO_START( peplus )
 
 static SCREEN_UPDATE( peplus )
 {
-	peplus_state *state = screen->machine->driver_data<peplus_state>();
+	peplus_state *state = screen->machine().driver_data<peplus_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	return 0;
@@ -690,7 +690,7 @@ static PALETTE_INIT( peplus )
 */
 	int i;
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -799,7 +799,7 @@ ADDRESS_MAP_END
 static CUSTOM_INPUT( peplus_input_r )
 {
 	UINT8 inp_ret = 0x00;
-	UINT8 inp_read = input_port_read(field->port->machine, (const char *)param);
+	UINT8 inp_read = input_port_read(field->port->machine(), (const char *)param);
 
 	if (inp_read & 0x01) inp_ret = 0x01;
 	if (inp_read & 0x02) inp_ret = 0x02;
@@ -998,7 +998,7 @@ static MACHINE_RESET( peplus )
 {
 	/* AutoHold Feature Currently Disabled */
 #if 0
-	peplus_state *state = machine->driver_data<peplus_state>();
+	peplus_state *state = machine.driver_data<peplus_state>();
 
 	// pepp0158
 	state->program_ram[0xa19f] = 0x22; // RET - Disable Memory Test
@@ -1064,9 +1064,9 @@ MACHINE_CONFIG_END
 *****************/
 
 /* Normal board */
-static void peplus_init(running_machine *machine)
+static void peplus_init(running_machine &machine)
 {
-	peplus_state *state = machine->driver_data<peplus_state>();
+	peplus_state *state = machine.driver_data<peplus_state>();
 	/* default : no address to patch in program RAM to enable autohold feature */
 	state->autohold_addr = 0;
 }
@@ -1079,7 +1079,7 @@ static void peplus_init(running_machine *machine)
 /* Normal board */
 static DRIVER_INIT( peplus )
 {
-	peplus_state *state = machine->driver_data<peplus_state>();
+	peplus_state *state = machine.driver_data<peplus_state>();
 	state->wingboard = FALSE;
 	state->jumper_e16_e17 = FALSE;
 	peplus_init(machine);
@@ -1088,7 +1088,7 @@ static DRIVER_INIT( peplus )
 /* Superboard */
 static DRIVER_INIT( peplussb )
 {
-	peplus_state *state = machine->driver_data<peplus_state>();
+	peplus_state *state = machine.driver_data<peplus_state>();
 	state->wingboard = FALSE;
 	state->jumper_e16_e17 = FALSE;
 	peplus_load_superdata(machine, "user1");
@@ -1099,7 +1099,7 @@ static DRIVER_INIT( peplussb )
 /* Superboard with Attached Wingboard */
 static DRIVER_INIT( peplussbw )
 {
-	peplus_state *state = machine->driver_data<peplus_state>();
+	peplus_state *state = machine.driver_data<peplus_state>();
 	state->wingboard = TRUE;
 	state->jumper_e16_e17 = TRUE;
 	peplus_load_superdata(machine, "user1");

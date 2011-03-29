@@ -82,8 +82,8 @@ MACHINE_RESET( twincobr );
 MACHINE_RESET( fsharkbt );
 MACHINE_RESET( wardner );
 
-extern void twincobr_driver_savestate(running_machine *machine);
-extern void wardner_driver_savestate(running_machine *machine);
+extern void twincobr_driver_savestate(running_machine &machine);
+extern void wardner_driver_savestate(running_machine &machine);
 
 
 
@@ -91,8 +91,8 @@ extern void wardner_driver_savestate(running_machine *machine);
 /*----------- defined in video/twincobr.c -----------*/
 extern const mc6845_interface twincobr_mc6845_intf;
 
-extern void twincobr_flipscreen(running_machine *machine, int flip);
-extern void twincobr_display(running_machine *machine, int enable);
+extern void twincobr_flipscreen(running_machine &machine, int flip);
+extern void twincobr_display(running_machine &machine, int enable);
 
 READ16_HANDLER(  twincobr_txram_r );
 READ16_HANDLER(  twincobr_bgram_r );

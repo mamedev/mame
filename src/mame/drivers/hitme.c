@@ -30,7 +30,7 @@
 
 static TILE_GET_INFO( get_hitme_tile_info )
 {
-	hitme_state *state = machine->driver_data<hitme_state>();
+	hitme_state *state = machine.driver_data<hitme_state>();
 
 	/* the code is the low 6 bits */
 	UINT8 code = state->videoram[tile_index] & 0x3f;
@@ -40,7 +40,7 @@ static TILE_GET_INFO( get_hitme_tile_info )
 
 static WRITE8_HANDLER( hitme_vidram_w )
 {
-	hitme_state *state = space->machine->driver_data<hitme_state>();
+	hitme_state *state = space->machine().driver_data<hitme_state>();
 
 	/* mark this tile dirty */
 	state->videoram[offset] = data;
@@ -57,23 +57,23 @@ static WRITE8_HANDLER( hitme_vidram_w )
 
 static VIDEO_START( hitme )
 {
-	hitme_state *state = machine->driver_data<hitme_state>();
+	hitme_state *state = machine.driver_data<hitme_state>();
 	state->tilemap = tilemap_create(machine, get_hitme_tile_info, tilemap_scan_rows, 8, 10, 40, 19);
 }
 
 
 static VIDEO_START( barricad )
 {
-	hitme_state *state = machine->driver_data<hitme_state>();
+	hitme_state *state = machine.driver_data<hitme_state>();
 	state->tilemap = tilemap_create(machine, get_hitme_tile_info, tilemap_scan_rows, 8, 8, 32, 24);
 }
 
 
 static SCREEN_UPDATE( hitme )
 {
-	hitme_state *state = screen->machine->driver_data<hitme_state>();
+	hitme_state *state = screen->machine().driver_data<hitme_state>();
 	/* the card width resistor comes from an input port, scaled to the range 0-25 kOhms */
-	double width_resist = input_port_read(screen->machine, "WIDTH") * 25000 / 100;
+	double width_resist = input_port_read(screen->machine(), "WIDTH") * 25000 / 100;
 	/* this triggers a oneshot for the following length of time */
 	double width_duration = 0.45 * 1000e-12 * width_resist;
 	/* the dot clock runs at the standard horizontal frequency * 320+16 clocks per scanline */
@@ -119,7 +119,7 @@ static SCREEN_UPDATE( hitme )
 
 static SCREEN_UPDATE( barricad )
 {
-	hitme_state *state = screen->machine->driver_data<hitme_state>();
+	hitme_state *state = screen->machine().driver_data<hitme_state>();
 	tilemap_draw(bitmap, cliprect, state->tilemap, 0, 0);
 	return 0;
 }
@@ -132,22 +132,22 @@ static SCREEN_UPDATE( barricad )
  *
  *************************************/
 
-static UINT8 read_port_and_t0( running_machine *machine, int port )
+static UINT8 read_port_and_t0( running_machine &machine, int port )
 {
-	hitme_state *state = machine->driver_data<hitme_state>();
+	hitme_state *state = machine.driver_data<hitme_state>();
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	UINT8 val = input_port_read(machine, portnames[port]);
-	if (machine->time() > state->timeout_time)
+	if (machine.time() > state->timeout_time)
 		val ^= 0x80;
 	return val;
 }
 
 
-static UINT8 read_port_and_t0_and_hblank( running_machine *machine, int port )
+static UINT8 read_port_and_t0_and_hblank( running_machine &machine, int port )
 {
 	UINT8 val = read_port_and_t0(machine, port);
-	if (machine->primary_screen->hpos() < (machine->primary_screen->width() * 9 / 10))
+	if (machine.primary_screen->hpos() < (machine.primary_screen->width() * 9 / 10))
 		val ^= 0x04;
 	return val;
 }
@@ -155,25 +155,25 @@ static UINT8 read_port_and_t0_and_hblank( running_machine *machine, int port )
 
 static READ8_HANDLER( hitme_port_0_r )
 {
-	return read_port_and_t0_and_hblank(space->machine, 0);
+	return read_port_and_t0_and_hblank(space->machine(), 0);
 }
 
 
 static READ8_HANDLER( hitme_port_1_r )
 {
-	return read_port_and_t0(space->machine, 1);
+	return read_port_and_t0(space->machine(), 1);
 }
 
 
 static READ8_HANDLER( hitme_port_2_r )
 {
-	return read_port_and_t0_and_hblank(space->machine, 2);
+	return read_port_and_t0_and_hblank(space->machine(), 2);
 }
 
 
 static READ8_HANDLER( hitme_port_3_r )
 {
-	return read_port_and_t0(space->machine, 3);
+	return read_port_and_t0(space->machine(), 3);
 }
 
 
@@ -192,11 +192,11 @@ static WRITE8_DEVICE_HANDLER( output_port_0_w )
         In fact, it is very important that our timing calculation timeout AFTER the sound
         system's equivalent computation, or else we will hang notes.
     */
-	hitme_state *state = device->machine->driver_data<hitme_state>();
-	UINT8 raw_game_speed = input_port_read(device->machine, "R3");
+	hitme_state *state = device->machine().driver_data<hitme_state>();
+	UINT8 raw_game_speed = input_port_read(device->machine(), "R3");
 	double resistance = raw_game_speed * 25000 / 100;
 	attotime duration = attotime(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data + 1));
-	state->timeout_time = device->machine->time() + duration;
+	state->timeout_time = device->machine().time() + duration;
 
 	discrete_sound_w(device, HITME_DOWNCOUNT_VAL, data);
 	discrete_sound_w(device, HITME_OUT0, 1);
@@ -311,7 +311,7 @@ static MACHINE_START( hitme )
 
 static MACHINE_RESET( hitme )
 {
-	hitme_state *state = machine->driver_data<hitme_state>();
+	hitme_state *state = machine.driver_data<hitme_state>();
 
 	state->timeout_time = attotime::zero;
 }

@@ -21,7 +21,7 @@ static KONAMI_SETLINES_CALLBACK( gbusters_banking );
 
 static INTERRUPT_GEN( gbusters_interrupt )
 {
-	gbusters_state *state = device->machine->driver_data<gbusters_state>();
+	gbusters_state *state = device->machine().driver_data<gbusters_state>();
 
 	if (k052109_is_irq_enabled(state->k052109))
 		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
@@ -29,17 +29,17 @@ static INTERRUPT_GEN( gbusters_interrupt )
 
 static READ8_HANDLER( bankedram_r )
 {
-	gbusters_state *state = space->machine->driver_data<gbusters_state>();
+	gbusters_state *state = space->machine().driver_data<gbusters_state>();
 
 	if (state->palette_selected)
-		return space->machine->generic.paletteram.u8[offset];
+		return space->machine().generic.paletteram.u8[offset];
 	else
 		return state->ram[offset];
 }
 
 static WRITE8_HANDLER( bankedram_w )
 {
-	gbusters_state *state = space->machine->driver_data<gbusters_state>();
+	gbusters_state *state = space->machine().driver_data<gbusters_state>();
 
 	if (state->palette_selected)
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
@@ -49,7 +49,7 @@ static WRITE8_HANDLER( bankedram_w )
 
 static WRITE8_HANDLER( gbusters_1f98_w )
 {
-	gbusters_state *state = space->machine->driver_data<gbusters_state>();
+	gbusters_state *state = space->machine().driver_data<gbusters_state>();
 
 	/* bit 0 = enable char ROM reading through the video RAM */
 	k052109_set_rmrd_line(state->k052109, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
@@ -66,14 +66,14 @@ static WRITE8_HANDLER( gbusters_1f98_w )
 
 static WRITE8_HANDLER( gbusters_coin_counter_w )
 {
-	gbusters_state *state = space->machine->driver_data<gbusters_state>();
+	gbusters_state *state = space->machine().driver_data<gbusters_state>();
 
 	/* bit 0 select palette RAM  or work RAM at 5800-5fff */
 	state->palette_selected = ~data & 0x01;
 
 	/* bits 1 & 2 = coin counters */
-	coin_counter_w(space->machine, 0, data & 0x02);
-	coin_counter_w(space->machine, 1, data & 0x04);
+	coin_counter_w(space->machine(), 0, data & 0x02);
+	coin_counter_w(space->machine(), 1, data & 0x04);
 
 	/* bits 3 selects tilemap priority */
 	state->priority = data & 0x08;
@@ -105,7 +105,7 @@ char baf[40];
 
 static WRITE8_HANDLER( gbusters_sh_irqtrigger_w )
 {
-	gbusters_state *state = space->machine->driver_data<gbusters_state>();
+	gbusters_state *state = space->machine().driver_data<gbusters_state>();
 	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
@@ -127,7 +127,7 @@ static WRITE8_DEVICE_HANDLER( gbusters_snd_bankswitch_w )
 /* special handlers to combine 052109 & 051960 */
 static READ8_HANDLER( k052109_051960_r )
 {
-	gbusters_state *state = space->machine->driver_data<gbusters_state>();
+	gbusters_state *state = space->machine().driver_data<gbusters_state>();
 
 	if (k052109_get_rmrd_line(state->k052109) == CLEAR_LINE)
 	{
@@ -144,7 +144,7 @@ static READ8_HANDLER( k052109_051960_r )
 
 static WRITE8_HANDLER( k052109_051960_w )
 {
-	gbusters_state *state = space->machine->driver_data<gbusters_state>();
+	gbusters_state *state = space->machine().driver_data<gbusters_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
 		k051937_w(state->k051960, offset - 0x3800, data);
@@ -274,31 +274,31 @@ static const k051960_interface gbusters_k051960_intf =
 
 static MACHINE_START( gbusters )
 {
-	gbusters_state *state = machine->driver_data<gbusters_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	gbusters_state *state = machine.driver_data<gbusters_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x10000], 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
-	machine->generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x800);
+	machine.generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x800);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->k052109 = machine->device("k052109");
-	state->k051960 = machine->device("k051960");
-	state->k007232 = machine->device("k007232");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->k052109 = machine.device("k052109");
+	state->k051960 = machine.device("k051960");
+	state->k007232 = machine.device("k007232");
 
 	state->save_item(NAME(state->palette_selected));
 	state->save_item(NAME(state->priority));
-	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x800);
+	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x800);
 }
 
 static MACHINE_RESET( gbusters )
 {
-	gbusters_state *state = machine->driver_data<gbusters_state>();
-	UINT8 *RAM = machine->region("maincpu")->base();
+	gbusters_state *state = machine.driver_data<gbusters_state>();
+	UINT8 *RAM = machine.region("maincpu")->base();
 
-	konami_configure_set_lines(machine->device("maincpu"), gbusters_banking);
+	konami_configure_set_lines(machine.device("maincpu"), gbusters_banking);
 
 	/* mirror address for banked ROM */
 	memcpy(&RAM[0x18000], &RAM[0x10000], 0x08000);
@@ -434,7 +434,7 @@ ROM_END
 static KONAMI_SETLINES_CALLBACK( gbusters_banking )
 {
 	/* bits 0-3 ROM bank */
-	memory_set_bank(device->machine,  "bank1", lines & 0x0f);
+	memory_set_bank(device->machine(),  "bank1", lines & 0x0f);
 
 	if (lines & 0xf0)
 	{

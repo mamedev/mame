@@ -1031,7 +1031,7 @@ static DEVICE_START( tms5110 )
 	devcb_resolve_read_line(&tms->data_func, &tms->intf->data_func, device);
 
 	/* initialize a stream */
-	tms->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() / 80, tms, tms5110_update);
+	tms->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() / 80, tms, tms5110_update);
 
 	if (tms->table == NULL)
 	{
@@ -1048,7 +1048,7 @@ static DEVICE_START( tms5110 )
 	}
 
 	tms->state = CTL_STATE_INPUT; /* most probably not defined */
-	tms->romclk_hack_timer = device->machine->scheduler().timer_alloc(FUNC(romclk_hack_timer_cb), (void *) device);
+	tms->romclk_hack_timer = device->machine().scheduler().timer_alloc(FUNC(romclk_hack_timer_cb), (void *) device);
 
 	register_for_save_states(tms);
 }
@@ -1415,13 +1415,13 @@ static DEVICE_START( tmsprom )
 
 	tms->rom = *device->region();
 	assert_always(tms->rom != NULL, "Error creating TMSPROM chip: No rom region found");
-	tms->prom = device->machine->region(tms->intf->prom_region)->base();
+	tms->prom = device->machine().region(tms->intf->prom_region)->base();
 	assert_always(tms->rom != NULL, "Error creating TMSPROM chip: No prom region found");
 
 	tms->device = device;
 	tms->clock = device->clock();
 
-	tms->romclk_timer = device->machine->scheduler().timer_alloc(FUNC(tmsprom_step), device);
+	tms->romclk_timer = device->machine().scheduler().timer_alloc(FUNC(tmsprom_step), device);
 	tms->romclk_timer->adjust(attotime::zero, 0, attotime::from_hz(tms->clock));
 
 	tms->bit = 0;

@@ -56,7 +56,7 @@
 #define DERIVED_CLOCK(num, den)		(0xff000000 | ((num) << 12) | ((den) << 0))
 
 // shorthand for accessing devices by machine/type/tag
-#define devtag_reset(mach,tag)								(mach)->device(tag)->reset()
+#define devtag_reset(mach,tag)								(mach).device(tag)->reset()
 
 // often derived devices need only a different name and a simple parameter to differentiate them
 // these are provided as macros because you can't pass string literals to templates, annoyingly enough
@@ -89,7 +89,7 @@ device_config *_ConfigClass::static_alloc_device_config(const machine_config &mc
 																						\
 device_t *_ConfigClass::alloc_device(running_machine &machine) const					\
 {																						\
-	return auto_alloc(&machine, _DeviceClass(machine, *this));							\
+	return auto_alloc(machine, _DeviceClass(machine, *this));							\
 }																						\
 
 
@@ -234,8 +234,8 @@ class device_list : public tagged_device_list<device_t>
 
 	static void static_reset(running_machine &machine);
 	static void static_exit(running_machine &machine);
-	static void static_pre_save(running_machine *machine, void *param);
-	static void static_post_load(running_machine *machine, void *param);
+	static void static_pre_save(running_machine &machine, void *param);
+	static void static_post_load(running_machine &machine, void *param);
 
 public:
 	device_list(resource_pool &pool = global_resource_pool);
@@ -394,6 +394,9 @@ protected:
 	virtual ~device_t();
 
 public:
+	// getters
+	running_machine &machine() const { return m_machine; }
+
 	// iteration helpers
 	device_t *next() const { return m_next; }
 	device_t *typenext() const;
@@ -466,9 +469,6 @@ public:
 	const rom_entry *rom_region() const { return m_baseconfig.rom_region(); }
 	machine_config_constructor machine_config_additions() const { return m_baseconfig.machine_config_additions(); }
 	const input_port_token *input_ports() const { return m_baseconfig.input_ports(); }
-
-public:
-	running_machine *		machine;
 
 protected:
 	// miscellaneous helpers

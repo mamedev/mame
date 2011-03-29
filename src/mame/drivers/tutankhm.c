@@ -63,7 +63,7 @@
 
 static INTERRUPT_GEN( tutankhm_interrupt )
 {
-	tutankhm_state *state = device->machine->driver_data<tutankhm_state>();
+	tutankhm_state *state = device->machine().driver_data<tutankhm_state>();
 
 	/* flip flops cause the interrupt to be signalled every other frame */
 	state->irq_toggle ^= 1;
@@ -74,7 +74,7 @@ static INTERRUPT_GEN( tutankhm_interrupt )
 
 static WRITE8_HANDLER( irq_enable_w )
 {
-	tutankhm_state *state = space->machine->driver_data<tutankhm_state>();
+	tutankhm_state *state = space->machine().driver_data<tutankhm_state>();
 
 	state->irq_enable = data & 1;
 	if (!state->irq_enable)
@@ -90,7 +90,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 static WRITE8_HANDLER( tutankhm_bankselect_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 }
 
 
@@ -102,13 +102,13 @@ static WRITE8_HANDLER( tutankhm_bankselect_w )
 
 static WRITE8_HANDLER( sound_mute_w )
 {
-	space->machine->sound().system_mute(data & 1);
+	space->machine().sound().system_mute(data & 1);
 }
 
 
 static WRITE8_HANDLER( tutankhm_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset ^ 1, data);
+	coin_counter_w(space->machine(), offset ^ 1, data);
 }
 
 
@@ -197,11 +197,11 @@ INPUT_PORTS_END
 
 static MACHINE_START( tutankhm )
 {
-	tutankhm_state *state = machine->driver_data<tutankhm_state>();
+	tutankhm_state *state = machine.driver_data<tutankhm_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x1000);
 
-	state->maincpu = machine->device<cpu_device>("maincpu");
+	state->maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->irq_toggle));
 	state->save_item(NAME(state->irq_enable));
@@ -211,7 +211,7 @@ static MACHINE_START( tutankhm )
 
 static MACHINE_RESET( tutankhm )
 {
-	tutankhm_state *state = machine->driver_data<tutankhm_state>();
+	tutankhm_state *state = machine.driver_data<tutankhm_state>();
 
 	state->irq_toggle = 0;
 	state->irq_enable = 0;

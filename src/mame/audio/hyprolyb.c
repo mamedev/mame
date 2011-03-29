@@ -25,8 +25,8 @@ static DEVICE_START( hyprolyb_adpcm )
 {
 	hyprolyb_adpcm_state *state = get_safe_token(device);
 
-	state->space = device->machine->device("audiocpu")->memory().space(AS_PROGRAM);
-	state->msm = device->machine->device("msm");
+	state->space = device->machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	state->msm = device->machine().device("msm");
 	device->save_item(NAME(state->adpcm_ready));	// only bootlegs
 	device->save_item(NAME(state->adpcm_busy));
 	device->save_item(NAME(state->vck_ready));
@@ -113,7 +113,7 @@ ADDRESS_MAP_END
 
 static void adpcm_vck_callback( device_t *device )
 {
-	device_t *adpcm = device->machine->device("hyprolyb_adpcm");
+	device_t *adpcm = device->machine().device("hyprolyb_adpcm");
 	hyprolyb_adpcm_state *state = get_safe_token(adpcm);
 
 	state->vck_ready = 0x80;

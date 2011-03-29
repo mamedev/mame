@@ -83,13 +83,13 @@ public:
 
 WRITE16_HANDLER( region4_w )
 {
-	littlerb_state *state = space->machine->driver_data<littlerb_state>();
+	littlerb_state *state = space->machine().driver_data<littlerb_state>();
 	COMBINE_DATA(&state->region4[offset]);
 }
 
 WRITE16_HANDLER(palette_offset_w)
 {
-	littlerb_state *state = space->machine->driver_data<littlerb_state>();
+	littlerb_state *state = space->machine().driver_data<littlerb_state>();
 	//printf("palette offset set to %04x\n",data);
 	state->paldac_offset = data;
 	state->paldac_select = 0;
@@ -99,7 +99,7 @@ WRITE16_HANDLER(palette_offset_w)
 
 WRITE16_HANDLER( palette_data_w )
 {
-	littlerb_state *state = space->machine->driver_data<littlerb_state>();
+	littlerb_state *state = space->machine().driver_data<littlerb_state>();
 	//printf("palette write %04x\n",data);
 
 	state->paldac[state->paldac_select][state->paldac_offset] = data;
@@ -112,7 +112,7 @@ WRITE16_HANDLER( palette_data_w )
 		g = state->paldac[1][state->paldac_offset];
 		b = state->paldac[2][state->paldac_offset];
 
-		palette_set_color(space->machine,state->paldac_offset,MAKE_RGB(r,g,b));
+		palette_set_color(space->machine(),state->paldac_offset,MAKE_RGB(r,g,b));
 
 		state->paldac_select = 0;
 		state->paldac_offset++;
@@ -122,7 +122,7 @@ WRITE16_HANDLER( palette_data_w )
 
 WRITE16_HANDLER( palette_reset_w )
 {
-	littlerb_state *state = space->machine->driver_data<littlerb_state>();
+	littlerb_state *state = space->machine().driver_data<littlerb_state>();
 //  printf("palette reset write %04x\n",data);
 
 	state->paldac_select = 0;
@@ -178,7 +178,7 @@ public:
 
 	virtual device_t *alloc_device(running_machine &machine) const
 	{
-		return auto_alloc(&machine, littlerb_vdp_device(machine, *this));
+		return auto_alloc(machine, littlerb_vdp_device(machine, *this));
 	}
 
 protected:
@@ -210,9 +210,9 @@ const device_type LITTLERBVDP = littlerb_vdp_device_config::static_alloc_device_
 /* end VDP device to give us our own memory map */
 
 
-static void littlerb_recalc_regs(running_machine *machine)
+static void littlerb_recalc_regs(running_machine &machine)
 {
-	littlerb_state *state = machine->driver_data<littlerb_state>();
+	littlerb_state *state = machine.driver_data<littlerb_state>();
 	state->vdp_address_low = state->write_address&0xffff;
 	state->vdp_address_high = (state->write_address>>16)&0xffff;
 }
@@ -220,11 +220,11 @@ static void littlerb_recalc_regs(running_machine *machine)
 
 
 
-static void littlerb_data_write(running_machine *machine, UINT16 data, UINT16 mem_mask)
+static void littlerb_data_write(running_machine &machine, UINT16 data, UINT16 mem_mask)
 {
-	littlerb_state *state = machine->driver_data<littlerb_state>();
+	littlerb_state *state = machine.driver_data<littlerb_state>();
 	UINT32 addr = state->write_address>>4; // is this right? should we shift?
-	address_space *vdp_space = machine->device<littlerb_vdp_device>("littlerbvdp")->space();
+	address_space *vdp_space = machine.device<littlerb_vdp_device>("littlerbvdp")->space();
 
 
 	vdp_space->write_word(addr*2, data, mem_mask);
@@ -239,15 +239,15 @@ static void littlerb_data_write(running_machine *machine, UINT16 data, UINT16 me
 
 
 
-static void littlerb_recalc_address(running_machine *machine)
+static void littlerb_recalc_address(running_machine &machine)
 {
-	littlerb_state *state = machine->driver_data<littlerb_state>();
+	littlerb_state *state = machine.driver_data<littlerb_state>();
 	state->write_address = state->vdp_address_low | state->vdp_address_high<<16;
 }
 
 static READ16_HANDLER( littlerb_vdp_r )
 {
-	littlerb_state *state = space->machine->driver_data<littlerb_state>();
+	littlerb_state *state = space->machine().driver_data<littlerb_state>();
 	logerror("%06x littlerb_vdp_r offs %04x mask %04x\n", cpu_get_pc(space->cpu), offset, mem_mask);
 
 	switch (offset)
@@ -271,7 +271,7 @@ static READ16_HANDLER( littlerb_vdp_r )
 #define LOG_VDP 0
 static WRITE16_HANDLER( littlerb_vdp_w )
 {
-	littlerb_state *state = space->machine->driver_data<littlerb_state>();
+	littlerb_state *state = space->machine().driver_data<littlerb_state>();
 
 	if (offset!=2)
 	{
@@ -311,17 +311,17 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 	{
 		case 0:
 		state->vdp_address_low = data;
-		littlerb_recalc_address(space->machine);
+		littlerb_recalc_address(space->machine());
 		break;
 
 		case 1:
 		state->vdp_address_high = data;
-		littlerb_recalc_address(space->machine);
+		littlerb_recalc_address(space->machine());
 		break;
 
 
 		case 2:
-		littlerb_data_write(space->machine, data, mem_mask);
+		littlerb_data_write(space->machine(), data, mem_mask);
 		break;
 
 		case 3:
@@ -431,9 +431,9 @@ static INPUT_PORTS_START( littlerb )
 INPUT_PORTS_END
 
 
-static void draw_sprite(running_machine *machine, bitmap_t *bitmap, int xsize,int ysize, int offset, int xpos, int ypos, int pal )
+static void draw_sprite(running_machine &machine, bitmap_t *bitmap, int xsize,int ysize, int offset, int xpos, int ypos, int pal )
 {
-	littlerb_state *state = machine->driver_data<littlerb_state>();
+	littlerb_state *state = machine.driver_data<littlerb_state>();
 	UINT16* spritegfx = state->region4;
 	int x,y;
 	//int pal = 1;
@@ -472,12 +472,12 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap, int xsize,in
 /* sprite format / offset could be completely wrong, this is just based on our (currently incorrect) vram access */
 static SCREEN_UPDATE(littlerb)
 {
-	littlerb_state *state = screen->machine->driver_data<littlerb_state>();
+	littlerb_state *state = screen->machine().driver_data<littlerb_state>();
 	int x,y,offs, code;
 	int xsize,ysize;
 	int pal;
 	UINT16* spriteregion = &state->region4[0x400];
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	//printf("frame\n");
 	/* the spriteram format is something like this .. */
 	for (offs=0x26/2;offs<0xc00;offs+=6) // start at 00x26?
@@ -496,7 +496,7 @@ static SCREEN_UPDATE(littlerb)
 
 		//if (code!=0) printf("%04x %04x %04x %04x %04x %04x\n", spriteregion[offs+0], spriteregion[offs+1], spriteregion[offs+2], spriteregion[offs+3], spriteregion[offs+4], spriteregion[offs+5]);
 
-		draw_sprite(screen->machine,bitmap,xsize,ysize,code,x-8,y-16, pal);
+		draw_sprite(screen->machine(),bitmap,xsize,ysize,code,x-8,y-16, pal);
 	}
 
 	return 0;

@@ -193,10 +193,10 @@ static VIDEO_START(mpoker)
 
 static SCREEN_UPDATE(mpoker)
 {
-	mpoker_state *state = screen->machine->driver_data<mpoker_state>();
+	mpoker_state *state = screen->machine().driver_data<mpoker_state>();
 	int y,x;
 	int count;
-	const gfx_element *gfx = screen->machine->gfx[0];
+	const gfx_element *gfx = screen->machine().gfx[0];
 
 	count = 0;
 	for (y=0;y<32;y++)
@@ -232,7 +232,7 @@ static PALETTE_INIT(mpoker)
 
 static READ8_HANDLER( mixport_r )
 {
-	mpoker_state *state = space->machine->driver_data<mpoker_state>();
+	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 /*  - bits -
     7654 3210
     ---- ---x   Unknown.
@@ -247,7 +247,7 @@ static READ8_HANDLER( mixport_r )
     If you change the status *every* read, the HW stucks.
 */
 
-	state->mixdata = (input_port_read(space->machine, "SW2") & 0xfd) | (space->machine->rand() & 0x02);
+	state->mixdata = (input_port_read(space->machine(), "SW2") & 0xfd) | (space->machine().rand() & 0x02);
 
 	return state->mixdata;
 }
@@ -283,7 +283,7 @@ static READ8_HANDLER( mixport_r )
 
 static WRITE8_HANDLER( outport0_w )
 {
-	mpoker_state *state = space->machine->driver_data<mpoker_state>();
+	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 	output_set_lamp_value(1, (data & 1));			/* Lamp 1 - BET */
 	output_set_lamp_value(5, (data >> 1) & 1);		/* Lamp 5 - HOLD 1 */
 
@@ -305,7 +305,7 @@ static WRITE8_HANDLER( outport0_w )
 
 static WRITE8_HANDLER( outport1_w )
 {
-	mpoker_state *state = space->machine->driver_data<mpoker_state>();
+	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 	output_set_lamp_value(2, (data & 1));			/* Lamp 2 - DEAL */
 	output_set_lamp_value(6, (data >> 1) & 1);		/* Lamp 6 - HOLD 2 */
 
@@ -327,7 +327,7 @@ static WRITE8_HANDLER( outport1_w )
 
 static WRITE8_HANDLER( outport2_w )
 {
-	mpoker_state *state = space->machine->driver_data<mpoker_state>();
+	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 	output_set_lamp_value(3, (data & 1));			/* Lamp 3 - CANCEL */
 	output_set_lamp_value(7, (data >> 1) & 1);		/* Lamp 7 - HOLD 3 */
 
@@ -349,7 +349,7 @@ static WRITE8_HANDLER( outport2_w )
 
 static WRITE8_HANDLER( outport3_w )
 {
-	mpoker_state *state = space->machine->driver_data<mpoker_state>();
+	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 	output_set_lamp_value(4, (data & 1));			/* Lamp 4 - STAND */
 	output_set_lamp_value(8, (data >> 1) & 1);		/* Lamp 8 - HOLD 4 */
 
@@ -371,7 +371,7 @@ static WRITE8_HANDLER( outport3_w )
 
 static WRITE8_HANDLER( outport4_w )
 {
-	mpoker_state *state = space->machine->driver_data<mpoker_state>();
+	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 	output_set_lamp_value(9, (data >> 1) & 1);		/* Lamp 9 - HOLD 5 */
 
 	state->output[4] = data;
@@ -392,7 +392,7 @@ static WRITE8_HANDLER( outport4_w )
 
 static WRITE8_HANDLER( outport5_w )
 {
-	mpoker_state *state = space->machine->driver_data<mpoker_state>();
+	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 	state->output[5] = data;
 	popmessage("outport5 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
 }
@@ -411,8 +411,8 @@ static WRITE8_HANDLER( outport5_w )
 
 static WRITE8_HANDLER( outport6_w )
 {
-	mpoker_state *state = space->machine->driver_data<mpoker_state>();
-	coin_counter_w(space->machine, 1, data & 0x02);	/* Payout pulse */
+	mpoker_state *state = space->machine().driver_data<mpoker_state>();
+	coin_counter_w(space->machine(), 1, data & 0x02);	/* Payout pulse */
 
 	state->output[6] = data;
 	popmessage("outport6 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
@@ -432,8 +432,8 @@ static WRITE8_HANDLER( outport6_w )
 
 static WRITE8_HANDLER( outport7_w )
 {
-	mpoker_state *state = space->machine->driver_data<mpoker_state>();
-	coin_counter_w(space->machine, 0, data & 0x02);	/* Coin pulse */
+	mpoker_state *state = space->machine().driver_data<mpoker_state>();
+	coin_counter_w(space->machine(), 0, data & 0x02);	/* Coin pulse */
 
 	state->output[7] = data;
 	popmessage("outport7 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
@@ -464,7 +464,7 @@ static WRITE8_HANDLER( outport7_w )
 
 //static WRITE8_HANDLER( sound_w )
 //{
-//  dac_data_w(space->machine->device("dac"), data);
+//  dac_data_w(space->machine().device("dac"), data);
 //}
 */
 

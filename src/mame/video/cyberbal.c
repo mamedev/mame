@@ -21,7 +21,7 @@
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	cyberbal_state *state = machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 	UINT16 data = state->alpha[tile_index];
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x07;
@@ -31,7 +31,7 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_alpha2_tile_info )
 {
-	cyberbal_state *state = machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 	UINT16 data = state->alpha2[tile_index];
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x07;
@@ -41,7 +41,7 @@ static TILE_GET_INFO( get_alpha2_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	cyberbal_state *state = machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 	UINT16 data = state->playfield[tile_index];
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
@@ -51,7 +51,7 @@ static TILE_GET_INFO( get_playfield_tile_info )
 
 static TILE_GET_INFO( get_playfield2_tile_info )
 {
-	cyberbal_state *state = machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 	UINT16 data = state->playfield2[tile_index];
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
@@ -66,7 +66,7 @@ static TILE_GET_INFO( get_playfield2_tile_info )
  *
  *************************************/
 
-static void video_start_cyberbal_common(running_machine* machine, int screens)
+static void video_start_cyberbal_common(running_machine &machine, int screens)
 {
 	static const atarimo_desc mo0desc =
 	{
@@ -141,7 +141,7 @@ static void video_start_cyberbal_common(running_machine* machine, int screens)
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	cyberbal_state *state = machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 
 	/* set the slip variables */
 	atarimo_0_slipram = &state->current_slip[0];
@@ -207,7 +207,7 @@ VIDEO_START( cyberbal2p )
  *
  *************************************/
 
-INLINE void set_palette_entry(running_machine *machine, int entry, UINT16 value)
+INLINE void set_palette_entry(running_machine &machine, int entry, UINT16 value)
 {
 	int r, g, b;
 
@@ -228,28 +228,28 @@ INLINE void set_palette_entry(running_machine *machine, int entry, UINT16 value)
 
 WRITE16_HANDLER( cyberbal_paletteram_0_w )
 {
-	cyberbal_state *state = space->machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
 	COMBINE_DATA(&state->paletteram_0[offset]);
-	set_palette_entry(space->machine, offset, state->paletteram_0[offset]);
+	set_palette_entry(space->machine(), offset, state->paletteram_0[offset]);
 }
 
 READ16_HANDLER( cyberbal_paletteram_0_r )
 {
-	cyberbal_state *state = space->machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
 	return state->paletteram_0[offset];
 }
 
 
 WRITE16_HANDLER( cyberbal_paletteram_1_w )
 {
-	cyberbal_state *state = space->machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
 	COMBINE_DATA(&state->paletteram_1[offset]);
-	set_palette_entry(space->machine, offset + 0x800, state->paletteram_1[offset]);
+	set_palette_entry(space->machine(), offset + 0x800, state->paletteram_1[offset]);
 }
 
 READ16_HANDLER( cyberbal_paletteram_1_r )
 {
-	cyberbal_state *state = space->machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
 	return state->paletteram_1[offset];
 }
 
@@ -263,12 +263,12 @@ READ16_HANDLER( cyberbal_paletteram_1_r )
 
 void cyberbal_scanline_update(screen_device &screen, int scanline)
 {
-	cyberbal_state *state = screen.machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = screen.machine().driver_data<cyberbal_state>();
 	int i;
 	screen_device *update_screen;
 
 	/* loop over screens */
-	for (i = 0, update_screen = screen.machine->first_screen(); update_screen != NULL; i++, update_screen = update_screen->next_screen())
+	for (i = 0, update_screen = screen.machine().first_screen(); update_screen != NULL; i++, update_screen = update_screen->next_screen())
 	{
 		UINT16 *vram = i ? state->alpha2 : state->alpha;
 		UINT16 *base = &vram[((scanline - 8) / 8) * 64 + 47];
@@ -335,7 +335,7 @@ void cyberbal_scanline_update(screen_device &screen, int scanline)
 
 static void update_one_screen(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	cyberbal_state *state = screen.machine->driver_data<cyberbal_state>();
+	cyberbal_state *state = screen.machine().driver_data<cyberbal_state>();
 	atarimo_rect_list rectlist;
 	rectangle tempclip = *cliprect;
 	bitmap_t *mobitmap;
@@ -343,9 +343,9 @@ static void update_one_screen(screen_device &screen, bitmap_t *bitmap, const rec
 	rectangle visarea = screen.visible_area();
 
 	/* for 2p games, the left screen is the main screen */
-	device_t *left_screen = screen.machine->device("lscreen");
+	device_t *left_screen = screen.machine().device("lscreen");
 	if (left_screen == NULL)
-		left_screen = screen.machine->device("screen");
+		left_screen = screen.machine().device("screen");
 
 	/* draw the playfield */
 	tilemap_draw(bitmap, cliprect, (&screen == left_screen) ? state->playfield_tilemap : state->playfield2_tilemap, 0, 0);

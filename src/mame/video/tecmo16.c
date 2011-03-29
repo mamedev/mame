@@ -16,7 +16,7 @@
 
 static TILE_GET_INFO( fg_get_tile_info )
 {
-	tecmo16_state *state = machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = machine.driver_data<tecmo16_state>();
 	int tile = state->videoram[tile_index] & 0x1fff;
 	int color = state->colorram[tile_index] & 0x0f;
 
@@ -32,7 +32,7 @@ static TILE_GET_INFO( fg_get_tile_info )
 
 static TILE_GET_INFO( bg_get_tile_info )
 {
-	tecmo16_state *state = machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = machine.driver_data<tecmo16_state>();
 	int tile = state->videoram2[tile_index] & 0x1fff;
 	int color = (state->colorram2[tile_index] & 0x0f)+0x10;
 
@@ -45,7 +45,7 @@ static TILE_GET_INFO( bg_get_tile_info )
 
 static TILE_GET_INFO( tx_get_tile_info )
 {
-	tecmo16_state *state = machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = machine.driver_data<tecmo16_state>();
 	int tile = state->charram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -58,9 +58,9 @@ static TILE_GET_INFO( tx_get_tile_info )
 
 VIDEO_START( fstarfrc )
 {
-	tecmo16_state *state = machine->driver_data<tecmo16_state>();
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	tecmo16_state *state = machine.driver_data<tecmo16_state>();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	/* set up tile layers */
 	state->tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
@@ -84,9 +84,9 @@ VIDEO_START( fstarfrc )
 
 VIDEO_START( ginkun )
 {
-	tecmo16_state *state = machine->driver_data<tecmo16_state>();
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	tecmo16_state *state = machine.driver_data<tecmo16_state>();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	/* set up tile layers */
 	state->tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
@@ -108,9 +108,9 @@ VIDEO_START( ginkun )
 
 VIDEO_START( riot )
 {
-	tecmo16_state *state = machine->driver_data<tecmo16_state>();
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	tecmo16_state *state = machine.driver_data<tecmo16_state>();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	/* set up tile layers */
 	state->tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
@@ -135,28 +135,28 @@ VIDEO_START( riot )
 
 WRITE16_HANDLER( tecmo16_videoram_w )
 {
-	tecmo16_state *state = space->machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->videoram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
 }
 
 WRITE16_HANDLER( tecmo16_colorram_w )
 {
-	tecmo16_state *state = space->machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->colorram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
 }
 
 WRITE16_HANDLER( tecmo16_videoram2_w )
 {
-	tecmo16_state *state = space->machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->videoram2[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
 
 WRITE16_HANDLER( tecmo16_colorram2_w )
 {
-	tecmo16_state *state = space->machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->colorram2[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
@@ -164,58 +164,58 @@ WRITE16_HANDLER( tecmo16_colorram2_w )
 
 WRITE16_HANDLER( tecmo16_charram_w )
 {
-	tecmo16_state *state = space->machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->charram[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap,offset);
 }
 
 WRITE16_HANDLER( tecmo16_flipscreen_w )
 {
-	tecmo16_state *state = space->machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	state->flipscreen = data & 0x01;
-	flip_screen_set(space->machine, state->flipscreen);
+	flip_screen_set(space->machine(), state->flipscreen);
 }
 
 /******************************************************************************/
 
 WRITE16_HANDLER( tecmo16_scroll_x_w )
 {
-	tecmo16_state *state = space->machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->scroll_x_w);
 	tilemap_set_scrollx(state->fg_tilemap,0,state->scroll_x_w);
 }
 
 WRITE16_HANDLER( tecmo16_scroll_y_w )
 {
-	tecmo16_state *state = space->machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->scroll_y_w);
 	tilemap_set_scrolly(state->fg_tilemap,0,state->scroll_y_w);
 }
 
 WRITE16_HANDLER( tecmo16_scroll2_x_w )
 {
-	tecmo16_state *state = space->machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->scroll2_x_w);
 	tilemap_set_scrollx(state->bg_tilemap,0,state->scroll2_x_w);
 }
 
 WRITE16_HANDLER( tecmo16_scroll2_y_w )
 {
-	tecmo16_state *state = space->machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->scroll2_y_w);
 	tilemap_set_scrolly(state->bg_tilemap,0,state->scroll2_y_w);
 }
 
 WRITE16_HANDLER( tecmo16_scroll_char_x_w )
 {
-	tecmo16_state *state = space->machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->scroll_char_x_w);
 	tilemap_set_scrollx(state->tx_tilemap,0,state->scroll_char_x_w);
 }
 
 WRITE16_HANDLER( tecmo16_scroll_char_y_w )
 {
-	tecmo16_state *state = space->machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->scroll_char_y_w);
 	tilemap_set_scrolly(state->tx_tilemap,0,state->scroll_char_y_w-16);
 }
@@ -223,7 +223,7 @@ WRITE16_HANDLER( tecmo16_scroll_char_y_w )
 /******************************************************************************/
 
 /* mix & blend the paletted 16-bit tile and sprite bitmaps into an RGB 32-bit bitmap */
-static void blendbitmaps(running_machine *machine,
+static void blendbitmaps(running_machine &machine,
 		bitmap_t *dest,bitmap_t *src1,bitmap_t *src2,bitmap_t *src3,
 		int sx,int sy,const rectangle *clip)
 {
@@ -251,7 +251,7 @@ static void blendbitmaps(running_machine *machine,
 	if (sy > ey) return;
 
 	{
-		const pen_t *paldata = machine->pens;
+		const pen_t *paldata = machine.pens;
 		UINT32 *end;
 
 		UINT16 *sd1 = (UINT16 *)src1->base;												/* source data   */
@@ -332,9 +332,9 @@ static void blendbitmaps(running_machine *machine,
 	}
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle *cliprect)
 {
-	tecmo16_state *state = machine->driver_data<tecmo16_state>();
+	tecmo16_state *state = machine.driver_data<tecmo16_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 	static const UINT8 layout[8][8] =
@@ -416,28 +416,28 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 							sx = 256 - (xpos + 8*(!flipx?(sizex-1-x):x) + 8);
 							sy = 256 - (ypos + 8*(!flipy?(sizey-1-y):y) + 8);
 						}
-						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
+						pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[2],
 								code + layout[y][x],
-								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
+								machine.gfx[2]->color_base + color * machine.gfx[2]->color_granularity,
 								flipx,flipy,
 								sx,sy,
-								machine->priority_bitmap, priority_mask,0);
+								machine.priority_bitmap, priority_mask,0);
 
 						/* wrap around x */
-						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
+						pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[2],
 								code + layout[y][x],
-								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
+								machine.gfx[2]->color_base + color * machine.gfx[2]->color_granularity,
 								flipx,flipy,
 								sx-512,sy,
-								machine->priority_bitmap, priority_mask,0);
+								machine.priority_bitmap, priority_mask,0);
 
 						/* wrap around x */
-						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
+						pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[2],
 								code + layout[y][x],
-								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
+								machine.gfx[2]->color_base + color * machine.gfx[2]->color_granularity,
 								flipx,flipy,
 								sx+512,sy,
-								machine->priority_bitmap, priority_mask,0);
+								machine.priority_bitmap, priority_mask,0);
 					}
 				}
 			}
@@ -459,28 +459,28 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 							sx = 256 - (xpos + 8*(!flipx?(sizex-1-x):x) + 8);
 							sy = 256 - (ypos + 8*(!flipy?(sizey-1-y):y) + 8);
 						}
-						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
+						pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[2],
 								code + layout[y][x],
-								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
+								machine.gfx[2]->color_base + color * machine.gfx[2]->color_granularity,
 								flipx,flipy,
 								sx,sy,
-								machine->priority_bitmap, priority_mask,0);
+								machine.priority_bitmap, priority_mask,0);
 
 						/* wrap around x */
-						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
+						pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[2],
 								code + layout[y][x],
-								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
+								machine.gfx[2]->color_base + color * machine.gfx[2]->color_granularity,
 								flipx,flipy,
 								sx-512,sy,
-								machine->priority_bitmap, priority_mask,0);
+								machine.priority_bitmap, priority_mask,0);
 
 						/* wrap around x */
-						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
+						pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[2],
 								code + layout[y][x],
-								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
+								machine.gfx[2]->color_base + color * machine.gfx[2]->color_granularity,
 								flipx,flipy,
 								sx+512,sy,
-								machine->priority_bitmap, priority_mask,0);
+								machine.priority_bitmap, priority_mask,0);
 					}
 				}
 			}
@@ -492,8 +492,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 
 SCREEN_UPDATE( tecmo16 )
 {
-	tecmo16_state *state = screen->machine->driver_data<tecmo16_state>();
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	tecmo16_state *state = screen->machine().driver_data<tecmo16_state>();
+	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
 
 	bitmap_fill(state->tile_bitmap_bg, cliprect, 0x300);
 	bitmap_fill(state->tile_bitmap_fg,     cliprect, 0);
@@ -508,9 +508,9 @@ SCREEN_UPDATE( tecmo16 )
 	tilemap_draw(state->tile_bitmap_fg, cliprect,state->tx_tilemap, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	draw_sprites(screen->machine, state->tile_bitmap_bg, state->tile_bitmap_fg, state->sprite_bitmap, cliprect);
+	draw_sprites(screen->machine(), state->tile_bitmap_bg, state->tile_bitmap_fg, state->sprite_bitmap, cliprect);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(screen->machine, bitmap, state->tile_bitmap_bg, state->tile_bitmap_fg, state->sprite_bitmap, 0, 0, cliprect);
+	blendbitmaps(screen->machine(), bitmap, state->tile_bitmap_bg, state->tile_bitmap_fg, state->sprite_bitmap, 0, 0, cliprect);
 	return 0;
 }

@@ -103,15 +103,15 @@ public:
 
 /*----------- defined in drivers/model3.c -----------*/
 
-void model3_set_irq_line(running_machine *machine, UINT8 bit, int state);
+void model3_set_irq_line(running_machine &machine, UINT8 bit, int state);
 
 
 /*----------- defined in machine/model3.c -----------*/
 
-void model3_machine_init(running_machine *machine, int step);
-int model3_tap_read(running_machine *machine);
-void model3_tap_write(running_machine *machine, int tck, int tms, int tdi, int trst);
-void model3_tap_reset(running_machine *machine);
+void model3_machine_init(running_machine &machine, int step);
+int model3_tap_read(running_machine &machine);
+void model3_tap_write(running_machine &machine, int tck, int tms, int tdi, int trst);
+void model3_tap_reset(running_machine &machine);
 READ32_HANDLER(rtc72421_r);
 WRITE32_HANDLER(rtc72421_w);
 
@@ -133,7 +133,7 @@ SCREEN_UPDATE(model3);
 WRITE64_HANDLER(real3d_cmd_w);
 WRITE64_HANDLER(real3d_display_list_w);
 WRITE64_HANDLER(real3d_polygon_ram_w);
-void real3d_display_list_end(running_machine *machine);
+void real3d_display_list_end(running_machine &machine);
 void real3d_display_list1_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap);
 void real3d_display_list2_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap);
 void real3d_vrom_texture_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap);

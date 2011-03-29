@@ -83,7 +83,7 @@ inline render_font::glyph &render_font::get_char(unicode_char chnum)
 	// grab the table; if none, return the dummy character
 	glyph *glyphtable = m_glyphs[chnum / 256];
 	if (glyphtable == NULL && m_format == FF_OSD)
-		glyphtable = m_glyphs[chnum / 256] = auto_alloc_array_clear(&m_manager.machine(), glyph, 256);
+		glyphtable = m_glyphs[chnum / 256] = auto_alloc_array_clear(m_manager.machine(), glyph, 256);
 	if (glyphtable == NULL)
 		return dummy_glyph;
 
@@ -161,15 +161,15 @@ render_font::~render_font()
 			{
 				glyph &gl = m_glyphs[tablenum][charnum];
 				m_manager.texture_free(gl.texture);
-				auto_free(&m_manager.machine(), gl.bitmap);
+				auto_free(m_manager.machine(), gl.bitmap);
 			}
 
 			// free the subtable itself
-			auto_free(&m_manager.machine(), m_glyphs[tablenum]);
+			auto_free(m_manager.machine(), m_glyphs[tablenum]);
 		}
 
 	// free the raw data and the size itself
-	auto_free(&m_manager.machine(), m_rawdata);
+	auto_free(m_manager.machine(), m_rawdata);
 
 	// release the OSD font
 	if (m_osdfont != NULL)
@@ -212,7 +212,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 			return;
 
 		// allocate a new bitmap of the size we need
-		gl.bitmap = auto_alloc(&m_manager.machine(), bitmap_t(gl.bmwidth, m_height, BITMAP_FORMAT_ARGB32));
+		gl.bitmap = auto_alloc(m_manager.machine(), bitmap_t(gl.bmwidth, m_height, BITMAP_FORMAT_ARGB32));
 		bitmap_fill(gl.bitmap, NULL, 0);
 
 		// extract the data
@@ -419,7 +419,7 @@ bool render_font::load_cached_bdf(const char *filename)
 
 	// determine the file size and allocate memory
 	m_rawsize = file.size();
-	char *data = auto_alloc_array_clear(&m_manager.machine(), char, m_rawsize + 1);
+	char *data = auto_alloc_array_clear(m_manager.machine(), char, m_rawsize + 1);
 
 	// read the first chunk
 	UINT32 bytes = file.read(data, MIN(CACHED_BDF_HASH_SIZE, m_rawsize));
@@ -445,7 +445,7 @@ bool render_font::load_cached_bdf(const char *filename)
 			// if that worked, we're done
 			if (result)
 			{
-				auto_free(&m_manager.machine(), data);
+				auto_free(m_manager.machine(), data);
 				return true;
 			}
 		}
@@ -457,7 +457,7 @@ bool render_font::load_cached_bdf(const char *filename)
 		UINT32 read = file.read(data + bytes, m_rawsize - bytes);
 		if (read != m_rawsize - bytes)
 		{
-			auto_free(&m_manager.machine(), data);
+			auto_free(m_manager.machine(), data);
 			return false;
 		}
 	}
@@ -559,7 +559,7 @@ bool render_font::load_bdf()
 			{
 				// if we don't have a subtable yet, make one
 				if (m_glyphs[charnum / 256] == NULL)
-					m_glyphs[charnum / 256] = auto_alloc_array_clear(&m_manager.machine(), glyph, 256);
+					m_glyphs[charnum / 256] = auto_alloc_array_clear(m_manager.machine(), glyph, 256);
 
 				// fill in the entry
 				glyph &gl = m_glyphs[charnum / 256][charnum % 256];
@@ -620,11 +620,11 @@ bool render_font::load_cached(emu_file &file, UINT32 hash)
 		return false;
 
 	// now read the rest of the data
-	UINT8 *data = auto_alloc_array(&m_manager.machine(), UINT8, filesize - CACHED_HEADER_SIZE);
+	UINT8 *data = auto_alloc_array(m_manager.machine(), UINT8, filesize - CACHED_HEADER_SIZE);
 	bytes_read = file.read(data, filesize - CACHED_HEADER_SIZE);
 	if (bytes_read != filesize - CACHED_HEADER_SIZE)
 	{
-		auto_free(&m_manager.machine(), data);
+		auto_free(m_manager.machine(), data);
 		return false;
 	}
 
@@ -637,7 +637,7 @@ bool render_font::load_cached(emu_file &file, UINT32 hash)
 
 		// if we don't have a subtable yet, make one
 		if (m_glyphs[chnum / 256] == NULL)
-			m_glyphs[chnum / 256] = auto_alloc_array_clear(&m_manager.machine(), glyph, 256);
+			m_glyphs[chnum / 256] = auto_alloc_array_clear(m_manager.machine(), glyph, 256);
 
 		// fill in the entry
 		glyph &gl = m_glyphs[chnum / 256][chnum % 256];
@@ -652,7 +652,7 @@ bool render_font::load_cached(emu_file &file, UINT32 hash)
 		offset += (gl.bmwidth * gl.bmheight + 7) / 8;
 		if (offset > filesize - CACHED_HEADER_SIZE)
 		{
-			auto_free(&m_manager.machine(), data);
+			auto_free(m_manager.machine(), data);
 			return false;
 		}
 	}
@@ -696,10 +696,10 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 	try
 	{
 		// allocate an array to hold the character data
-		UINT8 *chartable = auto_alloc_array_clear(&m_manager.machine(), UINT8, numchars * CACHED_CHAR_SIZE);
+		UINT8 *chartable = auto_alloc_array_clear(m_manager.machine(), UINT8, numchars * CACHED_CHAR_SIZE);
 
 		// allocate a temp buffer to compress into
-		UINT8 *tempbuffer = auto_alloc_array(&m_manager.machine(), UINT8, 65536);
+		UINT8 *tempbuffer = auto_alloc_array(m_manager.machine(), UINT8, 65536);
 
 		// write the header
 		UINT8 *dest = tempbuffer;
@@ -773,7 +773,7 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 
 					// free the bitmap and texture
 					m_manager.texture_free(gl.texture);
-					auto_free(&m_manager.machine(), gl.bitmap);
+					auto_free(m_manager.machine(), gl.bitmap);
 					gl.texture = NULL;
 					gl.bitmap = NULL;
 				}
@@ -802,15 +802,15 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 			throw emu_fatalerror("Error writing cached file");
 
 		// all done
-		auto_free(&m_manager.machine(), tempbuffer);
-		auto_free(&m_manager.machine(), chartable);
+		auto_free(m_manager.machine(), tempbuffer);
+		auto_free(m_manager.machine(), chartable);
 		return true;
 	}
 	catch (...)
 	{
 		file.remove_on_close();
-		auto_free(&m_manager.machine(), tempbuffer);
-		auto_free(&m_manager.machine(), chartable);
+		auto_free(m_manager.machine(), tempbuffer);
+		auto_free(m_manager.machine(), chartable);
 		return false;
 	}
 }

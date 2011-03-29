@@ -47,6 +47,6 @@
 //  PROTOTYPES
 //============================================================
 
-void winsound_init(running_machine *machine);
+void winsound_init(running_machine &machine);
 
 #endif

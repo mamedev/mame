@@ -81,17 +81,17 @@ static WRITE16_HANDLER( goodejan_gfxbank_w )
 /* Multiplexer device for the mahjong panel */
 static READ16_HANDLER( mahjong_panel_r )
 {
-	goodejan_state *state = space->machine->driver_data<goodejan_state>();
+	goodejan_state *state = space->machine().driver_data<goodejan_state>();
 	UINT16 ret;
 	ret = 0xffff;
 
 	switch(state->mux_data)
 	{
-		case 1:    ret = input_port_read(space->machine, "KEY0"); break;
-		case 2:    ret = input_port_read(space->machine, "KEY1"); break;
-		case 4:    ret = input_port_read(space->machine, "KEY2"); break;
-		case 8:    ret = input_port_read(space->machine, "KEY3"); break;
-		case 0x10: ret = input_port_read(space->machine, "KEY4"); break;
+		case 1:    ret = input_port_read(space->machine(), "KEY0"); break;
+		case 2:    ret = input_port_read(space->machine(), "KEY1"); break;
+		case 4:    ret = input_port_read(space->machine(), "KEY2"); break;
+		case 8:    ret = input_port_read(space->machine(), "KEY3"); break;
+		case 0x10: ret = input_port_read(space->machine(), "KEY4"); break;
 	}
 
 	return ret;
@@ -99,7 +99,7 @@ static READ16_HANDLER( mahjong_panel_r )
 
 static WRITE16_HANDLER( mahjong_panel_w )
 {
-	goodejan_state *state = space->machine->driver_data<goodejan_state>();
+	goodejan_state *state = space->machine().driver_data<goodejan_state>();
 	state->mux_data = data;
 }
 

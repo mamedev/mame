@@ -34,7 +34,7 @@ PALETTE_INIT( m57 )
 {
 	int i;
 
-	machine->colortable = colortable_alloc(machine, 32 * 8 + 16);
+	machine.colortable = colortable_alloc(machine, 32 * 8 + 16);
 
 	/* character palette */
 	for (i = 0; i < 256; i++)
@@ -57,8 +57,8 @@ PALETTE_INIT( m57 )
 		bit2 = (color_prom[0] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r,g,b));
-		colortable_entry_set_value(machine->colortable, i, i);
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r,g,b));
+		colortable_entry_set_value(machine.colortable, i, i);
 		color_prom++;
 	}
 
@@ -86,7 +86,7 @@ PALETTE_INIT( m57 )
 		bit2 = (*color_prom >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine->colortable, i + 256, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine.colortable, i + 256, MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -97,7 +97,7 @@ PALETTE_INIT( m57 )
 	/* sprite lookup table */
 	for (i = 0; i < 32 * 8; i++)
 	{
-		colortable_entry_set_value(machine->colortable, i + 32 * 8, 256 + (~*color_prom & 0x0f));
+		colortable_entry_set_value(machine.colortable, i + 32 * 8, 256 + (~*color_prom & 0x0f));
 		color_prom++;
 	}
 }
@@ -111,7 +111,7 @@ PALETTE_INIT( m57 )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	m57_state *state = machine->driver_data<m57_state>();
+	m57_state *state = machine.driver_data<m57_state>();
 
 	UINT8 attr = state->videoram[tile_index * 2 + 0];
 	UINT16 code = state->videoram[tile_index * 2 + 1] | ((attr & 0xc0) << 2);
@@ -128,7 +128,7 @@ static TILE_GET_INFO( get_tile_info )
 
 WRITE8_HANDLER( m57_videoram_w )
 {
-	m57_state *state = space->machine->driver_data<m57_state>();
+	m57_state *state = space->machine().driver_data<m57_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
@@ -143,7 +143,7 @@ WRITE8_HANDLER( m57_videoram_w )
 
 VIDEO_START( m57 )
 {
-	m57_state *state = machine->driver_data<m57_state>();
+	m57_state *state = machine.driver_data<m57_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 	tilemap_set_scroll_rows(state->bg_tilemap, 256);
@@ -160,14 +160,14 @@ VIDEO_START( m57 )
 
 WRITE8_HANDLER( m57_flipscreen_w )
 {
-	m57_state *state = space->machine->driver_data<m57_state>();
+	m57_state *state = space->machine().driver_data<m57_state>();
 
 	/* screen flip is handled both by software and hardware */
-	state->flipscreen = (data & 0x01) ^ (~input_port_read(space->machine, "DSW2") & 0x01);
+	state->flipscreen = (data & 0x01) ^ (~input_port_read(space->machine(), "DSW2") & 0x01);
 	tilemap_set_flip(state->bg_tilemap, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	coin_counter_w(space->machine, 0,data & 0x02);
-	coin_counter_w(space->machine, 1,data & 0x20);
+	coin_counter_w(space->machine(), 0,data & 0x02);
+	coin_counter_w(space->machine(), 1,data & 0x20);
 }
 
 
@@ -177,9 +177,9 @@ WRITE8_HANDLER( m57_flipscreen_w )
  *
  *************************************/
 
-static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	m57_state *state = machine->driver_data<m57_state>();
+	m57_state *state = machine.driver_data<m57_state>();
 	int y,x;
 	INT16 scrolly;
 
@@ -221,9 +221,9 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	m57_state *state = machine->driver_data<m57_state>();
+	m57_state *state = machine.driver_data<m57_state>();
 	int offs;
 
 	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
@@ -250,12 +250,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx_transmask(bitmap, cliprect, machine->gfx[1 + bank],
+		drawgfx_transmask(bitmap, cliprect, machine.gfx[1 + bank],
 			tile_number,
 			color,
 			flipx, flipy,
 			sx, sy,
-			colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 256 + 15));
+			colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 256 + 15));
 	}
 }
 
@@ -269,7 +269,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( m57 )
 {
-	draw_background(screen->machine, bitmap, cliprect);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_background(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

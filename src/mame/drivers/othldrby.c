@@ -22,13 +22,13 @@ Notes:
 
 static READ16_HANDLER( pip )
 {
-	othldrby_state *state = space->machine->driver_data<othldrby_state>();
+	othldrby_state *state = space->machine().driver_data<othldrby_state>();
 	return state->toggle ^= 1;
 }
 
 static READ16_HANDLER( pap )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 
@@ -42,10 +42,10 @@ static WRITE16_HANDLER( coinctrl_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0, data & 1);
-		coin_counter_w(space->machine, 1, data & 2);
-		coin_lockout_w(space->machine, 0, ~data & 4);
-		coin_lockout_w(space->machine, 1, ~data & 8);
+		coin_counter_w(space->machine(), 0, data & 1);
+		coin_counter_w(space->machine(), 1, data & 2);
+		coin_lockout_w(space->machine(), 0, ~data & 4);
+		coin_lockout_w(space->machine(), 1, ~data & 8);
 	}
 }
 
@@ -57,7 +57,7 @@ static READ16_HANDLER( calendar_r )
 {
 	system_time systime;
 
-	space->machine->base_datetime(systime);
+	space->machine().base_datetime(systime);
 
 	switch (offset)
 	{
@@ -218,7 +218,7 @@ GFXDECODE_END
 
 static MACHINE_START( othldrby )
 {
-	othldrby_state *state = machine->driver_data<othldrby_state>();
+	othldrby_state *state = machine.driver_data<othldrby_state>();
 
 	state->save_item(NAME(state->toggle));
 	state->save_item(NAME(state->vram_addr));
@@ -228,7 +228,7 @@ static MACHINE_START( othldrby )
 
 static MACHINE_RESET( othldrby )
 {
-	othldrby_state *state = machine->driver_data<othldrby_state>();
+	othldrby_state *state = machine.driver_data<othldrby_state>();
 
 	state->toggle = 0xff;
 	state->vram_addr = 0;

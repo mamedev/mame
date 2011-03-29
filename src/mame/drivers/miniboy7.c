@@ -170,21 +170,21 @@ public:
 
 static WRITE8_HANDLER( miniboy7_videoram_w )
 {
-	miniboy7_state *state = space->machine->driver_data<miniboy7_state>();
+	miniboy7_state *state = space->machine().driver_data<miniboy7_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( miniboy7_colorram_w )
 {
-	miniboy7_state *state = space->machine->driver_data<miniboy7_state>();
+	miniboy7_state *state = space->machine().driver_data<miniboy7_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	miniboy7_state *state = machine->driver_data<miniboy7_state>();
+	miniboy7_state *state = machine.driver_data<miniboy7_state>();
 /*  - bits -
     7654 3210
     --xx xx--   tiles color?.
@@ -204,13 +204,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( miniboy7 )
 {
-	miniboy7_state *state = machine->driver_data<miniboy7_state>();
+	miniboy7_state *state = machine.driver_data<miniboy7_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 37, 37);
 }
 
 static SCREEN_UPDATE( miniboy7 )
 {
-	miniboy7_state *state = screen->machine->driver_data<miniboy7_state>();
+	miniboy7_state *state = screen->machine().driver_data<miniboy7_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
@@ -233,7 +233,7 @@ static PALETTE_INIT( miniboy7 )
 	/* 0000IBGR */
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0, bit1, bit2, r, g, b, inten, intenmin, intenmax;
 

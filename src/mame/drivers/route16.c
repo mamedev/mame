@@ -90,21 +90,21 @@ static READ8_HANDLER( routex_prot_read );
 
 static READ8_HANDLER( sharedram_r )
 {
-	route16_state *state = space->machine->driver_data<route16_state>();
+	route16_state *state = space->machine().driver_data<route16_state>();
 	return state->sharedram[offset];
 }
 
 
 static WRITE8_HANDLER( sharedram_w )
 {
-	route16_state *state = space->machine->driver_data<route16_state>();
+	route16_state *state = space->machine().driver_data<route16_state>();
 	state->sharedram[offset] = data;
 }
 
 
 static WRITE8_HANDLER( route16_sharedram_w )
 {
-	route16_state *state = space->machine->driver_data<route16_state>();
+	route16_state *state = space->machine().driver_data<route16_state>();
 	state->sharedram[offset] = data;
 
 	// 4313-4319 are used in Route 16 as triggers to wake the other CPU
@@ -157,22 +157,22 @@ static WRITE8_DEVICE_HANDLER( stratvox_sn76477_w )
 
 static WRITE8_HANDLER( ttmahjng_input_port_matrix_w )
 {
-	route16_state *state = space->machine->driver_data<route16_state>();
+	route16_state *state = space->machine().driver_data<route16_state>();
 	state->ttmahjng_port_select = data;
 }
 
 
 static READ8_HANDLER( ttmahjng_input_port_matrix_r )
 {
-	route16_state *state = space->machine->driver_data<route16_state>();
+	route16_state *state = space->machine().driver_data<route16_state>();
 	UINT8 ret = 0;
 
 	switch (state->ttmahjng_port_select)
 	{
-	case 1:  ret = input_port_read(space->machine, "KEY0"); break;
-	case 2:  ret = input_port_read(space->machine, "KEY1"); break;
-	case 4:  ret = input_port_read(space->machine, "KEY2"); break;
-	case 8:  ret = input_port_read(space->machine, "KEY3"); break;
+	case 1:  ret = input_port_read(space->machine(), "KEY0"); break;
+	case 2:  ret = input_port_read(space->machine(), "KEY1"); break;
+	case 4:  ret = input_port_read(space->machine(), "KEY2"); break;
+	case 8:  ret = input_port_read(space->machine(), "KEY3"); break;
 	default: break;
 	}
 
@@ -192,7 +192,7 @@ static READ8_HANDLER( ttmahjng_input_port_matrix_r )
 
 static READ8_HANDLER ( speakres_in3_r )
 {
-	route16_state *state = space->machine->driver_data<route16_state>();
+	route16_state *state = space->machine().driver_data<route16_state>();
 	int bit2=4, bit1=2, bit0=1;
 
 	/* just using a counter, the constants are the number of reads
@@ -208,7 +208,7 @@ static READ8_HANDLER ( speakres_in3_r )
 
 static WRITE8_HANDLER ( speakres_out2_w )
 {
-	route16_state *state = space->machine->driver_data<route16_state>();
+	route16_state *state = space->machine().driver_data<route16_state>();
 	state->speakres_vrx=0;
 }
 
@@ -966,7 +966,7 @@ static READ8_HANDLER( routex_prot_read )
 
 static DRIVER_INIT( route16 )
 {
-	UINT8 *ROM = machine->region("cpu1")->base();
+	UINT8 *ROM = machine.region("cpu1")->base();
 	/* Is this actually a bootleg? some of the protection has
        been removed */
 
@@ -981,7 +981,7 @@ static DRIVER_INIT( route16 )
 
 static DRIVER_INIT( route16a )
 {
-	UINT8 *ROM = machine->region("cpu1")->base();
+	UINT8 *ROM = machine.region("cpu1")->base();
 	/* TO DO : Replace these patches with simulation of the protection device */
 
 	/* patch the protection */

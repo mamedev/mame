@@ -55,17 +55,17 @@ public:
 
 static VIDEO_START( mjsister )
 {
-	mjsister_state *state = machine->driver_data<mjsister_state>();
-	state->tmpbitmap0 = auto_bitmap_alloc(machine, 256, 256, machine->primary_screen->format());
-	state->tmpbitmap1 = auto_bitmap_alloc(machine, 256, 256, machine->primary_screen->format());
+	mjsister_state *state = machine.driver_data<mjsister_state>();
+	state->tmpbitmap0 = auto_bitmap_alloc(machine, 256, 256, machine.primary_screen->format());
+	state->tmpbitmap1 = auto_bitmap_alloc(machine, 256, 256, machine.primary_screen->format());
 
 	state->save_item(NAME(state->videoram0));
 	state->save_item(NAME(state->videoram1));
 }
 
-static void mjsister_plot0( running_machine *machine, int offset, UINT8 data )
+static void mjsister_plot0( running_machine &machine, int offset, UINT8 data )
 {
-	mjsister_state *state = machine->driver_data<mjsister_state>();
+	mjsister_state *state = machine.driver_data<mjsister_state>();
 	int x, y, c1, c2;
 
 	x = offset & 0x7f;
@@ -78,9 +78,9 @@ static void mjsister_plot0( running_machine *machine, int offset, UINT8 data )
 	*BITMAP_ADDR16(state->tmpbitmap0, y, x * 2 + 1) = c2;
 }
 
-static void mjsister_plot1( running_machine *machine, int offset, UINT8 data )
+static void mjsister_plot1( running_machine &machine, int offset, UINT8 data )
 {
-	mjsister_state *state = machine->driver_data<mjsister_state>();
+	mjsister_state *state = machine.driver_data<mjsister_state>();
 	int x, y, c1, c2;
 
 	x = offset & 0x7f;
@@ -100,22 +100,22 @@ static void mjsister_plot1( running_machine *machine, int offset, UINT8 data )
 
 static WRITE8_HANDLER( mjsister_videoram_w )
 {
-	mjsister_state *state = space->machine->driver_data<mjsister_state>();
+	mjsister_state *state = space->machine().driver_data<mjsister_state>();
 	if (state->vrambank)
 	{
 		state->videoram1[offset] = data;
-		mjsister_plot1(space->machine, offset, data);
+		mjsister_plot1(space->machine(), offset, data);
 	}
 	else
 	{
 		state->videoram0[offset] = data;
-		mjsister_plot0(space->machine, offset, data);
+		mjsister_plot0(space->machine(), offset, data);
 	}
 }
 
 static SCREEN_UPDATE( mjsister )
 {
-	mjsister_state *state = screen->machine->driver_data<mjsister_state>();
+	mjsister_state *state = screen->machine().driver_data<mjsister_state>();
 	int flip = state->flip_screen;
 	int i, j;
 
@@ -125,8 +125,8 @@ static SCREEN_UPDATE( mjsister )
 
 		for (offs = 0; offs < 0x8000; offs++)
 		{
-			mjsister_plot0(screen->machine, offs, state->videoram0[offs]);
-			mjsister_plot1(screen->machine, offs, state->videoram1[offs]);
+			mjsister_plot0(screen->machine(), offs, state->videoram0[offs]);
+			mjsister_plot1(screen->machine(), offs, state->videoram1[offs]);
 		}
 		state->screen_redraw = 0;
 	}
@@ -141,7 +141,7 @@ static SCREEN_UPDATE( mjsister )
 		copybitmap_trans(bitmap, state->tmpbitmap1, flip, flip, 2, 0, cliprect, 0);
 	}
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	return 0;
 }
 
@@ -153,38 +153,38 @@ static SCREEN_UPDATE( mjsister )
 
 static TIMER_CALLBACK( dac_callback )
 {
-	mjsister_state *state = machine->driver_data<mjsister_state>();
-	UINT8 *DACROM = machine->region("samples")->base();
+	mjsister_state *state = machine.driver_data<mjsister_state>();
+	UINT8 *DACROM = machine.region("samples")->base();
 
 	dac_data_w(state->dac, DACROM[(state->dac_bank * 0x10000 + state->dac_adr++) & 0x1ffff]);
 
 	if (((state->dac_adr & 0xff00 ) >> 8) !=  state->dac_adr_e)
-		machine->scheduler().timer_set(attotime::from_hz(MCLK) * 1024, FUNC(dac_callback));
+		machine.scheduler().timer_set(attotime::from_hz(MCLK) * 1024, FUNC(dac_callback));
 	else
 		state->dac_busy = 0;
 }
 
 static WRITE8_HANDLER( mjsister_dac_adr_s_w )
 {
-	mjsister_state *state = space->machine->driver_data<mjsister_state>();
+	mjsister_state *state = space->machine().driver_data<mjsister_state>();
 	state->dac_adr_s = data;
 }
 
 static WRITE8_HANDLER( mjsister_dac_adr_e_w )
 {
-	mjsister_state *state = space->machine->driver_data<mjsister_state>();
+	mjsister_state *state = space->machine().driver_data<mjsister_state>();
 	state->dac_adr_e = data;
 	state->dac_adr = state->dac_adr_s << 8;
 
 	if (state->dac_busy == 0)
-		space->machine->scheduler().synchronize(FUNC(dac_callback));
+		space->machine().scheduler().synchronize(FUNC(dac_callback));
 
 	state->dac_busy = 1;
 }
 
 static WRITE8_HANDLER( mjsister_banksel1_w )
 {
-	mjsister_state *state = space->machine->driver_data<mjsister_state>();
+	mjsister_state *state = space->machine().driver_data<mjsister_state>();
 	int tmp = state->colorbank;
 
 	switch (data)
@@ -215,12 +215,12 @@ static WRITE8_HANDLER( mjsister_banksel1_w )
 	if (tmp != state->colorbank)
 		state->screen_redraw = 1;
 
-	memory_set_bank(space->machine, "bank1", state->rombank0 * 2 + state->rombank1);
+	memory_set_bank(space->machine(), "bank1", state->rombank0 * 2 + state->rombank1);
 }
 
 static WRITE8_HANDLER( mjsister_banksel2_w )
 {
-	mjsister_state *state = space->machine->driver_data<mjsister_state>();
+	mjsister_state *state = space->machine().driver_data<mjsister_state>();
 
 	switch (data)
 	{
@@ -234,24 +234,24 @@ static WRITE8_HANDLER( mjsister_banksel2_w )
 			logerror("%04x p31_w:%02x\n", cpu_get_pc(space->cpu), data);
 	}
 
-	memory_set_bank(space->machine, "bank1", state->rombank0 * 2 + state->rombank1);
+	memory_set_bank(space->machine(), "bank1", state->rombank0 * 2 + state->rombank1);
 }
 
 static WRITE8_HANDLER( mjsister_input_sel1_w )
 {
-	mjsister_state *state = space->machine->driver_data<mjsister_state>();
+	mjsister_state *state = space->machine().driver_data<mjsister_state>();
 	state->input_sel1 = data;
 }
 
 static WRITE8_HANDLER( mjsister_input_sel2_w )
 {
-	mjsister_state *state = space->machine->driver_data<mjsister_state>();
+	mjsister_state *state = space->machine().driver_data<mjsister_state>();
 	state->input_sel2 = data;
 }
 
 static READ8_HANDLER( mjsister_keys_r )
 {
-	mjsister_state *state = space->machine->driver_data<mjsister_state>();
+	mjsister_state *state = space->machine().driver_data<mjsister_state>();
 	int p, i, ret = 0;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
@@ -261,7 +261,7 @@ static READ8_HANDLER( mjsister_keys_r )
 	for (i = 0; i < 6; i++)
 	{
 		if (BIT(p, i))
-			ret |= input_port_read(space->machine, keynames[i]);
+			ret |= input_port_read(space->machine(), keynames[i]);
 	}
 
 	return ret;
@@ -437,7 +437,7 @@ static const ay8910_interface ay8910_config =
 
 static STATE_POSTLOAD( mjsister_redraw )
 {
-	mjsister_state *state = machine->driver_data<mjsister_state>();
+	mjsister_state *state = machine.driver_data<mjsister_state>();
 
 	/* we can skip saving tmpbitmaps because we can redraw them from vram */
 	state->screen_redraw = 1;
@@ -445,13 +445,13 @@ static STATE_POSTLOAD( mjsister_redraw )
 
 static MACHINE_START( mjsister )
 {
-	mjsister_state *state = machine->driver_data<mjsister_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	mjsister_state *state = machine.driver_data<mjsister_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x8000);
 
-	state->maincpu = machine->device("maincpu");
-	state->dac = machine->device("dac");
+	state->maincpu = machine.device("maincpu");
+	state->dac = machine.device("dac");
 
 	state->save_item(NAME(state->dac_busy));
 	state->save_item(NAME(state->flip_screen));
@@ -466,12 +466,12 @@ static MACHINE_START( mjsister )
 	state->save_item(NAME(state->dac_bank));
 	state->save_item(NAME(state->dac_adr_s));
 	state->save_item(NAME(state->dac_adr_e));
-	machine->state().register_postload(mjsister_redraw, 0);
+	machine.state().register_postload(mjsister_redraw, 0);
 }
 
 static MACHINE_RESET( mjsister )
 {
-	mjsister_state *state = machine->driver_data<mjsister_state>();
+	mjsister_state *state = machine.driver_data<mjsister_state>();
 
 	state->dac_busy = 0;
 	state->flip_screen = 0;

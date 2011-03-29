@@ -8,7 +8,7 @@
 
 VIDEO_START( volfied )
 {
-	volfied_state *state = machine->driver_data<volfied_state>();
+	volfied_state *state = machine.driver_data<volfied_state>();
 	state->video_ram = auto_alloc_array(machine, UINT16, 0x40000);
 
 	state->video_ctrl = 0;
@@ -26,13 +26,13 @@ VIDEO_START( volfied )
 
 READ16_HANDLER( volfied_video_ram_r )
 {
-	volfied_state *state = space->machine->driver_data<volfied_state>();
+	volfied_state *state = space->machine().driver_data<volfied_state>();
 	return state->video_ram[offset];
 }
 
 WRITE16_HANDLER( volfied_video_ram_w )
 {
-	volfied_state *state = space->machine->driver_data<volfied_state>();
+	volfied_state *state = space->machine().driver_data<volfied_state>();
 
 	mem_mask &= state->video_mask;
 
@@ -41,7 +41,7 @@ WRITE16_HANDLER( volfied_video_ram_w )
 
 WRITE16_HANDLER( volfied_video_ctrl_w )
 {
-	volfied_state *state = space->machine->driver_data<volfied_state>();
+	volfied_state *state = space->machine().driver_data<volfied_state>();
 	COMBINE_DATA(&state->video_ctrl);
 }
 
@@ -58,13 +58,13 @@ READ16_HANDLER( volfied_video_ctrl_r )
 
 WRITE16_HANDLER( volfied_video_mask_w )
 {
-	volfied_state *state = space->machine->driver_data<volfied_state>();
+	volfied_state *state = space->machine().driver_data<volfied_state>();
 	COMBINE_DATA(&state->video_mask);
 }
 
 WRITE16_HANDLER( volfied_sprite_ctrl_w )
 {
-	volfied_state *state = space->machine->driver_data<volfied_state>();
+	volfied_state *state = space->machine().driver_data<volfied_state>();
 	pc090oj_set_sprite_ctrl(state->pc090oj, (data & 0x3c) >> 2);
 }
 
@@ -73,7 +73,7 @@ WRITE16_HANDLER( volfied_sprite_ctrl_w )
                 SCREEN REFRESH
 *******************************************************/
 
-static void refresh_pixel_layer( running_machine *machine, bitmap_t *bitmap )
+static void refresh_pixel_layer( running_machine &machine, bitmap_t *bitmap )
 {
 	int x, y;
 
@@ -97,10 +97,10 @@ static void refresh_pixel_layer( running_machine *machine, bitmap_t *bitmap )
 
     *********************************************************/
 
-	volfied_state *state = machine->driver_data<volfied_state>();
+	volfied_state *state = machine.driver_data<volfied_state>();
 	UINT16* p = state->video_ram;
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	if (state->video_ctrl & 1)
 		p += 0x20000;
@@ -130,10 +130,10 @@ static void refresh_pixel_layer( running_machine *machine, bitmap_t *bitmap )
 
 SCREEN_UPDATE( volfied )
 {
-	volfied_state *state = screen->machine->driver_data<volfied_state>();
+	volfied_state *state = screen->machine().driver_data<volfied_state>();
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
-	refresh_pixel_layer(screen->machine, bitmap);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	refresh_pixel_layer(screen->machine(), bitmap);
 	pc090oj_draw_sprites(state->pc090oj, bitmap, cliprect, 0);
 	return 0;
 }

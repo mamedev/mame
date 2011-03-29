@@ -27,9 +27,9 @@
 PALETTE_INIT( xevious )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define TOTAL_COLORS(gfxn) (machine.gfx[gfxn]->total_colors * machine.gfx[gfxn]->color_granularity)
 
-	machine->colortable = colortable_alloc(machine, 128+1);
+	machine.colortable = colortable_alloc(machine, 128+1);
 
 	for (i = 0;i < 128;i++)
 	{
@@ -54,12 +54,12 @@ PALETTE_INIT( xevious )
 		bit3 = (color_prom[2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine.colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
 	/* color 0x80 is used by sprites to mark transparency */
-	colortable_palette_set_color(machine->colortable,0x80,MAKE_RGB(0,0,0));
+	colortable_palette_set_color(machine.colortable,0x80,MAKE_RGB(0,0,0));
 
 	color_prom += 128;  /* the bottom part of the PROM is unused */
 	color_prom += 2*256;
@@ -68,7 +68,7 @@ PALETTE_INIT( xevious )
 	/* background tiles */
 	for (i = 0;i < TOTAL_COLORS(1);i++)
 	{
-		colortable_entry_set_value(machine->colortable, machine->gfx[1]->color_base + i,
+		colortable_entry_set_value(machine.colortable, machine.gfx[1]->color_base + i,
 				(color_prom[0] & 0x0f) | ((color_prom[TOTAL_COLORS(1)] & 0x0f) << 4));
 
 		color_prom++;
@@ -80,7 +80,7 @@ PALETTE_INIT( xevious )
 	{
 		int c = (color_prom[0] & 0x0f) | ((color_prom[TOTAL_COLORS(2)] & 0x0f) << 4);
 
-		colortable_entry_set_value(machine->colortable, machine->gfx[2]->color_base + i,
+		colortable_entry_set_value(machine.colortable, machine.gfx[2]->color_base + i,
 				(c & 0x80) ? (c & 0x7f) : 0x80);
 
 		color_prom++;
@@ -90,7 +90,7 @@ PALETTE_INIT( xevious )
 	/* foreground characters */
 	for (i = 0;i < TOTAL_COLORS(0);i++)
 	{
-		colortable_entry_set_value(machine->colortable, machine->gfx[0]->color_base + i,
+		colortable_entry_set_value(machine.colortable, machine.gfx[0]->color_base + i,
 				(i % 2 != 0) ? (i / 2) : 0x80);
 	}
 }
@@ -101,7 +101,7 @@ PALETTE_INIT( battles )
 {
 	int i;
 
-	machine->colortable = colortable_alloc(machine, 128+1);
+	machine.colortable = colortable_alloc(machine, 128+1);
 
 	for (i = 0;i < 128;i++)
 	{
@@ -126,12 +126,12 @@ PALETTE_INIT( battles )
 		bit3 = (color_prom[2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine.colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
 	/* color 0x80 is used by sprites to mark transparency */
-	colortable_palette_set_color(machine->colortable,0x80,MAKE_RGB(0,0,0));
+	colortable_palette_set_color(machine.colortable,0x80,MAKE_RGB(0,0,0));
 
 	color_prom += 128;  /* the bottom part of the PROM is unused */
 	color_prom += 2*256;
@@ -140,7 +140,7 @@ PALETTE_INIT( battles )
 	/* background tiles */
 	for (i = 0;i < TOTAL_COLORS(1);i++)
 	{
-		colortable_entry_set_value(machine->colortable, machine->gfx[1]->color_base + i,
+		colortable_entry_set_value(machine.colortable, machine.gfx[1]->color_base + i,
 				(color_prom[0] & 0x0f) | ((color_prom[0x400] & 0x0f) << 4));
 
 		color_prom++;
@@ -152,7 +152,7 @@ PALETTE_INIT( battles )
 	{
 		int c = (color_prom[0] & 0x0f) | ((color_prom[0x400] & 0x0f) << 4);
 
-		colortable_entry_set_value(machine->colortable, machine->gfx[2]->color_base + i,
+		colortable_entry_set_value(machine.colortable, machine.gfx[2]->color_base + i,
 				(c & 0x80) ? (c & 0x7f) : 0x80);
 
 		color_prom++;
@@ -161,7 +161,7 @@ PALETTE_INIT( battles )
 	/* foreground characters */
 	for (i = 0;i < TOTAL_COLORS(0);i++)
 	{
-		colortable_entry_set_value(machine->colortable, machine->gfx[0]->color_base + i,
+		colortable_entry_set_value(machine.colortable, machine.gfx[0]->color_base + i,
 				(i % 2 != 0) ? (i / 2) : 0x80);
 	}
 }
@@ -176,7 +176,7 @@ PALETTE_INIT( battles )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	xevious_state *state =  machine->driver_data<xevious_state>();
+	xevious_state *state =  machine.driver_data<xevious_state>();
 
 	UINT8 attr = state->xevious_fg_colorram[tile_index];
 
@@ -195,7 +195,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	xevious_state *state =  machine->driver_data<xevious_state>();
+	xevious_state *state =  machine.driver_data<xevious_state>();
 
 	UINT8 code = state->xevious_bg_videoram[tile_index];
 	UINT8 attr = state->xevious_bg_colorram[tile_index];
@@ -217,7 +217,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( xevious )
 {
-	xevious_state *state =  machine->driver_data<xevious_state>();
+	xevious_state *state =  machine.driver_data<xevious_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,     8,8,64,32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
@@ -243,7 +243,7 @@ VIDEO_START( xevious )
 
 WRITE8_HANDLER( xevious_fg_videoram_w )
 {
-	xevious_state *state =  space->machine->driver_data<xevious_state>();
+	xevious_state *state =  space->machine().driver_data<xevious_state>();
 
 	state->xevious_fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
@@ -251,7 +251,7 @@ WRITE8_HANDLER( xevious_fg_videoram_w )
 
 WRITE8_HANDLER( xevious_fg_colorram_w )
 {
-	xevious_state *state =  space->machine->driver_data<xevious_state>();
+	xevious_state *state =  space->machine().driver_data<xevious_state>();
 
 	state->xevious_fg_colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
@@ -259,7 +259,7 @@ WRITE8_HANDLER( xevious_fg_colorram_w )
 
 WRITE8_HANDLER( xevious_bg_videoram_w )
 {
-	xevious_state *state =  space->machine->driver_data<xevious_state>();
+	xevious_state *state =  space->machine().driver_data<xevious_state>();
 
 	state->xevious_bg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
@@ -267,7 +267,7 @@ WRITE8_HANDLER( xevious_bg_videoram_w )
 
 WRITE8_HANDLER( xevious_bg_colorram_w )
 {
-	xevious_state *state =  space->machine->driver_data<xevious_state>();
+	xevious_state *state =  space->machine().driver_data<xevious_state>();
 
 	state->xevious_bg_colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
@@ -275,7 +275,7 @@ WRITE8_HANDLER( xevious_bg_colorram_w )
 
 WRITE8_HANDLER( xevious_vh_latch_w )
 {
-	xevious_state *state =  space->machine->driver_data<xevious_state>();
+	xevious_state *state =  space->machine().driver_data<xevious_state>();
 
 	int reg;
 	int scroll = data + ((offset&0x01)<<8);   /* A0 -> D8 */
@@ -297,7 +297,7 @@ WRITE8_HANDLER( xevious_vh_latch_w )
 		tilemap_set_scrolly(state->fg_tilemap,0,scroll);
 		break;
 	case 7:
-		flip_screen_set(space->machine, scroll & 1);
+		flip_screen_set(space->machine(), scroll & 1);
 		break;
    default:
 		   logerror("CRTC WRITE REG: %x  Data: %03x\n",reg, scroll);
@@ -309,16 +309,16 @@ WRITE8_HANDLER( xevious_vh_latch_w )
 /* emulation for schematic 9B */
 WRITE8_HANDLER( xevious_bs_w )
 {
-	xevious_state *state =  space->machine->driver_data<xevious_state>();
+	xevious_state *state =  space->machine().driver_data<xevious_state>();
 
 	state->xevious_bs[offset & 1] = data;
 }
 
 READ8_HANDLER( xevious_bb_r )
 {
-	xevious_state *state =  space->machine->driver_data<xevious_state>();
+	xevious_state *state =  space->machine().driver_data<xevious_state>();
 
-	UINT8 *rom2a = space->machine->region("gfx4")->base();
+	UINT8 *rom2a = space->machine().region("gfx4")->base();
 	UINT8 *rom2b = rom2a+0x1000;
 	UINT8 *rom2c = rom2a+0x3000;
 	int adr_2b,adr_2c;
@@ -414,9 +414,9 @@ ROM 3M,3L color replace table for sprite
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	xevious_state *state =  machine->driver_data<xevious_state>();
+	xevious_state *state =  machine.driver_data<xevious_state>();
 
 	UINT8 *spriteram = state->xevious_sr3 + 0x780;
 	UINT8 *spriteram_2 = state->xevious_sr1 + 0x780;
@@ -455,41 +455,41 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				sy += 48;
 			}
 
-			transmask = colortable_get_transpen_mask(machine->colortable, machine->gfx[bank], color, 0x80);
+			transmask = colortable_get_transpen_mask(machine.colortable, machine.gfx[bank], color, 0x80);
 
 			if (spriteram_3[offs] & 2)  /* double height (?) */
 			{
 				if (spriteram_3[offs] & 1)  /* double width, double height */
 				{
 					code &= ~3;
-					drawgfx_transmask(bitmap,cliprect,machine->gfx[bank],
+					drawgfx_transmask(bitmap,cliprect,machine.gfx[bank],
 							code+3,color,flipx,flipy,
 							flipx ? sx : sx+16,flipy ? sy-16 : sy,transmask);
-					drawgfx_transmask(bitmap,cliprect,machine->gfx[bank],
+					drawgfx_transmask(bitmap,cliprect,machine.gfx[bank],
 							code+1,color,flipx,flipy,
 							flipx ? sx : sx+16,flipy ? sy : sy-16,transmask);
 				}
 				code &= ~2;
-				drawgfx_transmask(bitmap,cliprect,machine->gfx[bank],
+				drawgfx_transmask(bitmap,cliprect,machine.gfx[bank],
 						code+2,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy-16 : sy,transmask);
-				drawgfx_transmask(bitmap,cliprect,machine->gfx[bank],
+				drawgfx_transmask(bitmap,cliprect,machine.gfx[bank],
 						code,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy : sy-16,transmask);
 			}
 			else if (spriteram_3[offs] & 1) /* double width */
 			{
 				code &= ~1;
-				drawgfx_transmask(bitmap,cliprect,machine->gfx[bank],
+				drawgfx_transmask(bitmap,cliprect,machine.gfx[bank],
 						code,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy-16 : sy,transmask);
-				drawgfx_transmask(bitmap,cliprect,machine->gfx[bank],
+				drawgfx_transmask(bitmap,cliprect,machine.gfx[bank],
 						code+1,color,flipx,flipy,
 						flipx ? sx : sx+16,flipy ? sy-16 : sy,transmask);
 			}
 			else	/* normal */
 			{
-				drawgfx_transmask(bitmap,cliprect,machine->gfx[bank],
+				drawgfx_transmask(bitmap,cliprect,machine.gfx[bank],
 						code,color,flipx,flipy,sx,sy,transmask);
 			}
 		}
@@ -499,10 +499,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( xevious )
 {
-	xevious_state *state =  screen->machine->driver_data<xevious_state>();
+	xevious_state *state =  screen->machine().driver_data<xevious_state>();
 
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect);
+	draw_sprites(screen->machine(), bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
 	return 0;
 }

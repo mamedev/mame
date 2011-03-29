@@ -22,24 +22,24 @@ enum {
 /***************************************************************************/
 
 READ8_HANDLER( thief_context_ram_r ){
-	thief_state *state = space->machine->driver_data<thief_state>();
+	thief_state *state = space->machine().driver_data<thief_state>();
 	return state->coprocessor.context_ram[0x40*state->coprocessor.bank+offset];
 }
 
 WRITE8_HANDLER( thief_context_ram_w ){
-	thief_state *state = space->machine->driver_data<thief_state>();
+	thief_state *state = space->machine().driver_data<thief_state>();
 	state->coprocessor.context_ram[0x40*state->coprocessor.bank+offset] = data;
 }
 
 WRITE8_HANDLER( thief_context_bank_w ){
-	thief_state *state = space->machine->driver_data<thief_state>();
+	thief_state *state = space->machine().driver_data<thief_state>();
 	state->coprocessor.bank = data&0xf;
 }
 
 /***************************************************************************/
 
 WRITE8_HANDLER( thief_video_control_w ){
-	thief_state *state = space->machine->driver_data<thief_state>();
+	thief_state *state = space->machine().driver_data<thief_state>();
 	state->video_control = data;
 /*
     bit 0: screen flip
@@ -60,13 +60,13 @@ WRITE8_HANDLER( thief_color_map_w ){
 	int r = intensity[(data & 0x03) >> 0];
     int g = intensity[(data & 0x0C) >> 2];
     int b = intensity[(data & 0x30) >> 4];
-	palette_set_color( space->machine,offset,MAKE_RGB(r,g,b) );
+	palette_set_color( space->machine(),offset,MAKE_RGB(r,g,b) );
 }
 
 /***************************************************************************/
 
 WRITE8_HANDLER( thief_color_plane_w ){
-	thief_state *state = space->machine->driver_data<thief_state>();
+	thief_state *state = space->machine().driver_data<thief_state>();
 /*
     --xx----    selects bitplane to read from (0..3)
     ----xxxx    selects bitplane(s) to write to (0x0 = none, 0xf = all)
@@ -76,7 +76,7 @@ WRITE8_HANDLER( thief_color_plane_w ){
 }
 
 READ8_HANDLER( thief_videoram_r ){
-	thief_state *state = space->machine->driver_data<thief_state>();
+	thief_state *state = space->machine().driver_data<thief_state>();
 	UINT8 *videoram = state->videoram;
 	UINT8 *source = &videoram[offset];
 	if( state->video_control&0x02 ) source+=0x2000*4; /* foreground/background */
@@ -84,7 +84,7 @@ READ8_HANDLER( thief_videoram_r ){
 }
 
 WRITE8_HANDLER( thief_videoram_w ){
-	thief_state *state = space->machine->driver_data<thief_state>();
+	thief_state *state = space->machine().driver_data<thief_state>();
 	UINT8 *videoram = state->videoram;
 	UINT8 *dest = &videoram[offset];
 	if( state->video_control&0x02 )
@@ -98,7 +98,7 @@ WRITE8_HANDLER( thief_videoram_w ){
 /***************************************************************************/
 
 VIDEO_START( thief ){
-	thief_state *state = machine->driver_data<thief_state>();
+	thief_state *state = machine.driver_data<thief_state>();
 	memset( &state->coprocessor, 0x00, sizeof(state->coprocessor) );
 
 	state->videoram = auto_alloc_array_clear(machine, UINT8, 0x2000*4*2 );
@@ -108,15 +108,15 @@ VIDEO_START( thief ){
 }
 
 SCREEN_UPDATE( thief ){
-	thief_state *state = screen->machine->driver_data<thief_state>();
+	thief_state *state = screen->machine().driver_data<thief_state>();
 	UINT8 *videoram = state->videoram;
 	UINT32 offs;
 	int flipscreen = state->video_control&1;
 	const UINT8 *source = videoram;
 
-	if (tms9927_screen_reset(screen->machine->device("tms")))
+	if (tms9927_screen_reset(screen->machine().device("tms")))
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 		return 0;
 	}
 
@@ -166,10 +166,10 @@ static UINT16 fetch_image_addr( coprocessor_t &thief_coprocessor ){
 }
 
 WRITE8_HANDLER( thief_blit_w ){
-	thief_state *state = space->machine->driver_data<thief_state>();
+	thief_state *state = space->machine().driver_data<thief_state>();
 	coprocessor_t &thief_coprocessor = state->coprocessor;
 	int i, offs, xoffset, dy;
-	UINT8 *gfx_rom = space->machine->region( "gfx1" )->base();
+	UINT8 *gfx_rom = space->machine().region( "gfx1" )->base();
 	UINT8 x = thief_coprocessor.param[SCREEN_XPOS];
 	UINT8 y = thief_coprocessor.param[SCREEN_YPOS];
 	UINT8 width = thief_coprocessor.param[BLIT_WIDTH];
@@ -228,7 +228,7 @@ WRITE8_HANDLER( thief_blit_w ){
 }
 
 READ8_HANDLER( thief_coprocessor_r ){
-	thief_state *state = space->machine->driver_data<thief_state>();
+	thief_state *state = space->machine().driver_data<thief_state>();
 	coprocessor_t &thief_coprocessor = state->coprocessor;
 	switch( offset ){
 	case SCREEN_XPOS: /* xpos */
@@ -248,7 +248,7 @@ READ8_HANDLER( thief_coprocessor_r ){
 				return thief_coprocessor.image_ram[addr];
 			}
 			else {
-				UINT8 *gfx_rom = space->machine->region( "gfx1" )->base();
+				UINT8 *gfx_rom = space->machine().region( "gfx1" )->base();
 				addr -= 0x2000;
 				if( addr<0x6000 ) return gfx_rom[addr];
 			}
@@ -273,7 +273,7 @@ READ8_HANDLER( thief_coprocessor_r ){
 }
 
 WRITE8_HANDLER( thief_coprocessor_w ){
-	thief_state *state = space->machine->driver_data<thief_state>();
+	thief_state *state = space->machine().driver_data<thief_state>();
 	coprocessor_t &thief_coprocessor = state->coprocessor;
 	switch( offset ){
 	case GFX_PORT:

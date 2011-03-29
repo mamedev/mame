@@ -210,21 +210,21 @@ UINT8 blitter_status;
  *************************************/
 
 /* from jagobj.c */
-static void jagobj_init(running_machine *machine);
-static void process_object_list(running_machine *machine, int vc, UINT16 *_scanline);
+static void jagobj_init(running_machine &machine);
+static void process_object_list(running_machine &machine, int vc, UINT16 *_scanline);
 
 /* from jagblit.c */
-static void generic_blitter(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
-static void blitter_09800001_010020_010020(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
-static void blitter_09800009_000020_000020(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
-static void blitter_01800009_000028_000028(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
-static void blitter_01800001_000018_000018(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
-static void blitter_01c00001_000018_000018(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void generic_blitter(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_09800001_010020_010020(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_09800009_000020_000020(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_01800009_000028_000028(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_01800001_000018_000018(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_01c00001_000018_000018(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
 
 #ifdef MESS
-static void blitter_00010000_xxxxxx_xxxxxx(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
-static void blitter_01800001_xxxxxx_xxxxxx(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
-static void blitter_x1800x01_xxxxxx_xxxxxx(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_00010000_xxxxxx_xxxxxx(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_01800001_xxxxxx_xxxxxx(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_x1800x01_xxxxxx_xxxxxx(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
 #endif
 
 
@@ -235,9 +235,9 @@ static void blitter_x1800x01_xxxxxx_xxxxxx(running_machine *machine, UINT32 comm
  *
  *************************************/
 
-INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *y)
+INLINE void get_crosshair_xy(running_machine &machine, int player, int *x, int *y)
 {
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	int width = visarea.max_x + 1 - visarea.min_x;
 	int height = visarea.max_y + 1 - visarea.min_y;
@@ -270,7 +270,7 @@ INLINE int effective_hvalue(int value)
  *
  *************************************/
 
-INLINE int adjust_object_timer(running_machine *machine, int vc)
+INLINE int adjust_object_timer(running_machine &machine, int vc)
 {
 	int hdbpix[2];
 	int hdb = 0;
@@ -291,11 +291,11 @@ INLINE int adjust_object_timer(running_machine *machine, int vc)
 	hdb = hdbpix[vc % 2];
 
 	/* if setting the second one in a line, make sure we will ever actually hit it */
-	if (vc % 2 == 1 && (hdbpix[1] == hdbpix[0] || hdbpix[1] >= machine->primary_screen->width()))
+	if (vc % 2 == 1 && (hdbpix[1] == hdbpix[0] || hdbpix[1] >= machine.primary_screen->width()))
 		return FALSE;
 
 	/* adjust the timer */
-	object_timer->adjust(machine->primary_screen->time_until_pos(vc / 2, hdb), vc | (hdb << 16));
+	object_timer->adjust(machine.primary_screen->time_until_pos(vc / 2, hdb), vc | (hdb << 16));
 	return TRUE;
 }
 
@@ -307,15 +307,15 @@ INLINE int adjust_object_timer(running_machine *machine, int vc)
  *
  *************************************/
 
-void jaguar_gpu_suspend(running_machine *machine)
+void jaguar_gpu_suspend(running_machine &machine)
 {
-	machine->device<cpu_device>("gpu")->suspend(SUSPEND_REASON_SPIN, 1);
+	machine.device<cpu_device>("gpu")->suspend(SUSPEND_REASON_SPIN, 1);
 }
 
 
-void jaguar_gpu_resume(running_machine *machine)
+void jaguar_gpu_resume(running_machine &machine)
 {
-	machine->device<cpu_device>("gpu")->resume(SUSPEND_REASON_SPIN);
+	machine.device<cpu_device>("gpu")->resume(SUSPEND_REASON_SPIN);
 }
 
 
@@ -326,7 +326,7 @@ void jaguar_gpu_resume(running_machine *machine)
  *
  *************************************/
 
-static void update_cpu_irq(running_machine *machine)
+static void update_cpu_irq(running_machine &machine)
 {
 	if (cpu_irq_state & gpu_regs[INT1] & 0x1f)
 		cputag_set_input_line(machine, "maincpu", cojag_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
@@ -338,14 +338,14 @@ static void update_cpu_irq(running_machine *machine)
 void jaguar_gpu_cpu_int(device_t *device)
 {
 	cpu_irq_state |= 2;
-	update_cpu_irq(device->machine);
+	update_cpu_irq(device->machine());
 }
 
 
 void jaguar_dsp_cpu_int(device_t *device)
 {
 	cpu_irq_state |= 16;
-	update_cpu_irq(device->machine);
+	update_cpu_irq(device->machine());
 }
 
 
@@ -491,9 +491,9 @@ static void jaguar_set_palette(UINT16 vmode)
  *
  *************************************/
 
-static UINT8 *get_jaguar_memory(running_machine *machine, UINT32 offset)
+static UINT8 *get_jaguar_memory(running_machine &machine, UINT32 offset)
 {
-	address_space *space = machine->device("gpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("gpu")->memory().space(AS_PROGRAM);
 	return (UINT8 *)space->get_read_ptr(offset);
 }
 
@@ -505,7 +505,7 @@ static UINT8 *get_jaguar_memory(running_machine *machine, UINT32 offset)
  *
  *************************************/
 
-static void blitter_run(running_machine *machine)
+static void blitter_run(running_machine &machine)
 {
 	UINT32 command = blitter_regs[B_CMD] & STATIC_COMMAND_MASK;
 	UINT32 a1flags = blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK;
@@ -628,8 +628,8 @@ WRITE32_HANDLER( jaguar_blitter_w )
 	if (offset == B_CMD)
 	{
 		blitter_status = 0;
-		space->machine->scheduler().timer_set(attotime::from_usec(100), FUNC(blitter_done));
-		blitter_run(space->machine);
+		space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(blitter_done));
+		blitter_run(space->machine());
 	}
 
 	if (LOG_BLITTER_WRITE)
@@ -655,18 +655,18 @@ READ16_HANDLER( jaguar_tom_regs_r )
 			return cpu_irq_state;
 
 		case HC:
-			return space->machine->primary_screen->hpos() % (space->machine->primary_screen->width() / 2);
+			return space->machine().primary_screen->hpos() % (space->machine().primary_screen->width() / 2);
 
 		case VC:
 		{
 			UINT8 half_line;
 
-			if(space->machine->primary_screen->hpos() >= (space->machine->primary_screen->width() / 2))
+			if(space->machine().primary_screen->hpos() >= (space->machine().primary_screen->width() / 2))
 				half_line = 1;
 			else
 				half_line = 0;
 
-			return space->machine->primary_screen->vpos() * 2 + half_line;
+			return space->machine().primary_screen->vpos() * 2 + half_line;
 		}
 	}
 
@@ -687,8 +687,8 @@ static TIMER_CALLBACK( jaguar_pit )
 
 	if (gpu_regs[PIT0])
 	{
-		sample_period = attotime::from_nsec(((machine->device("gpu")->unscaled_clock()*PIT_MULT_DBG_HACK) / (1+gpu_regs[PIT0])) / (1+gpu_regs[PIT1]));
-		machine->scheduler().timer_set(sample_period, FUNC(jaguar_pit));
+		sample_period = attotime::from_nsec(((machine.device("gpu")->unscaled_clock()*PIT_MULT_DBG_HACK) / (1+gpu_regs[PIT0])) / (1+gpu_regs[PIT1]));
+		machine.scheduler().timer_set(sample_period, FUNC(jaguar_pit));
 	}
 }
 
@@ -712,14 +712,14 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 			case PIT1:
 				if (gpu_regs[PIT0] && gpu_regs[PIT0] != 0xffff) //FIXME: avoid too much small timers for now
 				{
-					sample_period = attotime::from_nsec(((space->machine->device("gpu")->unscaled_clock()*PIT_MULT_DBG_HACK) / (1+gpu_regs[PIT0])) / (1+gpu_regs[PIT1]));
-					space->machine->scheduler().timer_set(sample_period, FUNC(jaguar_pit));
+					sample_period = attotime::from_nsec(((space->machine().device("gpu")->unscaled_clock()*PIT_MULT_DBG_HACK) / (1+gpu_regs[PIT0])) / (1+gpu_regs[PIT1]));
+					space->machine().scheduler().timer_set(sample_period, FUNC(jaguar_pit));
 				}
 				break;
 
 			case INT1:
 				cpu_irq_state &= ~(gpu_regs[INT1] >> 8);
-				update_cpu_irq(space->machine);
+				update_cpu_irq(space->machine());
 				break;
 
 			case VMODE:
@@ -729,7 +729,7 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 
 			case OBF:	/* clear GPU interrupt */
 				cpu_irq_state &= 0xfd;
-				update_cpu_irq(space->machine);
+				update_cpu_irq(space->machine());
 				break;
 
 			case HP:
@@ -761,7 +761,7 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 						visarea.max_x = hbstart / 2 - 1;
 						visarea.min_y = vbend / 2;
 						visarea.max_y = vbstart / 2 - 1;
-						space->machine->primary_screen->configure(hperiod / 2, vperiod / 2, visarea, HZ_TO_ATTOSECONDS((double)COJAG_PIXEL_CLOCK * 2 / hperiod / vperiod));
+						space->machine().primary_screen->configure(hperiod / 2, vperiod / 2, visarea, HZ_TO_ATTOSECONDS((double)COJAG_PIXEL_CLOCK * 2 / hperiod / vperiod));
 					}
 				}
 				break;
@@ -807,15 +807,15 @@ READ32_HANDLER( cojag_gun_input_r )
 	switch (offset)
 	{
 		case 0:
-			get_crosshair_xy(space->machine, 1, &beamx, &beamy);
+			get_crosshair_xy(space->machine(), 1, &beamx, &beamy);
 			return (beamy << 16) | (beamx ^ 0x1ff);
 
 		case 1:
-			get_crosshair_xy(space->machine, 0, &beamx, &beamy);
+			get_crosshair_xy(space->machine(), 0, &beamx, &beamy);
 			return (beamy << 16) | (beamx ^ 0x1ff);
 
 		case 2:
-			return input_port_read(space->machine, "IN3");
+			return input_port_read(space->machine(), "IN3");
 	}
 	return 0;
 }
@@ -832,7 +832,7 @@ static TIMER_CALLBACK( cojag_scanline_update )
 {
 	int vc = param & 0xffff;
 	int hdb = param >> 16;
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	/* only run if video is enabled and we are past the "display begin" */
 	if ((gpu_regs[VMODE] & 1) && vc >= (gpu_regs[VDB] & 0x7ff))
@@ -885,7 +885,7 @@ static TIMER_CALLBACK( cojag_scanline_update )
 		}
 
 		/* point to the next counter value */
-		if (++vc / 2 >= machine->primary_screen->height())
+		if (++vc / 2 >= machine.primary_screen->height())
 			vc = 0;
 
 	} while (!adjust_object_timer(machine, vc));
@@ -902,7 +902,7 @@ VIDEO_START( cojag )
 	memset(&gpu_regs, 0, sizeof(gpu_regs));
 	cpu_irq_state = 0;
 
-	object_timer = machine->scheduler().timer_alloc(FUNC(cojag_scanline_update));
+	object_timer = machine.scheduler().timer_alloc(FUNC(cojag_scanline_update));
 	adjust_object_timer(machine, 0);
 
 	screen_bitmap = auto_bitmap_alloc(machine, 760, 512, BITMAP_FORMAT_RGB32);
@@ -915,7 +915,7 @@ VIDEO_START( cojag )
 	state_save_register_global_array(machine, blitter_regs);
 	state_save_register_global_array(machine, gpu_regs);
 	state_save_register_global(machine, cpu_irq_state);
-	machine->state().register_postload(cojag_postload, NULL);
+	machine.state().register_postload(cojag_postload, NULL);
 }
 
 

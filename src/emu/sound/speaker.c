@@ -140,7 +140,7 @@ static DEVICE_START( speaker )
 	int i;
 	double x;
 
-	sp->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), sp, speaker_sound_update);
+	sp->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), sp, speaker_sound_update);
 
 	if (intf != NULL)
 	{
@@ -159,8 +159,8 @@ static DEVICE_START( speaker )
 	for (i = 0; i < FILTER_LENGTH; i++)
 		sp->composed_volume[i] = 0;
 	sp->composed_sample_index = 0;
-	sp->last_update_time = device->machine->time();
-	sp->channel_sample_period = HZ_TO_ATTOSECONDS(device->machine->sample_rate());
+	sp->last_update_time = device->machine().time();
+	sp->channel_sample_period = HZ_TO_ATTOSECONDS(device->machine().sample_rate());
 	sp->channel_sample_period_secfrac = ATTOSECONDS_TO_DOUBLE(sp->channel_sample_period);
 	sp->interm_sample_period = sp->channel_sample_period / RATE_MULTIPLIER;
 	sp->interm_sample_period_secfrac = ATTOSECONDS_TO_DOUBLE(sp->interm_sample_period);
@@ -275,7 +275,7 @@ void speaker_level_w(device_t *device, int new_level)
 		new_level = sp->num_levels - 1;
 
 	volume = sp->levels[sp->level];
-	time = device->machine->time();
+	time = device->machine().time();
 
 	if (time < sp->channel_next_sample_time)
 	{

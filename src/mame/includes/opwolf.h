@@ -50,7 +50,7 @@ public:
 
 /*----------- defined in machine/opwolf.c -----------*/
 
-void opwolf_cchip_init(running_machine *machine);
+void opwolf_cchip_init(running_machine &machine);
 
 READ16_HANDLER( opwolf_cchip_status_r );
 READ16_HANDLER( opwolf_cchip_data_r );

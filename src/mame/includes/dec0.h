@@ -61,8 +61,8 @@ DRIVER_INIT( baddudes );
 DRIVER_INIT( hbarrel );
 DRIVER_INIT( birdtry );
 
-extern void dec0_i8751_write(running_machine *machine, int data);
-extern void dec0_i8751_reset(running_machine *machine);
+extern void dec0_i8751_write(running_machine &machine, int data);
+extern void dec0_i8751_reset(running_machine &machine);
 READ8_HANDLER( hippodrm_prot_r );
 WRITE8_HANDLER( dec0_mcu_port_w );
 READ8_HANDLER( dec0_mcu_port_r );

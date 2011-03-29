@@ -145,7 +145,7 @@ INLINE const mos6560_interface *get_interface( device_t *device )
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", device->machine->time().as_double(), (char*) M ); \
+				logerror("%11.6f: %-24s", device->machine().time().as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -153,9 +153,9 @@ INLINE const mos6560_interface *get_interface( device_t *device )
 
 /* 2008-05 FP: lightpen code needs to read input port from vc20.c */
 
-#define LIGHTPEN_BUTTON		((mos6560->lightpen_button_cb != NULL) ? mos6560->lightpen_button_cb(device->machine) : 0)
-#define LIGHTPEN_X_VALUE	((mos6560->lightpen_x_cb != NULL) ? mos6560->lightpen_x_cb(device->machine) : 0)
-#define LIGHTPEN_Y_VALUE	((mos6560->lightpen_y_cb != NULL) ? mos6560->lightpen_y_cb(device->machine) : 0)
+#define LIGHTPEN_BUTTON		((mos6560->lightpen_button_cb != NULL) ? mos6560->lightpen_button_cb(device->machine()) : 0)
+#define LIGHTPEN_X_VALUE	((mos6560->lightpen_x_cb != NULL) ? mos6560->lightpen_x_cb(device->machine()) : 0)
+#define LIGHTPEN_Y_VALUE	((mos6560->lightpen_y_cb != NULL) ? mos6560->lightpen_y_cb(device->machine()) : 0)
 
 /* lightpen delivers values from internal counters
  * they do not start with the visual area or frame area */
@@ -214,7 +214,7 @@ static void mos6560_draw_character( device_t *device, int ybegin, int yend, int 
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = mos6560->dma_read(device->machine, (mos6560->chargenaddr + ch * mos6560->charheight + y) & 0x3fff);
+		code = mos6560->dma_read(device->machine(), (mos6560->chargenaddr + ch * mos6560->charheight + y) & 0x3fff);
 		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 0) = color[code >> 7];
 		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 1) = color[(code >> 6) & 1];
 		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 2) = color[(code >> 5) & 1];
@@ -238,7 +238,7 @@ static void mos6560_draw_character_multi( device_t *device, int ybegin, int yend
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = mos6560->dma_read(device->machine, (mos6560->chargenaddr + ch * mos6560->charheight + y) & 0x3fff);
+		code = mos6560->dma_read(device->machine(), (mos6560->chargenaddr + ch * mos6560->charheight + y) & 0x3fff);
 		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 0) =
 			*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 1) = color[code >> 6];
 		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 2) =
@@ -298,8 +298,8 @@ static void mos6560_drawlines( device_t *device, int first, int last )
 
 		for (xoff = mos6560->xpos; (xoff < mos6560->xpos + mos6560->xsize) && (xoff < mos6560->total_xsize); xoff += 8, offs++)
 		{
-			ch = mos6560->dma_read(device->machine, (mos6560->videoaddr + offs) & 0x3fff);
-			attr = (mos6560->dma_read_color(device->machine, (mos6560->videoaddr + offs) & 0x3fff)) & 0xf;
+			ch = mos6560->dma_read(device->machine(), (mos6560->videoaddr + offs) & 0x3fff);
+			attr = (mos6560->dma_read_color(device->machine(), (mos6560->videoaddr + offs) & 0x3fff)) & 0xf;
 
 			if (mos6560->type == MOS6560_ATTACKUFO)
 			{
@@ -460,7 +460,7 @@ READ8_DEVICE_HANDLER( mos6560_port_r )
 		break;
 	case 6:						   /*lightpen horizontal */
 	case 7:						   /*lightpen vertical */
-		if (LIGHTPEN_BUTTON && ((device->machine->time().as_double() - mos6560->lightpenreadtime) * MOS656X_VRETRACERATE >= 1))
+		if (LIGHTPEN_BUTTON && ((device->machine().time().as_double() - mos6560->lightpenreadtime) * MOS656X_VRETRACERATE >= 1))
 		{
 			/* only 1 update each frame */
 			/* and diode must recognize light */
@@ -469,13 +469,13 @@ READ8_DEVICE_HANDLER( mos6560_port_r )
 				mos6560->reg[6] = MOS656X_X_VALUE;
 				mos6560->reg[7] = MOS656X_Y_VALUE;
 			}
-			mos6560->lightpenreadtime = device->machine->time().as_double();
+			mos6560->lightpenreadtime = device->machine().time().as_double();
 		}
 		val = mos6560->reg[offset];
 		break;
 	case 8:						   /* poti 1 */
 	case 9:						   /* poti 2 */
-		val = (mos6560->paddle_cb != NULL) ? mos6560->paddle_cb[offset - 8](device->machine) : mos6560->reg[offset];
+		val = (mos6560->paddle_cb != NULL) ? mos6560->paddle_cb[offset - 8](device->machine()) : mos6560->reg[offset];
 		break;
 	default:
 		val = mos6560->reg[offset];
@@ -587,7 +587,7 @@ static void mos6560_soundport_w( device_t *device, int offset, int data )
 		if (!(old & 0x80) && TONE1_ON)
 		{
 			mos6560->tone1pos = 0;
-			mos6560->tone1samples = device->machine->sample_rate() / TONE1_FREQUENCY;
+			mos6560->tone1samples = device->machine().sample_rate() / TONE1_FREQUENCY;
 			if (!mos6560->tone1samples == 0)
 				mos6560->tone1samples = 1;
 		}
@@ -598,7 +598,7 @@ static void mos6560_soundport_w( device_t *device, int offset, int data )
 		if (!(old & 0x80) && TONE2_ON)
 		{
 			mos6560->tone2pos = 0;
-			mos6560->tone2samples = device->machine->sample_rate() / TONE2_FREQUENCY;
+			mos6560->tone2samples = device->machine().sample_rate() / TONE2_FREQUENCY;
 			if (mos6560->tone2samples == 0)
 				mos6560->tone2samples = 1;
 		}
@@ -609,7 +609,7 @@ static void mos6560_soundport_w( device_t *device, int offset, int data )
 		if (!(old & 0x80) && TONE3_ON)
 		{
 			mos6560->tone3pos = 0;
-			mos6560->tone3samples = device->machine->sample_rate() / TONE3_FREQUENCY;
+			mos6560->tone3samples = device->machine().sample_rate() / TONE3_FREQUENCY;
 			if (mos6560->tone3samples == 0)
 				mos6560->tone3samples = 1;
 		}
@@ -619,7 +619,7 @@ static void mos6560_soundport_w( device_t *device, int offset, int data )
 		mos6560->reg[offset] = data;
 		if (NOISE_ON)
 		{
-			mos6560->noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * device->machine->sample_rate()
+			mos6560->noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * device->machine().sample_rate()
 								  * NOISE_BUFFER_SIZE_SEC / NOISE_FREQUENCY);
 			DBG_LOG (1, "mos6560", ("noise %.2x %d sample:%d\n",
 									data, NOISE_FREQUENCY, mos6560->noisesamples));
@@ -664,7 +664,7 @@ static STREAM_UPDATE( mos6560_update )
 			if (mos6560->tone1pos >= mos6560->tone1samples)
 			{
 				mos6560->tone1pos = 0;
-				mos6560->tone1samples = device->machine->sample_rate() / TONE1_FREQUENCY;
+				mos6560->tone1samples = device->machine().sample_rate() / TONE1_FREQUENCY;
 				if (mos6560->tone1samples == 0)
 					mos6560->tone1samples = 1;
 			}
@@ -680,7 +680,7 @@ static STREAM_UPDATE( mos6560_update )
 			if (mos6560->tone2pos >= mos6560->tone2samples)
 			{
 				mos6560->tone2pos = 0;
-				mos6560->tone2samples = device->machine->sample_rate() / TONE2_FREQUENCY;
+				mos6560->tone2samples = device->machine().sample_rate() / TONE2_FREQUENCY;
 				if (mos6560->tone2samples == 0)
 					mos6560->tone2samples = 1;
 			}
@@ -696,7 +696,7 @@ static STREAM_UPDATE( mos6560_update )
 			if (mos6560->tone3pos >= mos6560->tone3samples)
 			{
 				mos6560->tone3pos = 0;
-				mos6560->tone3samples = device->machine->sample_rate() / TONE3_FREQUENCY;
+				mos6560->tone3samples = device->machine().sample_rate() / TONE3_FREQUENCY;
 				if (mos6560->tone3samples == 0)
 					mos6560->tone3samples = 1;
 			}
@@ -739,11 +739,11 @@ static void mos6560_sound_start( device_t *device )
 	mos6560_state *mos6560 = get_safe_token(device);
 	int i;
 
-	mos6560->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), 0, mos6560_update);
+	mos6560->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), 0, mos6560_update);
 
 	/* buffer for fastest played sample for 5 second so we have enough data for min 5 second */
 	mos6560->noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
-	mos6560->noise = auto_alloc_array(device->machine, INT8, mos6560->noisesize);
+	mos6560->noise = auto_alloc_array(device->machine(), INT8, mos6560->noisesize);
 	{
 		int noiseshift = 0x7ffff8;
 		char data;
@@ -774,11 +774,11 @@ static void mos6560_sound_start( device_t *device )
 				noiseshift <<= 1;
 		}
 	}
-	mos6560->tonesize = device->machine->sample_rate() / TONE_FREQUENCY_MIN;
+	mos6560->tonesize = device->machine().sample_rate() / TONE_FREQUENCY_MIN;
 
 	if (mos6560->tonesize > 0)
 	{
-		mos6560->tone = auto_alloc_array(device->machine, INT16, mos6560->tonesize);
+		mos6560->tone = auto_alloc_array(device->machine(), INT16, mos6560->tonesize);
 
 		for (i = 0; i < mos6560->tonesize; i++)
 		{
@@ -802,13 +802,13 @@ static DEVICE_START( mos6560 )
 	const mos6560_interface *intf = (mos6560_interface *)device->baseconfig().static_config();
 	int width, height;
 
-	mos6560->screen = downcast<screen_device *>(device->machine->device(intf->screen));
+	mos6560->screen = downcast<screen_device *>(device->machine().device(intf->screen));
 	width = mos6560->screen->width();
 	height = mos6560->screen->height();
 
 	mos6560->type = intf->type;
 
-	mos6560->bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
+	mos6560->bitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED16);
 
 	assert(intf->dma_read != NULL);
 	assert(intf->dma_read_color != NULL);

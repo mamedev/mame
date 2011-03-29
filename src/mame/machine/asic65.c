@@ -119,13 +119,13 @@ static const UINT8 command_map[3][MAX_COMMANDS] =
  *
  *************************************/
 
-void asic65_config(running_machine *machine, int asictype)
+void asic65_config(running_machine &machine, int asictype)
 {
 	memset(&asic65, 0, sizeof(asic65));
 	asic65.type = asictype;
 	asic65.yorigin = 0x1800;
 	if (asic65.type == ASIC65_ROMBASED)
-		asic65.cpu = machine->device("asic65");
+		asic65.cpu = machine.device("asic65");
 }
 
 
@@ -136,9 +136,9 @@ void asic65_config(running_machine *machine, int asictype)
  *
  *************************************/
 
-void asic65_reset(running_machine *machine, int state)
+void asic65_reset(running_machine &machine, int state)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* rom-based means reset and clear states */
 	if (asic65.cpu != NULL)
@@ -147,7 +147,7 @@ void asic65_reset(running_machine *machine, int state)
 	/* otherwise, do it manually */
 	else
 	{
-		machine->device<cpu_device>("asic65")->suspend(SUSPEND_REASON_DISABLE, 1);
+		machine.device<cpu_device>("asic65")->suspend(SUSPEND_REASON_DISABLE, 1);
 
 		/* if reset is being signalled, clear everything */
 		if (state && !asic65.reset_state)
@@ -191,8 +191,8 @@ WRITE16_HANDLER( asic65_data_w )
 	/* rom-based use a deferred write mechanism */
 	if (asic65.type == ASIC65_ROMBASED)
 	{
-		space->machine->scheduler().synchronize(FUNC(m68k_asic65_deferred_w), data | (offset << 16));
-		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+		space->machine().scheduler().synchronize(FUNC(m68k_asic65_deferred_w), data | (offset << 16));
+		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 		return;
 	}
 
@@ -230,7 +230,7 @@ READ16_HANDLER( asic65_r )
 	if (asic65.type == ASIC65_ROMBASED)
 	{
 		asic65._68full = 0;
-		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
+		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
 		return asic65._68data;
 	}
 
@@ -448,7 +448,7 @@ READ16_HANDLER( asic65_io_r )
 		/* bit 14 = 68FULL */
 		/* bit 13 = XFLG */
 		/* bit 12 = controlled by jumper */
-		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
+		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
 		return (asic65.tfull << 15) | (asic65._68full << 14) | (asic65.xflg << 13) | 0x0000;
 	}
 	else

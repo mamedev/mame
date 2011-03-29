@@ -86,17 +86,17 @@ static READ32_HANDLER( eolith_custom_r )
     */
 	eolith_speedup_read(space);
 
-	return (input_port_read(space->machine, "IN0") & ~0x300) | (space->machine->rand() & 0x300);
+	return (input_port_read(space->machine(), "IN0") & ~0x300) | (space->machine().rand() & 0x300);
 }
 
 static WRITE32_HANDLER( systemcontrol_w )
 {
-	eolith_state *state = space->machine->driver_data<eolith_state>();
+	eolith_state *state = space->machine().driver_data<eolith_state>();
 	state->buffer = (data & 0x80) >> 7;
-	coin_counter_w(space->machine, 0, data & state->coin_counter_bit);
-	set_led_status(space->machine, 0, data & 1);
+	coin_counter_w(space->machine(), 0, data & state->coin_counter_bit);
+	set_led_status(space->machine(), 0, data & 1);
 
-	input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+	input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 
 	// bit 0x100 and 0x040 ?
 }
@@ -104,8 +104,8 @@ static WRITE32_HANDLER( systemcontrol_w )
 static READ32_HANDLER( hidctch3_pen1_r )
 {
 	//320 x 240
-	int xpos = input_port_read(space->machine, "PEN_X_P1");
-	int ypos = input_port_read(space->machine, "PEN_Y_P1");
+	int xpos = input_port_read(space->machine(), "PEN_X_P1");
+	int ypos = input_port_read(space->machine(), "PEN_Y_P1");
 
 	return xpos + (ypos*168*2);
 }
@@ -113,8 +113,8 @@ static READ32_HANDLER( hidctch3_pen1_r )
 static READ32_HANDLER( hidctch3_pen2_r )
 {
 	//320 x 240
-	int xpos = input_port_read(space->machine, "PEN_X_P2");
-	int ypos = input_port_read(space->machine, "PEN_Y_P2");
+	int xpos = input_port_read(space->machine(), "PEN_X_P2");
+	int ypos = input_port_read(space->machine(), "PEN_Y_P2");
 
 	return xpos + (ypos*168*2);
 }
@@ -1110,18 +1110,18 @@ static DRIVER_INIT( eolith )
 
 static DRIVER_INIT( landbrk )
 {
-	eolith_state *state = machine->driver_data<eolith_state>();
+	eolith_state *state = machine.driver_data<eolith_state>();
 	state->coin_counter_bit = 0x1000;
 	init_eolith_speedup(machine);
 }
 
 static DRIVER_INIT( landbrka )
 {
-	eolith_state *state = machine->driver_data<eolith_state>();
+	eolith_state *state = machine.driver_data<eolith_state>();
 	//it fails compares with memories:
 	//$4002d338 -> $4002d348 .... $4002d33f -> $4002d34f
 	//related with bits 0x100 - 0x200 read at startup from input(0) ?
-	UINT32 *rombase = (UINT32*)machine->region("maincpu")->base();
+	UINT32 *rombase = (UINT32*)machine.region("maincpu")->base();
 	rombase[0x14f00/4] = (rombase[0x14f00/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
 	state->coin_counter_bit = 0x2000;
@@ -1131,22 +1131,22 @@ static DRIVER_INIT( landbrka )
 static DRIVER_INIT( hidctch2 )
 {
 	//it fails compares in memory like in landbrka
-	UINT32 *rombase = (UINT32*)machine->region("maincpu")->base();
+	UINT32 *rombase = (UINT32*)machine.region("maincpu")->base();
 	rombase[0xbcc8/4] = (rombase[0xbcc8/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 	init_eolith_speedup(machine);
 }
 
 static DRIVER_INIT( hidctch3 )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xfc200000, 0xfc200003); // this generates pens vibration
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xfc200000, 0xfc200003); // this generates pens vibration
 
 	// It is not clear why the first reads are needed too
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfce00000, 0xfce00003, FUNC(hidctch3_pen1_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfce80000, 0xfce80003, FUNC(hidctch3_pen1_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfce00000, 0xfce00003, FUNC(hidctch3_pen1_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfce80000, 0xfce80003, FUNC(hidctch3_pen1_r));
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfcf00000, 0xfcf00003, FUNC(hidctch3_pen2_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfcf80000, 0xfcf80003, FUNC(hidctch3_pen2_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfcf00000, 0xfcf00003, FUNC(hidctch3_pen2_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfcf80000, 0xfcf80003, FUNC(hidctch3_pen2_r));
 
 	init_eolith_speedup(machine);
 }

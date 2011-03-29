@@ -19,7 +19,7 @@ static TILEMAP_MAPPER( get_memory_offset )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	videopin_state *state = machine->driver_data<videopin_state>();
+	videopin_state *state = machine.driver_data<videopin_state>();
 	UINT8 code = state->video_ram[tile_index];
 
 	SET_TILE_INFO(0, code, 0, (code & 0x40) ? TILE_FLIPY : 0);
@@ -28,14 +28,14 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( videopin )
 {
-	videopin_state *state = machine->driver_data<videopin_state>();
+	videopin_state *state = machine.driver_data<videopin_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, get_memory_offset,  8, 8, 48, 32);
 }
 
 
 SCREEN_UPDATE( videopin )
 {
-	videopin_state *state = screen->machine->driver_data<videopin_state>();
+	videopin_state *state = screen->machine().driver_data<videopin_state>();
 	int col;
 	int row;
 
@@ -84,7 +84,7 @@ SCREEN_UPDATE( videopin )
 				{
 					for (j = 0; j < 2; j++)
 					{
-						drawgfx_transpen(bitmap, &rect, screen->machine->gfx[1],
+						drawgfx_transpen(bitmap, &rect, screen->machine().gfx[1],
 							0, 0,
 							0, 0,
 							x + 16 * i,
@@ -102,7 +102,7 @@ SCREEN_UPDATE( videopin )
 
 WRITE8_HANDLER( videopin_ball_w )
 {
-	videopin_state *state = space->machine->driver_data<videopin_state>();
+	videopin_state *state = space->machine().driver_data<videopin_state>();
 	state->ball_x = data & 15;
 	state->ball_y = data >> 4;
 }
@@ -110,7 +110,7 @@ WRITE8_HANDLER( videopin_ball_w )
 
 WRITE8_HANDLER( videopin_video_ram_w )
 {
-	videopin_state *state = space->machine->driver_data<videopin_state>();
+	videopin_state *state = space->machine().driver_data<videopin_state>();
 	state->video_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }

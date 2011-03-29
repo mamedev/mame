@@ -8,29 +8,29 @@
 /* The collision detection techniques use in this driver
    are well explained in the comments in the sprint2 driver */
 
-WRITE8_HANDLER( starcrus_s1_x_w ) { space->machine->driver_data<starcrus_state>()->s1_x = data^0xff; }
-WRITE8_HANDLER( starcrus_s1_y_w ) { space->machine->driver_data<starcrus_state>()->s1_y = data^0xff; }
-WRITE8_HANDLER( starcrus_s2_x_w ) { space->machine->driver_data<starcrus_state>()->s2_x = data^0xff; }
-WRITE8_HANDLER( starcrus_s2_y_w ) { space->machine->driver_data<starcrus_state>()->s2_y = data^0xff; }
-WRITE8_HANDLER( starcrus_p1_x_w ) { space->machine->driver_data<starcrus_state>()->p1_x = data^0xff; }
-WRITE8_HANDLER( starcrus_p1_y_w ) { space->machine->driver_data<starcrus_state>()->p1_y = data^0xff; }
-WRITE8_HANDLER( starcrus_p2_x_w ) { space->machine->driver_data<starcrus_state>()->p2_x = data^0xff; }
-WRITE8_HANDLER( starcrus_p2_y_w ) { space->machine->driver_data<starcrus_state>()->p2_y = data^0xff; }
+WRITE8_HANDLER( starcrus_s1_x_w ) { space->machine().driver_data<starcrus_state>()->s1_x = data^0xff; }
+WRITE8_HANDLER( starcrus_s1_y_w ) { space->machine().driver_data<starcrus_state>()->s1_y = data^0xff; }
+WRITE8_HANDLER( starcrus_s2_x_w ) { space->machine().driver_data<starcrus_state>()->s2_x = data^0xff; }
+WRITE8_HANDLER( starcrus_s2_y_w ) { space->machine().driver_data<starcrus_state>()->s2_y = data^0xff; }
+WRITE8_HANDLER( starcrus_p1_x_w ) { space->machine().driver_data<starcrus_state>()->p1_x = data^0xff; }
+WRITE8_HANDLER( starcrus_p1_y_w ) { space->machine().driver_data<starcrus_state>()->p1_y = data^0xff; }
+WRITE8_HANDLER( starcrus_p2_x_w ) { space->machine().driver_data<starcrus_state>()->p2_x = data^0xff; }
+WRITE8_HANDLER( starcrus_p2_y_w ) { space->machine().driver_data<starcrus_state>()->p2_y = data^0xff; }
 
 VIDEO_START( starcrus )
 {
-	starcrus_state *state = machine->driver_data<starcrus_state>();
-	state->ship1_vid = auto_bitmap_alloc(machine, 16, 16, machine->primary_screen->format());
-	state->ship2_vid = auto_bitmap_alloc(machine, 16, 16, machine->primary_screen->format());
+	starcrus_state *state = machine.driver_data<starcrus_state>();
+	state->ship1_vid = auto_bitmap_alloc(machine, 16, 16, machine.primary_screen->format());
+	state->ship2_vid = auto_bitmap_alloc(machine, 16, 16, machine.primary_screen->format());
 
-	state->proj1_vid = auto_bitmap_alloc(machine, 16, 16, machine->primary_screen->format());
-	state->proj2_vid = auto_bitmap_alloc(machine, 16, 16, machine->primary_screen->format());
+	state->proj1_vid = auto_bitmap_alloc(machine, 16, 16, machine.primary_screen->format());
+	state->proj2_vid = auto_bitmap_alloc(machine, 16, 16, machine.primary_screen->format());
 }
 
 WRITE8_HANDLER( starcrus_ship_parm_1_w )
 {
-	starcrus_state *state = space->machine->driver_data<starcrus_state>();
-	device_t *samples = space->machine->device("samples");
+	starcrus_state *state = space->machine().driver_data<starcrus_state>();
+	device_t *samples = space->machine().device("samples");
 
 	state->s1_sprite = data&0x1f;
 	state->engine1_on = ((data&0x20)>>5)^0x01;
@@ -55,12 +55,12 @@ WRITE8_HANDLER( starcrus_ship_parm_1_w )
 
 WRITE8_HANDLER( starcrus_ship_parm_2_w )
 {
-	starcrus_state *state = space->machine->driver_data<starcrus_state>();
-	device_t *samples = space->machine->device("samples");
+	starcrus_state *state = space->machine().driver_data<starcrus_state>();
+	device_t *samples = space->machine().device("samples");
 
 	state->s2_sprite = data&0x1f;
-	set_led_status(space->machine, 2,~data & 0x80);			/* game over lamp */
-	coin_counter_w(space->machine, 0, ((data&0x40)>>6)^0x01);	/* coin counter */
+	set_led_status(space->machine(), 2,~data & 0x80);			/* game over lamp */
+	coin_counter_w(space->machine(), 0, ((data&0x40)>>6)^0x01);	/* coin counter */
 	state->engine2_on = ((data&0x20)>>5)^0x01;
 
 	if (state->engine1_on || state->engine2_on)
@@ -84,8 +84,8 @@ WRITE8_HANDLER( starcrus_ship_parm_2_w )
 
 WRITE8_HANDLER( starcrus_proj_parm_1_w )
 {
-	starcrus_state *state = space->machine->driver_data<starcrus_state>();
-	device_t *samples = space->machine->device("samples");
+	starcrus_state *state = space->machine().driver_data<starcrus_state>();
+	device_t *samples = space->machine().device("samples");
 
 	state->p1_sprite = data&0x0f;
 	state->launch1_on = ((data&0x20)>>5)^0x01;
@@ -124,8 +124,8 @@ WRITE8_HANDLER( starcrus_proj_parm_1_w )
 
 WRITE8_HANDLER( starcrus_proj_parm_2_w )
 {
-	starcrus_state *state = space->machine->driver_data<starcrus_state>();
-	device_t *samples = space->machine->device("samples");
+	starcrus_state *state = space->machine().driver_data<starcrus_state>();
+	device_t *samples = space->machine().device("samples");
 
 	state->p2_sprite = data&0x0f;
 	state->launch2_on = ((data&0x20)>>5)^0x01;
@@ -162,9 +162,9 @@ WRITE8_HANDLER( starcrus_proj_parm_2_w )
 	}
 }
 
-static int collision_check_s1s2(running_machine *machine)
+static int collision_check_s1s2(running_machine &machine)
 {
-	starcrus_state *state = machine->driver_data<starcrus_state>();
+	starcrus_state *state = machine.driver_data<starcrus_state>();
 	int org_x, org_y;
 	int sx, sy;
 	rectangle clip;
@@ -185,7 +185,7 @@ static int collision_check_s1s2(running_machine *machine)
 	/* Draw ship 1 */
 	drawgfx_opaque(state->ship1_vid,
 			&clip,
-			machine->gfx[8+((state->s1_sprite&0x04)>>2)],
+			machine.gfx[8+((state->s1_sprite&0x04)>>2)],
 			(state->s1_sprite&0x03)^0x03,
 			0,
 			(state->s1_sprite&0x08)>>3, (state->s1_sprite&0x10)>>4,
@@ -194,7 +194,7 @@ static int collision_check_s1s2(running_machine *machine)
 	/* Draw ship 2 */
 	drawgfx_opaque(state->ship2_vid,
 			&clip,
-			machine->gfx[10+((state->s2_sprite&0x04)>>2)],
+			machine.gfx[10+((state->s2_sprite&0x04)>>2)],
 			(state->s2_sprite&0x03)^0x03,
 			0,
 			(state->s2_sprite&0x08)>>3, (state->s2_sprite&0x10)>>4,
@@ -210,9 +210,9 @@ static int collision_check_s1s2(running_machine *machine)
 	return 0;
 }
 
-static int collision_check_p1p2(running_machine *machine)
+static int collision_check_p1p2(running_machine &machine)
 {
-	starcrus_state *state = machine->driver_data<starcrus_state>();
+	starcrus_state *state = machine.driver_data<starcrus_state>();
 	int org_x, org_y;
 	int sx, sy;
 	rectangle clip;
@@ -242,7 +242,7 @@ static int collision_check_p1p2(running_machine *machine)
 		/* Draw score/projectile 1 */
 		drawgfx_opaque(state->proj1_vid,
 				&clip,
-				machine->gfx[(state->p1_sprite&0x0c)>>2],
+				machine.gfx[(state->p1_sprite&0x0c)>>2],
 				(state->p1_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -254,7 +254,7 @@ static int collision_check_p1p2(running_machine *machine)
 		/* Draw score/projectile 2 */
 		drawgfx_opaque(state->proj2_vid,
 				&clip,
-				machine->gfx[4+((state->p2_sprite&0x0c)>>2)],
+				machine.gfx[4+((state->p2_sprite&0x0c)>>2)],
 				(state->p2_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -271,9 +271,9 @@ static int collision_check_p1p2(running_machine *machine)
 	return 0;
 }
 
-static int collision_check_s1p1p2(running_machine *machine)
+static int collision_check_s1p1p2(running_machine &machine)
 {
-	starcrus_state *state = machine->driver_data<starcrus_state>();
+	starcrus_state *state = machine.driver_data<starcrus_state>();
 	int org_x, org_y;
 	int sx, sy;
 	rectangle clip;
@@ -302,7 +302,7 @@ static int collision_check_s1p1p2(running_machine *machine)
 	/* Draw ship 1 */
 	drawgfx_opaque(state->ship1_vid,
 			&clip,
-			machine->gfx[8+((state->s1_sprite&0x04)>>2)],
+			machine.gfx[8+((state->s1_sprite&0x04)>>2)],
 			(state->s1_sprite&0x03)^0x03,
 			0,
 			(state->s1_sprite&0x08)>>3, (state->s1_sprite&0x10)>>4,
@@ -313,7 +313,7 @@ static int collision_check_s1p1p2(running_machine *machine)
 		/* Draw projectile 1 */
 		drawgfx_opaque(state->proj1_vid,
 				&clip,
-				machine->gfx[(state->p1_sprite&0x0c)>>2],
+				machine.gfx[(state->p1_sprite&0x0c)>>2],
 				(state->p1_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -325,7 +325,7 @@ static int collision_check_s1p1p2(running_machine *machine)
 		/* Draw projectile 2 */
 		drawgfx_opaque(state->proj2_vid,
 				&clip,
-				machine->gfx[4+((state->p2_sprite&0x0c)>>2)],
+				machine.gfx[4+((state->p2_sprite&0x0c)>>2)],
 				(state->p2_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -348,9 +348,9 @@ static int collision_check_s1p1p2(running_machine *machine)
 	return 0;
 }
 
-static int collision_check_s2p1p2(running_machine *machine)
+static int collision_check_s2p1p2(running_machine &machine)
 {
-	starcrus_state *state = machine->driver_data<starcrus_state>();
+	starcrus_state *state = machine.driver_data<starcrus_state>();
 	int org_x, org_y;
 	int sx, sy;
 	rectangle clip;
@@ -379,7 +379,7 @@ static int collision_check_s2p1p2(running_machine *machine)
 	/* Draw ship 2 */
 	drawgfx_opaque(state->ship2_vid,
 			&clip,
-			machine->gfx[10+((state->s2_sprite&0x04)>>2)],
+			machine.gfx[10+((state->s2_sprite&0x04)>>2)],
 			(state->s2_sprite&0x03)^0x03,
 			0,
 			(state->s2_sprite&0x08)>>3, (state->s2_sprite&0x10)>>4,
@@ -390,7 +390,7 @@ static int collision_check_s2p1p2(running_machine *machine)
 		/* Draw projectile 1 */
 		drawgfx_opaque(state->proj1_vid,
 				&clip,
-				machine->gfx[(state->p1_sprite&0x0c)>>2],
+				machine.gfx[(state->p1_sprite&0x0c)>>2],
 				(state->p1_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -402,7 +402,7 @@ static int collision_check_s2p1p2(running_machine *machine)
 		/* Draw projectile 2 */
 		drawgfx_opaque(state->proj2_vid,
 				&clip,
-				machine->gfx[4+((state->p2_sprite&0x0c)>>2)],
+				machine.gfx[4+((state->p2_sprite&0x0c)>>2)],
 				(state->p2_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -427,14 +427,14 @@ static int collision_check_s2p1p2(running_machine *machine)
 
 SCREEN_UPDATE( starcrus )
 {
-	starcrus_state *state = screen->machine->driver_data<starcrus_state>();
+	starcrus_state *state = screen->machine().driver_data<starcrus_state>();
 
 	bitmap_fill(bitmap,cliprect,0);
 
 	/* Draw ship 1 */
 	drawgfx_transpen(bitmap,
 			cliprect,
-			screen->machine->gfx[8+((state->s1_sprite&0x04)>>2)],
+			screen->machine().gfx[8+((state->s1_sprite&0x04)>>2)],
 			(state->s1_sprite&0x03)^0x03,
 			0,
 			(state->s1_sprite&0x08)>>3, (state->s1_sprite&0x10)>>4,
@@ -444,7 +444,7 @@ SCREEN_UPDATE( starcrus )
 	/* Draw ship 2 */
 	drawgfx_transpen(bitmap,
 			cliprect,
-			screen->machine->gfx[10+((state->s2_sprite&0x04)>>2)],
+			screen->machine().gfx[10+((state->s2_sprite&0x04)>>2)],
 			(state->s2_sprite&0x03)^0x03,
 			0,
 			(state->s2_sprite&0x08)>>3, (state->s2_sprite&0x10)>>4,
@@ -454,7 +454,7 @@ SCREEN_UPDATE( starcrus )
 	/* Draw score/projectile 1 */
 	drawgfx_transpen(bitmap,
 			cliprect,
-			screen->machine->gfx[(state->p1_sprite&0x0c)>>2],
+			screen->machine().gfx[(state->p1_sprite&0x0c)>>2],
 			(state->p1_sprite&0x03)^0x03,
 			0,
 			0,0,
@@ -464,7 +464,7 @@ SCREEN_UPDATE( starcrus )
 	/* Draw score/projectile 2 */
 	drawgfx_transpen(bitmap,
 			cliprect,
-			screen->machine->gfx[4+((state->p2_sprite&0x0c)>>2)],
+			screen->machine().gfx[4+((state->p2_sprite&0x0c)>>2)],
 			(state->p2_sprite&0x03)^0x03,
 			0,
 			0,0,
@@ -477,23 +477,23 @@ SCREEN_UPDATE( starcrus )
 		state->collision_reg = 0x00;
 
 		/* Check for collisions between ship1 and ship2 */
-		if (collision_check_s1s2(screen->machine))
+		if (collision_check_s1s2(screen->machine()))
 		{
 			state->collision_reg |= 0x08;
 		}
 		/* Check for collisions between ship1 and projectiles */
-		if (collision_check_s1p1p2(screen->machine))
+		if (collision_check_s1p1p2(screen->machine()))
 		{
 			state->collision_reg |= 0x02;
 		}
 		/* Check for collisions between ship1 and projectiles */
-		if (collision_check_s2p1p2(screen->machine))
+		if (collision_check_s2p1p2(screen->machine()))
 		{
 			state->collision_reg |= 0x01;
 		}
 		/* Check for collisions between ship1 and projectiles */
 		/* Note: I don't think this is used by the game */
-		if (collision_check_p1p2(screen->machine))
+		if (collision_check_p1p2(screen->machine()))
 		{
 			state->collision_reg |= 0x04;
 		}
@@ -504,7 +504,7 @@ SCREEN_UPDATE( starcrus )
 
 READ8_HANDLER( starcrus_coll_det_r )
 {
-	starcrus_state *state = space->machine->driver_data<starcrus_state>();
+	starcrus_state *state = space->machine().driver_data<starcrus_state>();
 
 	return state->collision_reg ^ 0xff;
 }

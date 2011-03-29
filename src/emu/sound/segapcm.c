@@ -109,7 +109,7 @@ static DEVICE_START( segapcm )
 	segapcm_state *spcm = get_safe_token(device);
 
 	spcm->rom = *device->region();
-	spcm->ram = auto_alloc_array(device->machine, UINT8, 0x800);
+	spcm->ram = auto_alloc_array(device->machine(), UINT8, 0x800);
 
 	memset(spcm->ram, 0xff, 0x800);
 
@@ -127,7 +127,7 @@ static DEVICE_START( segapcm )
 
 	spcm->bankmask = mask & (rom_mask >> spcm->bankshift);
 
-	spcm->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock() / 128, spcm, SEGAPCM_update);
+	spcm->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock() / 128, spcm, SEGAPCM_update);
 
 	device->save_item(NAME(spcm->low));
 	device->save_pointer(NAME(spcm->ram), 0x800);

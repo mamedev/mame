@@ -110,10 +110,10 @@
 
 static WRITE8_HANDLER( lamp_control_w )
 {
-	set_led_status(space->machine, 0, data & 0x80);
-	set_led_status(space->machine, 1, data & 0x40);
-	set_led_status(space->machine, 2, data & 0x20);
-	set_led_status(space->machine, 3, data & 0x10);
+	set_led_status(space->machine(), 0, data & 0x80);
+	set_led_status(space->machine(), 1, data & 0x40);
+	set_led_status(space->machine(), 2, data & 0x20);
+	set_led_status(space->machine(), 3, data & 0x10);
 }
 
 

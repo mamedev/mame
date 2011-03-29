@@ -43,7 +43,7 @@
 
 WRITE8_HANDLER( lkage_videoram_w )
 {
-	lkage_state *state = space->machine->driver_data<lkage_state>();
+	lkage_state *state = space->machine().driver_data<lkage_state>();
 
 	state->videoram[offset] = data;
 
@@ -68,28 +68,28 @@ WRITE8_HANDLER( lkage_videoram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	lkage_state *state = machine->driver_data<lkage_state>();
+	lkage_state *state = machine.driver_data<lkage_state>();
 	int code = state->videoram[tile_index + 0x800] + 256 * (state->bg_tile_bank ? 5 : 1);
 	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/ );
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	lkage_state *state = machine->driver_data<lkage_state>();
+	lkage_state *state = machine.driver_data<lkage_state>();
 	int code = state->videoram[tile_index + 0x400] + 256 * (state->fg_tile_bank ? 1 : 0);
 	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	lkage_state *state = machine->driver_data<lkage_state>();
+	lkage_state *state = machine.driver_data<lkage_state>();
 	int code = state->videoram[tile_index] + 256 * (state->tx_tile_bank ? 4 : 0);
 	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/);
 }
 
 VIDEO_START( lkage )
 {
-	lkage_state *state = machine->driver_data<lkage_state>();
+	lkage_state *state = machine.driver_data<lkage_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -104,9 +104,9 @@ VIDEO_START( lkage )
 }
 
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	lkage_state *state = machine->driver_data<lkage_state>();
+	lkage_state *state = machine.driver_data<lkage_state>();
 	const UINT8 *source = state->spriteram;
 	const UINT8 *finish = source + 0x60;
 
@@ -159,13 +159,13 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			pdrawgfx_transpen(
 				bitmap,
 				cliprect,
-				machine->gfx[1],
+				machine.gfx[1],
 				sprite_number ^ y,
 				color,
 				flipx,flipy,
 				sx&0xff,
 				sy + 16*y,
-				machine->priority_bitmap,
+				machine.priority_bitmap,
 				priority_mask,0 );
 		}
 		source += 4;
@@ -174,11 +174,11 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( lkage )
 {
-	lkage_state *state = screen->machine->driver_data<lkage_state>();
+	lkage_state *state = screen->machine().driver_data<lkage_state>();
 	int bank;
 
-	flip_screen_x_set(screen->machine, ~state->vreg[2] & 0x01);
-	flip_screen_y_set(screen->machine, ~state->vreg[2] & 0x02);
+	flip_screen_x_set(screen->machine(), ~state->vreg[2] & 0x01);
+	flip_screen_y_set(screen->machine(), ~state->vreg[2] & 0x02);
 
 	bank = state->vreg[1] & 0x08;
 
@@ -215,13 +215,13 @@ SCREEN_UPDATE( lkage )
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll[4]);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->scroll[5]);
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	if ((state->vreg[2] & 0xf0) == 0xf0)
 	{
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 1);
 		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, (state->vreg[1] & 2) ? 2 : 4);
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 4);
-		draw_sprites(screen->machine, bitmap, cliprect);
+		draw_sprites(screen->machine(), bitmap, cliprect);
 	}
 	else
 	{

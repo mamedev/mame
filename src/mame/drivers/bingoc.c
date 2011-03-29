@@ -70,15 +70,15 @@ static READ16_HANDLER( bingoc_rand_r )
 */
 static READ8_HANDLER( sound_test_r )
 {
-	bingoc_state *state = space->machine->driver_data<bingoc_state>();
+	bingoc_state *state = space->machine().driver_data<bingoc_state>();
 
-	if(input_code_pressed_once(space->machine, KEYCODE_Z))
+	if(input_code_pressed_once(space->machine(), KEYCODE_Z))
 		state->x++;
 
-	if(input_code_pressed_once(space->machine, KEYCODE_X))
+	if(input_code_pressed_once(space->machine(), KEYCODE_X))
 		state->x--;
 
-	if(input_code_pressed_once(space->machine, KEYCODE_A))
+	if(input_code_pressed_once(space->machine(), KEYCODE_A))
 		return 0xff;
 
 	popmessage("%02x",state->x);
@@ -88,7 +88,7 @@ static READ8_HANDLER( sound_test_r )
 static WRITE16_HANDLER( main_sound_latch_w )
 {
 	soundlatch_w(space,0,data&0xff);
-	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 #endif
 
@@ -98,7 +98,7 @@ static WRITE8_DEVICE_HANDLER( bingoc_play_w )
     ---- --x- sound rom banking
     ---- ---x start-stop sample
     */
-	UINT8 *upd = device->machine->region("upd")->base();
+	UINT8 *upd = device->machine().region("upd")->base();
 	memcpy(&upd[0x00000], &upd[0x20000 + (((data & 2)>>1) * 0x20000)], 0x20000);
 	upd7759_start_w(device, data & 1);
 //  printf("%02x\n",data);

@@ -130,25 +130,25 @@ static const UINT8 prot_data[0x10] =
 
 static CUSTOM_INPUT( prot_r )
 {
-	ddayjlc_state *state = field->port->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = field->port->machine().driver_data<ddayjlc_state>();
 	return prot_data[state->prot_addr];
 }
 
 static WRITE8_HANDLER( prot_w )
 {
-	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 	state->prot_addr = (state->prot_addr & (~(1 << offset))) | ((data & 1) << offset);
 }
 
 static WRITE8_HANDLER( char_bank_w )
 {
-	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 	state->char_bank = data;
 }
 
 static WRITE8_HANDLER( ddayjlc_bgram_w )
 {
-	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 
 	if (!offset)
 		tilemap_set_scrollx(state->bg_tilemap, 0, data + 8);
@@ -159,49 +159,49 @@ static WRITE8_HANDLER( ddayjlc_bgram_w )
 
 static WRITE8_HANDLER( ddayjlc_videoram_w )
 {
-	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 	state->videoram[offset] = data;
 }
 
 
 static WRITE8_HANDLER(sound_nmi_w)
 {
-	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 	state->sound_nmi_enable = data;
 }
 
 static WRITE8_HANDLER(main_nmi_w)
 {
-	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 	state->main_nmi_enable = data;
 }
 
 static WRITE8_HANDLER( bg0_w )
 {
-	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 	state->bgadr = (state->bgadr & 0xfe) | (data & 1);
 }
 
 static WRITE8_HANDLER( bg1_w )
 {
-	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 	state->bgadr = (state->bgadr & 0xfd) | ((data & 1) << 1);
 }
 
 static WRITE8_HANDLER( bg2_w )
 {
-	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 
 	state->bgadr = (state->bgadr & 0xfb) | ((data & 1) << 2);
 	if (state->bgadr > 2)
 		state->bgadr = 0;
 
-	memory_set_bank(space->machine, "bank1", state->bgadr);
+	memory_set_bank(space->machine(), "bank1", state->bgadr);
 }
 
 static WRITE8_HANDLER( sound_w )
 {
-	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 
 	soundlatch_w(space, offset, data);
 	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
@@ -209,7 +209,7 @@ static WRITE8_HANDLER( sound_w )
 
 static WRITE8_HANDLER( i8257_CH0_w )
 {
-	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 
 	state->e00x_d[offset][state->e00x_l[offset]] = data;
 	state->e00x_l[offset] ^= 1;
@@ -217,7 +217,7 @@ static WRITE8_HANDLER( i8257_CH0_w )
 
 static WRITE8_HANDLER( i8257_LMSR_w )
 {
-	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 
 	if (!data)
 	{
@@ -366,7 +366,7 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_tile_info_bg )
 {
-	ddayjlc_state *state = machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = machine.driver_data<ddayjlc_state>();
 	int code = state->bgram[tile_index] + ((state->bgram[tile_index + 0x400] & 0x08) << 5);
 	int color = (state->bgram[tile_index + 0x400] & 0x7);
 	color |= (state->bgram[tile_index + 0x400] & 0x40) >> 3;
@@ -376,13 +376,13 @@ static TILE_GET_INFO( get_tile_info_bg )
 
 static VIDEO_START( ddayjlc )
 {
-	ddayjlc_state *state = machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = machine.driver_data<ddayjlc_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info_bg, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE( ddayjlc )
 {
-	ddayjlc_state *state = screen->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = screen->machine().driver_data<ddayjlc_state>();
 	UINT32 i;
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
@@ -398,7 +398,7 @@ static SCREEN_UPDATE( ddayjlc )
 
 		code = (code & 0x7f) | ((flags & 0x30) << 3);
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], code, color, xflip, yflip, x, y, 0);
+		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], code, color, xflip, yflip, x, y, 0);
 	}
 
 	{
@@ -409,9 +409,9 @@ static SCREEN_UPDATE( ddayjlc )
 			{
 				c = state->videoram[y * 32 + x];
 				if (x > 1 && x < 30)
-					drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], c + state->char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
+					drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1], c + state->char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
 				else
-					drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[1], c + state->char_bank * 0x100, 2, 0, 0, x*8, y*8);
+					drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[1], c + state->char_bank * 0x100, 2, 0, 0, x*8, y*8);
 			}
 	}
 	return 0;
@@ -429,14 +429,14 @@ static const ay8910_interface ay8910_config =
 
 static INTERRUPT_GEN( ddayjlc_interrupt )
 {
-	ddayjlc_state *state = device->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = device->machine().driver_data<ddayjlc_state>();
 	if(state->main_nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( ddayjlc_snd_interrupt )
 {
-	ddayjlc_state *state = device->machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = device->machine().driver_data<ddayjlc_state>();
 	if(state->sound_nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -444,9 +444,9 @@ static INTERRUPT_GEN( ddayjlc_snd_interrupt )
 
 static MACHINE_START( ddayjlc )
 {
-	ddayjlc_state *state = machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = machine.driver_data<ddayjlc_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->char_bank));
 	state->save_item(NAME(state->bgadr));
@@ -463,7 +463,7 @@ static MACHINE_START( ddayjlc )
 
 static MACHINE_RESET( ddayjlc )
 {
-	ddayjlc_state *state = machine->driver_data<ddayjlc_state>();
+	ddayjlc_state *state = machine.driver_data<ddayjlc_state>();
 	int i;
 
 	state->char_bank = 0;
@@ -671,8 +671,8 @@ static DRIVER_INIT( ddayjlc )
 		UINT8 *src, *dst, *temp;
 		temp = auto_alloc_array(machine, UINT8, 0x10000);
 		src = temp;
-		dst = machine->region("gfx1")->base();
-		length = machine->region("gfx1")->bytes();
+		dst = machine.region("gfx1")->base();
+		length = machine.region("gfx1")->bytes();
 		memcpy(src, dst, length);
 		newadr = 0;
 		oldaddr = 0;
@@ -686,7 +686,7 @@ static DRIVER_INIT( ddayjlc )
 		auto_free(machine, temp);
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 3, machine->region("user1")->base(), 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 3, machine.region("user1")->base(), 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 }
 

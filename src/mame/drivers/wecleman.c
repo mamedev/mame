@@ -287,7 +287,7 @@ TODO:
 
 static READ16_HANDLER( wecleman_protection_r )
 {
-	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	wecleman_state *state = space->machine().driver_data<wecleman_state>();
 	int blend, data0, data1, r0, g0, b0, r1, g1, b1;
 
 	data0 = state->protection_ram[0];
@@ -314,7 +314,7 @@ static READ16_HANDLER( wecleman_protection_r )
 
 static WRITE16_HANDLER( wecleman_protection_w )
 {
-	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	wecleman_state *state = space->machine().driver_data<wecleman_state>();
 	if (offset == 2) state->prot_state = data & 0x2000;
 	if (!state->prot_state) COMBINE_DATA(state->protection_ram + offset);
 }
@@ -342,20 +342,20 @@ static WRITE16_HANDLER( wecleman_protection_w )
 */
 static WRITE16_HANDLER( irqctrl_w )
 {
-	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	wecleman_state *state = space->machine().driver_data<wecleman_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		// logerror("CPU #0 - PC = %06X - $140005 <- %02X (old value: %02X)\n",cpu_get_pc(space->cpu), data&0xFF, old_data&0xFF);
 
 		// Bit 0 : SUBINT
 		if ( (state->irqctrl & 1) && (!(data & 1)) )	// 1->0 transition
-			cputag_set_input_line(space->machine, "sub", 4, HOLD_LINE);
+			cputag_set_input_line(space->machine(), "sub", 4, HOLD_LINE);
 
 		// Bit 1 : NSUBRST
 		if (data & 2)
-			cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, ASSERT_LINE);
 
 		// Bit 2 : SOUND-ON
 		// Bit 3 : SOUNDRST
@@ -379,19 +379,19 @@ static WRITE16_HANDLER( irqctrl_w )
 */
 static WRITE16_HANDLER( selected_ip_w )
 {
-	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	wecleman_state *state = space->machine().driver_data<wecleman_state>();
 	if (ACCESSING_BITS_0_7) state->selected_ip = data & 0xff;	// latch the value
 }
 
 /* $140021.b - Return the previously selected input port's value */
 static READ16_HANDLER( selected_ip_r )
 {
-	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	wecleman_state *state = space->machine().driver_data<wecleman_state>();
 	switch ( (state->selected_ip >> 5) & 3 )
 	{																	// From WEC Le Mans Schems:
-		case 0:  return input_port_read(space->machine, "ACCEL");		// Accel - Schems: Accelevr
+		case 0:  return input_port_read(space->machine(), "ACCEL");		// Accel - Schems: Accelevr
 		case 1:  return ~0;												// ????? - Schems: Not Used
-		case 2:  return input_port_read(space->machine, "STEER");		// Wheel - Schems: Handlevr
+		case 2:  return input_port_read(space->machine(), "STEER");		// Wheel - Schems: Handlevr
 		case 3:  return ~0;												// Table - Schems: Turnvr
 
 		default: return ~0;
@@ -434,7 +434,7 @@ static READ16_HANDLER( selected_ip_r )
 */
 static WRITE16_HANDLER( blitter_w )
 {
-	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	wecleman_state *state = space->machine().driver_data<wecleman_state>();
 	COMBINE_DATA(&state->blitter_regs[offset]);
 
 	/* do a blit if $80010.b has been written */
@@ -604,20 +604,20 @@ WRITE16_HANDLER( wecleman_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xFF);
-		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 	}
 }
 
 /* Protection - an external multiplyer connected to the sound CPU */
 static READ8_HANDLER( multiply_r )
 {
-	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	wecleman_state *state = space->machine().driver_data<wecleman_state>();
 	return (state->multiply_reg[0] * state->multiply_reg[1]) & 0xFF;
 }
 
 static WRITE8_HANDLER( multiply_w )
 {
-	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	wecleman_state *state = space->machine().driver_data<wecleman_state>();
 	state->multiply_reg[offset] = data;
 }
 
@@ -666,7 +666,7 @@ static WRITE16_HANDLER( hotchase_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xFF);
-		cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -676,9 +676,9 @@ static WRITE8_HANDLER( hotchase_sound_control_w )
 
 	int reg[8];
 
-	sound[0] = space->machine->device("konami1");
-	sound[1] = space->machine->device("konami2");
-	sound[2] = space->machine->device("konami3");
+	sound[0] = space->machine().device("konami1");
+	sound[1] = space->machine().device("konami2");
+	sound[2] = space->machine().device("konami3");
 
 	reg[offset] = data;
 
@@ -1028,7 +1028,7 @@ static INTERRUPT_GEN( wecleman_interrupt )
 
 static MACHINE_RESET( wecleman )
 {
-	k007232_set_bank( machine->device("konami"), 0, 1 );
+	k007232_set_bank( machine.device("konami"), 0, 1 );
 }
 
 static MACHINE_CONFIG_START( wecleman, wecleman_state )
@@ -1209,13 +1209,13 @@ ROM_START( wecleman )
 
 ROM_END
 
-static void wecleman_unpack_sprites(running_machine *machine)
+static void wecleman_unpack_sprites(running_machine &machine)
 {
 	const char *region       = "gfx1";	// sprites
 
-	const UINT32 len = machine->region(region)->bytes();
-	UINT8 *src     = machine->region(region)->base() + len / 2 - 1;
-	UINT8 *dst     = machine->region(region)->base() + len - 1;
+	const UINT32 len = machine.region(region)->bytes();
+	UINT8 *src     = machine.region(region)->base() + len / 2 - 1;
+	UINT8 *dst     = machine.region(region)->base() + len - 1;
 
 	while(dst > src)
 	{
@@ -1226,7 +1226,7 @@ static void wecleman_unpack_sprites(running_machine *machine)
 	}
 }
 
-static void bitswap(running_machine *machine,UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0)
+static void bitswap(running_machine &machine,UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0)
 {
 	UINT8 *buffer = auto_alloc_array(machine, UINT8, len);
 	int i;
@@ -1243,10 +1243,10 @@ static void bitswap(running_machine *machine,UINT8 *src,size_t len,int _14,int _
 /* Unpack sprites data and do some patching */
 static DRIVER_INIT( wecleman )
 {
-	wecleman_state *state = machine->driver_data<wecleman_state>();
+	wecleman_state *state = machine.driver_data<wecleman_state>();
 	int i, len;
 	UINT8 *RAM;
-//  UINT16 *RAM1 = (UINT16 *) machine->region("maincpu")->base();   /* Main CPU patches */
+//  UINT16 *RAM1 = (UINT16 *) machine.region("maincpu")->base();   /* Main CPU patches */
 //  RAM1[0x08c2/2] = 0x601e;    // faster self test
 
 	/* Decode GFX Roms - Compensate for the address lines scrambling */
@@ -1256,8 +1256,8 @@ static DRIVER_INIT( wecleman )
         I hope you'll appreciate this effort!  */
 
 	/* let's swap even and odd *pixels* of the sprites */
-	RAM = machine->region("gfx1")->base();
-	len = machine->region("gfx1")->bytes();
+	RAM = machine.region("gfx1")->base();
+	len = machine.region("gfx1")->bytes();
 	for (i = 0; i < len; i ++)
 	{
 		/* TODO: could be wrong, colors have to be fixed.       */
@@ -1266,18 +1266,18 @@ static DRIVER_INIT( wecleman )
 		RAM[i] = BITSWAP8(RAM[i],7,0,1,2,3,4,5,6);
 	}
 
-	bitswap(machine, machine->region("gfx1")->base(), machine->region("gfx1")->bytes(),
+	bitswap(machine, machine.region("gfx1")->base(), machine.region("gfx1")->bytes(),
 			0,1,20,19,18,17,14,9,16,6,4,7,8,15,10,11,13,5,12,3,2);
 
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */
 	wecleman_unpack_sprites(machine);
 
 	/* Bg & Fg & Txt */
-	bitswap(machine, machine->region("gfx2")->base(), machine->region("gfx2")->bytes(),
+	bitswap(machine, machine.region("gfx2")->base(), machine.region("gfx2")->bytes(),
 			20,19,18,17,16,15,12,7,14,4,2,5,6,13,8,9,11,3,10,1,0);
 
 	/* Road */
-	bitswap(machine, machine->region("gfx3")->base(), machine->region("gfx3")->bytes(),
+	bitswap(machine, machine.region("gfx3")->base(), machine.region("gfx3")->bytes(),
 			20,19,18,17,16,15,14,7,12,4,2,5,6,13,8,9,11,3,10,1,0);
 
 	state->spr_color_offs = 0x40;
@@ -1337,12 +1337,12 @@ ROM_END
     in a ROM module definition.  This routine unpacks each sprite nibble
     into a byte, doubling the memory consumption. */
 
-static void hotchase_sprite_decode( running_machine *machine, int num16_banks, int bank_size )
+static void hotchase_sprite_decode( running_machine &machine, int num16_banks, int bank_size )
 {
 	UINT8 *base, *temp;
 	int i;
 
-	base = machine->region("gfx1")->base();	// sprites
+	base = machine.region("gfx1")->base();	// sprites
 	temp = auto_alloc_array(machine, UINT8,  bank_size );
 
 	for( i = num16_banks; i >0; i-- ){
@@ -1387,8 +1387,8 @@ static void hotchase_sprite_decode( running_machine *machine, int num16_banks, i
 /* Unpack sprites data and do some patching */
 static DRIVER_INIT( hotchase )
 {
-	wecleman_state *state = machine->driver_data<wecleman_state>();
-//  UINT16 *RAM1 = (UINT16) machine->region("maincpu")->base(); /* Main CPU patches */
+	wecleman_state *state = machine.driver_data<wecleman_state>();
+//  UINT16 *RAM1 = (UINT16) machine.region("maincpu")->base(); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test
 
 	UINT8 *RAM;
@@ -1396,13 +1396,13 @@ static DRIVER_INIT( hotchase )
 	/* Decode GFX Roms */
 
 	/* Let's swap even and odd bytes of the sprites gfx roms */
-	RAM = machine->region("gfx1")->base();
+	RAM = machine.region("gfx1")->base();
 
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */
 	hotchase_sprite_decode(machine,3,0x80000*2);	// num banks, bank len
 
 	/* Let's copy the second half of the fg layer gfx (charset) over the first */
-	RAM = machine->region("gfx3")->base();
+	RAM = machine.region("gfx3")->base();
 	memcpy(&RAM[0], &RAM[0x10000/2], 0x10000/2);
 
 	state->spr_color_offs = 0;

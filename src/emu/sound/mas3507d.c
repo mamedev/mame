@@ -21,7 +21,7 @@ device_config *mas3507d_device_config::static_alloc_device_config(const machine_
 
 device_t *mas3507d_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, mas3507d_device(machine, *this));
+	return auto_alloc(machine, mas3507d_device(machine, *this));
 }
 
 mas3507d_device::mas3507d_device(running_machine &machine, const mas3507d_device_config &_config)

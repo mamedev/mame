@@ -352,7 +352,7 @@ C - uses sub board with support for player 3 and 4 controls
 
 static WRITE8_HANDLER( namcos1_sub_firq_w )
 {
-	cputag_set_input_line(space->machine, "sub", M6809_FIRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "sub", M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( irq_ack_w )
@@ -369,27 +369,27 @@ static WRITE8_HANDLER( firq_ack_w )
 
 static READ8_HANDLER( dsw_r )
 {
-	int ret = input_port_read(space->machine, "DIPSW");
+	int ret = input_port_read(space->machine(), "DIPSW");
 	if (!(offset & 2)) ret >>= 4;
 	return 0xf0 | ret;
 }
 
 static WRITE8_HANDLER( namcos1_coin_w )
 {
-	coin_lockout_global_w(space->machine, ~data & 1);
-	coin_counter_w(space->machine, 0,data & 2);
-	coin_counter_w(space->machine, 1,data & 4);
+	coin_lockout_global_w(space->machine(), ~data & 1);
+	coin_counter_w(space->machine(), 0,data & 2);
+	coin_counter_w(space->machine(), 1,data & 4);
 }
 
-static void namcos1_update_DACs(running_machine *machine)
+static void namcos1_update_DACs(running_machine &machine)
 {
-	namcos1_state *state = machine->driver_data<namcos1_state>();
-	dac_signed_data_16_w(machine->device("dac"),0x8000 + (state->dac0_value * state->dac0_gain) + (state->dac1_value * state->dac1_gain));
+	namcos1_state *state = machine.driver_data<namcos1_state>();
+	dac_signed_data_16_w(machine.device("dac"),0x8000 + (state->dac0_value * state->dac0_gain) + (state->dac1_value * state->dac1_gain));
 }
 
-void namcos1_init_DACs(running_machine *machine)
+void namcos1_init_DACs(running_machine &machine)
 {
-	namcos1_state *state = machine->driver_data<namcos1_state>();
+	namcos1_state *state = machine.driver_data<namcos1_state>();
 	state->dac0_value = 0;
 	state->dac1_value = 0;
 	state->dac0_gain=0x80;
@@ -398,7 +398,7 @@ void namcos1_init_DACs(running_machine *machine)
 
 static WRITE8_HANDLER( namcos1_dac_gain_w )
 {
-	namcos1_state *state = space->machine->driver_data<namcos1_state>();
+	namcos1_state *state = space->machine().driver_data<namcos1_state>();
 	int value;
 
 	/* DAC0 (bits 0,2) */
@@ -409,21 +409,21 @@ static WRITE8_HANDLER( namcos1_dac_gain_w )
 	value = (data >> 3) & 3; /* GAIN2,GAIN3 */
 	state->dac1_gain = 0x20 * (value+1);
 
-	namcos1_update_DACs(space->machine);
+	namcos1_update_DACs(space->machine());
 }
 
 static WRITE8_HANDLER( namcos1_dac0_w )
 {
-	namcos1_state *state = space->machine->driver_data<namcos1_state>();
+	namcos1_state *state = space->machine().driver_data<namcos1_state>();
 	state->dac0_value = data - 0x80; /* shift zero point */
-	namcos1_update_DACs(space->machine);
+	namcos1_update_DACs(space->machine());
 }
 
 static WRITE8_HANDLER( namcos1_dac1_w )
 {
-	namcos1_state *state = space->machine->driver_data<namcos1_state>();
+	namcos1_state *state = space->machine().driver_data<namcos1_state>();
 	state->dac1_value = data - 0x80; /* shift zero point */
-	namcos1_update_DACs(space->machine);
+	namcos1_update_DACs(space->machine());
 }
 
 
@@ -1061,7 +1061,7 @@ GFXDECODE_END
 
 static void namcos1_sound_interrupt( device_t *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

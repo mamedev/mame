@@ -129,10 +129,10 @@ static VIDEO_START(calchase)
 
 static SCREEN_UPDATE(calchase)
 {
-	calchase_state *state = screen->machine->driver_data<calchase_state>();
+	calchase_state *state = screen->machine().driver_data<calchase_state>();
 	int x,y,count,i;
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
 	count = (0);
 
@@ -147,7 +147,7 @@ static SCREEN_UPDATE(calchase)
 				color = (state->vga_vram[count])>>(32-i) & 0x1;
 
 				if((x+i)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, x+(32-i)) = screen->machine->pens[color];
+					*BITMAP_ADDR32(bitmap, y, x+(32-i)) = screen->machine().pens[color];
 
 			}
 
@@ -182,7 +182,7 @@ static WRITE32_DEVICE_HANDLER(at32_dma8237_2_w)
 
 static READ8_HANDLER(at_page8_r)
 {
-	calchase_state *state = space->machine->driver_data<calchase_state>();
+	calchase_state *state = space->machine().driver_data<calchase_state>();
 	UINT8 data = state->at_pages[offset % 0x10];
 
 	switch(offset % 8) {
@@ -205,7 +205,7 @@ static READ8_HANDLER(at_page8_r)
 
 static WRITE8_HANDLER(at_page8_w)
 {
-	calchase_state *state = space->machine->driver_data<calchase_state>();
+	calchase_state *state = space->machine().driver_data<calchase_state>();
 	state->at_pages[offset % 0x10] = data;
 
 	switch(offset % 8) {
@@ -227,7 +227,7 @@ static WRITE8_HANDLER(at_page8_w)
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( device, state );
@@ -236,7 +236,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 
 static READ8_HANDLER( pc_dma_read_byte )
 {
-	calchase_state *state = space->machine->driver_data<calchase_state>();
+	calchase_state *state = space->machine().driver_data<calchase_state>();
 	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
@@ -246,7 +246,7 @@ static READ8_HANDLER( pc_dma_read_byte )
 
 static WRITE8_HANDLER( pc_dma_write_byte )
 {
-	calchase_state *state = space->machine->driver_data<calchase_state>();
+	calchase_state *state = space->machine().driver_data<calchase_state>();
 	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
@@ -255,7 +255,7 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 
 static void set_dma_channel(device_t *device, int channel, int state)
 {
-	calchase_state *drvstate = device->machine->driver_data<calchase_state>();
+	calchase_state *drvstate = device->machine().driver_data<calchase_state>();
 	if (!state) drvstate->dma_channel = channel;
 }
 
@@ -322,7 +322,7 @@ static WRITE32_DEVICE_HANDLER( fdc_w )
 
 static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
-	calchase_state *state = busdevice->machine->driver_data<calchase_state>();
+	calchase_state *state = busdevice->machine().driver_data<calchase_state>();
 //  mame_printf_debug("MXTC: read %d, %02X\n", function, reg);
 
 	return state->mxtc_config_reg[reg];
@@ -330,8 +330,8 @@ static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, 
 
 static void mxtc_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
-	calchase_state *state = busdevice->machine->driver_data<calchase_state>();
-//  mame_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine->describe_context(), function, reg, data);
+	calchase_state *state = busdevice->machine().driver_data<calchase_state>();
+//  mame_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
 
 	switch(reg)
 	{
@@ -339,11 +339,11 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
 			{
-				memory_set_bankptr(busdevice->machine, "bank1", state->bios_ram);
+				memory_set_bankptr(busdevice->machine(), "bank1", state->bios_ram);
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(busdevice->machine, "bank1", busdevice->machine->region("bios")->base() + 0x10000);
+				memory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("bios")->base() + 0x10000);
 			}
 			break;
 		}
@@ -352,9 +352,9 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 	state->mxtc_config_reg[reg] = data;
 }
 
-static void intel82439tx_init(running_machine *machine)
+static void intel82439tx_init(running_machine &machine)
 {
-	calchase_state *state = machine->driver_data<calchase_state>();
+	calchase_state *state = machine.driver_data<calchase_state>();
 	state->mxtc_config_reg[0x60] = 0x02;
 	state->mxtc_config_reg[0x61] = 0x02;
 	state->mxtc_config_reg[0x62] = 0x02;
@@ -409,15 +409,15 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 
 static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
-	calchase_state *state = busdevice->machine->driver_data<calchase_state>();
+	calchase_state *state = busdevice->machine().driver_data<calchase_state>();
 //  mame_printf_debug("PIIX4: read %d, %02X\n", function, reg);
 	return state->piix4_config_reg[function][reg];
 }
 
 static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
-	calchase_state *state = busdevice->machine->driver_data<calchase_state>();
-//  mame_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine->describe_context(), function, reg, data);
+	calchase_state *state = busdevice->machine().driver_data<calchase_state>();
+//  mame_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
 	state->piix4_config_reg[function][reg] = data;
 }
 
@@ -465,7 +465,7 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 
 static WRITE32_HANDLER(bios_ram_w)
 {
-	calchase_state *state = space->machine->driver_data<calchase_state>();
+	calchase_state *state = space->machine().driver_data<calchase_state>();
 	if (state->mxtc_config_reg[0x59] & 0x20)		// write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(state->bios_ram + offset);
@@ -565,7 +565,7 @@ INPUT_PORTS_END
 
 static IRQ_CALLBACK(irq_callback)
 {
-	calchase_state *state = device->machine->driver_data<calchase_state>();
+	calchase_state *state = device->machine().driver_data<calchase_state>();
 	int r = 0;
 	r = pic8259_acknowledge( state->pic8259_2);
 	if (r==0)
@@ -577,14 +577,14 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_START(calchase)
 {
-	calchase_state *state = machine->driver_data<calchase_state>();
-	device_set_irq_callback(machine->device("maincpu"), irq_callback);
+	calchase_state *state = machine.driver_data<calchase_state>();
+	device_set_irq_callback(machine.device("maincpu"), irq_callback);
 
-	state->pit8254 = machine->device( "pit8254" );
-	state->pic8259_1 = machine->device( "pic8259_1" );
-	state->pic8259_2 = machine->device( "pic8259_2" );
-	state->dma8237_1 = machine->device( "dma8237_1" );
-	state->dma8237_2 = machine->device( "dma8237_2" );
+	state->pit8254 = machine.device( "pit8254" );
+	state->pic8259_1 = machine.device( "pic8259_1" );
+	state->pic8259_2 = machine.device( "pic8259_2" );
+	state->dma8237_1 = machine.device( "dma8237_1" );
+	state->dma8237_2 = machine.device( "dma8237_2" );
 }
 
 /*************************************************************
@@ -595,7 +595,7 @@ static MACHINE_START(calchase)
 
 static WRITE_LINE_DEVICE_HANDLER( calchase_pic8259_1_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface calchase_pic8259_1_config =
@@ -636,29 +636,29 @@ static const struct pit8253_config calchase_pit8254_config =
 
 static MACHINE_RESET(calchase)
 {
-	memory_set_bankptr(machine, "bank1", machine->region("bios")->base() + 0x10000);
+	memory_set_bankptr(machine, "bank1", machine.region("bios")->base() + 0x10000);
 }
 
-static void set_gate_a20(running_machine *machine, int a20)
+static void set_gate_a20(running_machine &machine, int a20)
 {
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, a20);
 }
 
-static void keyboard_interrupt(running_machine *machine, int state)
+static void keyboard_interrupt(running_machine &machine, int state)
 {
-	calchase_state *drvstate = machine->driver_data<calchase_state>();
+	calchase_state *drvstate = machine.driver_data<calchase_state>();
 	pic8259_ir1_w(drvstate->pic8259_1, state);
 }
 
 static void ide_interrupt(device_t *device, int state)
 {
-	calchase_state *drvstate = device->machine->driver_data<calchase_state>();
+	calchase_state *drvstate = device->machine().driver_data<calchase_state>();
 	pic8259_ir6_w(drvstate->pic8259_2, state);
 }
 
-static int calchase_get_out2(running_machine *machine)
+static int calchase_get_out2(running_machine &machine)
 {
-	calchase_state *state = machine->driver_data<calchase_state>();
+	calchase_state *state = machine.driver_data<calchase_state>();
 	return pit8253_get_output(state->pit8254, 2 );
 }
 
@@ -667,9 +667,9 @@ static const struct kbdc8042_interface at8042 =
 	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, calchase_get_out2
 };
 
-static void calchase_set_keyb_int(running_machine *machine, int state)
+static void calchase_set_keyb_int(running_machine &machine, int state)
 {
-	calchase_state *drvstate = machine->driver_data<calchase_state>();
+	calchase_state *drvstate = machine.driver_data<calchase_state>();
 	pic8259_ir1_w(drvstate->pic8259_1, state);
 }
 
@@ -709,7 +709,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( calchase )
 {
-	calchase_state *state = machine->driver_data<calchase_state>();
+	calchase_state *state = machine.driver_data<calchase_state>();
 	state->bios_ram = auto_alloc_array(machine, UINT32, 0x10000/4);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, calchase_set_keyb_int);

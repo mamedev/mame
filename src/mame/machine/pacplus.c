@@ -39,14 +39,14 @@ static UINT8 decrypt(int addr, UINT8 e)
 }
 
 
-void pacplus_decode(running_machine *machine)
+void pacplus_decode(running_machine &machine)
 {
 	int i;
 	UINT8 *RAM;
 
 	/* CPU ROMs */
 
-	RAM = machine->region("maincpu")->base();
+	RAM = machine.region("maincpu")->base();
 	for (i = 0; i < 0x4000; i++)
 	{
 		RAM[i] = decrypt(i,RAM[i]);

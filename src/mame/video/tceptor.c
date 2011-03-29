@@ -20,11 +20,11 @@
 
 PALETTE_INIT( tceptor )
 {
-	tceptor_state *state = machine->driver_data<tceptor_state>();
+	tceptor_state *state = machine.driver_data<tceptor_state>();
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x400);
+	machine.colortable = colortable_alloc(machine, 0x400);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x400; i++)
@@ -33,7 +33,7 @@ PALETTE_INIT( tceptor )
 		int g = pal4bit(color_prom[i + 0x400]);
 		int b = pal4bit(color_prom[i + 0x800]);
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -52,35 +52,35 @@ PALETTE_INIT( tceptor )
 	for (i = 0; i < 0x0400; i++)
 	{
 		int ctabentry = color_prom[i];
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 
 	/* sprites lookup table (1024 colors) */
 	for (i = 0x0400; i < 0x0800; i++)
 	{
 		int ctabentry = color_prom[i] | 0x300;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 
 	/* background: no lookup PROM, use directly (512 colors) */
 	for (i = 0x0a00; i < 0x0c00; i++)
 	{
 		int ctabentry = i & 0x1ff;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 
 	/* road lookup table (256 colors) */
 	for (i = 0x0f00; i < 0x1000; i++)
 	{
 		int ctabentry = color_prom[i - 0x700] | 0x200;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 
 	/* setup sprite mask color map */
 	/* tceptor2: only 0x23 */
 	memset(state->is_mask_spr, 0, sizeof state->is_mask_spr);
 	for (i = 0; i < 0x400; i++)
-		if (colortable_entry_get_value(machine->colortable, i | 0x400) == SPR_MASK_COLOR)
+		if (colortable_entry_get_value(machine.colortable, i | 0x400) == SPR_MASK_COLOR)
 			state->is_mask_spr[i >> 4] = 1;
 }
 
@@ -105,7 +105,7 @@ INLINE int get_tile_addr(int tile_index)
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	tceptor_state *state = machine->driver_data<tceptor_state>();
+	tceptor_state *state = machine.driver_data<tceptor_state>();
 	int offset = get_tile_addr(tile_index);
 	int code = state->tile_ram[offset];
 	int color = state->tile_attr[offset];
@@ -144,7 +144,7 @@ static void tile_mark_dirty(tceptor_state *state, int offset)
 
 WRITE8_HANDLER( tceptor_tile_ram_w )
 {
-	tceptor_state *state = space->machine->driver_data<tceptor_state>();
+	tceptor_state *state = space->machine().driver_data<tceptor_state>();
 	if (state->tile_ram[offset] != data)
 	{
 		state->tile_ram[offset] = data;
@@ -154,7 +154,7 @@ WRITE8_HANDLER( tceptor_tile_ram_w )
 
 WRITE8_HANDLER( tceptor_tile_attr_w )
 {
-	tceptor_state *state = space->machine->driver_data<tceptor_state>();
+	tceptor_state *state = space->machine().driver_data<tceptor_state>();
 	if (state->tile_attr[offset] != data)
 	{
 		state->tile_attr[offset] = data;
@@ -167,7 +167,7 @@ WRITE8_HANDLER( tceptor_tile_attr_w )
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	tceptor_state *state = machine->driver_data<tceptor_state>();
+	tceptor_state *state = machine.driver_data<tceptor_state>();
 	UINT16 data = state->bg_ram[tile_index * 2] | (state->bg_ram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | 0x000;
 	int color = (data & 0xfc00) >> 10;
@@ -177,7 +177,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	tceptor_state *state = machine->driver_data<tceptor_state>();
+	tceptor_state *state = machine.driver_data<tceptor_state>();
 	UINT16 data = state->bg_ram[tile_index * 2 + 0x1000] | (state->bg_ram[tile_index * 2 + 1 + 0x1000] << 8);
 	int code = (data & 0x3ff) | 0x400;
 	int color = (data & 0xfc00) >> 10;
@@ -187,7 +187,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 WRITE8_HANDLER( tceptor_bg_ram_w )
 {
-	tceptor_state *state = space->machine->driver_data<tceptor_state>();
+	tceptor_state *state = space->machine().driver_data<tceptor_state>();
 	state->bg_ram[offset] = data;
 
 	offset /= 2;
@@ -199,7 +199,7 @@ WRITE8_HANDLER( tceptor_bg_ram_w )
 
 WRITE8_HANDLER( tceptor_bg_scroll_w )
 {
-	tceptor_state *state = space->machine->driver_data<tceptor_state>();
+	tceptor_state *state = space->machine().driver_data<tceptor_state>();
 	switch (offset)
 	{
 	case 0:
@@ -231,9 +231,9 @@ WRITE8_HANDLER( tceptor_bg_scroll_w )
 
 /*******************************************************************/
 
-static void decode_bg(running_machine *machine, const char * region)
+static void decode_bg(running_machine &machine, const char * region)
 {
-	tceptor_state *state = machine->driver_data<tceptor_state>();
+	tceptor_state *state = machine.driver_data<tceptor_state>();
 	static const gfx_layout bg_layout =
 	{
 		8, 8,
@@ -246,7 +246,7 @@ static void decode_bg(running_machine *machine, const char * region)
 	};
 
 	int gfx_index = state->bg;
-	UINT8 *src = machine->region(region)->base() + 0x8000;
+	UINT8 *src = machine.region(region)->base() + 0x8000;
 	UINT8 *buffer;
 	int len = 0x8000;
 	int i;
@@ -264,19 +264,19 @@ static void decode_bg(running_machine *machine, const char * region)
 	auto_free(machine, buffer);
 
 	/* decode the graphics */
-	machine->gfx[gfx_index] = gfx_element_alloc(machine, &bg_layout, machine->region(region)->base(), 64, 2048);
+	machine.gfx[gfx_index] = gfx_element_alloc(machine, &bg_layout, machine.region(region)->base(), 64, 2048);
 }
 
-static void decode_sprite(running_machine *machine, int gfx_index, const gfx_layout *layout, const void *data)
+static void decode_sprite(running_machine &machine, int gfx_index, const gfx_layout *layout, const void *data)
 {
 	/* decode the graphics */
-	machine->gfx[gfx_index] = gfx_element_alloc(machine, layout, (const UINT8 *)data, 64, 1024);
+	machine.gfx[gfx_index] = gfx_element_alloc(machine, layout, (const UINT8 *)data, 64, 1024);
 }
 
 // fix sprite order
-static void decode_sprite16(running_machine *machine, const char * region)
+static void decode_sprite16(running_machine &machine, const char * region)
 {
-	tceptor_state *state = machine->driver_data<tceptor_state>();
+	tceptor_state *state = machine.driver_data<tceptor_state>();
 	static const gfx_layout spr16_layout =
 	{
 		16, 16,
@@ -294,8 +294,8 @@ static void decode_sprite16(running_machine *machine, const char * region)
 		2*16*16
 	};
 
-	UINT8 *src = machine->region(region)->base();
-	int len = machine->region(region)->bytes();
+	UINT8 *src = machine.region(region)->base();
+	int len = machine.region(region)->bytes();
 	UINT8 *dst;
 	int i, y;
 
@@ -322,9 +322,9 @@ static void decode_sprite16(running_machine *machine, const char * region)
 }
 
 // fix sprite order
-static void decode_sprite32(running_machine *machine, const char * region)
+static void decode_sprite32(running_machine &machine, const char * region)
 {
-	tceptor_state *state = machine->driver_data<tceptor_state>();
+	tceptor_state *state = machine.driver_data<tceptor_state>();
 	static const gfx_layout spr32_layout =
 	{
 		32, 32,
@@ -346,8 +346,8 @@ static void decode_sprite32(running_machine *machine, const char * region)
 		2*32*32
 	};
 
-	UINT8 *src = machine->region(region)->base();
-	int len = machine->region(region)->bytes();
+	UINT8 *src = machine.region(region)->base();
+	int len = machine.region(region)->bytes();
 	int total = spr32_layout.total;
 	int size = spr32_layout.charincrement / 8;
 	UINT8 *dst;
@@ -373,14 +373,14 @@ static void decode_sprite32(running_machine *machine, const char * region)
 
 VIDEO_START( tceptor )
 {
-	tceptor_state *state = machine->driver_data<tceptor_state>();
+	tceptor_state *state = machine.driver_data<tceptor_state>();
 	int gfx_index;
 
 	state->sprite_ram_buffered = auto_alloc_array_clear(machine, UINT16, 0x200/2);
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
+		if (machine.gfx[gfx_index] == 0)
 			break;
 	assert(gfx_index + 4 <= MAX_GFX_ELEMENTS);
 
@@ -394,17 +394,17 @@ VIDEO_START( tceptor )
 	decode_sprite32(machine, "gfx4");
 
 	/* allocate temp bitmaps */
-	state->temp_bitmap = machine->primary_screen->alloc_compatible_bitmap();
+	state->temp_bitmap = machine.primary_screen->alloc_compatible_bitmap();
 
 	namco_road_init(machine, gfx_index);
 
-	namco_road_set_transparent_color(colortable_entry_get_value(machine->colortable, 0xfff));
+	namco_road_set_transparent_color(colortable_entry_get_value(machine.colortable, 0xfff));
 
 	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_cols,  8, 8, 34, 28);
 
 	tilemap_set_scrollx(state->tx_tilemap, 0, -2*8);
 	tilemap_set_scrolly(state->tx_tilemap, 0, 0);
-	colortable_configure_tilemap_groups(machine->colortable, state->tx_tilemap, machine->gfx[0], 7);
+	colortable_configure_tilemap_groups(machine.colortable, state->tx_tilemap, machine.gfx[0], 7);
 
 	state->bg1_tilemap = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 	state->bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
@@ -440,9 +440,9 @@ VIDEO_START( tceptor )
     z: zoom y
 */
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int sprite_priority)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int sprite_priority)
 {
-	tceptor_state *state = machine->driver_data<tceptor_state>();
+	tceptor_state *state = machine.driver_data<tceptor_state>();
 	UINT16 *mem1 = &state->sprite_ram_buffered[0x000/2];
 	UINT16 *mem2 = &state->sprite_ram_buffered[0x100/2];
 	int need_mask = 0;
@@ -495,14 +495,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			drawgfxzoom_transmask(bitmap,
 			            cliprect,
-			            machine->gfx[gfx],
+			            machine.gfx[gfx],
 			            code,
 			            color,
 			            flipx, flipy,
 			            x, y,
 			            scalex,
 			            scaley,
-			            colortable_get_transpen_mask(machine->colortable, machine->gfx[gfx], color, SPR_TRANS_COLOR));
+			            colortable_get_transpen_mask(machine.colortable, machine.gfx[gfx], color, SPR_TRANS_COLOR));
 		}
 	}
 
@@ -513,7 +513,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-				if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(bitmap, y, x)) == SPR_MASK_COLOR)
+				if (colortable_entry_get_value(machine.colortable, *BITMAP_ADDR16(bitmap, y, x)) == SPR_MASK_COLOR)
 					// restore pixel
 					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(state->temp_bitmap, y, x);
 	}
@@ -522,14 +522,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( tceptor )
 {
-	tceptor_state *state = screen->machine->driver_data<tceptor_state>();
+	tceptor_state *state = screen->machine().driver_data<tceptor_state>();
 	rectangle rect;
 	int pri;
 	int bg_center = 144 - ((((state->bg1_scroll_x + state->bg2_scroll_x ) & 0x1ff) - 288) / 2);
 
-	device_t *_2d_screen       = screen->machine->device("2dscreen");
-	device_t *_3d_left_screen  = screen->machine->device("3dleft");
-	device_t *_3d_right_screen = screen->machine->device("3dright");
+	device_t *_2d_screen       = screen->machine().device("2dscreen");
+	device_t *_3d_left_screen  = screen->machine().device("3dleft");
+	device_t *_3d_right_screen = screen->machine().device("3dright");
 
 	if (screen != _2d_screen)
 	{
@@ -557,9 +557,9 @@ SCREEN_UPDATE( tceptor )
 
 	for (pri = 0; pri < 8; pri++)
 	{
-		namco_road_draw(screen->machine, bitmap, cliprect, pri * 2);
-		namco_road_draw(screen->machine, bitmap, cliprect, pri * 2 + 1);
-		draw_sprites(screen->machine, bitmap, cliprect, pri);
+		namco_road_draw(screen->machine(), bitmap, cliprect, pri * 2);
+		namco_road_draw(screen->machine(), bitmap, cliprect, pri * 2 + 1);
+		draw_sprites(screen->machine(), bitmap, cliprect, pri);
 	}
 
 	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
@@ -569,6 +569,6 @@ SCREEN_UPDATE( tceptor )
 
 SCREEN_EOF( tceptor )
 {
-	tceptor_state *state = machine->driver_data<tceptor_state>();
+	tceptor_state *state = machine.driver_data<tceptor_state>();
 	memcpy(state->sprite_ram_buffered, state->sprite_ram, 0x200);
 }

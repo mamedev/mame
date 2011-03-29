@@ -51,50 +51,50 @@ Notes:
 
 static READ16_HANDLER( sound_status_r )
 {
-	snk68_state *state = space->machine->driver_data<snk68_state>();
+	snk68_state *state = space->machine().driver_data<snk68_state>();
 
 	return (state->sound_status << 8);
 }
 
 static WRITE8_HANDLER( sound_status_w )
 {
-	snk68_state *state = space->machine->driver_data<snk68_state>();
+	snk68_state *state = space->machine().driver_data<snk68_state>();
 
 	state->sound_status = data;
 }
 
 static READ16_HANDLER( control_1_r )
 {
-	return (input_port_read(space->machine, "P1") + (input_port_read(space->machine, "P2") << 8));
+	return (input_port_read(space->machine(), "P1") + (input_port_read(space->machine(), "P2") << 8));
 }
 
 static READ16_HANDLER( control_2_r )
 {
-	return input_port_read(space->machine, "SYSTEM");
+	return input_port_read(space->machine(), "SYSTEM");
 }
 
 static READ16_HANDLER( rotary_1_r )
 {
-	return (( ~(1 << input_port_read(space->machine, "ROT1")) )<<8)&0xff00;
+	return (( ~(1 << input_port_read(space->machine(), "ROT1")) )<<8)&0xff00;
 }
 
 static READ16_HANDLER( rotary_2_r )
 {
-	return (( ~(1 << input_port_read(space->machine, "ROT2")) )<<8)&0xff00;
+	return (( ~(1 << input_port_read(space->machine(), "ROT2")) )<<8)&0xff00;
 }
 
 static READ16_HANDLER( rotary_lsb_r )
 {
-	return ((( ~(1 << input_port_read(space->machine, "ROT2"))  ) <<4)&0xf000)
-		 + ((( ~(1 << input_port_read(space->machine, "ROT1"))  )    )&0x0f00);
+	return ((( ~(1 << input_port_read(space->machine(), "ROT2"))  ) <<4)&0xf000)
+		 + ((( ~(1 << input_port_read(space->machine(), "ROT1"))  )    )&0x0f00);
 }
 
 static READ16_HANDLER( protcontrols_r )
 {
-	snk68_state *state = space->machine->driver_data<snk68_state>();
+	snk68_state *state = space->machine().driver_data<snk68_state>();
 	static const char *const portnames[] = { "P1", "P2", "SYSTEM" };
 
-	return input_port_read(space->machine, portnames[offset]) ^ state->invert_controls;
+	return input_port_read(space->machine(), portnames[offset]) ^ state->invert_controls;
 }
 
 static WRITE16_HANDLER( protection_w )
@@ -103,7 +103,7 @@ static WRITE16_HANDLER( protection_w )
 	/* bottom byte is protection in ikari 3 and streetsm */
 	if (ACCESSING_BITS_0_7)
 	{
-		snk68_state *state = space->machine->driver_data<snk68_state>();
+		snk68_state *state = space->machine().driver_data<snk68_state>();
 		state->invert_controls = ((data & 0xff) == 0x07) ? 0xff : 0x00;
 	}
 }
@@ -113,7 +113,7 @@ static WRITE16_HANDLER( sound_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, 0, data >> 8);
-		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -580,7 +580,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =
@@ -1001,7 +1001,7 @@ ROM_END
 
 static DRIVER_INIT( searchar )
 {
-	memory_set_bankptr(machine, "bank1", machine->region("user1")->base());
+	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
 }
 
 /******************************************************************************/

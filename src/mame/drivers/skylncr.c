@@ -76,14 +76,14 @@ public:
 
 static WRITE8_HANDLER( skylncr_videoram_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tmap, offset);
 }
 
 static WRITE8_HANDLER( skylncr_colorram_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->tmap, offset);
 }
@@ -91,35 +91,35 @@ static WRITE8_HANDLER( skylncr_colorram_w )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	skylncr_state *state = machine->driver_data<skylncr_state>();
+	skylncr_state *state = machine.driver_data<skylncr_state>();
 	UINT16 code = state->videoram[ tile_index ] + (state->colorram[ tile_index ] << 8);
 	SET_TILE_INFO(0, code, 0, TILE_FLIPYX( 0 ));
 }
 
 static TILE_GET_INFO( get_reel_1_tile_info )
 {
-	skylncr_state *state = machine->driver_data<skylncr_state>();
+	skylncr_state *state = machine.driver_data<skylncr_state>();
 	UINT16 code = state->reeltiles_1_ram[ tile_index ] + (state->reeltileshigh_1_ram[ tile_index ] << 8);
 	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
 }
 
 static TILE_GET_INFO( get_reel_2_tile_info )
 {
-	skylncr_state *state = machine->driver_data<skylncr_state>();
+	skylncr_state *state = machine.driver_data<skylncr_state>();
 	UINT16 code = state->reeltiles_2_ram[ tile_index ] + (state->reeltileshigh_2_ram[ tile_index ] << 8);
 	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
 }
 
 static TILE_GET_INFO( get_reel_3_tile_info )
 {
-	skylncr_state *state = machine->driver_data<skylncr_state>();
+	skylncr_state *state = machine.driver_data<skylncr_state>();
 	UINT16 code = state->reeltiles_3_ram[ tile_index ] + (state->reeltileshigh_3_ram[ tile_index ] << 8);
 	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
 }
 
 static TILE_GET_INFO( get_reel_4_tile_info )
 {
-	skylncr_state *state = machine->driver_data<skylncr_state>();
+	skylncr_state *state = machine.driver_data<skylncr_state>();
 	UINT16 code = state->reeltiles_4_ram[ tile_index ] + (state->reeltileshigh_4_ram[ tile_index ] << 8);
 	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
 }
@@ -127,7 +127,7 @@ static TILE_GET_INFO( get_reel_4_tile_info )
 
 static VIDEO_START( skylncr )
 {
-	skylncr_state *state = machine->driver_data<skylncr_state>();
+	skylncr_state *state = machine.driver_data<skylncr_state>();
 
 	state->tmap = tilemap_create(	machine, get_tile_info, tilemap_scan_rows, 8, 8, 0x40, 0x20	);
 
@@ -156,7 +156,7 @@ static const rectangle visible3 = { 0*8, (20+48)*8-1, 20*8, (20+7)*8-1 };
 
 static SCREEN_UPDATE( skylncr )
 {
-	skylncr_state *state = screen->machine->driver_data<skylncr_state>();
+	skylncr_state *state = screen->machine().driver_data<skylncr_state>();
 	int i;
 
 	bitmap_fill(bitmap,cliprect,0);
@@ -180,56 +180,56 @@ static SCREEN_UPDATE( skylncr )
 
 static WRITE8_HANDLER( reeltiles_1_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->reeltiles_1_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel_1_tilemap, offset);
 }
 
 static WRITE8_HANDLER( reeltiles_2_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->reeltiles_2_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel_2_tilemap, offset);
 }
 
 static WRITE8_HANDLER( reeltiles_3_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->reeltiles_3_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel_3_tilemap, offset);
 }
 
 static WRITE8_HANDLER( reeltiles_4_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->reeltiles_4_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel_4_tilemap, offset);
 }
 
 static WRITE8_HANDLER( reeltileshigh_1_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->reeltileshigh_1_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel_1_tilemap, offset);
 }
 
 static WRITE8_HANDLER( reeltileshigh_2_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->reeltileshigh_2_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel_2_tilemap, offset);
 }
 
 static WRITE8_HANDLER( reeltileshigh_3_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->reeltileshigh_3_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel_3_tilemap, offset);
 }
 
 static WRITE8_HANDLER( reeltileshigh_4_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->reeltileshigh_4_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel_4_tilemap, offset);
 }
@@ -237,7 +237,7 @@ static WRITE8_HANDLER( reeltileshigh_4_w )
 
 static WRITE8_HANDLER( skylncr_paletteram_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 
 	if (offset == 0)
 	{
@@ -246,23 +246,23 @@ static WRITE8_HANDLER( skylncr_paletteram_w )
 	else
 	{
 		int r,g,b;
-		space->machine->generic.paletteram.u8[state->color] = data;
+		space->machine().generic.paletteram.u8[state->color] = data;
 
-		r = space->machine->generic.paletteram.u8[(state->color/3 * 3) + 0];
-		g = space->machine->generic.paletteram.u8[(state->color/3 * 3) + 1];
-		b = space->machine->generic.paletteram.u8[(state->color/3 * 3) + 2];
+		r = space->machine().generic.paletteram.u8[(state->color/3 * 3) + 0];
+		g = space->machine().generic.paletteram.u8[(state->color/3 * 3) + 1];
+		b = space->machine().generic.paletteram.u8[(state->color/3 * 3) + 2];
 		r = (r << 2) | (r >> 4);
 		g = (g << 2) | (g >> 4);
 		b = (b << 2) | (b >> 4);
 
-		palette_set_color(space->machine, state->color / 3, MAKE_RGB(r, g, b));
+		palette_set_color(space->machine(), state->color / 3, MAKE_RGB(r, g, b));
 		state->color = (state->color + 1) % (0x100 * 3);
 	}
 }
 
 static WRITE8_HANDLER( skylncr_paletteram2_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 
 	if (offset == 0)
 	{
@@ -271,41 +271,41 @@ static WRITE8_HANDLER( skylncr_paletteram2_w )
 	else
 	{
 		int r,g,b;
-		space->machine->generic.paletteram2.u8[state->color2] = data;
+		space->machine().generic.paletteram2.u8[state->color2] = data;
 
-		r = space->machine->generic.paletteram2.u8[(state->color2/3 * 3) + 0];
-		g = space->machine->generic.paletteram2.u8[(state->color2/3 * 3) + 1];
-		b = space->machine->generic.paletteram2.u8[(state->color2/3 * 3) + 2];
+		r = space->machine().generic.paletteram2.u8[(state->color2/3 * 3) + 0];
+		g = space->machine().generic.paletteram2.u8[(state->color2/3 * 3) + 1];
+		b = space->machine().generic.paletteram2.u8[(state->color2/3 * 3) + 2];
 		r = (r << 2) | (r >> 4);
 		g = (g << 2) | (g >> 4);
 		b = (b << 2) | (b >> 4);
 
-		palette_set_color(space->machine, 0x100 + state->color2 / 3, MAKE_RGB(r, g, b));
+		palette_set_color(space->machine(), 0x100 + state->color2 / 3, MAKE_RGB(r, g, b));
 		state->color2 = (state->color2 + 1) % (0x100 * 3);
 	}
 }
 
 static WRITE8_HANDLER( reelscroll1_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->reelscroll1[offset] = data;
 }
 
 static WRITE8_HANDLER( reelscroll2_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->reelscroll2[offset] = data;
 }
 
 static WRITE8_HANDLER( reelscroll3_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->reelscroll3[offset] = data;
 }
 
 static WRITE8_HANDLER( reelscroll4_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->reelscroll4[offset] = data;
 }
 
@@ -316,7 +316,7 @@ static WRITE8_HANDLER( reelscroll4_w )
 
 static WRITE8_HANDLER( skylncr_coin_w )
 {
-	coin_counter_w( space->machine, 0, data & 0x04 );
+	coin_counter_w( space->machine(), 0, data & 0x04 );
 }
 
 static READ8_HANDLER( ret_ff )
@@ -333,7 +333,7 @@ static READ8_HANDLER( ret_00 )
 
 static WRITE8_HANDLER( skylncr_nmi_enable_w )
 {
-	skylncr_state *state = space->machine->driver_data<skylncr_state>();
+	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->nmi_enable = data & 0x10;
 }
 
@@ -679,7 +679,7 @@ static const ay8910_interface ay8910_config =
 // It runs in IM 0, thus needs an opcode on the data bus
 static INTERRUPT_GEN( skylncr_vblank_interrupt )
 {
-	skylncr_state *state = device->machine->driver_data<skylncr_state>();
+	skylncr_state *state = device->machine().driver_data<skylncr_state>();
 	if (state->nmi_enable) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -856,8 +856,8 @@ ROM_END
 
 static DRIVER_INIT( skylncr )
 {
-	machine->generic.paletteram.u8   = auto_alloc_array(machine, UINT8, 0x100 * 3);
-	machine->generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x100 * 3);
+	machine.generic.paletteram.u8   = auto_alloc_array(machine, UINT8, 0x100 * 3);
+	machine.generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x100 * 3);
 }
 
 

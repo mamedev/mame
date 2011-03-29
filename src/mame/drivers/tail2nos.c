@@ -19,7 +19,7 @@
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	tail2nos_state *state = space->machine->driver_data<tail2nos_state>();
+	tail2nos_state *state = space->machine().driver_data<tail2nos_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -30,7 +30,7 @@ static WRITE16_HANDLER( sound_command_w )
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bank(device->machine, "bank3", data & 0x01);
+	memory_set_bank(device->machine(), "bank3", data & 0x01);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
@@ -180,7 +180,7 @@ GFXDECODE_END
 
 static void irqhandler( device_t *device, int irq )
 {
-	tail2nos_state *state = device->machine->driver_data<tail2nos_state>();
+	tail2nos_state *state = device->machine().driver_data<tail2nos_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -208,15 +208,15 @@ static const k051316_interface tail2nos_k051316_intf =
 
 static MACHINE_START( tail2nos )
 {
-	tail2nos_state *state = machine->driver_data<tail2nos_state>();
-	UINT8 *ROM = machine->region("audiocpu")->base();
+	tail2nos_state *state = machine.driver_data<tail2nos_state>();
+	UINT8 *ROM = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank3", 0, 2, &ROM[0x10000], 0x8000);
 	memory_set_bank(machine, "bank3", 0);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->k051316 = machine->device("k051316");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->k051316 = machine.device("k051316");
 
 	state->save_item(NAME(state->charbank));
 	state->save_item(NAME(state->charpalette));
@@ -225,11 +225,11 @@ static MACHINE_START( tail2nos )
 
 static MACHINE_RESET( tail2nos )
 {
-	tail2nos_state *state = machine->driver_data<tail2nos_state>();
+	tail2nos_state *state = machine.driver_data<tail2nos_state>();
 
 	/* point to the extra ROMs */
-	memory_set_bankptr(machine, "bank1", machine->region("user1")->base());
-	memory_set_bankptr(machine, "bank2", machine->region("user2")->base());
+	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
+	memory_set_bankptr(machine, "bank2", machine.region("user2")->base());
 
 	state->charbank = 0;
 	state->charpalette = 0;

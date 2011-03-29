@@ -99,7 +99,7 @@ INLINE double step_cr_filter(filter_state *state, double input)
  *
  *************************************/
 
-static void filter_init(running_machine *machine, lp_filter *iir, double fs)
+static void filter_init(running_machine &machine, lp_filter *iir, double fs)
 {
 	/* Section 1 */
 	iir->ProtoCoef[0].a0 = 1.0;
@@ -178,13 +178,13 @@ static void recompute_filter(lp_filter *iir, double k, double q, double fc)
 	iir->coef[0] = k;
 }
 
-void micro3d_noise_sh_w(running_machine *machine, UINT8 data)
+void micro3d_noise_sh_w(running_machine &machine, UINT8 data)
 {
-	micro3d_state *state = machine->driver_data<micro3d_state>();
+	micro3d_state *state = machine.driver_data<micro3d_state>();
 
 	if (~data & 8)
 	{
-		device_t *device = machine->device(data & 4 ? "noise_2" : "noise_1");
+		device_t *device = machine.device(data & 4 ? "noise_2" : "noise_1");
 		noise_state *nstate = (noise_state *)downcast<legacy_device_base *>(device)->token();
 
 		if (state->dac_data != nstate->dac[data & 3])
@@ -310,12 +310,12 @@ static STREAM_UPDATE( micro3d_stream_update )
 
 static DEVICE_START( micro3d_sound )
 {
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	noise_state *state = get_safe_token(device);
 
 	/* Allocate the stream */
-	state->stream = device->machine->sound().stream_alloc(*device, 0, 2, machine->sample_rate(), state, micro3d_stream_update);
-	filter_init(machine, &state->filter, machine->sample_rate());
+	state->stream = device->machine().sound().stream_alloc(*device, 0, 2, machine.sample_rate(), state, micro3d_stream_update);
+	filter_init(machine, &state->filter, machine.sample_rate());
 
 	configure_filter(&state->noise_filters[0], 2.7e3 + 2.7e3, 1.0e-6);
 	configure_filter(&state->noise_filters[1], 2.7e3 + 1e3, 0.30e-6);
@@ -372,7 +372,7 @@ DEVICE_GET_INFO( micro3d_sound )
 
 WRITE8_HANDLER( micro3d_snd_dac_a )
 {
-	micro3d_state *state = space->machine->driver_data<micro3d_state>();
+	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 	state->dac_data = data;
 }
 
@@ -383,7 +383,7 @@ WRITE8_HANDLER( micro3d_snd_dac_b )
 
 WRITE8_HANDLER( micro3d_sound_io_w )
 {
-	micro3d_state *state = space->machine->driver_data<micro3d_state>();
+	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
 	state->sound_port_latch[offset] = data;
 
@@ -391,12 +391,12 @@ WRITE8_HANDLER( micro3d_sound_io_w )
 	{
 		case 0x01:
 		{
-			micro3d_noise_sh_w(space->machine, data);
+			micro3d_noise_sh_w(space->machine(), data);
 			break;
 		}
 		case 0x03:
 		{
-			device_t *upd = space->machine->device("upd7759");
+			device_t *upd = space->machine().device("upd7759");
 			upd7759_set_bank_base(upd, (data & 0x4) ? 0x20000 : 0);
 			upd7759_reset_w(upd, (data & 0x10) ? 0 : 1);
 			break;
@@ -406,12 +406,12 @@ WRITE8_HANDLER( micro3d_sound_io_w )
 
 READ8_HANDLER( micro3d_sound_io_r )
 {
-	micro3d_state *state = space->machine->driver_data<micro3d_state>();
+	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
 	switch (offset)
 	{
-		case 0x01:	return (state->sound_port_latch[offset] & 0x7f) | input_port_read(space->machine, "SOUND_SW");
-		case 0x03:	return (state->sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(space->machine->device("upd7759")) ? 0x08 : 0);
+		case 0x01:	return (state->sound_port_latch[offset] & 0x7f) | input_port_read(space->machine(), "SOUND_SW");
+		case 0x03:	return (state->sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(space->machine().device("upd7759")) ? 0x08 : 0);
 		default:	return 0;
 	}
 }

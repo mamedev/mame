@@ -142,27 +142,27 @@ static INTERRUPT_GEN( galpani3_vblank ) // 2, 3, 5 ?
 
 static VIDEO_START(galpani3)
 {
-	galpani3_state *state = machine->driver_data<galpani3_state>();
+	galpani3_state *state = machine.driver_data<galpani3_state>();
 	/* so we can use suprnova.c */
 	state->spriteram32 = auto_alloc_array(machine, UINT32, 0x4000/4);
-	machine->generic.spriteram_size = 0x4000;
+	machine.generic.spriteram_size = 0x4000;
 	state->spc_regs = auto_alloc_array(machine, UINT32, 0x40/4);
 
 	state->sprite_bitmap_1 = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_INDEXED16);
 
-	state->spritegen = machine->device<sknsspr_device>("spritegen");
+	state->spritegen = machine.device<sknsspr_device>("spritegen");
 	state->spritegen->skns_sprite_kludge(0,0);
 }
 
 
-static int gp3_is_alpha_pen(running_machine *machine, int pen)
+static int gp3_is_alpha_pen(running_machine &machine, int pen)
 {
-	galpani3_state *state = machine->driver_data<galpani3_state>();
+	galpani3_state *state = machine.driver_data<galpani3_state>();
 	UINT16 dat = 0;
 
 	if (pen<0x4000)
 	{
-		dat = machine->generic.paletteram.u16[pen];
+		dat = machine.generic.paletteram.u16[pen];
 	}
 	else if (pen<0x4100)
 	{
@@ -196,12 +196,12 @@ static int gp3_is_alpha_pen(running_machine *machine, int pen)
 
 static SCREEN_UPDATE(galpani3)
 {
-	galpani3_state *state = screen->machine->driver_data<galpani3_state>();
+	galpani3_state *state = screen->machine().driver_data<galpani3_state>();
 	int x,y;
 	UINT16* src1;
 	UINT32* dst;
 	UINT16 pixdata1;
-	const pen_t *paldata = screen->machine->pens;
+	const pen_t *paldata = screen->machine().pens;
 
 	bitmap_fill(bitmap, cliprect, 0x0000);
 
@@ -261,7 +261,7 @@ static SCREEN_UPDATE(galpani3)
 						UINT16 pen = dat1+0x4000;
 						UINT32 pal = paldata[pen];
 
-						if (gp3_is_alpha_pen(screen->machine, pen))
+						if (gp3_is_alpha_pen(screen->machine(), pen))
 						{
 							int r,g,b;
 							r = (pal & 0x00ff0000)>>16;
@@ -289,7 +289,7 @@ static SCREEN_UPDATE(galpani3)
 						UINT16 pen = dat2+0x4100;
 						UINT32 pal = paldata[pen];
 
-						if (gp3_is_alpha_pen(screen->machine, pen))
+						if (gp3_is_alpha_pen(screen->machine(), pen))
 						{
 							int r,g,b;
 							r = (pal & 0x00ff0000)>>16;
@@ -321,20 +321,20 @@ static SCREEN_UPDATE(galpani3)
 				/*
                 else if (pridat==0x2f) // area outside of the girl
                 {
-                    //dst[0] = screen->machine->rand()&0x3fff;
+                    //dst[0] = screen->machine().rand()&0x3fff;
                 }
 
                 else if (pridat==0x00) // the initial line / box that gets drawn
                 {
-                    //dst[0] = screen->machine->rand()&0x3fff;
+                    //dst[0] = screen->machine().rand()&0x3fff;
                 }
                 else if (pridat==0x30) // during the 'gals boxes' on the intro
                 {
-                    //dst[0] = screen->machine->rand()&0x3fff;
+                    //dst[0] = screen->machine().rand()&0x3fff;
                 }
                 else if (pridat==0x0c) // 'nice' at end of level
                 {
-                    //dst[0] = screen->machine->rand()&0x3fff;
+                    //dst[0] = screen->machine().rand()&0x3fff;
                 }
                 else
                 {
@@ -347,7 +347,7 @@ static SCREEN_UPDATE(galpani3)
 
 	bitmap_fill(state->sprite_bitmap_1, cliprect, 0x0000);
 
-	state->spritegen->skns_draw_sprites(screen->machine, state->sprite_bitmap_1, cliprect, state->spriteram32, screen->machine->generic.spriteram_size, screen->machine->region("gfx1")->base(), screen->machine->region ("gfx1")->bytes(), state->spc_regs );
+	state->spritegen->skns_draw_sprites(screen->machine(), state->sprite_bitmap_1, cliprect, state->spriteram32, screen->machine().generic.spriteram_size, screen->machine().region("gfx1")->base(), screen->machine().region ("gfx1")->bytes(), state->spc_regs );
 
 	// ignoring priority bits for now..
 	for (y=0;y<240;y++)
@@ -434,7 +434,7 @@ INPUT_PORTS_END
 
 static WRITE16_HANDLER( galpani3_suprnova_sprite32_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	COMBINE_DATA(&state->spriteram[offset]);
 	offset>>=1;
 	state->spriteram32[offset]=(state->spriteram[offset*2+1]<<16) | (state->spriteram[offset*2]);
@@ -442,7 +442,7 @@ static WRITE16_HANDLER( galpani3_suprnova_sprite32_w )
 
 static WRITE16_HANDLER( galpani3_suprnova_sprite32regs_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	COMBINE_DATA(&state->sprregs[offset]);
 	offset>>=1;
 	state->spc_regs[offset]=(state->sprregs[offset*2+1]<<16) | (state->sprregs[offset*2]);
@@ -457,14 +457,14 @@ static WRITE16_HANDLER( galpani3_suprnova_sprite32regs_w )
 
 ***************************************************************************/
 
-static void galpani3_mcu_run(running_machine *machine)
+static void galpani3_mcu_run(running_machine &machine)
 {
-	galpani3_state *state = machine->driver_data<galpani3_state>();
+	galpani3_state *state = machine.driver_data<galpani3_state>();
 	UINT16 mcu_command = state->mcu_ram[0x0010/2];		/* command nb */
 	UINT16 mcu_offset  = state->mcu_ram[0x0012/2] / 2;	/* offset in shared RAM where MCU will write */
 	UINT16 mcu_subcmd  = state->mcu_ram[0x0014/2];		/* sub-command parameter, happens only for command #4 */
 
-	logerror("%s: MCU executed command : %04X %04X\n",machine->describe_context(),mcu_command,mcu_offset*2);
+	logerror("%s: MCU executed command : %04X %04X\n",machine.describe_context(),mcu_command,mcu_offset*2);
 
 	/* the only MCU commands found in program code are:
          0x04: protection: provide code/data,
@@ -477,7 +477,7 @@ static void galpani3_mcu_run(running_machine *machine)
 		case 0x03:	// DSW
 		{
 			state->mcu_ram[mcu_offset] = input_port_read(machine, "DSW");
-			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", machine->describe_context(), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", machine.describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
@@ -534,7 +534,7 @@ static void galpani3_mcu_run(running_machine *machine)
 #define GALPANI3_MCU_COM_W(_n_) \
 static WRITE16_HANDLER( galpani3_mcu_com##_n_##_w ) \
 { \
-	galpani3_state *state = space->machine->driver_data<galpani3_state>(); \
+	galpani3_state *state = space->machine().driver_data<galpani3_state>(); \
 	COMBINE_DATA(&state->mcu_com[_n_]); \
 	if (state->mcu_com[0] != 0xFFFF)	return; \
 	if (state->mcu_com[1] != 0xFFFF)	return; \
@@ -542,7 +542,7 @@ static WRITE16_HANDLER( galpani3_mcu_com##_n_##_w ) \
 	if (state->mcu_com[3] != 0xFFFF)	return; \
 \
 	memset(state->mcu_com, 0, 4 * sizeof( UINT16 ) ); \
-	galpani3_mcu_run(space->machine); \
+	galpani3_mcu_run(space->machine()); \
 }
 
 GALPANI3_MCU_COM_W(0)
@@ -560,7 +560,7 @@ static READ16_HANDLER( galpani3_mcu_status_r )
 
 static READ16_HANDLER( galpani3_regs1_r )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	switch (offset)
 	{
 		case 0x2:
@@ -585,7 +585,7 @@ static READ16_HANDLER( galpani3_regs1_r )
 
 static READ16_HANDLER( galpani3_regs2_r )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	switch (offset)
 	{
 		case 0x2:
@@ -610,7 +610,7 @@ static READ16_HANDLER( galpani3_regs2_r )
 
 static READ16_HANDLER( galpani3_regs3_r )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	switch (offset)
 	{
 		case 0x2:
@@ -686,16 +686,16 @@ static void gp3_do_rle(UINT32 address, UINT16*framebuffer, UINT8* rledata)
 
 static WRITE16_HANDLER( galpani3_regs1_address_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	logerror("galpani3_regs1_address_w %04x\n",data);
 	COMBINE_DATA(&state->regs1_address_regs[offset]);
 }
 
 static WRITE16_HANDLER( galpani3_regs1_go_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	UINT32 address = state->regs1_address_regs[1]| (state->regs1_address_regs[0]<<16);
-	UINT8* rledata = space->machine->region("gfx2")->base();
+	UINT8* rledata = space->machine().region("gfx2")->base();
 
 	printf("galpani3_regs1_go_w? %08x\n",address );
 	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, state->framebuffer1, rledata);
@@ -704,16 +704,16 @@ static WRITE16_HANDLER( galpani3_regs1_go_w )
 
 static WRITE16_HANDLER( galpani3_regs2_address_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	logerror("galpani3_regs2_address_w %04x\n",data);
 	COMBINE_DATA(&state->regs2_address_regs[offset]);
 }
 
 static WRITE16_HANDLER( galpani3_regs2_go_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	UINT32 address = state->regs2_address_regs[1]| (state->regs2_address_regs[0]<<16);
-	UINT8* rledata = space->machine->region("gfx2")->base();
+	UINT8* rledata = space->machine().region("gfx2")->base();
 
 	printf("galpani3_regs2_go_w? %08x\n", address );
 
@@ -726,137 +726,137 @@ static WRITE16_HANDLER( galpani3_regs2_go_w )
 
 static WRITE16_HANDLER( galpani3_regs3_address_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	logerror("galpani3_regs3_address_w %04x\n",data);
 	COMBINE_DATA(&state->regs3_address_regs[offset]);
 }
 
 static WRITE16_HANDLER( galpani3_regs3_go_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	UINT32 address =  state->regs3_address_regs[1]| (state->regs3_address_regs[0]<<16);
-	UINT8* rledata = space->machine->region("gfx2")->base();
+	UINT8* rledata = space->machine().region("gfx2")->base();
 
 	printf("galpani3_regs3_go_w? %08x\n",address );
 
 	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, state->framebuffer3, rledata);
 }
 
-static void set_color_555_gp3(running_machine *machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+static void set_color_555_gp3(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
 	palette_set_color_rgb(machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
 static WRITE16_HANDLER( galpani3_framebuffer1_palette_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	COMBINE_DATA(&state->framebuffer1_palette[offset]);
-	set_color_555_gp3(space->machine, offset+0x4000, 5, 10, 0, state->framebuffer1_palette[offset]);
+	set_color_555_gp3(space->machine(), offset+0x4000, 5, 10, 0, state->framebuffer1_palette[offset]);
 }
 
 
 static WRITE16_HANDLER( galpani3_framebuffer2_palette_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	COMBINE_DATA(&state->framebuffer2_palette[offset]);
-	set_color_555_gp3(space->machine, offset+0x4100, 5, 10, 0, state->framebuffer2_palette[offset]);
+	set_color_555_gp3(space->machine(), offset+0x4100, 5, 10, 0, state->framebuffer2_palette[offset]);
 }
 
 static WRITE16_HANDLER( galpani3_framebuffer3_palette_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	COMBINE_DATA(&state->framebuffer3_palette[offset]);
-	set_color_555_gp3(space->machine, offset+0x4200, 5, 10, 0, state->framebuffer3_palette[offset]);
+	set_color_555_gp3(space->machine(), offset+0x4200, 5, 10, 0, state->framebuffer3_palette[offset]);
 }
 
 static WRITE16_HANDLER( galpani3_framebuffer3_scrolly_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	state->framebuffer3_scrolly = data;
 }
 
 static WRITE16_HANDLER( galpani3_framebuffer3_scrollx_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	state->framebuffer3_scrollx = data;
 }
 
 static WRITE16_HANDLER( galpani3_framebuffer2_scrolly_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	state->framebuffer2_scrolly = data;
 }
 
 static WRITE16_HANDLER( galpani3_framebuffer2_scrollx_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	state->framebuffer2_scrollx = data;
 }
 
 static WRITE16_HANDLER( galpani3_framebuffer1_scrolly_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	state->framebuffer1_scrolly = data;
 }
 
 static WRITE16_HANDLER( galpani3_framebuffer1_scrollx_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	state->framebuffer1_scrollx = data;
 }
 
 static WRITE16_HANDLER( galpani3_priority_buffer_scrollx_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	state->priority_buffer_scrollx = data;
 }
 
 static WRITE16_HANDLER( galpani3_priority_buffer_scrolly_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	state->priority_buffer_scrolly = data;
 }
 
 /* I'm not convinced these are enables */
 static WRITE16_HANDLER( galpani3_framebuffer1_enable_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	state->framebuffer1_enable = data;
 }
 
 static WRITE16_HANDLER( galpani3_framebuffer2_enable_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	state->framebuffer2_enable = data;
 }
 
 static WRITE16_HANDLER( galpani3_framebuffer3_enable_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	state->framebuffer3_enable = data;
 }
 
 /* definitely looks like a cycling bg colour used for the girls */
 static WRITE16_HANDLER( galpani3_framebuffer1_bgcol_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	COMBINE_DATA(&state->framebuffer1_bgcol[offset]);
-	set_color_555_gp3(space->machine, offset+0x4300, 5, 10, 0, state->framebuffer1_bgcol[offset]);
+	set_color_555_gp3(space->machine(), offset+0x4300, 5, 10, 0, state->framebuffer1_bgcol[offset]);
 }
 
 static WRITE16_HANDLER( galpani3_framebuffer2_bgcol_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	COMBINE_DATA(&state->framebuffer2_bgcol[offset]);
-	set_color_555_gp3(space->machine, offset+0x4301, 5, 10, 0, state->framebuffer2_bgcol[offset]);
+	set_color_555_gp3(space->machine(), offset+0x4301, 5, 10, 0, state->framebuffer2_bgcol[offset]);
 }
 
 
 static WRITE16_HANDLER( galpani3_framebuffer3_bgcol_w )
 {
-	galpani3_state *state = space->machine->driver_data<galpani3_state>();
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
 	COMBINE_DATA(&state->framebuffer3_bgcol[offset]);
-	set_color_555_gp3(space->machine, offset+0x4302, 5, 10, 0, state->framebuffer3_bgcol[offset]);
+	set_color_555_gp3(space->machine(), offset+0x4302, 5, 10, 0, state->framebuffer3_bgcol[offset]);
 }
 
 
@@ -1003,7 +1003,7 @@ ROM_END
 
 static DRIVER_INIT( galpani3 )
 {
-	galpani3_state *state = machine->driver_data<galpani3_state>();
+	galpani3_state *state = machine.driver_data<galpani3_state>();
 	DRIVER_INIT_CALL( decrypt_toybox_rom );
 
 	memset(state->mcu_com, 0, 4 * sizeof( UINT16) );

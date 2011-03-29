@@ -62,7 +62,9 @@ struct _palette_private
 class colortable_t
 {
 public:
-	running_machine *	machine;			/* associated machine */
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
+	running_machine *	m_machine;			/* associated machine */
 	UINT32				entries;			/* number of entries */
 	UINT32				palentries;			/* number of palette entries */
 	UINT16 *			raw;				/* raw data about each entry */
@@ -75,13 +77,13 @@ public:
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void palette_presave(running_machine *machine, void *param);
-static void palette_postload(running_machine *machine, void *param);
+static void palette_presave(running_machine &machine, void *param);
+static void palette_postload(running_machine &machine, void *param);
 static void palette_exit(running_machine &machine);
-static void allocate_palette(running_machine *machine, palette_private *palette);
-static void allocate_color_tables(running_machine *machine, palette_private *palette);
-static void allocate_shadow_tables(running_machine *machine, palette_private *palette);
-static void configure_rgb_shadows(running_machine *machine, int mode, float factor);
+static void allocate_palette(running_machine &machine, palette_private *palette);
+static void allocate_color_tables(running_machine &machine, palette_private *palette);
+static void allocate_shadow_tables(running_machine &machine, palette_private *palette);
+static void configure_rgb_shadows(running_machine &machine, int mode, float factor);
 
 
 
@@ -94,17 +96,17 @@ static void configure_rgb_shadows(running_machine *machine, int mode, float fact
     takes place before the display is created
 -------------------------------------------------*/
 
-void palette_init(running_machine *machine)
+void palette_init(running_machine &machine)
 {
 	palette_private *palette = auto_alloc_clear(machine, palette_private);
-	screen_device *device = machine->first_screen();
+	screen_device *device = machine.first_screen();
 
 	/* get the format from the first screen, or use BITMAP_FORMAT_INVALID, if screenless */
 	bitmap_format format = (device != NULL) ? device->format() : BITMAP_FORMAT_INVALID;
 
 	/* request cleanup */
-	machine->palette_data = palette;
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, palette_exit);
+	machine.palette_data = palette;
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, palette_exit);
 
 	/* reset all our data */
 	palette->format = format;
@@ -120,7 +122,7 @@ void palette_init(running_machine *machine)
 
 		case BITMAP_FORMAT_INVALID:
 			/* invalid format means no palette - or at least it should */
-			assert(machine->total_colors() == 0);
+			assert(machine.total_colors() == 0);
 			return;
 
 		default:
@@ -129,7 +131,7 @@ void palette_init(running_machine *machine)
 	}
 
 	/* allocate all the data structures */
-	if (machine->total_colors() > 0)
+	if (machine.total_colors() > 0)
 	{
 		int numcolors;
 
@@ -138,13 +140,13 @@ void palette_init(running_machine *machine)
 		allocate_shadow_tables(machine, palette);
 
 		/* set up save/restore of the palette */
-		numcolors = palette_get_num_colors(machine->palette);
+		numcolors = palette_get_num_colors(machine.palette);
 		palette->save_pen = auto_alloc_array(machine, pen_t, numcolors);
 		palette->save_bright = auto_alloc_array(machine, float, numcolors);
 		state_save_register_global_pointer(machine, palette->save_pen, numcolors);
 		state_save_register_global_pointer(machine, palette->save_bright, numcolors);
-		machine->state().register_presave(palette_presave, palette);
-		machine->state().register_postload(palette_postload, palette);
+		machine.state().register_presave(palette_presave, palette);
+		machine.state().register_postload(palette_postload, palette);
 	}
 }
 
@@ -159,12 +161,12 @@ void palette_init(running_machine *machine)
     shadow brightness factor
 -------------------------------------------------*/
 
-void palette_set_shadow_factor(running_machine *machine, double factor)
+void palette_set_shadow_factor(running_machine &machine, double factor)
 {
-	palette_private *palette = machine->palette_data;
+	palette_private *palette = machine.palette_data;
 
 	assert(palette->shadow_group != 0);
-	palette_group_set_contrast(machine->palette, palette->shadow_group, factor);
+	palette_group_set_contrast(machine.palette, palette->shadow_group, factor);
 }
 
 
@@ -173,12 +175,12 @@ void palette_set_shadow_factor(running_machine *machine, double factor)
     highlight brightness factor
 -------------------------------------------------*/
 
-void palette_set_highlight_factor(running_machine *machine, double factor)
+void palette_set_highlight_factor(running_machine &machine, double factor)
 {
-	palette_private *palette = machine->palette_data;
+	palette_private *palette = machine.palette_data;
 
 	assert(palette->hilight_group != 0);
-	palette_group_set_contrast(machine->palette, palette->hilight_group, factor);
+	palette_group_set_contrast(machine.palette, palette->hilight_group, factor);
 }
 
 
@@ -238,11 +240,11 @@ void palette_set_highlight_factor(running_machine *machine, double factor)
     different live shadow tables
 -------------------------------------------------*/
 
-void palette_set_shadow_mode(running_machine *machine, int mode)
+void palette_set_shadow_mode(running_machine &machine, int mode)
 {
-	palette_private *palette = machine->palette_data;
+	palette_private *palette = machine.palette_data;
 	assert(mode >= 0 && mode < MAX_SHADOW_PRESETS);
-	machine->shadow_table = palette->shadow_table[mode].base;
+	machine.shadow_table = palette->shadow_table[mode].base;
 }
 
 
@@ -251,9 +253,9 @@ void palette_set_shadow_mode(running_machine *machine, int mode)
     RGB values for 1 of 4 shadow tables
 -------------------------------------------------*/
 
-void palette_set_shadow_dRGB32(running_machine *machine, int mode, int dr, int dg, int db, int noclip)
+void palette_set_shadow_dRGB32(running_machine &machine, int mode, int dr, int dg, int db, int noclip)
 {
-	palette_private *palette = machine->palette_data;
+	palette_private *palette = machine.palette_data;
 	shadow_table_data *stable = &palette->shadow_table[mode];
 	int i;
 
@@ -313,20 +315,19 @@ void palette_set_shadow_dRGB32(running_machine *machine, int mode, int dr, int d
     with the given number of entries
 -------------------------------------------------*/
 
-colortable_t *colortable_alloc(running_machine *machine, UINT32 palettesize)
+colortable_t *colortable_alloc(running_machine &machine, UINT32 palettesize)
 {
 	colortable_t *ctable;
 	UINT32 index;
 
-	assert(machine != NULL);
 	assert(palettesize > 0);
 
 	/* allocate the colortable */
 	ctable = auto_alloc_clear(machine, colortable_t);
 
 	/* fill in the basics */
-	ctable->machine = machine;
-	ctable->entries = machine->total_colors();
+	ctable->m_machine = &machine;
+	ctable->entries = machine.total_colors();
 	ctable->palentries = palettesize;
 
 	/* allocate the raw colortable */
@@ -361,7 +362,7 @@ void colortable_entry_set_value(colortable_t *ctable, UINT32 entry, UINT16 value
 	if (ctable->raw[entry] != value)
 	{
 		ctable->raw[entry] = value;
-		palette_set_color(ctable->machine, entry, ctable->palette[value]);
+		palette_set_color(ctable->machine(), entry, ctable->palette[value]);
 	}
 }
 
@@ -403,7 +404,7 @@ void colortable_palette_set_color(colortable_t *ctable, UINT32 entry, rgb_t colo
 		/* update the palette for any colortable entries that reference it */
 		for (index = 0; index < ctable->entries; index++)
 			if (ctable->raw[index] == entry)
-				palette_set_color(ctable->machine, index, color);
+				palette_set_color(ctable->machine(), index, color);
 	}
 }
 
@@ -495,9 +496,9 @@ UINT32 colortable_palette_get_size(colortable_t *ctable)
     black color
 -------------------------------------------------*/
 
-pen_t get_black_pen(running_machine *machine)
+pen_t get_black_pen(running_machine &machine)
 {
-	palette_private *palette = machine->palette_data;
+	palette_private *palette = machine.palette_data;
 	return palette->black_pen;
 }
 
@@ -507,9 +508,9 @@ pen_t get_black_pen(running_machine *machine)
     white color
 -------------------------------------------------*/
 
-pen_t get_white_pen(running_machine *machine)
+pen_t get_white_pen(running_machine &machine)
 {
-	palette_private *palette = machine->palette_data;
+	palette_private *palette = machine.palette_data;
 	return palette->white_pen;
 }
 
@@ -524,17 +525,17 @@ pen_t get_white_pen(running_machine *machine)
     for saving
 -------------------------------------------------*/
 
-static void palette_presave(running_machine *machine, void *param)
+static void palette_presave(running_machine &machine, void *param)
 {
-	int numcolors = palette_get_num_colors(machine->palette);
+	int numcolors = palette_get_num_colors(machine.palette);
 	palette_private *palette = (palette_private *)param;
 	int index;
 
 	/* fill the save arrays with updated pen and brightness information */
 	for (index = 0; index < numcolors; index++)
 	{
-		palette->save_pen[index] = palette_entry_get_color(machine->palette, index);
-		palette->save_bright[index] = palette_entry_get_contrast(machine->palette, index);
+		palette->save_pen[index] = palette_entry_get_color(machine.palette, index);
+		palette->save_bright[index] = palette_entry_get_contrast(machine.palette, index);
 	}
 }
 
@@ -544,17 +545,17 @@ static void palette_presave(running_machine *machine, void *param)
     actually update the palette
 -------------------------------------------------*/
 
-static void palette_postload(running_machine *machine, void *param)
+static void palette_postload(running_machine &machine, void *param)
 {
-	int numcolors = palette_get_num_colors(machine->palette);
+	int numcolors = palette_get_num_colors(machine.palette);
 	palette_private *palette = (palette_private *)param;
 	int index;
 
 	/* reset the pen and brightness for each entry */
 	for (index = 0; index < numcolors; index++)
 	{
-		palette_entry_set_color(machine->palette, index, palette->save_pen[index]);
-		palette_entry_set_contrast(machine->palette, index, palette->save_bright[index]);
+		palette_entry_set_color(machine.palette, index, palette->save_pen[index]);
+		palette_entry_set_contrast(machine.palette, index, palette->save_bright[index]);
 	}
 }
 
@@ -576,39 +577,39 @@ static void palette_exit(running_machine &machine)
     palette object itself
 -------------------------------------------------*/
 
-static void allocate_palette(running_machine *machine, palette_private *palette)
+static void allocate_palette(running_machine &machine, palette_private *palette)
 {
 	int numgroups, index;
 
 	/* determine the number of groups we need */
 	numgroups = 1;
-	if (machine->config().m_video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine.config().m_video_attributes & VIDEO_HAS_SHADOWS)
 		palette->shadow_group = numgroups++;
-	if (machine->config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS)
+	if (machine.config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS)
 		palette->hilight_group = numgroups++;
-	assert_always(machine->total_colors() * numgroups <= 65536, "Error: palette has more than 65536 colors.");
+	assert_always(machine.total_colors() * numgroups <= 65536, "Error: palette has more than 65536 colors.");
 
 	/* allocate a palette object containing all the colors and groups */
-	machine->palette = palette_alloc(machine->total_colors(), numgroups);
-	assert_always(machine->palette != NULL, "Failed to allocate system palette");
+	machine.palette = palette_alloc(machine.total_colors(), numgroups);
+	assert_always(machine.palette != NULL, "Failed to allocate system palette");
 
 	/* configure the groups */
 	if (palette->shadow_group != 0)
-		palette_group_set_contrast(machine->palette, palette->shadow_group, (float)PALETTE_DEFAULT_SHADOW_FACTOR);
+		palette_group_set_contrast(machine.palette, palette->shadow_group, (float)PALETTE_DEFAULT_SHADOW_FACTOR);
 	if (palette->hilight_group != 0)
-		palette_group_set_contrast(machine->palette, palette->hilight_group, (float)PALETTE_DEFAULT_HIGHLIGHT_FACTOR);
+		palette_group_set_contrast(machine.palette, palette->hilight_group, (float)PALETTE_DEFAULT_HIGHLIGHT_FACTOR);
 
 	/* set the initial colors to a standard rainbow */
-	for (index = 0; index < machine->total_colors(); index++)
-		palette_entry_set_color(machine->palette, index, MAKE_RGB(pal1bit(index >> 0), pal1bit(index >> 1), pal1bit(index >> 2)));
+	for (index = 0; index < machine.total_colors(); index++)
+		palette_entry_set_color(machine.palette, index, MAKE_RGB(pal1bit(index >> 0), pal1bit(index >> 1), pal1bit(index >> 2)));
 
 	/* switch off the color mode */
 	switch (palette->format)
 	{
 		/* 16-bit paletteized case */
 		case BITMAP_FORMAT_INDEXED16:
-			palette->black_pen = palette_get_black_entry(machine->palette);
-			palette->white_pen = palette_get_white_entry(machine->palette);
+			palette->black_pen = palette_get_black_entry(machine.palette);
+			palette->white_pen = palette_get_white_entry(machine.palette);
 			if (palette->black_pen >= 65536)
 				palette->black_pen = 0;
 			if (palette->white_pen >= 65536)
@@ -640,9 +641,9 @@ static void allocate_palette(running_machine *machine, palette_private *palette)
     pen and color tables
 -------------------------------------------------*/
 
-static void allocate_color_tables(running_machine *machine, palette_private *palette)
+static void allocate_color_tables(running_machine &machine, palette_private *palette)
 {
-	int total_colors = palette_get_num_colors(machine->palette) * palette_get_num_groups(machine->palette);
+	int total_colors = palette_get_num_colors(machine.palette) * palette_get_num_groups(machine.palette);
 	pen_t *pentable;
 	int i;
 
@@ -651,21 +652,21 @@ static void allocate_color_tables(running_machine *machine, palette_private *pal
 	{
 		case BITMAP_FORMAT_INDEXED16:
 			/* create a dummy 1:1 mapping */
-			machine->pens = pentable = auto_alloc_array(machine, pen_t, total_colors + 2);
+			machine.pens = pentable = auto_alloc_array(machine, pen_t, total_colors + 2);
 			for (i = 0; i < total_colors + 2; i++)
 				pentable[i] = i;
 			break;
 
 		case BITMAP_FORMAT_RGB15:
-			machine->pens = palette_entry_list_adjusted_rgb15(machine->palette);
+			machine.pens = palette_entry_list_adjusted_rgb15(machine.palette);
 			break;
 
 		case BITMAP_FORMAT_RGB32:
-			machine->pens = palette_entry_list_adjusted(machine->palette);
+			machine.pens = palette_entry_list_adjusted(machine.palette);
 			break;
 
 		default:
-			machine->pens = NULL;
+			machine.pens = NULL;
 			break;
 	}
 }
@@ -676,10 +677,10 @@ static void allocate_color_tables(running_machine *machine, palette_private *pal
     shadow tables
 -------------------------------------------------*/
 
-static void allocate_shadow_tables(running_machine *machine, palette_private *palette)
+static void allocate_shadow_tables(running_machine &machine, palette_private *palette)
 {
 	/* if we have shadows, allocate shadow tables */
-	if (machine->config().m_video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine.config().m_video_attributes & VIDEO_HAS_SHADOWS)
 	{
 		pen_t *table = auto_alloc_array(machine, pen_t, 65536);
 		int i;
@@ -689,7 +690,7 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
 		{
 			palette->shadow_table[0].base = palette->shadow_table[2].base = table;
 			for (i = 0; i < 65536; i++)
-				table[i] = (i < machine->total_colors()) ? (i + machine->total_colors()) : i;
+				table[i] = (i < machine.total_colors()) ? (i + machine.total_colors()) : i;
 		}
 
 		/* RGB mode gets two 32k tables in slots 0 and 2 */
@@ -702,7 +703,7 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
 	}
 
 	/* if we have hilights, allocate shadow tables */
-	if (machine->config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS)
+	if (machine.config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS)
 	{
 		pen_t *table = auto_alloc_array(machine, pen_t, 65536);
 		int i;
@@ -712,7 +713,7 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
 		{
 			palette->shadow_table[1].base = palette->shadow_table[3].base = table;
 			for (i = 0; i < 65536; i++)
-				table[i] = (i < machine->total_colors()) ? (i + 2 * machine->total_colors()) : i;
+				table[i] = (i < machine.total_colors()) ? (i + 2 * machine.total_colors()) : i;
 		}
 
 		/* RGB mode gets two 32k tables in slots 1 and 3 */
@@ -725,7 +726,7 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
 	}
 
 	/* set the default table */
-	machine->shadow_table = palette->shadow_table[0].base;
+	machine.shadow_table = palette->shadow_table[0].base;
 }
 
 
@@ -734,9 +735,9 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
     for the RGB tables
 -------------------------------------------------*/
 
-static void configure_rgb_shadows(running_machine *machine, int mode, float factor)
+static void configure_rgb_shadows(running_machine &machine, int mode, float factor)
 {
-	palette_private *palette = machine->palette_data;
+	palette_private *palette = machine.palette_data;
 	shadow_table_data *stable = &palette->shadow_table[mode];
 	int ifactor = (int)(factor * 256.0f);
 	int i;

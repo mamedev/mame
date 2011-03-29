@@ -89,7 +89,7 @@ static VIDEO_START( supdrapo )
 
 static SCREEN_UPDATE( supdrapo )
 {
-	supdrapo_state *state = screen->machine->driver_data<supdrapo_state>();
+	supdrapo_state *state = screen->machine().driver_data<supdrapo_state>();
 	int x, y;
 	int count;
 	int color;
@@ -104,7 +104,7 @@ static SCREEN_UPDATE( supdrapo )
 			/* Global Column Coloring, GUESS! */
 			color = state->col_line[(x*2) + 1] ? (state->col_line[(x*2) + 1] - 1) & 7 : 0;
 
-			drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], tile,color, 0, 0, x*8, y*8);
+			drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[0], tile,color, 0, 0, x*8, y*8);
 
 			count++;
 		}
@@ -149,7 +149,7 @@ static PALETTE_INIT( sdpoker )
 
 static READ8_HANDLER( sdpoker_rng_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static WRITE8_HANDLER( wdog8000_w )
@@ -179,7 +179,7 @@ static WRITE8_HANDLER( wdog8000_w )
   Watchdog: 00
 
 */
-	supdrapo_state *state = space->machine->driver_data<supdrapo_state>();
+	supdrapo_state *state = space->machine().driver_data<supdrapo_state>();
 
 	if (state->wdog == data)
 	{
@@ -212,12 +212,12 @@ static WRITE8_HANDLER( debug7c00_w )
 
 static WRITE8_HANDLER( coinin_w )
 {
-	coin_counter_w(space->machine, 0, data & 0x01);	/* Coin In */
+	coin_counter_w(space->machine(), 0, data & 0x01);	/* Coin In */
 }
 
 static WRITE8_HANDLER( payout_w )
 {
-	coin_counter_w(space->machine, 1, data & 0x01);	/* Payout */
+	coin_counter_w(space->machine(), 1, data & 0x01);	/* Payout */
 }
 
 
@@ -232,7 +232,7 @@ static MACHINE_START( supdrapo )
 
 static MACHINE_RESET( supdrapo )
 {
-	supdrapo_state *state = machine->driver_data<supdrapo_state>();
+	supdrapo_state *state = machine.driver_data<supdrapo_state>();
 	state->wdog = 1;
 }
 

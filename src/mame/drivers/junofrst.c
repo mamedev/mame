@@ -127,14 +127,14 @@ public:
 
 static WRITE8_HANDLER( junofrst_blitter_w )
 {
-	junofrst_state *state = space->machine->driver_data<junofrst_state>();
+	junofrst_state *state = space->machine().driver_data<junofrst_state>();
 	state->blitterdata[offset] = data;
 
 	/* blitter is triggered by $8073 */
 	if (offset == 3)
 	{
 		int i;
-		UINT8 *gfx_rom = space->machine->region("gfx1")->base();
+		UINT8 *gfx_rom = space->machine().region("gfx1")->base();
 
 		offs_t src = ((state->blitterdata[2] << 8) | state->blitterdata[3]) & 0xfffc;
 		offs_t dest = (state->blitterdata[0] << 8) | state->blitterdata[1];
@@ -181,13 +181,13 @@ static WRITE8_HANDLER( junofrst_blitter_w )
 
 static WRITE8_HANDLER( junofrst_bankselect_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 }
 
 
 static READ8_DEVICE_HANDLER( junofrst_portA_r )
 {
-	junofrst_state *state = device->machine->driver_data<junofrst_state>();
+	junofrst_state *state = device->machine().driver_data<junofrst_state>();
 	int timer;
 
 	/* main xtal 14.318MHz, divided by 8 to get the CPU clock, further */
@@ -204,7 +204,7 @@ static READ8_DEVICE_HANDLER( junofrst_portA_r )
 
 static WRITE8_DEVICE_HANDLER( junofrst_portB_w )
 {
-	junofrst_state *state = device->machine->driver_data<junofrst_state>();
+	junofrst_state *state = device->machine().driver_data<junofrst_state>();
 	device_t *filter[3] = { state->filter_0_0, state->filter_0_1, state->filter_0_2 };
 	int i;
 
@@ -225,7 +225,7 @@ static WRITE8_DEVICE_HANDLER( junofrst_portB_w )
 
 static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 {
-	junofrst_state *state = space->machine->driver_data<junofrst_state>();
+	junofrst_state *state = space->machine().driver_data<junofrst_state>();
 
 	if (state->last_irq == 0 && data == 1)
 	{
@@ -239,14 +239,14 @@ static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( junofrst_i8039_irq_w )
 {
-	junofrst_state *state = space->machine->driver_data<junofrst_state>();
+	junofrst_state *state = space->machine().driver_data<junofrst_state>();
 	device_set_input_line(state->i8039, 0, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
-	junofrst_state *state = space->machine->driver_data<junofrst_state>();
+	junofrst_state *state = space->machine().driver_data<junofrst_state>();
 
 	if ((data & 0x80) == 0)
 		device_set_input_line(state->i8039, 0, CLEAR_LINE);
@@ -263,7 +263,7 @@ static WRITE8_HANDLER( flip_screen_w )
 
 static WRITE8_HANDLER( junofrst_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset, data);
+	coin_counter_w(space->machine(), offset, data);
 }
 
 
@@ -370,14 +370,14 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( junofrst )
 {
-	junofrst_state *state = machine->driver_data<junofrst_state>();
+	junofrst_state *state = machine.driver_data<junofrst_state>();
 
-	state->maincpu = machine->device<cpu_device>("maincpu");
-	state->i8039 = machine->device("mcu");
-	state->soundcpu = machine->device<cpu_device>("audiocpu");
-	state->filter_0_0 = machine->device("filter.0.0");
-	state->filter_0_1 = machine->device("filter.0.1");
-	state->filter_0_2 = machine->device("filter.0.2");
+	state->maincpu = machine.device<cpu_device>("maincpu");
+	state->i8039 = machine.device("mcu");
+	state->soundcpu = machine.device<cpu_device>("audiocpu");
+	state->filter_0_0 = machine.device("filter.0.0");
+	state->filter_0_1 = machine.device("filter.0.1");
+	state->filter_0_2 = machine.device("filter.0.2");
 
 	state->save_item(NAME(state->i8039_status));
 	state->save_item(NAME(state->last_irq));
@@ -388,7 +388,7 @@ static MACHINE_START( junofrst )
 
 static MACHINE_RESET( junofrst )
 {
-	junofrst_state *state = machine->driver_data<junofrst_state>();
+	junofrst_state *state = machine.driver_data<junofrst_state>();
 
 	state->i8039_status = 0;
 	state->last_irq = 0;
@@ -503,7 +503,7 @@ static DRIVER_INIT( junofrst )
 {
 	UINT8 *decrypted = konami1_decode(machine, "maincpu");
 
-	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x1000);
 	memory_configure_bank_decrypted(machine, "bank1", 0, 16, decrypted + 0x10000, 0x1000);
 }
 

@@ -12,7 +12,7 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 sound_control;
-	void (*sound_handler)(running_machine *,UINT8 sound_val, UINT8 bits_changed);
+	void (*sound_handler)(running_machine &,UINT8 sound_val, UINT8 bits_changed);
 	UINT32 current_shift;
 	UINT32 last_shift;
 	UINT32 last_shift2;

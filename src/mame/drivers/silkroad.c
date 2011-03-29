@@ -129,8 +129,8 @@ ROM15.BIN       MX29F1610, SOP44 Surface Mounted Mask ROM /
 
 static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 {
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
-	palette_set_color_rgb(space->machine,offset,pal5bit(space->machine->generic.paletteram.u32[offset] >> (10+16)),pal5bit(space->machine->generic.paletteram.u32[offset] >> (5+16)),pal5bit(space->machine->generic.paletteram.u32[offset] >> (0+16)));
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	palette_set_color_rgb(space->machine(),offset,pal5bit(space->machine().generic.paletteram.u32[offset] >> (10+16)),pal5bit(space->machine().generic.paletteram.u32[offset] >> (5+16)),pal5bit(space->machine().generic.paletteram.u32[offset] >> (0+16)));
 }
 
 static WRITE32_DEVICE_HANDLER(silk_6295_bank_w)
@@ -139,7 +139,7 @@ static WRITE32_DEVICE_HANDLER(silk_6295_bank_w)
 	{
 		int bank = (data & 0x3000000) >> 24;
 		if(bank < 3)
-			device->machine->device<okim6295_device>("oki1")->set_bank_base(0x40000 * (bank));
+			device->machine().device<okim6295_device>("oki1")->set_bank_base(0x40000 * (bank));
 	}
 }
 
@@ -147,8 +147,8 @@ static WRITE32_HANDLER(silk_coin_counter_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
-		coin_counter_w(space->machine, 0, data & 0x10000);
-		coin_counter_w(space->machine, 1, data & 0x80000);
+		coin_counter_w(space->machine(), 0, data & 0x10000);
+		coin_counter_w(space->machine(), 1, data & 0x80000);
 	}
 }
 
@@ -328,7 +328,7 @@ static DRIVER_INIT( silkroad )
        verified as correct... problem with the original which the gfx
        hardware didn't care about? */
 
-	UINT8 *src = machine->region("gfx1")->base()+0x1000000;
+	UINT8 *src = machine.region("gfx1")->base()+0x1000000;
 	int len = 0x0200000;
 	UINT8 *buffer;
 

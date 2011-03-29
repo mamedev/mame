@@ -139,7 +139,7 @@ Dip locations verified with Service Mode.
 
 static READ16_HANDLER( extrarom1_r )
 {
-	UINT8 *rom = space->machine->region("user1")->base();
+	UINT8 *rom = space->machine().region("user1")->base();
 
 	offset *= 2;
 
@@ -148,7 +148,7 @@ static READ16_HANDLER( extrarom1_r )
 
 static READ16_HANDLER( extrarom2_r )
 {
-	UINT8 *rom = space->machine->region("user2")->base();
+	UINT8 *rom = space->machine().region("user2")->base();
 
 	offset *= 2;
 
@@ -157,12 +157,12 @@ static READ16_HANDLER( extrarom2_r )
 
 static WRITE8_HANDLER( crshrace_sh_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x03);
+	memory_set_bank(space->machine(), "bank1", data & 0x03);
 }
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	crshrace_state *state = space->machine->driver_data<crshrace_state>();
+	crshrace_state *state = space->machine().driver_data<crshrace_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -174,13 +174,13 @@ static WRITE16_HANDLER( sound_command_w )
 
 static CUSTOM_INPUT( country_sndpending_r )
 {
-	crshrace_state *state = field->port->machine->driver_data<crshrace_state>();
+	crshrace_state *state = field->port->machine().driver_data<crshrace_state>();
 	return state->pending_command;
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	crshrace_state *state = space->machine->driver_data<crshrace_state>();
+	crshrace_state *state = space->machine().driver_data<crshrace_state>();
 	state->pending_command = 0;
 }
 
@@ -427,7 +427,7 @@ GFXDECODE_END
 
 static void irqhandler( device_t *device, int irq )
 {
-	crshrace_state *state = device->machine->driver_data<crshrace_state>();
+	crshrace_state *state = device->machine().driver_data<crshrace_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -444,12 +444,12 @@ static const k053936_interface crshrace_k053936_intf =
 
 static MACHINE_START( crshrace )
 {
-	crshrace_state *state = machine->driver_data<crshrace_state>();
+	crshrace_state *state = machine.driver_data<crshrace_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 4, machine->region("audiocpu")->base() + 0x10000, 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000, 0x8000);
 
-	state->audiocpu = machine->device("audiocpu");
-	state->k053936 = machine->device("k053936");
+	state->audiocpu = machine.device("audiocpu");
+	state->k053936 = machine.device("k053936");
 
 	state->save_item(NAME(state->roz_bank));
 	state->save_item(NAME(state->gfxctrl));
@@ -459,7 +459,7 @@ static MACHINE_START( crshrace )
 
 static MACHINE_RESET( crshrace )
 {
-	crshrace_state *state = machine->driver_data<crshrace_state>();
+	crshrace_state *state = machine.driver_data<crshrace_state>();
 
 	state->roz_bank = 0;
 	state->gfxctrl = 0;
@@ -584,7 +584,7 @@ ROM_END
 void crshrace_patch_code( UINT16 offset )
 {
 	/* A hack which shows 3 player mode in code which is disabled */
-	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
 	RAM[(offset + 0)/2] = 0x4e71;
 	RAM[(offset + 2)/2] = 0x4e71;
 	RAM[(offset + 4)/2] = 0x4e71;

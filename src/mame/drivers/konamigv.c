@@ -194,9 +194,9 @@ ADDRESS_MAP_END
 
 /* SCSI */
 
-static void scsi_dma_read( running_machine *machine, UINT32 n_address, INT32 n_size )
+static void scsi_dma_read( running_machine &machine, UINT32 n_address, INT32 n_size )
 {
-	konamigv_state *state = machine->driver_data<konamigv_state>();
+	konamigv_state *state = machine.driver_data<konamigv_state>();
 	UINT32 *p_n_psxram = state->p_n_psxram;
 	UINT8 *sector_buffer = state->sector_buffer;
 	int i;
@@ -240,9 +240,9 @@ static void scsi_dma_read( running_machine *machine, UINT32 n_address, INT32 n_s
 	}
 }
 
-static void scsi_dma_write( running_machine *machine, UINT32 n_address, INT32 n_size )
+static void scsi_dma_write( running_machine &machine, UINT32 n_address, INT32 n_size )
 {
-	konamigv_state *state = machine->driver_data<konamigv_state>();
+	konamigv_state *state = machine.driver_data<konamigv_state>();
 	UINT32 *p_n_psxram = state->p_n_psxram;
 	UINT8 *sector_buffer = state->sector_buffer;
 	int i;
@@ -276,7 +276,7 @@ static void scsi_dma_write( running_machine *machine, UINT32 n_address, INT32 n_
 	}
 }
 
-static void scsi_irq(running_machine *machine)
+static void scsi_irq(running_machine &machine)
 {
 	psx_irq_set(machine, 0x400);
 }
@@ -306,14 +306,14 @@ static DRIVER_INIT( konamigv )
 
 	/* init the scsi controller and hook up it's DMA */
 	am53cf96_init(machine, &scsi_intf);
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, konamigv_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, konamigv_exit);
 	psx_dma_install_read_handler(machine, 5, scsi_dma_read);
 	psx_dma_install_write_handler(machine, 5, scsi_dma_write);
 }
 
 static MACHINE_START( konamigv )
 {
-	konamigv_state *state = machine->driver_data<konamigv_state>();
+	konamigv_state *state = machine.driver_data<konamigv_state>();
 
 	state->save_item(NAME(state->sector_buffer));
 	state->save_item(NAME(state->flash_address));
@@ -328,14 +328,14 @@ static MACHINE_RESET( konamigv )
 	psx_machine_init(machine);
 
 	/* also hook up CDDA audio to the CD-ROM drive */
-	cdda_set_cdrom(machine->device("cdda"), am53cf96_get_device(SCSI_ID_4));
+	cdda_set_cdrom(machine.device("cdda"), am53cf96_get_device(SCSI_ID_4));
 }
 
 static void spu_irq(device_t *device, UINT32 data)
 {
 	if (data)
 	{
-		psx_irq_set(device->machine, 1<<9);
+		psx_irq_set(device->machine(), 1<<9);
 	}
 }
 
@@ -440,7 +440,7 @@ INPUT_PORTS_END
 
 static READ32_HANDLER( flash_r )
 {
-	konamigv_state *state = space->machine->driver_data<konamigv_state>();
+	konamigv_state *state = space->machine().driver_data<konamigv_state>();
 	int reg = offset*2;
 	//int shift = 0;
 
@@ -471,7 +471,7 @@ static READ32_HANDLER( flash_r )
 
 static WRITE32_HANDLER( flash_w )
 {
-	konamigv_state *state = space->machine->driver_data<konamigv_state>();
+	konamigv_state *state = space->machine().driver_data<konamigv_state>();
 	int reg = offset*2;
 	int chip;
 
@@ -506,7 +506,7 @@ static WRITE32_HANDLER( flash_w )
 
 static READ32_HANDLER( trackball_r )
 {
-	konamigv_state *state = space->machine->driver_data<konamigv_state>();
+	konamigv_state *state = space->machine().driver_data<konamigv_state>();
 
 	if( offset == 0 && mem_mask == 0x0000ffff )
 	{
@@ -517,7 +517,7 @@ static READ32_HANDLER( trackball_r )
 
 		for( axis = 0; axis < 2; axis++ )
 		{
-			value = input_port_read(space->machine, axisnames[axis]);
+			value = input_port_read(space->machine(), axisnames[axis]);
 			diff = value - state->trackball_prev[ axis ];
 			state->trackball_prev[ axis ] = value;
 			state->trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
@@ -533,16 +533,16 @@ static READ32_HANDLER( unknown_r )
 
 static DRIVER_INIT( simpbowl )
 {
-	konamigv_state *state = machine->driver_data<konamigv_state>();
+	konamigv_state *state = machine.driver_data<konamigv_state>();
 
-	state->flash8[0] = machine->device<fujitsu_29f016a_device>("flash0");
-	state->flash8[1] = machine->device<fujitsu_29f016a_device>("flash1");
-	state->flash8[2] = machine->device<fujitsu_29f016a_device>("flash2");
-	state->flash8[3] = machine->device<fujitsu_29f016a_device>("flash3");
+	state->flash8[0] = machine.device<fujitsu_29f016a_device>("flash0");
+	state->flash8[1] = machine.device<fujitsu_29f016a_device>("flash1");
+	state->flash8[2] = machine.device<fujitsu_29f016a_device>("flash2");
+	state->flash8[3] = machine.device<fujitsu_29f016a_device>("flash3");
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f680080, 0x1f68008f, FUNC(flash_r), FUNC(flash_w) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler     ( 0x1f6800c0, 0x1f6800c7, FUNC(trackball_r) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler     ( 0x1f6800c8, 0x1f6800cb, FUNC(unknown_r) ); /* ?? */
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f680080, 0x1f68008f, FUNC(flash_r), FUNC(flash_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler     ( 0x1f6800c0, 0x1f6800c7, FUNC(trackball_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler     ( 0x1f6800c8, 0x1f6800cb, FUNC(unknown_r) ); /* ?? */
 
 	DRIVER_INIT_CALL(konamigv);
 }
@@ -569,7 +569,7 @@ INPUT_PORTS_END
 
 static READ32_HANDLER( btcflash_r )
 {
-	konamigv_state *state = space->machine->driver_data<konamigv_state>();
+	konamigv_state *state = space->machine().driver_data<konamigv_state>();
 
 	if (mem_mask == 0x0000ffff)
 	{
@@ -585,7 +585,7 @@ static READ32_HANDLER( btcflash_r )
 
 static WRITE32_HANDLER( btcflash_w )
 {
-	konamigv_state *state = space->machine->driver_data<konamigv_state>();
+	konamigv_state *state = space->machine().driver_data<konamigv_state>();
 
 	if (mem_mask == 0x0000ffff)
 	{
@@ -599,7 +599,7 @@ static WRITE32_HANDLER( btcflash_w )
 
 static READ32_HANDLER( btc_trackball_r )
 {
-	konamigv_state *state = space->machine->driver_data<konamigv_state>();
+	konamigv_state *state = space->machine().driver_data<konamigv_state>();
 
 //  mame_printf_debug( "r %08x %08x %08x\n", cpu_get_pc(space->cpu), offset, mem_mask );
 
@@ -612,7 +612,7 @@ static READ32_HANDLER( btc_trackball_r )
 
 		for( axis = 0; axis < 4; axis++ )
 		{
-			value = input_port_read(space->machine, axisnames[axis]);
+			value = input_port_read(space->machine(), axisnames[axis]);
 			diff = value - state->btc_trackball_prev[ axis ];
 			state->btc_trackball_prev[ axis ] = value;
 			state->btc_trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
@@ -629,13 +629,13 @@ static WRITE32_HANDLER( btc_trackball_w )
 
 static DRIVER_INIT( btchamp )
 {
-	konamigv_state *state = machine->driver_data<konamigv_state>();
+	konamigv_state *state = machine.driver_data<konamigv_state>();
 
-	state->flash16[0] = machine->device<sharp_lh28f400_device>("flash");
+	state->flash16[0] = machine.device<sharp_lh28f400_device>("flash");
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f680080, 0x1f68008f, FUNC(btc_trackball_r), FUNC(btc_trackball_w) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write                  ( 0x1f6800e0, 0x1f6800e3);
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f380000, 0x1f3fffff, FUNC(btcflash_r), FUNC(btcflash_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f680080, 0x1f68008f, FUNC(btc_trackball_r), FUNC(btc_trackball_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write                  ( 0x1f6800e0, 0x1f6800e3);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f380000, 0x1f3fffff, FUNC(btcflash_r), FUNC(btcflash_w) );
 
 	DRIVER_INIT_CALL(konamigv);
 }
@@ -688,8 +688,8 @@ static WRITE32_HANDLER( tokimeki_serial_w )
 
 static DRIVER_INIT( tokimosh )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler ( 0x1f680080, 0x1f680083, FUNC(tokimeki_serial_r) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1f680090, 0x1f680093, FUNC(tokimeki_serial_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler ( 0x1f680080, 0x1f680083, FUNC(tokimeki_serial_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1f680090, 0x1f680093, FUNC(tokimeki_serial_w) );
 
 	DRIVER_INIT_CALL(konamigv);
 }
@@ -717,17 +717,17 @@ static WRITE32_HANDLER( kdeadeye_0_w )
 
 static DRIVER_INIT( kdeadeye )
 {
-	konamigv_state *state = machine->driver_data<konamigv_state>();
+	konamigv_state *state = machine.driver_data<konamigv_state>();
 
-	state->flash16[0] = machine->device<sharp_lh28f400_device>("flash");
+	state->flash16[0] = machine.device<sharp_lh28f400_device>("flash");
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port  ( 0x1f680080, 0x1f680083, "GUNX1" );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port  ( 0x1f680090, 0x1f680093, "GUNY1" );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port  ( 0x1f6800a0, 0x1f6800a3, "GUNX2" );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port  ( 0x1f6800b0, 0x1f6800b3, "GUNY2" );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port  ( 0x1f6800c0, 0x1f6800c3, "BUTTONS" );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler    ( 0x1f6800e0, 0x1f6800e3, FUNC(kdeadeye_0_w) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f380000, 0x1f3fffff, FUNC(btcflash_r), FUNC(btcflash_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port  ( 0x1f680080, 0x1f680083, "GUNX1" );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port  ( 0x1f680090, 0x1f680093, "GUNY1" );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port  ( 0x1f6800a0, 0x1f6800a3, "GUNX2" );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port  ( 0x1f6800b0, 0x1f6800b3, "GUNY2" );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port  ( 0x1f6800c0, 0x1f6800c3, "BUTTONS" );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler    ( 0x1f6800e0, 0x1f6800e3, FUNC(kdeadeye_0_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f380000, 0x1f3fffff, FUNC(btcflash_r), FUNC(btcflash_w) );
 
 	DRIVER_INIT_CALL(konamigv);
 }

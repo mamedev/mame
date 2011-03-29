@@ -446,7 +446,7 @@ static const ay8910_interface survival_ay8910_interface =
 
 static MACHINE_RESET( phoenix )
 {
-	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x4000);
+	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x4000);
 }
 
 
@@ -1056,7 +1056,7 @@ ROM_END
 static DRIVER_INIT( condor )
 {
 	/* additional inputs for coinage */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x5000, 0x5000, "DSW1");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x5000, 0x5000, "DSW1");
 }
 
 

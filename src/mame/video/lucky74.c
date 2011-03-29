@@ -100,28 +100,28 @@
 
 WRITE8_HANDLER( lucky74_fg_videoram_w )
 {
-	lucky74_state *state = space->machine->driver_data<lucky74_state>();
+	lucky74_state *state = space->machine().driver_data<lucky74_state>();
 	state->fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( lucky74_fg_colorram_w )
 {
-	lucky74_state *state = space->machine->driver_data<lucky74_state>();
+	lucky74_state *state = space->machine().driver_data<lucky74_state>();
 	state->fg_colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( lucky74_bg_videoram_w )
 {
-	lucky74_state *state = space->machine->driver_data<lucky74_state>();
+	lucky74_state *state = space->machine().driver_data<lucky74_state>();
 	state->bg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( lucky74_bg_colorram_w )
 {
-	lucky74_state *state = space->machine->driver_data<lucky74_state>();
+	lucky74_state *state = space->machine().driver_data<lucky74_state>();
 	state->bg_colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -201,7 +201,7 @@ PALETTE_INIT( lucky74 )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	lucky74_state *state = machine->driver_data<lucky74_state>();
+	lucky74_state *state = machine.driver_data<lucky74_state>();
 /*  - bits -
     7654 3210
     ---- xxxx   tiles color.
@@ -217,7 +217,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	lucky74_state *state = machine->driver_data<lucky74_state>();
+	lucky74_state *state = machine.driver_data<lucky74_state>();
 /*  - bits -
     7654 3210
     ---- xxxx   tiles color.
@@ -234,7 +234,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( lucky74 )
 {
-	lucky74_state *state = machine->driver_data<lucky74_state>();
+	lucky74_state *state = machine.driver_data<lucky74_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
@@ -243,7 +243,7 @@ VIDEO_START( lucky74 )
 
 SCREEN_UPDATE( lucky74 )
 {
-	lucky74_state *state = screen->machine->driver_data<lucky74_state>();
+	lucky74_state *state = screen->machine().driver_data<lucky74_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;

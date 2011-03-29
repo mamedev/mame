@@ -109,35 +109,35 @@ public:
 
 static WRITE16_HANDLER( layer0_videoram_w )
 {
-	magic10_state *state = space->machine->driver_data<magic10_state>();
+	magic10_state *state = space->machine().driver_data<magic10_state>();
 	COMBINE_DATA(&state->layer0_videoram[offset]);
 	tilemap_mark_tile_dirty( state->layer0_tilemap, offset >> 1);
 }
 
 static WRITE16_HANDLER( layer1_videoram_w )
 {
-	magic10_state *state = space->machine->driver_data<magic10_state>();
+	magic10_state *state = space->machine().driver_data<magic10_state>();
 	COMBINE_DATA(&state->layer1_videoram[offset]);
 	tilemap_mark_tile_dirty( state->layer1_tilemap, offset >> 1);
 }
 
 static WRITE16_HANDLER( layer2_videoram_w )
 {
-	magic10_state *state = space->machine->driver_data<magic10_state>();
+	magic10_state *state = space->machine().driver_data<magic10_state>();
 	COMBINE_DATA(&state->layer2_videoram[offset]);
 	tilemap_mark_tile_dirty( state->layer2_tilemap, offset >> 1);
 }
 
 static WRITE16_HANDLER( paletteram_w )
 {
-	data = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	palette_set_color_rgb( space->machine, offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
+	data = COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	palette_set_color_rgb( space->machine(), offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 }
 
 
 static TILE_GET_INFO( get_layer0_tile_info )
 {
-	magic10_state *state = machine->driver_data<magic10_state>();
+	magic10_state *state = machine.driver_data<magic10_state>();
 	SET_TILE_INFO
 	(
 		1,
@@ -149,7 +149,7 @@ static TILE_GET_INFO( get_layer0_tile_info )
 
 static TILE_GET_INFO( get_layer1_tile_info )
 {
-	magic10_state *state = machine->driver_data<magic10_state>();
+	magic10_state *state = machine.driver_data<magic10_state>();
 	SET_TILE_INFO
 	(
 		1,
@@ -161,7 +161,7 @@ static TILE_GET_INFO( get_layer1_tile_info )
 
 static TILE_GET_INFO( get_layer2_tile_info )
 {
-	magic10_state *state = machine->driver_data<magic10_state>();
+	magic10_state *state = machine.driver_data<magic10_state>();
 	SET_TILE_INFO
 	(
 		0,
@@ -174,7 +174,7 @@ static TILE_GET_INFO( get_layer2_tile_info )
 
 static VIDEO_START( magic10 )
 {
-	magic10_state *state = machine->driver_data<magic10_state>();
+	magic10_state *state = machine.driver_data<magic10_state>();
 	state->layer0_tilemap = tilemap_create(machine, get_layer0_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->layer1_tilemap = tilemap_create(machine, get_layer1_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->layer2_tilemap = tilemap_create(machine, get_layer2_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
@@ -185,7 +185,7 @@ static VIDEO_START( magic10 )
 
 static SCREEN_UPDATE( magic10 )
 {
-	magic10_state *state = screen->machine->driver_data<magic10_state>();
+	magic10_state *state = screen->machine().driver_data<magic10_state>();
 	/*TODO: understand where this comes from. */
 	tilemap_set_scrollx(state->layer2_tilemap, 0, state->layer2_offset[0]);
 	tilemap_set_scrolly(state->layer2_tilemap, 0, state->layer2_offset[1]);
@@ -211,7 +211,7 @@ static SCREEN_UPDATE( magic10 )
 
 static READ16_HANDLER( magic102_r )
 {
-	magic10_state *state = space->machine->driver_data<magic10_state>();
+	magic10_state *state = space->machine().driver_data<magic10_state>();
 	state->magic102_ret ^= 0x20;
 	return state->magic102_ret;
 }
@@ -275,7 +275,7 @@ static WRITE16_HANDLER( magic10_out_w )
 	output_set_lamp_value(7, (data >> 6) & 1);		/* Lamp 7 - PLAY (BET/TAKE/CANCEL) */
 	output_set_lamp_value(8, (data >> 8) & 1);		/* Lamp 8 - PAYOUT/SUPERGAME */
 
-	coin_counter_w(space->machine, 0, data & 0x400);
+	coin_counter_w(space->machine(), 0, data & 0x400);
 }
 
 /***************************
@@ -1204,28 +1204,28 @@ ROM_END
 
 static DRIVER_INIT( magic10 )
 {
-	magic10_state *state = machine->driver_data<magic10_state>();
+	magic10_state *state = machine.driver_data<magic10_state>();
 	state->layer2_offset[0] = 32;
 	state->layer2_offset[1] = 2;
 }
 
 static DRIVER_INIT( magic102 )
 {
-	magic10_state *state = machine->driver_data<magic10_state>();
+	magic10_state *state = machine.driver_data<magic10_state>();
 	state->layer2_offset[0] = 8;
 	state->layer2_offset[1] = 20;
 }
 
 static DRIVER_INIT( suprpool )
 {
-	magic10_state *state = machine->driver_data<magic10_state>();
+	magic10_state *state = machine.driver_data<magic10_state>();
 	state->layer2_offset[0] = 8;
 	state->layer2_offset[1] = 16;
 }
 
 static DRIVER_INIT( hotslot )
 {
-	magic10_state *state = machine->driver_data<magic10_state>();
+	magic10_state *state = machine.driver_data<magic10_state>();
 /*  a value of -56 center the playfield, but displace the intro and initial screen.
     a value of -64 center the intro and initial screen, but displace the playfield.
 */
@@ -1235,7 +1235,7 @@ static DRIVER_INIT( hotslot )
 
 static DRIVER_INIT( sgsafari )
 {
-	magic10_state *state = machine->driver_data<magic10_state>();
+	magic10_state *state = machine.driver_data<magic10_state>();
 	state->layer2_offset[0] = 16;
 	state->layer2_offset[1] = 20;
 }

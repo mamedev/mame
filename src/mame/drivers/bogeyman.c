@@ -24,24 +24,24 @@
 
 static WRITE8_HANDLER( bogeyman_8910_latch_w )
 {
-	bogeyman_state *state = space->machine->driver_data<bogeyman_state>();
+	bogeyman_state *state = space->machine().driver_data<bogeyman_state>();
 	state->psg_latch = data;
 }
 
 static WRITE8_HANDLER( bogeyman_8910_control_w )
 {
-	bogeyman_state *state = space->machine->driver_data<bogeyman_state>();
+	bogeyman_state *state = space->machine().driver_data<bogeyman_state>();
 
 	// bit 0 is flipscreen
-	flip_screen_set(space->machine, data & 0x01);
+	flip_screen_set(space->machine(), data & 0x01);
 
 	// bit 5 goes to 8910 #0 BDIR pin
 	if ((state->last_write & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		ay8910_data_address_w(space->machine->device("ay1"), state->last_write >> 4, state->psg_latch);
+		ay8910_data_address_w(space->machine().device("ay1"), state->last_write >> 4, state->psg_latch);
 
 	// bit 7 goes to 8910 #1 BDIR pin
 	if ((state->last_write & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		ay8910_data_address_w(space->machine->device("ay2"), state->last_write >> 6, state->psg_latch);
+		ay8910_data_address_w(space->machine().device("ay2"), state->last_write >> 6, state->psg_latch);
 
 	state->last_write = data;
 }
@@ -207,7 +207,7 @@ GFXDECODE_END
 
 static MACHINE_START( bogeyman )
 {
-	bogeyman_state *state = machine->driver_data<bogeyman_state>();
+	bogeyman_state *state = machine.driver_data<bogeyman_state>();
 
 	state->save_item(NAME(state->psg_latch));
 	state->save_item(NAME(state->last_write));
@@ -215,7 +215,7 @@ static MACHINE_START( bogeyman )
 
 static MACHINE_RESET( bogeyman )
 {
-	bogeyman_state *state = machine->driver_data<bogeyman_state>();
+	bogeyman_state *state = machine.driver_data<bogeyman_state>();
 
 	state->psg_latch = 0;
 	state->last_write = 0;
@@ -223,7 +223,7 @@ static MACHINE_RESET( bogeyman )
 
 static WRITE8_DEVICE_HANDLER( bogeyman_colbank_w )
 {
-	bogeyman_state *state = device->machine->driver_data<bogeyman_state>();
+	bogeyman_state *state = device->machine().driver_data<bogeyman_state>();
 
 	if((data & 1) != (state->colbank & 1))
 	{

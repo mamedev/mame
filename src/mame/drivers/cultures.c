@@ -42,30 +42,30 @@ public:
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	cultures_state *state = machine->driver_data<cultures_state>();
-	UINT8 *region = machine->region("gfx3")->base() + 0x200000 + 0x80000 * state->bg1_bank;
+	cultures_state *state = machine.driver_data<cultures_state>();
+	UINT8 *region = machine.region("gfx3")->base() + 0x200000 + 0x80000 * state->bg1_bank;
 	int code = region[tile_index * 2] + (region[tile_index * 2 + 1] << 8);
 	SET_TILE_INFO(2, code, code >> 12, 0);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	cultures_state *state = machine->driver_data<cultures_state>();
-	UINT8 *region = machine->region("gfx2")->base() + 0x200000 + 0x80000 * state->bg2_bank;
+	cultures_state *state = machine.driver_data<cultures_state>();
+	UINT8 *region = machine.region("gfx2")->base() + 0x200000 + 0x80000 * state->bg2_bank;
 	int code = region[tile_index * 2] + (region[tile_index * 2 + 1] << 8);
 	SET_TILE_INFO(1, code, code >> 12, 0);
 }
 
 static TILE_GET_INFO( get_bg0_tile_info )
 {
-	cultures_state *state = machine->driver_data<cultures_state>();
+	cultures_state *state = machine.driver_data<cultures_state>();
 	int code = state->bg0_videoram[tile_index * 2] + (state->bg0_videoram[tile_index * 2 + 1] << 8);
 	SET_TILE_INFO(0, code, code >> 12, 0);
 }
 
 static VIDEO_START( cultures )
 {
-	cultures_state *state = machine->driver_data<cultures_state>();
+	cultures_state *state = machine.driver_data<cultures_state>();
 	state->bg0_tilemap = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_rows, 8, 8, 64, 128);
 	state->bg1_tilemap = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_rows, 8, 8, 512, 512);
 	state->bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,tilemap_scan_rows, 8, 8, 512, 512);
@@ -84,7 +84,7 @@ static VIDEO_START( cultures )
 
 static SCREEN_UPDATE( cultures )
 {
-	cultures_state *state = screen->machine->driver_data<cultures_state>();
+	cultures_state *state = screen->machine().driver_data<cultures_state>();
 	int attr;
 
 	// tilemaps attributes
@@ -114,14 +114,14 @@ static SCREEN_UPDATE( cultures )
 
 static WRITE8_HANDLER( cpu_bankswitch_w )
 {
-	cultures_state *state = space->machine->driver_data<cultures_state>();
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	cultures_state *state = space->machine().driver_data<cultures_state>();
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 	state->video_bank = ~data & 0x20;
 }
 
 static WRITE8_HANDLER( bg0_videoram_w )
 {
-	cultures_state *state = space->machine->driver_data<cultures_state>();
+	cultures_state *state = space->machine().driver_data<cultures_state>();
 	if (state->video_bank == 0)
 	{
 		int r, g, b, datax;
@@ -133,7 +133,7 @@ static WRITE8_HANDLER( bg0_videoram_w )
 		g = ((datax >> 3) & 0x1e) | ((datax & 0x2000) ? 0x1 : 0);
 		b = ((datax << 1) & 0x1e) | ((datax & 0x1000) ? 0x1 : 0);
 
-		palette_set_color_rgb(space->machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(space->machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 	else
 	{
@@ -144,14 +144,14 @@ static WRITE8_HANDLER( bg0_videoram_w )
 
 static WRITE8_HANDLER( misc_w )
 {
-	cultures_state *state = space->machine->driver_data<cultures_state>();
+	cultures_state *state = space->machine().driver_data<cultures_state>();
 	int new_bank = data & 0xf;
 
 	if (state->old_bank != new_bank)
 	{
 		// oki banking
-		UINT8 *src = space->machine->region("oki")->base() + 0x40000 + 0x20000 * new_bank;
-		UINT8 *dst = space->machine->region("oki")->base() + 0x20000;
+		UINT8 *src = space->machine().region("oki")->base() + 0x40000 + 0x20000 * new_bank;
+		UINT8 *dst = space->machine().region("oki")->base() + 0x20000;
 		memcpy(dst, src, 0x20000);
 
 		state->old_bank = new_bank;
@@ -162,7 +162,7 @@ static WRITE8_HANDLER( misc_w )
 
 static WRITE8_HANDLER( bg_bank_w )
 {
-	cultures_state *state = space->machine->driver_data<cultures_state>();
+	cultures_state *state = space->machine().driver_data<cultures_state>();
 	if (state->bg1_bank != (data & 3))
 	{
 		state->bg1_bank = data & 3;
@@ -174,7 +174,7 @@ static WRITE8_HANDLER( bg_bank_w )
 		state->bg2_bank = (data & 0xc) >> 2;
 		tilemap_mark_all_tiles_dirty(state->bg2_tilemap);
 	}
-	coin_counter_w(space->machine, 0, data & 0x10);
+	coin_counter_w(space->machine(), 0, data & 0x10);
 }
 
 static ADDRESS_MAP_START( cultures_map, AS_PROGRAM, 8 )
@@ -352,15 +352,15 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( cultures_interrupt )
 {
-	cultures_state *state = device->machine->driver_data<cultures_state>();
+	cultures_state *state = device->machine().driver_data<cultures_state>();
 	if (state->irq_enable)
 		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_START( cultures )
 {
-	cultures_state *state = machine->driver_data<cultures_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	cultures_state *state = machine.driver_data<cultures_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x0000], 0x4000);
 
@@ -374,7 +374,7 @@ static MACHINE_START( cultures )
 
 static MACHINE_RESET( cultures )
 {
-	cultures_state *state = machine->driver_data<cultures_state>();
+	cultures_state *state = machine.driver_data<cultures_state>();
 	state->old_bank = -1;
 	state->video_bank = 0;
 	state->irq_enable = 0;

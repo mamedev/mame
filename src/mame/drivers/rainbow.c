@@ -331,7 +331,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 static WRITE16_HANDLER( jumping_sound_w )
 {
-	rainbow_state *state = space->machine->driver_data<rainbow_state>();
+	rainbow_state *state = space->machine().driver_data<rainbow_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -398,12 +398,12 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( bankswitch_w )
 {
-	memory_set_bank(device->machine, "bank1", data & 3);
+	memory_set_bank(device->machine(), "bank1", data & 3);
 }
 
 static READ8_HANDLER( jumping_latch_r )
 {
-	rainbow_state *state = space->machine->driver_data<rainbow_state>();
+	rainbow_state *state = space->machine().driver_data<rainbow_state>();
 	return state->jumping_latch;
 }
 
@@ -627,7 +627,7 @@ GFXDECODE_END
 
 static void irqhandler( device_t *device, int irq )
 {
-	rainbow_state *state = device->machine->driver_data<rainbow_state>();
+	rainbow_state *state = device->machine().driver_data<rainbow_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -666,12 +666,12 @@ static const tc0140syt_interface rainbow_tc0140syt_intf =
 
 static MACHINE_START( rainbow )
 {
-	rainbow_state *state = machine->driver_data<rainbow_state>();
+	rainbow_state *state = machine.driver_data<rainbow_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->pc080sn = machine->device("pc080sn");
-	state->pc090oj = machine->device("pc090oj");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->pc080sn = machine.device("pc080sn");
+	state->pc090oj = machine.device("pc090oj");
 }
 
 static MACHINE_CONFIG_START( rainbow, rainbow_state )
@@ -870,7 +870,7 @@ ROM_END
 
 static DRIVER_INIT( rainbow )
 {
-	UINT8 *ROM = machine->region("audiocpu")->base();
+	UINT8 *ROM = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);
 
@@ -879,7 +879,7 @@ static DRIVER_INIT( rainbow )
 
 static DRIVER_INIT( rainbowe )
 {
-	UINT8 *ROM = machine->region("audiocpu")->base();
+	UINT8 *ROM = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);
 
@@ -888,9 +888,9 @@ static DRIVER_INIT( rainbowe )
 
 static DRIVER_INIT( jumping )
 {
-	rainbow_state *state = machine->driver_data<rainbow_state>();
-	int i, len = machine->region("gfx2")->bytes();
-	UINT8 *rom = machine->region("gfx2")->base();
+	rainbow_state *state = machine.driver_data<rainbow_state>();
+	int i, len = machine.region("gfx2")->bytes();
+	UINT8 *rom = machine.region("gfx2")->base();
 
 	/* Sprite colour map is reversed - switch to normal */
 

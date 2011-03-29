@@ -56,12 +56,12 @@ static DEVICE_START( ym2151 )
 	rate = device->clock()/64;
 
 	/* stream setup */
-	info->stream = device->machine->sound().stream_alloc(*device,0,2,rate,info,ym2151_update);
+	info->stream = device->machine().sound().stream_alloc(*device,0,2,rate,info,ym2151_update);
 
 	info->chip = ym2151_init(device,device->clock(),rate);
 	assert_always(info->chip != NULL, "Error creating YM2151 chip");
 
-	device->machine->state().register_postload(ym2151intf_postload, info);
+	device->machine().state().register_postload(ym2151intf_postload, info);
 
 	ym2151_set_irq_handler(info->chip,info->intf->irqhandler);
 	ym2151_set_port_write_handler(info->chip,info->intf->portwritehandler);

@@ -34,8 +34,8 @@ public:
 	UINT16 pf_control_0[8];
 	UINT16 pf_control_1[8];
 
-	void deco_bac06_pf_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition);
-	void deco_bac06_pf_draw_bootleg(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int flags, int mode, int type);
+	void deco_bac06_pf_draw(running_machine &machine,bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition);
+	void deco_bac06_pf_draw_bootleg(running_machine &machine,bitmap_t *bitmap,const rectangle *cliprect,int flags, int mode, int type);
 
 	UINT8 get_flip_state(void) { return pf_control_0[0]&0x80; };
 	void set_colmask(int data) { m_gfxcolmask = data; }
@@ -55,7 +55,7 @@ protected:
 	UINT8 m_bppmult;
 	UINT8 m_bppmask;
 
-	void custom_tilemap_draw(running_machine *machine,
+	void custom_tilemap_draw(running_machine &machine,
 							bitmap_t *bitmap,
 							const rectangle *cliprect,
 							tilemap_t *tilemap_ptr,

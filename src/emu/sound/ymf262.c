@@ -2268,7 +2268,7 @@ static int OPL3_LockTable(device_t *device)
 	{
 		cymfile = fopen("ymf262_.cym","wb");
 		if (cymfile)
-			device->machine->scheduler().timer_pulse ( attotime::from_hz(110), FUNC(cymfile_callback)); /*110 Hz pulse timer*/
+			device->machine().scheduler().timer_pulse ( attotime::from_hz(110), FUNC(cymfile_callback)); /*110 Hz pulse timer*/
 		else
 			logerror("Could not create ymf262_.cym file\n");
 	}
@@ -2341,7 +2341,7 @@ static OPL3 *OPL3Create(device_t *device, int clock, int rate, int type)
 	if (OPL3_LockTable(device) == -1) return NULL;
 
 	/* allocate memory block */
-	chip = auto_alloc_clear(device->machine, OPL3);
+	chip = auto_alloc_clear(device->machine(), OPL3);
 
 	chip->device = device;
 	chip->type  = type;
@@ -2360,7 +2360,7 @@ static OPL3 *OPL3Create(device_t *device, int clock, int rate, int type)
 static void OPL3Destroy(OPL3 *chip)
 {
 	OPL3_UnLockTable();
-	auto_free(chip->device->machine, chip);
+	auto_free(chip->device->machine(), chip);
 }
 
 

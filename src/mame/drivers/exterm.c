@@ -78,13 +78,13 @@
 
 static WRITE16_HANDLER( exterm_host_data_w )
 {
-	tms34010_host_w(space->machine->device("slave"), offset / TOWORD(0x00100000), data);
+	tms34010_host_w(space->machine().device("slave"), offset / TOWORD(0x00100000), data);
 }
 
 
 static READ16_HANDLER( exterm_host_data_r )
 {
-	return tms34010_host_r(space->machine->device("slave"), offset / TOWORD(0x00100000));
+	return tms34010_host_r(space->machine().device("slave"), offset / TOWORD(0x00100000));
 }
 
 
@@ -97,11 +97,11 @@ static READ16_HANDLER( exterm_host_data_r )
 
 static UINT16 exterm_trackball_port_r(address_space *space, int which, UINT16 mem_mask)
 {
-	exterm_state *state = space->machine->driver_data<exterm_state>();
+	exterm_state *state = space->machine().driver_data<exterm_state>();
 	UINT16 port;
 
 	/* Read the fake input port */
-	UINT8 trackball_pos = input_port_read(space->machine, which ? "DIAL1" : "DIAL0");
+	UINT8 trackball_pos = input_port_read(space->machine(), which ? "DIAL1" : "DIAL0");
 
 	/* Calculate the change from the last position. */
 	UINT8 trackball_diff = state->trackball_old[which] - trackball_pos;
@@ -117,7 +117,7 @@ static UINT16 exterm_trackball_port_r(address_space *space, int which, UINT16 me
 	state->aimpos[which] = (state->aimpos[which] + trackball_diff) & 0x3f;
 
 	/* Combine it with the standard input bits */
-	port = which ? input_port_read(space->machine, "P2") : input_port_read(space->machine, "P1");
+	port = which ? input_port_read(space->machine(), "P2") : input_port_read(space->machine(), "P1");
 
 	return (port & 0xc0ff) | (state->aimpos[which] << 8);
 }
@@ -144,7 +144,7 @@ static READ16_HANDLER( exterm_input_port_1_r )
 
 static WRITE16_HANDLER( exterm_output_port_0_w )
 {
-	exterm_state *state = space->machine->driver_data<exterm_state>();
+	exterm_state *state = space->machine().driver_data<exterm_state>();
 	/* All the outputs are activated on the rising edge */
 
 	if (ACCESSING_BITS_0_7)
@@ -160,11 +160,11 @@ static WRITE16_HANDLER( exterm_output_port_0_w )
 	{
 		/* Bit 13 = Resets the slave CPU */
 		if ((data & 0x2000) && !(state->last & 0x2000))
-			cputag_set_input_line(space->machine, "slave", INPUT_LINE_RESET, PULSE_LINE);
+			cputag_set_input_line(space->machine(), "slave", INPUT_LINE_RESET, PULSE_LINE);
 
 		/* Bits 14-15 = Coin counters */
-		coin_counter_w(space->machine, 0, data & 0x8000);
-		coin_counter_w(space->machine, 1, data & 0x4000);
+		coin_counter_w(space->machine(), 0, data & 0x8000);
+		coin_counter_w(space->machine(), 1, data & 0x4000);
 	}
 
 	COMBINE_DATA(&state->last);
@@ -173,7 +173,7 @@ static WRITE16_HANDLER( exterm_output_port_0_w )
 
 static TIMER_CALLBACK( sound_delayed_w )
 {
-	exterm_state *state = machine->driver_data<exterm_state>();
+	exterm_state *state = machine.driver_data<exterm_state>();
 	/* data is latched independently for both sound CPUs */
 	state->master_sound_latch = state->slave_sound_latch = param;
 	cputag_set_input_line(machine, "audiocpu", M6502_IRQ_LINE, ASSERT_LINE);
@@ -184,7 +184,7 @@ static TIMER_CALLBACK( sound_delayed_w )
 static WRITE16_HANDLER( sound_latch_w )
 {
 	if (ACCESSING_BITS_0_7)
-		space->machine->scheduler().synchronize(FUNC(sound_delayed_w), data & 0xff);
+		space->machine().scheduler().synchronize(FUNC(sound_delayed_w), data & 0xff);
 }
 
 
@@ -197,16 +197,16 @@ static WRITE16_HANDLER( sound_latch_w )
 
 static TIMER_DEVICE_CALLBACK( master_sound_nmi_callback )
 {
-	exterm_state *state = timer.machine->driver_data<exterm_state>();
+	exterm_state *state = timer.machine().driver_data<exterm_state>();
 	/* bit 0 of the sound control determines if the NMI is actually delivered */
 	if (state->sound_control & 0x01)
-		cputag_set_input_line(timer.machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(timer.machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static WRITE8_DEVICE_HANDLER( ym2151_data_latch_w )
 {
-	exterm_state *state = device->machine->driver_data<exterm_state>();
+	exterm_state *state = device->machine().driver_data<exterm_state>();
 	/* bit 7 of the sound control selects which port */
 	ym2151_w(device, state->sound_control >> 7, data);
 }
@@ -218,32 +218,32 @@ static WRITE8_HANDLER( sound_nmi_rate_w )
 	/* this value is latched into up-counters, which are clocked at the */
 	/* input clock / 256 */
 	attotime nmi_rate = attotime::from_hz(4000000) * (4096 * (256 - data));
-	timer_device *nmi_timer = space->machine->device<timer_device>("snd_nmi_timer");
+	timer_device *nmi_timer = space->machine().device<timer_device>("snd_nmi_timer");
 	nmi_timer->adjust(nmi_rate, 0, nmi_rate);
 }
 
 
 static READ8_HANDLER( sound_master_latch_r )
 {
-	exterm_state *state = space->machine->driver_data<exterm_state>();
+	exterm_state *state = space->machine().driver_data<exterm_state>();
 	/* read latch and clear interrupt */
-	cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", M6502_IRQ_LINE, CLEAR_LINE);
 	return state->master_sound_latch;
 }
 
 
 static READ8_HANDLER( sound_slave_latch_r )
 {
-	exterm_state *state = space->machine->driver_data<exterm_state>();
+	exterm_state *state = space->machine().driver_data<exterm_state>();
 	/* read latch and clear interrupt */
-	cputag_set_input_line(space->machine, "audioslave", M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audioslave", M6502_IRQ_LINE, CLEAR_LINE);
 	return state->slave_sound_latch;
 }
 
 
 static WRITE8_DEVICE_HANDLER( sound_slave_dac_w )
 {
-	exterm_state *state = device->machine->driver_data<exterm_state>();
+	exterm_state *state = device->machine().driver_data<exterm_state>();
 	/* DAC A is used to modulate DAC B */
 	state->dac_value[offset & 1] = data;
 	dac_data_16_w(device, (state->dac_value[0] ^ 0xff) * state->dac_value[1]);
@@ -253,14 +253,14 @@ static WRITE8_DEVICE_HANDLER( sound_slave_dac_w )
 static READ8_HANDLER( sound_nmi_to_slave_r )
 {
 	/* a read from here triggers an NMI pulse to the slave */
-	cputag_set_input_line(space->machine, "audioslave", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audioslave", INPUT_LINE_NMI, PULSE_LINE);
 	return 0xff;
 }
 
 
 static WRITE8_HANDLER( sound_control_w )
 {
-	exterm_state *state = space->machine->driver_data<exterm_state>();
+	exterm_state *state = space->machine().driver_data<exterm_state>();
 /*
     D7 = to S4-15
     D6 = to S4-12

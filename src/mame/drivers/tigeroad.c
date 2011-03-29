@@ -81,7 +81,7 @@ static const int f1dream_2450_lookup[32] = {
 
 static void f1dream_protection_w(address_space *space)
 {
-	tigeroad_state *state = space->machine->driver_data<tigeroad_state>();
+	tigeroad_state *state = space->machine().driver_data<tigeroad_state>();
 	int indx;
 	int value = 255;
 	int prevpc = cpu_get_previouspc(space->cpu);
@@ -145,7 +145,7 @@ static void f1dream_protection_w(address_space *space)
 
 static WRITE16_HANDLER( f1dream_control_w )
 {
-	tigeroad_state *state = space->machine->driver_data<tigeroad_state>();
+	tigeroad_state *state = space->machine().driver_data<tigeroad_state>();
 	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",cpu_get_pc(space->cpu), state->ram16[0x3fe0/2]);
 	f1dream_protection_w(space);
 }
@@ -495,7 +495,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -766,12 +766,12 @@ ROM_END
 
 static DRIVER_INIT( tigeroad )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe4002, 0xfe4003, FUNC(tigeroad_soundcmd_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe4002, 0xfe4003, FUNC(tigeroad_soundcmd_w));
 }
 
 static DRIVER_INIT( f1dream )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe4002, 0xfe4003, FUNC(f1dream_control_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe4002, 0xfe4003, FUNC(f1dream_control_w));
 }
 
 

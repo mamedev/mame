@@ -77,7 +77,7 @@ I/O read/write
 
 static MACHINE_RESET( senjyo )
 {
-	senjyo_state *state = machine->driver_data<senjyo_state>();
+	senjyo_state *state = machine.driver_data<senjyo_state>();
 
 	/* we must avoid generating interrupts for the first few frames otherwise */
 	/* Senjyo locks up. There must be an interrupt enable port somewhere, */
@@ -88,7 +88,7 @@ static MACHINE_RESET( senjyo )
 
 static INTERRUPT_GEN( senjyo_interrupt )
 {
-	senjyo_state *state = device->machine->driver_data<senjyo_state>();
+	senjyo_state *state = device->machine().driver_data<senjyo_state>();
 
 	if (state->int_delay_kludge == 0) device_set_input_line(device, 0, HOLD_LINE);
 	else state->int_delay_kludge--;
@@ -96,12 +96,12 @@ static INTERRUPT_GEN( senjyo_interrupt )
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(space->machine, data);
+	flip_screen_set(space->machine(), data);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_cmd_w )
 {
-	senjyo_state *state = device->machine->driver_data<senjyo_state>();
+	senjyo_state *state = device->machine().driver_data<senjyo_state>();
 
 	state->sound_cmd = data;
 
@@ -165,7 +165,7 @@ ADDRESS_MAP_END
 /* are scroll registers 1+2 linked on the bootleg?, only one copy is written */
 static WRITE8_HANDLER(starforb_scrolly2)
 {
-	senjyo_state *state = space->machine->driver_data<senjyo_state>();
+	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
 	state->scrolly2[offset] = data;
 	state->scrolly1[offset] = data;
@@ -173,7 +173,7 @@ static WRITE8_HANDLER(starforb_scrolly2)
 
 static WRITE8_HANDLER(starforb_scrollx2)
 {
-	senjyo_state *state = space->machine->driver_data<senjyo_state>();
+	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
 	state->scrollx2[offset] = data;
 	state->scrollx1[offset] = data;
@@ -890,14 +890,14 @@ ROM_END
 
 static DRIVER_INIT( starforc )
 {
-	senjyo_state *state = machine->driver_data<senjyo_state>();
+	senjyo_state *state = machine.driver_data<senjyo_state>();
 
 	state->is_senjyo = 0;
 	state->scrollhack = 1;
 }
 static DRIVER_INIT( starfore )
 {
-	senjyo_state *state = machine->driver_data<senjyo_state>();
+	senjyo_state *state = machine.driver_data<senjyo_state>();
 
 	/* encrypted CPU */
 	suprloco_decode(machine, "maincpu");
@@ -908,7 +908,7 @@ static DRIVER_INIT( starfore )
 
 static DRIVER_INIT( starfora )
 {
-	senjyo_state *state = machine->driver_data<senjyo_state>();
+	senjyo_state *state = machine.driver_data<senjyo_state>();
 
 	/* encrypted CPU */
 	yamato_decode(machine, "maincpu");
@@ -919,7 +919,7 @@ static DRIVER_INIT( starfora )
 
 static DRIVER_INIT( senjyo )
 {
-	senjyo_state *state = machine->driver_data<senjyo_state>();
+	senjyo_state *state = machine.driver_data<senjyo_state>();
 
 	state->is_senjyo = 1;
 	state->scrollhack = 0;

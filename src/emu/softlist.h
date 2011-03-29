@@ -71,7 +71,7 @@ const char *software_part_get_feature(software_part *part, const char *feature_n
 
 bool load_software_part(device_image_interface *image, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name);
 
-void ui_image_menu_software(running_machine *machine, ui_menu *menu, void *parameter, void *state);
+void ui_image_menu_software(running_machine &machine, ui_menu *menu, void *parameter, void *state);
 
 
 /*********************************************************************

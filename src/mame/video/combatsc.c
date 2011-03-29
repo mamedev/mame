@@ -15,7 +15,7 @@ PALETTE_INIT( combatsc )
 	int pal;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x80);
+	machine.colortable = colortable_alloc(machine, 0x80);
 
 	for (pal = 0; pal < 8; pal++)
 	{
@@ -54,7 +54,7 @@ PALETTE_INIT( combatsc )
 			else
 				ctabentry = (pal << 4) | (color_prom[(clut << 8) | i] & 0x0f);
 
-			colortable_entry_set_value(machine->colortable, (pal << 8) | i, ctabentry);
+			colortable_entry_set_value(machine.colortable, (pal << 8) | i, ctabentry);
 		}
 	}
 }
@@ -65,7 +65,7 @@ PALETTE_INIT( combatscb )
 	int pal;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x80);
+	machine.colortable = colortable_alloc(machine, 0x80);
 
 	for (pal = 0; pal < 8; pal++)
 	{
@@ -82,15 +82,15 @@ PALETTE_INIT( combatscb )
 				/* chars - no lookup? */
 				ctabentry = (pal << 4) | (i & 0x0f);	/* no lookup? */
 
-			colortable_entry_set_value(machine->colortable, (pal << 8) | i, ctabentry);
+			colortable_entry_set_value(machine.colortable, (pal << 8) | i, ctabentry);
 		}
 	}
 }
 
 
-static void set_pens( running_machine *machine )
+static void set_pens( running_machine &machine )
 {
-	combatsc_state *state = machine->driver_data<combatsc_state>();
+	combatsc_state *state = machine.driver_data<combatsc_state>();
 	int i;
 
 	for (i = 0x00; i < 0x100; i += 2)
@@ -99,7 +99,7 @@ static void set_pens( running_machine *machine )
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine->colortable, i >> 1, color);
+		colortable_palette_set_color(machine.colortable, i >> 1, color);
 	}
 }
 
@@ -113,7 +113,7 @@ static void set_pens( running_machine *machine )
 
 static TILE_GET_INFO( get_tile_info0 )
 {
-	combatsc_state *state = machine->driver_data<combatsc_state>();
+	combatsc_state *state = machine.driver_data<combatsc_state>();
 	UINT8 ctrl_6 = k007121_ctrlram_r(state->k007121_1, 6);
 	UINT8 attributes = state->page[0][tile_index];
 	int bank = 4 * ((state->vreg & 0x0f) - 1);
@@ -148,7 +148,7 @@ static TILE_GET_INFO( get_tile_info0 )
 
 static TILE_GET_INFO( get_tile_info1 )
 {
-	combatsc_state *state = machine->driver_data<combatsc_state>();
+	combatsc_state *state = machine.driver_data<combatsc_state>();
 	UINT8 ctrl_6 = k007121_ctrlram_r(state->k007121_2, 6);
 	UINT8 attributes = state->page[1][tile_index];
 	int bank = 4 * ((state->vreg >> 4) - 1);
@@ -183,7 +183,7 @@ static TILE_GET_INFO( get_tile_info1 )
 
 static TILE_GET_INFO( get_text_info )
 {
-	combatsc_state *state = machine->driver_data<combatsc_state>();
+	combatsc_state *state = machine.driver_data<combatsc_state>();
 	UINT8 attributes = state->page[0][tile_index + 0x800];
 	int number = state->page[0][tile_index + 0xc00];
 	int color = 16 + (attributes & 0x0f);
@@ -198,7 +198,7 @@ static TILE_GET_INFO( get_text_info )
 
 static TILE_GET_INFO( get_tile_info0_bootleg )
 {
-	combatsc_state *state = machine->driver_data<combatsc_state>();
+	combatsc_state *state = machine.driver_data<combatsc_state>();
 	UINT8 attributes = state->page[0][tile_index];
 	int bank = 4 * ((state->vreg & 0x0f) - 1);
 	int number, pal, color;
@@ -231,7 +231,7 @@ static TILE_GET_INFO( get_tile_info0_bootleg )
 
 static TILE_GET_INFO( get_tile_info1_bootleg )
 {
-	combatsc_state *state = machine->driver_data<combatsc_state>();
+	combatsc_state *state = machine.driver_data<combatsc_state>();
 	UINT8 attributes = state->page[1][tile_index];
 	int bank = 4*((state->vreg >> 4) - 1);
 	int number, pal, color;
@@ -264,7 +264,7 @@ static TILE_GET_INFO( get_tile_info1_bootleg )
 
 static TILE_GET_INFO( get_text_info_bootleg )
 {
-	combatsc_state *state = machine->driver_data<combatsc_state>();
+	combatsc_state *state = machine.driver_data<combatsc_state>();
 //  UINT8 attributes = state->page[0][tile_index + 0x800];
 	int number = state->page[0][tile_index + 0xc00];
 	int color = 16;// + (attributes & 0x0f);
@@ -284,7 +284,7 @@ static TILE_GET_INFO( get_text_info_bootleg )
 
 VIDEO_START( combatsc )
 {
-	combatsc_state *state = machine->driver_data<combatsc_state>();
+	combatsc_state *state = machine.driver_data<combatsc_state>();
 
 	state->bg_tilemap[0] = tilemap_create(machine, get_tile_info0, tilemap_scan_rows, 8, 8, 32, 32);
 	state->bg_tilemap[1] = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 8, 8, 32, 32);
@@ -305,7 +305,7 @@ VIDEO_START( combatsc )
 
 VIDEO_START( combatscb )
 {
-	combatsc_state *state = machine->driver_data<combatsc_state>();
+	combatsc_state *state = machine.driver_data<combatsc_state>();
 
 	state->bg_tilemap[0] = tilemap_create(machine, get_tile_info0_bootleg, tilemap_scan_rows, 8, 8, 32, 32);
 	state->bg_tilemap[1] = tilemap_create(machine, get_tile_info1_bootleg, tilemap_scan_rows, 8, 8, 32, 32);
@@ -333,13 +333,13 @@ VIDEO_START( combatscb )
 
 READ8_HANDLER( combatsc_video_r )
 {
-	combatsc_state *state = space->machine->driver_data<combatsc_state>();
+	combatsc_state *state = space->machine().driver_data<combatsc_state>();
 	return state->videoram[offset];
 }
 
 WRITE8_HANDLER( combatsc_video_w )
 {
-	combatsc_state *state = space->machine->driver_data<combatsc_state>();
+	combatsc_state *state = space->machine().driver_data<combatsc_state>();
 	state->videoram[offset] = data;
 
 	if (offset < 0x800)
@@ -357,7 +357,7 @@ WRITE8_HANDLER( combatsc_video_w )
 
 WRITE8_HANDLER( combatsc_pf_control_w )
 {
-	combatsc_state *state = space->machine->driver_data<combatsc_state>();
+	combatsc_state *state = space->machine().driver_data<combatsc_state>();
 	device_t *k007121 = state->video_circuit ? state->k007121_2 : state->k007121_1;
 	k007121_ctrl_w(k007121, offset, data);
 
@@ -375,13 +375,13 @@ WRITE8_HANDLER( combatsc_pf_control_w )
 
 READ8_HANDLER( combatsc_scrollram_r )
 {
-	combatsc_state *state = space->machine->driver_data<combatsc_state>();
+	combatsc_state *state = space->machine().driver_data<combatsc_state>();
 	return state->scrollram[offset];
 }
 
 WRITE8_HANDLER( combatsc_scrollram_w )
 {
-	combatsc_state *state = space->machine->driver_data<combatsc_state>();
+	combatsc_state *state = space->machine().driver_data<combatsc_state>();
 	state->scrollram[offset] = data;
 }
 
@@ -393,22 +393,22 @@ WRITE8_HANDLER( combatsc_scrollram_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *source, int circuit, UINT32 pri_mask )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *source, int circuit, UINT32 pri_mask )
 {
-	combatsc_state *state = machine->driver_data<combatsc_state>();
+	combatsc_state *state = machine.driver_data<combatsc_state>();
 	device_t *k007121 = circuit ? state->k007121_2 : state->k007121_1;
 	int base_color = (circuit * 4) * 16 + (k007121_ctrlram_r(k007121, 6) & 0x10) * 2;
 
-	k007121_sprites_draw(k007121, bitmap, cliprect, machine->gfx[circuit], machine->colortable, source, base_color, 0, 0, pri_mask);
+	k007121_sprites_draw(k007121, bitmap, cliprect, machine.gfx[circuit], machine.colortable, source, base_color, 0, 0, pri_mask);
 }
 
 
 SCREEN_UPDATE( combatsc )
 {
-	combatsc_state *state = screen->machine->driver_data<combatsc_state>();
+	combatsc_state *state = screen->machine().driver_data<combatsc_state>();
 	int i;
 
-	set_pens(screen->machine);
+	set_pens(screen->machine());
 
 	if (k007121_ctrlram_r(state->k007121_1, 1) & 0x02)
 	{
@@ -437,7 +437,7 @@ SCREEN_UPDATE( combatsc )
 	tilemap_set_scrolly(state->bg_tilemap[0], 0, k007121_ctrlram_r(state->k007121_1, 2));
 	tilemap_set_scrolly(state->bg_tilemap[1], 0, k007121_ctrlram_r(state->k007121_2, 2));
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	if (state->priority == 0)
 	{
@@ -447,8 +447,8 @@ SCREEN_UPDATE( combatsc )
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap[0], 1, 2);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(screen->machine, bitmap, cliprect, state->spriteram[1], 1, 0x0f00);
-		draw_sprites(screen->machine, bitmap, cliprect, state->spriteram[0], 0, 0x4444);
+		draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram[1], 1, 0x0f00);
+		draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram[0], 0, 0x4444);
 	}
 	else
 	{
@@ -458,8 +458,8 @@ SCREEN_UPDATE( combatsc )
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap[1], 0, 8);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(screen->machine, bitmap, cliprect, state->spriteram[1], 1, 0x0f00);
-		draw_sprites(screen->machine, bitmap, cliprect, state->spriteram[0], 0, 0x4444);
+		draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram[1], 1, 0x0f00);
+		draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram[0], 0, 0x4444);
 	}
 
 	if (k007121_ctrlram_r(state->k007121_1, 1) & 0x08)
@@ -515,10 +515,10 @@ byte #4:
 
 ***************************************************************************/
 
-static void bootleg_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *source, int circuit )
+static void bootleg_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *source, int circuit )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	const gfx_element *gfx = machine->gfx[circuit + 2];
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	const gfx_element *gfx = machine.gfx[circuit + 2];
 
 	int limit = circuit ? (space->read_byte(0xc2) * 256 + space->read_byte(0xc3)) : (space->read_byte(0xc0) * 256 + space->read_byte(0xc1));
 	const UINT8 *finish;
@@ -563,10 +563,10 @@ static void bootleg_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 
 SCREEN_UPDATE( combatscb )
 {
-	combatsc_state *state = screen->machine->driver_data<combatsc_state>();
+	combatsc_state *state = screen->machine().driver_data<combatsc_state>();
 	int i;
 
-	set_pens(screen->machine);
+	set_pens(screen->machine());
 
 	for (i = 0; i < 32; i++)
 	{
@@ -579,16 +579,16 @@ SCREEN_UPDATE( combatscb )
 	if (state->priority == 0)
 	{
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap[1], TILEMAP_DRAW_OPAQUE, 0);
-		bootleg_draw_sprites(screen->machine, bitmap,cliprect, state->page[0], 0);
+		bootleg_draw_sprites(screen->machine(), bitmap,cliprect, state->page[0], 0);
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap[0], 0 ,0);
-		bootleg_draw_sprites(screen->machine, bitmap,cliprect, state->page[1], 1);
+		bootleg_draw_sprites(screen->machine(), bitmap,cliprect, state->page[1], 1);
 	}
 	else
 	{
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap[0], TILEMAP_DRAW_OPAQUE, 0);
-		bootleg_draw_sprites(screen->machine, bitmap,cliprect, state->page[0], 0);
+		bootleg_draw_sprites(screen->machine(), bitmap,cliprect, state->page[0], 0);
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap[1], 0, 0);
-		bootleg_draw_sprites(screen->machine, bitmap,cliprect, state->page[1], 1);
+		bootleg_draw_sprites(screen->machine(), bitmap,cliprect, state->page[1], 1);
 	}
 
 	tilemap_draw(bitmap, cliprect, state->textlayer, 0, 0);

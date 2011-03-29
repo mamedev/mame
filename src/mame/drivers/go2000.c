@@ -52,7 +52,7 @@ public:
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
-	go2000_state *state = space->machine->driver_data<go2000_state>();
+	go2000_state *state = space->machine().driver_data<go2000_state>();
 	soundlatch_w(space, offset, data & 0xff);
 	device_set_input_line(state->soundcpu, 0, HOLD_LINE);
 }
@@ -73,7 +73,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( go2000_pcm_1_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x07);
+	memory_set_bank(space->machine(), "bank1", data & 0x07);
 }
 
 static ADDRESS_MAP_START( go2000_sound_map, AS_PROGRAM, 8 )
@@ -171,7 +171,7 @@ static VIDEO_START(go2000)
 
 static SCREEN_UPDATE(go2000)
 {
-	go2000_state *state = screen->machine->driver_data<go2000_state>();
+	go2000_state *state = screen->machine().driver_data<go2000_state>();
 	int x,y;
 	int count = 0;
 
@@ -182,7 +182,7 @@ static SCREEN_UPDATE(go2000)
 		{
 			int tile = state->videoram[count];
 			int attr = state->videoram2[count];
-			drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], tile, attr, 0, 0, x * 8, y * 8);
+			drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[0], tile, attr, 0, 0, x * 8, y * 8);
 			count++;
 		}
 	}
@@ -194,7 +194,7 @@ static SCREEN_UPDATE(go2000)
 		{
 			int tile = state->videoram[count];
 			int attr = state->videoram2[count];
-			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], tile, attr, 0, 0, x * 8, y * 8, 0xf);
+			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], tile, attr, 0, 0, x * 8, y * 8, 0xf);
 			count++;
 		}
 	}
@@ -203,8 +203,8 @@ static SCREEN_UPDATE(go2000)
 	{
 	int offs;
 
-	int max_x = screen->machine->primary_screen->width() - 8;
-	int max_y = screen->machine->primary_screen->height() - 8;
+	int max_x = screen->machine().primary_screen->width() - 8;
+	int max_y = screen->machine().primary_screen->height() - 8;
 
 	for (offs = 0xf800 / 2; offs < 0x10000 / 2 ; offs += 4/2)
 	{
@@ -277,7 +277,7 @@ static SCREEN_UPDATE(go2000)
 				if (flipx)
 					tile_flipx = !tile_flipx;
 
-				if (flip_screen_get(screen->machine))
+				if (flip_screen_get(screen->machine()))
 				{
 					sx = max_x - sx;
 					sy = max_y - sy;
@@ -285,7 +285,7 @@ static SCREEN_UPDATE(go2000)
 					tile_flipy = !tile_flipy;
 				}
 
-				drawgfx_transpen(	bitmap, cliprect,screen->machine->gfx[0],
+				drawgfx_transpen(	bitmap, cliprect,screen->machine().gfx[0],
 							(tile & 0x1fff) + bank*0x4000,
 							attr,
 							tile_flipx, tile_flipy,
@@ -306,8 +306,8 @@ static SCREEN_UPDATE(go2000)
 
 static MACHINE_START( go2000 )
 {
-	go2000_state *state = machine->driver_data<go2000_state>();
-	UINT8 *SOUND = machine->region("soundcpu")->base();
+	go2000_state *state = machine.driver_data<go2000_state>();
+	UINT8 *SOUND = machine.region("soundcpu")->base();
 	int i;
 
 	for (i = 0; i < 8; i++)
@@ -315,7 +315,7 @@ static MACHINE_START( go2000 )
 
 	memory_set_bank(machine, "bank1", 0);
 
-	state->soundcpu = machine->device("soundcpu");
+	state->soundcpu = machine.device("soundcpu");
 }
 
 static MACHINE_CONFIG_START( go2000, go2000_state )

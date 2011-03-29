@@ -100,7 +100,7 @@ device_config *timer_device_config::static_alloc_device_config(const machine_con
 
 device_t *timer_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, timer_device(machine, *this));
+	return auto_alloc(machine, timer_device(machine, *this));
 }
 
 
@@ -280,7 +280,7 @@ void timer_device::device_start()
 {
 	// fetch the screen
 	if (m_config.m_screen != NULL)
-		m_screen = downcast<screen_device *>(machine->device(m_config.m_screen));
+		m_screen = downcast<screen_device *>(m_machine.device(m_config.m_screen));
 
 	// allocate the timer
 	m_timer = timer_alloc();

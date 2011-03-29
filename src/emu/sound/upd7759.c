@@ -628,7 +628,7 @@ static void register_for_save(upd7759_state *chip, device_t *device)
 	device->save_item(NAME(chip->sample));
 
 	device->save_item(NAME(chip->romoffset));
-	device->machine->state().register_postload(upd7759_postload, chip);
+	device->machine().state().register_postload(upd7759_postload, chip);
 }
 
 
@@ -641,7 +641,7 @@ static DEVICE_START( upd7759 )
 	chip->device = device;
 
 	/* allocate a stream channel */
-	chip->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->clock()/4, chip, upd7759_update);
+	chip->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->clock()/4, chip, upd7759_update);
 
 	/* compute the stepping rate based on the chip's clock speed */
 	chip->step = 4 * FRAC_ONE;
@@ -655,7 +655,7 @@ static DEVICE_START( upd7759 )
 	/* compute the ROM base or allocate a timer */
 	chip->rom = chip->rombase = *device->region();
 	if (chip->rom == NULL)
-		chip->timer = device->machine->scheduler().timer_alloc(FUNC(upd7759_slave_update), chip);
+		chip->timer = device->machine().scheduler().timer_alloc(FUNC(upd7759_slave_update), chip);
 
 	/* set the DRQ callback */
 	chip->drqcallback = intf->drqcallback;

@@ -15,7 +15,7 @@
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	gaiden_state *state = machine->driver_data<gaiden_state>();
+	gaiden_state *state = machine.driver_data<gaiden_state>();
 	UINT16 *videoram1 = &state->videoram3[0x0800];
 	UINT16 *videoram2 = state->videoram3;
 	SET_TILE_INFO(
@@ -27,7 +27,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	gaiden_state *state = machine->driver_data<gaiden_state>();
+	gaiden_state *state = machine.driver_data<gaiden_state>();
 	UINT16 *videoram1 = &state->videoram2[0x0800];
 	UINT16 *videoram2 = state->videoram2;
 	SET_TILE_INFO(
@@ -39,7 +39,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info_raiga )
 {
-	gaiden_state *state = machine->driver_data<gaiden_state>();
+	gaiden_state *state = machine.driver_data<gaiden_state>();
 	UINT16 *videoram1 = &state->videoram2[0x0800];
 	UINT16 *videoram2 = state->videoram2;
 
@@ -55,7 +55,7 @@ static TILE_GET_INFO( get_fg_tile_info_raiga )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	gaiden_state *state = machine->driver_data<gaiden_state>();
+	gaiden_state *state = machine.driver_data<gaiden_state>();
 	UINT16 *videoram1 = &state->videoram[0x0400];
 	UINT16 *videoram2 = state->videoram;
 	SET_TILE_INFO(
@@ -74,9 +74,9 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( gaiden )
 {
-	gaiden_state *state = machine->driver_data<gaiden_state>();
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	gaiden_state *state = machine.driver_data<gaiden_state>();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	/* set up tile layers */
 	state->tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
@@ -105,9 +105,9 @@ VIDEO_START( gaiden )
 VIDEO_START( mastninj )
 {
 
-	gaiden_state *state = machine->driver_data<gaiden_state>();
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	gaiden_state *state = machine.driver_data<gaiden_state>();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	/* set up tile layers */
 	state->tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
@@ -130,9 +130,9 @@ VIDEO_START( mastninj )
 
 VIDEO_START( raiga )
 {
-	gaiden_state *state = machine->driver_data<gaiden_state>();
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	gaiden_state *state = machine.driver_data<gaiden_state>();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	/* set up tile layers */
 	state->tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
@@ -152,7 +152,7 @@ VIDEO_START( raiga )
 
 VIDEO_START( drgnbowl )
 {
-	gaiden_state *state = machine->driver_data<gaiden_state>();
+	gaiden_state *state = machine.driver_data<gaiden_state>();
 	/* set up tile layers */
 	state->background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
 	state->foreground = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
@@ -176,54 +176,54 @@ VIDEO_START( drgnbowl )
 WRITE16_HANDLER( gaiden_flip_w )
 {
 	if (ACCESSING_BITS_0_7)
-		flip_screen_set(space->machine, data & 1);
+		flip_screen_set(space->machine(), data & 1);
 }
 
 WRITE16_HANDLER( gaiden_txscrollx_w )
 {
-	gaiden_state *state = space->machine->driver_data<gaiden_state>();
+	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->tx_scroll_x);
 	tilemap_set_scrollx(state->text_layer, 0, state->tx_scroll_x);
 }
 
 WRITE16_HANDLER( gaiden_txscrolly_w )
 {
-	gaiden_state *state = space->machine->driver_data<gaiden_state>();
+	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->tx_scroll_y);
 	tilemap_set_scrolly(state->text_layer, 0, (state->tx_scroll_y - state->tx_offset_y) & 0xffff);
 }
 
 WRITE16_HANDLER( gaiden_fgscrollx_w )
 {
-	gaiden_state *state = space->machine->driver_data<gaiden_state>();
+	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->fg_scroll_x);
 	tilemap_set_scrollx(state->foreground, 0, state->fg_scroll_x);
 }
 
 WRITE16_HANDLER( gaiden_fgscrolly_w )
 {
-	gaiden_state *state = space->machine->driver_data<gaiden_state>();
+	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->fg_scroll_y);
 	tilemap_set_scrolly(state->foreground, 0, (state->fg_scroll_y - state->fg_offset_y) & 0xffff);
 }
 
 WRITE16_HANDLER( gaiden_bgscrollx_w )
 {
-	gaiden_state *state = space->machine->driver_data<gaiden_state>();
+	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->bg_scroll_x);
 	tilemap_set_scrollx(state->background, 0, state->bg_scroll_x);
 }
 
 WRITE16_HANDLER( gaiden_bgscrolly_w )
 {
-	gaiden_state *state = space->machine->driver_data<gaiden_state>();
+	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->bg_scroll_y);
 	tilemap_set_scrolly(state->background, 0, (state->bg_scroll_y - state->bg_offset_y) & 0xffff);
 }
 
 WRITE16_HANDLER( gaiden_txoffsety_w )
 {
-	gaiden_state *state = space->machine->driver_data<gaiden_state>();
+	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_0_7) {
 		state->tx_offset_y = data;
@@ -233,7 +233,7 @@ WRITE16_HANDLER( gaiden_txoffsety_w )
 
 WRITE16_HANDLER( gaiden_fgoffsety_w )
 {
-	gaiden_state *state = space->machine->driver_data<gaiden_state>();
+	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_0_7) {
 		state->fg_offset_y = data;
@@ -243,7 +243,7 @@ WRITE16_HANDLER( gaiden_fgoffsety_w )
 
 WRITE16_HANDLER( gaiden_bgoffsety_w )
 {
-	gaiden_state *state = space->machine->driver_data<gaiden_state>();
+	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_0_7) {
 		state->bg_offset_y = data;
@@ -253,7 +253,7 @@ WRITE16_HANDLER( gaiden_bgoffsety_w )
 
 WRITE16_HANDLER( gaiden_sproffsety_w )
 {
-	gaiden_state *state = space->machine->driver_data<gaiden_state>();
+	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_0_7) {
 		state->spr_offset_y = data;
@@ -264,33 +264,33 @@ WRITE16_HANDLER( gaiden_sproffsety_w )
 
 WRITE16_HANDLER( gaiden_videoram3_w )
 {
-	gaiden_state *state = space->machine->driver_data<gaiden_state>();
+	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->videoram3[offset]);
 	tilemap_mark_tile_dirty(state->background, offset & 0x07ff);
 }
 
 READ16_HANDLER( gaiden_videoram3_r )
 {
-	gaiden_state *state = space->machine->driver_data<gaiden_state>();
+	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	return state->videoram3[offset];
 }
 
 WRITE16_HANDLER( gaiden_videoram2_w )
 {
-	gaiden_state *state = space->machine->driver_data<gaiden_state>();
+	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->videoram2[offset]);
 	tilemap_mark_tile_dirty(state->foreground, offset & 0x07ff);
 }
 
 READ16_HANDLER( gaiden_videoram2_r )
 {
-	gaiden_state *state = space->machine->driver_data<gaiden_state>();
+	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	return state->videoram2[offset];
 }
 
 WRITE16_HANDLER( gaiden_videoram_w )
 {
-	gaiden_state *state = space->machine->driver_data<gaiden_state>();
+	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->videoram[offset]);
 	tilemap_mark_tile_dirty(state->text_layer, offset & 0x03ff);
 }
@@ -309,12 +309,12 @@ WRITE16_HANDLER( gaiden_videoram_w )
    to blend into the final 32-bit rgb bitmaps, this is currently broken (due to zsolt's core
    changes?) it appears that the sprite drawing is no longer putting the correct raw data
    in the bitmaps? */
-static void blendbitmaps(running_machine *machine,
+static void blendbitmaps(running_machine &machine,
 		bitmap_t *dest,bitmap_t *src1,bitmap_t *src2,bitmap_t *src3,
 		int sx,int sy,const rectangle *cliprect)
 {
 	int y,x;
-	const pen_t *paldata = machine->pens;
+	const pen_t *paldata = machine.pens;
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
@@ -367,7 +367,7 @@ static void blendbitmaps(running_machine *machine,
 
 #define NUM_SPRITES 256
 
-static void gaiden_draw_sprites( running_machine *machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle *cliprect )
+static void gaiden_draw_sprites( running_machine &machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle *cliprect )
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -381,8 +381,8 @@ static void gaiden_draw_sprites( running_machine *machine, bitmap_t *bitmap_bg, 
 		{42,43,46,47,58,59,62,63}
 	};
 
-	gaiden_state *state = machine->driver_data<gaiden_state>();
-	const gfx_element *gfx = machine->gfx[3];
+	gaiden_state *state = machine.driver_data<gaiden_state>();
+	const gfx_element *gfx = machine.gfx[3];
 	const UINT16 *source = (NUM_SPRITES - 1) * 8 + state->spriteram;
 	int count = NUM_SPRITES;
 
@@ -459,7 +459,7 @@ static void gaiden_draw_sprites( running_machine *machine, bitmap_t *bitmap_bg, 
 							gfx->color_base + color * gfx->color_granularity,
 							flipx, flipy,
 							sx, sy,
-							machine->priority_bitmap, priority_mask, 0);
+							machine.priority_bitmap, priority_mask, 0);
 					}
 				}
 			}
@@ -479,7 +479,7 @@ static void gaiden_draw_sprites( running_machine *machine, bitmap_t *bitmap_bg, 
 							gfx->color_base + color * gfx->color_granularity,
 							flipx, flipy,
 							sx, sy,
-							machine->priority_bitmap, priority_mask, 0);
+							machine.priority_bitmap, priority_mask, 0);
 					}
 				}
 			}
@@ -489,7 +489,7 @@ static void gaiden_draw_sprites( running_machine *machine, bitmap_t *bitmap_bg, 
 }
 
 
-static void raiga_draw_sprites( running_machine *machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle *cliprect )
+static void raiga_draw_sprites( running_machine &machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle *cliprect )
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -503,8 +503,8 @@ static void raiga_draw_sprites( running_machine *machine, bitmap_t *bitmap_bg, b
 		{42,43,46,47,58,59,62,63}
 	};
 
-	gaiden_state *state = machine->driver_data<gaiden_state>();
-	const gfx_element *gfx = machine->gfx[3];
+	gaiden_state *state = machine.driver_data<gaiden_state>();
+	const gfx_element *gfx = machine.gfx[3];
 	const UINT16 *source = (NUM_SPRITES - 1) * 8 + state->spriteram;
 	int count = NUM_SPRITES;
 
@@ -580,7 +580,7 @@ static void raiga_draw_sprites( running_machine *machine, bitmap_t *bitmap_bg, b
 							gfx->color_base + color * gfx->color_granularity,
 							flipx, flipy,
 							sx, sy,
-							machine->priority_bitmap, priority_mask, 0);
+							machine.priority_bitmap, priority_mask, 0);
 					}
 				}
 			}
@@ -600,7 +600,7 @@ static void raiga_draw_sprites( running_machine *machine, bitmap_t *bitmap_bg, b
 							gfx->color_base + color * gfx->color_granularity,
 							flipx, flipy,
 							sx, sy,
-							machine->priority_bitmap, priority_mask, 0);
+							machine.priority_bitmap, priority_mask, 0);
 					}
 				}
 			}
@@ -629,9 +629,9 @@ static void raiga_draw_sprites( running_machine *machine, bitmap_t *bitmap_bg, b
  *         |---------x------- | x position (high bit)
  */
 
-static void drgnbowl_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void drgnbowl_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	gaiden_state *state = machine->driver_data<gaiden_state>();
+	gaiden_state *state = machine.driver_data<gaiden_state>();
 	UINT16 *spriteram = state->spriteram;
 	int i, code, color, x, y, flipx, flipy, priority_mask;
 
@@ -654,26 +654,26 @@ static void drgnbowl_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		else
 			priority_mask = 0;
 
-		pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[3],
+		pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[3],
 				code,
-				machine->gfx[3]->color_base + color * machine->gfx[3]->color_granularity,
+				machine.gfx[3]->color_base + color * machine.gfx[3]->color_granularity,
 				flipx,flipy,x,y,
-				machine->priority_bitmap, priority_mask,15);
+				machine.priority_bitmap, priority_mask,15);
 
 		/* wrap x*/
-		pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[3],
+		pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[3],
 				code,
-				machine->gfx[3]->color_base + color * machine->gfx[3]->color_granularity,
+				machine.gfx[3]->color_base + color * machine.gfx[3]->color_granularity,
 				flipx,flipy,x-512,y,
-				machine->priority_bitmap, priority_mask,15);
+				machine.priority_bitmap, priority_mask,15);
 
 	}
 }
 
 SCREEN_UPDATE( gaiden )
 {
-	gaiden_state *state = screen->machine->driver_data<gaiden_state>();
-	bitmap_fill(screen->machine->priority_bitmap,    cliprect, 0);
+	gaiden_state *state = screen->machine().driver_data<gaiden_state>();
+	bitmap_fill(screen->machine().priority_bitmap,    cliprect, 0);
 
 	bitmap_fill(state->tile_bitmap_bg, cliprect, 0x200);
 	bitmap_fill(state->tile_bitmap_fg, cliprect, 0);
@@ -688,18 +688,18 @@ SCREEN_UPDATE( gaiden )
 	tilemap_draw(state->tile_bitmap_fg, cliprect, state->text_layer, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	gaiden_draw_sprites(screen->machine, state->tile_bitmap_bg, state->tile_bitmap_fg, state->sprite_bitmap, cliprect);
+	gaiden_draw_sprites(screen->machine(), state->tile_bitmap_bg, state->tile_bitmap_fg, state->sprite_bitmap, cliprect);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(screen->machine, bitmap, state->tile_bitmap_bg, state->tile_bitmap_fg, state->sprite_bitmap, 0, 0, cliprect);
+	blendbitmaps(screen->machine(), bitmap, state->tile_bitmap_bg, state->tile_bitmap_fg, state->sprite_bitmap, 0, 0, cliprect);
 	return 0;
 
 }
 
 SCREEN_UPDATE( raiga )
 {
-	gaiden_state *state = screen->machine->driver_data<gaiden_state>();
-	bitmap_fill(screen->machine->priority_bitmap,    cliprect, 0);
+	gaiden_state *state = screen->machine().driver_data<gaiden_state>();
+	bitmap_fill(screen->machine().priority_bitmap,    cliprect, 0);
 
 	bitmap_fill(state->tile_bitmap_bg, cliprect, 0x200);
 	bitmap_fill(state->tile_bitmap_fg, cliprect, 0);
@@ -714,21 +714,21 @@ SCREEN_UPDATE( raiga )
 	tilemap_draw(state->tile_bitmap_fg, cliprect, state->text_layer, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	raiga_draw_sprites(screen->machine, state->tile_bitmap_bg, state->tile_bitmap_fg, state->sprite_bitmap, cliprect);
+	raiga_draw_sprites(screen->machine(), state->tile_bitmap_bg, state->tile_bitmap_fg, state->sprite_bitmap, cliprect);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(screen->machine, bitmap, state->tile_bitmap_bg, state->tile_bitmap_fg, state->sprite_bitmap, 0, 0, cliprect);
+	blendbitmaps(screen->machine(), bitmap, state->tile_bitmap_bg, state->tile_bitmap_fg, state->sprite_bitmap, 0, 0, cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( drgnbowl )
 {
-	gaiden_state *state = screen->machine->driver_data<gaiden_state>();
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	gaiden_state *state = screen->machine().driver_data<gaiden_state>();
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, state->background, 0, 1);
 	tilemap_draw(bitmap, cliprect, state->foreground, 0, 2);
 	tilemap_draw(bitmap, cliprect, state->text_layer, 0, 4);
-	drgnbowl_draw_sprites(screen->machine, bitmap, cliprect);
+	drgnbowl_draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

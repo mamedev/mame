@@ -10,7 +10,7 @@
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	wc90b_state *state = machine->driver_data<wc90b_state>();
+	wc90b_state *state = machine.driver_data<wc90b_state>();
 	int attr = state->bgvideoram[tile_index];
 	int tile = state->bgvideoram[tile_index + 0x800];
 	SET_TILE_INFO(
@@ -22,7 +22,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	wc90b_state *state = machine->driver_data<wc90b_state>();
+	wc90b_state *state = machine.driver_data<wc90b_state>();
 	int attr = state->fgvideoram[tile_index];
 	int tile = state->fgvideoram[tile_index + 0x800];
 	SET_TILE_INFO(
@@ -34,7 +34,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	wc90b_state *state = machine->driver_data<wc90b_state>();
+	wc90b_state *state = machine.driver_data<wc90b_state>();
 	SET_TILE_INFO(
 			0,
 			state->txvideoram[tile_index + 0x800] + ((state->txvideoram[tile_index] & 0x07) << 8),
@@ -52,7 +52,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( wc90b )
 {
-	wc90b_state *state = machine->driver_data<wc90b_state>();
+	wc90b_state *state = machine.driver_data<wc90b_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,     16,16,64,32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,16,16,64,32);
 	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows, 8, 8,64,32);
@@ -71,21 +71,21 @@ VIDEO_START( wc90b )
 
 WRITE8_HANDLER( wc90b_bgvideoram_w )
 {
-	wc90b_state *state = space->machine->driver_data<wc90b_state>();
+	wc90b_state *state = space->machine().driver_data<wc90b_state>();
 	state->bgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x7ff);
 }
 
 WRITE8_HANDLER( wc90b_fgvideoram_w )
 {
-	wc90b_state *state = space->machine->driver_data<wc90b_state>();
+	wc90b_state *state = space->machine().driver_data<wc90b_state>();
 	state->fgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset & 0x7ff);
 }
 
 WRITE8_HANDLER( wc90b_txvideoram_w )
 {
-	wc90b_state *state = space->machine->driver_data<wc90b_state>();
+	wc90b_state *state = space->machine().driver_data<wc90b_state>();
 	state->txvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tx_tilemap,offset & 0x7ff);
 }
@@ -98,9 +98,9 @@ WRITE8_HANDLER( wc90b_txvideoram_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	wc90b_state *state = machine->driver_data<wc90b_state>();
+	wc90b_state *state = machine.driver_data<wc90b_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs, sx, sy;
 
@@ -122,7 +122,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			sy = 240 - spriteram[offs + 1];
 
-			drawgfx_transpen( bitmap, cliprect,machine->gfx[17], code,
+			drawgfx_transpen( bitmap, cliprect,machine.gfx[17], code,
 					flags >> 4, /* color */
 					bank & 1,   /* flipx */
 					bank & 2,   /* flipy */
@@ -134,7 +134,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( wc90b )
 {
-	wc90b_state *state = screen->machine->driver_data<wc90b_state>();
+	wc90b_state *state = screen->machine().driver_data<wc90b_state>();
 	tilemap_set_scrollx(state->bg_tilemap,0,8 * (state->scroll2x[0] & 0x7f) + 256 - 4 + (state->scroll_x_lo[0] & 0x07));
 	tilemap_set_scrolly(state->bg_tilemap,0,state->scroll2y[0] + 1 + ((state->scroll2x[0] & 0x80) ? 256 : 0));
 	tilemap_set_scrollx(state->fg_tilemap,0,8 * (state->scroll1x[0] & 0x7f) + 256 - 6 + ((state->scroll_x_lo[0] & 0x38) >> 3));
@@ -142,8 +142,8 @@ SCREEN_UPDATE( wc90b )
 
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect, 1 );
+	draw_sprites(screen->machine(), bitmap,cliprect, 1 );
 	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect, 0 );
+	draw_sprites(screen->machine(), bitmap,cliprect, 0 );
 	return 0;
 }

@@ -70,12 +70,12 @@ static const int zoomy_conv_table[] =
   Screen refresh
 ***************************************************************************/
 
-static void syvalion_draw_sprites( running_machine *machine,bitmap_t *bitmap, const rectangle *cliprect )
+static void syvalion_draw_sprites( running_machine &machine,bitmap_t *bitmap, const rectangle *cliprect )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
 
-	taitoh_state *state = machine->driver_data<taitoh_state>();
+	taitoh_state *state = machine.driver_data<taitoh_state>();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, ex, zx;
 	int ysize;
@@ -146,7 +146,7 @@ static void syvalion_draw_sprites( running_machine *machine,bitmap_t *bitmap, co
 						}
 
 						drawgfxzoom_transpen( bitmap, cliprect,
-								 machine -> gfx[0],
+								 machine.gfx[0],
 								 tile,
 								 color,
 								 flipx, flipy,
@@ -163,12 +163,12 @@ static void syvalion_draw_sprites( running_machine *machine,bitmap_t *bitmap, co
 	}
 }
 
-static void recordbr_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void recordbr_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
 
-	taitoh_state *state = machine->driver_data<taitoh_state>();
+	taitoh_state *state = machine.driver_data<taitoh_state>();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
 	int ysize;
@@ -258,7 +258,7 @@ static void recordbr_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 						}
 
 						drawgfxzoom_transpen( bitmap, cliprect,
-								 machine -> gfx[0],
+								 machine.gfx[0],
 								 tile,
 								 color,
 								 flipx, flipy,
@@ -275,12 +275,12 @@ static void recordbr_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	}
 }
 
-static void dleague_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void dleague_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
 
-	taitoh_state *state = machine->driver_data<taitoh_state>();
+	taitoh_state *state = machine.driver_data<taitoh_state>();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, ex, zx;
 	int ysize;
@@ -360,7 +360,7 @@ static void dleague_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 							}
 
 							drawgfxzoom_transpen( bitmap, cliprect,
-									 machine -> gfx[0],
+									 machine.gfx[0],
 									 tile,
 									 color,
 									 flipx, flipy,
@@ -380,7 +380,7 @@ static void dleague_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 
 
 
-static void taitoh_log_vram(running_machine *machine)
+static void taitoh_log_vram(running_machine &machine)
 {
 #ifdef MAME_DEBUG
 	// null function: the necessary pointers are now internal to taitoic.c
@@ -393,17 +393,17 @@ static void taitoh_log_vram(running_machine *machine)
 
 SCREEN_UPDATE( syvalion )
 {
-	taitoh_state *state = screen->machine->driver_data<taitoh_state>();
+	taitoh_state *state = screen->machine().driver_data<taitoh_state>();
 
 	tc0080vco_tilemap_update(state->tc0080vco);
 
-	taitoh_log_vram(screen->machine);
+	taitoh_log_vram(screen->machine());
 
 	bitmap_fill(bitmap, cliprect, 0);
 
 	tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 1, 0, 0);
-	syvalion_draw_sprites(screen->machine, bitmap,cliprect);
+	syvalion_draw_sprites(screen->machine(), bitmap,cliprect);
 	tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 2, 0, 0);
 
 	return 0;
@@ -412,28 +412,28 @@ SCREEN_UPDATE( syvalion )
 
 SCREEN_UPDATE( recordbr )
 {
-	taitoh_state *state = screen->machine->driver_data<taitoh_state>();
+	taitoh_state *state = screen->machine().driver_data<taitoh_state>();
 
 	tc0080vco_tilemap_update(state->tc0080vco);
 
-	taitoh_log_vram(screen->machine);
+	taitoh_log_vram(screen->machine());
 
 	bitmap_fill(bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
-	if (!input_code_pressed(screen->machine, KEYCODE_A))
+	if (!input_code_pressed(screen->machine(), KEYCODE_A))
 		tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
-	if (!input_code_pressed(screen->machine, KEYCODE_S))
-		recordbr_draw_sprites(screen->machine, bitmap, cliprect, 0);
-	if (!input_code_pressed(screen->machine, KEYCODE_D))
+	if (!input_code_pressed(screen->machine(), KEYCODE_S))
+		recordbr_draw_sprites(screen->machine(), bitmap, cliprect, 0);
+	if (!input_code_pressed(screen->machine(), KEYCODE_D))
 		tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 1, 0, 0);
-	if (!input_code_pressed(screen->machine, KEYCODE_F))
-		recordbr_draw_sprites(screen->machine, bitmap, cliprect, 1);
+	if (!input_code_pressed(screen->machine(), KEYCODE_F))
+		recordbr_draw_sprites(screen->machine(), bitmap, cliprect, 1);
 #else
 	tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
-	recordbr_draw_sprites(screen->machine, bitmap, cliprect, 0);
+	recordbr_draw_sprites(screen->machine(), bitmap, cliprect, 0);
 	tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 1, 0, 0);
-	recordbr_draw_sprites(screen->machine, bitmap, cliprect, 1);
+	recordbr_draw_sprites(screen->machine(), bitmap, cliprect, 1);
 #endif
 
 	tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 2, 0, 0);
@@ -443,28 +443,28 @@ SCREEN_UPDATE( recordbr )
 
 SCREEN_UPDATE( dleague )
 {
-	taitoh_state *state = screen->machine->driver_data<taitoh_state>();
+	taitoh_state *state = screen->machine().driver_data<taitoh_state>();
 
 	tc0080vco_tilemap_update(state->tc0080vco);
 
-	taitoh_log_vram(screen->machine);
+	taitoh_log_vram(screen->machine());
 
 	bitmap_fill(bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
-	if (!input_code_pressed(screen->machine, KEYCODE_A))
+	if (!input_code_pressed(screen->machine(), KEYCODE_A))
 		tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
-	if (!input_code_pressed(screen->machine, KEYCODE_S))
-		dleague_draw_sprites(screen->machine, bitmap, cliprect, 0);
-	if (!input_code_pressed(screen->machine, KEYCODE_D))
+	if (!input_code_pressed(screen->machine(), KEYCODE_S))
+		dleague_draw_sprites(screen->machine(), bitmap, cliprect, 0);
+	if (!input_code_pressed(screen->machine(), KEYCODE_D))
 		tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 1, 0, 0);
-	if (!input_code_pressed(screen->machine, KEYCODE_F))
-		dleague_draw_sprites(screen->machine, bitmap, cliprect, 1);
+	if (!input_code_pressed(screen->machine(), KEYCODE_F))
+		dleague_draw_sprites(screen->machine(), bitmap, cliprect, 1);
 #else
 	tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
-	dleague_draw_sprites (screen->machine, bitmap, cliprect, 0);
+	dleague_draw_sprites (screen->machine(), bitmap, cliprect, 0);
 	tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 1, 0, 0);
-	dleague_draw_sprites (screen->machine, bitmap, cliprect, 1);
+	dleague_draw_sprites (screen->machine(), bitmap, cliprect, 1);
 #endif
 
 	tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 2, 0, 0);

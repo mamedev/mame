@@ -57,7 +57,7 @@ SCREEN_UPDATE( sheriff );
 SCREEN_UPDATE( helifire );
 SCREEN_EOF( helifire );
 
-void spacefev_start_red_cannon(running_machine *machine);
+void spacefev_start_red_cannon(running_machine &machine);
 
 /*----------- defined in audio/n8080.c -----------*/
 

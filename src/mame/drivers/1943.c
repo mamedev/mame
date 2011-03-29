@@ -248,7 +248,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( 1943 )
 {
-	_1943_state *state = machine->driver_data<_1943_state>();
+	_1943_state *state = machine.driver_data<_1943_state>();
 
 	state->char_on = 0;
 	state->obj_on = 0;
@@ -589,7 +589,7 @@ ROM_END
 
 static DRIVER_INIT( 1943 )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 29, &ROM[0x10000], 0x1000);
 	memory_configure_bank(machine, "bank2", 0, 29, &ROM[0x11000], 0x1000);
 	memory_configure_bank(machine, "bank3", 0, 29, &ROM[0x12000], 0x1000);
@@ -603,7 +603,7 @@ static DRIVER_INIT( 1943b )
 	DRIVER_INIT_CALL( 1943 );
 	//it expects 0x00 to be returned from the protection reads because the protection has been patched out.
 	//AM_RANGE(0xc007, 0xc007) AM_READ(c1943_protection_r)
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc007, 0xc007, FUNC(_1943b_c007_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc007, 0xc007, FUNC(_1943b_c007_r));
 
 }
 

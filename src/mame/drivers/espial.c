@@ -43,28 +43,28 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 static TIMER_CALLBACK( interrupt_disable )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	espial_state *state = machine.driver_data<espial_state>();
 	//interrupt_enable = 0;
 	cpu_interrupt_enable(state->maincpu, 0);
 }
 
 static MACHINE_RESET( espial )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	espial_state *state = machine.driver_data<espial_state>();
 
 	state->flipscreen = 0;
 
 	/* we must start with NMI interrupts disabled */
-	machine->scheduler().synchronize(FUNC(interrupt_disable));
+	machine.scheduler().synchronize(FUNC(interrupt_disable));
 	state->sound_nmi_enabled = FALSE;
 }
 
 static MACHINE_START( espial )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	espial_state *state = machine.driver_data<espial_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	//state_save_register_global_array(machine, mcu_out[1]);
 	state->save_item(NAME(state->sound_nmi_enabled));
@@ -79,14 +79,14 @@ static WRITE8_HANDLER( espial_master_interrupt_enable_w )
 
 WRITE8_HANDLER( espial_sound_nmi_enable_w )
 {
-	espial_state *state = space->machine->driver_data<espial_state>();
+	espial_state *state = space->machine().driver_data<espial_state>();
 	state->sound_nmi_enabled = data & 1;
 }
 
 
 INTERRUPT_GEN( espial_sound_nmi_gen )
 {
-	espial_state *state = device->machine->driver_data<espial_state>();
+	espial_state *state = device->machine().driver_data<espial_state>();
 
 	if (state->sound_nmi_enabled)
 		nmi_line_pulse(device);
@@ -104,7 +104,7 @@ static INTERRUPT_GEN( espial_master_interrupt )
 
 static WRITE8_HANDLER( espial_master_soundlatch_w )
 {
-	espial_state *state = space->machine->driver_data<espial_state>();
+	espial_state *state = space->machine().driver_data<espial_state>();
 	soundlatch_w(space, offset, data);
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }

@@ -31,5 +31,5 @@ WRITE8_HANDLER( rockrage_vreg_w );
 SCREEN_UPDATE( rockrage );
 PALETTE_INIT( rockrage );
 
-void rockrage_tile_callback(running_machine *machine, int layer, int bank, int *code, int *color, int *flags);
-void rockrage_sprite_callback(running_machine *machine, int *code, int *color);
+void rockrage_tile_callback(running_machine &machine, int layer, int bank, int *code, int *color, int *flags);
+void rockrage_sprite_callback(running_machine &machine, int *code, int *color);

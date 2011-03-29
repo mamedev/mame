@@ -20,7 +20,7 @@ PALETTE_INIT( vulgus )
 {
 	int i;
 
-	machine->colortable = colortable_alloc(machine, 256);
+	machine.colortable = colortable_alloc(machine, 256);
 
 	for (i = 0;i < 256;i++)
 	{
@@ -42,7 +42,7 @@ PALETTE_INIT( vulgus )
 		bit3 = (color_prom[2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine.colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -51,20 +51,20 @@ PALETTE_INIT( vulgus )
 
 
 	/* characters use colors 32-47 (?) */
-	for (i = 0;i < machine->gfx[0]->total_colors * machine->gfx[0]->color_granularity;i++)
-		colortable_entry_set_value(machine->colortable, machine->gfx[0]->color_base + i, 32 + *color_prom++);
+	for (i = 0;i < machine.gfx[0]->total_colors * machine.gfx[0]->color_granularity;i++)
+		colortable_entry_set_value(machine.colortable, machine.gfx[0]->color_base + i, 32 + *color_prom++);
 
 	/* sprites use colors 16-31 */
-	for (i = 0;i < machine->gfx[2]->total_colors * machine->gfx[2]->color_granularity;i++)
-		colortable_entry_set_value(machine->colortable, machine->gfx[2]->color_base + i, 16 + *color_prom++);
+	for (i = 0;i < machine.gfx[2]->total_colors * machine.gfx[2]->color_granularity;i++)
+		colortable_entry_set_value(machine.colortable, machine.gfx[2]->color_base + i, 16 + *color_prom++);
 
 	/* background tiles use colors 0-15, 64-79, 128-143, 192-207 in four banks */
-	for (i = 0;i < machine->gfx[1]->total_colors * machine->gfx[1]->color_granularity / 4;i++)
+	for (i = 0;i < machine.gfx[1]->total_colors * machine.gfx[1]->color_granularity / 4;i++)
 	{
-		colortable_entry_set_value(machine->colortable, machine->gfx[1]->color_base + 0*32*8 + i, *color_prom);
-		colortable_entry_set_value(machine->colortable, machine->gfx[1]->color_base + 1*32*8 + i, *color_prom + 64);
-		colortable_entry_set_value(machine->colortable, machine->gfx[1]->color_base + 2*32*8 + i, *color_prom + 128);
-		colortable_entry_set_value(machine->colortable, machine->gfx[1]->color_base + 3*32*8 + i, *color_prom + 192);
+		colortable_entry_set_value(machine.colortable, machine.gfx[1]->color_base + 0*32*8 + i, *color_prom);
+		colortable_entry_set_value(machine.colortable, machine.gfx[1]->color_base + 1*32*8 + i, *color_prom + 64);
+		colortable_entry_set_value(machine.colortable, machine.gfx[1]->color_base + 2*32*8 + i, *color_prom + 128);
+		colortable_entry_set_value(machine.colortable, machine.gfx[1]->color_base + 3*32*8 + i, *color_prom + 192);
 		color_prom++;
 	}
 }
@@ -78,7 +78,7 @@ PALETTE_INIT( vulgus )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	vulgus_state *state = machine->driver_data<vulgus_state>();
+	vulgus_state *state = machine.driver_data<vulgus_state>();
 	int code, color;
 
 	code = state->fgvideoram[tile_index];
@@ -93,7 +93,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	vulgus_state *state = machine->driver_data<vulgus_state>();
+	vulgus_state *state = machine.driver_data<vulgus_state>();
 	int code, color;
 
 	code = state->bgvideoram[tile_index];
@@ -114,11 +114,11 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( vulgus )
 {
-	vulgus_state *state = machine->driver_data<vulgus_state>();
+	vulgus_state *state = machine.driver_data<vulgus_state>();
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows, 8, 8,32,32);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,32,32);
 
-	colortable_configure_tilemap_groups(machine->colortable, state->fg_tilemap, machine->gfx[0], 47);
+	colortable_configure_tilemap_groups(machine.colortable, state->fg_tilemap, machine.gfx[0], 47);
 }
 
 
@@ -130,14 +130,14 @@ VIDEO_START( vulgus )
 
 WRITE8_HANDLER( vulgus_fgvideoram_w )
 {
-	vulgus_state *state = space->machine->driver_data<vulgus_state>();
+	vulgus_state *state = space->machine().driver_data<vulgus_state>();
 	state->fgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( vulgus_bgvideoram_w )
 {
-	vulgus_state *state = space->machine->driver_data<vulgus_state>();
+	vulgus_state *state = space->machine().driver_data<vulgus_state>();
 	state->bgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
 }
@@ -146,17 +146,17 @@ WRITE8_HANDLER( vulgus_bgvideoram_w )
 WRITE8_HANDLER( vulgus_c804_w )
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(space->machine, 0, data & 0x01);
-	coin_counter_w(space->machine, 1, data & 0x02);
+	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(space->machine(), 1, data & 0x02);
 
 	/* bit 7 flips screen */
-	flip_screen_set(space->machine, data & 0x80);
+	flip_screen_set(space->machine(), data & 0x80);
 }
 
 
 WRITE8_HANDLER( vulgus_palette_bank_w )
 {
-	vulgus_state *state = space->machine->driver_data<vulgus_state>();
+	vulgus_state *state = space->machine().driver_data<vulgus_state>();
 	if (state->palette_bank != (data & 3))
 	{
 		state->palette_bank = data & 3;
@@ -171,9 +171,9 @@ WRITE8_HANDLER( vulgus_palette_bank_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	vulgus_state *state = machine->driver_data<vulgus_state>();
+	vulgus_state *state = machine.driver_data<vulgus_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -200,14 +200,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		do
 		{
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 					code + i,
 					col,
 					flip_screen_get(machine),flip_screen_get(machine),
 					sx, sy + 16 * i * dir,15);
 
 			/* draw again with wraparound */
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 					code + i,
 					col,
 					flip_screen_get(machine),flip_screen_get(machine),
@@ -219,12 +219,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( vulgus )
 {
-	vulgus_state *state = screen->machine->driver_data<vulgus_state>();
+	vulgus_state *state = screen->machine().driver_data<vulgus_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll_low[1] + 256 * state->scroll_high[1]);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->scroll_low[0] + 256 * state->scroll_high[0]);
 
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect);
+	draw_sprites(screen->machine(), bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
 	return 0;
 }

@@ -8,7 +8,7 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
     ST-V status:
-    colmns97 & stress crash due to SCSP stream->machine getting corrupted.
+    colmns97 & stress crash due to SCSP stream->machine() getting corrupted.
 
     cottonbm w/US bios: run to 60323B4 on master, then MOV insn @ 602f5aa crashes?
     actually crash on slave @ 6032b38 after above.  reading wrong addr for jump vector.
@@ -683,7 +683,7 @@ static CPU_INIT( sh2 )
 	int regnum;
 
 	/* allocate enough space for the cache and the core */
-	cache = auto_alloc(device->machine, drc_cache(CACHE_SIZE + sizeof(sh2_state)));
+	cache = auto_alloc(device->machine(), drc_cache(CACHE_SIZE + sizeof(sh2_state)));
 
 	/* allocate the core memory */
 	*(sh2_state **)device->token() = sh2 = (sh2_state *)cache->alloc_near(sizeof(sh2_state));
@@ -705,7 +705,7 @@ static CPU_INIT( sh2 )
 		flags |= DRCUML_OPTION_LOG_UML;
 	if (LOG_NATIVE)
 		flags |= DRCUML_OPTION_LOG_NATIVE;
-	sh2->drcuml = auto_alloc(device->machine, drcuml_state(*device, *cache, flags, 1, 32, 1));
+	sh2->drcuml = auto_alloc(device->machine(), drcuml_state(*device, *cache, flags, 1, 32, 1));
 
 	/* add symbols for our stuff */
 	sh2->drcuml->symbol_add(&sh2->pc, sizeof(sh2->pc), "pc");
@@ -724,7 +724,7 @@ static CPU_INIT( sh2 )
 	sh2->drcuml->symbol_add(&sh2->mach, sizeof(sh2->macl), "mach");
 
 	/* initialize the front-end helper */
-	sh2->drcfe = auto_alloc(device->machine, sh2_frontend(*sh2, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
+	sh2->drcfe = auto_alloc(device->machine(), sh2_frontend(*sh2, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
 
 	/* compute the register parameters */
 	for (regnum = 0; regnum < 16; regnum++)
@@ -764,9 +764,9 @@ static CPU_EXIT( sh2 )
 	sh2_state *sh2 = get_safe_token(device);
 
 	/* clean up the DRC */
-	auto_free(device->machine, sh2->drcfe);
-	auto_free(device->machine, sh2->drcuml);
-	auto_free(device->machine, sh2->cache);
+	auto_free(device->machine(), sh2->drcfe);
+	auto_free(device->machine(), sh2->drcuml);
+	auto_free(device->machine(), sh2->cache);
 }
 
 
@@ -1577,7 +1577,7 @@ static void generate_sequence_instruction(sh2_state *sh2, drcuml_block *block, c
 	}
 
 	/* if we are debugging, call the debugger */
-	if ((sh2->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((sh2->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		UML_MOV(block, mem(&sh2->pc), desc->pc);								// mov     [pc],desc->pc
 		save_fast_iregs(sh2, block);

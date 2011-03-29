@@ -164,23 +164,23 @@ static MACHINE_RESET( taito_dualscreen );
                           SOUND
 ***********************************************************/
 
-static void reset_sound_region( running_machine *machine )
+static void reset_sound_region( running_machine &machine )
 {
-	warriorb_state *state = machine->driver_data<warriorb_state>();
+	warriorb_state *state = machine.driver_data<warriorb_state>();
 	memory_set_bank(machine, "bank10", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	warriorb_state *state = space->machine->driver_data<warriorb_state>();
+	warriorb_state *state = space->machine().driver_data<warriorb_state>();
 
 	state->banknum = data & 7;
-	reset_sound_region(space->machine);
+	reset_sound_region(space->machine());
 }
 
 static WRITE16_HANDLER( warriorb_sound_w )
 {
-	warriorb_state *state = space->machine->driver_data<warriorb_state>();
+	warriorb_state *state = space->machine().driver_data<warriorb_state>();
 
 	if (offset == 0)
 		tc0140syt_port_w(state->tc0140syt, 0, data & 0xff);
@@ -190,7 +190,7 @@ static WRITE16_HANDLER( warriorb_sound_w )
 
 static READ16_HANDLER( warriorb_sound_r )
 {
-	warriorb_state *state = space->machine->driver_data<warriorb_state>();
+	warriorb_state *state = space->machine().driver_data<warriorb_state>();
 
 	if (offset == 1)
 		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff));
@@ -201,7 +201,7 @@ static READ16_HANDLER( warriorb_sound_r )
 
 static WRITE8_HANDLER( warriorb_pancontrol )
 {
-	warriorb_state *state = space->machine->driver_data<warriorb_state>();
+	warriorb_state *state = space->machine().driver_data<warriorb_state>();
 	device_t *flt = NULL;
 	offset &= 3;
 
@@ -221,7 +221,7 @@ static WRITE8_HANDLER( warriorb_pancontrol )
 
 static WRITE16_HANDLER( tc0100scn_dual_screen_w )
 {
-	warriorb_state *state = space->machine->driver_data<warriorb_state>();
+	warriorb_state *state = space->machine().driver_data<warriorb_state>();
 
 	tc0100scn_word_w(state->tc0100scn_1, offset, data, mem_mask);
 	tc0100scn_word_w(state->tc0100scn_2, offset, data, mem_mask);
@@ -419,7 +419,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler( device_t *device, int irq )
 {
-	warriorb_state *state = device->machine->driver_data<warriorb_state>();
+	warriorb_state *state = device->machine().driver_data<warriorb_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -538,37 +538,37 @@ static STATE_POSTLOAD( warriorb_postload )
 
 static MACHINE_START( warriorb )
 {
-	warriorb_state *state = machine->driver_data<warriorb_state>();
+	warriorb_state *state = machine.driver_data<warriorb_state>();
 
-	memory_configure_bank(machine, "bank10", 0, 8, machine->region("audiocpu")->base() + 0xc000, 0x4000);
+	memory_configure_bank(machine, "bank10", 0, 8, machine.region("audiocpu")->base() + 0xc000, 0x4000);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->tc0140syt = machine->device("tc0140syt");
-	state->tc0100scn_1 = machine->device("tc0100scn_1");
-	state->tc0100scn_2 = machine->device("tc0100scn_2");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->tc0140syt = machine.device("tc0140syt");
+	state->tc0100scn_1 = machine.device("tc0100scn_1");
+	state->tc0100scn_2 = machine.device("tc0100scn_2");
 
-	state->lscreen = machine->device("lscreen");
-	state->rscreen = machine->device("rscreen");
+	state->lscreen = machine.device("lscreen");
+	state->rscreen = machine.device("rscreen");
 
-	state->_2610_1l = machine->device("2610.1.l");
-	state->_2610_1r = machine->device("2610.1.r");
-	state->_2610_2l = machine->device("2610.2.l");
-	state->_2610_2r = machine->device("2610.2.r");
+	state->_2610_1l = machine.device("2610.1.l");
+	state->_2610_1r = machine.device("2610.1.r");
+	state->_2610_2l = machine.device("2610.2.l");
+	state->_2610_2r = machine.device("2610.2.r");
 
 	state->save_item(NAME(state->banknum));
 	state->save_item(NAME(state->pandata));
-	machine->state().register_postload(warriorb_postload, NULL);
+	machine.state().register_postload(warriorb_postload, NULL);
 }
 
 static MACHINE_RESET( taito_dualscreen )
 {
-	warriorb_state *state = machine->driver_data<warriorb_state>();
+	warriorb_state *state = machine.driver_data<warriorb_state>();
 
 	state->banknum = 0;
 
 	/**** mixer control enable ****/
-	machine->sound().system_enable(true);	/* mixer enabled */
+	machine.sound().system_enable(true);	/* mixer enabled */
 }
 
 static MACHINE_CONFIG_START( darius2d, warriorb_state )

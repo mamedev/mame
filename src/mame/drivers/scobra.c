@@ -208,13 +208,13 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(scobra_soundram_r)
 {
-	scobra_state *state = space->machine->driver_data<scobra_state>();
+	scobra_state *state = space->machine().driver_data<scobra_state>();
 	return state->soundram[offset & 0x03ff];
 }
 
 static WRITE8_HANDLER(scobra_soundram_w)
 {
-	scobra_state *state = space->machine->driver_data<scobra_state>();
+	scobra_state *state = space->machine().driver_data<scobra_state>();
 	state->soundram[offset & 0x03ff] = data;
 }
 
@@ -264,7 +264,7 @@ ADDRESS_MAP_END
 static CUSTOM_INPUT( stratgyx_coinage_r )
 {
 	int bit_mask = (FPTR)param;
-	return (input_port_read(field->port->machine, "IN4") & bit_mask) ? 0x01 : 0x00;
+	return (input_port_read(field->port->machine(), "IN4") & bit_mask) ? 0x01 : 0x00;
 }
 
 

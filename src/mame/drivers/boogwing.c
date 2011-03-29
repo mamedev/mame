@@ -276,13 +276,13 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int state)
 {
-	boogwing_state *driver_state = device->machine->driver_data<boogwing_state>();
+	boogwing_state *driver_state = device->machine().driver_data<boogwing_state>();
 	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	boogwing_state *state = device->machine->driver_data<boogwing_state>();
+	boogwing_state *state = device->machine().driver_data<boogwing_state>();
 	state->oki2->set_bank_base(((data & 2) >> 1) * 0x40000);
 	state->oki1->set_bank_base((data & 1) * 0x40000);
 }
@@ -564,8 +564,8 @@ ROM_END
 
 static DRIVER_INIT( boogwing )
 {
-	const UINT8* src = machine->region("gfx6")->base();
-	UINT8* dst = machine->region("tiles2")->base() + 0x200000;
+	const UINT8* src = machine.region("gfx6")->base();
+	UINT8* dst = machine.region("tiles2")->base() + 0x200000;
 
 	deco56_decrypt_gfx(machine, "tiles1");
 	deco56_decrypt_gfx(machine, "tiles2");

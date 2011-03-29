@@ -4,12 +4,12 @@
 
 WRITE8_HANDLER( mexico86_bankswitch_w )
 {
-	mexico86_state *state = space->machine->driver_data<mexico86_state>();
+	mexico86_state *state = space->machine().driver_data<mexico86_state>();
 
 	if ((data & 7) > 5)
 		popmessage("Switching to invalid bank!");
 
-	memory_set_bank(space->machine, "bank1", data & 0x07);
+	memory_set_bank(space->machine(), "bank1", data & 0x07);
 
 	state->charbank = BIT(data, 5);
 }
@@ -18,7 +18,7 @@ WRITE8_HANDLER( mexico86_bankswitch_w )
 
 SCREEN_UPDATE( mexico86 )
 {
-	mexico86_state *state = screen->machine->driver_data<mexico86_state>();
+	mexico86_state *state = screen->machine().driver_data<mexico86_state>();
 	int offs;
 	int sx, sy, xc, yc;
 	int gfx_num, gfx_attr, gfx_offs;
@@ -88,7 +88,7 @@ SCREEN_UPDATE( mexico86 )
 				x = (sx + xc * 8) & 0xff;
 				y = (sy + yc * 8) & 0xff;
 
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
 						code,
 						color,
 						flipx,flipy,
@@ -101,7 +101,7 @@ SCREEN_UPDATE( mexico86 )
 
 SCREEN_UPDATE( kikikai )
 {
-	mexico86_state *state = screen->machine->driver_data<mexico86_state>();
+	mexico86_state *state = screen->machine().driver_data<mexico86_state>();
 	int offs;
 	int sx, sy, yc;
 	int gfx_num, /*gfx_attr,*/ gfx_offs;
@@ -109,7 +109,7 @@ SCREEN_UPDATE( kikikai )
 	int goffs, code, color, y;
 	int tx, ty;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	sx = 0;
 	for (offs = 0; offs < state->objectram_size; offs += 4)
 	{
@@ -147,7 +147,7 @@ SCREEN_UPDATE( kikikai )
 			color = (state->videoram[goffs + 1] & 0xe0) >> 5;
 			goffs += 0x40;
 
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
 					code,
 					color,
 					0,0,
@@ -156,7 +156,7 @@ SCREEN_UPDATE( kikikai )
 			code = state->videoram[goffs] + ((state->videoram[goffs + 1] & 0x1f) << 8);
 			color = (state->videoram[goffs + 1] & 0xe0) >> 5;
 
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
 					code,
 					color,
 					0,0,

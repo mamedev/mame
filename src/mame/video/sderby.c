@@ -5,7 +5,7 @@
 
 static TILE_GET_INFO( get_sderby_tile_info )
 {
-	sderby_state *state = machine->driver_data<sderby_state>();
+	sderby_state *state = machine.driver_data<sderby_state>();
 	int tileno,colour;
 
 	tileno = state->videoram[tile_index*2];
@@ -16,7 +16,7 @@ static TILE_GET_INFO( get_sderby_tile_info )
 
 WRITE16_HANDLER( sderby_videoram_w )
 {
-	sderby_state *state = space->machine->driver_data<sderby_state>();
+	sderby_state *state = space->machine().driver_data<sderby_state>();
 
 	COMBINE_DATA(&state->videoram[offset]);
 	tilemap_mark_tile_dirty(state->tilemap,offset/2);
@@ -26,7 +26,7 @@ WRITE16_HANDLER( sderby_videoram_w )
 
 static TILE_GET_INFO( get_sderby_md_tile_info )
 {
-	sderby_state *state = machine->driver_data<sderby_state>();
+	sderby_state *state = machine.driver_data<sderby_state>();
 	int tileno,colour;
 
 	tileno = state->md_videoram[tile_index*2];
@@ -37,7 +37,7 @@ static TILE_GET_INFO( get_sderby_md_tile_info )
 
 WRITE16_HANDLER( sderby_md_videoram_w )
 {
-	sderby_state *state = space->machine->driver_data<sderby_state>();
+	sderby_state *state = space->machine().driver_data<sderby_state>();
 
 	COMBINE_DATA(&state->md_videoram[offset]);
 	tilemap_mark_tile_dirty(state->md_tilemap,offset/2);
@@ -47,7 +47,7 @@ WRITE16_HANDLER( sderby_md_videoram_w )
 
 static TILE_GET_INFO( get_sderby_fg_tile_info )
 {
-	sderby_state *state = machine->driver_data<sderby_state>();
+	sderby_state *state = machine.driver_data<sderby_state>();
 	int tileno,colour;
 
 	tileno = state->fg_videoram[tile_index*2];
@@ -58,20 +58,20 @@ static TILE_GET_INFO( get_sderby_fg_tile_info )
 
 WRITE16_HANDLER( sderby_fg_videoram_w )
 {
-	sderby_state *state = space->machine->driver_data<sderby_state>();
+	sderby_state *state = space->machine().driver_data<sderby_state>();
 
 	COMBINE_DATA(&state->fg_videoram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset/2);
 }
 
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int codeshift)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int codeshift)
 {
-	sderby_state *state = machine->driver_data<sderby_state>();
+	sderby_state *state = machine.driver_data<sderby_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	int offs;
-	int height = machine->gfx[0]->height;
-	int colordiv = machine->gfx[0]->color_granularity / 16;
+	int height = machine.gfx[0]->height;
+	int colordiv = machine.gfx[0]->color_granularity / 16;
 
 	for (offs = 4;offs < state->spriteram_size/2;offs += 4)
 	{
@@ -86,7 +86,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		code = spriteram16[offs+2] >> codeshift;
 		color = (spriteram16[offs+1] & 0x3e00) >> 9;
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 				code,
 				color/colordiv+48,
 				flipx,0,
@@ -97,7 +97,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_START( sderby )
 {
-	sderby_state *state = machine->driver_data<sderby_state>();
+	sderby_state *state = machine.driver_data<sderby_state>();
 
 	state->tilemap = tilemap_create(machine, get_sderby_tile_info,tilemap_scan_rows, 16, 16,32,32);
 	state->md_tilemap = tilemap_create(machine, get_sderby_md_tile_info,tilemap_scan_rows, 16, 16,32,32);
@@ -110,10 +110,10 @@ VIDEO_START( sderby )
 
 SCREEN_UPDATE( sderby )
 {
-	sderby_state *state = screen->machine->driver_data<sderby_state>();
+	sderby_state *state = screen->machine().driver_data<sderby_state>();
 
 	tilemap_draw(bitmap,cliprect,state->tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect,0);
+	draw_sprites(screen->machine(), bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,state->md_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
 	return 0;
@@ -121,11 +121,11 @@ SCREEN_UPDATE( sderby )
 
 SCREEN_UPDATE( pmroulet )
 {
-	sderby_state *state = screen->machine->driver_data<sderby_state>();
+	sderby_state *state = screen->machine().driver_data<sderby_state>();
 
 	tilemap_draw(bitmap,cliprect,state->tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->md_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect,0);
+	draw_sprites(screen->machine(), bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
 	return 0;
 }
@@ -133,7 +133,7 @@ SCREEN_UPDATE( pmroulet )
 
 WRITE16_HANDLER( sderby_scroll_w )
 {
-	sderby_state *state = space->machine->driver_data<sderby_state>();
+	sderby_state *state = space->machine().driver_data<sderby_state>();
 
 	data = COMBINE_DATA(&state->scroll[offset]);
 

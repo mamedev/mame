@@ -334,7 +334,7 @@ static void write_from_qword(UINT8* region, UINT64 qword)
 	}
 }
 
-void naomi_game_decrypt(running_machine* machine, UINT64 key, UINT8* region, int length)
+void naomi_game_decrypt(running_machine& machine, UINT64 key, UINT8* region, int length)
 {
 	int i;
 
@@ -345,7 +345,7 @@ void naomi_game_decrypt(running_machine* machine, UINT64 key, UINT8* region, int
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"encrypted %s", machine->system().name);
+		sprintf(filename,"encrypted %s", machine.system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
@@ -370,7 +370,7 @@ void naomi_game_decrypt(running_machine* machine, UINT64 key, UINT8* region, int
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"decrypted %s", machine->system().name);
+		sprintf(filename,"decrypted %s", machine.system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{

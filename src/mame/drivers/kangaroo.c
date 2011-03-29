@@ -174,23 +174,23 @@ static WRITE8_HANDLER(mcu_sim_w);
 
 static MACHINE_START( kangaroo )
 {
-	memory_configure_bank(machine, "bank1", 0, 2, machine->region("gfx1")->base(), 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine.region("gfx1")->base(), 0x2000);
 }
 
 
 static MACHINE_START( kangaroo_mcu )
 {
-	kangaroo_state *state = machine->driver_data<kangaroo_state>();
+	kangaroo_state *state = machine.driver_data<kangaroo_state>();
 
 	MACHINE_START_CALL(kangaroo);
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xef00, 0xefff, FUNC(mcu_sim_r), FUNC(mcu_sim_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xef00, 0xefff, FUNC(mcu_sim_r), FUNC(mcu_sim_w));
 	state->save_item(NAME(state->clock));
 }
 
 
 static MACHINE_RESET( kangaroo )
 {
-	kangaroo_state *state = machine->driver_data<kangaroo_state>();
+	kangaroo_state *state = machine.driver_data<kangaroo_state>();
 
 	/* I think there is a bug in the startup checks of the game. At the very */
 	/* beginning, during the RAM check, it goes one byte too far, and ends up */
@@ -222,7 +222,7 @@ static MACHINE_RESET( kangaroo )
 
 static READ8_HANDLER( mcu_sim_r )
 {
-	kangaroo_state *state = space->machine->driver_data<kangaroo_state>();
+	kangaroo_state *state = space->machine().driver_data<kangaroo_state>();
 	return ++state->clock & 0x0f;
 }
 
@@ -240,8 +240,8 @@ static WRITE8_HANDLER( mcu_sim_w )
 
 static WRITE8_HANDLER( kangaroo_coin_counter_w )
 {
-	coin_counter_w(space->machine, 0, data & 1);
-	coin_counter_w(space->machine, 1, data & 2);
+	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(space->machine(), 1, data & 2);
 }
 
 

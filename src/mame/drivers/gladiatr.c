@@ -194,22 +194,22 @@ TODO:
 /*Rom bankswitching*/
 static WRITE8_HANDLER( gladiatr_bankswitch_w )
 {
-	UINT8 *rom = space->machine->region("maincpu")->base() + 0x10000;
+	UINT8 *rom = space->machine().region("maincpu")->base() + 0x10000;
 
-	memory_set_bankptr(space->machine, "bank1", rom + 0x6000 * (data & 0x01));
+	memory_set_bankptr(space->machine(), "bank1", rom + 0x6000 * (data & 0x01));
 }
 
 
 static READ8_HANDLER( gladiator_dsw1_r )
 {
-	int orig = input_port_read(space->machine, "DSW1")^0xff;
+	int orig = input_port_read(space->machine(), "DSW1")^0xff;
 
 	return BITSWAP8(orig, 0,1,2,3,4,5,6,7);
 }
 
 static READ8_HANDLER( gladiator_dsw2_r )
 {
-	int orig = input_port_read(space->machine, "DSW2")^0xff;
+	int orig = input_port_read(space->machine(), "DSW2")^0xff;
 
 	return BITSWAP8(orig, 2,3,4,5,6,7,1,0);
 }
@@ -218,15 +218,15 @@ static READ8_HANDLER( gladiator_controls_r )
 {
 	int coins = 0;
 
-	if( input_port_read(space->machine, "COINS") & 0xc0 ) coins = 0x80;
+	if( input_port_read(space->machine(), "COINS") & 0xc0 ) coins = 0x80;
 	switch(offset)
 	{
 	case 0x01: /* start button , coins */
-		return input_port_read(space->machine, "IN0") | coins;
+		return input_port_read(space->machine(), "IN0") | coins;
 	case 0x02: /* Player 1 Controller , coins */
-		return input_port_read(space->machine, "IN1") | coins;
+		return input_port_read(space->machine(), "IN1") | coins;
 	case 0x04: /* Player 2 Controller , coins */
-		return input_port_read(space->machine, "IN2") | coins;
+		return input_port_read(space->machine(), "IN2") | coins;
 	}
 	/* unknown */
 	return 0;
@@ -237,7 +237,7 @@ static READ8_HANDLER( gladiator_button3_r )
 	switch(offset)
 	{
 	case 0x01: /* button 3 */
-		return input_port_read(space->machine, "IN3");
+		return input_port_read(space->machine(), "IN3");
 	}
 	/* unknown */
 	return 0;
@@ -256,9 +256,9 @@ static MACHINE_RESET( gladiator )
 	TAITO8741_start(&gladiator_8741interface);
 	/* 6809 bank memory set */
 	{
-		UINT8 *rom = machine->region("audiocpu")->base() + 0x10000;
+		UINT8 *rom = machine.region("audiocpu")->base() + 0x10000;
 		memory_set_bankptr(machine, "bank2",rom);
-		machine->device("audiocpu")->reset();
+		machine.device("audiocpu")->reset();
 	}
 }
 
@@ -273,16 +273,16 @@ static WRITE8_DEVICE_HANDLER( gladiator_int_control_w )
 static void gladiator_ym_irq(device_t *device, int irq)
 {
 	/* NMI IRQ is not used by gladiator sound program */
-	cputag_set_input_line(device->machine, "sub", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "sub", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*Sound Functions*/
 static WRITE8_DEVICE_HANDLER( glad_adpcm_w )
 {
-	UINT8 *rom = device->machine->region("audiocpu")->base() + 0x10000;
+	UINT8 *rom = device->machine().region("audiocpu")->base() + 0x10000;
 
 	/* bit6 = bank offset */
-	memory_set_bankptr(device->machine, "bank2",rom + ((data & 0x40) ? 0xc000 : 0));
+	memory_set_bankptr(device->machine(), "bank2",rom + ((data & 0x40) ? 0xc000 : 0));
 
 	msm5205_data_w(device,data);         /* bit0..3  */
 	msm5205_reset_w(device,(data>>5)&1); /* bit 5    */
@@ -292,18 +292,18 @@ static WRITE8_DEVICE_HANDLER( glad_adpcm_w )
 static WRITE8_HANDLER( glad_cpu_sound_command_w )
 {
 	soundlatch_w(space,0,data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static READ8_HANDLER( glad_cpu_sound_command_r )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space,0);
 }
 
 static WRITE8_HANDLER( gladiatr_flipscreen_w )
 {
-	flip_screen_set(space->machine, data & 1);
+	flip_screen_set(space->machine(), data & 1);
 }
 
 
@@ -311,7 +311,7 @@ static WRITE8_HANDLER( gladiatr_flipscreen_w )
 /* !!!!! patch to IRQ timming for 2nd CPU !!!!! */
 static WRITE8_HANDLER( gladiatr_irq_patch_w )
 {
-	cputag_set_input_line(space->machine, "sub", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "sub", 0, HOLD_LINE);
 }
 #endif
 
@@ -323,7 +323,7 @@ static WRITE8_HANDLER( gladiatr_irq_patch_w )
 
 static WRITE8_HANDLER(qx0_w)
 {
-	gladiatr_state *state = space->machine->driver_data<gladiatr_state>();
+	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
 	if(!offset)
 	{
 		state->data2=data;
@@ -333,7 +333,7 @@ static WRITE8_HANDLER(qx0_w)
 
 static WRITE8_HANDLER(qx1_w)
 {
-	gladiatr_state *state = space->machine->driver_data<gladiatr_state>();
+	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
 	if(!offset)
 	{
 		state->data1=data;
@@ -345,13 +345,13 @@ static WRITE8_HANDLER(qx2_w){ }
 
 static WRITE8_HANDLER(qx3_w){ }
 
-static READ8_HANDLER(qx2_r){ return space->machine->rand(); }
+static READ8_HANDLER(qx2_r){ return space->machine().rand(); }
 
-static READ8_HANDLER(qx3_r){ return space->machine->rand()&0xf; }
+static READ8_HANDLER(qx3_r){ return space->machine().rand()&0xf; }
 
 static READ8_HANDLER(qx0_r)
 {
-	gladiatr_state *state = space->machine->driver_data<gladiatr_state>();
+	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
 	if(!offset)
 		 return state->data1;
 	else
@@ -360,7 +360,7 @@ static READ8_HANDLER(qx0_r)
 
 static READ8_HANDLER(qx1_r)
 {
-	gladiatr_state *state = space->machine->driver_data<gladiatr_state>();
+	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
 	if(!offset)
 		return state->data2;
 	else
@@ -369,7 +369,7 @@ static READ8_HANDLER(qx1_r)
 
 static MACHINE_RESET( ppking )
 {
-	gladiatr_state *state = machine->driver_data<gladiatr_state>();
+	gladiatr_state *state = machine.driver_data<gladiatr_state>();
 	state->data1 = state->data2 = 0;
 	state->flag1 = state->flag2 = 1;
 }
@@ -627,7 +627,7 @@ GFXDECODE_END
 
 static READ8_DEVICE_HANDLER(f1_r)
 {
-	return device->machine->rand();
+	return device->machine().rand();
 }
 
 static const ym2203_interface ppking_ym2203_interface =
@@ -962,7 +962,7 @@ static DRIVER_INIT( gladiatr )
 	UINT8 *rom;
 	int i,j;
 
-	rom = machine->region("gfx2")->base();
+	rom = machine.region("gfx2")->base();
 	// unpack 3bpp graphics
 	for (j = 3; j >= 0; j--)
 	{
@@ -976,7 +976,7 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x14000, rom + 0x18000, 0x4000);
 
 
-	rom = machine->region("gfx3")->base();
+	rom = machine.region("gfx3")->base();
 	// unpack 3bpp graphics
 	for (j = 5; j >= 0; j--)
 	{
@@ -993,14 +993,14 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x24000, rom + 0x28000, 0x4000);
 
 	/* make sure bank is valid in cpu-reset */
-	rom = machine->region("audiocpu")->base() + 0x10000;
+	rom = machine.region("audiocpu")->base() + 0x10000;
 	memory_set_bankptr(machine, "bank2",rom);
 }
 
 
 static READ8_HANDLER(f6a3_r)
 {
-	gladiatr_state *state = space->machine->driver_data<gladiatr_state>();
+	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
 	if(cpu_get_previouspc(space->cpu)==0x8e)
 		state->m_nvram[0x6a3]=1;
 
@@ -1012,14 +1012,14 @@ static DRIVER_INIT(ppking)
 	UINT8 *rom;
 	int i,j;
 
-	rom = machine->region("gfx2")->base();
+	rom = machine.region("gfx2")->base();
 	// unpack 3bpp graphics
 	for (i = 0; i < 0x2000; i++)
 	{
 		rom[i+0x2000] = rom[i] >> 4;
 	}
 
-	rom = machine->region("gfx3")->base();
+	rom = machine.region("gfx3")->base();
 	// unpack 3bpp graphics
 	for (j = 1; j >= 0; j--)
 	{
@@ -1030,7 +1030,7 @@ static DRIVER_INIT(ppking)
 		}
 	}
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf6a3,0xf6a3,FUNC(f6a3_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf6a3,0xf6a3,FUNC(f6a3_r) );
 }
 
 

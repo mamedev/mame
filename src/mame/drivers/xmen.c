@@ -44,18 +44,18 @@ static const eeprom_interface eeprom_intf =
 
 static WRITE16_HANDLER( eeprom_w )
 {
-	xmen_state *state = space->machine->driver_data<xmen_state>();
+	xmen_state *state = space->machine().driver_data<xmen_state>();
 
 	logerror("%06x: write %04x to 108000\n",cpu_get_pc(space->cpu),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = coin counter */
-		coin_counter_w(space->machine, 0, data & 0x01);
+		coin_counter_w(space->machine(), 0, data & 0x01);
 
 		/* bit 2 is data */
 		/* bit 3 is clock (active high) */
 		/* bit 4 is cs (active low) */
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -82,7 +82,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	xmen_state *state = space->machine->driver_data<xmen_state>();
+	xmen_state *state = space->machine().driver_data<xmen_state>();
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
@@ -95,17 +95,17 @@ static WRITE16_HANDLER( xmen_18fa00_w )
 	}
 }
 
-static void sound_reset_bank( running_machine *machine )
+static void sound_reset_bank( running_machine &machine )
 {
-	xmen_state *state = machine->driver_data<xmen_state>();
+	xmen_state *state = machine.driver_data<xmen_state>();
 	memory_set_bank(machine, "bank4", state->sound_curbank & 0x07);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	xmen_state *state = space->machine->driver_data<xmen_state>();
+	xmen_state *state = space->machine().driver_data<xmen_state>();
 	state->sound_curbank = data;
-	sound_reset_bank(space->machine);
+	sound_reset_bank(space->machine());
 }
 
 
@@ -258,7 +258,7 @@ INPUT_PORTS_END
 
 static CUSTOM_INPUT( xmen_frame_r )
 {
-	xmen_state *state = field->port->machine->driver_data<xmen_state>();
+	xmen_state *state = field->port->machine().driver_data<xmen_state>();
 	return state->current_frame;
 }
 
@@ -311,31 +311,31 @@ static STATE_POSTLOAD( xmen_postload )
 
 static MACHINE_START( xmen )
 {
-	xmen_state *state = machine->driver_data<xmen_state>();
-	UINT8 *ROM = machine->region("audiocpu")->base();
+	xmen_state *state = machine.driver_data<xmen_state>();
+	UINT8 *ROM = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank4", 0, 8, &ROM[0x10000], 0x4000);
 	memory_set_bank(machine, "bank4", 0);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->k053246 = machine->device("k053246");
-	state->k053251 = machine->device("k053251");
-	state->k052109 = machine->device("k052109");
-	state->k054539 = machine->device("k054539");
-	state->lscreen = machine->device("lscreen");
-	state->rscreen = machine->device("rscreen");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->k053246 = machine.device("k053246");
+	state->k053251 = machine.device("k053251");
+	state->k052109 = machine.device("k052109");
+	state->k054539 = machine.device("k054539");
+	state->lscreen = machine.device("lscreen");
+	state->rscreen = machine.device("rscreen");
 
 	state->save_item(NAME(state->sound_curbank));
 	state->save_item(NAME(state->sprite_colorbase));
 	state->save_item(NAME(state->layer_colorbase));
 	state->save_item(NAME(state->layerpri));
-	machine->state().register_postload(xmen_postload, NULL);
+	machine.state().register_postload(xmen_postload, NULL);
 }
 
 static MACHINE_RESET( xmen )
 {
-	xmen_state *state = machine->driver_data<xmen_state>();
+	xmen_state *state = machine.driver_data<xmen_state>();
 	int i;
 
 	for (i = 0; i < 3; i++)
@@ -412,7 +412,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_START( xmen6p )
 {
-	xmen_state *state = machine->driver_data<xmen_state>();
+	xmen_state *state = machine.driver_data<xmen_state>();
 
 	MACHINE_START_CALL(xmen);
 
@@ -421,7 +421,7 @@ static MACHINE_START( xmen6p )
 
 static MACHINE_RESET( xmen6p )
 {
-	xmen_state *state = machine->driver_data<xmen_state>();
+	xmen_state *state = machine.driver_data<xmen_state>();
 	state->current_frame = 0x00;
 }
 

@@ -116,10 +116,10 @@ static win_i *win_list;
 //  PROTOTYPES
 //============================================================
 
-static void debugmain_init(running_machine *machine);
-static void memorywin_new(running_machine *machine);
-static void disasmwin_new(running_machine *machine);
-static void logwin_new(running_machine *machine);
+static void debugmain_init(running_machine &machine);
+static void memorywin_new(running_machine &machine);
+static void disasmwin_new(running_machine &machine);
+static void logwin_new(running_machine &machine);
 
 
 //============================================================
@@ -208,12 +208,12 @@ static win_i *get_first_win_i(int win_type_mask)
 //  add_win_i
 //============================================================
 
-static win_i *add_win_i(running_machine *machine, int win_type)
+static win_i *add_win_i(running_machine &machine, int win_type)
 {
 	win_i *win = (win_i *) osd_malloc(sizeof(*win));
 	memset(win, 0, sizeof(*win));
 	win->cpu = NULL;
-	win->machine = machine;
+	win->machine() = machine;
 	win->type = win_type;
 
 	win->next = win_list;
@@ -471,7 +471,7 @@ static void debugmain_set_cpu(device_t *device)
 		dv->view->set_source(*dv->view->source_list().match_device(device));
 
 		// then update the caption
-		title.printf("Debug: %s - %s '%s'", device->machine->system().name, device->name(), device->tag());
+		title.printf("Debug: %s - %s '%s'", device->machine().system().name, device->name(), device->tag());
 		gtk_window_set_title(GTK_WINDOW(dmain->win), title);
 		disasmview_update_checks(dmain);
 	}
@@ -482,7 +482,7 @@ static void debugmain_set_cpu(device_t *device)
 //  configuration_load
 //============================================================
 
-static void configuration_load(running_machine *machine, int config_type, xml_data_node *parentnode)
+static void configuration_load(running_machine &machine, int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *wnode;
 
@@ -508,7 +508,7 @@ static void configuration_load(running_machine *machine, int config_type, xml_da
 //  configuration_save
 //============================================================
 
-static void configuration_save(running_machine *machine, int config_type, xml_data_node *parentnode)
+static void configuration_save(running_machine &machine, int config_type, xml_data_node *parentnode)
 {
 	/* we only care about game files */
 	if (config_type != CONFIG_TYPE_GAME)
@@ -608,7 +608,7 @@ void sdl_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 //  debugwin_update_during_game
 //============================================================
 
-void debugwin_update_during_game(running_machine *machine)
+void debugwin_update_during_game(running_machine &machine)
 {
 	win_i *dmain = get_first_win_i(WIN_TYPE_MAIN);
 	if(dmain)
@@ -625,9 +625,9 @@ void debugwin_update_during_game(running_machine *machine)
 static void debugmain_process_string(win_i *win, const char *str)
 {
 	if(!str[0])
-		debug_cpu_get_visible_cpu(win->machine)->debug()->single_step();
+		debug_cpu_get_visible_cpu(win->machine())->debug()->single_step();
 	else
-		debug_console_execute_command(win->machine, str, 1);
+		debug_console_execute_command(win->machine(), str, 1);
 }
 
 
@@ -640,7 +640,7 @@ static void debugmain_destroy(GtkObject *obj, gpointer user_data)
 {
 	win_i *dmain = get_first_win_i(WIN_TYPE_MAIN);
 
-	dmain->machine->schedule_exit();
+	dmain->machine().schedule_exit();
 }
 
 
@@ -649,7 +649,7 @@ static void debugmain_destroy(GtkObject *obj, gpointer user_data)
 //  debugmain_init
 //============================================================
 
-static void debugmain_init(running_machine *machine)
+static void debugmain_init(running_machine &machine)
 {
 	win_i *dmain;
 
@@ -761,7 +761,7 @@ static void memorywin_destroy(GtkObject *obj, gpointer user_data)
 //  memorywin_new
 //============================================================
 
-static void memorywin_new(running_machine *machine)
+static void memorywin_new(running_machine &machine)
 {
 	win_i *mem;
 	int item, cursel;
@@ -855,7 +855,7 @@ static void disasmwin_destroy(GtkObject *obj, gpointer user_data)
 //  disasmwin_new
 //============================================================
 
-static void disasmwin_new(running_machine *machine)
+static void disasmwin_new(running_machine &machine)
 {
 	win_i *dis;
 	int item, cursel;
@@ -917,7 +917,7 @@ static void logwin_destroy(GtkObject *obj, gpointer user_data)
 //  logwin_new
 //============================================================
 
-static void logwin_new(running_machine *machine)
+static void logwin_new(running_machine &machine)
 {
 	win_i *log;
 
@@ -1123,11 +1123,11 @@ void on_run_to_cursor_activate(GtkWidget *win)
 
 	if (disasm->view->cursor_visible())
 	{
-		if (debug_cpu_get_visible_cpu(info->machine) == disasm->view->source()->device())
+		if (debug_cpu_get_visible_cpu(info->machine()) == disasm->view->source()->device())
 		{
 			offs_t address = downcast<debug_view_disasm *>(disasm->view)->selected_address();
 			command.printf("go 0x%X", address);
-			debug_console_execute_command(info->machine, command, 1);
+			debug_console_execute_command(info->machine(), command, 1);
 		}
 	}
 }
@@ -1141,7 +1141,7 @@ on_set_breakpoint_at_cursor_activate(GtkWidget *win)
 
 	if (disasm->view->cursor_visible())
 	{
-		if (debug_cpu_get_visible_cpu(info->machine) == disasm->view->source()->device())
+		if (debug_cpu_get_visible_cpu(info->machine()) == disasm->view->source()->device())
 		{
 			offs_t address = downcast<debug_view_disasm *>(disasm->view)->selected_address();
 			device_debug *cpuinfo = disasm->view->source()->device()->debug();
@@ -1161,7 +1161,7 @@ on_set_breakpoint_at_cursor_activate(GtkWidget *win)
 				command.printf("bpset 0x%X", address);
 			else
 				command.printf("bpclear 0x%X", bpindex);
-			debug_console_execute_command(info->machine, command, 1);
+			debug_console_execute_command(info->machine(), command, 1);
 		}
 	}
 }
@@ -1205,7 +1205,7 @@ on_memoryview_key_press_event(GtkWidget   *widget,
 	//printf("%s\n", event->string);
 	//printf("The name of this keysym is `%s'\n",
 	//          gdk_keyval_name(event->keyval));
-	//if (/*waiting_for_debugger ||*/ !debugwin_seq_pressed(info->view-> owner->machine))
+	//if (/*waiting_for_debugger ||*/ !debugwin_seq_pressed(info->view-> owner->machine()))
 	switch (event->keyval)
 	{
 		case GDK_Up:
@@ -1291,7 +1291,7 @@ void sdl_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 }
 
 // win32 stubs for linking
-void debugwin_update_during_game(running_machine *machine)
+void debugwin_update_during_game(running_machine &machine)
 {
 }
 

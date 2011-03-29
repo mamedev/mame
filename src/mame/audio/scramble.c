@@ -45,7 +45,7 @@ static const int scramble_timer[10] =
 
 READ8_DEVICE_HANDLER( scramble_portB_r )
 {
-	return scramble_timer[(device->machine->device<cpu_device>("audiocpu")->total_cycles()/512) % 10];
+	return scramble_timer[(device->machine().device<cpu_device>("audiocpu")->total_cycles()/512) % 10];
 }
 
 
@@ -74,23 +74,23 @@ static const int frogger_timer[10] =
 
 READ8_DEVICE_HANDLER( frogger_portB_r )
 {
-	return frogger_timer[(device->machine->device<cpu_device>("audiocpu")->total_cycles()/512) % 10];
+	return frogger_timer[(device->machine().device<cpu_device>("audiocpu")->total_cycles()/512) % 10];
 }
 
 WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 {
-	device_t *target = device->machine->device("konami_7474");
+	device_t *target = device->machine().device("konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	ttl7474_clock_w(target, (~data & 0x08) >> 3);
 
 	/* bit 4 is sound disable */
-	device->machine->sound().system_mute((data & 0x10) >> 4);
+	device->machine().sound().system_mute((data & 0x10) >> 4);
 }
 
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 {
-	device_t *target = device->machine->device("konami_7474");
+	device_t *target = device->machine().device("konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	ttl7474_clock_w(target, (~data & 0x08) >> 3);
@@ -98,7 +98,7 @@ WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 
 static IRQ_CALLBACK(scramble_sh_irq_callback)
 {
-	device_t *target = device->machine->device("konami_7474");
+	device_t *target = device->machine().device("konami_7474");
 
 	/* interrupt acknowledge clears the flip-flop --
        we need to pulse the CLR line because MAME's core never clears this
@@ -114,18 +114,18 @@ WRITE_LINE_DEVICE_HANDLER( scramble_sh_7474_q_callback )
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */
-	cputag_set_input_line(device->machine, "audiocpu", 0, !state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, !state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_HANDLER( hotshock_sh_irqtrigger_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", 0, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, ASSERT_LINE);
 }
 
 READ8_DEVICE_HANDLER( hotshock_soundlatch_r )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, CLEAR_LINE);
-	return soundlatch_r(device->machine->device("audiocpu")->memory().space(AS_PROGRAM),0);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, CLEAR_LINE);
+	return soundlatch_r(device->machine().device("audiocpu")->memory().space(AS_PROGRAM),0);
 }
 
 static void filter_w(device_t *device, int data)
@@ -144,27 +144,27 @@ static void filter_w(device_t *device, int data)
 
 WRITE8_HANDLER( scramble_filter_w )
 {
-	filter_w(space->machine->device("filter.1.0"), (offset >>  0) & 3);
-	filter_w(space->machine->device("filter.1.1"), (offset >>  2) & 3);
-	filter_w(space->machine->device("filter.1.2"), (offset >>  4) & 3);
-	filter_w(space->machine->device("filter.0.0"), (offset >>  6) & 3);
-	filter_w(space->machine->device("filter.0.1"), (offset >>  8) & 3);
-	filter_w(space->machine->device("filter.0.2"), (offset >> 10) & 3);
+	filter_w(space->machine().device("filter.1.0"), (offset >>  0) & 3);
+	filter_w(space->machine().device("filter.1.1"), (offset >>  2) & 3);
+	filter_w(space->machine().device("filter.1.2"), (offset >>  4) & 3);
+	filter_w(space->machine().device("filter.0.0"), (offset >>  6) & 3);
+	filter_w(space->machine().device("filter.0.1"), (offset >>  8) & 3);
+	filter_w(space->machine().device("filter.0.2"), (offset >> 10) & 3);
 }
 
 WRITE8_HANDLER( frogger_filter_w )
 {
-	filter_w(space->machine->device("filter.0.0"), (offset >>  6) & 3);
-	filter_w(space->machine->device("filter.0.1"), (offset >>  8) & 3);
-	filter_w(space->machine->device("filter.0.2"), (offset >> 10) & 3);
+	filter_w(space->machine().device("filter.0.0"), (offset >>  6) & 3);
+	filter_w(space->machine().device("filter.0.1"), (offset >>  8) & 3);
+	filter_w(space->machine().device("filter.0.2"), (offset >> 10) & 3);
 }
 
-void scramble_sh_init(running_machine *machine)
+void scramble_sh_init(running_machine &machine)
 {
-	device_set_irq_callback(machine->device("audiocpu"), scramble_sh_irq_callback);
+	device_set_irq_callback(machine.device("audiocpu"), scramble_sh_irq_callback);
 
 	/* PR is always 0, D is always 1 */
-	ttl7474_d_w(machine->device("konami_7474"), 1);
+	ttl7474_d_w(machine.device("konami_7474"), 1);
 }
 
 

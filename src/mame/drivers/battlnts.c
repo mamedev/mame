@@ -27,25 +27,25 @@
 
 static INTERRUPT_GEN( battlnts_interrupt )
 {
-	battlnts_state *state = device->machine->driver_data<battlnts_state>();
+	battlnts_state *state = device->machine().driver_data<battlnts_state>();
 	if (k007342_is_int_enabled(state->k007342))
 		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
 {
-	battlnts_state *state = space->machine->driver_data<battlnts_state>();
+	battlnts_state *state = space->machine().driver_data<battlnts_state>();
 	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( battlnts_bankswitch_w )
 {
 	/* bits 6 & 7 = bank number */
-	memory_set_bank(space->machine, "bank1", (data & 0xc0) >> 6);
+	memory_set_bank(space->machine(), "bank1", (data & 0xc0) >> 6);
 
 	/* bits 4 & 5 = coin counters */
-	coin_counter_w(space->machine, 0, data & 0x10);
-	coin_counter_w(space->machine, 1, data & 0x20);
+	coin_counter_w(space->machine(), 0, data & 0x10);
+	coin_counter_w(space->machine(), 1, data & 0x20);
 
 	/* other bits unknown */
 }
@@ -220,14 +220,14 @@ static const k007420_interface bladestl_k007420_intf =
 
 static MACHINE_START( battlnts )
 {
-	battlnts_state *state = machine->driver_data<battlnts_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	battlnts_state *state = machine.driver_data<battlnts_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 
-	state->audiocpu = machine->device("audiocpu");
-	state->k007342 = machine->device("k007342");
-	state->k007420 = machine->device("k007420");
+	state->audiocpu = machine.device("audiocpu");
+	state->k007342 = machine.device("k007342");
+	state->k007420 = machine.device("k007420");
 
 	state->save_item(NAME(state->spritebank));
 	state->save_item(NAME(state->layer_colorbase));
@@ -235,7 +235,7 @@ static MACHINE_START( battlnts )
 
 static MACHINE_RESET( battlnts )
 {
-	battlnts_state *state = machine->driver_data<battlnts_state>();
+	battlnts_state *state = machine.driver_data<battlnts_state>();
 
 	state->layer_colorbase[0] = 0;
 	state->layer_colorbase[1] = 0;
@@ -402,7 +402,7 @@ static void shuffle( UINT8 *buf, int len )
 static DRIVER_INIT( rackemup )
 {
 	/* rearrange char ROM */
-	shuffle(machine->region("gfx1")->base(), machine->region("gfx1")->bytes());
+	shuffle(machine.region("gfx1")->base(), machine.region("gfx1")->bytes());
 }
 
 

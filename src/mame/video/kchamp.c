@@ -14,11 +14,11 @@ PALETTE_INIT( kchamp )
 {
 	int i, red, green, blue;
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		red = color_prom[i];
-		green = color_prom[machine->total_colors() + i];
-		blue = color_prom[2 * machine->total_colors() + i];
+		green = color_prom[machine.total_colors() + i];
+		blue = color_prom[2 * machine.total_colors() + i];
 
 		palette_set_color_rgb(machine, i, pal4bit(red), pal4bit(green), pal4bit(blue));
 	}
@@ -26,26 +26,26 @@ PALETTE_INIT( kchamp )
 
 WRITE8_HANDLER( kchamp_videoram_w )
 {
-	kchamp_state *state = space->machine->driver_data<kchamp_state>();
+	kchamp_state *state = space->machine().driver_data<kchamp_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kchamp_colorram_w )
 {
-	kchamp_state *state = space->machine->driver_data<kchamp_state>();
+	kchamp_state *state = space->machine().driver_data<kchamp_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kchamp_flipscreen_w )
 {
-	flip_screen_set(space->machine, data & 0x01);
+	flip_screen_set(space->machine(), data & 0x01);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	kchamp_state *state = machine->driver_data<kchamp_state>();
+	kchamp_state *state = machine.driver_data<kchamp_state>();
 	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 7) << 8);
 	int color = (state->colorram[tile_index] >> 3) & 0x1f;
 
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( kchamp )
 {
-	kchamp_state *state = machine->driver_data<kchamp_state>();
+	kchamp_state *state = machine.driver_data<kchamp_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
@@ -68,9 +68,9 @@ VIDEO_START( kchamp )
              3        XXXXXXXX
 */
 
-static void kchamp_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void kchamp_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	kchamp_state *state = machine->driver_data<kchamp_state>();
+	kchamp_state *state = machine.driver_data<kchamp_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -93,13 +93,13 @@ static void kchamp_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[bank], code, color, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[bank], code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
-static void kchampvs_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void kchampvs_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	kchamp_state *state = machine->driver_data<kchamp_state>();
+	kchamp_state *state = machine.driver_data<kchamp_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -122,25 +122,25 @@ static void kchampvs_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[bank], code, color, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[bank], code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
 
 SCREEN_UPDATE( kchamp )
 {
-	kchamp_state *state = screen->machine->driver_data<kchamp_state>();
+	kchamp_state *state = screen->machine().driver_data<kchamp_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	kchamp_draw_sprites(screen->machine, bitmap, cliprect);
+	kchamp_draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( kchampvs )
 {
-	kchamp_state *state = screen->machine->driver_data<kchamp_state>();
+	kchamp_state *state = screen->machine().driver_data<kchamp_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	kchampvs_draw_sprites(screen->machine, bitmap, cliprect);
+	kchampvs_draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

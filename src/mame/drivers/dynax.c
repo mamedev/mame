@@ -99,39 +99,39 @@ TODO:
 
 
 /* It runs in IM 0, thus needs an opcode on the data bus */
-void sprtmtch_update_irq( running_machine *machine )
+void sprtmtch_update_irq( running_machine &machine )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 	int irq = (state->sound_irq ? 0x08 : 0) | ((state->vblank_irq) ? 0x10 : 0) | ((state->blitter_irq) ? 0x20 : 0) ;
 	device_set_input_line_and_vector(state->maincpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static WRITE8_HANDLER( dynax_vblank_ack_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->vblank_irq = 0;
-	sprtmtch_update_irq(space->machine);
+	sprtmtch_update_irq(space->machine());
 }
 
 static WRITE8_HANDLER( dynax_blitter_ack_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->blitter_irq = 0;
-	sprtmtch_update_irq(space->machine);
+	sprtmtch_update_irq(space->machine());
 }
 
 static INTERRUPT_GEN( sprtmtch_vblank_interrupt )
 {
-	dynax_state *state = device->machine->driver_data<dynax_state>();
+	dynax_state *state = device->machine().driver_data<dynax_state>();
 	state->vblank_irq = 1;
-	sprtmtch_update_irq(device->machine);
+	sprtmtch_update_irq(device->machine());
 }
 
 static void sprtmtch_sound_callback( device_t *device, int state )
 {
-	dynax_state *driver_state = device->machine->driver_data<dynax_state>();
+	dynax_state *driver_state = device->machine().driver_data<dynax_state>();
 	driver_state->sound_irq = state;
-	sprtmtch_update_irq(device->machine);
+	sprtmtch_update_irq(device->machine());
 }
 
 
@@ -140,39 +140,39 @@ static void sprtmtch_sound_callback( device_t *device, int state )
 ***************************************************************************/
 
 /* It runs in IM 0, thus needs an opcode on the data bus */
-void jantouki_update_irq(running_machine *machine)
+void jantouki_update_irq(running_machine &machine)
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 	int irq = ((state->blitter_irq) ? 0x08 : 0) | ((state->blitter2_irq) ? 0x10 : 0) | ((state->vblank_irq) ? 0x20 : 0) ;
 	device_set_input_line_and_vector(state->maincpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static WRITE8_HANDLER( jantouki_vblank_ack_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->vblank_irq = 0;
-	jantouki_update_irq(space->machine);
+	jantouki_update_irq(space->machine());
 }
 
 static WRITE8_HANDLER( jantouki_blitter_ack_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->blitter_irq = data;
-	jantouki_update_irq(space->machine);
+	jantouki_update_irq(space->machine());
 }
 
 static WRITE8_HANDLER( jantouki_blitter2_ack_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->blitter2_irq = data;
-	jantouki_update_irq(space->machine);
+	jantouki_update_irq(space->machine());
 }
 
 static INTERRUPT_GEN( jantouki_vblank_interrupt )
 {
-	dynax_state *state = device->machine->driver_data<dynax_state>();
+	dynax_state *state = device->machine().driver_data<dynax_state>();
 	state->vblank_irq = 1;
-	jantouki_update_irq(device->machine);
+	jantouki_update_irq(device->machine());
 }
 
 
@@ -180,32 +180,32 @@ static INTERRUPT_GEN( jantouki_vblank_interrupt )
                             Jantouki - Sound CPU
 ***************************************************************************/
 
-static void jantouki_sound_update_irq(running_machine *machine)
+static void jantouki_sound_update_irq(running_machine &machine)
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 	int irq = ((state->sound_irq) ? 0x08 : 0) | ((state->soundlatch_irq) ? 0x10 : 0) | ((state->sound_vblank_irq) ? 0x20 : 0) ;
 	device_set_input_line_and_vector(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static INTERRUPT_GEN( jantouki_sound_vblank_interrupt )
 {
-	dynax_state *state = device->machine->driver_data<dynax_state>();
+	dynax_state *state = device->machine().driver_data<dynax_state>();
 	state->sound_vblank_irq = 1;
-	jantouki_sound_update_irq(device->machine);
+	jantouki_sound_update_irq(device->machine());
 }
 
 static WRITE8_HANDLER( jantouki_sound_vblank_ack_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->sound_vblank_irq = 0;
-	jantouki_sound_update_irq(space->machine);
+	jantouki_sound_update_irq(space->machine());
 }
 
 static void jantouki_sound_callback(device_t *device, int state)
 {
-	dynax_state *driver_state = device->machine->driver_data<dynax_state>();
+	dynax_state *driver_state = device->machine().driver_data<dynax_state>();
 	driver_state->sound_irq = state;
-	jantouki_sound_update_irq(device->machine);
+	jantouki_sound_update_irq(device->machine());
 }
 
 
@@ -223,12 +223,12 @@ static void jantouki_sound_callback(device_t *device, int state)
 
 static WRITE8_HANDLER( dynax_coincounter_0_w )
 {
-	coin_counter_w(space->machine, 0, data);
+	coin_counter_w(space->machine(), 0, data);
 }
 
 static WRITE8_HANDLER( dynax_coincounter_1_w )
 {
-	coin_counter_w(space->machine, 1, data);
+	coin_counter_w(space->machine(), 1, data);
 }
 
 static READ8_HANDLER( ret_ff )
@@ -239,60 +239,60 @@ static READ8_HANDLER( ret_ff )
 
 static READ8_HANDLER( hanamai_keyboard_0_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	int res = 0x3f;
 
 	/* the game reads all rows at once (keyb = 0) to check if a key is pressed */
-	if (!BIT(state->keyb, 0)) res &= input_port_read(space->machine, "KEY0");
-	if (!BIT(state->keyb, 1)) res &= input_port_read(space->machine, "KEY1");
-	if (!BIT(state->keyb, 2)) res &= input_port_read(space->machine, "KEY2");
-	if (!BIT(state->keyb, 3)) res &= input_port_read(space->machine, "KEY3");
-	if (!BIT(state->keyb, 4)) res &= input_port_read(space->machine, "KEY4");
+	if (!BIT(state->keyb, 0)) res &= input_port_read(space->machine(), "KEY0");
+	if (!BIT(state->keyb, 1)) res &= input_port_read(space->machine(), "KEY1");
+	if (!BIT(state->keyb, 2)) res &= input_port_read(space->machine(), "KEY2");
+	if (!BIT(state->keyb, 3)) res &= input_port_read(space->machine(), "KEY3");
+	if (!BIT(state->keyb, 4)) res &= input_port_read(space->machine(), "KEY4");
 
 	return res;
 }
 
 static READ8_HANDLER( hanamai_keyboard_1_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	int res = 0x3f;
 
 	/* the game reads all rows at once (keyb = 0) to check if a key is pressed */
-	if (!BIT(state->keyb, 0)) res &= input_port_read(space->machine, "KEY5");
-	if (!BIT(state->keyb, 1)) res &= input_port_read(space->machine, "KEY6");
-	if (!BIT(state->keyb, 2)) res &= input_port_read(space->machine, "KEY7");
-	if (!BIT(state->keyb, 3)) res &= input_port_read(space->machine, "KEY8");
-	if (!BIT(state->keyb, 4)) res &= input_port_read(space->machine, "KEY9");
+	if (!BIT(state->keyb, 0)) res &= input_port_read(space->machine(), "KEY5");
+	if (!BIT(state->keyb, 1)) res &= input_port_read(space->machine(), "KEY6");
+	if (!BIT(state->keyb, 2)) res &= input_port_read(space->machine(), "KEY7");
+	if (!BIT(state->keyb, 3)) res &= input_port_read(space->machine(), "KEY8");
+	if (!BIT(state->keyb, 4)) res &= input_port_read(space->machine(), "KEY9");
 
 	return res;
 }
 
 static WRITE8_HANDLER( hanamai_keyboard_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->keyb = data;
 }
 
 
 static WRITE8_HANDLER( dynax_rombank_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 }
 
 static WRITE8_HANDLER( jantouki_sound_rombank_w )
 {
-	memory_set_bank(space->machine, "bank2", data);
+	memory_set_bank(space->machine(), "bank2", data);
 }
 
 
 static WRITE8_HANDLER( hnoridur_rombank_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
-	int bank_n = (space->machine->region("maincpu")->bytes() - 0x10000) / 0x8000;
+	dynax_state *state = space->machine().driver_data<dynax_state>();
+	int bank_n = (space->machine().region("maincpu")->bytes() - 0x10000) / 0x8000;
 
 	//logerror("%04x: rom bank = %02x\n", cpu_get_pc(space->cpu), data);
 	if (data < bank_n)
-		memory_set_bank(space->machine, "bank1", data);
+		memory_set_bank(space->machine(), "bank1", data);
 	else
 		logerror("rom_bank = %02x (larger than the maximum bank %02x)\n", data, bank_n);
 	state->hnoridur_bank = data;
@@ -301,14 +301,14 @@ static WRITE8_HANDLER( hnoridur_rombank_w )
 
 static WRITE8_HANDLER( hnoridur_palbank_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->palbank = data & 0x0f;
 	dynax_blit_palbank_w(space, 0, data);
 }
 
 static WRITE8_HANDLER( hnoridur_palette_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (state->hnoridur_bank)
 	{
@@ -327,7 +327,7 @@ static WRITE8_HANDLER( hnoridur_palette_w )
 		// hnoridur: R/W RAM
 		case 0x18:
 		{
-			UINT8 *RAM = space->machine->region("maincpu")->base() + 0x10000 + state->hnoridur_bank * 0x8000;
+			UINT8 *RAM = space->machine().region("maincpu")->base() + 0x10000 + state->hnoridur_bank * 0x8000;
 			RAM[offset] = data;
 			return;
 		}
@@ -343,13 +343,13 @@ static WRITE8_HANDLER( hnoridur_palette_w )
 		int r = BITSWAP8((x >>  0) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
 		int g = BITSWAP8((x >>  5) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
 		int b = BITSWAP8((x >> 10) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
-		palette_set_color_rgb(space->machine, 256 * state->palbank + offset, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(space->machine(), 256 * state->palbank + offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
 static WRITE8_HANDLER( yarunara_palette_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	int addr = 512 * state->palbank + offset;
 
 	switch (state->hnoridur_bank)
@@ -375,13 +375,13 @@ static WRITE8_HANDLER( yarunara_palette_w )
 		int r = br & 0x1f;
 		int g = bg & 0x1f;
 		int b = ((bg & 0xc0) >> 3) | ((br & 0xe0) >> 5);
-		palette_set_color_rgb(space->machine, 256 * state->palbank + ((offset & 0x0f) | ((offset & 0x1e0) >> 1)), pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(space->machine(), 256 * state->palbank + ((offset & 0x0f) | ((offset & 0x1e0) >> 1)), pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
 static WRITE8_HANDLER( nanajign_palette_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (state->hnoridur_bank)
 	{
@@ -404,14 +404,14 @@ static WRITE8_HANDLER( nanajign_palette_w )
 		int r = br & 0x1f;
 		int g = bg & 0x1f;
 		int b = ((bg & 0xc0) >> 3) | ((br & 0xe0) >> 5);
-		palette_set_color_rgb(space->machine, 256 * state->palbank + offset, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(space->machine(), 256 * state->palbank + offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
 
 static void adpcm_int( device_t *device )
 {
-	dynax_state *state = device->machine->driver_data<dynax_state>();
+	dynax_state *state = device->machine().driver_data<dynax_state>();
 	msm5205_data_w(device, state->msm5205next >> 4);
 	state->msm5205next <<= 4;
 
@@ -426,7 +426,7 @@ static void adpcm_int( device_t *device )
 
 static void adpcm_int_cpu1( device_t *device )
 {
-	dynax_state *state = device->machine->driver_data<dynax_state>();
+	dynax_state *state = device->machine().driver_data<dynax_state>();
 	msm5205_data_w(device, state->msm5205next >> 4);
 	state->msm5205next <<= 4;
 
@@ -441,23 +441,23 @@ static void adpcm_int_cpu1( device_t *device )
 
 static WRITE8_HANDLER( adpcm_data_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->msm5205next = data;
 }
 
 static WRITE8_DEVICE_HANDLER( adpcm_reset_w )
 {
-	dynax_state *state = device->machine->driver_data<dynax_state>();
+	dynax_state *state = device->machine().driver_data<dynax_state>();
 	state->resetkludge = data & 1;
 	msm5205_reset_w(device, ~data & 1);
 }
 
 static MACHINE_RESET( adpcm )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 	/* start with the MSM5205 reset */
 	state->resetkludge = 0;
-	msm5205_reset_w(machine->device("msm"), 1);
+	msm5205_reset_w(machine.device("msm"), 1);
 }
 
 static WRITE8_HANDLER( yarunara_layer_half_w )
@@ -609,35 +609,35 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( hjingi_bank_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->hnoridur_bank = data;
 }
 
 static WRITE8_HANDLER( hjingi_lockout_w )
 {
-	coin_lockout_w(space->machine, 0, (~data) & 0x01);
+	coin_lockout_w(space->machine(), 0, (~data) & 0x01);
 }
 
 static WRITE8_HANDLER( hjingi_hopper_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->hopper = data & 0x01;
 }
 
-static UINT8 hjingi_hopper_bit( running_machine *machine )
+static UINT8 hjingi_hopper_bit( running_machine &machine )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
-	return (state->hopper && !(machine->primary_screen->frame_number() % 10)) ? 0 : (1 << 6);
+	dynax_state *state = machine.driver_data<dynax_state>();
+	return (state->hopper && !(machine.primary_screen->frame_number() % 10)) ? 0 : (1 << 6);
 }
 
 static READ8_HANDLER( hjingi_keyboard_0_r )
 {
-	return hanamai_keyboard_0_r(space, 0) | hjingi_hopper_bit(space->machine);
+	return hanamai_keyboard_0_r(space, 0) | hjingi_hopper_bit(space->machine());
 }
 
 static READ8_HANDLER( hjingi_keyboard_1_r )
 {
-	return hanamai_keyboard_1_r(space, 0) | input_port_read(space->machine, "BET");
+	return hanamai_keyboard_1_r(space, 0) | input_port_read(space->machine(), "BET");
 }
 
 static ADDRESS_MAP_START( hjingi_mem_map, AS_PROGRAM, 8 )
@@ -706,7 +706,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( yarunara_input_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (offset)
 	{
@@ -721,7 +721,7 @@ static WRITE8_HANDLER( yarunara_input_w )
 
 static READ8_HANDLER( yarunara_input_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 
@@ -732,7 +732,7 @@ static READ8_HANDLER( yarunara_input_r )
 			switch (state->input_sel)
 			{
 			case 0x00:
-				return input_port_read(space->machine, "COINS");	// coins
+				return input_port_read(space->machine(), "COINS");	// coins
 
 			case 0x02:
 				return 0xff;	// bit 7 must be 1. Bit 2?
@@ -749,12 +749,12 @@ static READ8_HANDLER( yarunara_input_r )
 			// player 2
 			case 0x01:	//quiztvqq
 			case 0x81:
-				return input_port_read(space->machine, keynames1[state->keyb++]);
+				return input_port_read(space->machine(), keynames1[state->keyb++]);
 
 			// player 1
 			case 0x02:	//quiztvqq
 			case 0x82:
-				return input_port_read(space->machine, keynames0[state->keyb++]);
+				return input_port_read(space->machine(), keynames0[state->keyb++]);
 
 			default:
 				return 0xff;
@@ -766,8 +766,8 @@ static READ8_HANDLER( yarunara_input_r )
 
 static WRITE8_HANDLER( yarunara_rombank_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
-	memory_set_bank(space->machine, "bank1", data);
+	dynax_state *state = space->machine().driver_data<dynax_state>();
+	memory_set_bank(space->machine(), "bank1", data);
 
 	state->hnoridur_bank = data;
 }
@@ -962,19 +962,19 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( jantouki_soundlatch_ack_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	return (state->soundlatch_ack) ? 0x80 : 0;
 }
 
 static WRITE8_HANDLER( jantouki_soundlatch_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	state->soundlatch_ack = 1;
 	state->soundlatch_full = 1;
 	state->soundlatch_irq = 1;
 	state->latch = data;
-	jantouki_sound_update_irq(space->machine);
+	jantouki_sound_update_irq(space->machine());
 }
 
 static READ8_HANDLER( jantouki_blitter_busy_r )
@@ -984,8 +984,8 @@ static READ8_HANDLER( jantouki_blitter_busy_r )
 
 static WRITE8_HANDLER( jantouki_rombank_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
-	set_led_status(space->machine, 0, data & 0x10);	// maybe
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	set_led_status(space->machine(), 0, data & 0x10);	// maybe
 }
 
 static ADDRESS_MAP_START( jantouki_io_map, AS_IO, 8 )
@@ -1027,22 +1027,22 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( jantouki_soundlatch_ack_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->soundlatch_ack = data;
 	state->soundlatch_irq = 0;
-	jantouki_sound_update_irq(space->machine);
+	jantouki_sound_update_irq(space->machine());
 }
 
 static READ8_HANDLER( jantouki_soundlatch_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->soundlatch_full = 0;
 	return state->latch;
 }
 
 static READ8_HANDLER( jantouki_soundlatch_status_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	return (state->soundlatch_full) ? 0 : 0x80;
 }
 
@@ -1068,21 +1068,21 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( mjelctrn_keyboard_1_r )
 {
-	return (hanamai_keyboard_1_r(space, 0) & 0x3f) | (input_port_read(space->machine, "FAKE") ? 0x40 : 0);
+	return (hanamai_keyboard_1_r(space, 0) & 0x3f) | (input_port_read(space->machine(), "FAKE") ? 0x40 : 0);
 }
 
 static READ8_HANDLER( mjelctrn_dsw_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	int dsw = (state->keyb & 0xc0) >> 6;
 	static const char *const dswnames[] = { "DSW0", "DSW1", "DSW3", "DSW4" };
 
-	return input_port_read(space->machine, dswnames[dsw]);
+	return input_port_read(space->machine(), dswnames[dsw]);
 }
 
 static WRITE8_HANDLER( mjelctrn_blitter_ack_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->blitter_irq = 0;
 }
 
@@ -1131,33 +1131,33 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( htengoku_select_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->input_sel = data;
 	state->keyb = 0;
 }
 
 static WRITE8_DEVICE_HANDLER( htengoku_dsw_w )
 {
-	dynax_state *state = device->machine->driver_data<dynax_state>();
+	dynax_state *state = device->machine().driver_data<dynax_state>();
 	state->dsw_sel = data;
 }
 
 static READ8_DEVICE_HANDLER( htengoku_dsw_r )
 {
-	dynax_state *state = device->machine->driver_data<dynax_state>();
-	if (!BIT(state->dsw_sel, 0))	return input_port_read(device->machine, "DSW0");
-	if (!BIT(state->dsw_sel, 1))	return input_port_read(device->machine, "DSW1");
-	if (!BIT(state->dsw_sel, 2))	return input_port_read(device->machine, "DSW2");
-	if (!BIT(state->dsw_sel, 3))	return input_port_read(device->machine, "DSW3");
-	if (!BIT(state->dsw_sel, 4))	return input_port_read(device->machine, "DSW4");
-	logerror("%s: warning, unknown bits read, dsw_sel = %02x\n", device->machine->describe_context(), state->dsw_sel);
+	dynax_state *state = device->machine().driver_data<dynax_state>();
+	if (!BIT(state->dsw_sel, 0))	return input_port_read(device->machine(), "DSW0");
+	if (!BIT(state->dsw_sel, 1))	return input_port_read(device->machine(), "DSW1");
+	if (!BIT(state->dsw_sel, 2))	return input_port_read(device->machine(), "DSW2");
+	if (!BIT(state->dsw_sel, 3))	return input_port_read(device->machine(), "DSW3");
+	if (!BIT(state->dsw_sel, 4))	return input_port_read(device->machine(), "DSW4");
+	logerror("%s: warning, unknown bits read, dsw_sel = %02x\n", device->machine().describe_context(), state->dsw_sel);
 
 	return 0xff;
 }
 
 static WRITE8_HANDLER( htengoku_coin_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (state->input_sel)
 	{
@@ -1165,7 +1165,7 @@ static WRITE8_HANDLER( htengoku_coin_w )
 			// bit 0 = coin counter
 			// bit 1 = out counter
 			// bit 2 = hopper
-			coin_counter_w(space->machine, 0, data & 1);
+			coin_counter_w(space->machine(), 0, data & 1);
 			state->hopper = data & 0x04;
 #ifdef MAME_DEBUG
 //          popmessage("COINS %02x",data);
@@ -1182,14 +1182,14 @@ static WRITE8_HANDLER( htengoku_coin_w )
 
 static READ8_HANDLER( htengoku_input_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 
 	switch (state->input_sel)
 	{
-		case 0x81:	return input_port_read(space->machine, keynames1[state->keyb++]);
-		case 0x82:	return input_port_read(space->machine, keynames0[state->keyb++]);
+		case 0x81:	return input_port_read(space->machine(), keynames1[state->keyb++]);
+		case 0x82:	return input_port_read(space->machine(), keynames0[state->keyb++]);
 		case 0x0d:	return 0xff;	// unused
 	}
 	logerror("%04x: input_r with select = %02x\n", cpu_get_pc(space->cpu), state->input_sel);
@@ -1198,13 +1198,13 @@ static READ8_HANDLER( htengoku_input_r )
 
 static READ8_HANDLER( htengoku_coin_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (state->input_sel)
 	{
-		case 0x00:	return input_port_read(space->machine, "COINS");
+		case 0x00:	return input_port_read(space->machine(), "COINS");
 		case 0x01:	return 0xff;	//?
-		case 0x02:	return 0xbf | ((state->hopper && !(space->machine->primary_screen->frame_number() % 10)) ? 0 : (1 << 6));	// bit 7 = blitter busy, bit 6 = hopper
+		case 0x02:	return 0xbf | ((state->hopper && !(space->machine().primary_screen->frame_number() % 10)) ? 0 : (1 << 6));	// bit 7 = blitter busy, bit 6 = hopper
 		case 0x03:	return state->coins;
 	}
 	logerror("%04x: coin_r with select = %02x\n", cpu_get_pc(space->cpu), state->input_sel);
@@ -1213,9 +1213,9 @@ static READ8_HANDLER( htengoku_coin_r )
 
 static WRITE8_HANDLER( htengoku_rombank_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
-	memory_set_bank(space->machine, "bank1", data & 0x07);
+	memory_set_bank(space->machine(), "bank1", data & 0x07);
 	state->hnoridur_bank = data;
 }
 
@@ -1276,7 +1276,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tenkai_ipsel_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	switch (offset)
 	{
 	case 0:	state->input_sel = data;
@@ -1290,13 +1290,13 @@ static WRITE8_HANDLER( tenkai_ipsel_w )
 
 static WRITE8_HANDLER( tenkai_ip_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (state->input_sel)
 	{
 	case 0x0c:
-		coin_counter_w(space->machine, 0, data & 0x01);
-		coin_counter_w(space->machine, 1, data & 0x02);
+		coin_counter_w(space->machine(), 0, data & 0x01);
+		coin_counter_w(space->machine(), 1, data & 0x02);
 		// bit 2?
 		// bit 3?
 //          popmessage("%02x", data);
@@ -1312,7 +1312,7 @@ static WRITE8_HANDLER( tenkai_ip_w )
 
 static READ8_HANDLER( tenkai_ip_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 	//static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 
@@ -1323,7 +1323,7 @@ static READ8_HANDLER( tenkai_ip_r )
 			switch (state->input_sel)
 			{
 				case 0x00:
-					return input_port_read(space->machine, "COINS");	// coins
+					return input_port_read(space->machine(), "COINS");	// coins
 
 				default:
 					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", cpu_get_pc(space->cpu), state->input_sel, offset);
@@ -1342,13 +1342,13 @@ static READ8_HANDLER( tenkai_ip_r )
 				case 0x81:
 					if (state->keyb >= 5)
 						logerror("%04x: unmapped keyb=%02x read\n", cpu_get_pc(space->cpu), state->keyb);
-					return 0xff;//input_port_read(space->machine, keynames1[state->keyb++]);
+					return 0xff;//input_port_read(space->machine(), keynames1[state->keyb++]);
 
 				// player 1
 				case 0x82:
 					if (state->keyb >= 5)
 						logerror("%04x: unmapped keyb=%02x read\n", cpu_get_pc(space->cpu), state->keyb);
-					return input_port_read(space->machine, keynames0[state->keyb++]);
+					return input_port_read(space->machine(), keynames0[state->keyb++]);
 
 				default:
 					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", cpu_get_pc(space->cpu), state->input_sel, offset);
@@ -1362,33 +1362,33 @@ static READ8_HANDLER( tenkai_ip_r )
 
 static WRITE8_DEVICE_HANDLER( tenkai_dswsel_w )
 {
-	dynax_state *state = device->machine->driver_data<dynax_state>();
+	dynax_state *state = device->machine().driver_data<dynax_state>();
 	state->dsw_sel = data;
 }
 
 static READ8_DEVICE_HANDLER( tenkai_dsw_r )
 {
-	dynax_state *state = device->machine->driver_data<dynax_state>();
+	dynax_state *state = device->machine().driver_data<dynax_state>();
 
-	if (!BIT(state->dsw_sel, 0)) return input_port_read(device->machine, "DSW0");
-	if (!BIT(state->dsw_sel, 1)) return input_port_read(device->machine, "DSW1");
-	if (!BIT(state->dsw_sel, 2)) return input_port_read(device->machine, "DSW2");
-	if (!BIT(state->dsw_sel, 3)) return input_port_read(device->machine, "DSW3");
-	if (!BIT(state->dsw_sel, 4)) return input_port_read(device->machine, "DSW4");
-	logerror("%s: unmapped dsw %02x read\n", device->machine->describe_context(), state->dsw_sel);
+	if (!BIT(state->dsw_sel, 0)) return input_port_read(device->machine(), "DSW0");
+	if (!BIT(state->dsw_sel, 1)) return input_port_read(device->machine(), "DSW1");
+	if (!BIT(state->dsw_sel, 2)) return input_port_read(device->machine(), "DSW2");
+	if (!BIT(state->dsw_sel, 3)) return input_port_read(device->machine(), "DSW3");
+	if (!BIT(state->dsw_sel, 4)) return input_port_read(device->machine(), "DSW4");
+	logerror("%s: unmapped dsw %02x read\n", device->machine().describe_context(), state->dsw_sel);
 
 	return 0xff;
 }
 
 static READ8_HANDLER( tenkai_palette_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	return state->palette_ram[512 * state->palbank + offset];
 }
 
 static WRITE8_HANDLER( tenkai_palette_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	int addr = 512 * state->palbank + offset;
 	state->palette_ram[addr] = data;
 
@@ -1398,14 +1398,14 @@ static WRITE8_HANDLER( tenkai_palette_w )
 		int r = br & 0x1f;
 		int g = bg & 0x1f;
 		int b = ((bg & 0xc0) >> 3) | ((br & 0xe0) >> 5);
-		palette_set_color_rgb(space->machine, 256 * state->palbank + ((offset & 0xf) | ((offset & 0x1e0) >> 1)), pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(space->machine(), 256 * state->palbank + ((offset & 0xf) | ((offset & 0x1e0) >> 1)), pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
-static void tenkai_update_rombank( running_machine *machine )
+static void tenkai_update_rombank( running_machine &machine )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
-	state->romptr = machine->region("maincpu")->base() + 0x10000 + 0x8000 * state->rombank;
+	dynax_state *state = machine.driver_data<dynax_state>();
+	state->romptr = machine.region("maincpu")->base() + 0x10000 + 0x8000 * state->rombank;
 //  logerror("rombank = %02x\n", state->rombank);
 }
 
@@ -1416,26 +1416,26 @@ static READ8_HANDLER( tenkai_p3_r )
 
 static WRITE8_HANDLER( tenkai_p3_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->rombank = ((data & 0x04) << 1) | (state->rombank & 0x07);
-	tenkai_update_rombank(space->machine);
+	tenkai_update_rombank(space->machine());
 }
 static WRITE8_HANDLER( tenkai_p4_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->rombank = (state->rombank & 0x08) | ((data & 0x0e) >> 1);
-	tenkai_update_rombank(space->machine);
+	tenkai_update_rombank(space->machine());
 }
 
 static READ8_HANDLER( tenkai_p5_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	return state->tenkai_p5_val;
 }
 
 static WRITE8_HANDLER( tenkai_p6_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->tenkai_p5_val &= 0x0f;
 
 	if (data & 0x0f)
@@ -1444,7 +1444,7 @@ static WRITE8_HANDLER( tenkai_p6_w )
 
 static WRITE8_HANDLER( tenkai_p7_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->tenkai_p5_val &= 0xf0;
 
 	if (data & 0x03)
@@ -1453,9 +1453,9 @@ static WRITE8_HANDLER( tenkai_p7_w )
 
 static WRITE8_HANDLER( tenkai_p8_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->rombank = ((data & 0x08) << 1) | (state->rombank & 0x0f);
-	tenkai_update_rombank(space->machine);
+	tenkai_update_rombank(space->machine());
 }
 
 static READ8_HANDLER( tenkai_p8_r )
@@ -1465,7 +1465,7 @@ static READ8_HANDLER( tenkai_p8_r )
 
 static READ8_HANDLER( tenkai_8000_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	if (state->rombank < 0x10)
 		return state->romptr[offset];
@@ -1480,7 +1480,7 @@ static READ8_HANDLER( tenkai_8000_r )
 
 static WRITE8_HANDLER( tenkai_8000_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	if ((state->rombank == 0x10) && (offset < 0x10))
 	{
@@ -1496,24 +1496,24 @@ static WRITE8_HANDLER( tenkai_8000_w )
 	logerror("%04x: unmapped offset %04X=%02X written with rombank=%02X\n", cpu_get_pc(space->cpu), offset, data, state->rombank);
 }
 
-static void tenkai_show_6c( running_machine *machine )
+static void tenkai_show_6c( running_machine &machine )
 {
-//    dynax_state *state = machine->driver_data<dynax_state>();
+//    dynax_state *state = machine.driver_data<dynax_state>();
 //    popmessage("%02x %02x", state->tenkai_6c, state->tenkai_70);
 }
 
 static WRITE8_HANDLER( tenkai_6c_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->tenkai_6c = data;
-	tenkai_show_6c(space->machine);
+	tenkai_show_6c(space->machine());
 }
 
 static WRITE8_HANDLER( tenkai_70_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->tenkai_70 = data;
-	tenkai_show_6c(space->machine);
+	tenkai_show_6c(space->machine());
 }
 
 static WRITE8_HANDLER( tenkai_blit_romregion_w )
@@ -1570,30 +1570,30 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( gekisha_keyboard_0_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	int res = 0x3f;
 
-	if (!BIT(state->keyb, 0)) res &= input_port_read(space->machine, "KEY0");
-	if (!BIT(state->keyb, 1)) res &= input_port_read(space->machine, "KEY1");
-	if (!BIT(state->keyb, 2)) res &= input_port_read(space->machine, "KEY2");
-	if (!BIT(state->keyb, 3)) res &= input_port_read(space->machine, "KEY3");
-	if (!BIT(state->keyb, 4)) res &= input_port_read(space->machine, "KEY4");
+	if (!BIT(state->keyb, 0)) res &= input_port_read(space->machine(), "KEY0");
+	if (!BIT(state->keyb, 1)) res &= input_port_read(space->machine(), "KEY1");
+	if (!BIT(state->keyb, 2)) res &= input_port_read(space->machine(), "KEY2");
+	if (!BIT(state->keyb, 3)) res &= input_port_read(space->machine(), "KEY3");
+	if (!BIT(state->keyb, 4)) res &= input_port_read(space->machine(), "KEY4");
 
 	return res;
 }
 static READ8_HANDLER( gekisha_keyboard_1_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	int res = 0x3f;
 
-	if (!BIT(state->keyb, 0)) res &= input_port_read(space->machine, "KEY5");
-	if (!BIT(state->keyb, 1)) res &= input_port_read(space->machine, "KEY6");
-	if (!BIT(state->keyb, 2)) res &= input_port_read(space->machine, "KEY7");
-	if (!BIT(state->keyb, 3)) res &= input_port_read(space->machine, "KEY8");
-	if (!BIT(state->keyb, 4)) res &= input_port_read(space->machine, "KEY9");
+	if (!BIT(state->keyb, 0)) res &= input_port_read(space->machine(), "KEY5");
+	if (!BIT(state->keyb, 1)) res &= input_port_read(space->machine(), "KEY6");
+	if (!BIT(state->keyb, 2)) res &= input_port_read(space->machine(), "KEY7");
+	if (!BIT(state->keyb, 3)) res &= input_port_read(space->machine(), "KEY8");
+	if (!BIT(state->keyb, 4)) res &= input_port_read(space->machine(), "KEY9");
 
 	// bit 6
-	res |= input_port_read(space->machine, "BET");
+	res |= input_port_read(space->machine(), "BET");
 
 	// bit 7 = blitter busy
 
@@ -1602,41 +1602,41 @@ static READ8_HANDLER( gekisha_keyboard_1_r )
 
 static WRITE8_HANDLER( gekisha_hopper_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->gekisha_val[offset] = data;
 //  popmessage("%02x %02x", gekisha_val[0], gekisha_val[1]);
 }
 
-static void gekisha_set_rombank( running_machine *machine, UINT8 data )
+static void gekisha_set_rombank( running_machine &machine, UINT8 data )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 	state->rombank = data;
-	state->romptr = machine->region("maincpu")->base() + 0x8000 + state->rombank * 0x8000;
+	state->romptr = machine.region("maincpu")->base() + 0x8000 + state->rombank * 0x8000;
 }
 
 static WRITE8_HANDLER( gekisha_p4_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->gekisha_rom_enable = !BIT(data, 3);
-	gekisha_set_rombank(space->machine, BIT(data, 2));
+	gekisha_set_rombank(space->machine(), BIT(data, 2));
 }
 
 static READ8_HANDLER( gekisha_8000_r )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	if (state->gekisha_rom_enable)
 		return state->romptr[offset];
 
 	switch (offset + 0x8000)
 	{
-		case 0x8061:	return input_port_read(space->machine, "COINS");
+		case 0x8061:	return input_port_read(space->machine(), "COINS");
 		case 0x8062:	return gekisha_keyboard_1_r(space, 0);
 		case 0x8063:	return gekisha_keyboard_0_r(space, 0);
-		case 0x8064:	return input_port_read(space->machine, "DSW1");
-		case 0x8065:	return input_port_read(space->machine, "DSW3");
-		case 0x8066:	return input_port_read(space->machine, "DSW4");
-		case 0x8067:	return input_port_read(space->machine, "DSW2");
+		case 0x8064:	return input_port_read(space->machine(), "DSW1");
+		case 0x8065:	return input_port_read(space->machine(), "DSW3");
+		case 0x8066:	return input_port_read(space->machine(), "DSW4");
+		case 0x8067:	return input_port_read(space->machine(), "DSW2");
 	}
 
 	logerror("%04x: unmapped offset %04X read with rombank=%02X\n",cpu_get_pc(space->cpu), offset, state->rombank);
@@ -1645,7 +1645,7 @@ static READ8_HANDLER( gekisha_8000_r )
 
 static WRITE8_HANDLER( gekisha_8000_w )
 {
-	dynax_state *state = space->machine->driver_data<dynax_state>();
+	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	if (!state->gekisha_rom_enable)
 	{
@@ -4203,12 +4203,12 @@ INPUT_PORTS_END
 
 static MACHINE_START( dynax )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->soundcpu = machine->device("soundcpu");
-	state->rtc = machine->device("rtc");
-	state->ymsnd = machine->device("ymsnd");
+	state->maincpu = machine.device("maincpu");
+	state->soundcpu = machine.device("soundcpu");
+	state->rtc = machine.device("rtc");
+	state->ymsnd = machine.device("ymsnd");
 
 	state->save_item(NAME(state->sound_irq));
 	state->save_item(NAME(state->vblank_irq));
@@ -4243,9 +4243,9 @@ static MACHINE_START( dynax )
 
 static MACHINE_RESET( dynax )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 
-	if (machine->device("msm") != NULL)
+	if (machine.device("msm") != NULL)
 		MACHINE_RESET_CALL(adpcm);
 
 	state->sound_irq = 0;
@@ -4283,7 +4283,7 @@ static MACHINE_RESET( dynax )
 
 static MACHINE_START( hanamai )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 0x10, &ROM[0x8000], 0x8000);
 
 	MACHINE_START_CALL(dynax);
@@ -4291,8 +4291,8 @@ static MACHINE_START( hanamai )
 
 static MACHINE_START( hnoridur )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
-	int bank_n = (machine->region("maincpu")->bytes() - 0x10000) / 0x8000;
+	UINT8 *ROM = machine.region("maincpu")->base();
+	int bank_n = (machine.region("maincpu")->bytes() - 0x10000) / 0x8000;
 
 	memory_configure_bank(machine, "bank1", 0, bank_n, &ROM[0x10000], 0x8000);
 
@@ -4301,7 +4301,7 @@ static MACHINE_START( hnoridur )
 
 static MACHINE_START( htengoku )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x8000);
 
@@ -4596,7 +4596,7 @@ MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( yarunara_clock_interrupt )
 {
-	dynax_state *state = device->machine->driver_data<dynax_state>();
+	dynax_state *state = device->machine().driver_data<dynax_state>();
 	state->yarunara_clk_toggle ^= 1;
 
 	if (state->yarunara_clk_toggle == 1)
@@ -4604,7 +4604,7 @@ static INTERRUPT_GEN( yarunara_clock_interrupt )
 	else
 		state->sound_irq = 1;
 
-	sprtmtch_update_irq(device->machine);
+	sprtmtch_update_irq(device->machine());
 }
 
 static MACHINE_CONFIG_DERIVED( yarunara, hnoridur )
@@ -4674,15 +4674,15 @@ static const msm5205_interface jantouki_msm5205_interface =
 
 static MACHINE_START( jantouki )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
-	UINT8 *MAIN = machine->region("maincpu")->base();
-	UINT8 *SOUND = machine->region("soundcpu")->base();
+	dynax_state *state = machine.driver_data<dynax_state>();
+	UINT8 *MAIN = machine.region("maincpu")->base();
+	UINT8 *SOUND = machine.region("soundcpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 0x10, &MAIN[0x8000],  0x8000);
 	memory_configure_bank(machine, "bank2", 0, 12,   &SOUND[0x8000], 0x8000);
 
-	state->top_scr = machine->device("top");
-	state->bot_scr = machine->device("bottom");
+	state->top_scr = machine.device("top");
+	state->bot_scr = machine.device("bottom");
 
 	MACHINE_START_CALL(dynax);
 }
@@ -4757,16 +4757,16 @@ MACHINE_CONFIG_END
 /*  It runs in IM 2, thus needs a vector on the data bus:
     0xfa and 0xfc are very similar, they should be triggered by the blitter
     0xf8 is vblank  */
-void mjelctrn_update_irq( running_machine *machine )
+void mjelctrn_update_irq( running_machine &machine )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 	state->blitter_irq = 1;
 	device_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xfa);
 }
 
 static INTERRUPT_GEN( mjelctrn_vblank_interrupt )
 {
-	dynax_state *state = device->machine->driver_data<dynax_state>();
+	dynax_state *state = device->machine().driver_data<dynax_state>();
 
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
@@ -4792,16 +4792,16 @@ MACHINE_CONFIG_END
     0x42 and 0x44 are very similar, they should be triggered by the blitter
     0x40 is vblank
     0x46 is a periodic irq? */
-void neruton_update_irq( running_machine *machine )
+void neruton_update_irq( running_machine &machine )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 	state->blitter_irq = 1;
 	device_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0x42);
 }
 
 static INTERRUPT_GEN( neruton_vblank_interrupt )
 {
-	dynax_state *state = device->machine->driver_data<dynax_state>();
+	dynax_state *state = device->machine().driver_data<dynax_state>();
 
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
@@ -4830,7 +4830,7 @@ MACHINE_CONFIG_END
     0x40 is vblank  */
 static INTERRUPT_GEN( majxtal7_vblank_interrupt )
 {
-	dynax_state *state = device->machine->driver_data<dynax_state>();
+	dynax_state *state = device->machine().driver_data<dynax_state>();
 
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
@@ -4934,7 +4934,7 @@ static MACHINE_START( tenkai )
 {
 	MACHINE_START_CALL(dynax);
 
-	machine->state().register_postload(tenkai_bank_postload, NULL);
+	machine.state().register_postload(tenkai_bank_postload, NULL);
 }
 
 static MACHINE_CONFIG_START( tenkai, dynax_state )
@@ -4988,7 +4988,7 @@ MACHINE_CONFIG_END
 
 static STATE_POSTLOAD( gekisha_bank_postload )
 {
-	dynax_state *state = machine->driver_data<dynax_state>();
+	dynax_state *state = machine.driver_data<dynax_state>();
 
 	gekisha_set_rombank(machine, state->rombank);
 }
@@ -4997,7 +4997,7 @@ static MACHINE_START( gekisha )
 {
 	MACHINE_START_CALL(dynax);
 
-	machine->state().register_postload(gekisha_bank_postload, NULL);
+	machine.state().register_postload(gekisha_bank_postload, NULL);
 }
 
 static MACHINE_RESET( gekisha )
@@ -5386,7 +5386,7 @@ ROM_END
 static DRIVER_INIT( blktouch )
 {
 	// fearsome encryption ;-)
-	UINT8	*src = (UINT8 *)machine->region("maincpu")->base();
+	UINT8	*src = (UINT8 *)machine.region("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x90000; i++)
@@ -5395,7 +5395,7 @@ static DRIVER_INIT( blktouch )
 
 	}
 
-	src = (UINT8 *)machine->region("gfx1")->base();
+	src = (UINT8 *)machine.region("gfx1")->base();
 
 	for (i = 0; i < 0xc0000; i++)
 	{
@@ -5408,8 +5408,8 @@ static DRIVER_INIT( maya )
 {
 	/* Address lines scrambling on 1 z80 rom */
 	int i;
-	UINT8	*gfx = (UINT8 *)machine->region("gfx1")->base();
-	UINT8	*rom = machine->region("maincpu")->base() + 0x28000, *end = rom + 0x10000;
+	UINT8	*gfx = (UINT8 *)machine.region("gfx1")->base();
+	UINT8	*rom = machine.region("maincpu")->base() + 0x28000, *end = rom + 0x10000;
 	for ( ; rom < end; rom += 8)
 	{
 		UINT8 temp[8];
@@ -6126,8 +6126,8 @@ ROM_END
 static DRIVER_INIT( mjelct3 )
 {
 	int i;
-	UINT8	*rom = machine->region("maincpu")->base();
-	size_t  size = machine->region("maincpu")->bytes();
+	UINT8	*rom = machine.region("maincpu")->base();
+	size_t  size = machine.region("maincpu")->bytes();
 	UINT8	*rom1 = auto_alloc_array(machine, UINT8, size);
 
 	memcpy(rom1, rom, size);
@@ -6139,8 +6139,8 @@ static DRIVER_INIT( mjelct3 )
 static DRIVER_INIT( mjelct3a )
 {
 	int i, j;
-	UINT8	*rom = machine->region("maincpu")->base();
-	size_t  size = machine->region("maincpu")->bytes();
+	UINT8	*rom = machine.region("maincpu")->base();
+	size_t  size = machine.region("maincpu")->bytes();
 	UINT8	*rom1 = auto_alloc_array(machine, UINT8, size);
 
 	memcpy(rom1, rom, size);
@@ -6517,7 +6517,7 @@ ROM_END
 
 static DRIVER_INIT( mjreach )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x10060, 0x10060, FUNC(yarunara_flipscreen_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x10060, 0x10060, FUNC(yarunara_flipscreen_w));
 }
 
 /***************************************************************************

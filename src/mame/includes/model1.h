@@ -1,4 +1,4 @@
-typedef void (*tgp_func)(running_machine *machine);
+typedef void (*tgp_func)(running_machine &machine);
 
 enum {FIFO_SIZE = 256};
 enum {MAT_STACK_SIZE = 32};
@@ -103,8 +103,8 @@ ADDRESS_MAP_EXTERN( model1_vr_tgp_map, 32 );
 
 MACHINE_START( model1 );
 
-void model1_vr_tgp_reset( running_machine *machine );
-void model1_tgp_reset(running_machine *machine, int swa);
+void model1_vr_tgp_reset( running_machine &machine );
+void model1_tgp_reset(running_machine &machine, int swa);
 
 
 /*----------- defined in video/model1.c -----------*/

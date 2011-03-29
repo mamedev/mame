@@ -226,9 +226,9 @@ static DEVICE_START( zsg2 )
 	memset(&info->zc, 0, sizeof(info->zc));
 	memset(&info->act, 0, sizeof(info->act));
 
-	info->stream = device->machine->sound().stream_alloc(*device, 0, 2, info->sample_rate, info, update_stereo);
+	info->stream = device->machine().sound().stream_alloc(*device, 0, 2, info->sample_rate, info, update_stereo);
 
-	info->bank_samples = device->machine->region(intf->samplergn)->base();
+	info->bank_samples = device->machine().region(intf->samplergn)->base();
 }
 
 /**************************************************************************

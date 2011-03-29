@@ -841,7 +841,7 @@ INLINE UINT8 FM_STATUS_FLAG(FM_ST *ST)
 {
 	if( COMPARE_TIMES(ST->busy_expiry_time, UNDEFINED_TIME) != 0 )
 	{
-		if (COMPARE_TIMES(ST->busy_expiry_time, FM_GET_TIME_NOW(ST->device->machine)) > 0)
+		if (COMPARE_TIMES(ST->busy_expiry_time, FM_GET_TIME_NOW(&ST->device->machine())) > 0)
 			return ST->status | 0x80;	/* with busy */
 		/* expire */
 		FM_BUSY_CLEAR(ST);
@@ -851,7 +851,7 @@ INLINE UINT8 FM_STATUS_FLAG(FM_ST *ST)
 INLINE void FM_BUSY_SET(FM_ST *ST,int busyclock )
 {
 	TIME_TYPE expiry_period = MULTIPLY_TIME_BY_INT(attotime::from_hz(ST->clock), busyclock * ST->timer_prescaler);
-	ST->busy_expiry_time = ADD_TIMES(FM_GET_TIME_NOW(ST->device->machine), expiry_period);
+	ST->busy_expiry_time = ADD_TIMES(FM_GET_TIME_NOW(&ST->device->machine()), expiry_period);
 }
 #else
 #define FM_STATUS_FLAG(ST) ((ST)->status)
@@ -2264,11 +2264,11 @@ void * ym2203_init(void *param, device_t *device, int clock, int rate,
 	YM2203 *F2203;
 
 	/* allocate ym2203 state space */
-	F2203 = auto_alloc_clear(device->machine, YM2203);
+	F2203 = auto_alloc_clear(device->machine(), YM2203);
 
 	if( !init_tables() )
 	{
-		auto_free( device->machine, F2203 );
+		auto_free( device->machine(), F2203 );
 		return NULL;
 	}
 
@@ -2295,7 +2295,7 @@ void ym2203_shutdown(void *chip)
 	YM2203 *FM2203 = (YM2203 *)chip;
 
 	FMCloseTable();
-	auto_free(FM2203->OPN.ST.device->machine, FM2203);
+	auto_free(FM2203->OPN.ST.device->machine(), FM2203);
 }
 
 /* YM2203 I/O interface */
@@ -3487,11 +3487,11 @@ void * ym2608_init(void *param, device_t *device, int clock, int rate,
 	YM2608 *F2608;
 
 	/* allocate extend state space */
-	F2608 = auto_alloc_clear(device->machine, YM2608);
+	F2608 = auto_alloc_clear(device->machine(), YM2608);
 	/* allocate total level table (128kb space) */
 	if( !init_tables() )
 	{
-		auto_free( device->machine, F2608 );
+		auto_free( device->machine(), F2608 );
 		return NULL;
 	}
 
@@ -3539,7 +3539,7 @@ void ym2608_shutdown(void *chip)
 	YM2608 *F2608 = (YM2608 *)chip;
 
 	FMCloseTable();
-	auto_free(F2608->OPN.ST.device->machine, F2608);
+	auto_free(F2608->OPN.ST.device->machine(), F2608);
 }
 
 /* reset one of chips */
@@ -4170,11 +4170,11 @@ void *ym2610_init(void *param, device_t *device, int clock, int rate,
 	YM2610 *F2610;
 
 	/* allocate extend state space */
-	F2610 = auto_alloc_clear(device->machine, YM2610);
+	F2610 = auto_alloc_clear(device->machine(), YM2610);
 	/* allocate total level table (128kb space) */
 	if( !init_tables() )
 	{
-		auto_free( device->machine, F2610 );
+		auto_free( device->machine(), F2610 );
 		return NULL;
 	}
 
@@ -4214,7 +4214,7 @@ void ym2610_shutdown(void *chip)
 	YM2610 *F2610 = (YM2610 *)chip;
 
 	FMCloseTable();
-	auto_free(F2610->OPN.ST.device->machine, F2610);
+	auto_free(F2610->OPN.ST.device->machine(), F2610);
 }
 
 /* reset one of chip */
@@ -4230,17 +4230,17 @@ void ym2610_reset_chip(void *chip)
 
 	/* setup PCM buffers again */
 	name.printf("%s",dev->tag());
-	F2610->pcmbuf   = (const UINT8 *)dev->machine->region(name)->base();
-	F2610->pcm_size = dev->machine->region(name)->bytes();
+	F2610->pcmbuf   = (const UINT8 *)dev->machine().region(name)->base();
+	F2610->pcm_size = dev->machine().region(name)->bytes();
 	name.printf("%s.deltat",dev->tag());
-	F2610->deltaT.memory = (UINT8 *)dev->machine->region(name)->base();
+	F2610->deltaT.memory = (UINT8 *)dev->machine().region(name)->base();
 	if(F2610->deltaT.memory == NULL)
 	{
 		F2610->deltaT.memory = (UINT8*)F2610->pcmbuf;
 		F2610->deltaT.memory_size = F2610->pcm_size;
 	}
 	else
-		F2610->deltaT.memory_size = dev->machine->region(name)->bytes();
+		F2610->deltaT.memory_size = dev->machine().region(name)->bytes();
 
 	/* Reset Prescaler */
 	OPNSetPres( OPN, 6*24, 6*24, 4*2); /* OPN 1/6 , SSG 1/4 */

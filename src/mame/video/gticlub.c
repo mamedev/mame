@@ -38,7 +38,7 @@ static int K001006_device_sel[MAX_K001006_CHIPS] = { 0, 0 };
 
 static UINT32 *K001006_palette[MAX_K001006_CHIPS];
 
-void K001006_init(running_machine *machine)
+void K001006_init(running_machine &machine)
 {
 	int i;
 	for (i=0; i<MAX_K001006_CHIPS; i++)
@@ -52,7 +52,7 @@ void K001006_init(running_machine *machine)
 	}
 }
 
-static UINT32 K001006_r(running_machine *machine, int chip, int offset, UINT32 mem_mask)
+static UINT32 K001006_r(running_machine &machine, int chip, int offset, UINT32 mem_mask)
 {
 	if (offset == 1)
 	{
@@ -60,7 +60,7 @@ static UINT32 K001006_r(running_machine *machine, int chip, int offset, UINT32 m
 		{
 			case 0x0b:		// CG Board ROM read
 			{
-				UINT16 *rom = (UINT16*)machine->region("gfx1")->base();
+				UINT16 *rom = (UINT16*)machine.region("gfx1")->base();
 				return rom[K001006_addr[chip] / 2] << 16;
 			}
 			case 0x0d:		// Palette RAM read
@@ -135,7 +135,7 @@ static void K001006_w(int chip, int offset, UINT32 data, UINT32 mem_mask)
 
 READ32_HANDLER(K001006_0_r)
 {
-	return K001006_r(space->machine, 0, offset, mem_mask);
+	return K001006_r(space->machine(), 0, offset, mem_mask);
 }
 
 WRITE32_HANDLER(K001006_0_w)
@@ -145,7 +145,7 @@ WRITE32_HANDLER(K001006_0_w)
 
 READ32_HANDLER(K001006_1_r)
 {
-	return K001006_r(space->machine, 1, offset, mem_mask);
+	return K001006_r(space->machine(), 1, offset, mem_mask);
 }
 
 WRITE32_HANDLER(K001006_1_w)
@@ -168,7 +168,7 @@ static bitmap_t *K001005_bitmap[2];
 static bitmap_t *K001005_zbuffer;
 static rectangle K001005_cliprect;
 
-static void render_polygons(running_machine *machine);
+static void render_polygons(running_machine &machine);
 
 static UINT8 *K001005_texture;
 
@@ -197,18 +197,18 @@ static void K001005_exit(running_machine &machine)
 	poly_free(poly);
 }
 
-void K001005_init(running_machine *machine)
+void K001005_init(running_machine &machine)
 {
 	int i;
 
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 	K001005_zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
 
-	gfxrom = machine->region("gfx1")->base();
+	gfxrom = machine.region("gfx1")->base();
 
-	K001005_bitmap[0] = machine->primary_screen->alloc_compatible_bitmap();
-	K001005_bitmap[1] = machine->primary_screen->alloc_compatible_bitmap();
+	K001005_bitmap[0] = machine.primary_screen->alloc_compatible_bitmap();
+	K001005_bitmap[1] = machine.primary_screen->alloc_compatible_bitmap();
 
 	K001005_texture = auto_alloc_array(machine, UINT8, 0x800000);
 
@@ -220,7 +220,7 @@ void K001005_init(running_machine *machine)
 	K001005_3d_fifo = auto_alloc_array(machine, UINT32, 0x10000);
 
 	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, K001005_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, K001005_exit);
 
 	for (i=0; i < 128; i++)
 	{
@@ -313,19 +313,19 @@ READ32_HANDLER( K001005_r )
 			{
 				if (K001005_fifo_read_ptr < 0x3ff)
 				{
-					//cputag_set_input_line(space->machine, "dsp", SHARC_INPUT_FLAG1, CLEAR_LINE);
-					sharc_set_flag_input(space->machine->device("dsp"), 1, CLEAR_LINE);
+					//cputag_set_input_line(space->machine(), "dsp", SHARC_INPUT_FLAG1, CLEAR_LINE);
+					sharc_set_flag_input(space->machine().device("dsp"), 1, CLEAR_LINE);
 				}
 				else
 				{
-					//cputag_set_input_line(space->machine, "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
-					sharc_set_flag_input(space->machine->device("dsp"), 1, ASSERT_LINE);
+					//cputag_set_input_line(space->machine(), "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
+					sharc_set_flag_input(space->machine().device("dsp"), 1, ASSERT_LINE);
 				}
 			}
 			else
 			{
-				//cputag_set_input_line(space->machine, "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
-				sharc_set_flag_input(space->machine->device("dsp"), 1, ASSERT_LINE);
+				//cputag_set_input_line(space->machine(), "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
+				sharc_set_flag_input(space->machine().device("dsp"), 1, ASSERT_LINE);
 			}
 
 			K001005_fifo_read_ptr++;
@@ -366,19 +366,19 @@ WRITE32_HANDLER( K001005_w )
 			{
 				if (K001005_fifo_write_ptr < 0x400)
 				{
-					//cputag_set_input_line(space->machine, "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
-					sharc_set_flag_input(space->machine->device("dsp"), 1, ASSERT_LINE);
+					//cputag_set_input_line(space->machine(), "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
+					sharc_set_flag_input(space->machine().device("dsp"), 1, ASSERT_LINE);
 				}
 				else
 				{
-					//cputag_set_input_line(space->machine, "dsp", SHARC_INPUT_FLAG1, CLEAR_LINE);
-					sharc_set_flag_input(space->machine->device("dsp"), 1, CLEAR_LINE);
+					//cputag_set_input_line(space->machine(), "dsp", SHARC_INPUT_FLAG1, CLEAR_LINE);
+					sharc_set_flag_input(space->machine().device("dsp"), 1, CLEAR_LINE);
 				}
 			}
 			else
 			{
-				//cputag_set_input_line(space->machine, "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
-				sharc_set_flag_input(space->machine->device("dsp"), 1, ASSERT_LINE);
+				//cputag_set_input_line(space->machine(), "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
+				sharc_set_flag_input(space->machine().device("dsp"), 1, ASSERT_LINE);
 			}
 
 	    //  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, cpu_get_pc(space->cpu));
@@ -417,8 +417,8 @@ WRITE32_HANDLER( K001005_w )
 
 			if (data == 2 && K001005_3d_fifo_ptr > 0)
 			{
-				K001005_swap_buffers(space->machine);
-				render_polygons(space->machine);
+				K001005_swap_buffers(space->machine());
+				render_polygons(space->machine());
 				poly_wait(poly, "render_polygons");
 				K001005_3d_fifo_ptr = 0;
 			}
@@ -538,10 +538,10 @@ static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *ext
 	}
 }
 
-static void render_polygons(running_machine *machine)
+static void render_polygons(running_machine &machine)
 {
 	int i, j;
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 
 //  mame_printf_debug("K001005_fifo_ptr = %08X\n", K001005_3d_fifo_ptr);
 
@@ -955,13 +955,13 @@ void K001005_draw(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 }
 
-void K001005_swap_buffers(running_machine *machine)
+void K001005_swap_buffers(running_machine &machine)
 {
 	K001005_bitmap_page ^= 1;
 
 	//if (K001005_status == 2)
 	{
-		bitmap_fill(K001005_bitmap[K001005_bitmap_page], &K001005_cliprect, machine->pens[0]&0x00ffffff);
+		bitmap_fill(K001005_bitmap[K001005_bitmap_page], &K001005_cliprect, machine.pens[0]&0x00ffffff);
 		bitmap_fill(K001005_zbuffer, &K001005_cliprect, 0xffffffff);
 	}
 }
@@ -983,7 +983,7 @@ VIDEO_START( gticlub )
 
 SCREEN_UPDATE( gticlub )
 {
-	device_t *k001604 = screen->machine->device("k001604_1");
+	device_t *k001604 = screen->machine().device("k001604_1");
 
 	k001604_draw_back_layer(k001604, bitmap, cliprect);
 
@@ -995,15 +995,15 @@ SCREEN_UPDATE( gticlub )
 	if( tick >= 5 ) {
 		tick = 0;
 
-		if( input_code_pressed(screen->machine, KEYCODE_O) )
+		if( input_code_pressed(screen->machine(), KEYCODE_O) )
 			debug_tex_page++;
 
-		if( input_code_pressed(screen->machine, KEYCODE_I) )
+		if( input_code_pressed(screen->machine(), KEYCODE_I) )
 			debug_tex_page--;
 
-		if (input_code_pressed(screen->machine, KEYCODE_U))
+		if (input_code_pressed(screen->machine(), KEYCODE_U))
 			debug_tex_palette++;
-		if (input_code_pressed(screen->machine, KEYCODE_Y))
+		if (input_code_pressed(screen->machine(), KEYCODE_Y))
 			debug_tex_palette--;
 
 		if (debug_tex_page < 0)
@@ -1025,7 +1025,7 @@ SCREEN_UPDATE( gticlub )
         int index = (debug_tex_page - 1) * 0x40000;
         int pal = debug_tex_palette & 7;
         int tp = (debug_tex_palette >> 3) & 1;
-        UINT8 *rom = machine->region("gfx1")->base();
+        UINT8 *rom = machine.region("gfx1")->base();
 
         for (y=0; y < 384; y++)
         {
@@ -1044,19 +1044,19 @@ SCREEN_UPDATE( gticlub )
 	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg[0]);
 	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg[1]);
 
-	//cputag_set_input_line(screen->machine, "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
-	sharc_set_flag_input(screen->machine->device("dsp"), 1, ASSERT_LINE);
+	//cputag_set_input_line(screen->machine(), "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
+	sharc_set_flag_input(screen->machine().device("dsp"), 1, ASSERT_LINE);
 	return 0;
 }
 
 SCREEN_UPDATE( hangplt )
 {
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
+	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
 
 	if (strcmp(screen->tag(), "lscreen") == 0)
 	{
-		device_t *k001604 = screen->machine->device("k001604_1");
-		device_t *voodoo = screen->machine->device("voodoo0");
+		device_t *k001604 = screen->machine().device("k001604_1");
+		device_t *voodoo = screen->machine().device("voodoo0");
 
 	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
 
@@ -1066,8 +1066,8 @@ SCREEN_UPDATE( hangplt )
 	}
 	else if (strcmp(screen->tag(), "rscreen") == 0)
 	{
-		device_t *k001604 = screen->machine->device("k001604_2");
-		device_t *voodoo = screen->machine->device("voodoo1");
+		device_t *k001604 = screen->machine().device("k001604_2");
+		device_t *voodoo = screen->machine().device("voodoo1");
 
 	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
 

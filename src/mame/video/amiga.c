@@ -112,7 +112,7 @@ PALETTE_INIT( amiga )
 
 VIDEO_START( amiga )
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	int j;
 
 	/* generate tables that produce the correct playfield color for dual playfield mode */
@@ -145,9 +145,9 @@ VIDEO_START( amiga )
 
 UINT32 amiga_gethvpos(screen_device &screen)
 {
-	amiga_state *state = screen.machine->driver_data<amiga_state>();
+	amiga_state *state = screen.machine().driver_data<amiga_state>();
 	UINT32 hvpos = (state->last_scanline << 8) | (screen.hpos() >> 2);
-	UINT32 latchedpos = input_port_read_safe(screen.machine, "HVPOS", 0);
+	UINT32 latchedpos = input_port_read_safe(screen.machine(), "HVPOS", 0);
 
 	/* if there's no latched position, or if we are in the active display area */
 	/* but before the latching point, return the live HV position */
@@ -166,9 +166,9 @@ UINT32 amiga_gethvpos(screen_device &screen)
  *
  *************************************/
 
-void amiga_set_genlock_color(running_machine *machine, UINT16 color)
+void amiga_set_genlock_color(running_machine &machine, UINT16 color)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 
 	state->genlock_color = color;
 }
@@ -181,9 +181,9 @@ void amiga_set_genlock_color(running_machine *machine, UINT16 color)
  *
  *************************************/
 
-void amiga_copper_setpc(running_machine *machine, UINT32 pc)
+void amiga_copper_setpc(running_machine &machine, UINT32 pc)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 
 	if (LOG_COPPER)
 		logerror("copper_setpc(%06x)\n", pc);
@@ -193,9 +193,9 @@ void amiga_copper_setpc(running_machine *machine, UINT32 pc)
 }
 
 
-int amiga_copper_execute_next(running_machine *machine, int xpos)
+int amiga_copper_execute_next(running_machine &machine, int xpos)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	int word0, word1;
 
 	/* bail if not enabled */
@@ -207,7 +207,7 @@ int amiga_copper_execute_next(running_machine *machine, int xpos)
 	{
 		if (LOG_COPPER)
 			logerror("%02X.%02X: Write to %s = %04x\n", state->last_scanline, xpos / 2, amiga_custom_names[state->copper_pending_offset & 0xff], state->copper_pending_data);
-		amiga_custom_w(machine->device("maincpu")->memory().space(AS_PROGRAM), state->copper_pending_offset, state->copper_pending_data, 0xffff);
+		amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), state->copper_pending_offset, state->copper_pending_data, 0xffff);
 		state->copper_pending_offset = 0;
 	}
 
@@ -263,7 +263,7 @@ int amiga_copper_execute_next(running_machine *machine, int xpos)
 			{
 				if (LOG_COPPER)
 					logerror("%02X.%02X: Write to %s = %04x\n", state->last_scanline, xpos / 2, amiga_custom_names[word0 & 0xff], word1);
-				amiga_custom_w(machine->device("maincpu")->memory().space(AS_PROGRAM), word0, word1, 0xffff);
+				amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), word0, word1, 0xffff);
 			}
 			else	// additional 2 cycles needed for non-Agnus registers
 			{
@@ -335,9 +335,9 @@ int amiga_copper_execute_next(running_machine *machine, int xpos)
  *
  *************************************/
 
-void amiga_sprite_dma_reset(running_machine *machine, int which)
+void amiga_sprite_dma_reset(running_machine &machine, int which)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 
 	if (LOG_SPRITE_DMA) logerror("sprite %d dma reset\n", which );
 	state->sprite_dma_reload_mask |= 1 << which;
@@ -345,9 +345,9 @@ void amiga_sprite_dma_reset(running_machine *machine, int which)
 }
 
 
-void amiga_sprite_enable_comparitor(running_machine *machine, int which, int enable)
+void amiga_sprite_enable_comparitor(running_machine &machine, int which, int enable)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 
 	if (LOG_SPRITE_DMA) logerror("sprite %d comparitor %sable\n", which, enable ? "en" : "dis" );
 	if (enable)
@@ -619,9 +619,9 @@ INLINE int update_ham(amiga_state *state, int newpix)
  *
  *************************************/
 
-void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline)
+void amiga_render_scanline(running_machine &machine, bitmap_t *bitmap, int scanline)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	UINT16 save_color0 = CUSTOM_REG(REG_COLOR00);
 	int ddf_start_pixel = 0, ddf_stop_pixel = 0;
 	int hires = 0, dualpf = 0, lace = 0, ham = 0;
@@ -944,7 +944,7 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 	}
 
 #if 0
-	if ( machine->primary_screen->frame_number() % 64 == 0 && scanline == 100 )
+	if ( machine.primary_screen->frame_number() % 64 == 0 && scanline == 100 )
 	{
 		const char *m_lores = "LORES";
 		const char *m_hires = "HIRES";
@@ -981,7 +981,7 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 	CUSTOM_REG(REG_COLOR00) = save_color0;
 
 #if GUESS_COPPER_OFFSET
-	if (machine->primary_screen->frame_number() % 64 == 0 && scanline == 0)
+	if (machine.primary_screen->frame_number() % 64 == 0 && scanline == 0)
 	{
 		if (input_code_pressed(machine, KEYCODE_Q))
 			popmessage("%d", state->wait_offset -= 1);
@@ -1005,7 +1005,7 @@ SCREEN_UPDATE( amiga )
 
 	/* render each scanline in the visible region */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		amiga_render_scanline(screen->machine, bitmap, y);
+		amiga_render_scanline(screen->machine(), bitmap, y);
 
 	return 0;
 }

@@ -120,7 +120,7 @@ static void draw_led(bitmap_t *bitmap, int x, int y,UINT8 value)
 /* actually debugging purpose, it will be converted to the artwork system at some point. */
 static SCREEN_UPDATE( kungfur )
 {
-	kungfur_state *state = screen->machine->driver_data<kungfur_state>();
+	kungfur_state *state = screen->machine().driver_data<kungfur_state>();
 //  popmessage("%02x %02x %02x %02x %02x %02x",io_data[0],io_data[1],io_data[2],io_data[3],io_data[4],io_data[5]);
 	int i;
 
@@ -132,7 +132,7 @@ static SCREEN_UPDATE( kungfur )
 
 static WRITE8_DEVICE_HANDLER( test0_w )
 {
-	kungfur_state *state = device->machine->driver_data<kungfur_state>();
+	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 	state->mux_data = data & 7;	/* multiplexer selector? (00-06) */
 
 	state->mux_data|= (data & 0x10)>>1;
@@ -147,7 +147,7 @@ static WRITE8_DEVICE_HANDLER( test1_w )
 
 static WRITE8_DEVICE_HANDLER( test2_w )
 {
-	kungfur_state *state = device->machine->driver_data<kungfur_state>();
+	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 //  io_data[2] = data;  /* lower nibble should be NULL */
 	state->led[state->mux_data] = data;
 //  printf("%02x Unk 2 W\n",data);
@@ -162,7 +162,7 @@ static WRITE8_DEVICE_HANDLER( test3_w )
 /*mux is always 0*/
 static WRITE8_DEVICE_HANDLER( test4_w )
 {
-	kungfur_state *state = device->machine->driver_data<kungfur_state>();
+	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 //  io_data[4] = data;
 	state->led[state->mux_data] = data;
 }
@@ -177,18 +177,18 @@ static WRITE8_DEVICE_HANDLER( test5_w )
 
 static WRITE8_DEVICE_HANDLER( kungfur_adpcm1_w )
 {
-	kungfur_state *state = device->machine->driver_data<kungfur_state>();
+	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 	state->adpcm_pos[0] = 0x40000+(data & 0xff) * 0x100;
 	state->adpcm_idle[0] = 0;
-	msm5205_reset_w(device->machine->device("adpcm1"),0);
+	msm5205_reset_w(device->machine().device("adpcm1"),0);
 }
 
 static WRITE8_DEVICE_HANDLER( kungfur_adpcm2_w )
 {
-	kungfur_state *state = device->machine->driver_data<kungfur_state>();
+	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 	state->adpcm_pos[1] = (data & 0xff) * 0x400;
 	state->adpcm_idle[1] = 0;
-	msm5205_reset_w(device->machine->device("adpcm2"),0);
+	msm5205_reset_w(device->machine().device("adpcm2"),0);
 }
 
 /*
@@ -279,19 +279,19 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 static void kfr_adpcm1_int(device_t *device)
 {
-	kungfur_state *state = device->machine->driver_data<kungfur_state>();
+	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 
 	if (state->adpcm_pos[0] >= 0x40000 || state->adpcm_idle[0])
 	{
-		msm5205_reset_w(device->machine->device("adpcm1"),1);
+		msm5205_reset_w(device->machine().device("adpcm1"),1);
 		state->trigger1 = 0;
 	}
 	else
 	{
-		UINT8 *ROM = device->machine->region("adpcm1")->base();
+		UINT8 *ROM = device->machine().region("adpcm1")->base();
 
 		state->adpcm_data1 = ((state->trigger1 ? (ROM[state->adpcm_pos[0]] & 0x0f) : (ROM[state->adpcm_pos[0]] & 0xf0)>>4) );
-		msm5205_data_w(device->machine->device("adpcm1"), state->adpcm_data1 & 0xf);
+		msm5205_data_w(device->machine().device("adpcm1"), state->adpcm_data1 & 0xf);
 		state->trigger1 ^= 1;
 		if(state->trigger1 == 0)
 		{
@@ -305,19 +305,19 @@ static void kfr_adpcm1_int(device_t *device)
 
 static void kfr_adpcm2_int(device_t *device)
 {
-	kungfur_state *state = device->machine->driver_data<kungfur_state>();
+	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 
 	if (state->adpcm_pos[1] >= 0x10000 || state->adpcm_idle[1])
 	{
-		msm5205_reset_w(device->machine->device("adpcm2"),1);
+		msm5205_reset_w(device->machine().device("adpcm2"),1);
 		state->trigger2 = 0;
 	}
 	else
 	{
-		UINT8 *ROM = device->machine->region("adpcm2")->base();
+		UINT8 *ROM = device->machine().region("adpcm2")->base();
 
 		state->adpcm_data2 = ((state->trigger2 ? (ROM[state->adpcm_pos[1]] & 0x0f) : (ROM[state->adpcm_pos[1]] & 0xf0)>>4) );
-		msm5205_data_w(device->machine->device("adpcm2"), state->adpcm_data2 & 0xf);
+		msm5205_data_w(device->machine().device("adpcm2"), state->adpcm_data2 & 0xf);
 		state->trigger2 ^= 1;
 		if(state->trigger2 == 0)
 		{
@@ -342,14 +342,14 @@ static const msm5205_interface msm5205_config_2 =
 
 static MACHINE_RESET( kungfur )
 {
-	kungfur_state *state = machine->driver_data<kungfur_state>();
+	kungfur_state *state = machine.driver_data<kungfur_state>();
 	state->adpcm_pos[0] =	state->adpcm_pos[1] = 0;
 	state->adpcm_idle[0] = state->adpcm_idle[1] = 1;
 }
 
 static INTERRUPT_GEN( kungfur_irq )
 {
-	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( kungfur, kungfur_state )

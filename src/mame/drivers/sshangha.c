@@ -62,7 +62,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 static WRITE16_HANDLER( sshangha_protection16_w )
 {
-	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	COMBINE_DATA(&state->prot_data[offset]);
 
 	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",cpu_get_pc(space->cpu),offset<<1,data);
@@ -71,15 +71,15 @@ static WRITE16_HANDLER( sshangha_protection16_w )
 /* Protection/IO chip 146 */
 static READ16_HANDLER( sshangha_protection16_r )
 {
-	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	switch (offset)
 	{
 		case 0x050 >> 1:
-			return input_port_read(space->machine, "INPUTS");
+			return input_port_read(space->machine(), "INPUTS");
 		case 0x76a >> 1:
-			return input_port_read(space->machine, "SYSTEM");
+			return input_port_read(space->machine(), "SYSTEM");
 		case 0x0ac >> 1:
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 
 		// Protection TODO
 	}
@@ -90,15 +90,15 @@ static READ16_HANDLER( sshangha_protection16_r )
 
 static READ16_HANDLER( sshanghb_protection16_r )
 {
-	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	switch (offset)
 	{
 		case 0x050 >> 1:
-			return input_port_read(space->machine, "INPUTS");
+			return input_port_read(space->machine(), "INPUTS");
 		case 0x76a >> 1:
-			return input_port_read(space->machine, "SYSTEM");
+			return input_port_read(space->machine(), "SYSTEM");
 		case 0x0ac >> 1:
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 	}
 
 	return state->prot_data[offset];
@@ -118,7 +118,7 @@ static MACHINE_RESET( sshangha )
 
 /******************************************************************************/
 
-INLINE void set_color_888(running_machine *machine, pen_t color, int rshift, int gshift, int bshift, UINT32 data)
+INLINE void set_color_888(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT32 data)
 {
 	palette_set_color_rgb(machine, color, (data >> rshift) & 0xff, (data >> gshift) & 0xff, (data >> bshift) & 0xff);
 }
@@ -126,9 +126,9 @@ INLINE void set_color_888(running_machine *machine, pen_t color, int rshift, int
 
 WRITE16_HANDLER( paletteram16_xbgr_word_be_sprites2_w )
 {
-	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	COMBINE_DATA(&state->sprite_paletteram2[offset]);
-	set_color_888(space->machine, (offset/2)+0x100, 0, 8, 16, state->sprite_paletteram2[(offset) | 1] | (state->sprite_paletteram2[(offset) & ~1] << 16) );
+	set_color_888(space->machine(), (offset/2)+0x100, 0, 8, 16, state->sprite_paletteram2[(offset) | 1] | (state->sprite_paletteram2[(offset) & ~1] << 16) );
 }
 
 WRITE16_HANDLER( paletteram16_xbgr_word_be_sprites_w )
@@ -140,23 +140,23 @@ WRITE16_HANDLER( paletteram16_xbgr_word_be_sprites_w )
 	// maybe related to sprite DMA on the original, or the apparent lack of a 2nd sprite controller on the bootleg.
 	paletteram16_xbgr_word_be_sprites2_w(space,offset,data,mem_mask);
 
-	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	COMBINE_DATA(&state->sprite_paletteram[offset]);
-	set_color_888(space->machine, (offset/2)+0x000, 0, 8, 16, state->sprite_paletteram[(offset) | 1] | (state->sprite_paletteram[(offset) & ~1] << 16) );
+	set_color_888(space->machine(), (offset/2)+0x000, 0, 8, 16, state->sprite_paletteram[(offset) | 1] | (state->sprite_paletteram[(offset) & ~1] << 16) );
 }
 
 WRITE16_HANDLER( paletteram16_xbgr_word_be_tilelow_w )
 {
-	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	COMBINE_DATA(&state->tile_paletteram1[offset]);
-	set_color_888(space->machine, (offset/2)+0x200, 0, 8, 16, state->tile_paletteram1[(offset) | 1] | (state->tile_paletteram1[(offset) & ~1] << 16) );
+	set_color_888(space->machine(), (offset/2)+0x200, 0, 8, 16, state->tile_paletteram1[(offset) | 1] | (state->tile_paletteram1[(offset) & ~1] << 16) );
 }
 
 WRITE16_HANDLER( paletteram16_xbgr_word_be_tilehigh_w )
 {
-	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	COMBINE_DATA(&state->tile_paletteram2[offset]);
-	set_color_888(space->machine, (offset/2)+0x300, 0, 8, 16, state->tile_paletteram2[(offset) | 1] | (state->tile_paletteram2[(offset) & ~1] << 16) );
+	set_color_888(space->machine(), (offset/2)+0x300, 0, 8, 16, state->tile_paletteram2[(offset) | 1] | (state->tile_paletteram2[(offset) & ~1] << 16) );
 }
 
 static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16 )
@@ -224,13 +224,13 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(sshangha_sound_shared_r)
 {
-	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	return state->sound_shared_ram[offset] & 0xff;
 }
 
 static WRITE8_HANDLER(sshangha_sound_shared_w)
 {
-	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	state->sound_shared_ram[offset] = data & 0xff;
 }
 
@@ -367,7 +367,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, state);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, state);
 }
 
 static const ym2203_interface ym2203_config =
@@ -502,7 +502,7 @@ static DRIVER_INIT( sshangha )
 #if SSHANGHA_HACK
 	/* This is a hack to allow you to use the extra features
          of the first "Unused" Dip Switch (see notes above). */
-	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
 	RAM[0x000384/2] = 0x4e71;
 	RAM[0x000386/2] = 0x4e71;
 	RAM[0x000388/2] = 0x4e71;

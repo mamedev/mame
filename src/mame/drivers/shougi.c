@@ -132,7 +132,7 @@ static PALETTE_INIT( shougi )
 			3,	resistances_rg,	weights_g,	1000, 0,
 			2,	resistances_b,	weights_b,	1000, 0);
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -162,7 +162,7 @@ static PALETTE_INIT( shougi )
 
 static SCREEN_UPDATE( shougi )
 {
-	shougi_state *state = screen->machine->driver_data<shougi_state>();
+	shougi_state *state = screen->machine().driver_data<shougi_state>();
 	int offs;
 
 	for (offs = 0;offs <0x4000; offs++)
@@ -233,43 +233,43 @@ static WRITE8_HANDLER( shougi_watchdog_reset_w )
 static WRITE8_HANDLER( shougi_mcu_halt_off_w )
 {
 	/* logerror("mcu HALT OFF"); */
-	cputag_set_input_line(space->machine, "mcu", INPUT_LINE_HALT, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( shougi_mcu_halt_on_w )
 {
 	/* logerror("mcu HALT ON"); */
-	cputag_set_input_line(space->machine, "mcu", INPUT_LINE_HALT,ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_HALT,ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( nmi_disable_and_clear_line_w )
 {
-	shougi_state *state = space->machine->driver_data<shougi_state>();
+	shougi_state *state = space->machine().driver_data<shougi_state>();
 
 	state->nmi_enabled = 0; /* disable NMIs */
 
 	/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
-	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	shougi_state *state = space->machine->driver_data<shougi_state>();
+	shougi_state *state = space->machine().driver_data<shougi_state>();
 
 	state->nmi_enabled = 1; /* enable NMIs */
 }
 
 static INTERRUPT_GEN( shougi_vblank_nmi )
 {
-	shougi_state *state = device->machine->driver_data<shougi_state>();
+	shougi_state *state = device->machine().driver_data<shougi_state>();
 
 	if ( state->nmi_enabled == 1 )
 	{
 		/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
-		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
-		cputag_set_input_line(device->machine, "sub", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(device->machine(), "sub", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -305,7 +305,7 @@ ADDRESS_MAP_END
 /* sub */
 static READ8_HANDLER ( dummy_r )
 {
-	shougi_state *state = space->machine->driver_data<shougi_state>();
+	shougi_state *state = space->machine().driver_data<shougi_state>();
 	state->r ^= 1;
 
 	if(state->r)

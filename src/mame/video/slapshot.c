@@ -6,7 +6,7 @@
 
 VIDEO_START( slapshot )
 {
-	slapshot_state *state = machine->driver_data<slapshot_state>();
+	slapshot_state *state = machine.driver_data<slapshot_state>();
 	int i;
 
 	state->spriteram_delayed = auto_alloc_array(machine, UINT16, state->spriteram_size / 2);
@@ -34,7 +34,7 @@ VIDEO_START( slapshot )
             SPRITE DRAW ROUTINES
 ************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int *primasks, int y_offset )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int *primasks, int y_offset )
 {
 	/*
         Sprite format:
@@ -89,7 +89,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
         000b - 000f : unused
 
     */
-	slapshot_state *state = machine->driver_data<slapshot_state>();
+	slapshot_state *state = machine.driver_data<slapshot_state>();
 	int x, y, off, extoffs;
 	int code, color, spritedata, spritecont, flipx, flipy;
 	int xcurrent, ycurrent, big_sprite = 0;
@@ -333,7 +333,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		{
 			sprite_ptr->code = code;
 			sprite_ptr->color = color;
-			if (machine->gfx[0]->color_granularity == 64)	/* Final Blow, Slapshot are 6bpp */
+			if (machine.gfx[0]->color_granularity == 64)	/* Final Blow, Slapshot are 6bpp */
 				sprite_ptr->color /= 4;
 			sprite_ptr->flipx = flipx;
 			sprite_ptr->flipy = flipy;
@@ -350,7 +350,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			}
 			else
 			{
-				drawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
+				drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[0],
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
@@ -366,20 +366,20 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	{
 		sprite_ptr--;
 
-		pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
+		pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[0],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				machine->priority_bitmap,sprite_ptr->primask,0);
+				machine.priority_bitmap,sprite_ptr->primask,0);
 	}
 }
 
 
-static void taito_handle_sprite_buffering( running_machine *machine )
+static void taito_handle_sprite_buffering( running_machine &machine )
 {
-	slapshot_state *state = machine->driver_data<slapshot_state>();
+	slapshot_state *state = machine.driver_data<slapshot_state>();
 
 	if (state->prepare_sprites)	/* no buffering */
 	{
@@ -388,9 +388,9 @@ static void taito_handle_sprite_buffering( running_machine *machine )
 	}
 }
 
-static void taito_update_sprites_active_area( running_machine *machine )
+static void taito_update_sprites_active_area( running_machine &machine )
 {
-	slapshot_state *state = machine->driver_data<slapshot_state>();
+	slapshot_state *state = machine.driver_data<slapshot_state>();
 	int off;
 
 	/* if the frame was skipped, we'll have to do the buffering now */
@@ -430,7 +430,7 @@ static void taito_update_sprites_active_area( running_machine *machine )
 
 SCREEN_EOF( taito_no_buffer )
 {
-	slapshot_state *state = machine->driver_data<slapshot_state>();
+	slapshot_state *state = machine.driver_data<slapshot_state>();
 
 	taito_update_sprites_active_area(machine);
 
@@ -456,45 +456,45 @@ a bg layer given priority over some sprites.
 
 SCREEN_UPDATE( slapshot )
 {
-	slapshot_state *state = screen->machine->driver_data<slapshot_state>();
+	slapshot_state *state = screen->machine().driver_data<slapshot_state>();
 	UINT8 layer[5];
 	UINT8 tilepri[5];
 	UINT8 spritepri[4];
 	UINT16 priority;
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed_once (screen->machine, KEYCODE_Z))
+	if (input_code_pressed_once (screen->machine(), KEYCODE_Z))
 	{
 		state->dislayer[0] ^= 1;
 		popmessage("bg0: %01x",state->dislayer[0]);
 	}
 
-	if (input_code_pressed_once (screen->machine, KEYCODE_X))
+	if (input_code_pressed_once (screen->machine(), KEYCODE_X))
 	{
 		state->dislayer[1] ^= 1;
 		popmessage("bg1: %01x",state->dislayer[1]);
 	}
 
-	if (input_code_pressed_once (screen->machine, KEYCODE_C))
+	if (input_code_pressed_once (screen->machine(), KEYCODE_C))
 	{
 		state->dislayer[2] ^= 1;
 		popmessage("bg2: %01x",state->dislayer[2]);
 	}
 
-	if (input_code_pressed_once (screen->machine, KEYCODE_V))
+	if (input_code_pressed_once (screen->machine(), KEYCODE_V))
 	{
 		state->dislayer[3] ^= 1;
 		popmessage("bg3: %01x",state->dislayer[3]);
 	}
 
-	if (input_code_pressed_once (screen->machine, KEYCODE_B))
+	if (input_code_pressed_once (screen->machine(), KEYCODE_B))
 	{
 		state->dislayer[4] ^= 1;
 		popmessage("text: %01x",state->dislayer[4]);
 	}
 #endif
 
-	taito_handle_sprite_buffering(screen->machine);
+	taito_handle_sprite_buffering(screen->machine());
 
 	tc0480scp_tilemap_update(state->tc0480scp);
 
@@ -519,7 +519,7 @@ SCREEN_UPDATE( slapshot )
 	spritepri[2] = tc0360pri_r(state->tc0360pri, 7) & 0x0f;
 	spritepri[3] = tc0360pri_r(state->tc0360pri, 7) >> 4;
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
@@ -554,7 +554,7 @@ SCREEN_UPDATE( slapshot )
 			if (spritepri[i] < tilepri[(layer[3])]) primasks[i] |= 0xff00;
 		}
 
-		draw_sprites(screen->machine,bitmap,cliprect,primasks,0);
+		draw_sprites(screen->machine(),bitmap,cliprect,primasks,0);
 	}
 
 	/*

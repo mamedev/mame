@@ -23,7 +23,7 @@
 
 static INTERRUPT_GEN( ironhors_interrupt )
 {
-	ironhors_state *state = device->machine->driver_data<ironhors_state>();
+	ironhors_state *state = device->machine().driver_data<ironhors_state>();
 
 	if (cpu_getiloops(device) == 0)
 	{
@@ -39,7 +39,7 @@ static INTERRUPT_GEN( ironhors_interrupt )
 
 static WRITE8_HANDLER( ironhors_sh_irqtrigger_w )
 {
-	ironhors_state *state = space->machine->driver_data<ironhors_state>();
+	ironhors_state *state = space->machine().driver_data<ironhors_state>();
 
 	device_set_input_line_and_vector(state->soundcpu, 0, HOLD_LINE, 0xff);
 }
@@ -358,9 +358,9 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( ironhors )
 {
-	ironhors_state *state = machine->driver_data<ironhors_state>();
+	ironhors_state *state = machine.driver_data<ironhors_state>();
 
-	state->soundcpu = machine->device("soundcpu");
+	state->soundcpu = machine.device("soundcpu");
 
 	state->save_item(NAME(state->palettebank));
 	state->save_item(NAME(state->charbank));
@@ -369,7 +369,7 @@ static MACHINE_START( ironhors )
 
 static MACHINE_RESET( ironhors )
 {
-	ironhors_state *state = machine->driver_data<ironhors_state>();
+	ironhors_state *state = machine.driver_data<ironhors_state>();
 
 	state->palettebank = 0;
 	state->charbank = 0;
@@ -424,7 +424,7 @@ MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( farwest_interrupt )
 {
-	ironhors_state *state = device->machine->driver_data<ironhors_state>();
+	ironhors_state *state = device->machine().driver_data<ironhors_state>();
 
 	if (cpu_getiloops(device) &1)
 	{
@@ -440,7 +440,7 @@ static INTERRUPT_GEN( farwest_interrupt )
 
 static READ8_DEVICE_HANDLER( farwest_soundlatch_r )
 {
-	ironhors_state *state = device->machine->driver_data<ironhors_state>();
+	ironhors_state *state = device->machine().driver_data<ironhors_state>();
 
 	return soundlatch_r(state->soundcpu->memory().space(AS_PROGRAM), 0);
 }

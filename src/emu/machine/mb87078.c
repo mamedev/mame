@@ -175,7 +175,7 @@ static void gain_recalc( device_t *device )
 		int old_index = mb87078->gain[i];
 		mb87078->gain[i] = calc_gain_index(mb87078->latch[0][i], mb87078->latch[1][i]);
 		if (old_index != mb87078->gain[i])
-			mb87078->gain_changed_cb(device->machine, i, mb87078_gain_percent[mb87078->gain[i]]);
+			mb87078->gain_changed_cb(device->machine(), i, mb87078_gain_percent[mb87078->gain[i]]);
 	}
 }
 

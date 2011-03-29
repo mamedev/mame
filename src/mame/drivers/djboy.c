@@ -149,7 +149,7 @@ Notes:
 
 static WRITE8_HANDLER( beast_data_w )
 {
-	djboy_state *state = space->machine->driver_data<djboy_state>();
+	djboy_state *state = space->machine().driver_data<djboy_state>();
 
 	state->data_to_beast = data;
 	state->z80_to_beast_full = 1;
@@ -159,7 +159,7 @@ static WRITE8_HANDLER( beast_data_w )
 
 static READ8_HANDLER( beast_data_r )
 {
-	djboy_state *state = space->machine->driver_data<djboy_state>();
+	djboy_state *state = space->machine().driver_data<djboy_state>();
 
 	state->beast_to_z80_full = 0;
 	return state->data_to_z80;
@@ -167,7 +167,7 @@ static READ8_HANDLER( beast_data_r )
 
 static READ8_HANDLER( beast_status_r )
 {
-	djboy_state *state = space->machine->driver_data<djboy_state>();
+	djboy_state *state = space->machine().driver_data<djboy_state>();
 	return (!state->beast_to_z80_full << 2) | (state->z80_to_beast_full << 3);
 }
 
@@ -175,17 +175,17 @@ static READ8_HANDLER( beast_status_r )
 
 static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
 {
-	djboy_state *state = space->machine->driver_data<djboy_state>();
+	djboy_state *state = space->machine().driver_data<djboy_state>();
 	device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( cpu0_bankswitch_w )
 {
-	djboy_state *state = space->machine->driver_data<djboy_state>();
+	djboy_state *state = space->machine().driver_data<djboy_state>();
 
 	data ^= state->bankxor;
-	memory_set_bank(space->machine, "bank1", data);
-	memory_set_bank(space->machine, "bank4", 0); /* unsure if/how this area is banked */
+	memory_set_bank(space->machine(), "bank1", data);
+	memory_set_bank(space->machine(), "bank4", 0); /* unsure if/how this area is banked */
 }
 
 /******************************************************************************/
@@ -198,7 +198,7 @@ static WRITE8_HANDLER( cpu0_bankswitch_w )
  */
 static WRITE8_HANDLER( cpu1_bankswitch_w )
 {
-	djboy_state *state = space->machine->driver_data<djboy_state>();
+	djboy_state *state = space->machine().driver_data<djboy_state>();
 	state->videoreg = data;
 
 	switch (data & 0xf)
@@ -208,7 +208,7 @@ static WRITE8_HANDLER( cpu1_bankswitch_w )
 	case 0x01:
 	case 0x02:
 	case 0x03:
-		memory_set_bank(space->machine, "bank2", (data & 0xf));
+		memory_set_bank(space->machine(), "bank2", (data & 0xf));
 		break;
 
 	/* bs101.6w */
@@ -220,7 +220,7 @@ static WRITE8_HANDLER( cpu1_bankswitch_w )
 	case 0x0d:
 	case 0x0e:
 	case 0x0f:
-		memory_set_bank(space->machine, "bank2", (data & 0xf) - 4);
+		memory_set_bank(space->machine(), "bank2", (data & 0xf) - 4);
 		break;
 
 	default:
@@ -230,22 +230,22 @@ static WRITE8_HANDLER( cpu1_bankswitch_w )
 
 static WRITE8_HANDLER( coin_count_w )
 {
-	coin_counter_w(space->machine, 0, data & 1);
-	coin_counter_w(space->machine, 1, data & 2);
+	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(space->machine(), 1, data & 2);
 }
 
 /******************************************************************************/
 
 static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
-	djboy_state *state = space->machine->driver_data<djboy_state>();
+	djboy_state *state = space->machine().driver_data<djboy_state>();
 	soundlatch_w(space, 0, data);
 	device_set_input_line(state->cpu2, INPUT_LINE_NMI, PULSE_LINE);
 } /* trigger_nmi_on_sound_cpu2 */
 
 static WRITE8_HANDLER( cpu2_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank3", data);	// shall we check data<0x07?
+	memory_set_bank(space->machine(), "bank3", data);	// shall we check data<0x07?
 }
 
 /******************************************************************************/
@@ -315,7 +315,7 @@ static READ8_HANDLER( beast_p0_r )
 
 static WRITE8_HANDLER( beast_p0_w )
 {
-	djboy_state *state = space->machine->driver_data<djboy_state>();
+	djboy_state *state = space->machine().driver_data<djboy_state>();
 
 	if (!BIT(state->beast_p0, 1) && BIT(data, 1))
 	{
@@ -331,7 +331,7 @@ static WRITE8_HANDLER( beast_p0_w )
 
 static READ8_HANDLER( beast_p1_r )
 {
-	djboy_state *state = space->machine->driver_data<djboy_state>();
+	djboy_state *state = space->machine().driver_data<djboy_state>();
 
 	if (BIT(state->beast_p0, 0) == 0)
 		return state->data_to_beast;
@@ -341,7 +341,7 @@ static READ8_HANDLER( beast_p1_r )
 
 static WRITE8_HANDLER( beast_p1_w )
 {
-	djboy_state *state = space->machine->driver_data<djboy_state>();
+	djboy_state *state = space->machine().driver_data<djboy_state>();
 
 	if (data == 0xff)
 	{
@@ -354,30 +354,30 @@ static WRITE8_HANDLER( beast_p1_w )
 
 static READ8_HANDLER( beast_p2_r )
 {
-	djboy_state *state = space->machine->driver_data<djboy_state>();
+	djboy_state *state = space->machine().driver_data<djboy_state>();
 
 	switch ((state->beast_p0 >> 2) & 3)
 	{
-		case 0: return input_port_read(space->machine, "IN1");
-		case 1: return input_port_read(space->machine, "IN2");
-		case 2: return input_port_read(space->machine, "IN0");
+		case 0: return input_port_read(space->machine(), "IN1");
+		case 1: return input_port_read(space->machine(), "IN2");
+		case 2: return input_port_read(space->machine(), "IN0");
 		default: return 0xff;
 	}
 }
 
 static WRITE8_HANDLER( beast_p2_w )
 {
-	djboy_state *state = space->machine->driver_data<djboy_state>();
+	djboy_state *state = space->machine().driver_data<djboy_state>();
 	state->beast_p2 = data;
 }
 
 static READ8_HANDLER( beast_p3_r )
 {
-	djboy_state *state = space->machine->driver_data<djboy_state>();
+	djboy_state *state = space->machine().driver_data<djboy_state>();
 
 	UINT8 dsw = 0;
-	UINT8 dsw1 = ~input_port_read(space->machine, "DSW1");
-	UINT8 dsw2 = ~input_port_read(space->machine, "DSW2");
+	UINT8 dsw1 = ~input_port_read(space->machine(), "DSW1");
+	UINT8 dsw2 = ~input_port_read(space->machine(), "DSW2");
 
 	switch ((state->beast_p0 >> 5) & 3)
 	{
@@ -391,7 +391,7 @@ static READ8_HANDLER( beast_p3_r )
 
 static WRITE8_HANDLER( beast_p3_w )
 {
-	djboy_state *state = space->machine->driver_data<djboy_state>();
+	djboy_state *state = space->machine().driver_data<djboy_state>();
 
 	state->beast_p3 = data;
 	device_set_input_line(state->cpu1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
@@ -518,11 +518,11 @@ static TIMER_DEVICE_CALLBACK( djboy_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line_and_vector(timer.machine, "maincpu", 0, HOLD_LINE, 0xfd);
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xfd);
 
 	/* Pandora "sprite end dma" irq? TODO: timing is clearly off, attract mode relies on this */
 	if(scanline == 64)
-		cputag_set_input_line_and_vector(timer.machine, "maincpu", 0, HOLD_LINE, 0xff);
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xff);
 }
 
 static const kaneko_pandora_interface djboy_pandora_config =
@@ -535,10 +535,10 @@ static const kaneko_pandora_interface djboy_pandora_config =
 
 static MACHINE_START( djboy )
 {
-	djboy_state *state = machine->driver_data<djboy_state>();
-	UINT8 *MAIN = machine->region("maincpu")->base();
-	UINT8 *CPU1 = machine->region("cpu1")->base();
-	UINT8 *CPU2 = machine->region("cpu2")->base();
+	djboy_state *state = machine.driver_data<djboy_state>();
+	UINT8 *MAIN = machine.region("maincpu")->base();
+	UINT8 *CPU1 = machine.region("cpu1")->base();
+	UINT8 *CPU2 = machine.region("cpu2")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4,  &MAIN[0x00000], 0x2000);
 	memory_configure_bank(machine, "bank1", 4, 28, &MAIN[0x10000], 0x2000);
@@ -548,11 +548,11 @@ static MACHINE_START( djboy )
 	memory_configure_bank(machine, "bank3", 3, 5,  &CPU2[0x10000], 0x4000);
 	memory_configure_bank(machine, "bank4", 0, 1,  &MAIN[0x10000], 0x3000); /* unsure if/how this area is banked */
 
-	state->maincpu = machine->device("maincpu");
-	state->cpu1 = machine->device("cpu1");
-	state->cpu2 = machine->device("cpu2");
-	state->beast = machine->device("beast");
-	state->pandora = machine->device("pandora");
+	state->maincpu = machine.device("maincpu");
+	state->cpu1 = machine.device("cpu1");
+	state->cpu2 = machine.device("cpu2");
+	state->beast = machine.device("beast");
+	state->pandora = machine.device("pandora");
 
 	state->save_item(NAME(state->videoreg));
 	state->save_item(NAME(state->scrollx));
@@ -572,7 +572,7 @@ static MACHINE_START( djboy )
 
 static MACHINE_RESET( djboy )
 {
-	djboy_state *state = machine->driver_data<djboy_state>();
+	djboy_state *state = machine.driver_data<djboy_state>();
 
 	state->videoreg = 0;
 	state->scrollx = 0;
@@ -748,13 +748,13 @@ ROM_END
 
 static DRIVER_INIT( djboy )
 {
-	djboy_state *state = machine->driver_data<djboy_state>();
+	djboy_state *state = machine.driver_data<djboy_state>();
 	state->bankxor = 0x00;
 }
 
 static DRIVER_INIT( djboyj )
 {
-	djboy_state *state = machine->driver_data<djboy_state>();
+	djboy_state *state = machine.driver_data<djboy_state>();
 	state->bankxor = 0x1f;
 }
 

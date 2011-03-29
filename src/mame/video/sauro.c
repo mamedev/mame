@@ -13,7 +13,7 @@
 
 WRITE8_HANDLER( tecfri_videoram_w )
 {
-	sauro_state *state = space->machine->driver_data<sauro_state>();
+	sauro_state *state = space->machine().driver_data<sauro_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -21,7 +21,7 @@ WRITE8_HANDLER( tecfri_videoram_w )
 
 WRITE8_HANDLER( tecfri_colorram_w )
 {
-	sauro_state *state = space->machine->driver_data<sauro_state>();
+	sauro_state *state = space->machine().driver_data<sauro_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -29,7 +29,7 @@ WRITE8_HANDLER( tecfri_colorram_w )
 
 WRITE8_HANDLER( tecfri_videoram2_w )
 {
-	sauro_state *state = space->machine->driver_data<sauro_state>();
+	sauro_state *state = space->machine().driver_data<sauro_state>();
 
 	state->videoram2[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -37,7 +37,7 @@ WRITE8_HANDLER( tecfri_videoram2_w )
 
 WRITE8_HANDLER( tecfri_colorram2_w )
 {
-	sauro_state *state = space->machine->driver_data<sauro_state>();
+	sauro_state *state = space->machine().driver_data<sauro_state>();
 
 	state->colorram2[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -45,14 +45,14 @@ WRITE8_HANDLER( tecfri_colorram2_w )
 
 WRITE8_HANDLER( tecfri_scroll_bg_w )
 {
-	sauro_state *state = space->machine->driver_data<sauro_state>();
+	sauro_state *state = space->machine().driver_data<sauro_state>();
 
 	tilemap_set_scrollx(state->bg_tilemap, 0, data);
 }
 
 static TILE_GET_INFO( get_tile_info_bg )
 {
-	sauro_state *state = machine->driver_data<sauro_state>();
+	sauro_state *state = machine.driver_data<sauro_state>();
 	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x07) << 8);
 	int color = ((state->colorram[tile_index] >> 4) & 0x0f) | state->palette_bank;
 	int flags = state->colorram[tile_index] & 0x08 ? TILE_FLIPX : 0;
@@ -62,7 +62,7 @@ static TILE_GET_INFO( get_tile_info_bg )
 
 static TILE_GET_INFO( get_tile_info_fg )
 {
-	sauro_state *state = machine->driver_data<sauro_state>();
+	sauro_state *state = machine.driver_data<sauro_state>();
 	int code = state->videoram2[tile_index] + ((state->colorram2[tile_index] & 0x07) << 8);
 	int color = ((state->colorram2[tile_index] >> 4) & 0x0f) | state->palette_bank;
 	int flags = state->colorram2[tile_index] & 0x08 ? TILE_FLIPX : 0;
@@ -77,16 +77,16 @@ static const int scroll2_map_flip[8] = {0, 7, 2, 1, 4, 3, 6, 5};
 
 WRITE8_HANDLER( sauro_palette_bank_w )
 {
-	sauro_state *state = space->machine->driver_data<sauro_state>();
+	sauro_state *state = space->machine().driver_data<sauro_state>();
 
 	state->palette_bank = (data & 0x03) << 4;
-	tilemap_mark_all_tiles_dirty_all(space->machine);
+	tilemap_mark_all_tiles_dirty_all(space->machine());
 }
 
 WRITE8_HANDLER( sauro_scroll_fg_w )
 {
-	sauro_state *state = space->machine->driver_data<sauro_state>();
-	const int *map = (flip_screen_get(space->machine) ? scroll2_map_flip : scroll2_map);
+	sauro_state *state = space->machine().driver_data<sauro_state>();
+	const int *map = (flip_screen_get(space->machine()) ? scroll2_map_flip : scroll2_map);
 	int scroll = (data & 0xf8) | map[data & 7];
 
 	tilemap_set_scrollx(state->fg_tilemap, 0, scroll);
@@ -94,7 +94,7 @@ WRITE8_HANDLER( sauro_scroll_fg_w )
 
 VIDEO_START( sauro )
 {
-	sauro_state *state = machine->driver_data<sauro_state>();
+	sauro_state *state = machine.driver_data<sauro_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info_bg, tilemap_scan_cols,
 		 8, 8, 32, 32);
@@ -106,9 +106,9 @@ VIDEO_START( sauro )
 	state->palette_bank = 0;
 }
 
-static void sauro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void sauro_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	sauro_state *state = machine->driver_data<sauro_state>();
+	sauro_state *state = machine.driver_data<sauro_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs,code,sx,sy,color,flipx;
 	int flipy = flip_screen_get(machine);
@@ -146,7 +146,7 @@ static void sauro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[2],
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[2],
 				code,
 				color,
 				flipx, flipy,
@@ -156,11 +156,11 @@ static void sauro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 SCREEN_UPDATE( sauro )
 {
-	sauro_state *state = screen->machine->driver_data<sauro_state>();
+	sauro_state *state = screen->machine().driver_data<sauro_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
-	sauro_draw_sprites(screen->machine, bitmap, cliprect);
+	sauro_draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -168,15 +168,15 @@ SCREEN_UPDATE( sauro )
 
 VIDEO_START( trckydoc )
 {
-	sauro_state *state = machine->driver_data<sauro_state>();
+	sauro_state *state = machine.driver_data<sauro_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info_bg, tilemap_scan_cols,
 		 8, 8, 32, 32);
 }
 
-static void trckydoc_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void trckydoc_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	sauro_state *state = machine->driver_data<sauro_state>();
+	sauro_state *state = machine.driver_data<sauro_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs,code,sy,color,flipx,sx;
 	int flipy = flip_screen_get(machine);
@@ -222,7 +222,7 @@ static void trckydoc_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect,machine->gfx[1],
+		drawgfx_transpen(bitmap, cliprect,machine.gfx[1],
 				code,
 				color,
 				flipx, flipy,
@@ -232,8 +232,8 @@ static void trckydoc_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 SCREEN_UPDATE( trckydoc )
 {
-	sauro_state *state = screen->machine->driver_data<sauro_state>();
+	sauro_state *state = screen->machine().driver_data<sauro_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	trckydoc_draw_sprites(screen->machine, bitmap, cliprect);
+	trckydoc_draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

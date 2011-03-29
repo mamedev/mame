@@ -8,7 +8,7 @@
 
 WRITE32_HANDLER( macrossp_scra_videoram_w )
 {
-	macrossp_state *state = space->machine->driver_data<macrossp_state>();
+	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
 	COMBINE_DATA(&state->scra_videoram[offset]);
 
@@ -18,7 +18,7 @@ WRITE32_HANDLER( macrossp_scra_videoram_w )
 
 static TILE_GET_INFO( get_macrossp_scra_tile_info )
 {
-	macrossp_state *state = machine->driver_data<macrossp_state>();
+	macrossp_state *state = machine.driver_data<macrossp_state>();
 	UINT32 attr, tileno, color;
 
 	attr = state->scra_videoram[tile_index];
@@ -35,7 +35,7 @@ static TILE_GET_INFO( get_macrossp_scra_tile_info )
 			break;
 
 		default:
-			color = machine->rand() & 7;
+			color = machine.rand() & 7;
 			break;
 	}
 
@@ -46,7 +46,7 @@ static TILE_GET_INFO( get_macrossp_scra_tile_info )
 
 WRITE32_HANDLER( macrossp_scrb_videoram_w )
 {
-	macrossp_state *state = space->machine->driver_data<macrossp_state>();
+	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
 	COMBINE_DATA(&state->scrb_videoram[offset]);
 
@@ -56,7 +56,7 @@ WRITE32_HANDLER( macrossp_scrb_videoram_w )
 
 static TILE_GET_INFO( get_macrossp_scrb_tile_info )
 {
-	macrossp_state *state = machine->driver_data<macrossp_state>();
+	macrossp_state *state = machine.driver_data<macrossp_state>();
 	UINT32 attr, tileno, color;
 
 	attr = state->scrb_videoram[tile_index];
@@ -73,7 +73,7 @@ static TILE_GET_INFO( get_macrossp_scrb_tile_info )
 			break;
 
 		default:
-			color = machine->rand() & 7;
+			color = machine.rand() & 7;
 			break;
 	}
 
@@ -84,7 +84,7 @@ static TILE_GET_INFO( get_macrossp_scrb_tile_info )
 
 WRITE32_HANDLER( macrossp_scrc_videoram_w )
 {
-	macrossp_state *state = space->machine->driver_data<macrossp_state>();
+	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
 	COMBINE_DATA(&state->scrc_videoram[offset]);
 
@@ -94,7 +94,7 @@ WRITE32_HANDLER( macrossp_scrc_videoram_w )
 
 static TILE_GET_INFO( get_macrossp_scrc_tile_info )
 {
-	macrossp_state *state = machine->driver_data<macrossp_state>();
+	macrossp_state *state = machine.driver_data<macrossp_state>();
 	UINT32 attr, tileno, color;
 
 	attr = state->scrc_videoram[tile_index];
@@ -111,7 +111,7 @@ static TILE_GET_INFO( get_macrossp_scrc_tile_info )
 			break;
 
 		default:
-			color = machine->rand() & 7;
+			color = machine.rand() & 7;
 			break;
 	}
 
@@ -122,7 +122,7 @@ static TILE_GET_INFO( get_macrossp_scrc_tile_info )
 
 WRITE32_HANDLER( macrossp_text_videoram_w )
 {
-	macrossp_state *state = space->machine->driver_data<macrossp_state>();
+	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
 	COMBINE_DATA(&state->text_videoram[offset]);
 
@@ -132,7 +132,7 @@ WRITE32_HANDLER( macrossp_text_videoram_w )
 
 static TILE_GET_INFO( get_macrossp_text_tile_info )
 {
-	macrossp_state *state = machine->driver_data<macrossp_state>();
+	macrossp_state *state = machine.driver_data<macrossp_state>();
 	UINT32 tileno, colour;
 
 	tileno = state->text_videoram[tile_index] & 0x0000ffff;
@@ -147,7 +147,7 @@ static TILE_GET_INFO( get_macrossp_text_tile_info )
 
 VIDEO_START( macrossp )
 {
-	macrossp_state *state = machine->driver_data<macrossp_state>();
+	macrossp_state *state = machine.driver_data<macrossp_state>();
 
 	state->spriteram_old = auto_alloc_array_clear(machine, UINT32, state->spriteram_size / 4);
 	state->spriteram_old2 = auto_alloc_array_clear(machine, UINT32, state->spriteram_size / 4);
@@ -162,10 +162,10 @@ VIDEO_START( macrossp )
 	tilemap_set_transparent_pen(state->scrb_tilemap, 0);
 	tilemap_set_transparent_pen(state->scrc_tilemap, 0);
 
-	machine->gfx[0]->color_granularity = 64;
-	machine->gfx[1]->color_granularity = 64;
-	machine->gfx[2]->color_granularity = 64;
-	machine->gfx[3]->color_granularity = 64;
+	machine.gfx[0]->color_granularity = 64;
+	machine.gfx[1]->color_granularity = 64;
+	machine.gfx[2]->color_granularity = 64;
+	machine.gfx[3]->color_granularity = 64;
 
 	state->save_pointer(NAME(state->spriteram_old), state->spriteram_size / 4);
 	state->save_pointer(NAME(state->spriteram_old2), state->spriteram_size / 4);
@@ -173,10 +173,10 @@ VIDEO_START( macrossp )
 
 
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	macrossp_state *state = machine->driver_data<macrossp_state>();
-	const gfx_element *gfx = machine->gfx[0];
+	macrossp_state *state = machine.driver_data<macrossp_state>();
+	const gfx_element *gfx = machine.gfx[0];
 	//  UINT32 *source = state->spriteram;
 	UINT32 *source = state->spriteram_old2; /* buffers by two frames */
 	UINT32 *finish = source + state->spriteram_size / 4;
@@ -232,7 +232,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					break;
 
 				default:
-					col = machine->rand();
+					col = machine.rand();
 					break;
 			}
 
@@ -320,9 +320,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-static void draw_layer( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer )
+static void draw_layer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer )
 {
-	macrossp_state *state = machine->driver_data<macrossp_state>();
+	macrossp_state *state = machine.driver_data<macrossp_state>();
 	tilemap_t *tm;
 	UINT32 *vr;
 
@@ -389,10 +389,10 @@ static void sortlayers(int *layer,int *pri)
 
 SCREEN_UPDATE( macrossp )
 {
-	macrossp_state *state = screen->machine->driver_data<macrossp_state>();
+	macrossp_state *state = screen->machine().driver_data<macrossp_state>();
 	int layers[3],layerpri[3];
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	layers[0] = 0;
 	layerpri[0] = (state->scra_videoregs[0] & 0x0000c000) >> 14;
@@ -403,13 +403,13 @@ SCREEN_UPDATE( macrossp )
 
 	sortlayers(layers, layerpri);
 
-	draw_layer(screen->machine, bitmap, cliprect, layers[0]);
-	draw_sprites(screen->machine, bitmap, cliprect, 0);
-	draw_layer(screen->machine, bitmap, cliprect, layers[1]);
-	draw_sprites(screen->machine, bitmap, cliprect, 1);
-	draw_layer(screen->machine, bitmap, cliprect, layers[2]);
-	draw_sprites(screen->machine, bitmap, cliprect, 2);
-	draw_sprites(screen->machine, bitmap, cliprect, 3);
+	draw_layer(screen->machine(), bitmap, cliprect, layers[0]);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0);
+	draw_layer(screen->machine(), bitmap, cliprect, layers[1]);
+	draw_sprites(screen->machine(), bitmap, cliprect, 1);
+	draw_layer(screen->machine(), bitmap, cliprect, layers[2]);
+	draw_sprites(screen->machine(), bitmap, cliprect, 2);
+	draw_sprites(screen->machine(), bitmap, cliprect, 3);
 	tilemap_draw(bitmap, cliprect, state->text_tilemap, 0, 0);
 
 #if 0
@@ -431,7 +431,7 @@ state->scrc_videoregs[2]);// 08 - 0b
 
 SCREEN_EOF( macrossp )
 {
-	macrossp_state *state = machine->driver_data<macrossp_state>();
+	macrossp_state *state = machine.driver_data<macrossp_state>();
 
 	/* looks like sprites are *two* frames ahead, like nmk16 */
 	memcpy(state->spriteram_old2, state->spriteram_old, state->spriteram_size);

@@ -44,12 +44,12 @@ Notes:
 static WRITE8_HANDLER( sidearms_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 
 
 	/* bits 0 and 1 select the ROM bank */
 	bankaddress = 0x10000 + (data & 0x0f) * 0x4000;
-	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);
 }
 
 
@@ -63,7 +63,7 @@ static READ8_HANDLER( turtship_ports_r )
 
 	res = 0;
 	for (i = 0;i < 8;i++)
-		res |= ((input_port_read_safe(space->machine, portnames[i], 0) >> offset) & 1) << i;
+		res |= ((input_port_read_safe(space->machine(), portnames[i], 0) >> offset) & 1) << i;
 
 	return res;
 }
@@ -124,7 +124,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( whizz_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 	int bank = 0;
 
 	switch (data & 0xC0)
@@ -136,7 +136,7 @@ static WRITE8_HANDLER( whizz_bankswitch_w )
 	}
 
 	bankaddress = 0x10000 + bank * 0x4000;
-	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8 )
@@ -634,7 +634,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -1149,28 +1149,28 @@ ROM_END
 
 static DRIVER_INIT( sidearms )
 {
-	sidearms_state *state = machine->driver_data<sidearms_state>();
+	sidearms_state *state = machine.driver_data<sidearms_state>();
 
 	state->gameid = 0;
 }
 
 static DRIVER_INIT( turtship )
 {
-	sidearms_state *state = machine->driver_data<sidearms_state>();
+	sidearms_state *state = machine.driver_data<sidearms_state>();
 
 	state->gameid = 1;
 }
 
 static DRIVER_INIT( dyger )
 {
-	sidearms_state *state = machine->driver_data<sidearms_state>();
+	sidearms_state *state = machine.driver_data<sidearms_state>();
 
 	state->gameid = 2;
 }
 
 static DRIVER_INIT( whizz )
 {
-	sidearms_state *state = machine->driver_data<sidearms_state>();
+	sidearms_state *state = machine.driver_data<sidearms_state>();
 
 	state->gameid = 3;
 }

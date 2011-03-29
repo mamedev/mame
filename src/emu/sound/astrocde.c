@@ -271,7 +271,7 @@ static DEVICE_START( astrocade )
 		chip->bitswap[i] = BITSWAP8(i, 0,1,2,3,4,5,6,7);
 
 	/* allocate a stream for output */
-	chip->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock(), chip, astrocade_update);
+	chip->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), chip, astrocade_update);
 
 	/* reset state */
 	DEVICE_RESET_CALL(astrocade);

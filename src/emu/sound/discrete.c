@@ -314,7 +314,7 @@ void discrete_task::check(discrete_task *dest_task)
 						{
 							output_buffer buf;
 
-							buf.node_buf = auto_alloc_array(m_device.machine, double,
+							buf.node_buf = auto_alloc_array(m_device.machine(), double,
 									((task_node->sample_rate() + sound_manager::STREAMS_UPDATE_FREQUENCY) / sound_manager::STREAMS_UPDATE_FREQUENCY));
 							buf.ptr = buf.node_buf;
 							buf.source = dest_node->m_input[inputnum];
@@ -326,7 +326,7 @@ void discrete_task::check(discrete_task *dest_task)
 						m_device.discrete_log("dso_task_start - buffering %d(%d) in task %p group %d referenced by %d group %d", NODE_INDEX(inputnode_num), NODE_CHILD_NODE_NUM(inputnode_num), this, task_group, dest_node->index(), dest_task->task_group);
 
 						/* register into source list */
-						//source = auto_alloc(device->machine, discrete_source_node);
+						//source = auto_alloc(device->machine(), discrete_source_node);
 						//source.task = this;
 						//source.output_node = i;
 						source.linked_outbuf = pbuf;
@@ -688,7 +688,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 		/* make sure we have one simple task
          * No need to create a node since there are no dependencies.
          */
-		task = auto_alloc_clear(machine, discrete_task(*this));
+		task = auto_alloc_clear(m_machine, discrete_task(*this));
 		task_list.add(task);
 	}
 
@@ -722,7 +722,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 					{
 						if (task != NULL)
 							fatalerror("init_nodes() - Nested DISCRETE_START_TASK.");
-						task = auto_alloc_clear(machine, discrete_task(*this));
+						task = auto_alloc_clear(m_machine, discrete_task(*this));
 						task->task_group = block->initial[0];
 						if (task->task_group < 0 || task->task_group >= DISCRETE_MAX_TASK_GROUPS)
 							fatalerror("discrete_dso_task: illegal task_group %d", task->task_group);
@@ -861,12 +861,12 @@ device_config *discrete_sound_device_config::static_alloc_device_config(const ma
 
 device_t *discrete_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, discrete_device(machine, *this));
+	return auto_alloc(machine, discrete_device(machine, *this));
 }
 
 device_t *discrete_sound_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, discrete_sound_device(machine, *this));
+	return auto_alloc(machine, discrete_sound_device(machine, *this));
 }
 
 
@@ -930,7 +930,7 @@ void discrete_device::device_start()
 	if (this->clock())
 		m_sample_rate = this->clock();
 	else
-		m_sample_rate = this->machine->sample_rate();
+		m_sample_rate = this->machine().sample_rate();
 	m_sample_time = 1.0 / m_sample_rate;
 	m_neg_sample_time = - m_sample_time;
 
@@ -958,7 +958,7 @@ void discrete_device::device_start()
 	m_node_list.clear();
 
 	/* allocate memory to hold pointers to nodes by index */
-	m_indexed_node = auto_alloc_array_clear(this->machine, discrete_base_node *, DISCRETE_MAX_NODES);
+	m_indexed_node = auto_alloc_array_clear(this->machine(), discrete_base_node *, DISCRETE_MAX_NODES);
 
 	/* initialize the node data */
 	init_nodes(block_list);

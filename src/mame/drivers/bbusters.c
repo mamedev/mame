@@ -239,14 +239,14 @@ Country :
 
 static READ16_HANDLER( sound_status_r )
 {
-	bbusters_state *state = space->machine->driver_data<bbusters_state>();
+	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 
 	return state->sound_status;
 }
 
 static WRITE8_HANDLER( sound_status_w )
 {
-	bbusters_state *state = space->machine->driver_data<bbusters_state>();
+	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 
 	state->sound_status = data;
 }
@@ -256,24 +256,24 @@ static WRITE16_HANDLER( sound_cpu_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data&0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 /* Eprom is byte wide, top half of word _must_ be 0xff */
 static READ16_HANDLER( eprom_r )
 {
-	bbusters_state *state = space->machine->driver_data<bbusters_state>();
+	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 
 	return (state->eprom_data[offset]&0xff) | 0xff00;
 }
 
 static READ16_HANDLER( control_3_r )
 {
-	bbusters_state *state = space->machine->driver_data<bbusters_state>();
+	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 	static const char *const port[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2", "GUNX3", "GUNY3" };
 
-	UINT16 retdata = input_port_read(space->machine, port[state->gun_select]);
+	UINT16 retdata = input_port_read(space->machine(), port[state->gun_select]);
 
 	retdata >>=1; // by lowering the precision of the gun reading hardware the game seems to work better
 
@@ -282,7 +282,7 @@ static READ16_HANDLER( control_3_r )
 
 static WRITE16_HANDLER( gun_select_w )
 {
-	bbusters_state *state = space->machine->driver_data<bbusters_state>();
+	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 
 	logerror("%08x: gun r\n",cpu_get_pc(space->cpu));
 
@@ -314,8 +314,8 @@ static READ16_HANDLER( mechatt_gun_r )
 {
 	int x, y;
 
-	x = input_port_read(space->machine, offset ? "GUNX2" : "GUNX1");
-	y = input_port_read(space->machine, offset ? "GUNY2" : "GUNY1");
+	x = input_port_read(space->machine(), offset ? "GUNX2" : "GUNX1");
+	y = input_port_read(space->machine(), offset ? "GUNY2" : "GUNY1");
 
 	/* Todo - does the hardware really clamp like this? */
 	x += 0x18;
@@ -644,7 +644,7 @@ GFXDECODE_END
 
 static void sound_irq( device_t *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2608_interface ym2608_config =
@@ -666,7 +666,7 @@ static const ym2610_interface ym2610_config =
 
 static SCREEN_EOF( bbuster )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	buffer_spriteram16_w(space,0,0,0xffff);
 	buffer_spriteram16_2_w(space,0,0,0xffff);
@@ -674,7 +674,7 @@ static SCREEN_EOF( bbuster )
 
 static SCREEN_EOF( mechatt )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	buffer_spriteram16_w(space,0,0,0xffff);
 }
 

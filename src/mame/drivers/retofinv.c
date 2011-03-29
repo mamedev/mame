@@ -39,65 +39,65 @@ Notes:
 
 static WRITE8_HANDLER( cpu1_reset_w )
 {
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( cpu2_reset_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( mcu_reset_w )
 {
 	/* the bootlegs don't have a MCU, so make sure it's there before trying to reset it */
-	if (space->machine->device("68705") != NULL)
-		cputag_set_input_line(space->machine, "68705", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	if (space->machine().device("68705") != NULL)
+		cputag_set_input_line(space->machine(), "68705", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( cpu2_m6000_w )
 {
-	retofinv_state *state = space->machine->driver_data<retofinv_state>();
+	retofinv_state *state = space->machine().driver_data<retofinv_state>();
 	state->cpu2_m6000 = data;
 }
 
 static READ8_HANDLER( cpu0_mf800_r )
 {
-	retofinv_state *state = space->machine->driver_data<retofinv_state>();
+	retofinv_state *state = space->machine().driver_data<retofinv_state>();
 	return state->cpu2_m6000;
 }
 
 static WRITE8_HANDLER( soundcommand_w )
 {
       soundlatch_w(space, 0, data);
-      cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+      cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( irq0_ack_w )
 {
 	int bit = data & 1;
 
-	cpu_interrupt_enable(space->machine->device("maincpu"), bit);
+	cpu_interrupt_enable(space->machine().device("maincpu"), bit);
 	if (!bit)
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( irq1_ack_w )
 {
 	int bit = data & 1;
 
-	cpu_interrupt_enable(space->machine->device("sub"), bit);
+	cpu_interrupt_enable(space->machine().device("sub"), bit);
 	if (!bit)
-		cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "sub", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( coincounter_w )
 {
-	coin_counter_w(space->machine, 0, data & 1);
+	coin_counter_w(space->machine(), 0, data & 1);
 }
 
 static WRITE8_HANDLER( coinlockout_w )
 {
-	coin_lockout_w(space->machine, 0,~data & 1);
+	coin_lockout_w(space->machine(), 0,~data & 1);
 }
 
 

@@ -172,8 +172,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	wiz_state *state = space->machine->driver_data<wiz_state>();
-	device_t *discrete = space->machine->device("discrete");
+	wiz_state *state = space->machine().driver_data<wiz_state>();
+	device_t *discrete = space->machine().device("discrete");
 
 	switch (offset)
 	{
@@ -198,7 +198,7 @@ static WRITE8_HANDLER( sound_command_w )
 
 static READ8_HANDLER( wiz_protection_r )
 {
-	wiz_state *state = space->machine->driver_data<wiz_state>();
+	wiz_state *state = space->machine().driver_data<wiz_state>();
 	switch (state->colorram2[0])
 	{
 	case 0x35: return 0x25;	/* FIX: sudden player death + free play afterwards   */
@@ -211,7 +211,7 @@ static READ8_HANDLER( wiz_protection_r )
 
 static WRITE8_HANDLER( wiz_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset,data);
+	coin_counter_w(space->machine(), offset,data);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
@@ -677,7 +677,7 @@ DISCRETE_SOUND_END
 
 static MACHINE_RESET( wiz )
 {
-	wiz_state *state = machine->driver_data<wiz_state>();
+	wiz_state *state = machine.driver_data<wiz_state>();
 	state->dsc0 = state->dsc1 = 1;
 }
 
@@ -1034,9 +1034,9 @@ static DRIVER_INIT( stinger )
 		{ 5,3,7, 0x80 },
 		{ 5,7,3, 0x28 }
 	};
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine->region("maincpu")->base();
-	int size = machine->region("maincpu")->bytes();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine.region("maincpu")->base();
+	int size = machine.region("maincpu")->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, size);
 	int A;
 	const UINT8 *tbl;
@@ -1071,13 +1071,13 @@ static DRIVER_INIT( stinger )
 
 static DRIVER_INIT( scion )
 {
-	machine->device("audiocpu")->memory().space(AS_PROGRAM)->nop_write(0x4000, 0x4001);
+	machine.device("audiocpu")->memory().space(AS_PROGRAM)->nop_write(0x4000, 0x4001);
 }
 
 
 static DRIVER_INIT( wiz )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd400, 0xd400, FUNC(wiz_protection_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd400, 0xd400, FUNC(wiz_protection_r));
 }
 
 

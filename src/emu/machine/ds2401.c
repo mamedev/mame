@@ -20,7 +20,7 @@ inline void ATTR_PRINTF(3,4) ds2401_device::verboselog(int n_level, const char *
 		va_start(v, s_fmt);
 		vsprintf(buf, s_fmt, v);
 		va_end(v);
-		logerror("ds2401 %s %s: %s", config.tag(), machine->describe_context(), buf);
+		logerror("ds2401 %s %s: %s", config.tag(), m_machine.describe_context(), buf);
 	}
 }
 
@@ -38,7 +38,7 @@ device_config *ds2401_device_config::static_alloc_device_config(const machine_co
 
 device_t *ds2401_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, ds2401_device(machine, *this));
+	return auto_alloc(machine, ds2401_device(machine, *this));
 }
 
 ds2401_device::ds2401_device(running_machine &_machine, const ds2401_device_config &_config)

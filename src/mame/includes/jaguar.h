@@ -30,10 +30,10 @@ extern UINT32 *jaguar_wave_rom;
 
 TIMER_DEVICE_CALLBACK( jaguar_serial_callback );
 
-void jaguar_dsp_suspend(running_machine *machine);
-void jaguar_dsp_resume(running_machine *machine);
+void jaguar_dsp_suspend(running_machine &machine);
+void jaguar_dsp_resume(running_machine &machine);
 
-void cojag_sound_init(running_machine *machine);
+void cojag_sound_init(running_machine &machine);
 
 void jaguar_external_int(device_t *device, int state);
 
@@ -50,8 +50,8 @@ WRITE32_HANDLER( jaguar_serial_w );
 
 extern UINT8 blitter_status;
 
-void jaguar_gpu_suspend(running_machine *machine);
-void jaguar_gpu_resume(running_machine *machine);
+void jaguar_gpu_suspend(running_machine &machine);
+void jaguar_gpu_resume(running_machine &machine);
 
 void jaguar_gpu_cpu_int(device_t *device);
 void jaguar_dsp_cpu_int(device_t *device);

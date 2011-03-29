@@ -146,7 +146,7 @@ public:
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	bigfghtr_state *state = machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = machine.driver_data<bigfghtr_state>();
 	int data = state->fg_videoram[tile_index];
 	SET_TILE_INFO(
 			1,
@@ -158,7 +158,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	bigfghtr_state *state = machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = machine.driver_data<bigfghtr_state>();
 	int data = state->bg_videoram[tile_index];
 	SET_TILE_INFO(
 			2,
@@ -169,7 +169,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	bigfghtr_state *state = machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = machine.driver_data<bigfghtr_state>();
 	int tile_number = state->text_videoram[tile_index] & 0xff;
 	int attributes;
 
@@ -184,7 +184,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 static VIDEO_START( bigfghtr )
 {
-	bigfghtr_state *state = machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = machine.driver_data<bigfghtr_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 64, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 16, 16, 64, 32);
@@ -196,7 +196,7 @@ static VIDEO_START( bigfghtr )
 
 static WRITE16_HANDLER(text_videoram_w )
 {
-	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
 
 	COMBINE_DATA(&state->text_videoram[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset & 0x7ff);
@@ -204,7 +204,7 @@ static WRITE16_HANDLER(text_videoram_w )
 
 static WRITE16_HANDLER( fg_videoram_w )
 {
-	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
 
 	COMBINE_DATA(&state->fg_videoram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -212,7 +212,7 @@ static WRITE16_HANDLER( fg_videoram_w )
 
 static WRITE16_HANDLER( bg_videoram_w )
 {
-	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
 
 	COMBINE_DATA(&state->bg_videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -220,19 +220,19 @@ static WRITE16_HANDLER( bg_videoram_w )
 
 static WRITE16_HANDLER( fg_scrollx_w )
 {
-	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
 	COMBINE_DATA(&state->fg_scrollx);
 }
 
 static WRITE16_HANDLER( fg_scrolly_w )
 {
-	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
 	COMBINE_DATA(&state->fg_scrolly);
 }
 
 static WRITE16_HANDLER( bg_scrollx_w )
 {
-	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
 
 	COMBINE_DATA(&state->scroll_x);
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll_x);
@@ -240,17 +240,17 @@ static WRITE16_HANDLER( bg_scrollx_w )
 
 static WRITE16_HANDLER( bg_scrolly_w )
 {
-	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
 
 	COMBINE_DATA(&state->scroll_y);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->scroll_y);
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	UINT16 *buffered_spriteram = machine->generic.buffered_spriteram.u16;
+	UINT16 *buffered_spriteram = machine.generic.buffered_spriteram.u16;
 	int offs;
-	for (offs = 0; offs < machine->generic.spriteram_size / 2; offs += 4)
+	for (offs = 0; offs < machine.generic.spriteram_size / 2; offs += 4)
 	{
 		int code = buffered_spriteram[offs + 1]; /* ??YX?TTTTTTTTTTT */
 		int flipx = code & 0x2000;
@@ -261,7 +261,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 		if (((buffered_spriteram[offs + 0] & 0x3000) >> 12) == priority)
 		{
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 				code & 0xfff,
 				color,
 				flipx,flipy,
@@ -273,7 +273,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static SCREEN_UPDATE( bigfghtr )
 {
-	bigfghtr_state *state = screen->machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = screen->machine().driver_data<bigfghtr_state>();
 	int sprite_enable = state->vreg & 0x200;
 
 	tilemap_set_enable(state->bg_tilemap, state->vreg & 0x800);
@@ -286,20 +286,20 @@ static SCREEN_UPDATE( bigfghtr )
 	if (state->vreg & 0x0800)
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	if(sprite_enable)
-		draw_sprites(screen->machine, bitmap, cliprect, 2);
+		draw_sprites(screen->machine(), bitmap, cliprect, 2);
 
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 
 	if(sprite_enable)
-		draw_sprites(screen->machine, bitmap, cliprect, 1);
+		draw_sprites(screen->machine(), bitmap, cliprect, 1);
 
 	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 
 	if (sprite_enable)
-		draw_sprites(screen->machine, bitmap, cliprect, 0);
+		draw_sprites(screen->machine(), bitmap, cliprect, 0);
 
 	return 0;
 }
@@ -308,7 +308,7 @@ static SCREEN_UPDATE( bigfghtr )
 
 static SCREEN_EOF( bigfghtr )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	buffer_spriteram16_w(space, 0, 0, 0xffff);
 }
 
@@ -321,16 +321,16 @@ static WRITE16_HANDLER( sound_command_w )
 
 static WRITE16_HANDLER( io_w )
 {
-	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
 
 	COMBINE_DATA(&state->vreg);
-	flip_screen_set(space->machine, state->vreg & 0x1000);
+	flip_screen_set(space->machine(), state->vreg & 0x1000);
 }
 
 
 static WRITE16_HANDLER( sharedram_w )
 {
-	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
 	COMBINE_DATA(&state->sharedram[offset]);
 
 	switch(offset)
@@ -344,7 +344,7 @@ static WRITE16_HANDLER( sharedram_w )
 
 static READ16_HANDLER(sharedram_r)
 {
-	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
 
 	if(state->mcu_input_snippet)
 	{
@@ -354,21 +354,21 @@ static READ16_HANDLER(sharedram_r)
 				if(state->read_latch)
 				{
 					state->read_latch = 0;
-					return space->machine->rand(); // TODO
+					return space->machine().rand(); // TODO
 				}
 				break;
 
 			case 0x642/2:
-				return (input_port_read(space->machine, "DSW0") & 0xffff) ^ 0xffff;
+				return (input_port_read(space->machine(), "DSW0") & 0xffff) ^ 0xffff;
 
 			case 0x644/2:
-				return (input_port_read(space->machine, "DSW1") & 0xffff) ^ 0xffff;
+				return (input_port_read(space->machine(), "DSW1") & 0xffff) ^ 0xffff;
 
 			case 0x646/2:
-				return (input_port_read(space->machine, "P1") & 0xffff) ^ 0xffff;
+				return (input_port_read(space->machine(), "P1") & 0xffff) ^ 0xffff;
 
 			case 0x648/2:
-				return (input_port_read(space->machine, "P2") & 0xffff) ^ 0xffff;
+				return (input_port_read(space->machine(), "P2") & 0xffff) ^ 0xffff;
 		}
 	}
 
@@ -380,20 +380,20 @@ static READ16_HANDLER(sharedram_r)
 				if(state->read_latch)
 				{
 					state->read_latch = 0;
-					return space->machine->rand(); // TODO
+					return space->machine().rand(); // TODO
 				}
 				break;
 			case 0x642/2:
-				return (input_port_read(space->machine, "DSW0") & 0xffff) ^ 0xffff;
+				return (input_port_read(space->machine(), "DSW0") & 0xffff) ^ 0xffff;
 
 			case 0x644/2:
-				return (input_port_read(space->machine, "DSW1") & 0xffff) ^ 0xffff;
+				return (input_port_read(space->machine(), "DSW1") & 0xffff) ^ 0xffff;
 
 			case 0x646/2:
-				return (input_port_read(space->machine, "P1") & 0xffff) ^ 0xffff;
+				return (input_port_read(space->machine(), "P1") & 0xffff) ^ 0xffff;
 
 			case 0x648/2:
-				return (input_port_read(space->machine, "P2") & 0xffff) ^ 0xffff;
+				return (input_port_read(space->machine(), "P2") & 0xffff) ^ 0xffff;
 
 			/*
             protection controls where the program code should jump to.
@@ -475,7 +475,7 @@ static READ16_HANDLER(sharedram_r)
 
 static READ16_HANDLER( latch_r )
 {
-	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
 
 	state->read_latch = 1;
 	return 0;
@@ -655,7 +655,7 @@ GFXDECODE_END
 
 static MACHINE_START( bigfghtr )
 {
-	bigfghtr_state *state = machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = machine.driver_data<bigfghtr_state>();
 
 	state->save_item(NAME(state->fg_scrollx));
 	state->save_item(NAME(state->fg_scrolly));
@@ -667,7 +667,7 @@ static MACHINE_START( bigfghtr )
 
 static MACHINE_RESET( bigfghtr )
 {
-	bigfghtr_state *state = machine->driver_data<bigfghtr_state>();
+	bigfghtr_state *state = machine.driver_data<bigfghtr_state>();
 
 	state->fg_scrollx = 0;
 	state->fg_scrolly = 0;

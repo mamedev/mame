@@ -20,13 +20,13 @@
 
 
 /* startup */
-void watchdog_init(running_machine *machine);
+void watchdog_init(running_machine &machine);
 
 /* reset the watchdog */
-void watchdog_reset(running_machine *machine);
+void watchdog_reset(running_machine &machine);
 
 /* enable/disable the watchdog */
-void watchdog_enable(running_machine *machine, int enable);
+void watchdog_enable(running_machine &machine, int enable);
 
 
 #endif	/* __WATCHDOG_H__ */

@@ -32,17 +32,17 @@ public:
 
 static READ16_HANDLER( unknown_read_0xc00000 )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static READ16_HANDLER( unknown_read_0xd00000 )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static READ16_HANDLER( unknown_read_0xffff00 )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16 )
@@ -74,7 +74,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( unknown_sub_read_0xbe0004 )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 

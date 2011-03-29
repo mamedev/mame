@@ -11,10 +11,10 @@
 struct WD33C93interface
 {
 	const SCSIConfigTable *scsidevs;		/* SCSI devices */
-	void (*irq_callback)(running_machine *machine, int state); /* irq callback */
+	void (*irq_callback)(running_machine &machine, int state); /* irq callback */
 };
 
-extern void wd33c93_init( running_machine *machine, const struct WD33C93interface *interface );
+extern void wd33c93_init( running_machine &machine, const struct WD33C93interface *interface );
 extern void wd33c93_exit( const struct WD33C93interface *interface );
 extern void wd33c93_get_dma_data(int bytes, UINT8 *pData);
 extern void wd33c93_write_data(int bytes, UINT8 *pData);

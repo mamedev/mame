@@ -226,7 +226,7 @@ static STREAM_UPDATE( warpwarp_sound_update )
 static DEVICE_START( warpwarp_sound )
 {
 	warpwarp_sound_state *state = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	int i;
 
 	state->decay = auto_alloc_array(machine, INT16, 32768);
@@ -234,10 +234,10 @@ static DEVICE_START( warpwarp_sound )
 	for( i = 0; i < 0x8000; i++ )
 		state->decay[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 
-	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, CLOCK_16H, NULL, warpwarp_sound_update);
+	state->channel = device->machine().sound().stream_alloc(*device, 0, 1, CLOCK_16H, NULL, warpwarp_sound_update);
 
-	state->sound_volume_timer = machine->scheduler().timer_alloc(FUNC(sound_volume_decay), state);
-	state->music_volume_timer = machine->scheduler().timer_alloc(FUNC(music_volume_decay), state);
+	state->sound_volume_timer = machine.scheduler().timer_alloc(FUNC(sound_volume_decay), state);
+	state->music_volume_timer = machine.scheduler().timer_alloc(FUNC(music_volume_decay), state);
 }
 
 

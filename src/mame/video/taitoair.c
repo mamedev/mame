@@ -69,12 +69,12 @@ static const int zoomy_conv_table[] =
   Screen refresh
 ***************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
 
-	taitoair_state *state = machine->driver_data<taitoair_state>();
+	taitoair_state *state = machine.driver_data<taitoair_state>();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
 	int ysize;
@@ -164,7 +164,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 						}
 
 						drawgfxzoom_transpen( bitmap, cliprect,
-								 machine -> gfx[0],
+								 machine.gfx[0],
 								 tile,
 								 color,
 								 flipx, flipy,
@@ -343,26 +343,26 @@ static void fill_poly( bitmap_t *bitmap, const rectangle *cliprect, const struct
 
 SCREEN_UPDATE( taitoair )
 {
-	taitoair_state *state = screen->machine->driver_data<taitoair_state>();
+	taitoair_state *state = screen->machine().driver_data<taitoair_state>();
 
 	tc0080vco_tilemap_update(state->tc0080vco);
 
 	bitmap_fill(bitmap, cliprect, 0x41);
 
 #ifdef MAME_DEBUG
-	if (!input_code_pressed(screen->machine, KEYCODE_A))
+	if (!input_code_pressed(screen->machine(), KEYCODE_A))
 		tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 0, 0, 0);
-	if (!input_code_pressed(screen->machine, KEYCODE_S))
-		draw_sprites(screen->machine, bitmap, cliprect, 0);
-	if (!input_code_pressed(screen->machine, KEYCODE_D))
+	if (!input_code_pressed(screen->machine(), KEYCODE_S))
+		draw_sprites(screen->machine(), bitmap, cliprect, 0);
+	if (!input_code_pressed(screen->machine(), KEYCODE_D))
 		tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 1, 0, 0);
-	if (!input_code_pressed(screen->machine, KEYCODE_F))
-		draw_sprites(screen->machine, bitmap, cliprect, 1);
+	if (!input_code_pressed(screen->machine(), KEYCODE_F))
+		draw_sprites(screen->machine(), bitmap, cliprect, 1);
 #else
 	tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 0, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0);
 	tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 1, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 1);
+	draw_sprites(screen->machine(), bitmap, cliprect, 1);
 #endif
 
 	tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 2, 0, 0);

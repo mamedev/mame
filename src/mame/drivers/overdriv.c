@@ -68,7 +68,7 @@ static WRITE16_HANDLER( eeprom_w )
 		/* bit 0 is data */
 		/* bit 1 is clock (active high) */
 		/* bit 2 is cs (active low) */
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 	}
 }
 
@@ -83,7 +83,7 @@ static INTERRUPT_GEN( cpuA_interrupt )
 
 static INTERRUPT_GEN( cpuB_interrupt )
 {
-	overdriv_state *state = device->machine->driver_data<overdriv_state>();
+	overdriv_state *state = device->machine().driver_data<overdriv_state>();
 
 	if (k053246_is_irq_enabled(state->k053246))
 		device_set_input_line(device, 4, HOLD_LINE);
@@ -92,7 +92,7 @@ static INTERRUPT_GEN( cpuB_interrupt )
 
 static WRITE16_HANDLER( cpuA_ctrl_w )
 {
-	overdriv_state *state = space->machine->driver_data<overdriv_state>();
+	overdriv_state *state = space->machine().driver_data<overdriv_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -101,9 +101,9 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 
 		/* bit 1 is clear during service mode - function unknown */
 
-		set_led_status(space->machine, 0, data & 0x08);
-		coin_counter_w(space->machine, 0, data & 0x10);
-		coin_counter_w(space->machine, 1, data & 0x20);
+		set_led_status(space->machine(), 0, data & 0x08);
+		coin_counter_w(space->machine(), 0, data & 0x10);
+		coin_counter_w(space->machine(), 1, data & 0x20);
 
 //logerror("%06x: write %04x to cpuA_ctrl_w\n",cpu_get_pc(space->cpu),data);
 	}
@@ -111,13 +111,13 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 
 static READ16_HANDLER( cpuB_ctrl_r )
 {
-	overdriv_state *state = space->machine->driver_data<overdriv_state>();
+	overdriv_state *state = space->machine().driver_data<overdriv_state>();
 	return state->cpuB_ctrl;
 }
 
 static WRITE16_HANDLER( cpuB_ctrl_w )
 {
-	overdriv_state *state = space->machine->driver_data<overdriv_state>();
+	overdriv_state *state = space->machine().driver_data<overdriv_state>();
 	COMBINE_DATA(&state->cpuB_ctrl);
 
 	if (ACCESSING_BITS_0_7)
@@ -139,19 +139,19 @@ static READ8_DEVICE_HANDLER( overdriv_sound_r )
 
 static WRITE16_HANDLER( overdriv_soundirq_w )
 {
-	overdriv_state *state = space->machine->driver_data<overdriv_state>();
+	overdriv_state *state = space->machine().driver_data<overdriv_state>();
 	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( overdriv_cpuB_irq5_w )
 {
-	overdriv_state *state = space->machine->driver_data<overdriv_state>();
+	overdriv_state *state = space->machine().driver_data<overdriv_state>();
 	device_set_input_line(state->subcpu, 5, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( overdriv_cpuB_irq6_w )
 {
-	overdriv_state *state = space->machine->driver_data<overdriv_state>();
+	overdriv_state *state = space->machine().driver_data<overdriv_state>();
 	device_set_input_line(state->subcpu, 6, HOLD_LINE);
 }
 
@@ -296,17 +296,17 @@ static const k051316_interface overdriv_k051316_intf_2 =
 
 static MACHINE_START( overdriv )
 {
-	overdriv_state *state = machine->driver_data<overdriv_state>();
+	overdriv_state *state = machine.driver_data<overdriv_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->subcpu = machine->device("sub");
-	state->k051316_1 = machine->device("k051316_1");
-	state->k051316_2 = machine->device("k051316_2");
-	state->k053260_1 = machine->device("k053260_1");
-	state->k053260_2 = machine->device("k053260_2");
-	state->k053246 = machine->device("k053246");
-	state->k053251 = machine->device("k053251");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->subcpu = machine.device("sub");
+	state->k051316_1 = machine.device("k051316_1");
+	state->k051316_2 = machine.device("k051316_2");
+	state->k053260_1 = machine.device("k053260_1");
+	state->k053260_2 = machine.device("k053260_2");
+	state->k053246 = machine.device("k053246");
+	state->k053251 = machine.device("k053251");
 
 	state->save_item(NAME(state->cpuB_ctrl));
 	state->save_item(NAME(state->sprite_colorbase));
@@ -316,7 +316,7 @@ static MACHINE_START( overdriv )
 
 static MACHINE_RESET( overdriv )
 {
-	overdriv_state *state = machine->driver_data<overdriv_state>();
+	overdriv_state *state = machine.driver_data<overdriv_state>();
 
 	state->cpuB_ctrl = 0;
 	state->sprite_colorbase = 0;

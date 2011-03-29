@@ -23,7 +23,7 @@ static KONAMI_SETLINES_CALLBACK( thunderx_banking );
 
 static INTERRUPT_GEN( scontra_interrupt )
 {
-	thunderx_state *state = device->machine->driver_data<thunderx_state>();
+	thunderx_state *state = device->machine().driver_data<thunderx_state>();
 
 	if (k052109_is_irq_enabled(state->k052109))
 		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
@@ -31,23 +31,23 @@ static INTERRUPT_GEN( scontra_interrupt )
 
 static TIMER_CALLBACK( thunderx_firq_callback )
 {
-	thunderx_state *state = machine->driver_data<thunderx_state>();
+	thunderx_state *state = machine.driver_data<thunderx_state>();
 	device_set_input_line(state->maincpu, KONAMI_FIRQ_LINE, HOLD_LINE);
 }
 
 static READ8_HANDLER( scontra_bankedram_r )
 {
-	thunderx_state *state = space->machine->driver_data<thunderx_state>();
+	thunderx_state *state = space->machine().driver_data<thunderx_state>();
 
 	if (state->palette_selected)
-		return space->machine->generic.paletteram.u8[offset];
+		return space->machine().generic.paletteram.u8[offset];
 	else
 		return state->ram[offset];
 }
 
 static WRITE8_HANDLER( scontra_bankedram_w )
 {
-	thunderx_state *state = space->machine->driver_data<thunderx_state>();
+	thunderx_state *state = space->machine().driver_data<thunderx_state>();
 
 	if (state->palette_selected)
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
@@ -57,7 +57,7 @@ static WRITE8_HANDLER( scontra_bankedram_w )
 
 static READ8_HANDLER( thunderx_bankedram_r )
 {
-	thunderx_state *state = space->machine->driver_data<thunderx_state>();
+	thunderx_state *state = space->machine().driver_data<thunderx_state>();
 
 	if (state->rambank & 0x01)
 		return state->ram[offset];
@@ -75,12 +75,12 @@ static READ8_HANDLER( thunderx_bankedram_r )
 		}
 	}
 	else
-		return space->machine->generic.paletteram.u8[offset];
+		return space->machine().generic.paletteram.u8[offset];
 }
 
 static WRITE8_HANDLER( thunderx_bankedram_w )
 {
-	thunderx_state *state = space->machine->driver_data<thunderx_state>();
+	thunderx_state *state = space->machine().driver_data<thunderx_state>();
 
 	if (state->rambank & 0x01)
 		state->ram[offset] = data;
@@ -185,9 +185,9 @@ this is the data written to internal ram on startup:
 // +3 : x (2 pixel units) of center of object
 // +4 : y (2 pixel units) of center of object
 
-static void run_collisions( running_machine *machine, int s0, int e0, int s1, int e1, int cm, int hm )
+static void run_collisions( running_machine &machine, int s0, int e0, int s1, int e1, int cm, int hm )
 {
-	thunderx_state *state = machine->driver_data<thunderx_state>();
+	thunderx_state *state = machine.driver_data<thunderx_state>();
 	UINT8* p0;
 	UINT8* p1;
 	int ii, jj;
@@ -237,9 +237,9 @@ static void run_collisions( running_machine *machine, int s0, int e0, int s1, in
 //
 // emulates K052591 collision detection
 
-static void calculate_collisions( running_machine *machine )
+static void calculate_collisions( running_machine &machine )
 {
-	thunderx_state *state = machine->driver_data<thunderx_state>();
+	thunderx_state *state = machine.driver_data<thunderx_state>();
 	int	X0,Y0;
 	int	X1,Y1;
 	int	CM,HM;
@@ -291,13 +291,13 @@ static void calculate_collisions( running_machine *machine )
 
 static READ8_HANDLER( thunderx_1f98_r )
 {
-	thunderx_state *state = space->machine->driver_data<thunderx_state>();
+	thunderx_state *state = space->machine().driver_data<thunderx_state>();
 	return state->_1f98_data;
 }
 
 static WRITE8_HANDLER( thunderx_1f98_w )
 {
-	thunderx_state *state = space->machine->driver_data<thunderx_state>();
+	thunderx_state *state = space->machine().driver_data<thunderx_state>();
 
 	// logerror("%04x: 1f98_w %02x\n", cpu_get_pc(space->cpu),data);
 
@@ -310,10 +310,10 @@ static WRITE8_HANDLER( thunderx_1f98_w )
 	/* bit 2 = do collision detection when 0->1 */
 	if ((data & 4) && !(state->_1f98_data & 4))
 	{
-		calculate_collisions(space->machine);
+		calculate_collisions(space->machine());
 
 		/* 100 cycle delay is arbitrary */
-		space->machine->scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(100), FUNC(thunderx_firq_callback));
+		space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(100), FUNC(thunderx_firq_callback));
 	}
 
 	state->_1f98_data = data;
@@ -321,22 +321,22 @@ static WRITE8_HANDLER( thunderx_1f98_w )
 
 static WRITE8_HANDLER( scontra_bankswitch_w )
 {
-	thunderx_state *state = space->machine->driver_data<thunderx_state>();
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	thunderx_state *state = space->machine().driver_data<thunderx_state>();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 	int offs;
 
 //logerror("%04x: bank switch %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bits 0-3 ROM bank */
 	offs = 0x10000 + (data & 0x0f)*0x2000;
-	memory_set_bankptr(space->machine,  "bank1", &RAM[offs] );
+	memory_set_bankptr(space->machine(),  "bank1", &RAM[offs] );
 
 	/* bit 4 select work RAM or palette RAM at 5800-5fff */
 	state->palette_selected = ~data & 0x10;
 
 	/* bits 5/6 coin counters */
-	coin_counter_w(space->machine, 0, data & 0x20);
-	coin_counter_w(space->machine, 1, data & 0x40);
+	coin_counter_w(space->machine(), 0, data & 0x20);
+	coin_counter_w(space->machine(), 1, data & 0x40);
 
 	/* bit 7 controls layer priority */
 	state->priority = data & 0x80;
@@ -344,7 +344,7 @@ static WRITE8_HANDLER( scontra_bankswitch_w )
 
 static WRITE8_HANDLER( thunderx_videobank_w )
 {
-	thunderx_state *state = space->machine->driver_data<thunderx_state>();
+	thunderx_state *state = space->machine().driver_data<thunderx_state>();
 	//logerror("%04x: select video ram bank %02x\n",cpu_get_pc(space->cpu),data);
 	/* 0x01 = work RAM at 4000-5fff */
 	/* 0x00 = palette at 5800-5fff */
@@ -352,8 +352,8 @@ static WRITE8_HANDLER( thunderx_videobank_w )
 	state->rambank = data;
 
 	/* bits 1/2 coin counters */
-	coin_counter_w(space->machine, 0, data & 0x02);
-	coin_counter_w(space->machine, 1, data & 0x04);
+	coin_counter_w(space->machine(), 0, data & 0x02);
+	coin_counter_w(space->machine(), 1, data & 0x04);
 
 	/* bit 3 controls layer priority (seems to be always 1) */
 	state->priority = data & 0x08;
@@ -361,7 +361,7 @@ static WRITE8_HANDLER( thunderx_videobank_w )
 
 static WRITE8_HANDLER( thunderx_sh_irqtrigger_w )
 {
-	thunderx_state *state = space->machine->driver_data<thunderx_state>();
+	thunderx_state *state = space->machine().driver_data<thunderx_state>();
 	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
@@ -377,7 +377,7 @@ static WRITE8_DEVICE_HANDLER( scontra_snd_bankswitch_w )
 
 static READ8_HANDLER( k052109_051960_r )
 {
-	thunderx_state *state = space->machine->driver_data<thunderx_state>();
+	thunderx_state *state = space->machine().driver_data<thunderx_state>();
 
 	if (k052109_get_rmrd_line(state->k052109) == CLEAR_LINE)
 	{
@@ -394,7 +394,7 @@ static READ8_HANDLER( k052109_051960_r )
 
 static WRITE8_HANDLER( k052109_051960_w )
 {
-	thunderx_state *state = space->machine->driver_data<thunderx_state>();
+	thunderx_state *state = space->machine().driver_data<thunderx_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
 		k051937_w(state->k051960, offset - 0x3800, data);
@@ -627,28 +627,28 @@ static const k051960_interface thunderx_k051960_intf =
 
 static MACHINE_START( scontra )
 {
-	thunderx_state *state = machine->driver_data<thunderx_state>();
+	thunderx_state *state = machine.driver_data<thunderx_state>();
 
-	machine->generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x800);
+	machine.generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x800);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->k007232 = machine->device("k007232");
-	state->k052109 = machine->device("k052109");
-	state->k051960 = machine->device("k051960");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->k007232 = machine.device("k007232");
+	state->k052109 = machine.device("k052109");
+	state->k051960 = machine.device("k051960");
 
 	state->save_item(NAME(state->priority));
 	state->save_item(NAME(state->_1f98_data));
 	state->save_item(NAME(state->palette_selected));
 	state->save_item(NAME(state->rambank));
 	state->save_item(NAME(state->pmcbank));
-	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x800);
+	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x800);
 }
 
 static MACHINE_START( thunderx )
 {
-	thunderx_state *state = machine->driver_data<thunderx_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	thunderx_state *state = machine.driver_data<thunderx_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);
 	memory_configure_bank(machine, "bank1", 12, 4, &ROM[0x08000], 0x2000);
@@ -663,7 +663,7 @@ static MACHINE_START( thunderx )
 
 static MACHINE_RESET( scontra )
 {
-	thunderx_state *state = machine->driver_data<thunderx_state>();
+	thunderx_state *state = machine.driver_data<thunderx_state>();
 
 	state->priority = 0;
 	state->_1f98_data = 0;
@@ -674,7 +674,7 @@ static MACHINE_RESET( scontra )
 
 static MACHINE_RESET( thunderx )
 {
-	konami_configure_set_lines(machine->device("maincpu"), thunderx_banking);
+	konami_configure_set_lines(machine.device("maincpu"), thunderx_banking);
 
 	MACHINE_RESET_CALL(scontra);
 }
@@ -1017,7 +1017,7 @@ ROM_END
 static KONAMI_SETLINES_CALLBACK( thunderx_banking )
 {
 	//logerror("thunderx %04x: bank select %02x\n", cpu_get_pc(device->cpu), lines);
-	memory_set_bank(device->machine,  "bank1", ((lines & 0x0f) ^ 0x08));
+	memory_set_bank(device->machine(),  "bank1", ((lines & 0x0f) ^ 0x08));
 }
 
 GAME( 1988, scontra,   0,        scontra,  scontra,  0, ROT90, "Konami", "Super Contra", GAME_SUPPORTS_SAVE )

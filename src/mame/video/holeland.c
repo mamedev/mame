@@ -18,7 +18,7 @@
 
 static TILE_GET_INFO( holeland_get_tile_info )
 {
-	holeland_state *state = machine->driver_data<holeland_state>();
+	holeland_state *state = machine.driver_data<holeland_state>();
 	int attr = state->colorram[tile_index];
 	int tile_number = state->videoram[tile_index] | ((attr & 0x03) << 8);
 
@@ -36,7 +36,7 @@ static TILE_GET_INFO( holeland_get_tile_info )
 
 static TILE_GET_INFO( crzrally_get_tile_info )
 {
-	holeland_state *state = machine->driver_data<holeland_state>();
+	holeland_state *state = machine.driver_data<holeland_state>();
 	int attr = state->colorram[tile_index];
 	int tile_number = state->videoram[tile_index] | ((attr & 0x03) << 8);
 
@@ -56,7 +56,7 @@ static TILE_GET_INFO( crzrally_get_tile_info )
 
 VIDEO_START( holeland )
 {
-	holeland_state *state = machine->driver_data<holeland_state>();
+	holeland_state *state = machine.driver_data<holeland_state>();
 	state->bg_tilemap = tilemap_create(machine, holeland_get_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
 	tilemap_set_transmask(state->bg_tilemap, 0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
@@ -65,53 +65,53 @@ VIDEO_START( holeland )
 
 VIDEO_START( crzrally )
 {
-	holeland_state *state = machine->driver_data<holeland_state>();
+	holeland_state *state = machine.driver_data<holeland_state>();
 	state->bg_tilemap = tilemap_create(machine, crzrally_get_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 }
 
 WRITE8_HANDLER( holeland_videoram_w )
 {
-	holeland_state *state = space->machine->driver_data<holeland_state>();
+	holeland_state *state = space->machine().driver_data<holeland_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( holeland_colorram_w )
 {
-	holeland_state *state = space->machine->driver_data<holeland_state>();
+	holeland_state *state = space->machine().driver_data<holeland_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( holeland_pal_offs_w )
 {
-	holeland_state *state = space->machine->driver_data<holeland_state>();
+	holeland_state *state = space->machine().driver_data<holeland_state>();
 	if ((data & 1) != state->po[offset])
 	{
 		state->po[offset] = data & 1;
 		state->palette_offset = (state->po[0] + (state->po[1] << 1)) << 4;
-		tilemap_mark_all_tiles_dirty_all(space->machine);
+		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 }
 
 WRITE8_HANDLER( holeland_scroll_w )
 {
-	holeland_state *state = space->machine->driver_data<holeland_state>();
+	holeland_state *state = space->machine().driver_data<holeland_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( holeland_flipscreen_w )
 {
 	if (offset)
-		flip_screen_y_set(space->machine, data);
+		flip_screen_y_set(space->machine(), data);
 	else
-		flip_screen_x_set(space->machine, data);
+		flip_screen_x_set(space->machine(), data);
 }
 
 
-static void holeland_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void holeland_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	holeland_state *state = machine->driver_data<holeland_state>();
+	holeland_state *state = machine.driver_data<holeland_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs, code, sx, sy, color, flipx, flipy;
 
@@ -141,7 +141,7 @@ static void holeland_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -149,9 +149,9 @@ static void holeland_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	}
 }
 
-static void crzrally_draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
+static void crzrally_draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	holeland_state *state = machine->driver_data<holeland_state>();
+	holeland_state *state = machine.driver_data<holeland_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs, code, sx, sy, color, flipx, flipy;
 
@@ -180,7 +180,7 @@ static void crzrally_draw_sprites( running_machine *machine, bitmap_t *bitmap,co
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -190,18 +190,18 @@ static void crzrally_draw_sprites( running_machine *machine, bitmap_t *bitmap,co
 
 SCREEN_UPDATE( holeland )
 {
-	holeland_state *state = screen->machine->driver_data<holeland_state>();
+	holeland_state *state = screen->machine().driver_data<holeland_state>();
 /*tilemap_mark_all_tiles_dirty(state->bg_tilemap); */
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	holeland_draw_sprites(screen->machine, bitmap, cliprect);
+	holeland_draw_sprites(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE( crzrally )
 {
-	holeland_state *state = screen->machine->driver_data<holeland_state>();
+	holeland_state *state = screen->machine().driver_data<holeland_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	crzrally_draw_sprites(screen->machine, bitmap, cliprect);
+	crzrally_draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

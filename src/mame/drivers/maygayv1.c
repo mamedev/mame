@@ -233,7 +233,7 @@ public:
 
 static WRITE16_HANDLER( i82716_w )
 {
-	maygayv1_state *state = space->machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = space->machine().driver_data<maygayv1_state>();
 	i82716_t &i82716 = state->i82716;
 	// Accessing register window?
 	if ((VREG(RWBA) & 0xfff0) == (offset & 0xfff0))
@@ -253,7 +253,7 @@ static WRITE16_HANDLER( i82716_w )
 
 static READ16_HANDLER( i82716_r )
 {
-	maygayv1_state *state = space->machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = space->machine().driver_data<maygayv1_state>();
 	i82716_t &i82716 = state->i82716;
 	// Accessing register window?
 	if ((VREG(RWBA) & ~0xf) == (offset & ~0xf))
@@ -282,7 +282,7 @@ static VIDEO_START( maygayv1 )
 
 static SCREEN_UPDATE( maygayv1 )
 {
-	maygayv1_state *state = screen->machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = screen->machine().driver_data<maygayv1_state>();
 	i82716_t &i82716 = state->i82716;
 	UINT16 *atable = &i82716.dram[VREG(ATBA)];
 	UINT16 *otable = &i82716.dram[VREG(ODTBA) & 0xfc00];  // both must be bank 0
@@ -297,7 +297,7 @@ static SCREEN_UPDATE( maygayv1 )
 	/* If screen output is disabled, fill with black */
 	if (!(VREG(VCR0) & VCR0_DEN))
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 		return 0;
 	}
 
@@ -413,7 +413,7 @@ static SCREEN_UPDATE( maygayv1 )
 
 static SCREEN_EOF( maygayv1 )
 {
-	maygayv1_state *state = machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = machine.driver_data<maygayv1_state>();
 	i82716_t &i82716 = state->i82716;
 	// UCF
 	if (VREG(VCR0) & VCR0_UCF)
@@ -507,7 +507,7 @@ static void update_outputs(i8279_t &i8279, UINT16 which)
 
 static READ16_HANDLER( maygay_8279_r )
 {
-	maygayv1_state *state = space->machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = space->machine().driver_data<maygayv1_state>();
 	i8279_t &i8279 = state->i8279;
 	static const char *const portnames[] = { "STROBE1","STROBE2","STROBE3","STROBE4","STROBE5","STROBE6","STROBE7","STROBE8" };
 	UINT8 result = 0xff;
@@ -522,7 +522,7 @@ static READ16_HANDLER( maygay_8279_r )
 			case 0x40:
 				addr = i8279.command & 0x07;
 
-				result = input_port_read(space->machine, portnames[addr]);
+				result = input_port_read(space->machine(), portnames[addr]);
 
 				/* handle autoincrement */
 				if (i8279.command & 0x10)
@@ -555,7 +555,7 @@ static READ16_HANDLER( maygay_8279_r )
 
 static WRITE16_HANDLER( maygay_8279_w )
 {
-	maygayv1_state *state = space->machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = space->machine().driver_data<maygayv1_state>();
 	i8279_t &i8279 = state->i8279;
 	UINT8 addr;
 
@@ -658,12 +658,12 @@ static WRITE16_HANDLER( maygay_8279_w )
 
 static WRITE16_HANDLER( vsync_int_ctrl )
 {
-	maygayv1_state *state = space->machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = space->machine().driver_data<maygayv1_state>();
 	state->vsync_latch_preset = data & 0x0100;
 
 	// Active low
 	if (!(state->vsync_latch_preset))
-		cputag_set_input_line(space->machine, "maincpu", 3, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", 3, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
@@ -717,13 +717,13 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( mcu_r )
 {
-	maygayv1_state *state = space->machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = space->machine().driver_data<maygayv1_state>();
 	switch (offset)
 	{
 		case 1:
 		{
 			if ( !BIT(state->p3, 4) )
-				return (input_port_read(space->machine, "REEL"));	// Reels???
+				return (input_port_read(space->machine(), "REEL"));	// Reels???
 			else
 				return 0;
 		}
@@ -735,7 +735,7 @@ static READ8_HANDLER( mcu_r )
 
 static WRITE8_HANDLER( mcu_w )
 {
-	maygayv1_state *state = space->machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = space->machine().driver_data<maygayv1_state>();
 			logerror("O %x D %x",offset,data);
 
 	switch (offset)
@@ -922,18 +922,18 @@ INPUT_PORTS_END
 
 static void duart_irq_handler(device_t *device, UINT8 vector)
 {
-	cputag_set_input_line_and_vector(device->machine, "maincpu", 5, ASSERT_LINE, vector);
-//  cputag_set_input_line(device->machine, "maincpu", 5, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line_and_vector(device->machine(), "maincpu", 5, ASSERT_LINE, vector);
+//  cputag_set_input_line(device->machine(), "maincpu", 5, state ? ASSERT_LINE : CLEAR_LINE);
 };
 
 
 static void duart_tx(device_t *device, int channel, UINT8 data)
 {
-	maygayv1_state *state = device->machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = device->machine().driver_data<maygayv1_state>();
 	if (channel == 0)
 	{
 		state->d68681_val = data;
-		cputag_set_input_line(device->machine, "soundcpu", MCS51_RX_LINE, ASSERT_LINE);  // ?
+		cputag_set_input_line(device->machine(), "soundcpu", MCS51_RX_LINE, ASSERT_LINE);  // ?
 	}
 
 };
@@ -949,13 +949,13 @@ static const duart68681_config maygayv1_duart68681_config =
 
 static int data_to_i8031(device_t *device)
 {
-	maygayv1_state *state = device->machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = device->machine().driver_data<maygayv1_state>();
 	return state->d68681_val;
 }
 
 static void data_from_i8031(device_t *device, int data)
 {
-	maygayv1_state *state = device->machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = device->machine().driver_data<maygayv1_state>();
 	duart68681_rx_data(state->duart68681, 0, data);
 }
 
@@ -991,7 +991,7 @@ static const pia6821_interface pia_intf =
 
 static MACHINE_START( maygayv1 )
 {
-	maygayv1_state *state = machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = machine.driver_data<maygayv1_state>();
 	i82716_t &i82716 = state->i82716;
 	i82716.dram = auto_alloc_array(machine, UINT16, 0x80000/2);   // ???
 	i82716.line_buf = auto_alloc_array(machine, UINT8, 512);
@@ -1000,16 +1000,16 @@ static MACHINE_START( maygayv1 )
 
 //  duart_68681_init(DUART_CLOCK, duart_irq_handler, duart_tx);
 
-	i8051_set_serial_tx_callback(machine->device("soundcpu"), data_from_i8031);
-	i8051_set_serial_rx_callback(machine->device("soundcpu"), data_to_i8031);
+	i8051_set_serial_tx_callback(machine.device("soundcpu"), data_from_i8031);
+	i8051_set_serial_rx_callback(machine.device("soundcpu"), data_to_i8031);
 }
 
 static MACHINE_RESET( maygayv1 )
 {
-	maygayv1_state *state = machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = machine.driver_data<maygayv1_state>();
 	i82716_t &i82716 = state->i82716;
 	// ?
-	state->duart68681 = machine->device( "duart68681" );
+	state->duart68681 = machine.device( "duart68681" );
 	memset(i82716.dram, 0, 0x40000);
 	i82716.r[RWBA] = 0x0200;
 }
@@ -1017,9 +1017,9 @@ static MACHINE_RESET( maygayv1 )
 
 static INTERRUPT_GEN( vsync_interrupt )
 {
-	maygayv1_state *state = device->machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = device->machine().driver_data<maygayv1_state>();
 	if (state->vsync_latch_preset)
-		cputag_set_input_line(device->machine, "maincpu", 3, ASSERT_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", 3, ASSERT_LINE);
 }
 
 
@@ -1137,7 +1137,7 @@ ROM_END
 
 static DRIVER_INIT( screenpl )
 {
-	maygayv1_state *state = machine->driver_data<maygayv1_state>();
+	maygayv1_state *state = machine.driver_data<maygayv1_state>();
 	state->p1 = state->p3 = 0xff;
 }
 

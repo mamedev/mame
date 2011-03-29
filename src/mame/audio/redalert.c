@@ -70,13 +70,13 @@ WRITE8_HANDLER( redalert_audio_command_w )
 	/* D7 is also connected to the NMI input of the CPU -
        the NMI is actually toggled by a 74121 */
 	if ((data & 0x80) == 0x00)
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 {
-	redalert_state *state = device->machine->driver_data<redalert_state>();
+	redalert_state *state = device->machine().driver_data<redalert_state>();
 	/* BC2 is connected to a pull-up resistor, so BC2=1 always */
 	switch (data & 0x03)
 	{
@@ -102,14 +102,14 @@ static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 
 static READ8_HANDLER( redalert_ay8910_latch_1_r )
 {
-	redalert_state *state = space->machine->driver_data<redalert_state>();
+	redalert_state *state = space->machine().driver_data<redalert_state>();
 	return state->ay8910_latch_1;
 }
 
 
 static WRITE8_HANDLER( redalert_ay8910_latch_2_w )
 {
-	redalert_state *state = space->machine->driver_data<redalert_state>();
+	redalert_state *state = space->machine().driver_data<redalert_state>();
 	state->ay8910_latch_2 = data;
 }
 
@@ -142,7 +142,7 @@ ADDRESS_MAP_END
 
 static SOUND_START( redalert_audio )
 {
-	redalert_state *state = machine->driver_data<redalert_state>();
+	redalert_state *state = machine.driver_data<redalert_state>();
 	state->save_item(NAME(state->ay8910_latch_1));
 	state->save_item(NAME(state->ay8910_latch_2));
 }
@@ -157,19 +157,19 @@ static SOUND_START( redalert_audio )
 WRITE8_HANDLER( redalert_voice_command_w )
 {
 	soundlatch2_w(space, 0, (data & 0x78) >> 3);
-	cputag_set_input_line(space->machine, "voice", I8085_RST75_LINE, (~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "voice", I8085_RST75_LINE, (~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sod_callback )
 {
-	hc55516_digit_w(device->machine->device("cvsd"), state);
+	hc55516_digit_w(device->machine().device("cvsd"), state);
 }
 
 
 static READ_LINE_DEVICE_HANDLER( sid_callback )
 {
-	return hc55516_clock_state_r(device->machine->device("cvsd"));
+	return hc55516_clock_state_r(device->machine().device("cvsd"));
 }
 
 
@@ -284,29 +284,29 @@ WRITE8_HANDLER( demoneye_audio_command_w )
 {
 	/* the byte is connected to port A of the AY8910 */
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static WRITE8_DEVICE_HANDLER( demoneye_ay8910_latch_1_w )
 {
-	redalert_state *state = device->machine->driver_data<redalert_state>();
+	redalert_state *state = device->machine().driver_data<redalert_state>();
 	state->ay8910_latch_1 = data;
 }
 
 
 static READ8_DEVICE_HANDLER( demoneye_ay8910_latch_2_r )
 {
-	redalert_state *state = device->machine->driver_data<redalert_state>();
+	redalert_state *state = device->machine().driver_data<redalert_state>();
 	return state->ay8910_latch_2;
 }
 
 
 static WRITE8_DEVICE_HANDLER( demoneye_ay8910_data_w )
 {
-	redalert_state *state = device->machine->driver_data<redalert_state>();
-	device_t *ay1 = device->machine->device("ay1");
-	device_t *ay2 = device->machine->device("ay2");
+	redalert_state *state = device->machine().driver_data<redalert_state>();
+	device_t *ay1 = device->machine().device("ay1");
+	device_t *ay2 = device->machine().device("ay2");
 
 	switch (state->ay8910_latch_1 & 0x03)
 	{
@@ -389,7 +389,7 @@ static const pia6821_interface demoneye_pia_intf =
 
 static SOUND_START( demoneye )
 {
-	redalert_state *state = machine->driver_data<redalert_state>();
+	redalert_state *state = machine.driver_data<redalert_state>();
 	state->save_item(NAME(state->ay8910_latch_1));
 	state->save_item(NAME(state->ay8910_latch_2));
 }

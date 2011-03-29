@@ -40,11 +40,11 @@
     Function Prototypes
 ******************************************************************************/
 
-static int  vdp_data_r(running_machine *machine);
-static void vdp_data_w(running_machine *machine, int data);
-static int  vdp_control_r(running_machine *machine);
+static int  vdp_data_r(running_machine &machine);
+static void vdp_data_w(running_machine &machine, int data);
+static int  vdp_control_r(running_machine &machine);
 static void vdp_control_w(address_space *space, int data);
-static void vdp_register_w(running_machine *machine, int data, int vblank);
+static void vdp_register_w(running_machine &machine, int data, int vblank);
 static void vdp_control_dma(address_space *space, int data);
 static void vdp_dma_68k(address_space *space);
 static void vdp_dma_fill(int);
@@ -132,9 +132,9 @@ static void start_genesis_vdp(screen_device *screen)
 	genesis_screen = screen;
 
 	/* allocate memory for the VDP, the lookup table, and the buffer bitmap */
-	vdp_vram			= auto_alloc_array(screen->machine, UINT8, VRAM_SIZE);
-	vdp_vsram			= auto_alloc_array(screen->machine, UINT8, VSRAM_SIZE);
-	transparent_lookup	= auto_alloc_array(screen->machine, UINT16, 0x1000);
+	vdp_vram			= auto_alloc_array(screen->machine(), UINT8, VRAM_SIZE);
+	vdp_vsram			= auto_alloc_array(screen->machine(), UINT8, VSRAM_SIZE);
+	transparent_lookup	= auto_alloc_array(screen->machine(), UINT16, 0x1000);
 
 	/* clear the VDP memory, prevents corrupt tile in Puyo Puyo 2 */
 	memset(vdp_vram, 0, VRAM_SIZE);
@@ -163,41 +163,41 @@ static void start_genesis_vdp(screen_device *screen)
 
 	/* reset VDP */
     for (i = 0; i < 24; i++)
-        vdp_register_w(screen->machine, 0x8000 | (i << 8) | vdp_init[i], 1);
+        vdp_register_w(screen->machine(), 0x8000 | (i << 8) | vdp_init[i], 1);
 	vdp_cmdpart = 0;
 	vdp_code    = 0;
 	vdp_address = 0;
 
 	/* Save State Stuff */
-	state_save_register_global_array(screen->machine, genesis_vdp_regs);
-	state_save_register_global_pointer(screen->machine, vdp_vram, 0x10000);
-	state_save_register_global_pointer(screen->machine, vdp_vsram, 0x80);
-	state_save_register_global_array(screen->machine, genesis_bg_pal_lookup);
-	state_save_register_global_array(screen->machine, genesis_sp_pal_lookup);
-	state_save_register_global(screen->machine, display_enable);
-	state_save_register_global(screen->machine, vdp_scrollabase);
-	state_save_register_global(screen->machine, vdp_scrollbbase);
-	state_save_register_global(screen->machine, vdp_windowbase);
-	state_save_register_global(screen->machine, vdp_spritebase);
-	state_save_register_global(screen->machine, vdp_hscrollbase);
-	state_save_register_global(screen->machine, vdp_hscrollmask);
-	state_save_register_global(screen->machine, vdp_hscrollsize);
-	state_save_register_global(screen->machine, vdp_vscrollmode);
-	state_save_register_global(screen->machine, vdp_cmdpart);
-	state_save_register_global(screen->machine, vdp_code);
-	state_save_register_global(screen->machine, vdp_address);
-	state_save_register_global(screen->machine, vdp_dmafill);
-	state_save_register_global(screen->machine, scrollheight);
-	state_save_register_global(screen->machine, scrollwidth);
-	state_save_register_global(screen->machine, bgcol);
-	state_save_register_global(screen->machine, window_down);
-	state_save_register_global(screen->machine, window_vpos);
+	state_save_register_global_array(screen->machine(), genesis_vdp_regs);
+	state_save_register_global_pointer(screen->machine(), vdp_vram, 0x10000);
+	state_save_register_global_pointer(screen->machine(), vdp_vsram, 0x80);
+	state_save_register_global_array(screen->machine(), genesis_bg_pal_lookup);
+	state_save_register_global_array(screen->machine(), genesis_sp_pal_lookup);
+	state_save_register_global(screen->machine(), display_enable);
+	state_save_register_global(screen->machine(), vdp_scrollabase);
+	state_save_register_global(screen->machine(), vdp_scrollbbase);
+	state_save_register_global(screen->machine(), vdp_windowbase);
+	state_save_register_global(screen->machine(), vdp_spritebase);
+	state_save_register_global(screen->machine(), vdp_hscrollbase);
+	state_save_register_global(screen->machine(), vdp_hscrollmask);
+	state_save_register_global(screen->machine(), vdp_hscrollsize);
+	state_save_register_global(screen->machine(), vdp_vscrollmode);
+	state_save_register_global(screen->machine(), vdp_cmdpart);
+	state_save_register_global(screen->machine(), vdp_code);
+	state_save_register_global(screen->machine(), vdp_address);
+	state_save_register_global(screen->machine(), vdp_dmafill);
+	state_save_register_global(screen->machine(), scrollheight);
+	state_save_register_global(screen->machine(), scrollwidth);
+	state_save_register_global(screen->machine(), bgcol);
+	state_save_register_global(screen->machine(), window_down);
+	state_save_register_global(screen->machine(), window_vpos);
 }
 
 
-void system18_vdp_start(running_machine *machine)
+void system18_vdp_start(running_machine &machine)
 {
-	start_genesis_vdp(machine->primary_screen);
+	start_genesis_vdp(machine.primary_screen);
 
 	genesis_palette_base = 0x1800;
 	genesis_bg_pal_lookup[0] = genesis_sp_pal_lookup[0] = 0x1800;
@@ -262,11 +262,11 @@ READ16_HANDLER( genesis_vdp_r )
 	{
 		case 0x00:	/* Read Data */
 		case 0x01:
-			return vdp_data_r(space->machine);
+			return vdp_data_r(space->machine());
 
 		case 0x02:	/* Status Register */
 		case 0x03:
-			return vdp_control_r(space->machine);
+			return vdp_control_r(space->machine());
 
 		case 0x04:	/* HV counter */
 		case 0x05:
@@ -305,7 +305,7 @@ WRITE16_HANDLER( genesis_vdp_w )
 				 else
 					data |= data << 8;
 			}
-			vdp_data_w(space->machine, data);
+			vdp_data_w(space->machine(), data);
 			break;
 
 		case 0x02:	/* Control Write */
@@ -325,7 +325,7 @@ WRITE16_HANDLER( genesis_vdp_w )
 		case 0x09:
 		case 0x0a:
 		case 0x0b:
-			device = space->machine->device("snsnd");
+			device = space->machine().device("snsnd");
 			if (device != NULL && ACCESSING_BITS_0_7)
 				sn76496_w(device, 0, data & 0xff);
 			break;
@@ -347,7 +347,7 @@ WRITE16_HANDLER( genesis_vdp_w )
 ******************************************************************************/
 
 /* Games needing Read to Work .. bloxeed (attract) .. puyo puyo .. probably more */
-static int vdp_data_r(running_machine *machine)
+static int vdp_data_r(running_machine &machine)
 {
 	int read = 0;
 
@@ -366,7 +366,7 @@ static int vdp_data_r(running_machine *machine)
 			break;
 
 		default:		/* Illegal read attempt */
-			logerror("%s: VDP illegal read type %02x\n", machine->describe_context(), vdp_code);
+			logerror("%s: VDP illegal read type %02x\n", machine.describe_context(), vdp_code);
 			read = 0x00;
 			break;
 	}
@@ -377,7 +377,7 @@ static int vdp_data_r(running_machine *machine)
 }
 
 
-static void vdp_data_w(running_machine *machine, int data)
+static void vdp_data_w(running_machine &machine, int data)
 {
 	/* kill 2nd write pending flag */
 	vdp_cmdpart = 0;
@@ -398,7 +398,7 @@ static void vdp_data_w(running_machine *machine, int data)
 			/* if the hscroll RAM is changing, force an update */
 			if (vdp_address >= vdp_hscrollbase &&
 				vdp_address < vdp_hscrollbase + vdp_hscrollsize)
-				machine->primary_screen->update_partial(machine->primary_screen->vpos());
+				machine.primary_screen->update_partial(machine.primary_screen->vpos());
 
 			/* write to VRAM */
 			if (vdp_address & 1)
@@ -417,7 +417,7 @@ static void vdp_data_w(running_machine *machine, int data)
 		case 0x05:		/* VSRAM write */
 
 			/* vscroll RAM is changing, force an update */
-			machine->primary_screen->update_partial(machine->primary_screen->vpos());
+			machine.primary_screen->update_partial(machine.primary_screen->vpos());
 
 			/* write to VSRAM */
 			if (vdp_address & 1)
@@ -427,7 +427,7 @@ static void vdp_data_w(running_machine *machine, int data)
 			break;
 
 		default:		/* Illegal write attempt */
-			logerror("%s: VDP illegal write type %02x data %04x\n", machine->describe_context(), vdp_code, data);
+			logerror("%s: VDP illegal write type %02x data %04x\n", machine.describe_context(), vdp_code, data);
 			break;
 	}
 
@@ -471,7 +471,7 @@ static void vdp_data_w(running_machine *machine, int data)
 
 ******************************************************************************/
 
-static int vdp_control_r(running_machine *machine)
+static int vdp_control_r(running_machine &machine)
 {
 	int status = 0x3600; // wwally needs fifo empty set
 
@@ -479,11 +479,11 @@ static int vdp_control_r(running_machine *machine)
 	vdp_cmdpart = 0;
 
 	/* set the VBLANK bit */
-	if (machine->primary_screen->vblank())
+	if (machine.primary_screen->vblank())
 		status |= 0x0008;
 
 	/* set the HBLANK bit */
-	if (machine->primary_screen->hblank())
+	if (machine.primary_screen->hblank())
 		status |= 0x0004;
 
 	return (status);
@@ -497,7 +497,7 @@ static void vdp_control_w(address_space *space, int data)
 	{
 		/* if 10xxxxxx xxxxxxxx this is a register setting command */
 		if ((data & 0xc000) == 0x8000)
-			vdp_register_w(space->machine, data, space->machine->primary_screen->vblank());
+			vdp_register_w(space->machine(), data, space->machine().primary_screen->vblank());
 
 		/* otherwise this is the First part of a mode setting command */
 		else
@@ -519,7 +519,7 @@ static void vdp_control_w(address_space *space, int data)
 }
 
 
-static void vdp_register_w(running_machine *machine, int data, int vblank)
+static void vdp_register_w(running_machine &machine, int data, int vblank)
 {
 	int scrwidth = 0;
 	static const UINT8 is_important[32] = { 0,0,1,1,1,1,0,1,0,0,0,1,0,1,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0 };
@@ -531,7 +531,7 @@ static void vdp_register_w(running_machine *machine, int data, int vblank)
 
 	/* these are mostly important writes; force an update if they written */
 	if (is_important[regnum])
-		machine->primary_screen->update_partial(machine->primary_screen->vpos());
+		machine.primary_screen->update_partial(machine.primary_screen->vpos());
 
 	/* For quite a few of the registers its a good idea to set a couple of variable based
        upon the writes here */
@@ -674,7 +674,7 @@ static void vdp_dma_68k(address_space *space)
 	/* handle the DMA */
 	for (count = 0; count < length; count++)
 	{
-		vdp_data_w(space->machine, space->read_word(source));
+		vdp_data_w(space->machine(), space->read_word(source));
 		source += 2;
 	}
 }

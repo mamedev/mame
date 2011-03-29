@@ -298,7 +298,7 @@ INLINE void M_UNDEFINED(alpha8201_state *cpustate)
 	mame_printf_debug("alpha8201:  cpustate->PC = %03x,  Unimplemented opcode = %02x\n", cpustate->PC-1, M_RDMEM(cpustate->PC-1));
 #endif
 #if BREAK_ON_UNKNOWN_OPCODE
-	debugger_break(cpustate->device->machine);
+	debugger_break(cpustate->device->machine());
 #endif
 }
 
@@ -311,7 +311,7 @@ INLINE void M_UNDEFINED2(alpha8201_state *cpustate)
 	mame_printf_debug("alpha8201:  cpustate->PC = %03x,  Unimplemented opcode = %02x,%02x\n", cpustate->PC-2, op,imm);
 #endif
 #if BREAK_ON_UNKNOWN_OPCODE
-	debugger_break(cpustate->device->machine);
+	debugger_break(cpustate->device->machine());
 #endif
 }
 

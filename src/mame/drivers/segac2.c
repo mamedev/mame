@@ -86,7 +86,7 @@
 #define LOG_IOCHIP			0
 
 
-static void recompute_palette_tables( running_machine *machine );
+static void recompute_palette_tables( running_machine &machine );
 
 /******************************************************************************
     Machine init
@@ -99,7 +99,7 @@ static void recompute_palette_tables( running_machine *machine );
 
 static MACHINE_START( segac2 )
 {
-	segac2_state *state = machine->driver_data<segac2_state>();
+	segac2_state *state = machine.driver_data<segac2_state>();
 
 	state_save_register_global_array(machine, state->misc_io_data);
 	state_save_register_global(machine, state->prot_write_buf);
@@ -109,16 +109,16 @@ static MACHINE_START( segac2 )
 
 static MACHINE_RESET( segac2 )
 {
-	segac2_state *state = machine->driver_data<segac2_state>();
-	megadrive_ram = reinterpret_cast<UINT16 *>(memory_get_shared(*machine, "nvram"));
+	segac2_state *state = machine.driver_data<segac2_state>();
+	megadrive_ram = reinterpret_cast<UINT16 *>(memory_get_shared(machine, "nvram"));
 
 	/* set up interrupts and such */
 	MACHINE_RESET_CALL(megadriv);
 
 	/* determine how many sound banks */
 	state->sound_banks = 0;
-	if (machine->region("upd")->base())
-		state->sound_banks = machine->region("upd")->bytes() / 0x20000;
+	if (machine.region("upd")->base())
+		state->sound_banks = machine.region("upd")->bytes() / 0x20000;
 
 	/* reset the protection */
 	state->prot_write_buf = 0;
@@ -150,7 +150,7 @@ static MACHINE_RESET( segac2 )
 /* handle writes to the UPD7759 */
 static WRITE16_DEVICE_HANDLER( segac2_upd7759_w )
 {
-	segac2_state *state = device->machine->driver_data<segac2_state>();
+	segac2_state *state = device->machine().driver_data<segac2_state>();
 
 	/* make sure we have a UPD chip */
 	if (!state->sound_banks)
@@ -186,7 +186,7 @@ static WRITE16_DEVICE_HANDLER( segac2_upd7759_w )
 /* handle reads from the paletteram */
 static READ16_HANDLER( palette_r )
 {
-	segac2_state *state = space->machine->driver_data<segac2_state>();
+	segac2_state *state = space->machine().driver_data<segac2_state>();
 	offset &= 0x1ff;
 	if (state->segac2_alt_palette_mode)
 		offset = ((offset << 1) & 0x100) | ((offset << 2) & 0x80) | ((~offset >> 2) & 0x40) | ((offset >> 1) & 0x20) | (offset & 0x1f);
@@ -197,7 +197,7 @@ static READ16_HANDLER( palette_r )
 /* handle writes to the paletteram */
 static WRITE16_HANDLER( palette_w )
 {
-	segac2_state *state = space->machine->driver_data<segac2_state>();
+	segac2_state *state = space->machine().driver_data<segac2_state>();
 	int r, g, b, newword;
 	int tmpr, tmpg, tmpb;
 
@@ -217,7 +217,7 @@ static WRITE16_HANDLER( palette_w )
 	b = ((newword >> 7) & 0x1e) | ((newword >> 14) & 0x01);
 
 	/* set the color */
-	palette_set_color_rgb(space->machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(space->machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 
 	megadrive_vdp_palette_lookup[offset] = (b) | (g << 5) | (r << 10);
 	megadrive_vdp_palette_lookup_sprite[offset] = (b) | (g << 5) | (r << 10);
@@ -265,9 +265,9 @@ static WRITE16_HANDLER( palette_w )
 
 ******************************************************************************/
 
-static void recompute_palette_tables( running_machine *machine )
+static void recompute_palette_tables( running_machine &machine )
 {
-	segac2_state *state = machine->driver_data<segac2_state>();
+	segac2_state *state = machine.driver_data<segac2_state>();
 	int i;
 
 	for (i = 0; i < 4; i++)
@@ -304,7 +304,7 @@ static void recompute_palette_tables( running_machine *machine )
 
 static READ16_HANDLER( io_chip_r )
 {
-	segac2_state *state = space->machine->driver_data<segac2_state>();
+	segac2_state *state = space->machine().driver_data<segac2_state>();
 	static const char *const portnames[] = { "P1", "P2", "PORTC", "PORTD", "SERVICE", "COINAGE", "DSW", "PORTH" };
 	offset &= 0x1f/2;
 
@@ -325,8 +325,8 @@ static READ16_HANDLER( io_chip_r )
 
 			/* otherwise, return an input port */
 			if (offset == 0x04/2 && state->sound_banks)
-				return (input_port_read(space->machine, portnames[offset]) & 0xbf) | (upd7759_busy_r(space->machine->device("upd")) << 6);
-			return input_port_read(space->machine, portnames[offset]);
+				return (input_port_read(space->machine(), portnames[offset]) & 0xbf) | (upd7759_busy_r(space->machine().device("upd")) << 6);
+			return input_port_read(space->machine(), portnames[offset]);
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -354,7 +354,7 @@ static READ16_HANDLER( io_chip_r )
 
 static WRITE16_HANDLER( io_chip_w )
 {
-	segac2_state *state = space->machine->driver_data<segac2_state>();
+	segac2_state *state = space->machine().driver_data<segac2_state>();
 	UINT8 newbank;
 	UINT8 old;
 
@@ -386,10 +386,10 @@ static WRITE16_HANDLER( io_chip_w )
              D1 : To CN1 pin J. (Coin meter 2)
              D0 : To CN1 pin 8. (Coin meter 1)
             */
-/*          coin_lockout_w(space->machine, 1, data & 0x08);
-            coin_lockout_w(space->machine, 0, data & 0x04); */
-			coin_counter_w(space->machine, 1, data & 0x02);
-			coin_counter_w(space->machine, 0, data & 0x01);
+/*          coin_lockout_w(space->machine(), 1, data & 0x08);
+            coin_lockout_w(space->machine(), 0, data & 0x04); */
+			coin_counter_w(space->machine(), 1, data & 0x02);
+			coin_counter_w(space->machine(), 0, data & 0x01);
 			break;
 
 		/* banking */
@@ -407,13 +407,13 @@ static WRITE16_HANDLER( io_chip_w )
 			newbank = data & 3;
 			if (newbank != state->palbank)
 			{
-				//space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos() + 1);
+				//space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() + 1);
 				state->palbank = newbank;
-				recompute_palette_tables(space->machine);
+				recompute_palette_tables(space->machine());
 			}
 			if (state->sound_banks > 1)
 			{
-				device_t *upd = space->machine->device("upd");
+				device_t *upd = space->machine().device("upd");
 				newbank = (data >> 2) & (state->sound_banks - 1);
 				upd7759_set_bank_base(upd, newbank * 0x20000);
 			}
@@ -423,7 +423,7 @@ static WRITE16_HANDLER( io_chip_w )
 		case 0x1c/2:
 			if (state->sound_banks > 1)
 			{
-				device_t *upd = space->machine->device("upd");
+				device_t *upd = space->machine().device("upd");
 				upd7759_reset_w(upd, (data >> 1) & 1);
 			}
 			break;
@@ -443,14 +443,14 @@ static WRITE16_HANDLER( io_chip_w )
 
 static WRITE16_HANDLER( control_w )
 {
-	segac2_state *state = space->machine->driver_data<segac2_state>();
+	segac2_state *state = space->machine().driver_data<segac2_state>();
 	/* skip if not LSB */
 	if (!ACCESSING_BITS_0_7)
 		return;
 	data &= 0x0f;
 
 	/* bit 0 controls display enable */
-	//segac2_enable_display(space->machine, ~data & 1);
+	//segac2_enable_display(space->machine(), ~data & 1);
 	state->segac2_enable_display = ~data & 1;
 
 	/* bit 1 resets the protection */
@@ -459,7 +459,7 @@ static WRITE16_HANDLER( control_w )
 
 	/* bit 2 controls palette shuffling; only ribbit and twinsqua use this feature */
 	state->segac2_alt_palette_mode = ((~data & 4) >> 2);
-	recompute_palette_tables(space->machine);
+	recompute_palette_tables(space->machine());
 }
 
 
@@ -479,7 +479,7 @@ static WRITE16_HANDLER( control_w )
 /* protection chip reads */
 static READ16_HANDLER( prot_r )
 {
-	segac2_state *state = space->machine->driver_data<segac2_state>();
+	segac2_state *state = space->machine().driver_data<segac2_state>();
 	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", cpu_get_previouspc(space->cpu), state->prot_func ? state->prot_read_buf : 0xff);
 	return state->prot_read_buf | 0xf0;
 }
@@ -488,7 +488,7 @@ static READ16_HANDLER( prot_r )
 /* protection chip writes */
 static WRITE16_HANDLER( prot_w )
 {
-	segac2_state *state = space->machine->driver_data<segac2_state>();
+	segac2_state *state = space->machine().driver_data<segac2_state>();
 	int new_sp_palbase = (data >> 2) & 3;
 	int new_bg_palbase = data & 3;
 	int table_index;
@@ -511,11 +511,11 @@ static WRITE16_HANDLER( prot_w )
 	/* if the palette changed, force an update */
 	if (new_sp_palbase != state->sp_palbase || new_bg_palbase != state->bg_palbase)
 	{
-		//space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos() + 1);
+		//space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() + 1);
 		state->sp_palbase = new_sp_palbase;
 		state->bg_palbase = new_bg_palbase;
-		recompute_palette_tables(space->machine);
-		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", state->bg_palbase, state->sp_palbase, space->machine->primary_screen->vpos());
+		recompute_palette_tables(space->machine());
+		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", state->bg_palbase, state->sp_palbase, space->machine().primary_screen->vpos());
 	}
 }
 
@@ -550,8 +550,8 @@ static WRITE16_HANDLER( counter_timer_w )
 				break;
 
 			case 0x10:	/* coin counter */
-//              coin_counter_w(space->machine, 0,1);
-//              coin_counter_w(space->machine, 0,0);
+//              coin_counter_w(space->machine(), 0,1);
+//              coin_counter_w(space->machine(), 0,0);
 				break;
 
 			case 0x12:	/* set coinage info -- followed by two 4-bit values */
@@ -581,13 +581,13 @@ static WRITE16_HANDLER( counter_timer_w )
 
 static READ16_HANDLER( printer_r )
 {
-	segac2_state *state = space->machine->driver_data<segac2_state>();
+	segac2_state *state = space->machine().driver_data<segac2_state>();
 	return state->cam_data;
 }
 
 static WRITE16_HANDLER( print_club_camera_w )
 {
-	segac2_state *state = space->machine->driver_data<segac2_state>();
+	segac2_state *state = space->machine().driver_data<segac2_state>();
 	state->cam_data = data;
 }
 
@@ -1296,7 +1296,7 @@ INPUT_PORTS_END
 static void  segac2_irq2_interrupt(device_t *device, int state)
 {
 	//printf("sound irq %d\n", state);
-	cputag_set_input_line(device->machine, "maincpu", 2, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 static const ym3438_interface ym3438_intf =
 {
@@ -1328,10 +1328,10 @@ static VIDEO_START(segac2_new)
 
 static SCREEN_UPDATE(segac2_new)
 {
-	segac2_state *state = screen->machine->driver_data<segac2_state>();
+	segac2_state *state = screen->machine().driver_data<segac2_state>();
 	if (!state->segac2_enable_display)
 	{
-		bitmap_fill(bitmap, NULL, get_black_pen(screen->machine));
+		bitmap_fill(bitmap, NULL, get_black_pen(screen->machine()));
 		return 0;
 	}
 
@@ -1816,10 +1816,10 @@ it should be, otherwise I don't see how the formula could be computed.
 
 ******************************************************************************/
 
-static void segac2_common_init(running_machine* machine, int (*func)(int in))
+static void segac2_common_init(running_machine& machine, int (*func)(int in))
 {
-	segac2_state *state = machine->driver_data<segac2_state>();
-	device_t *upd = machine->device("upd");
+	segac2_state *state = machine.driver_data<segac2_state>();
+	device_t *upd = machine.device("upd");
 
 	DRIVER_INIT_CALL( megadriv_c2 );
 
@@ -1830,7 +1830,7 @@ static void segac2_common_init(running_machine* machine, int (*func)(int in))
 	genesis_other_hacks = 0;
 
 	if (upd != NULL)
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*upd, 0x880000, 0x880001, 0, 0x13fefe, FUNC(segac2_upd7759_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*upd, 0x880000, 0x880001, 0, 0x13fefe, FUNC(segac2_upd7759_w));
 }
 
 
@@ -2087,7 +2087,7 @@ static DRIVER_INIT( tfrceacb )
 {
 	/* disable the palette bank switching from the protection chip */
 	segac2_common_init(machine, NULL);
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x800000, 0x800001);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x800000, 0x800001);
 }
 
 static DRIVER_INIT( borench )
@@ -2153,7 +2153,7 @@ static DRIVER_INIT( ichirj )
 static DRIVER_INIT( ichirjbl )
 {
 	/* when did this actually work? - the protection is patched but the new check fails? */
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 	rom[0x390/2] = 0x6600;
 
 	segac2_common_init(machine, NULL);
@@ -2174,36 +2174,36 @@ static DRIVER_INIT( pclub )
 {
 	segac2_common_init(machine, prot_func_pclub);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
 }
 
 static DRIVER_INIT( pclubjv2 )
 {
 	segac2_common_init(machine, prot_func_pclubjv2);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
 }
 
 static DRIVER_INIT( pclubjv4 )
 {
 	segac2_common_init(machine, prot_func_pclubjv4);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
 }
 
 static DRIVER_INIT( pclubjv5 )
 {
 	segac2_common_init(machine, prot_func_pclubjv5);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
 }
 
 

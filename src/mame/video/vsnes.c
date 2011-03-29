@@ -16,12 +16,12 @@ PALETTE_INIT( vsdual )
 
 static void ppu_irq_1( device_t *device, int *ppu_regs )
 {
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static void ppu_irq_2( device_t *device, int *ppu_regs )
 {
-	cputag_set_input_line(device->machine, "sub", INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(device->machine(), "sub", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /* our ppu interface                                            */
@@ -58,13 +58,13 @@ VIDEO_START( vsdual )
 SCREEN_UPDATE( vsnes )
 {
 	/* render the ppu */
-	ppu2c0x_render( screen->machine->device("ppu1"), bitmap, 0, 0, 0, 0 );
+	ppu2c0x_render( screen->machine().device("ppu1"), bitmap, 0, 0, 0, 0 );
 	return 0;
 }
 
 
 SCREEN_UPDATE( vsnes_bottom )
 {
-	ppu2c0x_render(screen->machine->device("ppu2"), bitmap, 0, 0, 0, 0);
+	ppu2c0x_render(screen->machine().device("ppu2"), bitmap, 0, 0, 0, 0);
 	return 0;
 }

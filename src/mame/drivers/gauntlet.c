@@ -134,9 +134,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	gauntlet_state *state = machine->driver_data<gauntlet_state>();
+	gauntlet_state *state = machine.driver_data<gauntlet_state>();
 	cputag_set_input_line(machine, "maincpu", 4, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 6, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -144,11 +144,11 @@ static void update_interrupts(running_machine *machine)
 
 static void scanline_update(screen_device &screen, int scanline)
 {
-	address_space *space = screen.machine->device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space *space = screen.machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		atarigen_6502_irq_gen(screen.machine->device("audiocpu"));
+		atarigen_6502_irq_gen(screen.machine().device("audiocpu"));
 	else
 		atarigen_6502_irq_ack_r(space, 0);
 }
@@ -156,7 +156,7 @@ static void scanline_update(screen_device &screen, int scanline)
 
 static MACHINE_START( gauntlet )
 {
-	gauntlet_state *state = machine->driver_data<gauntlet_state>();
+	gauntlet_state *state = machine.driver_data<gauntlet_state>();
 	atarigen_init(machine);
 
 	state->save_item(NAME(state->sound_reset_val));
@@ -165,15 +165,15 @@ static MACHINE_START( gauntlet )
 
 static MACHINE_RESET( gauntlet )
 {
-	gauntlet_state *state = machine->driver_data<gauntlet_state>();
+	gauntlet_state *state = machine.driver_data<gauntlet_state>();
 
 	state->sound_reset_val = 1;
 
 	atarigen_eeprom_reset(state);
 	atarigen_slapstic_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine->primary_screen, scanline_update, 32);
-	atarigen_sound_io_reset(machine->device("audiocpu"));
+	atarigen_scanline_timer_reset(*machine.primary_screen, scanline_update, 32);
+	atarigen_sound_io_reset(machine.device("audiocpu"));
 }
 
 
@@ -186,8 +186,8 @@ static MACHINE_RESET( gauntlet )
 
 static READ16_HANDLER( port4_r )
 {
-	gauntlet_state *state = space->machine->driver_data<gauntlet_state>();
-	int temp = input_port_read(space->machine, "803008");
+	gauntlet_state *state = space->machine().driver_data<gauntlet_state>();
+	int temp = input_port_read(space->machine(), "803008");
 	if (state->cpu_to_sound_ready) temp ^= 0x0020;
 	if (state->sound_to_cpu_ready) temp ^= 0x0010;
 	return temp;
@@ -203,7 +203,7 @@ static READ16_HANDLER( port4_r )
 
 static WRITE16_HANDLER( sound_reset_w )
 {
-	gauntlet_state *state = space->machine->driver_data<gauntlet_state>();
+	gauntlet_state *state = space->machine().driver_data<gauntlet_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		int oldword = state->sound_reset_val;
@@ -211,16 +211,16 @@ static WRITE16_HANDLER( sound_reset_w )
 
 		if ((oldword ^ state->sound_reset_val) & 1)
 		{
-			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (state->sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
-			atarigen_sound_reset(space->machine);
+			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, (state->sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
+			atarigen_sound_reset(space->machine());
 			if (state->sound_reset_val & 1)
 			{
-				devtag_reset(space->machine, "ymsnd");
-				devtag_reset(space->machine, "tms");
-				tms5220_set_frequency(space->machine->device("tms"), ATARI_CLOCK_14MHz/2 / 11);
-				atarigen_set_ym2151_vol(space->machine, 0);
-				atarigen_set_pokey_vol(space->machine, 0);
-				atarigen_set_tms5220_vol(space->machine, 0);
+				devtag_reset(space->machine(), "ymsnd");
+				devtag_reset(space->machine(), "tms");
+				tms5220_set_frequency(space->machine().device("tms"), ATARI_CLOCK_14MHz/2 / 11);
+				atarigen_set_ym2151_vol(space->machine(), 0);
+				atarigen_set_pokey_vol(space->machine(), 0);
+				atarigen_set_tms5220_vol(space->machine(), 0);
 			}
 		}
 	}
@@ -236,13 +236,13 @@ static WRITE16_HANDLER( sound_reset_w )
 
 static READ8_HANDLER( switch_6502_r )
 {
-	gauntlet_state *state = space->machine->driver_data<gauntlet_state>();
+	gauntlet_state *state = space->machine().driver_data<gauntlet_state>();
 	int temp = 0x30;
 
 	if (state->cpu_to_sound_ready) temp ^= 0x80;
 	if (state->sound_to_cpu_ready) temp ^= 0x40;
-	if (!tms5220_readyq_r(space->machine->device("tms"))) temp ^= 0x20;
-	if (!(input_port_read(space->machine, "803008") & 0x0008)) temp ^= 0x10;
+	if (!tms5220_readyq_r(space->machine().device("tms"))) temp ^= 0x20;
+	if (!(input_port_read(space->machine(), "803008") & 0x0008)) temp ^= 0x10;
 
 	return temp;
 }
@@ -256,11 +256,11 @@ static READ8_HANDLER( switch_6502_r )
 
 static WRITE8_HANDLER( sound_ctl_w )
 {
-	device_t *tms = space->machine->device("tms");
+	device_t *tms = space->machine().device("tms");
 	switch (offset & 7)
 	{
 		case 0:	/* music reset, bit D7, low reset */
-			if (((data>>7)&1) == 0) devtag_reset(space->machine, "ymsnd");
+			if (((data>>7)&1) == 0) devtag_reset(space->machine(), "ymsnd");
 			break;
 
 		case 1:	/* speech write, bit D7, active low */
@@ -288,9 +288,9 @@ static WRITE8_HANDLER( sound_ctl_w )
 
 static WRITE8_HANDLER( mixer_w )
 {
-	atarigen_set_ym2151_vol(space->machine, (data & 7) * 100 / 7);
-	atarigen_set_pokey_vol(space->machine, ((data >> 3) & 3) * 100 / 3);
-	atarigen_set_tms5220_vol(space->machine, ((data >> 5) & 7) * 100 / 7);
+	atarigen_set_ym2151_vol(space->machine(), (data & 7) * 100 / 7);
+	atarigen_set_pokey_vol(space->machine(), ((data >> 3) & 3) * 100 / 3);
+	atarigen_set_tms5220_vol(space->machine(), ((data >> 5) & 7) * 100 / 7);
 }
 
 
@@ -1621,12 +1621,12 @@ ROM_END
  *
  *************************************/
 
-static void gauntlet_common_init(running_machine *machine, int slapstic, int vindctr2)
+static void gauntlet_common_init(running_machine &machine, int slapstic, int vindctr2)
 {
-	gauntlet_state *state = machine->driver_data<gauntlet_state>();
-	UINT8 *rom = machine->region("maincpu")->base();
+	gauntlet_state *state = machine.driver_data<gauntlet_state>();
+	UINT8 *rom = machine.region("maincpu")->base();
 	state->eeprom_default = NULL;
-	atarigen_slapstic_init(machine->device("maincpu"), 0x038000, 0, slapstic);
+	atarigen_slapstic_init(machine.device("maincpu"), 0x038000, 0, slapstic);
 
 	/* swap the top and bottom halves of the main CPU ROM images */
 	atarigen_swap_mem(rom + 0x000000, rom + 0x008000, 0x8000);
@@ -1660,7 +1660,7 @@ static DRIVER_INIT( gauntlet2 )
 
 static DRIVER_INIT( vindctr2 )
 {
-	UINT8 *gfx2_base = machine->region("gfx2")->base();
+	UINT8 *gfx2_base = machine.region("gfx2")->base();
 	UINT8 *data = auto_alloc_array(machine, UINT8, 0x8000);
 	int i;
 

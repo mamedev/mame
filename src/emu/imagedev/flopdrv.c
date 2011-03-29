@@ -214,7 +214,7 @@ static void floppy_drive_init(device_t *img)
 	pDrive->flags = 0;
 	pDrive->index_pulse_callback = NULL;
 	pDrive->ready_state_change_callback = NULL;
-	pDrive->index_timer = img->machine->scheduler().timer_alloc(FUNC(floppy_drive_index_callback), (void *) img);
+	pDrive->index_timer = img->machine().scheduler().timer_alloc(FUNC(floppy_drive_index_callback), (void *) img);
 	pDrive->idx = 0;
 
 	floppy_drive_set_geometry(img, ((floppy_config*)img->baseconfig().static_config())->floppy_type);
@@ -674,7 +674,7 @@ DEVICE_IMAGE_LOAD( floppy )
 	else
 		next_wpt = CLEAR_LINE;
 
-	image.device().machine->scheduler().timer_set(attotime::from_msec(250), FUNC(set_wpt), next_wpt, flopimg);
+	image.device().machine().scheduler().timer_set(attotime::from_msec(250), FUNC(set_wpt), next_wpt, flopimg);
 
 	return retVal;
 }
@@ -702,16 +702,16 @@ DEVICE_IMAGE_UNLOAD( floppy )
 	devcb_call_write_line(&flopimg->out_wpt_func, flopimg->wpt);
 
 	/* set timer for disk eject */
-	image.device().machine->scheduler().timer_set(attotime::from_msec(250), FUNC(set_wpt), ASSERT_LINE, flopimg);
+	image.device().machine().scheduler().timer_set(attotime::from_msec(250), FUNC(set_wpt), ASSERT_LINE, flopimg);
 }
 
-device_t *floppy_get_device(running_machine *machine,int drive)
+device_t *floppy_get_device(running_machine &machine,int drive)
 {
 	switch(drive) {
-		case 0 : return machine->device(FLOPPY_0);
-		case 1 : return machine->device(FLOPPY_1);
-		case 2 : return machine->device(FLOPPY_2);
-		case 3 : return machine->device(FLOPPY_3);
+		case 0 : return machine.device(FLOPPY_0);
+		case 1 : return machine.device(FLOPPY_1);
+		case 2 : return machine.device(FLOPPY_2);
+		case 3 : return machine.device(FLOPPY_3);
 	}
 	return NULL;
 }
@@ -728,7 +728,7 @@ void floppy_set_type(device_t *image,int ftype)
 	flopimg->floppy_drive_type = ftype;
 }
 
-device_t *floppy_get_device_by_type(running_machine *machine,int ftype,int drive)
+device_t *floppy_get_device_by_type(running_machine &machine,int ftype,int drive)
 {
 	int i;
 	int cnt = 0;
@@ -758,7 +758,7 @@ int floppy_get_drive_by_type(device_t *image,int ftype)
 {
 	int i,drive =0;
 	for (i=0;i<4;i++) {
-		device_t *disk = floppy_get_device(image->machine,i);
+		device_t *disk = floppy_get_device(image->machine(),i);
 		if (floppy_get_drive_type(disk)==ftype) {
 			if (image==disk) {
 				return drive;
@@ -769,13 +769,13 @@ int floppy_get_drive_by_type(device_t *image,int ftype)
 	return drive;
 }
 
-int floppy_get_count(running_machine *machine)
+int floppy_get_count(running_machine &machine)
 {
 	int cnt = 0;
-	if (machine->device(FLOPPY_0)) cnt++;
-    if (machine->device(FLOPPY_1)) cnt++;
-    if (machine->device(FLOPPY_2)) cnt++;
-    if (machine->device(FLOPPY_3)) cnt++;
+	if (machine.device(FLOPPY_0)) cnt++;
+    if (machine.device(FLOPPY_1)) cnt++;
+    if (machine.device(FLOPPY_2)) cnt++;
+    if (machine.device(FLOPPY_3)) cnt++;
 	return cnt;
 }
 

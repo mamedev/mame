@@ -91,7 +91,7 @@ TODO:
 
 static WRITE8_DEVICE_HANDLER( io_select_w )
 {
-	gameplan_state *state = device->machine->driver_data<gameplan_state>();
+	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 
 	switch (data)
 	{
@@ -108,15 +108,15 @@ static WRITE8_DEVICE_HANDLER( io_select_w )
 static READ8_DEVICE_HANDLER( io_port_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "DSW0", "DSW1" };
-	gameplan_state *state = device->machine->driver_data<gameplan_state>();
+	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 
-	return input_port_read(device->machine, portnames[state->current_port]);
+	return input_port_read(device->machine(), portnames[state->current_port]);
 }
 
 
 static WRITE8_DEVICE_HANDLER( coin_w )
 {
-	coin_counter_w(device->machine, 0, ~data & 1);
+	coin_counter_w(device->machine(), 0, ~data & 1);
 }
 
 
@@ -139,28 +139,28 @@ static const via6522_interface via_1_interface =
 
 static WRITE8_DEVICE_HANDLER( audio_reset_w )
 {
-	gameplan_state *state = device->machine->driver_data<gameplan_state>();
+	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 
 	device_set_input_line(state->audiocpu, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 
 	if (data == 0)
 	{
 		state->riot->reset();
-		device->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+		device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 	}
 }
 
 
 static WRITE8_DEVICE_HANDLER( audio_cmd_w )
 {
-	gameplan_state *state = device->machine->driver_data<gameplan_state>();
+	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 	riot6532_porta_in_set(state->riot, data, 0x7f);
 }
 
 
 static WRITE8_DEVICE_HANDLER( audio_trigger_w )
 {
-	gameplan_state *state = device->machine->driver_data<gameplan_state>();
+	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 	riot6532_porta_in_set(state->riot, data << 7, 0x80);
 }
 
@@ -184,17 +184,17 @@ static const via6522_interface via_2_interface =
 
 static WRITE_LINE_DEVICE_HANDLER( r6532_irq )
 {
-	gameplan_state *gameplan = device->machine->driver_data<gameplan_state>();
+	gameplan_state *gameplan = device->machine().driver_data<gameplan_state>();
 
 	device_set_input_line(gameplan->audiocpu, 0, state);
 	if (state == ASSERT_LINE)
-		device->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+		device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
 
 static WRITE8_DEVICE_HANDLER( r6532_soundlatch_w )
 {
-	address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	soundlatch_w(space, 0, data);
 }
 
@@ -982,11 +982,11 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( gameplan )
 {
-	gameplan_state *state = machine->driver_data<gameplan_state>();
+	gameplan_state *state = machine.driver_data<gameplan_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->riot = machine->device("riot");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->riot = machine.device("riot");
 
 	/* register for save states */
 	state->save_item(NAME(state->current_port));
@@ -999,7 +999,7 @@ static MACHINE_START( gameplan )
 
 static MACHINE_RESET( gameplan )
 {
-	gameplan_state *state = machine->driver_data<gameplan_state>();
+	gameplan_state *state = machine.driver_data<gameplan_state>();
 	state->current_port = 0;
 	state->video_x = 0;
 	state->video_y = 0;

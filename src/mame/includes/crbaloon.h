@@ -45,5 +45,5 @@ SCREEN_UPDATE( crbaloon );
 WRITE8_HANDLER( crbaloon_videoram_w );
 WRITE8_HANDLER( crbaloon_colorram_w );
 
-UINT16 crbaloon_get_collision_address(running_machine *machine);
-void crbaloon_set_clear_collision_address(running_machine *machine, int _crbaloon_collision_address_clear);
+UINT16 crbaloon_get_collision_address(running_machine &machine);
+void crbaloon_set_clear_collision_address(running_machine &machine, int _crbaloon_collision_address_clear);

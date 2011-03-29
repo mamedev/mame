@@ -30,8 +30,8 @@ public:
 
 /*----------- defined in video/lethal.c -----------*/
 
-extern void lethalen_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
-extern void lethalen_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
+extern void lethalen_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
+extern void lethalen_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 
 WRITE8_HANDLER(lethalen_palette_control);
 

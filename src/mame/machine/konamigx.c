@@ -137,7 +137,7 @@ WRITE16_HANDLER( K055550_word_w )
 				else
 					if (dy < 0) i = 0x80;
 				else
-					i = space->machine->rand() & 0xff; // vector direction indeterminate
+					i = space->machine().rand() & 0xff; // vector direction indeterminate
 
 				prot_data[0x10] = i;
 			break;
@@ -439,10 +439,10 @@ if((data1=obj[0])&0x80000000)\
 
 static UINT32 fantjour_dma[8];
 
-void fantjour_dma_install(running_machine *machine)
+void fantjour_dma_install(running_machine &machine)
 {
 	state_save_register_global_array(machine, fantjour_dma);
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xdb0000, 0xdb001f, FUNC(fantjour_dma_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xdb0000, 0xdb001f, FUNC(fantjour_dma_w));
 	memset(fantjour_dma, 0, sizeof(fantjour_dma));
 }
 

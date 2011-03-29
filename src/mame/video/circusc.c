@@ -44,7 +44,7 @@ PALETTE_INIT( circusc )
 			2, &resistances_b[0],  bweights, 0, 0);
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 32);
+	machine.colortable = colortable_alloc(machine, 32);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -69,7 +69,7 @@ PALETTE_INIT( circusc )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -79,14 +79,14 @@ PALETTE_INIT( circusc )
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine->colortable, i, ctabentry + 0x10);
+		colortable_entry_set_value(machine.colortable, i, ctabentry + 0x10);
 	}
 
 	/* sprites map to the lower 16 palette entries */
 	for (i = 0x100; i < 0x200; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 }
 
@@ -100,7 +100,7 @@ PALETTE_INIT( circusc )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	circusc_state *state = machine->driver_data<circusc_state>();
+	circusc_state *state = machine.driver_data<circusc_state>();
 	UINT8 attr = state->colorram[tile_index];
 	tileinfo->category = (attr & 0x10) >> 4;
 
@@ -120,7 +120,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( circusc )
 {
-	circusc_state *state = machine->driver_data<circusc_state>();
+	circusc_state *state = machine.driver_data<circusc_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_scroll_cols(state->bg_tilemap, 32);
@@ -136,21 +136,21 @@ VIDEO_START( circusc )
 
 WRITE8_HANDLER( circusc_videoram_w )
 {
-	circusc_state *state = space->machine->driver_data<circusc_state>();
+	circusc_state *state = space->machine().driver_data<circusc_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( circusc_colorram_w )
 {
-	circusc_state *state = space->machine->driver_data<circusc_state>();
+	circusc_state *state = space->machine().driver_data<circusc_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( circusc_flipscreen_w )
 {
-	flip_screen_set(space->machine, data & 1);
+	flip_screen_set(space->machine(), data & 1);
 }
 
 
@@ -161,9 +161,9 @@ WRITE8_HANDLER( circusc_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	circusc_state *state = machine->driver_data<circusc_state>();
+	circusc_state *state = machine.driver_data<circusc_state>();
 	int offs;
 	UINT8 *sr;
 
@@ -190,17 +190,17 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		}
 
 
-		drawgfx_transmask(bitmap,cliprect,machine->gfx[1],
+		drawgfx_transmask(bitmap,cliprect,machine.gfx[1],
 				code, color,
 				flipx,flipy,
 				sx,sy,
-				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
+				colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0));
 	}
 }
 
 SCREEN_UPDATE( circusc )
 {
-	circusc_state *state = screen->machine->driver_data<circusc_state>();
+	circusc_state *state = screen->machine().driver_data<circusc_state>();
 	int i;
 
 	for (i = 0; i < 10; i++)
@@ -210,7 +210,7 @@ SCREEN_UPDATE( circusc )
 
 	bitmap_fill(bitmap, cliprect, 0);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 1, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }

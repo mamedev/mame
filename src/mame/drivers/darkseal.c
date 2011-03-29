@@ -33,7 +33,7 @@ static WRITE16_HANDLER( darkseal_control_w )
 		return;
     case 8: /* Sound CPU write */
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
     	return;
 	case 0xa: /* IRQ Ack (VBL) */
 		return;
@@ -45,13 +45,13 @@ static READ16_HANDLER( darkseal_control_r )
 	switch (offset<<1)
 	{
 		case 0:
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 
 		case 2:
-			return input_port_read(space->machine, "P1_P2");
+			return input_port_read(space->machine(), "P1_P2");
 
 		case 4:
-			return input_port_read(space->machine, "SYSTEM");
+			return input_port_read(space->machine(), "SYSTEM");
 	}
 
 	return ~0;
@@ -224,7 +224,7 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
+	cputag_set_input_line(device->machine(), "audiocpu", 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -475,7 +475,7 @@ ROM_END
 
 static DRIVER_INIT( darkseal )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	int i;
 
 	for (i=0x00000; i<0x80000; i++)

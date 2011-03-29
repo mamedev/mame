@@ -34,7 +34,7 @@ PALETTE_INIT( arknoid2 )
 {
 	int i, col;
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		col = (color_prom[i] << 8) + color_prom[i + 512];
 		palette_set_color_rgb(machine, i, pal5bit(col >> 10), pal5bit(col >> 5), pal5bit(col >> 0));
@@ -43,9 +43,9 @@ PALETTE_INIT( arknoid2 )
 
 
 
-static void draw_background( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *m )
+static void draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *m )
 {
-	tnzs_state *state = machine->driver_data<tnzs_state>();
+	tnzs_state *state = machine.driver_data<tnzs_state>();
 	int x, y, column, tot, transpen;
 	int scrollx, scrolly;
 	UINT32 upperbits;
@@ -104,7 +104,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 					flipy = !flipy;
 				}
 
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 						code,
 						color,
 						flipx,flipy,
@@ -112,7 +112,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 						transpen);
 
 				/* wrap around x */
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 						code,
 						color,
 						flipx,flipy,
@@ -126,10 +126,10 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 }
 
 
-static void draw_foreground( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
+static void draw_foreground( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect,
 							 UINT8 *char_pointer, UINT8 *x_pointer, UINT8 *y_pointer, UINT8 *ctrl_pointer, UINT8 *color_pointer)
 {
-	tnzs_state *state = machine->driver_data<tnzs_state>();
+	tnzs_state *state = machine.driver_data<tnzs_state>();
 	int i;
 	int ctrl2 = state->objctrl[1];
 
@@ -163,14 +163,14 @@ static void draw_foreground( running_machine *machine, bitmap_t *bitmap, const r
 			if ((sy == 0) && (code == 0)) sy += 240;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy+2,0);
 
 		/* wrap around x */
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				code,
 				color,
 				flipx,flipy,
@@ -180,7 +180,7 @@ static void draw_foreground( running_machine *machine, bitmap_t *bitmap, const r
 
 SCREEN_UPDATE( tnzs )
 {
-	tnzs_state *state = screen->machine->driver_data<tnzs_state>();
+	tnzs_state *state = screen->machine().driver_data<tnzs_state>();
 	/* If the byte at f300 has bit 6 set, flip the screen
        (I'm not 100% sure about this) */
 	state->screenflip = (state->objctrl[0] & 0x40) >> 6;
@@ -190,10 +190,10 @@ SCREEN_UPDATE( tnzs )
 	bitmap_fill(bitmap, cliprect, 0x1f0);
 
 	/* Redraw the background tiles (c400-c5ff) */
-	draw_background(screen->machine, bitmap, cliprect, state->objram + 0x400);
+	draw_background(screen->machine(), bitmap, cliprect, state->objram + 0x400);
 
 	/* Draw the sprites on top */
-	draw_foreground(screen->machine, bitmap, cliprect,
+	draw_foreground(screen->machine(), bitmap, cliprect,
 					state->objram + 0x0000, /*  chars : c000 */
 					state->objram + 0x0200, /*      x : c200 */
 					state->vdcram + 0x0000, /*      y : f000 */
@@ -204,7 +204,7 @@ SCREEN_UPDATE( tnzs )
 
 SCREEN_EOF( tnzs )
 {
-	tnzs_state *state = machine->driver_data<tnzs_state>();
+	tnzs_state *state = machine.driver_data<tnzs_state>();
 	int ctrl2 =	state->objctrl[1];
 	if (~ctrl2 & 0x20)
 	{

@@ -61,16 +61,16 @@ public:
 
 static READ8_HANDLER( mcu_portA_r )
 {
-	maxaflex_state *state = space->machine->driver_data<maxaflex_state>();
-	state->portA_in = input_port_read(space->machine, "dsw") | (input_port_read(space->machine, "coin") << 4) | (input_port_read(space->machine, "console") << 5);
+	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
+	state->portA_in = input_port_read(space->machine(), "dsw") | (input_port_read(space->machine(), "coin") << 4) | (input_port_read(space->machine(), "console") << 5);
 	return (state->portA_in & ~state->ddrA) | (state->portA_out & state->ddrA);
 }
 
 static WRITE8_HANDLER( mcu_portA_w )
 {
-	maxaflex_state *state = space->machine->driver_data<maxaflex_state>();
+	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
 	state->portA_out = data;
-	speaker_level_w(space->machine->device("speaker"), data >> 7);
+	speaker_level_w(space->machine().device("speaker"), data >> 7);
 }
 
 /* Port B:
@@ -86,26 +86,26 @@ static WRITE8_HANDLER( mcu_portA_w )
 
 static READ8_HANDLER( mcu_portB_r )
 {
-	maxaflex_state *state = space->machine->driver_data<maxaflex_state>();
+	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
 	return (state->portB_in & ~state->ddrB) | (state->portB_out & state->ddrB);
 }
 
 static WRITE8_HANDLER( mcu_portB_w )
 {
-	maxaflex_state *state = space->machine->driver_data<maxaflex_state>();
+	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
 	UINT8 diff = data ^ state->portB_out;
 	state->portB_out = data;
 
 	/* clear coin interrupt */
 	if (data & 0x04)
-		cputag_set_input_line(space->machine, "mcu", M6805_IRQ_LINE, CLEAR_LINE );
+		cputag_set_input_line(space->machine(), "mcu", M6805_IRQ_LINE, CLEAR_LINE );
 
 	/* AUDMUTE */
-	space->machine->sound().system_enable((data >> 5) & 1);
+	space->machine().sound().system_enable((data >> 5) & 1);
 
 	/* RES600 */
 	if (diff & 0x10)
-		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* latch for lamps */
 	if ((diff & 0x40) && !(data & 0x40))
@@ -125,13 +125,13 @@ static WRITE8_HANDLER( mcu_portB_w )
 
 static READ8_HANDLER( mcu_portC_r )
 {
-	maxaflex_state *state = space->machine->driver_data<maxaflex_state>();
+	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
 	return (state->portC_in & ~state->ddrC) | (state->portC_out & state->ddrC);
 }
 
 static WRITE8_HANDLER( mcu_portC_w )
 {
-	maxaflex_state *state = space->machine->driver_data<maxaflex_state>();
+	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
 	/* uses a 7447A, which is equivalent to an LS47/48 */
 	static const UINT8 ls48_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
@@ -155,31 +155,31 @@ static READ8_HANDLER( mcu_ddr_r )
 
 static WRITE8_HANDLER( mcu_portA_ddr_w )
 {
-	maxaflex_state *state = space->machine->driver_data<maxaflex_state>();
+	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
 	state->ddrA = data;
 }
 
 static WRITE8_HANDLER( mcu_portB_ddr_w )
 {
-	maxaflex_state *state = space->machine->driver_data<maxaflex_state>();
+	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
 	state->ddrB = data;
 }
 
 static WRITE8_HANDLER( mcu_portC_ddr_w )
 {
-	maxaflex_state *state = space->machine->driver_data<maxaflex_state>();
+	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
 	state->ddrC = data;
 }
 
 static TIMER_DEVICE_CALLBACK( mcu_timer_proc )
 {
-	maxaflex_state *state = timer.machine->driver_data<maxaflex_state>();
+	maxaflex_state *state = timer.machine().driver_data<maxaflex_state>();
 	if ( --state->tdr == 0x00 )
 	{
 		if ( (state->tcr & 0x40) == 0 )
 		{
 			//timer interrupt!
-			generic_pulse_irq_line(timer.machine->device("mcu"), M68705_INT_TIMER);
+			generic_pulse_irq_line(timer.machine().device("mcu"), M68705_INT_TIMER);
 		}
 	}
 }
@@ -187,26 +187,26 @@ static TIMER_DEVICE_CALLBACK( mcu_timer_proc )
 /* Timer Data Reg */
 static READ8_HANDLER( mcu_tdr_r )
 {
-	maxaflex_state *state = space->machine->driver_data<maxaflex_state>();
+	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
 	return state->tdr;
 }
 
 static WRITE8_HANDLER( mcu_tdr_w )
 {
-	maxaflex_state *state = space->machine->driver_data<maxaflex_state>();
+	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
 	state->tdr = data;
 }
 
 /* Timer control reg */
 static READ8_HANDLER( mcu_tcr_r )
 {
-	maxaflex_state *state = space->machine->driver_data<maxaflex_state>();
+	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
 	return state->tcr & ~0x08;
 }
 
 static WRITE8_HANDLER( mcu_tcr_w )
 {
-	maxaflex_state *state = space->machine->driver_data<maxaflex_state>();
+	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
 	state->tcr = data;
 	if ( (state->tcr & 0x40) == 0 )
 	{
@@ -237,12 +237,12 @@ static WRITE8_HANDLER( mcu_tcr_w )
 
 static MACHINE_RESET(supervisor_board)
 {
-	maxaflex_state *state = machine->driver_data<maxaflex_state>();
+	maxaflex_state *state = machine.driver_data<maxaflex_state>();
 	state->portA_in = state->portA_out = state->ddrA	= 0;
 	state->portB_in = state->portB_out = state->ddrB	= 0;
 	state->portC_in = state->portC_out = state->ddrC	= 0;
 	state->tdr = state->tcr = 0;
-	state->mcu_timer = machine->device<timer_device>("mcu_timer");
+	state->mcu_timer = machine.device<timer_device>("mcu_timer");
 
 	output_set_lamp_value(0, 0);
 	output_set_lamp_value(1, 0);
@@ -256,12 +256,12 @@ static MACHINE_RESET(supervisor_board)
 static INPUT_CHANGED( coin_inserted )
 {
 	if (!newval)
-		cputag_set_input_line(field->port->machine, "mcu", M6805_IRQ_LINE, HOLD_LINE );
+		cputag_set_input_line(field->port->machine(), "mcu", M6805_IRQ_LINE, HOLD_LINE );
 }
 
-int atari_input_disabled(running_machine *machine)
+int atari_input_disabled(running_machine &machine)
 {
-	maxaflex_state *state = machine->driver_data<maxaflex_state>();
+	maxaflex_state *state = machine.driver_data<maxaflex_state>();
 	return (state->portB_out & 0x80) == 0x00;
 }
 
@@ -474,7 +474,7 @@ ROM_END
 
 static DRIVER_INIT( a600xl )
 {
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	memcpy( rom + 0x5000, rom + 0xd000, 0x800 );
 }
 

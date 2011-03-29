@@ -54,7 +54,7 @@ PALETTE_INIT( tp84 )
 			0, 0, 0, 0, 0);
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x100);
+	machine.colortable = colortable_alloc(machine, 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -83,7 +83,7 @@ PALETTE_INIT( tp84 )
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = combine_4_weights(weights, bit0, bit1, bit2, bit3);
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -97,7 +97,7 @@ PALETTE_INIT( tp84 )
 		for (j = 0; j < 8; j++)
 		{
 			UINT8 ctabentry = ((~i & 0x100) >> 1) | (j << 4) | (color_prom[i] & 0x0f);
-			colortable_entry_set_value(machine->colortable, ((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
+			colortable_entry_set_value(machine.colortable, ((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
 		}
 	}
 }
@@ -105,9 +105,9 @@ PALETTE_INIT( tp84 )
 
 WRITE8_HANDLER( tp84_spriteram_w )
 {
-	tp84_state *state = space->machine->driver_data<tp84_state>();
+	tp84_state *state = space->machine().driver_data<tp84_state>();
 	/* the game multiplexes the sprites, so update now */
-	space->machine->primary_screen->update_now();
+	space->machine().primary_screen->update_now();
 	state->spriteram[offset] = data;
 }
 
@@ -115,13 +115,13 @@ WRITE8_HANDLER( tp84_spriteram_w )
 READ8_HANDLER( tp84_scanline_r )
 {
 	/* reads 1V - 128V */
-	return space->machine->primary_screen->vpos();
+	return space->machine().primary_screen->vpos();
 }
 
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	tp84_state *state = machine->driver_data<tp84_state>();
+	tp84_state *state = machine.driver_data<tp84_state>();
 	int code = ((state->bg_colorram[tile_index] & 0x30) << 4) | state->bg_videoram[tile_index];
 	int color = ((*state->palette_bank & 0x07) << 6) |
 				((*state->palette_bank & 0x18) << 1) |
@@ -133,7 +133,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	tp84_state *state = machine->driver_data<tp84_state>();
+	tp84_state *state = machine.driver_data<tp84_state>();
 	int code = ((state->fg_colorram[tile_index] & 0x30) << 4) | state->fg_videoram[tile_index];
 	int color = ((*state->palette_bank & 0x07) << 6) |
 				((*state->palette_bank & 0x18) << 1) |
@@ -146,15 +146,15 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( tp84 )
 {
-	tp84_state *state = machine->driver_data<tp84_state>();
+	tp84_state *state = machine.driver_data<tp84_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	tp84_state *state = machine->driver_data<tp84_state>();
+	tp84_state *state = machine.driver_data<tp84_state>();
 	int offs;
 	int palette_base = ((*state->palette_bank & 0x07) << 4);
 
@@ -168,8 +168,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int flip_x = ~state->spriteram[offs + 2] & 0x40;
 		int flip_y =  state->spriteram[offs + 2] & 0x80;
 
-		drawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, flip_x, flip_y, x, y,
-				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, palette_base));
+		drawgfx_transmask(bitmap, cliprect, machine.gfx[1], code, color, flip_x, flip_y, x, y,
+				colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, palette_base));
 
 	}
 }
@@ -177,23 +177,23 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( tp84 )
 {
-	tp84_state *state = screen->machine->driver_data<tp84_state>();
+	tp84_state *state = screen->machine().driver_data<tp84_state>();
 	rectangle clip = *cliprect;
 	const rectangle &visarea = screen->visible_area();
 
 	if (cliprect->min_y == screen->visible_area().min_y)
 	{
-		tilemap_mark_all_tiles_dirty_all(screen->machine);
+		tilemap_mark_all_tiles_dirty_all(screen->machine());
 
 		tilemap_set_scrollx(state->bg_tilemap, 0, *state->scroll_x);
 		tilemap_set_scrolly(state->bg_tilemap, 0, *state->scroll_y);
 
-		tilemap_set_flip_all(screen->machine, ((*state->flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
+		tilemap_set_flip_all(screen->machine(), ((*state->flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
 									   ((*state->flipscreen_y & 0x01) ? TILEMAP_FLIPY : 0));
 	}
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 
 	/* draw top status region */
 	clip.min_x = visarea.min_x;

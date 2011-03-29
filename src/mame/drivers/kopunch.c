@@ -18,14 +18,14 @@ static READ8_HANDLER( kopunch_in_r )
 {
 	/* port 31 + low 3 bits of port 32 contain the punch strength */
 	if (offset == 0)
-		return space->machine->rand();
+		return space->machine().rand();
 	else
-		return (space->machine->rand() & 0x07) | input_port_read(space->machine, "SYSTEM");
+		return (space->machine().rand() & 0x07) | input_port_read(space->machine(), "SYSTEM");
 }
 
 static WRITE8_HANDLER( kopunch_lamp_w )
 {
-	set_led_status(space->machine, 0, ~data & 0x80);
+	set_led_status(space->machine(), 0, ~data & 0x80);
 
 //  if ((data & 0x7f) != 0x7f)
 //      popmessage("port 38 = %02x",data);
@@ -33,8 +33,8 @@ static WRITE8_HANDLER( kopunch_lamp_w )
 
 static WRITE8_HANDLER( kopunch_coin_w )
 {
-	coin_counter_w(space->machine, 0, ~data & 0x80);
-	coin_counter_w(space->machine, 1, ~data & 0x40);
+	coin_counter_w(space->machine(), 0, ~data & 0x80);
+	coin_counter_w(space->machine(), 1, ~data & 0x40);
 
 //  if ((data & 0x3f) != 0x3f)
 //      popmessage("port 34 = %02x",data);
@@ -70,7 +70,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( left_coin_inserted )
 {
-	kopunch_state *state = field->port->machine->driver_data<kopunch_state>();
+	kopunch_state *state = field->port->machine().driver_data<kopunch_state>();
 
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
 	if (newval)
@@ -79,7 +79,7 @@ static INPUT_CHANGED( left_coin_inserted )
 
 static INPUT_CHANGED( right_coin_inserted )
 {
-	kopunch_state *state = field->port->machine->driver_data<kopunch_state>();
+	kopunch_state *state = field->port->machine().driver_data<kopunch_state>();
 
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
 	if (newval)
@@ -173,16 +173,16 @@ GFXDECODE_END
 
 static MACHINE_START( kopunch )
 {
-	kopunch_state *state = machine->driver_data<kopunch_state>();
+	kopunch_state *state = machine.driver_data<kopunch_state>();
 
-	state->maincpu = machine->device("maincpu");
+	state->maincpu = machine.device("maincpu");
 
 	state->save_item(NAME(state->gfxbank));
 }
 
 static MACHINE_RESET( kopunch )
 {
-	kopunch_state *state = machine->driver_data<kopunch_state>();
+	kopunch_state *state = machine.driver_data<kopunch_state>();
 
 	state->gfxbank = 0;
 }

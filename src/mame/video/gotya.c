@@ -23,7 +23,7 @@ PALETTE_INIT( gotya )
 			2, &resistances_b[0],  bweights, 0, 0);
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 32);
+	machine.colortable = colortable_alloc(machine, 32);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -48,7 +48,7 @@ PALETTE_INIT( gotya )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -57,27 +57,27 @@ PALETTE_INIT( gotya )
 	for (i = 0; i < 0x40; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x07;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 }
 
 WRITE8_HANDLER( gotya_videoram_w )
 {
-	gotya_state *state = space->machine->driver_data<gotya_state>();
+	gotya_state *state = space->machine().driver_data<gotya_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( gotya_colorram_w )
 {
-	gotya_state *state = space->machine->driver_data<gotya_state>();
+	gotya_state *state = space->machine().driver_data<gotya_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( gotya_video_control_w )
 {
-	gotya_state *state = space->machine->driver_data<gotya_state>();
+	gotya_state *state = space->machine().driver_data<gotya_state>();
 
 	/* bit 0 - scroll bit 8
        bit 1 - flip screen
@@ -85,16 +85,16 @@ WRITE8_HANDLER( gotya_video_control_w )
 
 	state->scroll_bit_8 = data & 0x01;
 
-	if (flip_screen_get(space->machine) != (data & 0x02))
+	if (flip_screen_get(space->machine()) != (data & 0x02))
 	{
-		flip_screen_set(space->machine, data & 0x02);
-		tilemap_mark_all_tiles_dirty_all(space->machine);
+		flip_screen_set(space->machine(), data & 0x02);
+		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	gotya_state *state = machine->driver_data<gotya_state>();
+	gotya_state *state = machine.driver_data<gotya_state>();
 	int code = state->videoram[tile_index];
 	int color = state->colorram[tile_index] & 0x0f;
 
@@ -111,13 +111,13 @@ static TILEMAP_MAPPER( tilemap_scan_rows_thehand )
 
 VIDEO_START( gotya )
 {
-	gotya_state *state = machine->driver_data<gotya_state>();
+	gotya_state *state = machine.driver_data<gotya_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_thehand, 8, 8, 64, 32);
 }
 
-static void draw_status_row( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int sx, int col )
+static void draw_status_row( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int sx, int col )
 {
-	gotya_state *state = machine->driver_data<gotya_state>();
+	gotya_state *state = machine.driver_data<gotya_state>();
 	int row;
 
 	if (flip_screen_get(machine))
@@ -135,7 +135,7 @@ static void draw_status_row( running_machine *machine, bitmap_t *bitmap, const r
 			sy = 31 - row;
 
 		drawgfx_opaque(bitmap,cliprect,
-			machine->gfx[0],
+			machine.gfx[0],
 			state->videoram2[row * 32 + col],
 			state->videoram2[row * 32 + col + 0x10] & 0x0f,
 			flip_screen_x_get(machine), flip_screen_y_get(machine),
@@ -143,9 +143,9 @@ static void draw_status_row( running_machine *machine, bitmap_t *bitmap, const r
 	}
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	gotya_state *state = machine->driver_data<gotya_state>();
+	gotya_state *state = machine.driver_data<gotya_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -160,14 +160,14 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			sy = 240 - sy;
 
 		drawgfx_transpen(bitmap,cliprect,
-			machine->gfx[1],
+			machine.gfx[1],
 			code, color,
 			flip_screen_x_get(machine), flip_screen_y_get(machine),
 			sx, sy, 0);
 	}
 }
 
-static void draw_status( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_status( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	draw_status_row(machine, bitmap, cliprect, 0,  1);
 	draw_status_row(machine, bitmap, cliprect, 1,  0);
@@ -179,10 +179,10 @@ static void draw_status( running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( gotya )
 {
-	gotya_state *state = screen->machine->driver_data<gotya_state>();
+	gotya_state *state = screen->machine().driver_data<gotya_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, -(*state->scroll + (state->scroll_bit_8 * 256)) - 2 * 8);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
-	draw_status(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_status(screen->machine(), bitmap, cliprect);
 	return 0;
 }

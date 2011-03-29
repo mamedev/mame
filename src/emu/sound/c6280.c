@@ -26,7 +26,7 @@
       game will reset the index prior to playback so this isn't an issue.
 
     - While the noise emulation is complete, the data for the pseudo-random
-      bitstream is calculated by machine->rand() and is not a representation of what
+      bitstream is calculated by machine.rand() and is not a representation of what
       the actual hardware does.
 
     For some background on Hudson Soft's C62 chipset:
@@ -107,7 +107,7 @@ static void c6280_init(device_t *device, c6280_t *p, double clk, double rate)
     memset(p, 0, sizeof(c6280_t));
 
     p->device = device;
-    p->cpudevice = device->machine->device(intf->cpu);
+    p->cpudevice = device->machine().device(intf->cpu);
     if (p->cpudevice == NULL)
     	fatalerror("c6280_init: no CPU found with tag of '%s'\n", device->tag());
 
@@ -277,7 +277,7 @@ static STREAM_UPDATE( c6280_update )
                     p->channel[ch].noise_counter += step;
                     if(p->channel[ch].noise_counter >= 0x800)
                     {
-                        data = (p->device->machine->rand() & 1) ? 0x1F : 0;
+                        data = (p->device->machine().rand() & 1) ? 0x1F : 0;
                     }
                     p->channel[ch].noise_counter &= 0x7FF;
                     outputs[0][i] += (INT16)(vll * (data - 16));
@@ -328,7 +328,7 @@ static DEVICE_START( c6280 )
     c6280_init(device, info, device->clock(), rate);
 
     /* Create stereo stream */
-    info->stream = device->machine->sound().stream_alloc(*device, 0, 2, rate, info, c6280_update);
+    info->stream = device->machine().sound().stream_alloc(*device, 0, 2, rate, info, c6280_update);
 }
 
 READ8_DEVICE_HANDLER( c6280_r )

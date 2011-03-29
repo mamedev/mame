@@ -61,7 +61,7 @@ static device_t *soundalt_cpu;
     FUNCTION PROTOTYPES
 ****************************************************************************/
 
-static void init_audio_state(running_machine *machine);
+static void init_audio_state(running_machine &machine);
 
 static void cvsd_ym2151_irq(device_t *device, int state);
 static void adpcm_ym2151_irq(device_t *device, int state);
@@ -264,17 +264,17 @@ MACHINE_CONFIG_END
     INITIALIZATION
 ****************************************************************************/
 
-void williams_cvsd_init(running_machine *machine)
+void williams_cvsd_init(running_machine &machine)
 {
 	UINT8 *ROM;
 	int bank;
 
 	/* configure the CPU */
-	sound_cpu = machine->device("cvsdcpu");
+	sound_cpu = machine.device("cvsdcpu");
 	soundalt_cpu = NULL;
 
 	/* configure master CPU banks */
-	ROM = machine->region("cvsdcpu")->base();
+	ROM = machine.region("cvsdcpu")->base();
 	for (bank = 0; bank < 16; bank++)
 	{
 		/*
@@ -288,7 +288,7 @@ void williams_cvsd_init(running_machine *machine)
 	memory_set_bank(machine, "bank5", 0);
 
 	/* reset the IRQ state */
-	pia6821_ca1_w(machine->device("cvsdpia"), 1);
+	pia6821_ca1_w(machine.device("cvsdpia"), 1);
 
 	/* register for save states */
 	state_save_register_global(machine, williams_sound_int_state);
@@ -296,17 +296,17 @@ void williams_cvsd_init(running_machine *machine)
 }
 
 
-void williams_narc_init(running_machine *machine)
+void williams_narc_init(running_machine &machine)
 {
 	UINT8 *ROM;
 	int bank;
 
 	/* configure the CPU */
-	sound_cpu = machine->device("narc1cpu");
-	soundalt_cpu = machine->device("narc2cpu");
+	sound_cpu = machine.device("narc1cpu");
+	soundalt_cpu = machine.device("narc2cpu");
 
 	/* configure master CPU banks */
-	ROM = machine->region("narc1cpu")->base();
+	ROM = machine.region("narc1cpu")->base();
 	for (bank = 0; bank < 16; bank++)
 	{
 		/*
@@ -320,7 +320,7 @@ void williams_narc_init(running_machine *machine)
 	memory_set_bankptr(machine, "bank6", &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	/* configure slave CPU banks */
-	ROM = machine->region("narc2cpu")->base();
+	ROM = machine.region("narc2cpu")->base();
 	for (bank = 0; bank < 16; bank++)
 	{
 		/*
@@ -340,22 +340,22 @@ void williams_narc_init(running_machine *machine)
 }
 
 
-void williams_adpcm_init(running_machine *machine)
+void williams_adpcm_init(running_machine &machine)
 {
 	UINT8 *ROM;
 
 	/* configure the CPU */
-	sound_cpu = machine->device("adpcm");
+	sound_cpu = machine.device("adpcm");
 	soundalt_cpu = NULL;
 
 	/* configure banks */
-	ROM = machine->region("adpcm")->base();
+	ROM = machine.region("adpcm")->base();
 	memory_configure_bank(machine, "bank5", 0, 8, &ROM[0x10000], 0x8000);
 	memory_set_bankptr(machine, "bank6", &ROM[0x10000 + 0x4000 + 7 * 0x8000]);
 
 	/* expand ADPCM data */
 	/* it is assumed that U12 is loaded @ 0x00000 and U13 is loaded @ 0x40000 */
-	ROM = machine->region("oki")->base();
+	ROM = machine.region("oki")->base();
 	memcpy(ROM + 0x1c0000, ROM + 0x080000, 0x20000);	/* expand individual banks */
 	memcpy(ROM + 0x180000, ROM + 0x0a0000, 0x20000);
 	memcpy(ROM + 0x140000, ROM + 0x0c0000, 0x20000);
@@ -378,7 +378,7 @@ void williams_adpcm_init(running_machine *machine)
 }
 
 
-static void init_audio_state(running_machine *machine)
+static void init_audio_state(running_machine &machine)
 {
 	/* reset the YM2151 state */
 	devtag_reset(machine, "ymsnd");
@@ -407,7 +407,7 @@ static void init_audio_state(running_machine *machine)
 
 static void cvsd_ym2151_irq(device_t *device, int state)
 {
-	pia6821_ca1_w(device->machine->device("cvsdpia"), !state);
+	pia6821_ca1_w(device->machine().device("cvsdpia"), !state);
 }
 
 
@@ -441,7 +441,7 @@ static void adpcm_ym2151_irq(device_t *device, int state)
 
 static WRITE8_HANDLER( cvsd_bank_select_w )
 {
-	memory_set_bank(space->machine, "bank5", data & 0x0f);
+	memory_set_bank(space->machine(), "bank5", data & 0x0f);
 }
 
 
@@ -471,16 +471,16 @@ static WRITE8_DEVICE_HANDLER( cvsd_clock_set_w )
 
 static TIMER_CALLBACK( williams_cvsd_delayed_data_w )
 {
-	device_t *pia = machine->device("cvsdpia");
+	device_t *pia = machine.device("cvsdpia");
 	pia6821_portb_w(pia, 0, param & 0xff);
 	pia6821_cb1_w(pia, (param >> 8) & 1);
 	pia6821_cb2_w(pia, (param >> 9) & 1);
 }
 
 
-void williams_cvsd_data_w(running_machine *machine, int data)
+void williams_cvsd_data_w(running_machine &machine, int data)
 {
-	machine->scheduler().synchronize(FUNC(williams_cvsd_delayed_data_w), data);
+	machine.scheduler().synchronize(FUNC(williams_cvsd_delayed_data_w), data);
 }
 
 
@@ -492,7 +492,7 @@ void williams_cvsd_reset_w(int state)
 	if (state)
 	{
 		cvsd_bank_select_w(space, 0, 0);
-		init_audio_state(space->machine);
+		init_audio_state(space->machine());
 		device_set_input_line(space->cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	/* going low resets and reactivates the CPU */
@@ -508,13 +508,13 @@ void williams_cvsd_reset_w(int state)
 
 static WRITE8_HANDLER( narc_master_bank_select_w )
 {
-	memory_set_bank(space->machine, "bank5", data & 0x0f);
+	memory_set_bank(space->machine(), "bank5", data & 0x0f);
 }
 
 
 static WRITE8_HANDLER( narc_slave_bank_select_w )
 {
-	memory_set_bank(space->machine, "bank7", data & 0x0f);
+	memory_set_bank(space->machine(), "bank7", data & 0x0f);
 }
 
 
@@ -554,7 +554,7 @@ static TIMER_CALLBACK( narc_sync_clear )
 
 static WRITE8_HANDLER( narc_master_sync_w )
 {
-	space->machine->scheduler().timer_set(attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), FUNC(narc_sync_clear), 0x01);
+	space->machine().scheduler().timer_set(attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), FUNC(narc_sync_clear), 0x01);
 	audio_sync |= 0x01;
 	logerror("Master sync = %02X\n", data);
 }
@@ -568,7 +568,7 @@ static WRITE8_HANDLER( narc_slave_talkback_w )
 
 static WRITE8_HANDLER( narc_slave_sync_w )
 {
-	space->machine->scheduler().timer_set(attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), FUNC(narc_sync_clear), 0x02);
+	space->machine().scheduler().timer_set(attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), FUNC(narc_sync_clear), 0x02);
 	audio_sync |= 0x02;
 	logerror("Slave sync = %02X\n", data);
 }
@@ -601,7 +601,7 @@ void williams_narc_reset_w(int state)
 		address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 		narc_master_bank_select_w(space, 0, 0);
 		narc_slave_bank_select_w(space, 0, 0);
-		init_audio_state(space->machine);
+		init_audio_state(space->machine());
 		device_set_input_line(sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 		device_set_input_line(soundalt_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
@@ -627,7 +627,7 @@ int williams_narc_talkback_r(void)
 
 static WRITE8_HANDLER( adpcm_bank_select_w )
 {
-	memory_set_bank(space->machine, "bank5", data & 0x07);
+	memory_set_bank(space->machine(), "bank5", data & 0x07);
 }
 
 
@@ -649,7 +649,7 @@ static READ8_HANDLER( adpcm_command_r )
 
 	/* don't clear the external IRQ state for a short while; this allows the
        self-tests to pass */
-	space->machine->scheduler().timer_set(attotime::from_usec(10), FUNC(clear_irq_state));
+	space->machine().scheduler().timer_set(attotime::from_usec(10), FUNC(clear_irq_state));
 	return soundlatch_r(space, 0);
 }
 
@@ -674,7 +674,7 @@ void williams_adpcm_data_w(int data)
 	{
 		device_set_input_line(sound_cpu, M6809_IRQ_LINE, ASSERT_LINE);
 		williams_sound_int_state = 1;
-		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 	}
 }
 
@@ -686,7 +686,7 @@ void williams_adpcm_reset_w(int state)
 	{
 		address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 		adpcm_bank_select_w(space, 0, 0);
-		init_audio_state(space->machine);
+		init_audio_state(space->machine());
 		device_set_input_line(sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	/* going low resets and reactivates the CPU */

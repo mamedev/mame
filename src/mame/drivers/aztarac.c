@@ -37,7 +37,7 @@ static IRQ_CALLBACK(aztarac_irq_callback)
 
 static MACHINE_RESET( aztarac )
 {
-	device_set_irq_callback(machine->device("maincpu"), aztarac_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), aztarac_irq_callback);
 }
 
 
@@ -50,7 +50,7 @@ static MACHINE_RESET( aztarac )
 
 static READ16_HANDLER( nvram_r )
 {
-	aztarac_state *state = space->machine->driver_data<aztarac_state>();
+	aztarac_state *state = space->machine().driver_data<aztarac_state>();
 	return state->m_nvram[offset] | 0xfff0;
 }
 
@@ -64,8 +64,8 @@ static READ16_HANDLER( nvram_r )
 
 static READ16_HANDLER( joystick_r )
 {
-    return (((input_port_read(space->machine, "STICKZ") - 0xf) << 8) |
-            ((input_port_read(space->machine, "STICKY") - 0xf) & 0xff));
+    return (((input_port_read(space->machine(), "STICKZ") - 0xf) << 8) |
+            ((input_port_read(space->machine(), "STICKY") - 0xf) & 0xff));
 }
 
 

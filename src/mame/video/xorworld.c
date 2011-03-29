@@ -20,7 +20,7 @@ PALETTE_INIT( xorworld )
 {
 	int i;
 
-	for (i = 0;i < machine->total_colors();i++){
+	for (i = 0;i < machine.total_colors();i++){
 		int bit0,bit1,bit2,bit3;
 		int r,g,b;
 
@@ -31,16 +31,16 @@ PALETTE_INIT( xorworld )
 		bit3 = (color_prom[0] >> 3) & 0x01;
 		r = 0x0e*bit0 + 0x1e*bit1 + 0x44*bit2 + 0x8f*bit3;
 		/* green component */
-		bit0 = (color_prom[machine->total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[machine->total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[machine->total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[machine->total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[machine.total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[machine.total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[machine.total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[machine.total_colors()] >> 3) & 0x01;
 		g = 0x0e*bit0 + 0x1e*bit1 + 0x44*bit2 + 0x8f*bit3;
 		/* blue component */
-		bit0 = (color_prom[2*machine->total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine->total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine->total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine->total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[2*machine.total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[2*machine.total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[2*machine.total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[2*machine.total_colors()] >> 3) & 0x01;
 		b = 0x0e*bit0 + 0x1e * bit1 + 0x44*bit2 + 0x8f*bit3;
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
@@ -50,7 +50,7 @@ PALETTE_INIT( xorworld )
 
 WRITE16_HANDLER( xorworld_videoram16_w )
 {
-	xorworld_state *state = space->machine->driver_data<xorworld_state>();
+	xorworld_state *state = space->machine().driver_data<xorworld_state>();
 	UINT16 *videoram = state->videoram;
 	COMBINE_DATA(&videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -68,7 +68,7 @@ WRITE16_HANDLER( xorworld_videoram16_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	xorworld_state *state = machine->driver_data<xorworld_state>();
+	xorworld_state *state = machine.driver_data<xorworld_state>();
 	UINT16 *videoram = state->videoram;
 	int data = videoram[tile_index];
 	int code = data & 0x0fff;
@@ -78,7 +78,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( xorworld )
 {
-	xorworld_state *state = machine->driver_data<xorworld_state>();
+	xorworld_state *state = machine.driver_data<xorworld_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 }
@@ -96,9 +96,9 @@ VIDEO_START( xorworld )
       1  | xxxx---- -------- | sprite color
 */
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	xorworld_state *state = machine->driver_data<xorworld_state>();
+	xorworld_state *state = machine.driver_data<xorworld_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	int i;
 
@@ -109,14 +109,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int code = (spriteram16[i+1] & 0x0ffc) >> 2;
 		int color = (spriteram16[i+1] & 0xf000) >> 12;
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, 0, 0, sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, 0, 0, sx, sy, 0);
 	}
 }
 
 SCREEN_UPDATE( xorworld )
 {
-	xorworld_state *state = screen->machine->driver_data<xorworld_state>();
+	xorworld_state *state = screen->machine().driver_data<xorworld_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

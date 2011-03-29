@@ -132,9 +132,9 @@ static VIDEO_START(sub)
 
 static SCREEN_UPDATE(sub)
 {
-	sub_state *state = screen->machine->driver_data<sub_state>();
-	const gfx_element *gfx = screen->machine->gfx[0];
-	const gfx_element *gfx_1 = screen->machine->gfx[1];
+	sub_state *state = screen->machine().driver_data<sub_state>();
+	const gfx_element *gfx = screen->machine().gfx[0];
+	const gfx_element *gfx_1 = screen->machine().gfx[1];
 	int y,x;
 	int count = 0;
 
@@ -238,12 +238,12 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( subm_to_sound_w )
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "soundcpu", 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( nmi_mask_w )
 {
-	sub_state *state = space->machine->driver_data<sub_state>();
+	sub_state *state = space->machine().driver_data<sub_state>();
 
 	state->nmi_en = data & 1;
 }
@@ -381,10 +381,10 @@ GFXDECODE_END
 static PALETTE_INIT( sub )
 {
 	int i;
-	UINT8* lookup = machine->region("proms2")->base();
+	UINT8* lookup = machine.region("proms2")->base();
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x100);
+	machine.colortable = colortable_alloc(machine, 0x100);
 
 	for (i = 0;i < 0x100;i++)
 	{
@@ -393,8 +393,8 @@ static PALETTE_INIT( sub )
 		g = (color_prom[0x100] >> 0);
 		b = (color_prom[0x200] >> 0);
 
-		//colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b)));
+		//colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b)));
 
 		color_prom++;
 	}
@@ -403,7 +403,7 @@ static PALETTE_INIT( sub )
 	for (i = 0;i < 0x400;i++)
 	{
 		UINT8 ctabentry = lookup[i+0x400] | (lookup[i+0x000] << 4);
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 
 }
@@ -411,10 +411,10 @@ static PALETTE_INIT( sub )
 
 static INTERRUPT_GEN( subm_sound_irq )
 {
-	sub_state *state = device->machine->driver_data<sub_state>();
+	sub_state *state = device->machine().driver_data<sub_state>();
 
 	if(state->nmi_en)
-		cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( sub, sub_state )

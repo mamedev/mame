@@ -168,8 +168,8 @@ static const struct WD33C93interface *intf;
 #define SRCID_ER					0x80
 
 /* command handler definition */
-typedef void (*cmd_handler)(running_machine *machine);
-#define CMD_HANDLER(name) void name(running_machine *machine)
+typedef void (*cmd_handler)(running_machine &machine);
+#define CMD_HANDLER(name) void name(running_machine &machine)
 
 #define TEMP_INPUT_LEN	262144
 #define FIFO_SIZE		12
@@ -235,7 +235,7 @@ static void wd33c93_read_data(int bytes, UINT8 *pData)
 	}
 }
 
-static void wd33c93_complete_immediate( running_machine *machine, int status )
+static void wd33c93_complete_immediate( running_machine &machine, int status )
 {
 	/* reset our timer */
 	scsi_data.cmd_timer->reset(  );
@@ -293,7 +293,7 @@ static void wd33c93_complete_cmd( UINT8 status )
 /* command handlers */
 static CMD_HANDLER( wd33c93_invalid_cmd )
 {
-	logerror( "%s:Unknown/Unimplemented SCSI controller command: %02x\n", machine->describe_context(), scsi_data.regs[WD_COMMAND] );
+	logerror( "%s:Unknown/Unimplemented SCSI controller command: %02x\n", machine.describe_context(), scsi_data.regs[WD_COMMAND] );
 
 	/* complete the command */
 	wd33c93_complete_cmd( CSR_INVALID );
@@ -352,7 +352,7 @@ static CMD_HANDLER( wd33c93_select_cmd )
 		}
 
 		/* queue up a service request out in the future */
-		machine->scheduler().timer_set( attotime::from_usec(50), FUNC(wd33c93_service_request ));
+		machine.scheduler().timer_set( attotime::from_usec(50), FUNC(wd33c93_service_request ));
 	}
 	else
 	{
@@ -424,7 +424,7 @@ static CMD_HANDLER( wd33c93_selectxfer_cmd )
 			scsi_data.busphase = PHS_MESS_IN;
 
 			/* queue up a service request out in the future */
-			machine->scheduler().timer_set( attotime::from_msec(50), FUNC(wd33c93_service_request ));
+			machine.scheduler().timer_set( attotime::from_msec(50), FUNC(wd33c93_service_request ));
 		}
 	}
 	else
@@ -454,7 +454,7 @@ static CMD_HANDLER( wd33c93_xferinfo_cmd )
 	scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_CIP;
 
 	/* the command will be completed once the data is transferred */
-	machine->scheduler().timer_set( attotime::from_msec(1), FUNC(wd33c93_deassert_cip ));
+	machine.scheduler().timer_set( attotime::from_msec(1), FUNC(wd33c93_deassert_cip ));
 }
 
 /* Command handlers */
@@ -497,7 +497,7 @@ static const cmd_handler wd33c93_cmds[0x22] =
 };
 
 /* Handle pending commands */
-static void wd33c93_command( running_machine *machine )
+static void wd33c93_command( running_machine &machine )
 {
 	/* get the command */
 	UINT8 cmd = scsi_data.regs[WD_COMMAND];
@@ -540,7 +540,7 @@ WRITE8_HANDLER(wd33c93_w)
 				scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_CIP;
 
 				/* process the command */
-				wd33c93_command(space->machine);
+				wd33c93_command(space->machine());
 			}
 			else if ( scsi_data.sasr == WD_CDB_1 )
 			{
@@ -635,7 +635,7 @@ WRITE8_HANDLER(wd33c93_w)
 						}
 
 						/* complete the command */
-						wd33c93_complete_immediate(space->machine, CSR_XFER_DONE | scsi_data.busphase);
+						wd33c93_complete_immediate(space->machine(), CSR_XFER_DONE | scsi_data.busphase);
 					}
 				}
 				else
@@ -682,7 +682,7 @@ READ8_HANDLER(wd33c93_r)
 
 				if (intf && intf->irq_callback)
 				{
-					intf->irq_callback(space->machine, 0);
+					intf->irq_callback(space->machine(), 0);
 				}
 
 				LOG(( "WD33C93: PC=%08x - Status read (%02x)\n", cpu_get_pc(space->cpu), scsi_data.regs[WD_SCSI_STATUS] ));
@@ -778,7 +778,7 @@ READ8_HANDLER(wd33c93_r)
 	return 0;
 }
 
-void wd33c93_init( running_machine *machine, const struct WD33C93interface *interface )
+void wd33c93_init( running_machine &machine, const struct WD33C93interface *interface )
 {
 	int i;
 
@@ -795,7 +795,7 @@ void wd33c93_init( running_machine *machine, const struct WD33C93interface *inte
 	}
 
 	/* allocate a timer for commands */
-	scsi_data.cmd_timer = machine->scheduler().timer_alloc(FUNC(wd33c93_complete_cb));
+	scsi_data.cmd_timer = machine.scheduler().timer_alloc(FUNC(wd33c93_complete_cb));
 
 	scsi_data.temp_input = auto_alloc_array( machine, UINT8, TEMP_INPUT_LEN );
 

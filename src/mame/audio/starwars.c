@@ -18,8 +18,8 @@
 
 SOUND_START( starwars )
 {
-	starwars_state *state = machine->driver_data<starwars_state>();
-	state->riot = machine->device("riot");
+	starwars_state *state = machine.driver_data<starwars_state>();
+	state->riot = machine.device("riot");
 }
 
 
@@ -44,7 +44,7 @@ static READ8_DEVICE_HANDLER( r6532_porta_r )
 	/* Note: bit 4 is always set to avoid sound self test */
 	UINT8 olddata = riot6532_porta_in_get(device);
 
-	return (olddata & 0xc0) | 0x10 | (tms5220_readyq_r(device->machine->device("tms")) << 2);
+	return (olddata & 0xc0) | 0x10 | (tms5220_readyq_r(device->machine().device("tms")) << 2);
 }
 
 
@@ -59,7 +59,7 @@ static WRITE8_DEVICE_HANDLER( r6532_porta_w )
 
 static WRITE_LINE_DEVICE_HANDLER( snd_interrupt )
 {
-	cputag_set_input_line(device->machine, "audiocpu", M6809_IRQ_LINE, state);
+	cputag_set_input_line(device->machine(), "audiocpu", M6809_IRQ_LINE, state);
 }
 
 
@@ -83,16 +83,16 @@ const riot6532_interface starwars_riot6532_intf =
 
 static TIMER_CALLBACK( sound_callback )
 {
-	starwars_state *state = machine->driver_data<starwars_state>();
+	starwars_state *state = machine.driver_data<starwars_state>();
 	riot6532_porta_in_set(state->riot, 0x40, 0x40);
 	state->main_data = param;
-	machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 
 READ8_HANDLER( starwars_sin_r )
 {
-	starwars_state *state = space->machine->driver_data<starwars_state>();
+	starwars_state *state = space->machine().driver_data<starwars_state>();
 	riot6532_porta_in_set(state->riot, 0x00, 0x80);
 	return state->sound_data;
 }
@@ -100,7 +100,7 @@ READ8_HANDLER( starwars_sin_r )
 
 WRITE8_HANDLER( starwars_sout_w )
 {
-	space->machine->scheduler().synchronize(FUNC(sound_callback), data);
+	space->machine().scheduler().synchronize(FUNC(sound_callback), data);
 }
 
 
@@ -113,7 +113,7 @@ WRITE8_HANDLER( starwars_sout_w )
 
 READ8_HANDLER( starwars_main_read_r )
 {
-	starwars_state *state = space->machine->driver_data<starwars_state>();
+	starwars_state *state = space->machine().driver_data<starwars_state>();
 	riot6532_porta_in_set(state->riot, 0x00, 0x40);
 	return state->main_data;
 }
@@ -121,32 +121,32 @@ READ8_HANDLER( starwars_main_read_r )
 
 READ8_HANDLER( starwars_main_ready_flag_r )
 {
-	starwars_state *state = space->machine->driver_data<starwars_state>();
+	starwars_state *state = space->machine().driver_data<starwars_state>();
 	return riot6532_porta_in_get(state->riot) & 0xc0;	/* only upper two flag bits mapped */
 }
 
 static TIMER_CALLBACK( main_callback )
 {
-	starwars_state *state = machine->driver_data<starwars_state>();
+	starwars_state *state = machine.driver_data<starwars_state>();
 	if (riot6532_porta_in_get(state->riot) & 0x80)
 		logerror("Sound data not read %x\n",state->sound_data);
 
 	riot6532_porta_in_set(state->riot, 0x80, 0x80);
 	state->sound_data = param;
-	machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 WRITE8_HANDLER( starwars_main_wr_w )
 {
-	space->machine->scheduler().synchronize(FUNC(main_callback), data);
+	space->machine().scheduler().synchronize(FUNC(main_callback), data);
 }
 
 
 WRITE8_HANDLER( starwars_soundrst_w )
 {
-	starwars_state *state = space->machine->driver_data<starwars_state>();
+	starwars_state *state = space->machine().driver_data<starwars_state>();
 	riot6532_porta_in_set(state->riot, 0x00, 0xc0);
 
 	/* reset sound CPU here  */
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 }

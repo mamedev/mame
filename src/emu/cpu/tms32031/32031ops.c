@@ -103,7 +103,7 @@ void tms3203x_device::illegal(UINT32 op)
 	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		logerror("Illegal op @ %06X: %08X (tbl=%03X)\n", m_pc - 1, op, op >> 21);
-		debugger_break(machine);
+		debugger_break(m_machine);
 	}
 }
 
@@ -120,7 +120,7 @@ inline void tms3203x_device::execute_one()
 	m_icount -= 2;	// 2 clocks per cycle
 	m_pc++;
 #if (TMS_3203X_LOG_OPCODE_USAGE)
-	if (machine->primary_screen->frame_number() == 2003)
+	if (machine.primary_screen->frame_number() == 2003)
 		m_hits[op >> 21]++;
 #endif
 	(this->*s_tms32031ops[op >> 21])(op);

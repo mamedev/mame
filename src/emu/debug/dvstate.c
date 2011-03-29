@@ -108,7 +108,7 @@ void debug_view_state::enumerate_sources()
 	for (bool gotone = m_machine.m_devicelist.first(state); gotone; gotone = state->next(state))
 	{
 		name.printf("%s '%s'", state->device().name(), state->device().tag());
-		m_source_list.append(*auto_alloc(&m_machine, debug_view_state_source(name, state->device())));
+		m_source_list.append(*auto_alloc(m_machine, debug_view_state_source(name, state->device())));
 	}
 
 	// reset the source to a known good entry
@@ -127,7 +127,7 @@ void debug_view_state::reset()
 	{
 		state_item *oldhead = m_state_list;
 		m_state_list = oldhead->m_next;
-		auto_free(&m_machine, oldhead);
+		auto_free(m_machine, oldhead);
 	}
 }
 
@@ -146,34 +146,34 @@ void debug_view_state::recompute()
 
 	// add a cycles entry: cycles:99999999
 	state_item **tailptr = &m_state_list;
-	*tailptr = auto_alloc(&m_machine, state_item(REG_CYCLES, "cycles", 8));
+	*tailptr = auto_alloc(m_machine, state_item(REG_CYCLES, "cycles", 8));
 	tailptr = &(*tailptr)->m_next;
 
 	// add a beam entry: beamx:1234
-	*tailptr = auto_alloc(&m_machine, state_item(REG_BEAMX, "beamx", 4));
+	*tailptr = auto_alloc(m_machine, state_item(REG_BEAMX, "beamx", 4));
 	tailptr = &(*tailptr)->m_next;
 
 	// add a beam entry: beamy:5678
-	*tailptr = auto_alloc(&m_machine, state_item(REG_BEAMY, "beamy", 4));
+	*tailptr = auto_alloc(m_machine, state_item(REG_BEAMY, "beamy", 4));
 	tailptr = &(*tailptr)->m_next;
 
 	// add a beam entry: frame:123456
-	*tailptr = auto_alloc(&m_machine, state_item(REG_FRAME, "frame", 6));
+	*tailptr = auto_alloc(m_machine, state_item(REG_FRAME, "frame", 6));
 	tailptr = &(*tailptr)->m_next;
 
 	// add a flags entry: flags:xxxxxxxx
-	*tailptr = auto_alloc(&m_machine, state_item(STATE_GENFLAGS, "flags", source.m_stateintf->state_string_max_length(STATE_GENFLAGS)));
+	*tailptr = auto_alloc(m_machine, state_item(STATE_GENFLAGS, "flags", source.m_stateintf->state_string_max_length(STATE_GENFLAGS)));
 	tailptr = &(*tailptr)->m_next;
 
 	// add a divider entry
-	*tailptr = auto_alloc(&m_machine, state_item(REG_DIVIDER, "", 0));
+	*tailptr = auto_alloc(m_machine, state_item(REG_DIVIDER, "", 0));
 	tailptr = &(*tailptr)->m_next;
 
 	// add all registers into it
 	for (const device_state_entry *entry = source.m_stateintf->state_first(); entry != NULL; entry = entry->next())
 		if (entry->visible())
 		{
-			*tailptr = auto_alloc(&m_machine, state_item(entry->index(), entry->symbol(), source.m_stateintf->state_string_max_length(entry->index())));
+			*tailptr = auto_alloc(m_machine, state_item(entry->index(), entry->symbol(), source.m_stateintf->state_string_max_length(entry->index())));
 			tailptr = &(*tailptr)->m_next;
 		}
 

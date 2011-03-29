@@ -145,7 +145,7 @@ static DEVICE_START( rf5c68 )
 	rf5c68_state *chip = get_safe_token(device);
 
 	/* allocate the stream */
-	chip->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock() / 384, chip, rf5c68_update);
+	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock() / 384, chip, rf5c68_update);
 
 	chip->device = device;
 

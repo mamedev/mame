@@ -30,9 +30,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	skullxbo_state *state = machine->driver_data<skullxbo_state>();
+	skullxbo_state *state = machine.driver_data<skullxbo_state>();
 	cputag_set_input_line(machine, "maincpu", 1, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 2, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 4, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
@@ -41,13 +41,13 @@ static void update_interrupts(running_machine *machine)
 
 static TIMER_CALLBACK( irq_gen )
 {
-	atarigen_scanline_int_gen(machine->device("maincpu"));
+	atarigen_scanline_int_gen(machine.device("maincpu"));
 }
 
 
 static void alpha_row_update(screen_device &screen, int scanline)
 {
-	skullxbo_state *state = screen.machine->driver_data<skullxbo_state>();
+	skullxbo_state *state = screen.machine().driver_data<skullxbo_state>();
 	UINT16 *check = &state->alpha[(scanline / 8) * 64 + 42];
 
 	/* check for interrupts in the alpha ram */
@@ -56,17 +56,17 @@ static void alpha_row_update(screen_device &screen, int scanline)
 	{
 		int	width = screen.width();
 		attotime period = screen.time_until_pos(screen.vpos() + 6, width * 0.9);
-		screen.machine->scheduler().timer_set(period, FUNC(irq_gen));
+		screen.machine().scheduler().timer_set(period, FUNC(irq_gen));
 	}
 
 	/* update the playfield and motion objects */
-	skullxbo_scanline_update(screen.machine, scanline);
+	skullxbo_scanline_update(screen.machine(), scanline);
 }
 
 
 static WRITE16_HANDLER( skullxbo_halt_until_hblank_0_w )
 {
-	atarigen_halt_until_hblank_0(*space->machine->primary_screen);
+	atarigen_halt_until_hblank_0(*space->machine().primary_screen);
 }
 
 
@@ -78,11 +78,11 @@ static MACHINE_START( skullxbo )
 
 static MACHINE_RESET( skullxbo )
 {
-	skullxbo_state *state = machine->driver_data<skullxbo_state>();
+	skullxbo_state *state = machine.driver_data<skullxbo_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine->primary_screen, alpha_row_update, 8);
+	atarigen_scanline_timer_reset(*machine.primary_screen, alpha_row_update, 8);
 	atarijsa_reset();
 }
 
@@ -96,10 +96,10 @@ static MACHINE_RESET( skullxbo )
 
 static READ16_HANDLER( special_port1_r )
 {
-	skullxbo_state *state = space->machine->driver_data<skullxbo_state>();
-	int temp = input_port_read(space->machine, "FF5802");
+	skullxbo_state *state = space->machine().driver_data<skullxbo_state>();
+	int temp = input_port_read(space->machine(), "FF5802");
 	if (state->cpu_to_sound_ready) temp ^= 0x0040;
-	if (atarigen_get_hblank(*space->machine->primary_screen)) temp ^= 0x0010;
+	if (atarigen_get_hblank(*space->machine().primary_screen)) temp ^= 0x0010;
 	return temp;
 }
 
@@ -620,7 +620,7 @@ ROM_END
 static DRIVER_INIT( skullxbo )
 {
 	atarijsa_init(machine, "FF5802", 0x0080);
-	memset(machine->region("gfx1")->base() + 0x170000, 0, 0x20000);
+	memset(machine.region("gfx1")->base() + 0x170000, 0, 0x20000);
 }
 
 

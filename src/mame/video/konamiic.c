@@ -1187,22 +1187,22 @@ static void shuffle(UINT16 *buf,int len)
 
 
 /* helper function to join two 16-bit ROMs and form a 32-bit data stream */
-void konami_rom_deinterleave_2(running_machine *machine, const char *mem_region)
+void konami_rom_deinterleave_2(running_machine &machine, const char *mem_region)
 {
-	shuffle((UINT16 *)machine->region(mem_region)->base(),machine->region(mem_region)->bytes()/2);
+	shuffle((UINT16 *)machine.region(mem_region)->base(),machine.region(mem_region)->bytes()/2);
 }
 
 /* hacked version of rom_deinterleave_2_half for Lethal Enforcers */
-void konami_rom_deinterleave_2_half(running_machine *machine, const char *mem_region)
+void konami_rom_deinterleave_2_half(running_machine &machine, const char *mem_region)
 {
-	UINT8 *rgn = machine->region(mem_region)->base();
+	UINT8 *rgn = machine.region(mem_region)->base();
 
-	shuffle((UINT16 *)rgn,machine->region(mem_region)->bytes()/4);
-	shuffle((UINT16 *)(rgn+machine->region(mem_region)->length()/2),machine->region(mem_region)->bytes()/4);
+	shuffle((UINT16 *)rgn,machine.region(mem_region)->bytes()/4);
+	shuffle((UINT16 *)(rgn+machine.region(mem_region)->length()/2),machine.region(mem_region)->bytes()/4);
 }
 
 /* helper function to join four 16-bit ROMs and form a 64-bit data stream */
-void konami_rom_deinterleave_4(running_machine *machine, const char *mem_region)
+void konami_rom_deinterleave_4(running_machine &machine, const char *mem_region)
 {
 	konami_rom_deinterleave_2(machine, mem_region);
 	konami_rom_deinterleave_2(machine, mem_region);
@@ -1210,13 +1210,13 @@ void konami_rom_deinterleave_4(running_machine *machine, const char *mem_region)
 #endif
 
 
-static void decode_gfx(running_machine *machine, int gfx_index, UINT8 *data, UINT32 total, const gfx_layout *layout, int bpp)
+static void decode_gfx(running_machine &machine, int gfx_index, UINT8 *data, UINT32 total, const gfx_layout *layout, int bpp)
 {
 	gfx_layout gl;
 
 	memcpy(&gl, layout, sizeof(gl));
 	gl.total = total;
-	machine->gfx[gfx_index] = gfx_element_alloc(machine, &gl, data, machine->total_colors() >> bpp, 0);
+	machine.gfx[gfx_index] = gfx_element_alloc(machine, &gl, data, machine.total_colors() >> bpp, 0);
 }
 
 
@@ -1234,7 +1234,7 @@ UINT8 K007121_ctrlram[MAX_K007121][8];
 static int K007121_flipscreen[MAX_K007121];
 
 
-void K007121_ctrl_w(running_machine *machine,int chip,int offset,int data)
+void K007121_ctrl_w(running_machine &machine,int chip,int offset,int data)
 {
 	switch (offset)
 	{
@@ -1253,12 +1253,12 @@ if ((K007121_ctrlram[chip][offset] & 0x30) != (data & 0x30))
 
 WRITE8_HANDLER( K007121_ctrl_0_w )
 {
-	K007121_ctrl_w(space->machine,0,offset,data);
+	K007121_ctrl_w(space->machine(),0,offset,data);
 }
 
 WRITE8_HANDLER( K007121_ctrl_1_w )
 {
-	K007121_ctrl_w(space->machine,1,offset,data);
+	K007121_ctrl_w(space->machine(),1,offset,data);
 }
 
 
@@ -1302,7 +1302,7 @@ void K007121_sprites_draw(int chip,bitmap_t *bitmap,const rectangle *cliprect, g
 						  int global_x_offset,int bank_base, UINT32 pri_mask)
 {
 	const gfx_element *gfx = gfxs[chip];
-	bitmap_t *priority_bitmap = gfx->machine->priority_bitmap;
+	bitmap_t *priority_bitmap = gfx->machine().priority_bitmap;
 	int flipscreen = K007121_flipscreen[chip];
 	int i,num,inc,offs[5];
 	int is_flakatck = (ctable == NULL);
@@ -1312,7 +1312,7 @@ popmessage("%02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x  %02x-%02x-%02x-%02x-%02x-%0
 	K007121_ctrlram[0][0x00],K007121_ctrlram[0][0x01],K007121_ctrlram[0][0x02],K007121_ctrlram[0][0x03],K007121_ctrlram[0][0x04],K007121_ctrlram[0][0x05],K007121_ctrlram[0][0x06],K007121_ctrlram[0][0x07],
 	K007121_ctrlram[1][0x00],K007121_ctrlram[1][0x01],K007121_ctrlram[1][0x02],K007121_ctrlram[1][0x03],K007121_ctrlram[1][0x04],K007121_ctrlram[1][0x05],K007121_ctrlram[1][0x06],K007121_ctrlram[1][0x07]);
 
-if (input_code_pressed(gfx->machine, KEYCODE_D))
+if (input_code_pressed(gfx->machine(), KEYCODE_D))
 {
 	FILE *fp;
 	fp=fopen(chip?"SPRITE1.DMP":"SPRITE0.DMP", "w+b");
@@ -1490,7 +1490,7 @@ static TILEMAP_MAPPER( K007342_scan )
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5);
 }
 
-INLINE void K007342_get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT8 *cram,UINT8 *vram)
+INLINE void K007342_get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,int layer,UINT8 *cram,UINT8 *vram)
 {
 	int color, code, flags;
 
@@ -1514,7 +1514,7 @@ static TILE_GET_INFO( K007342_get_tile_info1 ) { K007342_get_tile_info(machine,t
 
 
 
-void K007342_vh_start(running_machine *machine, int gfx_index, void (*callback)(int tmap, int bank, int *code, int *color, int *flags))
+void K007342_vh_start(running_machine &machine, int gfx_index, void (*callback)(int tmap, int bank, int *code, int *color, int *flags))
 {
 	K007342_gfxnum = gfx_index;
 	K007342_callback = callback;
@@ -1585,7 +1585,7 @@ WRITE8_HANDLER( K007342_vreg_w )
 			break;
 		case 0x01:  /* used for banking in Rock'n'Rage */
 			if (data != K007342_regs[1])
-				tilemap_mark_all_tiles_dirty_all(space->machine);
+				tilemap_mark_all_tiles_dirty_all(space->machine());
 		case 0x02:
 			K007342_scrollx[0] = (K007342_scrollx[0] & 0xff) | ((data & 0x01) << 8);
 			K007342_scrollx[1] = (K007342_scrollx[1] & 0xff) | ((data & 0x02) << 7);
@@ -1695,9 +1695,9 @@ static void (*K007420_callback)(int *code,int *color);
 static UINT8 *K007420_ram;
 static int K007420_banklimit;
 
-void K007420_vh_start(running_machine *machine, int gfxnum, void (*callback)(int *code,int *color))
+void K007420_vh_start(running_machine &machine, int gfxnum, void (*callback)(int *code,int *color))
 {
-	K007420_gfx = machine->gfx[gfxnum];
+	K007420_gfx = machine.gfx[gfxnum];
 	K007420_callback = callback;
 	K007420_ram = auto_alloc_array_clear(machine, UINT8, 0x200);
 
@@ -1925,7 +1925,7 @@ tilemap_t *K052109_tilemap[3];
   color RAM    ------xx  depends on external connections (usually banking, flip)
 */
 
-INLINE void K052109_get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT8 *cram,UINT8 *vram1,UINT8 *vram2)
+INLINE void K052109_get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,int layer,UINT8 *cram,UINT8 *vram1,UINT8 *vram2)
 {
 	int flipy = 0;
 	int code = vram1[tile_index] + 256 * vram2[tile_index];
@@ -1973,7 +1973,7 @@ static STATE_POSTLOAD( K052109_tileflip_reset )
 
 #define XOR(a) WORD_XOR_BE(a)
 
-void K052109_vh_start(running_machine *machine,const char *gfx_memory_region,int plane_order,
+void K052109_vh_start(running_machine &machine,const char *gfx_memory_region,int plane_order,
 		void (*callback)(int tmap,int bank,int *code,int *color,int *flags,int *priority))
 {
 	int gfx_index, i;
@@ -2002,7 +2002,7 @@ void K052109_vh_start(running_machine *machine,const char *gfx_memory_region,int
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
+		if (machine.gfx[gfx_index] == 0)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -2010,13 +2010,13 @@ void K052109_vh_start(running_machine *machine,const char *gfx_memory_region,int
 	switch (plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
-		total = machine->region(gfx_memory_region)->bytes() / 32;
-		decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &charlayout, 4);
+		total = machine.region(gfx_memory_region)->bytes() / 32;
+		decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &charlayout, 4);
 		break;
 
 	case GRADIUS3_PLANE_ORDER:
 		total = 0x1000;
-		decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &charlayout_gradius3, 4);
+		decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &charlayout_gradius3, 4);
 		break;
 
 	default:
@@ -2069,7 +2069,7 @@ void K052109_vh_start(running_machine *machine,const char *gfx_memory_region,int
 	state_save_register_global_array(machine, K052109_dy);
 	state_save_register_global(machine, has_extra_video_ram);
 
-	machine->state().register_postload(K052109_tileflip_reset, NULL);
+	machine.state().register_postload(K052109_tileflip_reset, NULL);
 }
 
 READ8_HANDLER( K052109_r )
@@ -2110,11 +2110,11 @@ else
 		(*K052109_callback)(0,bank,&code,&color,&flags,&priority);
 
 		addr = (code << 5) + (offset & 0x1f);
-		addr &= space->machine->region(K052109_memory_region)->bytes()-1;
+		addr &= space->machine().region(K052109_memory_region)->bytes()-1;
 
 //      logerror("%04x: off = %04x sub = %02x (bnk = %x) adr = %06x\n",cpu_get_pc(space->cpu),offset,K052109_romsubbank,bank,addr);
 
-		return space->machine->region(K052109_memory_region)->base()[addr];
+		return space->machine().region(K052109_memory_region)->base()[addr];
 	}
 }
 
@@ -2464,7 +2464,7 @@ static int K051960_dx, K051960_dy;
 static int K051960_irq_enabled, K051960_nmi_enabled;
 
 
-void K051960_vh_start(running_machine *machine,const char *gfx_memory_region,int plane_order,
+void K051960_vh_start(running_machine &machine,const char *gfx_memory_region,int plane_order,
 		void (*callback)(int *code,int *color,int *priority,int *shadow))
 {
 	int gfx_index;
@@ -2508,7 +2508,7 @@ void K051960_vh_start(running_machine *machine,const char *gfx_memory_region,int
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
+		if (machine.gfx[gfx_index] == 0)
 			break;
 
 	assert(gfx_index != MAX_GFX_ELEMENTS);
@@ -2517,31 +2517,31 @@ void K051960_vh_start(running_machine *machine,const char *gfx_memory_region,int
 	switch (plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
-		total = machine->region(gfx_memory_region)->bytes() / 128;
-		decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &spritelayout, 4);
+		total = machine.region(gfx_memory_region)->bytes() / 128;
+		decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &spritelayout, 4);
 		break;
 
 	case REVERSE_PLANE_ORDER:
-		total = machine->region(gfx_memory_region)->bytes() / 128;
-		decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &spritelayout_reverse, 4);
+		total = machine.region(gfx_memory_region)->bytes() / 128;
+		decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &spritelayout_reverse, 4);
 		break;
 
 	case GRADIUS3_PLANE_ORDER:
 		total = 0x4000;
-		decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &spritelayout_gradius3, 4);
+		decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &spritelayout_gradius3, 4);
 		break;
 
 	default:
 		fatalerror("Unknown plane_order");
 	}
 
-	if (VERBOSE && !(machine->config().m_video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	K051960_dx = K051960_dy = 0;
 
 	K051960_memory_region = gfx_memory_region;
-	K051960_gfx = machine->gfx[gfx_index];
+	K051960_gfx = machine.gfx[gfx_index];
 	K051960_callback = callback;
 	K051960_ram = auto_alloc_array_clear(machine, UINT8, 0x400);
 
@@ -2555,7 +2555,7 @@ void K051960_vh_start(running_machine *machine,const char *gfx_memory_region,int
 }
 
 
-static int K051960_fetchromdata(running_machine *machine, int byte)
+static int K051960_fetchromdata(running_machine &machine, int byte)
 {
 	int code,color,pri,shadow,off1,addr;
 
@@ -2570,11 +2570,11 @@ static int K051960_fetchromdata(running_machine *machine, int byte)
 	(*K051960_callback)(&code,&color,&pri,&shadow);
 
 	addr = (code << 7) | (off1 << 2) | byte;
-	addr &= machine->region(K051960_memory_region)->bytes()-1;
+	addr &= machine.region(K051960_memory_region)->bytes()-1;
 
-//  popmessage("%s: addr %06x",machine->describe_context(),addr);
+//  popmessage("%s: addr %06x",machine.describe_context(),addr);
 
-	return machine->region(K051960_memory_region)->base()[addr];
+	return machine.region(K051960_memory_region)->base()[addr];
 }
 
 READ8_HANDLER( K051960_r )
@@ -2583,7 +2583,7 @@ READ8_HANDLER( K051960_r )
 	{
 		/* the 051960 remembers the last address read and uses it when reading the sprite ROMs */
 		K051960_romoffset = (offset & 0x3fc) >> 2;
-		return K051960_fetchromdata(space->machine, offset & 3);	/* only 88 Games reads the ROMs from here */
+		return K051960_fetchromdata(space->machine(), offset & 3);	/* only 88 Games reads the ROMs from here */
 	}
 	else
 		return K051960_ram[offset];
@@ -2611,7 +2611,7 @@ READ8_HANDLER( K051937_r )
 {
 	if (K051960_readroms && offset >= 4 && offset < 8)
 	{
-		return K051960_fetchromdata(space->machine, offset & 3);
+		return K051960_fetchromdata(space->machine(), offset & 3);
 	}
 	else
 	{
@@ -2715,7 +2715,7 @@ WRITE16_HANDLER( K051937_word_w )
  * Note that Aliens also uses the shadow bit to select the second sprite bank.
  */
 
-void K051960_sprites_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int min_priority,int max_priority)
+void K051960_sprites_draw(running_machine &machine,bitmap_t *bitmap,const rectangle *cliprect,int min_priority,int max_priority)
 {
 #define NUM_SPRITES 128
 	int offs,pri_code;
@@ -2827,15 +2827,15 @@ void K051960_sprites_draw(running_machine *machine,bitmap_t *bitmap,const rectan
 								color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
-								machine->priority_bitmap,pri,
-								drawmode_table,machine->shadow_table);
+								machine.priority_bitmap,pri,
+								drawmode_table,machine.shadow_table);
 					else
 						drawgfx_transtable(bitmap,cliprect,K051960_gfx,
 								c,
 								color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
-								drawmode_table,machine->shadow_table);
+								drawmode_table,machine.shadow_table);
 				}
 			}
 		}
@@ -2866,8 +2866,8 @@ void K051960_sprites_draw(running_machine *machine,bitmap_t *bitmap,const rectan
 								flipx,flipy,
 								sx & 0x1ff,sy,
 								(zw << 16) / 16,(zh << 16) / 16,
-								machine->priority_bitmap,pri,
-								drawmode_table,machine->shadow_table);
+								machine.priority_bitmap,pri,
+								drawmode_table,machine.shadow_table);
 					else
 						drawgfxzoom_transtable(bitmap,cliprect,K051960_gfx,
 								c,
@@ -2875,7 +2875,7 @@ void K051960_sprites_draw(running_machine *machine,bitmap_t *bitmap,const rectan
 								flipx,flipy,
 								sx & 0x1ff,sy,
 								(zw << 16) / 16,(zh << 16) / 16,
-								drawmode_table,machine->shadow_table);
+								drawmode_table,machine.shadow_table);
 				}
 			}
 		}
@@ -2993,7 +2993,7 @@ static UINT16 *K053245_ram[MAX_K053245_CHIPS], *K053245_buffer[MAX_K053245_CHIPS
 static UINT8 K053244_regs[MAX_K053245_CHIPS][0x10];
 static int K053245_dx[MAX_K053245_CHIPS], K053245_dy[MAX_K053245_CHIPS];
 
-void K053245_vh_start(running_machine *machine,int chip, const char *gfx_memory_region,int plane_order,
+void K053245_vh_start(running_machine &machine,int chip, const char *gfx_memory_region,int plane_order,
 		void (*callback)(int *code,int *color,int *priority))
 {
 	int gfx_index;
@@ -3019,7 +3019,7 @@ void K053245_vh_start(running_machine *machine,int chip, const char *gfx_memory_
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
+		if (machine.gfx[gfx_index] == 0)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -3027,21 +3027,21 @@ void K053245_vh_start(running_machine *machine,int chip, const char *gfx_memory_
 	switch (plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
-		total = machine->region(gfx_memory_region)->bytes() / 128;
-		decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &spritelayout, 4);
+		total = machine.region(gfx_memory_region)->bytes() / 128;
+		decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &spritelayout, 4);
 		break;
 
 	default:
 		fatalerror("Unsupported plane_order");
 	}
 
-	if (VERBOSE && !(machine->config().m_video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 
 	K05324x_z_rejection = -1;
 	K053245_memory_region[chip] = gfx_memory_region;
-	K053245_gfx[chip] = machine->gfx[gfx_index];
+	K053245_gfx[chip] = machine.gfx[gfx_index];
 	K053245_callback[chip] = callback;
 	K053244_rombank[chip] = 0;
 	K053245_ramsize[chip] = 0x800;
@@ -3113,7 +3113,7 @@ INLINE void K053245_update_buffer( int chip )
 	memcpy(K053245_buffer[chip], K053245_ram[chip], K053245_ramsize[chip]);
 }
 
-static UINT8 K053244_chip_r (running_machine *machine, int chip, int offset)
+static UINT8 K053244_chip_r (running_machine &machine, int chip, int offset)
 {
 	if ((K053244_regs[chip][5] & 0x10) && offset >= 0x0c && offset < 0x10)
 	{
@@ -3122,11 +3122,11 @@ static UINT8 K053244_chip_r (running_machine *machine, int chip, int offset)
 		addr = (K053244_rombank[chip] << 19) | ((K053244_regs[chip][11] & 0x7) << 18)
 			| (K053244_regs[chip][8] << 10) | (K053244_regs[chip][9] << 2)
 			| ((offset & 3) ^ 1);
-		addr &= machine->region(K053245_memory_region[chip])->bytes()-1;
+		addr &= machine.region(K053245_memory_region[chip])->bytes()-1;
 
-//  popmessage("%s: offset %02x addr %06x",machine->describe_context(),offset&3,addr);
+//  popmessage("%s: offset %02x addr %06x",machine.describe_context(),offset&3,addr);
 
-		return machine->region(K053245_memory_region[chip])->base()[addr];
+		return machine.region(K053245_memory_region[chip])->base()[addr];
 	}
 	else if (offset == 0x06)
 	{
@@ -3135,7 +3135,7 @@ static UINT8 K053244_chip_r (running_machine *machine, int chip, int offset)
 	}
 	else
 	{
-//logerror("%s: read from unknown 053244 address %x\n",machine->describe_context(),offset);
+//logerror("%s: read from unknown 053244 address %x\n",machine.describe_context(),offset);
 		return 0;
 	}
 
@@ -3144,7 +3144,7 @@ static UINT8 K053244_chip_r (running_machine *machine, int chip, int offset)
 
 READ8_HANDLER( K053244_r )
 {
-	return K053244_chip_r(space->machine,0,offset);
+	return K053244_chip_r(space->machine(),0,offset);
 }
 
 static void K053244_chip_w(int chip, int offset, int data)
@@ -3157,7 +3157,7 @@ static void K053244_chip_w(int chip, int offset, int data)
 //          popmessage("053244 reg 05 = %02x",data);
 		/* bit 2 = unknown, Parodius uses it */
 		/* bit 5 = unknown, Rollergames uses it */
-//      logerror("%s: write %02x to 053244 address 5\n",machine->describe_context(),data);
+//      logerror("%s: write %02x to 053244 address 5\n",machine.describe_context(),data);
 		break;
 	}
 	case 0x06:
@@ -3235,7 +3235,7 @@ void K053244_bankselect(int chip, int bank)
  * The rest of the sprite remains normal.
  */
 
-void K053245_sprites_draw(running_machine *machine, int chip, bitmap_t *bitmap,const rectangle *cliprect) //*
+void K053245_sprites_draw(running_machine &machine, int chip, bitmap_t *bitmap,const rectangle *cliprect) //*
 {
 #define NUM_SPRITES 128
 	int offs,pri_code,i;
@@ -3436,8 +3436,8 @@ void K053245_sprites_draw(running_machine *machine, int chip, bitmap_t *bitmap,c
 							color,
 							fx,fy,
 							sx,sy,
-							machine->priority_bitmap,pri,
-							drawmode_table,machine->shadow_table);
+							machine.priority_bitmap,pri,
+							drawmode_table,machine.shadow_table);
 				}
 				else
 				{
@@ -3447,8 +3447,8 @@ void K053245_sprites_draw(running_machine *machine, int chip, bitmap_t *bitmap,c
 							fx,fy,
 							sx,sy,
 							(zw << 16) / 16,(zh << 16) / 16,
-							machine->priority_bitmap,pri,
-							drawmode_table,machine->shadow_table);
+							machine.priority_bitmap,pri,
+							drawmode_table,machine.shadow_table);
 
 				}
 			}
@@ -3472,7 +3472,7 @@ if (input_code_pressed(machine, KEYCODE_D))
 
 /* Lethal Enforcers has 2 of these chips hooked up in parallel to give 6bpp gfx.. lets cheat a
   bit and make emulating it a little less messy by using a custom function instead */
-void K053245_sprites_draw_lethal(running_machine *machine,int chip, bitmap_t *bitmap,const rectangle *cliprect) //*
+void K053245_sprites_draw_lethal(running_machine &machine,int chip, bitmap_t *bitmap,const rectangle *cliprect) //*
 {
 #define NUM_SPRITES 128
 	int offs,pri_code,i;
@@ -3604,7 +3604,7 @@ void K053245_sprites_draw_lethal(running_machine *machine,int chip, bitmap_t *bi
 		ox -= (zoomx * w) >> 13;
 		oy -= (zoomy * h) >> 13;
 
-		drawmode_table[machine->gfx[0]->color_granularity-1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[machine.gfx[0]->color_granularity-1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
 		for (y = 0;y < h;y++)
 		{
@@ -3668,24 +3668,24 @@ void K053245_sprites_draw_lethal(running_machine *machine,int chip, bitmap_t *bi
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
 				{
-					pdrawgfx_transtable(bitmap,cliprect,machine->gfx[0], /* hardcoded to 0 (decoded 6bpp gfx) for le */
+					pdrawgfx_transtable(bitmap,cliprect,machine.gfx[0], /* hardcoded to 0 (decoded 6bpp gfx) for le */
 							c,
 							color,
 							fx,fy,
 							sx,sy,
-							machine->priority_bitmap,pri,
-							drawmode_table,machine->shadow_table);
+							machine.priority_bitmap,pri,
+							drawmode_table,machine.shadow_table);
 				}
 				else
 				{
-					pdrawgfxzoom_transtable(bitmap,cliprect,machine->gfx[0],  /* hardcoded to 0 (decoded 6bpp gfx) for le */
+					pdrawgfxzoom_transtable(bitmap,cliprect,machine.gfx[0],  /* hardcoded to 0 (decoded 6bpp gfx) for le */
 							c,
 							color,
 							fx,fy,
 							sx,sy,
 							(zw << 16) / 16,(zh << 16) / 16,
-							machine->priority_bitmap,pri,
-							drawmode_table,machine->shadow_table);
+							machine.priority_bitmap,pri,
+							drawmode_table,machine.shadow_table);
 
 				}
 			}
@@ -3721,10 +3721,10 @@ static UINT8  K053246_regs[8];
 static UINT16 K053247_regs[16];
 static UINT16 *K053247_ram=0;
 static gfx_element *K053247_gfx;
-static void (*K053247_callback)(running_machine *machine, int *code,int *color,int *priority);
+static void (*K053247_callback)(running_machine &machine, int *code,int *color,int *priority);
 static UINT8 K053246_OBJCHA_line;
 
-void K053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(running_machine *, int *, int *, int *), int *dx, int *dy)
+void K053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(running_machine &, int *, int *, int *), int *dx, int *dy)
 {
 	if(ram)
 		*ram = K053247_ram;
@@ -3753,7 +3753,7 @@ void K053247_wraparound_enable(int status)
 	K053247_wraparound = status;
 }
 
-void K053247_vh_start(running_machine *machine, const char *gfx_memory_region, int dx, int dy, int plane_order,
+void K053247_vh_start(running_machine &machine, const char *gfx_memory_region, int dx, int dy, int plane_order,
 					 void (*callback)(int *code,int *color,int *priority))
 {
 	int gfx_index;
@@ -3784,7 +3784,7 @@ void K053247_vh_start(running_machine *machine, const char *gfx_memory_region, i
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
+		if (machine.gfx[gfx_index] == 0)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -3792,13 +3792,13 @@ void K053247_vh_start(running_machine *machine, const char *gfx_memory_region, i
 	switch (plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
-		total = machine->region(gfx_memory_region)->bytes() / 128;
-		decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &spritelayout, 4);
+		total = machine.region(gfx_memory_region)->bytes() / 128;
+		decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &spritelayout, 4);
 		break;
 
 	case TASMAN_PLANE_ORDER:
-		total = machine->region(gfx_memory_region)->bytes() / 128;
-		decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &tasman_16x16_layout, 4);
+		total = machine.region(gfx_memory_region)->bytes() / 128;
+		decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &tasman_16x16_layout, 4);
 		break;
 
 	default:
@@ -3807,14 +3807,14 @@ void K053247_vh_start(running_machine *machine, const char *gfx_memory_region, i
 
 	if (VERBOSE)
 	{
-	if (machine->primary_screen->format() == BITMAP_FORMAT_RGB32)
+	if (machine.primary_screen->format() == BITMAP_FORMAT_RGB32)
 	{
-		if ((machine->config().m_video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
+		if ((machine.config().m_video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
 			popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
 	}
 	else
 	{
-		if (!(machine->config().m_video_attributes & VIDEO_HAS_SHADOWS))
+		if (!(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
 			popmessage("driver should use VIDEO_HAS_SHADOWS");
 	}
 	}
@@ -3824,7 +3824,7 @@ void K053247_vh_start(running_machine *machine, const char *gfx_memory_region, i
 	K053247_wraparound = 1;
 	K05324x_z_rejection = -1;
 	K053247_memory_region = gfx_memory_region;
-	K053247_gfx = machine->gfx[gfx_index];
+	K053247_gfx = machine.gfx[gfx_index];
 	K053247_callback = callback;
 	K053246_OBJCHA_line = CLEAR_LINE;
 	K053247_ram = auto_alloc_array(machine, UINT16, 0x1000/2);
@@ -3841,7 +3841,7 @@ void K053247_vh_start(running_machine *machine, const char *gfx_memory_region, i
 #endif
 
 /* K055673 used with the 54246 in PreGX/Run and Gun/System GX games */
-void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, int layout, int dx, int dy, void (*callback)(running_machine *machine, int *code,int *color,int *priority))
+void K055673_vh_start(running_machine &machine, const char *gfx_memory_region, int layout, int dx, int dy, void (*callback)(running_machine &machine, int *code,int *color,int *priority))
 {
 	int gfx_index;
 	UINT32 total;
@@ -3896,23 +3896,23 @@ void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, i
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
+		if (machine.gfx[gfx_index] == 0)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
-	K055673_rom = (UINT16 *)machine->region(gfx_memory_region)->base();
+	K055673_rom = (UINT16 *)machine.region(gfx_memory_region)->base();
 
 	/* decode the graphics */
 	switch(layout)
 	{
 	case K055673_LAYOUT_GX:
-		size4 = (machine->region(gfx_memory_region)->bytes()/(1024*1024))/5;
+		size4 = (machine.region(gfx_memory_region)->bytes()/(1024*1024))/5;
 		size4 *= 4*1024*1024;
 		/* set the # of tiles based on the 4bpp section */
 		K055673_rom = auto_alloc_array(machine, UINT16, size4 * 5 / 2);
 		d = (UINT8 *)K055673_rom;
 		// now combine the graphics together to form 5bpp
-		s1 = machine->region(gfx_memory_region)->base(); // 4bpp area
+		s1 = machine.region(gfx_memory_region)->base(); // 4bpp area
 		s2 = s1 + (size4);	 // 1bpp area
 		for (i = 0; i < size4; i+= 4)
 		{
@@ -3928,17 +3928,17 @@ void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, i
 		break;
 
 	case K055673_LAYOUT_RNG:
-		total = machine->region(gfx_memory_region)->bytes() / (16*16/2);
+		total = machine.region(gfx_memory_region)->bytes() / (16*16/2);
 		decode_gfx(machine, gfx_index, (UINT8 *)K055673_rom, total, &spritelayout2, 4);
 		break;
 
 	case K055673_LAYOUT_LE2:
-		total = machine->region(gfx_memory_region)->bytes() / (16*16);
+		total = machine.region(gfx_memory_region)->bytes() / (16*16);
 		decode_gfx(machine, gfx_index, (UINT8 *)K055673_rom, total, &spritelayout3, 4);
 		break;
 
 	case K055673_LAYOUT_GX6:
-		total = machine->region(gfx_memory_region)->bytes() / (16*16*6/8);
+		total = machine.region(gfx_memory_region)->bytes() / (16*16*6/8);
 		decode_gfx(machine, gfx_index, (UINT8 *)K055673_rom, total, &spritelayout4, 4);
 		break;
 
@@ -3946,7 +3946,7 @@ void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, i
 		fatalerror("Unsupported layout");
 	}
 
-	if (VERBOSE && !(machine->config().m_video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	K053247_dx = dx;
@@ -3954,7 +3954,7 @@ void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, i
 	K053247_wraparound = 1;
 	K05324x_z_rejection = -1;
 	K053247_memory_region = gfx_memory_region;
-	K053247_gfx = machine->gfx[gfx_index];
+	K053247_gfx = machine.gfx[gfx_index];
 	K053247_callback = callback;
 	K053246_OBJCHA_line = CLEAR_LINE;
 	K053247_ram = auto_alloc_array(machine, UINT16, 0x1000/2);
@@ -4035,9 +4035,9 @@ WRITE8_HANDLER( K053247_w )
 // in this window, +0 = 32 bits from one set of ROMs, and +8 = 32 bits from another set
 READ16_HANDLER( K055673_rom_word_r )	// 5bpp
 {
-	UINT8 *ROM8 = (UINT8 *)space->machine->region(K053247_memory_region)->base();
-	UINT16 *ROM = (UINT16 *)space->machine->region(K053247_memory_region)->base();
-	int size4 = (space->machine->region(K053247_memory_region)->bytes()/(1024*1024))/5;
+	UINT8 *ROM8 = (UINT8 *)space->machine().region(K053247_memory_region)->base();
+	UINT16 *ROM = (UINT16 *)space->machine().region(K053247_memory_region)->base();
+	int size4 = (space->machine().region(K053247_memory_region)->bytes()/(1024*1024))/5;
 	int romofs;
 
 	size4 *= 4*1024*1024;	// get offset to 5th bit
@@ -4073,7 +4073,7 @@ READ16_HANDLER( K055673_rom_word_r )	// 5bpp
 
 READ16_HANDLER( K055673_GX6bpp_rom_word_r )
 {
-	UINT16 *ROM = (UINT16 *)space->machine->region(K053247_memory_region)->base();
+	UINT16 *ROM = (UINT16 *)space->machine().region(K053247_memory_region)->base();
 	int romofs;
 
 	romofs = K053246_regs[6]<<16 | K053246_regs[7]<<8 | K053246_regs[4];
@@ -4113,10 +4113,10 @@ READ8_HANDLER( K053246_r )
 		int addr;
 
 		addr = (K053246_regs[6] << 17) | (K053246_regs[7] << 9) | (K053246_regs[4] << 1) | ((offset & 1) ^ 1);
-		addr &= space->machine->region(K053247_memory_region)->bytes()-1;
+		addr &= space->machine().region(K053247_memory_region)->bytes()-1;
 		if (VERBOSE)
 			popmessage("%04x: offset %02x addr %06x",cpu_get_pc(space->cpu),offset,addr);
-		return space->machine->region(K053247_memory_region)->base()[addr];
+		return space->machine().region(K053247_memory_region)->base()[addr];
 	}
 	else
 	{
@@ -4203,7 +4203,7 @@ int K053246_is_IRQ_enabled(void)
  */
 
 #ifdef UNUSED_FUNCTION
-void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect) //*
+void K053247_sprites_draw(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect) //*
 {
 #define NUM_SPRITES 256
 
@@ -4230,7 +4230,7 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 	int offx = (short)((K053246_regs[0] << 8) | K053246_regs[1]);
 	int offy = (short)((K053246_regs[2] << 8) | K053246_regs[3]);
 
-	int screen_width = machine->primary_screen->width();
+	int screen_width = machine.primary_screen->width();
 	UINT8 drawmode_table[256];
 	UINT8 shadowmode_table[256];
 	UINT8 *whichtable;
@@ -4245,9 +4245,9 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 
         VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
     */
-	if (machine->config().m_video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine.config().m_video_attributes & VIDEO_HAS_SHADOWS)
 	{
-		if (bitmap->bpp == 32 && (machine->config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
+		if (bitmap->bpp == 32 && (machine.config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows
@@ -4529,8 +4529,8 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 							color,
 							fx,fy,
 							sx,sy,
-							machine->priority_bitmap,primask,
-							whichtable,machine->shadow_table);
+							machine.priority_bitmap,primask,
+							whichtable,machine.shadow_table);
 				}
 				else
 				{
@@ -4540,8 +4540,8 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 							fx,fy,
 							sx,sy,
 							(zw << 16) >> 4,(zh << 16) >> 4,
-							machine->priority_bitmap,primask,
-							whichtable,machine->shadow_table);
+							machine.priority_bitmap,primask,
+							whichtable,machine.shadow_table);
 				}
 
 				if (mirrory && h == 1)  /* Simpsons shadows */
@@ -4553,8 +4553,8 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 								color,
 								fx,!fy,
 								sx,sy,
-								machine->priority_bitmap,primask,
-								whichtable,machine->shadow_table);
+								machine.priority_bitmap,primask,
+								whichtable,machine.shadow_table);
 					}
 					else
 					{
@@ -4564,8 +4564,8 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 								fx,!fy,
 								sx,sy,
 								(zw << 16) >> 4,(zh << 16) >> 4,
-								machine->priority_bitmap,primask,
-								whichtable,machine->shadow_table);
+								machine.priority_bitmap,primask,
+								whichtable,machine.shadow_table);
 					}
 				}
 			} // end of X loop
@@ -4603,7 +4603,7 @@ static tilemap_t *K051316_tilemap[MAX_K051316];
 
 ***************************************************************************/
 
-INLINE void K051316_get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int chip)
+INLINE void K051316_get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,int chip)
 {
 	int code = K051316_ram[chip][tile_index];
 	int color = K051316_ram[chip][tile_index + 0x400];
@@ -4623,7 +4623,7 @@ static TILE_GET_INFO( K051316_get_tile_info1 ) { K051316_get_tile_info(machine,t
 static TILE_GET_INFO( K051316_get_tile_info2 ) { K051316_get_tile_info(machine,tileinfo,tile_index,2); }
 
 
-static void K051316_vh_start(running_machine *machine,int chip, const char *gfx_memory_region,int bpp,
+static void K051316_vh_start(running_machine &machine,int chip, const char *gfx_memory_region,int bpp,
 		int pen_is_mask,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags))
 {
@@ -4681,7 +4681,7 @@ static void K051316_vh_start(running_machine *machine,int chip, const char *gfx_
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
+		if (machine.gfx[gfx_index] == 0)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -4691,22 +4691,22 @@ static void K051316_vh_start(running_machine *machine,int chip, const char *gfx_
 	case -4:
 		total = 0x400;
 		bpp = 4;
-		decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &charlayout_tail2nos, 4);
+		decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &charlayout_tail2nos, 4);
 		break;
 
 	case 4:
-		total = machine->region(gfx_memory_region)->bytes() / 128;
-		decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &charlayout4, 4);
+		total = machine.region(gfx_memory_region)->bytes() / 128;
+		decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &charlayout4, 4);
 		break;
 
 	case 7:
-		total = machine->region(gfx_memory_region)->bytes() / 256;
-		decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &charlayout7, 7);
+		total = machine.region(gfx_memory_region)->bytes() / 256;
+		decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &charlayout7, 7);
 		break;
 
 	case 8:
-		total = machine->region(gfx_memory_region)->bytes() / 256;
-		decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &charlayout8, 8);
+		total = machine.region(gfx_memory_region)->bytes() / 256;
+		decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &charlayout8, 8);
 		break;
 
 	default:
@@ -4740,21 +4740,21 @@ static void K051316_vh_start(running_machine *machine,int chip, const char *gfx_
 	state_save_register_item(machine, "K051316", NULL, chip, K051316_offset[chip][1]);
 }
 
-void K051316_vh_start_0(running_machine *machine,const char *gfx_memory_region,int bpp,
+void K051316_vh_start_0(running_machine &machine,const char *gfx_memory_region,int bpp,
 		int pen_is_mask,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags))
 {
 	K051316_vh_start(machine,0,gfx_memory_region,bpp,pen_is_mask,transparent_pen,callback);
 }
 
-void K051316_vh_start_1(running_machine *machine,const char *gfx_memory_region,int bpp,
+void K051316_vh_start_1(running_machine &machine,const char *gfx_memory_region,int bpp,
 		int pen_is_mask,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags))
 {
 	K051316_vh_start(machine,1,gfx_memory_region,bpp,pen_is_mask,transparent_pen,callback);
 }
 
-void K051316_vh_start_2(running_machine *machine,const char *gfx_memory_region,int bpp,
+void K051316_vh_start_2(running_machine &machine,const char *gfx_memory_region,int bpp,
 		int pen_is_mask,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags))
 {
@@ -4805,7 +4805,7 @@ WRITE8_HANDLER( K051316_2_w )
 }
 
 
-static int K051316_rom_r(running_machine *machine, int chip, int offset)
+static int K051316_rom_r(running_machine &machine, int chip, int offset)
 {
 	if ((K051316_ctrlram[chip][0x0e] & 0x01) == 0)
 	{
@@ -4813,32 +4813,32 @@ static int K051316_rom_r(running_machine *machine, int chip, int offset)
 
 		addr = offset + (K051316_ctrlram[chip][0x0c] << 11) + (K051316_ctrlram[chip][0x0d] << 19);
 		if (K051316_bpp[chip] <= 4) addr /= 2;
-		addr &= machine->region(K051316_memory_region[chip])->bytes()-1;
+		addr &= machine.region(K051316_memory_region[chip])->bytes()-1;
 
-//  popmessage("%s: offset %04x addr %04x",machine->describe_context(),offset,addr);
+//  popmessage("%s: offset %04x addr %04x",machine.describe_context(),offset,addr);
 
-		return machine->region(K051316_memory_region[chip])->base()[addr];
+		return machine.region(K051316_memory_region[chip])->base()[addr];
 	}
 	else
 	{
-//logerror("%s: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n",machine->describe_context(),offset);
+//logerror("%s: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n",machine.describe_context(),offset);
 		return 0;
 	}
 }
 
 READ8_HANDLER( K051316_rom_0_r )
 {
-	return K051316_rom_r(space->machine,0,offset);
+	return K051316_rom_r(space->machine(),0,offset);
 }
 
 READ8_HANDLER( K051316_rom_1_r )
 {
-	return K051316_rom_r(space->machine,1,offset);
+	return K051316_rom_r(space->machine(),1,offset);
 }
 
 READ8_HANDLER( K051316_rom_2_r )
 {
-	return K051316_rom_r(space->machine,2,offset);
+	return K051316_rom_r(space->machine(),2,offset);
 }
 
 
@@ -4846,7 +4846,7 @@ READ8_HANDLER( K051316_rom_2_r )
 static void K051316_ctrl_w(int chip,int offset,int data)
 {
 	K051316_ctrlram[chip][offset] = data;
-//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n",machine->describe_context(),data,offset);
+//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n",machine.describe_context(),data,offset);
 }
 
 WRITE8_HANDLER( K051316_ctrl_0_w )
@@ -5123,12 +5123,12 @@ static STATE_POSTLOAD( K053251_reset_indexes )
 	K053251_palette_index[4] = 16 * ((K053251_ram[10] >> 3) & 0x07);
 }
 
-void K053251_vh_start(running_machine *machine)
+void K053251_vh_start(running_machine &machine)
 {
 	K053251_set_tilemaps(NULL,NULL,NULL,NULL,NULL);
 
 	state_save_register_global_array(machine, K053251_ram);
-	machine->state().register_postload(K053251_reset_indexes, NULL);
+	machine.state().register_postload(K053251_reset_indexes, NULL);
 }
 
 void K053251_set_tilemaps(tilemap_t *ci0,tilemap_t *ci1,tilemap_t *ci2,tilemap_t *ci3,tilemap_t *ci4)
@@ -5167,7 +5167,7 @@ WRITE8_HANDLER( K053251_w )
 			}
 
 			if (!K053251_tilemaps_set)
-				tilemap_mark_all_tiles_dirty_all(space->machine);
+				tilemap_mark_all_tiles_dirty_all(space->machine());
 		}
 		else if (offset == 10)
 		{
@@ -5185,7 +5185,7 @@ WRITE8_HANDLER( K053251_w )
 			}
 
 			if (!K053251_tilemaps_set)
-				tilemap_mark_all_tiles_dirty_all(space->machine);
+				tilemap_mark_all_tiles_dirty_all(space->machine());
 		}
 	}
 }
@@ -5542,9 +5542,9 @@ int K056832_get_lookup(int bits)
 }
 #endif
 
-static void (*K056832_callback)(running_machine *machine, int layer, int *code, int *color, int *flags);
+static void (*K056832_callback)(running_machine &machine, int layer, int *code, int *color, int *flags);
 
-INLINE void K056832_get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int pageIndex )
+INLINE void K056832_get_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int pageIndex )
 {
 	static const struct K056832_SHIFTMASKS
 	{
@@ -5676,9 +5676,9 @@ static STATE_POSTLOAD( K056832_postload )
 	K056832_change_rombank();
 }
 
-void K056832_vh_start(running_machine *machine, const char *gfx_memory_region, int bpp, int big,
+void K056832_vh_start(running_machine &machine, const char *gfx_memory_region, int bpp, int big,
 	int (*scrolld)[4][2],
-	void (*callback)(running_machine *machine, int layer, int *code, int *color, int *flags),
+	void (*callback)(running_machine &machine, int layer, int *code, int *color, int *flags),
 	int djmain_hack)
 {
 	tilemap_t *tmap;
@@ -5762,7 +5762,7 @@ void K056832_vh_start(running_machine *machine, const char *gfx_memory_region, i
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 	{
-		if (machine->gfx[gfx_index] == 0) break;
+		if (machine.gfx[gfx_index] == 0) break;
 	}
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -5773,52 +5773,52 @@ void K056832_vh_start(running_machine *machine, const char *gfx_memory_region, i
 	switch (bpp)
 	{
 		case K056832_BPP_4:
-			total = machine->region(gfx_memory_region)->bytes() / (i*4);
-			decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &charlayout4, 4);
+			total = machine.region(gfx_memory_region)->bytes() / (i*4);
+			decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &charlayout4, 4);
 			break;
 
 		case K056832_BPP_5:
-			total = machine->region(gfx_memory_region)->bytes() / (i*5);
-			decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &charlayout5, 4);
+			total = machine.region(gfx_memory_region)->bytes() / (i*5);
+			decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &charlayout5, 4);
 			break;
 
 		case K056832_BPP_6:
-			total = machine->region(gfx_memory_region)->bytes() / (i*6);
-			decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &charlayout6, 4);
+			total = machine.region(gfx_memory_region)->bytes() / (i*6);
+			decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &charlayout6, 4);
 			break;
 
 		case K056832_BPP_8:
-			total = machine->region(gfx_memory_region)->bytes() / (i*8);
-			decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &charlayout8, 4);
+			total = machine.region(gfx_memory_region)->bytes() / (i*8);
+			decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &charlayout8, 4);
 			break;
 
 		case K056832_BPP_8LE:
-			total = machine->region(gfx_memory_region)->bytes() / (i*8);
-			decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &charlayout8le, 4);
+			total = machine.region(gfx_memory_region)->bytes() / (i*8);
+			decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &charlayout8le, 4);
 			break;
 
 		case K056832_BPP_8TASMAN:
-			total = machine->region(gfx_memory_region)->bytes() / (i*8);
-			decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &charlayout8_tasman, 4);
+			total = machine.region(gfx_memory_region)->bytes() / (i*8);
+			decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &charlayout8_tasman, 4);
 			break;
 
 		case K056832_BPP_4dj:
-			total = machine->region(gfx_memory_region)->bytes() / (i*4);
-			decode_gfx(machine, gfx_index, machine->region(gfx_memory_region)->base(), total, &charlayout4dj, 4);
+			total = machine.region(gfx_memory_region)->bytes() / (i*4);
+			decode_gfx(machine, gfx_index, machine.region(gfx_memory_region)->base(), total, &charlayout4dj, 4);
 			break;
 
 		default:
 			fatalerror("Unsupported bpp");
 	}
 
-	machine->gfx[gfx_index]->color_granularity = 16; /* override */
+	machine.gfx[gfx_index]->color_granularity = 16; /* override */
 
 	K056832_memory_region = gfx_memory_region;
 	K056832_gfxnum = gfx_index;
 	K056832_callback = callback;
 
-	K056832_rombase = machine->region(gfx_memory_region)->base();
-	K056832_NumGfxBanks = machine->region(gfx_memory_region)->bytes() / 0x2000;
+	K056832_rombase = machine.region(gfx_memory_region)->base();
+	K056832_NumGfxBanks = machine.region(gfx_memory_region)->bytes() / 0x2000;
 	K056832_CurGfxBank = 0;
 	K056832_use_ext_linescroll = 0;
 	K056832_uses_tile_banks = 0;
@@ -5901,7 +5901,7 @@ void K056832_vh_start(running_machine *machine, const char *gfx_memory_region, i
 	state_save_register_global_array(machine, K056832_dy);
 	state_save_register_global_array(machine, K056832_LayerTileMode);
 
-	machine->state().register_postload(K056832_postload, NULL);
+	machine.state().register_postload(K056832_postload, NULL);
 }
 
 /* call if a game uses external linescroll */
@@ -5913,12 +5913,12 @@ void K056832_SetExtLinescroll(void)
 #endif
 
 /* generic helper routine for ROM checksumming */
-static int K056832_rom_read_b(running_machine *machine, int offset, int blksize, int blksize2, int zerosec)
+static int K056832_rom_read_b(running_machine &machine, int offset, int blksize, int blksize2, int zerosec)
 {
 	UINT8 *rombase;
 	int base, ret;
 
-	rombase = (UINT8 *)machine->region(K056832_memory_region)->base();
+	rombase = (UINT8 *)machine.region(K056832_memory_region)->base();
 
 	if ((K056832_rom_half) && (zerosec))
 	{
@@ -5952,11 +5952,11 @@ READ16_HANDLER( K056832_5bpp_rom_word_r )
 {
 	if (mem_mask == 0xff00)
 	{
-		return K056832_rom_read_b(space->machine, offset*2, 4, 5, 0)<<8;
+		return K056832_rom_read_b(space->machine(), offset*2, 4, 5, 0)<<8;
 	}
 	else if (mem_mask == 0x00ff)
 	{
-		return K056832_rom_read_b(space->machine, offset*2+1, 4, 5, 0)<<16;
+		return K056832_rom_read_b(space->machine(), offset*2+1, 4, 5, 0)<<16;
 	}
 	else
 	{
@@ -5970,19 +5970,19 @@ READ32_HANDLER( K056832_5bpp_rom_long_r )
 {
 	if (mem_mask == 0xff000000)
 	{
-		return K056832_rom_read_b(space->machine, offset*4, 4, 5, 0)<<24;
+		return K056832_rom_read_b(space->machine(), offset*4, 4, 5, 0)<<24;
 	}
 	else if (mem_mask == 0x00ff0000)
 	{
-		return K056832_rom_read_b(space->machine, offset*4+1, 4, 5, 0)<<16;
+		return K056832_rom_read_b(space->machine(), offset*4+1, 4, 5, 0)<<16;
 	}
 	else if (mem_mask == 0x0000ff00)
 	{
-		return K056832_rom_read_b(space->machine, offset*4+2, 4, 5, 0)<<8;
+		return K056832_rom_read_b(space->machine(), offset*4+2, 4, 5, 0)<<8;
 	}
 	else if (mem_mask == 0x000000ff)
 	{
-		return K056832_rom_read_b(space->machine, offset*4+3, 4, 5, 1);
+		return K056832_rom_read_b(space->machine(), offset*4+3, 4, 5, 1);
 	}
 	else
 	{
@@ -5995,19 +5995,19 @@ READ32_HANDLER( K056832_6bpp_rom_long_r )
 {
 	if (mem_mask == 0xff000000)
 	{
-		return K056832_rom_read_b(space->machine, offset*4, 4, 6, 0)<<24;
+		return K056832_rom_read_b(space->machine(), offset*4, 4, 6, 0)<<24;
 	}
 	else if (mem_mask == 0x00ff0000)
 	{
-		return K056832_rom_read_b(space->machine, offset*4+1, 4, 6, 0)<<16;
+		return K056832_rom_read_b(space->machine(), offset*4+1, 4, 6, 0)<<16;
 	}
 	else if (mem_mask == 0x0000ff00)
 	{
-		return K056832_rom_read_b(space->machine, offset*4+2, 4, 6, 0)<<8;
+		return K056832_rom_read_b(space->machine(), offset*4+2, 4, 6, 0)<<8;
 	}
 	else if (mem_mask == 0x000000ff)
 	{
-		return K056832_rom_read_b(space->machine, offset*4+3, 4, 6, 0);
+		return K056832_rom_read_b(space->machine(), offset*4+3, 4, 6, 0);
 	}
 	else
 	{
@@ -6031,7 +6031,7 @@ READ16_HANDLER( K056832_rom_word_r )
 
 	if (!K056832_rombase)
 	{
-		K056832_rombase = space->machine->region(K056832_memory_region)->base();
+		K056832_rombase = space->machine().region(K056832_memory_region)->base();
 	}
 	rombase = (UINT8 *)K056832_rombase;
 
@@ -6058,7 +6058,7 @@ READ16_HANDLER( K056832_mw_rom_word_r )
 
 	if (!K056832_rombase)
 	{
-		K056832_rombase = space->machine->region(K056832_memory_region)->base();
+		K056832_rombase = space->machine().region(K056832_memory_region)->base();
 	}
 
 	if (K056832_regsb[2] & 0x8)
@@ -6123,7 +6123,7 @@ READ16_HANDLER( K056832_bishi_rom_word_r )
 
 	if (!K056832_rombase)
 	{
-		K056832_rombase = space->machine->region(K056832_memory_region)->base();
+		K056832_rombase = space->machine().region(K056832_memory_region)->base();
 	}
 
 	return K056832_rombase[addr+2] | (K056832_rombase[addr] << 8);
@@ -6135,7 +6135,7 @@ READ16_HANDLER( K056832_rom_word_8000_r )
 
 	if (!K056832_rombase)
 	{
-		K056832_rombase = space->machine->region(K056832_memory_region)->base();
+		K056832_rombase = space->machine().region(K056832_memory_region)->base();
 	}
 
 	return K056832_rombase[addr+2] | (K056832_rombase[addr] << 8);
@@ -6147,7 +6147,7 @@ READ16_HANDLER( K056832_old_rom_word_r )
 
 	if (!K056832_rombase)
 	{
-		K056832_rombase = space->machine->region(K056832_memory_region)->base();
+		K056832_rombase = space->machine().region(K056832_memory_region)->base();
 	}
 
 	return K056832_rombase[addr+1] | (K056832_rombase[addr] << 8);
@@ -6517,7 +6517,7 @@ WRITE32_HANDLER( K056832_b_long_w )
 }
 #endif
 
-static int K056832_update_linemap(running_machine *machine, bitmap_t *bitmap, int page, int flags)
+static int K056832_update_linemap(running_machine &machine, bitmap_t *bitmap, int page, int flags)
 {
 
 	if (K056832_PageTileMode[page]) return(0);
@@ -6588,8 +6588,8 @@ static int K056832_update_linemap(running_machine *machine, bitmap_t *bitmap, in
 				{ xpr_ptr[count+N] = 0; }
 
 			pixmap  = K056832_pixmap[page];
-			pal_ptr    = machine->pens;
-			src_gfx    = machine->gfx[K056832_gfxnum];
+			pal_ptr    = machine.pens;
+			src_gfx    = machine.gfx[K056832_gfxnum];
 			src_pitch  = src_gfx->line_modulo;
 			src_modulo = src_gfx->char_modulo;
 			dst_pitch  = pixmap->rowpixels;
@@ -6641,7 +6641,7 @@ static int K056832_update_linemap(running_machine *machine, bitmap_t *bitmap, in
 	return(0);
 }
 
-void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, UINT32 flags, UINT32 priority)
+void K056832_tilemap_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, UINT32 flags, UINT32 priority)
 {
 	static int last_colorbase[K056832_PAGE_COUNT];
 
@@ -6931,7 +6931,7 @@ void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rect
 } // end of function
 
 #ifdef UNUSED_FUNCTION
-void K056832_tilemap_draw_dj(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, UINT32 flags, UINT32 priority) //*
+void K056832_tilemap_draw_dj(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, UINT32 flags, UINT32 priority) //*
 {
 	static int last_colorbase[K056832_PAGE_COUNT];
 
@@ -7256,7 +7256,7 @@ int K056832_read_register(int regnum)
 
 static UINT8 k55555_regs[128];
 
-void K055555_vh_start(running_machine *machine)
+void K055555_vh_start(running_machine &machine)
 {
 	state_save_register_global_array(machine, k55555_regs);
 
@@ -7347,7 +7347,7 @@ static int K054338_alphainverted;
 // K054338 alpha blend / final mixer (normally used with the 55555)
 // because the implementation is video dependant, this is just a
 // register-handling shell.
-void K054338_vh_start(running_machine *machine)
+void K054338_vh_start(running_machine &machine)
 {
 	memset(k54338_regs, 0, sizeof(UINT16)*32);
 	memset(K054338_shdRGB, 0, sizeof(int)*9);
@@ -7374,7 +7374,7 @@ int K054338_read_register(int reg)
 	return k54338_regs[reg];
 }
 
-void K054338_update_all_shadows(running_machine *machine, int rushingheroes_hack)
+void K054338_update_all_shadows(running_machine &machine, int rushingheroes_hack)
 {
 	int i, d;
 	int noclip = k54338_regs[K338_REG_CONTROL] & K338_CTL_CLIPSL;
@@ -7423,13 +7423,13 @@ void K054338_fill_solid_bg(bitmap_t *bitmap)
 #endif
 
 // Unified K054338/K055555 BG color fill
-void K054338_fill_backcolor(running_machine *machine, bitmap_t *bitmap, int mode) // (see p.67)
+void K054338_fill_backcolor(running_machine &machine, bitmap_t *bitmap, int mode) // (see p.67)
 {
 	int clipx, clipy, clipw, cliph, i, dst_pitch;
 	int BGC_CBLK, BGC_SET;
 	UINT32 *dst_ptr, *pal_ptr;
 	int bgcolor;
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	clipx = visarea.min_x & ~3;
 	clipy = visarea.min_y;
@@ -7441,7 +7441,7 @@ void K054338_fill_backcolor(running_machine *machine, bitmap_t *bitmap, int mode
 	dst_ptr += clipx;
 
 	BGC_SET = 0;
-	pal_ptr = machine->generic.paletteram.u32;
+	pal_ptr = machine.generic.paletteram.u32;
 
 	if (!mode)
 	{
@@ -7592,14 +7592,14 @@ void K053250_set_LayerOffset(int chip, int offsx, int offsy)
 
 // The DMA process should be instantaneous but since rendering in MAME is performed at SCREEN_UPDATE()
 // the K053250 memory must be buffered to maintain visual integrity.
-static void K053250_dma(running_machine *machine, int chip, int limiter)
+static void K053250_dma(running_machine &machine, int chip, int limiter)
 {
 	struct K053250_CHIPTAG *chip_ptr;
 	int last_frame, current_frame;
 
 	chip_ptr = &K053250_info.chip[chip];
 
-	current_frame = machine->primary_screen->frame_number();
+	current_frame = machine.primary_screen->frame_number();
 	last_frame = chip_ptr->frame;
 
 	if (limiter && current_frame == last_frame) return; // make sure we only do DMA transfer once per frame
@@ -7610,13 +7610,13 @@ static void K053250_dma(running_machine *machine, int chip, int limiter)
 }
 
 // Pixel data of the K053250 is nibble packed. It's preferable to be unpacked into byte format.
-void K053250_unpack_pixels(running_machine *machine, const char *region)
+void K053250_unpack_pixels(running_machine &machine, const char *region)
 {
 	UINT8 *src_ptr, *dst_ptr;
 	int hi_nibble, lo_nibble, offset;
 
-	dst_ptr = src_ptr = machine->region(region)->base();
-	offset = machine->region(region)->bytes() / 2 - 1;
+	dst_ptr = src_ptr = machine.region(region)->base();
+	offset = machine.region(region)->bytes() / 2 - 1;
 
 	do
 	{
@@ -7629,7 +7629,7 @@ void K053250_unpack_pixels(running_machine *machine, const char *region)
 	while ((--offset) >= 0);
 }
 
-void K053250_vh_start(running_machine *machine, int chips, const char **region)
+void K053250_vh_start(running_machine &machine, int chips, const char **region)
 {
 	UINT16 *ram;
 	int chip;
@@ -7638,14 +7638,14 @@ void K053250_vh_start(running_machine *machine, int chips, const char **region)
 
 	for(chip=0; chip<chips; chip++)
 	{
-		K053250_info.chip[chip].base = machine->region(region[chip])->base();
+		K053250_info.chip[chip].base = machine.region(region[chip])->base();
 		ram = auto_alloc_array(machine, UINT16, 0x6000/2);
 		K053250_info.chip[chip].ram = ram;
 		K053250_info.chip[chip].rammax = ram + 0x800;
 		K053250_info.chip[chip].buffer[0] = ram + 0x2000;
 		K053250_info.chip[chip].buffer[1] = ram + 0x2800;
 		memset(ram+0x2000, 0, 0x2000);
-		K053250_info.chip[chip].rommask = machine->region(region[chip])->bytes();
+		K053250_info.chip[chip].rommask = machine.region(region[chip])->bytes();
 		K053250_info.chip[chip].page[1] = K053250_info.chip[chip].page[0] = 0;
 		K053250_info.chip[chip].offsy = K053250_info.chip[chip].offsx = 0;
 		K053250_info.chip[chip].frame = -1;
@@ -7660,7 +7660,7 @@ WRITE16_HANDLER( K053250_0_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		// start LVC DMA transfer at the falling edge of control register's bit1
-		if (offset == 4 && !(data & 2) && (K053250_info.chip[0].regs[4] & 2)) K053250_dma(space->machine, 0, 1);
+		if (offset == 4 && !(data & 2) && (K053250_info.chip[0].regs[4] & 2)) K053250_dma(space->machine(), 0, 1);
 
 		K053250_info.chip[0].regs[offset] = data;
 	}
@@ -7694,7 +7694,7 @@ WRITE16_HANDLER( K053250_1_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		// start LVC DMA transfer at the falling edge of control register's bit1
-		if (offset == 4 && !(data & 2) && (K053250_info.chip[1].regs[4] & 2)) K053250_dma(space->machine, 1, 1);
+		if (offset == 4 && !(data & 2) && (K053250_info.chip[1].regs[4] & 2)) K053250_dma(space->machine(), 1, 1);
 
 		K053250_info.chip[1].regs[offset] = data;
 	}
@@ -7897,12 +7897,12 @@ static void K053250_pdraw_scanline8(
 	}
 }
 
-void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int colorbase, int pri)
+void K053250_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int colorbase, int pri)
 {
 	static int pmode[2] = {-1,-1};
 	static int kc=-1, kk=0, kxx=-105, kyy=0;
 
-	const rectangle area = *machine->primary_screen->visible_area();
+	const rectangle area = *machine.primary_screen->visible_area();
 	UINT16 *line;
 	int delta, dim1, dim1_max, dim2_max;
 	UINT32 mask1, mask2;
@@ -8087,11 +8087,11 @@ void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *c
 		}
 		if(orientation & ORIENTATION_SWAP_XY)
 			K053250_pdraw_scanline8(bitmap, area.min_y, area.min_x+dim1, dim2_max, scanline,
-							machine->pens + ((dim1 == kc ? 0x200 : colorbase) | ((color & 0x0f) << 4)),
+							machine.pens + ((dim1 == kc ? 0x200 : colorbase) | ((color & 0x0f) << 4)),
 							0, orientation, pri);
 		else
 			K053250_pdraw_scanline8(bitmap, area.min_x, area.min_y+dim1, dim2_max, scanline,
-							machine->pens + ((dim1 == kc ? 0x200 : colorbase) | ((color & 0x0f) << 4)),
+							machine.pens + ((dim1 == kc ? 0x200 : colorbase) | ((color & 0x0f) << 4)),
 							0, orientation, pri);
 	}
 }
@@ -8264,7 +8264,7 @@ INLINE void K053250_pdraw_scanline32(bitmap_t *bitmap, const pen_t *palette, UIN
 #undef FIXPOINT_PRECISION_HALF
 }
 
-void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int colorbase, int flags, int priority)
+void K053250_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int colorbase, int flags, int priority)
 {
 	struct K053250_CHIPTAG *chip_ptr;
 	UINT16 *line_ram;
@@ -8412,7 +8412,7 @@ void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *c
 	linedata_offs += line_start * linedata_adv;		// pre-advance line info offset for the clipped region
 
 	// load physical palette base
-	pal_base = machine->pens + (colorbase << 4) % machine->total_colors();
+	pal_base = machine.pens + (colorbase << 4) % machine.total_colors();
 
 	// walk the target bitmap within the visible area vertically or horizontally, one line at a time
 	for (line_pos=line_start; line_pos<=line_end; linedata_offs+=linedata_adv, line_pos++)
@@ -8470,7 +8470,7 @@ void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *c
                 priority     : value to be written to the priority bitmap, no effect when equals zero
             */
 			K053250_pdraw_scanline32(bitmap, pal_ptr, pix_ptr, cliprect,
-				line_pos, scroll, zoom, src_clipmask, src_wrapmask, orientation, machine->priority_bitmap, (UINT8)priority);
+				line_pos, scroll, zoom, src_clipmask, src_wrapmask, orientation, machine.priority_bitmap, (UINT8)priority);
 
 			// shift scanline position one virtual screen upward to render the wrapped end if necessary
 			scroll -= dst_height;

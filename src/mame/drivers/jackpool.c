@@ -39,8 +39,8 @@ static VIDEO_START(jackpool)
 
 static SCREEN_UPDATE(jackpool)
 {
-	jackpool_state *state = screen->machine->driver_data<jackpool_state>();
-	const gfx_element *gfx = screen->machine->gfx[0];
+	jackpool_state *state = screen->machine().driver_data<jackpool_state>();
+	const gfx_element *gfx = screen->machine().gfx[0];
 	int count;// = 0x00000/2;
 
 	int y,x;
@@ -90,27 +90,27 @@ static READ16_HANDLER( jackpool_ff_r )
 
 static READ16_HANDLER( jackpool_io_r )
 {
-	jackpool_state *state = space->machine->driver_data<jackpool_state>();
+	jackpool_state *state = space->machine().driver_data<jackpool_state>();
 	switch(offset*2)
 	{
-		case 0x00: return input_port_read(space->machine,"COIN1");
-		case 0x04: return input_port_read(space->machine,"UNK1");
-		case 0x06: return input_port_read(space->machine,"UNK2");
-		case 0x08: return input_port_read(space->machine,"SERVICE1");
-		case 0x0a: return input_port_read(space->machine,"SERVICE2");//probably not a button, remote?
-		case 0x0c: return input_port_read(space->machine,"PAYOUT");
-		case 0x0e: return input_port_read(space->machine,"START2");
-		case 0x10: return input_port_read(space->machine,"HOLD3");
-		case 0x12: return input_port_read(space->machine,"HOLD4");
-		case 0x14: return input_port_read(space->machine,"HOLD2");
-		case 0x16: return input_port_read(space->machine,"HOLD1");
-		case 0x18: return input_port_read(space->machine,"HOLD5");
-		case 0x1a: return input_port_read(space->machine,"START1");
-		case 0x1c: return input_port_read(space->machine,"BET");
+		case 0x00: return input_port_read(space->machine(),"COIN1");
+		case 0x04: return input_port_read(space->machine(),"UNK1");
+		case 0x06: return input_port_read(space->machine(),"UNK2");
+		case 0x08: return input_port_read(space->machine(),"SERVICE1");
+		case 0x0a: return input_port_read(space->machine(),"SERVICE2");//probably not a button, remote?
+		case 0x0c: return input_port_read(space->machine(),"PAYOUT");
+		case 0x0e: return input_port_read(space->machine(),"START2");
+		case 0x10: return input_port_read(space->machine(),"HOLD3");
+		case 0x12: return input_port_read(space->machine(),"HOLD4");
+		case 0x14: return input_port_read(space->machine(),"HOLD2");
+		case 0x16: return input_port_read(space->machine(),"HOLD1");
+		case 0x18: return input_port_read(space->machine(),"HOLD5");
+		case 0x1a: return input_port_read(space->machine(),"START1");
+		case 0x1c: return input_port_read(space->machine(),"BET");
 		case 0x1e: return 0xff; //ticket motor
 		case 0x20: return 0xff; //hopper motor
-    	case 0x2c: return eeprom_read_bit(space->machine->device("eeprom"));
-    	case 0x2e: return eeprom_read_bit(space->machine->device("eeprom"));
+    	case 0x2c: return eeprom_read_bit(space->machine().device("eeprom"));
+    	case 0x2e: return eeprom_read_bit(space->machine().device("eeprom"));
 //      default: printf("R %02x\n",offset*2); break;
 	}
 
@@ -120,7 +120,7 @@ static READ16_HANDLER( jackpool_io_r )
 
 static WRITE16_HANDLER( jackpool_io_w )
 {
-	jackpool_state *state = space->machine->driver_data<jackpool_state>();
+	jackpool_state *state = space->machine().driver_data<jackpool_state>();
 	COMBINE_DATA(&state->io[offset]);
 
 	switch(offset*2)
@@ -138,11 +138,11 @@ static WRITE16_HANDLER( jackpool_io_w )
 		case 0x4a: /* ---- ---x Ticket motor */break;
 		case 0x4c: /* ---- ---x Hopper motor */break;
 		case 0x4e: state->map_vreg = data & 1;        break;
-		case 0x50: eeprom_set_cs_line(space->machine->device("eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
-		case 0x52: eeprom_set_clock_line(space->machine->device("eeprom"), (data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
-		case 0x54: eeprom_write_bit(space->machine->device("eeprom"), data & 1); break;
-//      case 0x5a: eeprom_set_cs_line(space->machine->device("eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
-//      case 0x5c: eeprom_set_cs_line(space->machine->device("eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
+		case 0x50: eeprom_set_cs_line(space->machine().device("eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
+		case 0x52: eeprom_set_clock_line(space->machine().device("eeprom"), (data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
+		case 0x54: eeprom_write_bit(space->machine().device("eeprom"), data & 1); break;
+//      case 0x5a: eeprom_set_cs_line(space->machine().device("eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
+//      case 0x5c: eeprom_set_cs_line(space->machine().device("eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
 		case 0x60: break;
 //      default: printf("[%02x] <- %02x W\n",offset*2,data);      break;
 	}
@@ -151,17 +151,17 @@ static WRITE16_HANDLER( jackpool_io_w )
 	if(offset*2 == 0x54)
 	{
 		printf("Write bit %02x\n",data);
-		eeprom_write_bit(space->machine->device("eeprom"), data & 1);
+		eeprom_write_bit(space->machine().device("eeprom"), data & 1);
 	}
 	if(offset*2 == 0x52)
 	{
 		printf("Clock bit %02x\n",data);
-		eeprom_set_clock_line(space->machine->device("eeprom"), (data & 1) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(space->machine().device("eeprom"), (data & 1) ? ASSERT_LINE : CLEAR_LINE );
 	}
 	if(offset*2 == 0x50)
 	{
 		printf("chip select bit %02x\n",data);
-		eeprom_set_cs_line(space->machine->device("eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line(space->machine().device("eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE );
 	}
 	#endif
 }
@@ -294,7 +294,7 @@ ROM_END
 
 static DRIVER_INIT( jackpool )
 {
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 
 	/* patch NVRAM routine */
 	rom[0x9040/2] = 0x6602;

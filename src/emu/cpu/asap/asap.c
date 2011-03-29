@@ -194,7 +194,7 @@ device_config *asap_device_config::static_alloc_device_config(const machine_conf
 
 device_t *asap_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, asap_device(machine, *this));
+	return auto_alloc(machine, asap_device(machine, *this));
 }
 
 

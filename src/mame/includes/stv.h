@@ -17,7 +17,7 @@ DRIVER_INIT ( stv );
 
 /*----------- defined in drivers/stvinit.c -----------*/
 
-void install_stvbios_speedups(running_machine *machine);
+void install_stvbios_speedups(running_machine &machine);
 DRIVER_INIT(mausuke);
 DRIVER_INIT(puyosun);
 DRIVER_INIT(shienryu);
@@ -66,8 +66,8 @@ extern int stv_framebuffer_double_interlace;
 extern int stv_framebuffer_mode;
 extern UINT8* stv_vdp1_gfx_decode;
 
-int stv_vdp1_start ( running_machine *machine );
-void video_update_vdp1(running_machine *machine);
+int stv_vdp1_start ( running_machine &machine );
+void video_update_vdp1(running_machine &machine);
 
 READ32_HANDLER( stv_vdp1_regs_r );
 WRITE32_HANDLER( stv_vdp1_regs_w );
@@ -84,7 +84,7 @@ extern UINT32* stv_vdp2_vram;
 extern int stv_vblank,stv_hblank;
 extern UINT32* stv_vdp2_cram;
 
-UINT8 stv_get_vblank(running_machine *machine);
+UINT8 stv_get_vblank(running_machine &machine);
 
 WRITE32_HANDLER ( stv_vdp2_vram_w );
 READ32_HANDLER ( stv_vdp2_vram_r );

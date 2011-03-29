@@ -116,14 +116,14 @@ public:
 
 static WRITE8_HANDLER( luckgrln_reel1_ram_w )
 {
-	luckgrln_state *state = space->machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->reel1_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel1_tilemap,offset);
 }
 
 static WRITE8_HANDLER( luckgrln_reel1_attr_w )
 {
-	luckgrln_state *state = space->machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->reel1_attr[offset] = data;
 	tilemap_mark_tile_dirty(state->reel1_tilemap,offset);
 }
@@ -132,7 +132,7 @@ static WRITE8_HANDLER( luckgrln_reel1_attr_w )
 
 static TILE_GET_INFO( get_luckgrln_reel1_tile_info )
 {
-	luckgrln_state *state = machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = machine.driver_data<luckgrln_state>();
 	int code = state->reel1_ram[tile_index];
 	int attr = state->reel1_attr[tile_index];
 	int col = (attr & 0x1f);
@@ -150,14 +150,14 @@ static TILE_GET_INFO( get_luckgrln_reel1_tile_info )
 
 static WRITE8_HANDLER( luckgrln_reel2_ram_w )
 {
-	luckgrln_state *state = space->machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->reel2_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel2_tilemap,offset);
 }
 
 static WRITE8_HANDLER( luckgrln_reel2_attr_w )
 {
-	luckgrln_state *state = space->machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->reel2_attr[offset] = data;
 	tilemap_mark_tile_dirty(state->reel2_tilemap,offset);
 }
@@ -165,7 +165,7 @@ static WRITE8_HANDLER( luckgrln_reel2_attr_w )
 
 static TILE_GET_INFO( get_luckgrln_reel2_tile_info )
 {
-	luckgrln_state *state = machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = machine.driver_data<luckgrln_state>();
 	int code = state->reel2_ram[tile_index];
 	int attr = state->reel2_attr[tile_index];
 	int col = (attr & 0x1f);
@@ -182,14 +182,14 @@ static TILE_GET_INFO( get_luckgrln_reel2_tile_info )
 
 static WRITE8_HANDLER( luckgrln_reel3_ram_w )
 {
-	luckgrln_state *state = space->machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->reel3_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel3_tilemap,offset);
 }
 
 static WRITE8_HANDLER( luckgrln_reel3_attr_w )
 {
-	luckgrln_state *state = space->machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->reel3_attr[offset] = data;
 	tilemap_mark_tile_dirty(state->reel3_tilemap,offset);
 }
@@ -197,7 +197,7 @@ static WRITE8_HANDLER( luckgrln_reel3_attr_w )
 
 static TILE_GET_INFO( get_luckgrln_reel3_tile_info )
 {
-	luckgrln_state *state = machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = machine.driver_data<luckgrln_state>();
 	int code = state->reel3_ram[tile_index];
 	int attr = state->reel3_attr[tile_index];
 	int col = (attr & 0x1f);
@@ -213,14 +213,14 @@ static TILE_GET_INFO( get_luckgrln_reel3_tile_info )
 
 static WRITE8_HANDLER( luckgrln_reel4_ram_w )
 {
-	luckgrln_state *state = space->machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->reel4_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel4_tilemap,offset);
 }
 
 static WRITE8_HANDLER( luckgrln_reel4_attr_w )
 {
-	luckgrln_state *state = space->machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->reel4_attr[offset] = data;
 	tilemap_mark_tile_dirty(state->reel4_tilemap,offset);
 }
@@ -228,7 +228,7 @@ static WRITE8_HANDLER( luckgrln_reel4_attr_w )
 
 static TILE_GET_INFO( get_luckgrln_reel4_tile_info )
 {
-	luckgrln_state *state = machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = machine.driver_data<luckgrln_state>();
 	int code = state->reel4_ram[tile_index];
 	int attr = state->reel4_attr[tile_index];
 	int col = (attr & 0x1f);
@@ -244,7 +244,7 @@ static TILE_GET_INFO( get_luckgrln_reel4_tile_info )
 
 static VIDEO_START(luckgrln)
 {
-	luckgrln_state *state = machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = machine.driver_data<luckgrln_state>();
 	state->reel1_tilemap = tilemap_create(machine,get_luckgrln_reel1_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
 	state->reel2_tilemap = tilemap_create(machine,get_luckgrln_reel2_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
 	state->reel3_tilemap = tilemap_create(machine,get_luckgrln_reel3_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
@@ -263,7 +263,7 @@ static VIDEO_START(luckgrln)
 
 static SCREEN_UPDATE(luckgrln)
 {
-	luckgrln_state *state = screen->machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = screen->machine().driver_data<luckgrln_state>();
 	int y,x;
 	int count = 0;
 	const rectangle &visarea = screen->visible_area();
@@ -341,10 +341,10 @@ static SCREEN_UPDATE(luckgrln)
 				if (bgenable==3) tilemap_draw(bitmap, &clip, state->reel4_tilemap, 0, 0);
 			}
 
-			if (tileattr&0x08) drawgfx_transpen(bitmap,&clip,screen->machine->gfx[region],tile,col,0,0,x*8,y*8, 0);
+			if (tileattr&0x08) drawgfx_transpen(bitmap,clip,screen->machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
 
 #else // treat it as priority flag instead (looks better in non-adult title screen - needs verifying)
-			if (!(tileattr&0x08)) drawgfx_transpen(bitmap,&clip,screen->machine->gfx[region],tile,col,0,0,x*8,y*8, 0);
+			if (!(tileattr&0x08)) drawgfx_transpen(bitmap,&clip,screen->machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
 
 			if (tileattr&0x04)
 			{
@@ -354,7 +354,7 @@ static SCREEN_UPDATE(luckgrln)
 				if (bgenable==3) tilemap_draw(bitmap, &clip, state->reel4_tilemap, 0, 0);
 			}
 
-			if ((tileattr&0x08)) drawgfx_transpen(bitmap,&clip,screen->machine->gfx[region],tile,col,0,0,x*8,y*8, 0);
+			if ((tileattr&0x08)) drawgfx_transpen(bitmap,&clip,screen->machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
 #endif
 
 			count++;
@@ -401,7 +401,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( output_w )
 {
-	luckgrln_state *state = space->machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	/* correct? */
 	if (data==0x84)
 		state->nmi_enable = 0;
@@ -415,19 +415,19 @@ static WRITE8_HANDLER( output_w )
 
 static WRITE8_HANDLER( palette_offset_low_w )
 {
-	luckgrln_state *state = space->machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->palette_count = data<<1;
 }
 static WRITE8_HANDLER( palette_offset_high_w )
 {
-	luckgrln_state *state = space->machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->palette_count = state->palette_count | data<<9;
 }
 
 
 static WRITE8_HANDLER( palette_w )
 {
-	luckgrln_state *state = space->machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->palette_ram[state->palette_count] = data;
 
 
@@ -442,7 +442,7 @@ static WRITE8_HANDLER( palette_w )
 		g = (dat >> 5) & 0x1f;
 		b = (dat >> 10) & 0x1f;
 
-		palette_set_color_rgb(space->machine, offs/2, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(space->machine(), offs/2, pal5bit(r), pal5bit(g), pal5bit(b));
 
 	}
 
@@ -454,7 +454,7 @@ static WRITE8_HANDLER( palette_w )
 static READ8_HANDLER( rtc_r )
 {
 	system_time systime;
-	space->machine->base_datetime(systime);
+	space->machine().base_datetime(systime);
 
 	switch(offset)
 	{
@@ -534,10 +534,10 @@ static WRITE8_HANDLER(counters_w)
     xxxx ----  unused
 
 */
-	coin_counter_w(space->machine, 0, data & 0x01);	/* COIN 1 */
-	coin_counter_w(space->machine, 1, data & 0x04);	/* COIN 2 */
-	coin_counter_w(space->machine, 2, data & 0x08);	/* COIN 3 */
-	coin_counter_w(space->machine, 3, data & 0x02);	/* KEY IN */
+	coin_counter_w(space->machine(), 0, data & 0x01);	/* COIN 1 */
+	coin_counter_w(space->machine(), 1, data & 0x04);	/* COIN 2 */
+	coin_counter_w(space->machine(), 2, data & 0x08);	/* COIN 3 */
+	coin_counter_w(space->machine(), 3, data & 0x02);	/* KEY IN */
 }
 
 
@@ -841,9 +841,9 @@ static const mc6845_interface mc6845_intf =
 
 static INTERRUPT_GEN( luckgrln_irq )
 {
-	luckgrln_state *state = device->machine->driver_data<luckgrln_state>();
+	luckgrln_state *state = device->machine().driver_data<luckgrln_state>();
 	if(state->nmi_enable)
-		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( luckgrln, luckgrln_state )
@@ -875,7 +875,7 @@ static DRIVER_INIT( luckgrln )
 {
 	int i;
 	UINT8 x,v;
-	UINT8* rom = machine->region("rom_data")->base();
+	UINT8* rom = machine.region("rom_data")->base();
 
 	for (i=0;i<0x20000;i++)
 	{
@@ -891,7 +891,7 @@ static DRIVER_INIT( luckgrln )
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"decrypted_%s", machine->system().name);
+		sprintf(filename,"decrypted_%s", machine.system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{

@@ -16,9 +16,9 @@ class Triangle
 {
 	public:
 		Triangle() { fatalerror("Please don't use the default constructor for N64::RDP::Triangle\n"); }
-		Triangle(running_machine *machine, bool shade, bool texture, bool zbuffer, bool rect, bool flip);
+		Triangle(running_machine &machine, bool shade, bool texture, bool zbuffer, bool rect, bool flip);
 
-		void InitFromData(running_machine* machine, bool shade, bool texture, bool zbuffer, bool rect, bool flip);
+		void InitFromData(running_machine& machine, bool shade, bool texture, bool zbuffer, bool rect, bool flip);
 		void Draw();
 
 	private:

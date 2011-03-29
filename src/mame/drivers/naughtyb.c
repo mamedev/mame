@@ -112,15 +112,15 @@ TODO:
 
 static READ8_HANDLER( in0_port_r )
 {
-	naughtyb_state *state = space->machine->driver_data<naughtyb_state>();
-	int in0 = input_port_read(space->machine, "IN0");
+	naughtyb_state *state = space->machine().driver_data<naughtyb_state>();
+	int in0 = input_port_read(space->machine(), "IN0");
 
 	if ( state->cocktail )
 	{
 		// cabinet == cocktail -AND- handling player 2
 
 		in0 = ( in0 & 0x03 ) |				// start buttons
-			  ( input_port_read(space->machine, "IN0_COCKTAIL") & 0xFC );	// cocktail inputs
+			  ( input_port_read(space->machine(), "IN0_COCKTAIL") & 0xFC );	// cocktail inputs
 	}
 
 	return in0;
@@ -130,8 +130,8 @@ static READ8_HANDLER( dsw0_port_r )
 {
 	// vblank replaces the cabinet dip
 
-	return ( ( input_port_read(space->machine, "DSW0") & 0x7F ) |		// dsw0
-			 ( input_port_read(space->machine, "FAKE") & 0x80 ) );		// vblank
+	return ( ( input_port_read(space->machine(), "DSW0") & 0x7F ) |		// dsw0
+			 ( input_port_read(space->machine(), "FAKE") & 0x80 ) );		// vblank
 }
 
 /* Pop Flamer
@@ -144,7 +144,7 @@ static READ8_HANDLER( dsw0_port_r )
 
 static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 {
-	naughtyb_state *state = space->machine->driver_data<naughtyb_state>();
+	naughtyb_state *state = space->machine().driver_data<naughtyb_state>();
 	static const int seed00[4] = { 0x78, 0x68, 0x48, 0x38|0x80 };
 	static const int seed10[4] = { 0x68, 0x60, 0x68, 0x60|0x80 };
 	UINT8 seedxx;
@@ -184,7 +184,7 @@ static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 
 static WRITE8_HANDLER( popflame_protection_w )
 {
-	naughtyb_state *state = space->machine->driver_data<naughtyb_state>();
+	naughtyb_state *state = space->machine().driver_data<naughtyb_state>();
 	/*
     Alternative protection check is executed at the end of stage 3, it seems some kind of pseudo "EEPROM" device:
 2720: 21 98 B0      ld   hl,$B098
@@ -284,7 +284,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( naughtyb_interrupt )
 {
-	if (input_port_read(device->machine, "FAKE") & 1)
+	if (input_port_read(device->machine(), "FAKE") & 1)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -854,22 +854,22 @@ ROM_END
 static DRIVER_INIT( popflame )
 {
 	/* install a handler to catch protection checks */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x9000, 0x9000, FUNC(popflame_protection_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x9090, 0x9090, FUNC(popflame_protection_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x9000, 0x9000, FUNC(popflame_protection_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x9090, 0x9090, FUNC(popflame_protection_r));
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xb000, 0xb0ff, FUNC(popflame_protection_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xb000, 0xb0ff, FUNC(popflame_protection_w));
 }
 
 
 static READ8_HANDLER( trvmstr_questions_r )
 {
-	naughtyb_state *state = space->machine->driver_data<naughtyb_state>();
-	return space->machine->region("user1")->base()[state->question_offset];
+	naughtyb_state *state = space->machine().driver_data<naughtyb_state>();
+	return space->machine().region("user1")->base()[state->question_offset];
 }
 
 static WRITE8_HANDLER( trvmstr_questions_w )
 {
-	naughtyb_state *state = space->machine->driver_data<naughtyb_state>();
+	naughtyb_state *state = space->machine().driver_data<naughtyb_state>();
 	switch(offset)
 	{
 	case 0:
@@ -887,7 +887,7 @@ static WRITE8_HANDLER( trvmstr_questions_w )
 static DRIVER_INIT( trvmstr )
 {
 	/* install questions' handlers  */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc000, 0xc002, FUNC(trvmstr_questions_r), FUNC(trvmstr_questions_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc000, 0xc002, FUNC(trvmstr_questions_r), FUNC(trvmstr_questions_w));
 }
 
 

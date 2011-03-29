@@ -206,7 +206,7 @@ TODO:
 
 static WRITE8_HANDLER( rallyx_interrupt_vector_w )
 {
-	rallyx_state *state = space->machine->driver_data<rallyx_state>();
+	rallyx_state *state = space->machine().driver_data<rallyx_state>();
 
 	device_set_input_line_vector(state->maincpu, 0, data);
 	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
@@ -215,7 +215,7 @@ static WRITE8_HANDLER( rallyx_interrupt_vector_w )
 
 static WRITE8_HANDLER( rallyx_bang_w )
 {
-	rallyx_state *state = space->machine->driver_data<rallyx_state>();
+	rallyx_state *state = space->machine().driver_data<rallyx_state>();
 
 	if (data == 0 && state->last_bang != 0)
 		sample_start(state->samples, 0, 0, 0);
@@ -225,7 +225,7 @@ static WRITE8_HANDLER( rallyx_bang_w )
 
 static WRITE8_HANDLER( rallyx_latch_w )
 {
-	rallyx_state *state = space->machine->driver_data<rallyx_state>();
+	rallyx_state *state = space->machine().driver_data<rallyx_state>();
 	int bit = data & 1;
 
 	switch (offset)
@@ -242,28 +242,28 @@ static WRITE8_HANDLER( rallyx_latch_w )
 
 		case 0x02:	/* SOUND ON */
 			/* this doesn't work in New Rally X so I'm not supporting it */
-//          pacman_sound_enable_w(space->machine->device("namco"), bit);
+//          pacman_sound_enable_w(space->machine().device("namco"), bit);
 			break;
 
 		case 0x03:	/* FLIP */
-			flip_screen_set_no_update(space->machine, bit);
-			tilemap_set_flip_all(space->machine, bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
+			flip_screen_set_no_update(space->machine(), bit);
+			tilemap_set_flip_all(space->machine(), bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
 			break;
 
 		case 0x04:
-			set_led_status(space->machine, 0, bit);
+			set_led_status(space->machine(), 0, bit);
 			break;
 
 		case 0x05:
-			set_led_status(space->machine, 1, bit);
+			set_led_status(space->machine(), 1, bit);
 			break;
 
 		case 0x06:
-			coin_lockout_w(space->machine, 0, !bit);
+			coin_lockout_w(space->machine(), 0, !bit);
 			break;
 
 		case 0x07:
-			coin_counter_w(space->machine, 0, bit);
+			coin_counter_w(space->machine(), 0, bit);
 			break;
 	}
 }
@@ -271,7 +271,7 @@ static WRITE8_HANDLER( rallyx_latch_w )
 
 static WRITE8_HANDLER( locomotn_latch_w )
 {
-	rallyx_state *state = space->machine->driver_data<rallyx_state>();
+	rallyx_state *state = space->machine().driver_data<rallyx_state>();
 	int bit = data & 1;
 
 	switch (offset)
@@ -289,19 +289,19 @@ static WRITE8_HANDLER( locomotn_latch_w )
 			break;
 
 		case 0x03:	/* FLIP */
-			flip_screen_set_no_update(space->machine, bit);
-			tilemap_set_flip_all(space->machine, bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
+			flip_screen_set_no_update(space->machine(), bit);
+			tilemap_set_flip_all(space->machine(), bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
 			break;
 
 		case 0x04:	/* OUT1 */
-			coin_counter_w(space->machine, 0, bit);
+			coin_counter_w(space->machine(), 0, bit);
 			break;
 
 		case 0x05:	/* OUT2 */
 			break;
 
 		case 0x06:	/* OUT3 */
-			coin_counter_w(space->machine, 1,bit);
+			coin_counter_w(space->machine(), 1,bit);
 			break;
 
 		case 0x07:	/* STARSON */
@@ -877,10 +877,10 @@ static const samples_interface rallyx_samples_interface =
 
 static MACHINE_START( rallyx )
 {
-	rallyx_state *state = machine->driver_data<rallyx_state>();
+	rallyx_state *state = machine.driver_data<rallyx_state>();
 
-	state->maincpu = machine->device<cpu_device>("maincpu");
-	state->samples = machine->device("samples");
+	state->maincpu = machine.device<cpu_device>("maincpu");
+	state->samples = machine.device("samples");
 
 	state->save_item(NAME(state->last_bang));
 	state->save_item(NAME(state->stars_enable));
@@ -888,7 +888,7 @@ static MACHINE_START( rallyx )
 
 static MACHINE_RESET( rallyx )
 {
-	rallyx_state *state = machine->driver_data<rallyx_state>();
+	rallyx_state *state = machine.driver_data<rallyx_state>();
 
 	state->last_bang = 0;
 	state->stars_enable = 0;

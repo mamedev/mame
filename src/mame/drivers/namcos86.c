@@ -184,29 +184,29 @@ TODO:
 
 static WRITE8_HANDLER( bankswitch1_w )
 {
-	UINT8 *base = space->machine->region("cpu1")->base() + 0x10000;
+	UINT8 *base = space->machine().region("cpu1")->base() + 0x10000;
 
 	/* if the ROM expansion module is available, don't do anything. This avoids conflict */
 	/* with bankswitch1_ext_w() in wndrmomo */
-	if (space->machine->region("user1")->base()) return;
+	if (space->machine().region("user1")->base()) return;
 
-	memory_set_bankptr(space->machine, "bank1",base + ((data & 0x03) * 0x2000));
+	memory_set_bankptr(space->machine(), "bank1",base + ((data & 0x03) * 0x2000));
 }
 
 static WRITE8_HANDLER( bankswitch1_ext_w )
 {
-	UINT8 *base = space->machine->region("user1")->base();
+	UINT8 *base = space->machine().region("user1")->base();
 
 	if (base == 0) return;
 
-	memory_set_bankptr(space->machine, "bank1",base + ((data & 0x1f) * 0x2000));
+	memory_set_bankptr(space->machine(), "bank1",base + ((data & 0x1f) * 0x2000));
 }
 
 static WRITE8_HANDLER( bankswitch2_w )
 {
-	UINT8 *base = space->machine->region("cpu2")->base() + 0x10000;
+	UINT8 *base = space->machine().region("cpu2")->base() + 0x10000;
 
-	memory_set_bankptr(space->machine, "bank2",base + ((data & 0x03) * 0x2000));
+	memory_set_bankptr(space->machine(), "bank2",base + ((data & 0x03) * 0x2000));
 }
 
 /* Stubs to pass the correct Dip Switch setup to the MCU */
@@ -214,15 +214,15 @@ static READ8_HANDLER( dsw0_r )
 {
 	int rhi, rlo;
 
-	rhi  = ( input_port_read(space->machine, "DSWA") & 0x01 ) << 4;
-	rhi |= ( input_port_read(space->machine, "DSWA") & 0x04 ) << 3;
-	rhi |= ( input_port_read(space->machine, "DSWA") & 0x10 ) << 2;
-	rhi |= ( input_port_read(space->machine, "DSWA") & 0x40 ) << 1;
+	rhi  = ( input_port_read(space->machine(), "DSWA") & 0x01 ) << 4;
+	rhi |= ( input_port_read(space->machine(), "DSWA") & 0x04 ) << 3;
+	rhi |= ( input_port_read(space->machine(), "DSWA") & 0x10 ) << 2;
+	rhi |= ( input_port_read(space->machine(), "DSWA") & 0x40 ) << 1;
 
-	rlo  = ( input_port_read(space->machine, "DSWB") & 0x01 );
-	rlo |= ( input_port_read(space->machine, "DSWB") & 0x04 ) >> 1;
-	rlo |= ( input_port_read(space->machine, "DSWB") & 0x10 ) >> 2;
-	rlo |= ( input_port_read(space->machine, "DSWB") & 0x40 ) >> 3;
+	rlo  = ( input_port_read(space->machine(), "DSWB") & 0x01 );
+	rlo |= ( input_port_read(space->machine(), "DSWB") & 0x04 ) >> 1;
+	rlo |= ( input_port_read(space->machine(), "DSWB") & 0x10 ) >> 2;
+	rlo |= ( input_port_read(space->machine(), "DSWB") & 0x40 ) >> 3;
 
 	return rhi | rlo;
 }
@@ -231,15 +231,15 @@ static READ8_HANDLER( dsw1_r )
 {
 	int rhi, rlo;
 
-	rhi  = ( input_port_read(space->machine, "DSWA") & 0x02 ) << 3;
-	rhi |= ( input_port_read(space->machine, "DSWA") & 0x08 ) << 2;
-	rhi |= ( input_port_read(space->machine, "DSWA") & 0x20 ) << 1;
-	rhi |= ( input_port_read(space->machine, "DSWA") & 0x80 );
+	rhi  = ( input_port_read(space->machine(), "DSWA") & 0x02 ) << 3;
+	rhi |= ( input_port_read(space->machine(), "DSWA") & 0x08 ) << 2;
+	rhi |= ( input_port_read(space->machine(), "DSWA") & 0x20 ) << 1;
+	rhi |= ( input_port_read(space->machine(), "DSWA") & 0x80 );
 
-	rlo  = ( input_port_read(space->machine, "DSWB") & 0x02 ) >> 1;
-	rlo |= ( input_port_read(space->machine, "DSWB") & 0x08 ) >> 2;
-	rlo |= ( input_port_read(space->machine, "DSWB") & 0x20 ) >> 3;
-	rlo |= ( input_port_read(space->machine, "DSWB") & 0x80 ) >> 4;
+	rlo  = ( input_port_read(space->machine(), "DSWB") & 0x02 ) >> 1;
+	rlo |= ( input_port_read(space->machine(), "DSWB") & 0x08 ) >> 2;
+	rlo |= ( input_port_read(space->machine(), "DSWB") & 0x20 ) >> 3;
+	rlo |= ( input_port_read(space->machine(), "DSWB") & 0x80 ) >> 4;
 
 	return rhi | rlo;
 }
@@ -247,18 +247,18 @@ static READ8_HANDLER( dsw1_r )
 
 static WRITE8_HANDLER( int_ack1_w )
 {
-	cputag_set_input_line(space->machine, "cpu1", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "cpu1", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( int_ack2_w )
 {
-	cputag_set_input_line(space->machine, "cpu2", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "cpu2", 0, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( watchdog1_w )
 {
-	namcos86_state *state = space->machine->driver_data<namcos86_state>();
+	namcos86_state *state = space->machine().driver_data<namcos86_state>();
 	state->wdog |= 1;
 	if (state->wdog == 3)
 	{
@@ -269,7 +269,7 @@ static WRITE8_HANDLER( watchdog1_w )
 
 static WRITE8_HANDLER( watchdog2_w )
 {
-	namcos86_state *state = space->machine->driver_data<namcos86_state>();
+	namcos86_state *state = space->machine().driver_data<namcos86_state>();
 	state->wdog |= 2;
 	if (state->wdog == 3)
 	{
@@ -281,22 +281,22 @@ static WRITE8_HANDLER( watchdog2_w )
 
 static WRITE8_HANDLER( namcos86_coin_w )
 {
-	coin_lockout_global_w(space->machine, data & 1);
-	coin_counter_w(space->machine, 0,~data & 2);
-	coin_counter_w(space->machine, 1,~data & 4);
+	coin_lockout_global_w(space->machine(), data & 1);
+	coin_counter_w(space->machine(), 0,~data & 2);
+	coin_counter_w(space->machine(), 1,~data & 4);
 }
 
 static WRITE8_HANDLER( namcos86_led_w )
 {
-	set_led_status(space->machine, 0,data & 0x08);
-	set_led_status(space->machine, 1,data & 0x10);
+	set_led_status(space->machine(), 0,data & 0x08);
+	set_led_status(space->machine(), 1,data & 0x10);
 }
 
 
 static WRITE8_HANDLER( cus115_w )
 {
 	/* make sure the expansion board is present */
-	if (!space->machine->region("user1")->base())
+	if (!space->machine().region("user1")->base())
 	{
 		popmessage("expansion board not present");
 		return;
@@ -308,7 +308,7 @@ static WRITE8_HANDLER( cus115_w )
 		case 1:
 		case 2:
 		case 3:
-			namco_63701x_w(space->machine->device("namco2"), (offset & 0x1e00) >> 9,data);
+			namco_63701x_w(space->machine().device("namco2"), (offset & 0x1e00) >> 9,data);
 			break;
 
 		case 4:
@@ -326,7 +326,7 @@ static WRITE8_HANDLER( cus115_w )
 
 static MACHINE_RESET( namco86 )
 {
-	UINT8 *base = machine->region("cpu1")->base() + 0x10000;
+	UINT8 *base = machine.region("cpu1")->base() + 0x10000;
 
 	memory_set_bankptr(machine, "bank1",base);
 }
@@ -1474,8 +1474,8 @@ static DRIVER_INIT( namco86 )
 	UINT8 *buffer;
 
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
-	gfx = machine->region("gfx1")->base();
-	size = machine->region("gfx1")->bytes() * 2 / 3;
+	gfx = machine.region("gfx1")->base();
+	size = machine.region("gfx1")->bytes() * 2 / 3;
 	buffer = auto_alloc_array(machine, UINT8,  size );
 
 	{
@@ -1499,8 +1499,8 @@ static DRIVER_INIT( namco86 )
 		auto_free( machine, buffer );
 	}
 
-	gfx = machine->region("gfx2")->base();
-	size = machine->region("gfx2")->bytes() * 2 / 3;
+	gfx = machine.region("gfx2")->base();
+	size = machine.region("gfx2")->bytes() * 2 / 3;
 	buffer = auto_alloc_array(machine, UINT8,  size );
 
 	{

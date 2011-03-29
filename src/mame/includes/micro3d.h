@@ -132,7 +132,7 @@ WRITE8_HANDLER( micro3d_snd_dac_b );
 READ8_HANDLER( micro3d_sound_io_r );
 WRITE8_HANDLER( micro3d_sound_io_w );
 
-void micro3d_noise_sh_w(running_machine *machine, UINT8 data);
+void micro3d_noise_sh_w(running_machine &machine, UINT8 data);
 
 DECLARE_LEGACY_SOUND_DEVICE(MICRO3D, micro3d_sound);
 

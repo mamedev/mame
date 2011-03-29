@@ -17,13 +17,13 @@
 
 VIDEO_START( ccastles )
 {
-	ccastles_state *state = machine->driver_data<ccastles_state>();
+	ccastles_state *state = machine.driver_data<ccastles_state>();
 	static const int resistances[3] = { 22000, 10000, 4700 };
 
 	/* get pointers to our PROMs */
-	state->syncprom = machine->region("proms")->base() + 0x000;
-	state->wpprom = machine->region("proms")->base() + 0x200;
-	state->priprom = machine->region("proms")->base() + 0x300;
+	state->syncprom = machine.region("proms")->base() + 0x000;
+	state->wpprom = machine.region("proms")->base() + 0x200;
+	state->priprom = machine.region("proms")->base() + 0x300;
 
 	/* compute the color output resistor weights at startup */
 	compute_resistor_weights(0,	255, -1.0,
@@ -32,7 +32,7 @@ VIDEO_START( ccastles )
 			3,	resistances, state->bweights, 1000, 0);
 
 	/* allocate a bitmap for drawing sprites */
-	state->spritebitmap = machine->primary_screen->alloc_compatible_bitmap();
+	state->spritebitmap = machine.primary_screen->alloc_compatible_bitmap();
 
 	/* register for savestates */
 	state->save_item(NAME(state->video_control));
@@ -51,22 +51,22 @@ VIDEO_START( ccastles )
 
 WRITE8_HANDLER( ccastles_hscroll_w )
 {
-	ccastles_state *state = space->machine->driver_data<ccastles_state>();
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+	ccastles_state *state = space->machine().driver_data<ccastles_state>();
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 	state->hscroll = data;
 }
 
 
 WRITE8_HANDLER( ccastles_vscroll_w )
 {
-	ccastles_state *state = space->machine->driver_data<ccastles_state>();
+	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 	state->vscroll = data;
 }
 
 
 WRITE8_HANDLER( ccastles_video_control_w )
 {
-	ccastles_state *state = space->machine->driver_data<ccastles_state>();
+	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 	/* only D3 matters */
 	state->video_control[offset] = (data >> 3) & 1;
 }
@@ -81,7 +81,7 @@ WRITE8_HANDLER( ccastles_video_control_w )
 
 WRITE8_HANDLER( ccastles_paletteram_w )
 {
-	ccastles_state *state = space->machine->driver_data<ccastles_state>();
+	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 	int bit0, bit1, bit2;
 	int r, g, b;
 
@@ -108,7 +108,7 @@ WRITE8_HANDLER( ccastles_paletteram_w )
 	bit2 = (~b >> 2) & 0x01;
 	b = combine_3_weights(state->bweights, bit0, bit1, bit2);
 
-	palette_set_color(space->machine, offset & 0x1f, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset & 0x1f, MAKE_RGB(r, g, b));
 }
 
 
@@ -120,9 +120,9 @@ WRITE8_HANDLER( ccastles_paletteram_w )
  *
  *************************************/
 
-INLINE void ccastles_write_vram( running_machine *machine, UINT16 addr, UINT8 data, UINT8 bitmd, UINT8 pixba )
+INLINE void ccastles_write_vram( running_machine &machine, UINT16 addr, UINT8 data, UINT8 bitmd, UINT8 pixba )
 {
-	ccastles_state *state = machine->driver_data<ccastles_state>();
+	ccastles_state *state = machine.driver_data<ccastles_state>();
 	UINT8 *dest = &state->videoram[addr & 0x7ffe];
 	UINT8 promaddr = 0;
 	UINT8 wpbits;
@@ -167,9 +167,9 @@ INLINE void ccastles_write_vram( running_machine *machine, UINT16 addr, UINT8 da
  *
  *************************************/
 
-INLINE void bitmode_autoinc( running_machine *machine )
+INLINE void bitmode_autoinc( running_machine &machine )
 {
-	ccastles_state *state = machine->driver_data<ccastles_state>();
+	ccastles_state *state = machine.driver_data<ccastles_state>();
 
 	/* auto increment in the x-direction if it's enabled */
 	if (!state->video_control[0])	/* /AX */
@@ -201,7 +201,7 @@ INLINE void bitmode_autoinc( running_machine *machine )
 WRITE8_HANDLER( ccastles_videoram_w )
 {
 	/* direct writes to VRAM go through the write protect PROM as well */
-	ccastles_write_vram(space->machine, offset, data, 0, 0);
+	ccastles_write_vram(space->machine(), offset, data, 0, 0);
 }
 
 
@@ -214,7 +214,7 @@ WRITE8_HANDLER( ccastles_videoram_w )
 
 READ8_HANDLER( ccastles_bitmode_r )
 {
-	ccastles_state *state = space->machine->driver_data<ccastles_state>();
+	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 
 	/* in bitmode, the address comes from the autoincrement latches */
 	UINT16 addr = (state->bitmode_addr[1] << 7) | (state->bitmode_addr[0] >> 1);
@@ -223,7 +223,7 @@ READ8_HANDLER( ccastles_bitmode_r )
 	UINT8 result = state->videoram[addr] << ((~state->bitmode_addr[0] & 1) * 4);
 
 	/* autoincrement because /BITMD was selected */
-	bitmode_autoinc(space->machine);
+	bitmode_autoinc(space->machine());
 
 	/* the low 4 bits of the data lines are not driven so make them all 1's */
 	return result | 0x0f;
@@ -232,7 +232,7 @@ READ8_HANDLER( ccastles_bitmode_r )
 
 WRITE8_HANDLER( ccastles_bitmode_w )
 {
-	ccastles_state *state = space->machine->driver_data<ccastles_state>();
+	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 
 	/* in bitmode, the address comes from the autoincrement latches */
 	UINT16 addr = (state->bitmode_addr[1] << 7) | (state->bitmode_addr[0] >> 1);
@@ -241,19 +241,19 @@ WRITE8_HANDLER( ccastles_bitmode_w )
 	data = (data & 0xf0) | (data >> 4);
 
 	/* write through the generic VRAM routine, passing the low 2 X bits as PIXB/PIXA */
-	ccastles_write_vram(space->machine, addr, data, 1, state->bitmode_addr[0] & 3);
+	ccastles_write_vram(space->machine(), addr, data, 1, state->bitmode_addr[0] & 3);
 
 	/* autoincrement because /BITMD was selected */
-	bitmode_autoinc(space->machine);
+	bitmode_autoinc(space->machine());
 }
 
 
 WRITE8_HANDLER( ccastles_bitmode_addr_w )
 {
-	ccastles_state *state = space->machine->driver_data<ccastles_state>();
+	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 
 	/* write through to video RAM and also to the addressing latches */
-	ccastles_write_vram(space->machine, offset, data, 0, 0);
+	ccastles_write_vram(space->machine(), offset, data, 0, 0);
 	state->bitmode_addr[offset] = data;
 }
 
@@ -267,10 +267,10 @@ WRITE8_HANDLER( ccastles_bitmode_addr_w )
 
 SCREEN_UPDATE( ccastles )
 {
-	ccastles_state *state = screen->machine->driver_data<ccastles_state>();
+	ccastles_state *state = screen->machine().driver_data<ccastles_state>();
 	UINT8 *spriteaddr = &state->spriteram[state->video_control[7] * 0x100];	/* BUF1/BUF2 */
 	int flip = state->video_control[4] ? 0xff : 0x00;	/* PLAYER2 */
-	pen_t black = get_black_pen(screen->machine);
+	pen_t black = get_black_pen(screen->machine());
 	int x, y, offs;
 
 	/* draw the sprites */
@@ -282,7 +282,7 @@ SCREEN_UPDATE( ccastles )
 		int which = spriteaddr[offs];
 		int color = spriteaddr[offs + 2] >> 7;
 
-		drawgfx_transpen(state->spritebitmap, cliprect, screen->machine->gfx[0], which, color, flip, flip, x, y, 7);
+		drawgfx_transpen(state->spritebitmap, cliprect, screen->machine().gfx[0], which, color, flip, flip, x, y, 7);
 	}
 
 	/* draw the bitmap to the screen, looping over Y */

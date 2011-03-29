@@ -104,7 +104,7 @@ static WRITE8_HANDLER( obc1_write )
 	}
 }
 
-static void obc1_init( running_machine *machine )
+static void obc1_init( running_machine &machine )
 {
 	obc1_state.offset  = (snes_ram[0x1ff5] & 0x01) ? 0x1800 : 0x1c00;
 	obc1_state.address = (snes_ram[0x1ff6] & 0x7f);

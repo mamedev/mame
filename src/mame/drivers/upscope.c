@@ -60,9 +60,9 @@ public:
  *
  *************************************/
 
-static void upscope_reset(running_machine *machine)
+static void upscope_reset(running_machine &machine)
 {
-	upscope_state *state = machine->driver_data<upscope_state>();
+	upscope_state *state = machine.driver_data<upscope_state>();
 	state->prev_cia1_porta = 0xff;
 }
 
@@ -86,16 +86,16 @@ static void upscope_reset(running_machine *machine)
 static WRITE8_DEVICE_HANDLER( upscope_cia_0_porta_w )
 {
 	/* switch banks as appropriate */
-	memory_set_bank(device->machine, "bank1", data & 1);
+	memory_set_bank(device->machine(), "bank1", data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		device->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x000000, 0x07ffff, "bank1");
+		device->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x000000, 0x07ffff, "bank1");
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		device->machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x000000, 0x07ffff);
+		device->machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x000000, 0x07ffff);
 }
 
 
@@ -117,13 +117,13 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_0_porta_w )
 
 static WRITE8_DEVICE_HANDLER( upscope_cia_0_portb_w )
 {
-	upscope_state *state = device->machine->driver_data<upscope_state>();
+	upscope_state *state = device->machine().driver_data<upscope_state>();
 	state->parallel_data = data;
 }
 
 static READ8_DEVICE_HANDLER( upscope_cia_0_portb_r )
 {
-	upscope_state *state = device->machine->driver_data<upscope_state>();
+	upscope_state *state = device->machine().driver_data<upscope_state>();
 	return state->nvram_data_latch;
 }
 
@@ -146,13 +146,13 @@ static READ8_DEVICE_HANDLER( upscope_cia_0_portb_r )
 
 static READ8_DEVICE_HANDLER( upscope_cia_1_porta_r )
 {
-	upscope_state *state = device->machine->driver_data<upscope_state>();
+	upscope_state *state = device->machine().driver_data<upscope_state>();
 	return 0xf8 | (state->prev_cia1_porta & 0x07);
 }
 
 static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 {
-	upscope_state *state = device->machine->driver_data<upscope_state>();
+	upscope_state *state = device->machine().driver_data<upscope_state>();
 	/* on a low transition of POUT, we latch stuff for the NVRAM */
 	if ((state->prev_cia1_porta & 2) && !(data & 2))
 	{
@@ -183,7 +183,7 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 
 				case 0x02:
 					/* coin counter */
-					coin_counter_w(device->machine, 0, data & 1);
+					coin_counter_w(device->machine(), 0, data & 1);
 					break;
 
 				case 0x03:
@@ -217,7 +217,7 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 		if (data & 4)
 		{
 			if (LOG_IO) logerror("Internal register (%d) read\n", state->nvram_address_latch);
-			state->nvram_data_latch = (state->nvram_address_latch == 0) ? input_port_read(device->machine, "IO0") : 0xff;
+			state->nvram_data_latch = (state->nvram_address_latch == 0) ? input_port_read(device->machine(), "IO0") : 0xff;
 		}
 
 		/* if SEL == 0, we read NVRAM */
@@ -385,7 +385,7 @@ ROM_END
 
 static DRIVER_INIT( upscope )
 {
-	upscope_state *state = machine->driver_data<upscope_state>();
+	upscope_state *state = machine.driver_data<upscope_state>();
 	static const amiga_machine_interface upscope_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
@@ -398,11 +398,11 @@ static DRIVER_INIT( upscope )
 	amiga_machine_config(machine, &upscope_intf);
 
 	/* allocate NVRAM */
-	machine->device<nvram_device>("nvram")->set_base(state->m_nvram, sizeof(state->m_nvram));
+	machine.device<nvram_device>("nvram")->set_base(state->m_nvram, sizeof(state->m_nvram));
 
 	/* set up memory */
 	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user1")->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
 }
 
 

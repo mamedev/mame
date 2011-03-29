@@ -59,8 +59,8 @@ public:
 
 static MACHINE_START( drw80pkr )
 {
-	drw80pkr_state *state = machine->driver_data<drw80pkr_state>();
-	machine->device<nvram_device>("nvram")->set_base(state->pkr_io_ram, sizeof(state->pkr_io_ram));
+	drw80pkr_state *state = machine.driver_data<drw80pkr_state>();
+	machine.device<nvram_device>("nvram")->set_base(state->pkr_io_ram, sizeof(state->pkr_io_ram));
 }
 
 /*****************
@@ -69,37 +69,37 @@ static MACHINE_START( drw80pkr )
 
 static WRITE8_HANDLER( t0_w )
 {
-	drw80pkr_state *state = space->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
 	state->t0 = data;
 }
 
 static WRITE8_HANDLER( t1_w )
 {
-	drw80pkr_state *state = space->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
 	state->t1 = data;
 }
 
 static WRITE8_HANDLER( p0_w )
 {
-	drw80pkr_state *state = space->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
 	state->p0 = data;
 }
 
 static WRITE8_HANDLER( p1_w )
 {
-	drw80pkr_state *state = space->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
 	state->p1 = data;
 }
 
 static WRITE8_HANDLER( p2_w )
 {
-	drw80pkr_state *state = space->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
 	state->p2 = data;
 }
 
 static WRITE8_HANDLER( prog_w )
 {
-	drw80pkr_state *state = space->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
 	state->prog = data;
 
 	// Bankswitch Program Memory
@@ -107,19 +107,19 @@ static WRITE8_HANDLER( prog_w )
 	{
 		state->active_bank = state->active_bank ^ 0x01;
 
-		memory_set_bank(space->machine, "bank1", state->active_bank);
+		memory_set_bank(space->machine(), "bank1", state->active_bank);
 	}
 }
 
 static WRITE8_HANDLER( bus_w )
 {
-	drw80pkr_state *state = space->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
 	state->bus = data;
 }
 
 static WRITE8_HANDLER( drw80pkr_io_w )
 {
-	drw80pkr_state *state = space->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
 	UINT16 n_offs;
 
 	if (state->p2 == 0x3f || state->p2 == 0x7f)
@@ -184,11 +184,11 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 
 		// ay8910 control port
 		if (state->p1 == 0xfc)
-			ay8910_address_w(space->machine->device("aysnd"), 0, data);
+			ay8910_address_w(space->machine().device("aysnd"), 0, data);
 
 		// ay8910_write_port_0_w
 		if (state->p1 == 0xfe)
-			ay8910_data_w(space->machine->device("aysnd"), 0, data);
+			ay8910_data_w(space->machine().device("aysnd"), 0, data);
 	}
 }
 
@@ -198,43 +198,43 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 
 static READ8_HANDLER( t0_r )
 {
-	drw80pkr_state *state = space->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
     return state->t0;
 }
 
 static READ8_HANDLER( t1_r )
 {
-	drw80pkr_state *state = space->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
     return state->t1;
 }
 
 static READ8_HANDLER( p0_r )
 {
-	drw80pkr_state *state = space->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
     return state->p0;
 }
 
 static READ8_HANDLER( p1_r )
 {
-	drw80pkr_state *state = space->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
     return state->p1;
 }
 
 static READ8_HANDLER( p2_r )
 {
-	drw80pkr_state *state = space->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
     return state->p2;
 }
 
 static READ8_HANDLER( bus_r )
 {
-	drw80pkr_state *state = space->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
     return state->bus;
 }
 
 static READ8_HANDLER( drw80pkr_io_r )
 {
-	drw80pkr_state *state = space->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
 	UINT8 ret;
 	UINT16 kbdin;
 
@@ -284,7 +284,7 @@ static READ8_HANDLER( drw80pkr_io_r )
 		{
 
 			// TODO: Get Input Port Values
-			kbdin = ((input_port_read(space->machine, "IN1") & 0xaf ) << 8) + input_port_read(space->machine, "IN0");
+			kbdin = ((input_port_read(space->machine(), "IN1") & 0xaf ) << 8) + input_port_read(space->machine(), "IN0");
 
 			switch (kbdin)
 			{
@@ -324,7 +324,7 @@ static READ8_HANDLER( drw80pkr_io_r )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	drw80pkr_state *state = machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = machine.driver_data<drw80pkr_state>();
 	int color = state->color_ram[tile_index];
 	int code = state->video_ram[tile_index];
 
@@ -333,13 +333,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( drw80pkr )
 {
-	drw80pkr_state *state = machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = machine.driver_data<drw80pkr_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 24, 27);
 }
 
 static SCREEN_UPDATE( drw80pkr )
 {
-	drw80pkr_state *state = screen->machine->driver_data<drw80pkr_state>();
+	drw80pkr_state *state = screen->machine().driver_data<drw80pkr_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	return 0;
@@ -349,7 +349,7 @@ static PALETTE_INIT( drw80pkr )
 {
 	int j;
 
-	for (j = 0; j < machine->total_colors(); j++)
+	for (j = 0; j < machine.total_colors(); j++)
 	{
 		int r, g, b, tr, tg, tb, i;
 
@@ -404,7 +404,7 @@ GFXDECODE_END
 
 static DRIVER_INIT( drw80pkr )
 {
-	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base(), 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base(), 0x1000);
 }
 
 

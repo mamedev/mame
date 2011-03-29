@@ -20,15 +20,15 @@ Atari Ultra Tank driver
 
 static CUSTOM_INPUT( get_collision )
 {
-	ultratnk_state *state = field->port->machine->driver_data<ultratnk_state>();
+	ultratnk_state *state = field->port->machine().driver_data<ultratnk_state>();
 	return state->collision[(FPTR) param];
 }
 
 
 static CUSTOM_INPUT( get_joystick )
 {
-	ultratnk_state *state = field->port->machine->driver_data<ultratnk_state>();
-	UINT8 joy = input_port_read(field->port->machine, (const char *)param) & 3;
+	ultratnk_state *state = field->port->machine().driver_data<ultratnk_state>();
+	UINT8 joy = input_port_read(field->port->machine(), (const char *)param) & 3;
 
 	if (joy == 1)
 	{
@@ -57,19 +57,19 @@ static TIMER_CALLBACK( nmi_callback	)
 	if (input_port_read(machine, "IN0") & 0x40)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(nmi_callback), scanline);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(nmi_callback), scanline);
 }
 
 
 static MACHINE_RESET( ultratnk )
 {
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(32), FUNC(nmi_callback), 32);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(32), FUNC(nmi_callback), 32);
 }
 
 
 static READ8_HANDLER( ultratnk_wram_r )
 {
-	ultratnk_state *state = space->machine->driver_data<ultratnk_state>();
+	ultratnk_state *state = space->machine().driver_data<ultratnk_state>();
 	UINT8 *videoram = state->videoram;
 	return videoram[0x380 + offset];
 }
@@ -77,27 +77,27 @@ static READ8_HANDLER( ultratnk_wram_r )
 
 static READ8_HANDLER( ultratnk_analog_r )
 {
-	return (input_port_read(space->machine, "ANALOG") << (~offset & 7)) & 0x80;
+	return (input_port_read(space->machine(), "ANALOG") << (~offset & 7)) & 0x80;
 }
 static READ8_HANDLER( ultratnk_coin_r )
 {
-	return (input_port_read(space->machine, "COIN") << (~offset & 7)) & 0x80;
+	return (input_port_read(space->machine(), "COIN") << (~offset & 7)) & 0x80;
 }
 static READ8_HANDLER( ultratnk_collision_r )
 {
-	return (input_port_read(space->machine, "COLLISION") << (~offset & 7)) & 0x80;
+	return (input_port_read(space->machine(), "COLLISION") << (~offset & 7)) & 0x80;
 }
 
 
 static READ8_HANDLER( ultratnk_options_r )
 {
-	return (input_port_read(space->machine, "DIP") >> (2 * (offset & 3))) & 3;
+	return (input_port_read(space->machine(), "DIP") >> (2 * (offset & 3))) & 3;
 }
 
 
 static WRITE8_HANDLER( ultratnk_wram_w )
 {
-	ultratnk_state *state = space->machine->driver_data<ultratnk_state>();
+	ultratnk_state *state = space->machine().driver_data<ultratnk_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[0x380 + offset] = data;
 }
@@ -105,31 +105,31 @@ static WRITE8_HANDLER( ultratnk_wram_w )
 
 static WRITE8_HANDLER( ultratnk_collision_reset_w )
 {
-	ultratnk_state *state = space->machine->driver_data<ultratnk_state>();
+	ultratnk_state *state = space->machine().driver_data<ultratnk_state>();
 	state->collision[(offset >> 1) & 3] = 0;
 }
 
 
 static WRITE8_HANDLER( ultratnk_da_latch_w )
 {
-	ultratnk_state *state = space->machine->driver_data<ultratnk_state>();
+	ultratnk_state *state = space->machine().driver_data<ultratnk_state>();
 	state->da_latch = data & 15;
 }
 
 
 static WRITE8_HANDLER( ultratnk_led_1_w )
 {
-	set_led_status(space->machine, 0, offset & 1); /* left player start */
+	set_led_status(space->machine(), 0, offset & 1); /* left player start */
 }
 static WRITE8_HANDLER( ultratnk_led_2_w )
 {
-	set_led_status(space->machine, 1, offset & 1); /* right player start */
+	set_led_status(space->machine(), 1, offset & 1); /* right player start */
 }
 
 
 static WRITE8_HANDLER( ultratnk_lockout_w )
 {
-	coin_lockout_global_w(space->machine, ~offset & 1);
+	coin_lockout_global_w(space->machine(), ~offset & 1);
 }
 
 

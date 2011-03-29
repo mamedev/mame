@@ -104,7 +104,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 static VIDEO_START( spaceint )
 {
-	astinvad_state *state = machine->driver_data<astinvad_state>();
+	astinvad_state *state = machine.driver_data<astinvad_state>();
 	state->colorram = auto_alloc_array(machine, UINT8, state->videoram_size);
 
 	state->save_item(NAME(state->color_latch));
@@ -114,14 +114,14 @@ static VIDEO_START( spaceint )
 
 static WRITE8_HANDLER( color_latch_w )
 {
-	astinvad_state *state = space->machine->driver_data<astinvad_state>();
+	astinvad_state *state = space->machine().driver_data<astinvad_state>();
 	state->color_latch = data & 0x0f;
 }
 
 
 static WRITE8_HANDLER( spaceint_videoram_w )
 {
-	astinvad_state *state = space->machine->driver_data<astinvad_state>();
+	astinvad_state *state = space->machine().driver_data<astinvad_state>();
 	state->videoram[offset] = data;
 	state->colorram[offset] = state->color_latch;
 }
@@ -134,9 +134,9 @@ static WRITE8_HANDLER( spaceint_videoram_w )
  *
  *************************************/
 
-static void plot_byte( running_machine *machine, bitmap_t *bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color )
+static void plot_byte( running_machine &machine, bitmap_t *bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color )
 {
-	astinvad_state *state = machine->driver_data<astinvad_state>();
+	astinvad_state *state = machine.driver_data<astinvad_state>();
 	pen_t fore_pen = MAKE_RGB(pal1bit(color >> 0), pal1bit(color >> 2), pal1bit(color >> 1));
 	UINT8 flip_xor = state->screen_flip & 7;
 
@@ -153,8 +153,8 @@ static void plot_byte( running_machine *machine, bitmap_t *bitmap, UINT8 y, UINT
 
 static SCREEN_UPDATE( astinvad )
 {
-	astinvad_state *state = screen->machine->driver_data<astinvad_state>();
-	const UINT8 *color_prom = screen->machine->region("proms")->base();
+	astinvad_state *state = screen->machine().driver_data<astinvad_state>();
+	const UINT8 *color_prom = screen->machine().region("proms")->base();
 	UINT8 yoffs = state->flip_yoffs & state->screen_flip;
 	int x, y;
 
@@ -164,7 +164,7 @@ static SCREEN_UPDATE( astinvad )
 		{
 			UINT8 color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (state->screen_flip ? 0 : 4);
 			UINT8 data = state->videoram[(((y ^ state->screen_flip) + yoffs) << 5) | ((x ^ state->screen_flip) >> 3)];
-			plot_byte(screen->machine, bitmap, y, x, data, state->screen_red ? 1 : color);
+			plot_byte(screen->machine(), bitmap, y, x, data, state->screen_red ? 1 : color);
 		}
 
 	return 0;
@@ -173,8 +173,8 @@ static SCREEN_UPDATE( astinvad )
 
 static SCREEN_UPDATE( spaceint )
 {
-	astinvad_state *state = screen->machine->driver_data<astinvad_state>();
-	const UINT8 *color_prom = screen->machine->region("proms")->base();
+	astinvad_state *state = screen->machine().driver_data<astinvad_state>();
+	const UINT8 *color_prom = screen->machine().region("proms")->base();
 	int offs;
 
 	for (offs = 0; offs < state->videoram_size; offs++)
@@ -189,7 +189,7 @@ static SCREEN_UPDATE( spaceint )
 		offs_t n = ((offs >> 5) & 0xf0) | color;
 		color = color_prom[n] & 0x07;
 
-		plot_byte(screen->machine, bitmap, y, x, data, color);
+		plot_byte(screen->machine(), bitmap, y, x, data, color);
 	}
 
 	return 0;
@@ -205,35 +205,35 @@ static SCREEN_UPDATE( spaceint )
 
 static TIMER_CALLBACK( kamikaze_int_off )
 {
-	astinvad_state *state = machine->driver_data<astinvad_state>();
+	astinvad_state *state = machine.driver_data<astinvad_state>();
 	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( kamizake_int_gen )
 {
-	astinvad_state *state = machine->driver_data<astinvad_state>();
+	astinvad_state *state = machine.driver_data<astinvad_state>();
 	/* interrupts are asserted on every state change of the 128V line */
 	device_set_input_line(state->maincpu, 0, ASSERT_LINE);
 	param ^= 128;
-	state->int_timer->adjust(machine->primary_screen->time_until_pos(param), param);
+	state->int_timer->adjust(machine.primary_screen->time_until_pos(param), param);
 
 	/* an RC circuit turns the interrupt off after a short amount of time */
-	machine->scheduler().timer_set(attotime::from_double(300 * 0.1e-6), FUNC(kamikaze_int_off));
+	machine.scheduler().timer_set(attotime::from_double(300 * 0.1e-6), FUNC(kamikaze_int_off));
 }
 
 
 static MACHINE_START( kamikaze )
 {
-	astinvad_state *state = machine->driver_data<astinvad_state>();
+	astinvad_state *state = machine.driver_data<astinvad_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->ppi8255_0 = machine->device("ppi8255_0");
-	state->ppi8255_1 = machine->device("ppi8255_1");
-	state->samples = machine->device("samples");
+	state->maincpu = machine.device("maincpu");
+	state->ppi8255_0 = machine.device("ppi8255_0");
+	state->ppi8255_1 = machine.device("ppi8255_1");
+	state->samples = machine.device("samples");
 
-	state->int_timer = machine->scheduler().timer_alloc(FUNC(kamizake_int_gen));
-	state->int_timer->adjust(machine->primary_screen->time_until_pos(128), 128);
+	state->int_timer = machine.scheduler().timer_alloc(FUNC(kamizake_int_gen));
+	state->int_timer->adjust(machine.primary_screen->time_until_pos(128), 128);
 
 	state->save_item(NAME(state->screen_flip));
 	state->save_item(NAME(state->screen_red));
@@ -242,7 +242,7 @@ static MACHINE_START( kamikaze )
 
 static MACHINE_RESET( kamikaze )
 {
-	astinvad_state *state = machine->driver_data<astinvad_state>();
+	astinvad_state *state = machine.driver_data<astinvad_state>();
 
 	state->screen_flip = 0;
 	state->screen_red = 0;
@@ -253,10 +253,10 @@ static MACHINE_RESET( kamikaze )
 
 static MACHINE_START( spaceint )
 {
-	astinvad_state *state = machine->driver_data<astinvad_state>();
+	astinvad_state *state = machine.driver_data<astinvad_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->samples = machine->device("samples");
+	state->maincpu = machine.device("maincpu");
+	state->samples = machine.device("samples");
 
 	state->save_item(NAME(state->screen_flip));
 	state->save_item(NAME(state->sound_state));
@@ -264,7 +264,7 @@ static MACHINE_START( spaceint )
 
 static MACHINE_RESET( spaceint )
 {
-	astinvad_state *state = machine->driver_data<astinvad_state>();
+	astinvad_state *state = machine.driver_data<astinvad_state>();
 
 	state->screen_flip = 0;
 	state->sound_state[0] = 0;
@@ -275,7 +275,7 @@ static MACHINE_RESET( spaceint )
 
 static INPUT_CHANGED( spaceint_coin_inserted )
 {
-	astinvad_state *state = field->port->machine->driver_data<astinvad_state>();
+	astinvad_state *state = field->port->machine().driver_data<astinvad_state>();
 	/* coin insertion causes an NMI */
 	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -290,7 +290,7 @@ static INPUT_CHANGED( spaceint_coin_inserted )
 
 static READ8_HANDLER( kamikaze_ppi_r )
 {
-	astinvad_state *state = space->machine->driver_data<astinvad_state>();
+	astinvad_state *state = space->machine().driver_data<astinvad_state>();
 	UINT8 result = 0xff;
 
 	/* the address lines are used for /CS; yes, they can overlap! */
@@ -304,7 +304,7 @@ static READ8_HANDLER( kamikaze_ppi_r )
 
 static WRITE8_HANDLER( kamikaze_ppi_w )
 {
-	astinvad_state *state = space->machine->driver_data<astinvad_state>();
+	astinvad_state *state = space->machine().driver_data<astinvad_state>();
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
@@ -323,7 +323,7 @@ static WRITE8_HANDLER( kamikaze_ppi_w )
 
 static WRITE8_DEVICE_HANDLER( astinvad_sound1_w )
 {
-	astinvad_state *state = device->machine->driver_data<astinvad_state>();
+	astinvad_state *state = device->machine().driver_data<astinvad_state>();
 	int bits_gone_hi = data & ~state->sound_state[0];
 	state->sound_state[0] = data;
 
@@ -333,14 +333,14 @@ static WRITE8_DEVICE_HANDLER( astinvad_sound1_w )
 	if (bits_gone_hi & 0x04) sample_start(state->samples, 2, SND_BASEHIT, 0);
 	if (bits_gone_hi & 0x08) sample_start(state->samples, 3, SND_INVADERHIT, 0);
 
-	device->machine->sound().system_enable(data & 0x20);
+	device->machine().sound().system_enable(data & 0x20);
 	state->screen_red = data & 0x04;
 }
 
 
 static WRITE8_DEVICE_HANDLER( astinvad_sound2_w )
 {
-	astinvad_state *state = device->machine->driver_data<astinvad_state>();
+	astinvad_state *state = device->machine().driver_data<astinvad_state>();
 	int bits_gone_hi = data & ~state->sound_state[1];
 	state->sound_state[1] = data;
 
@@ -350,13 +350,13 @@ static WRITE8_DEVICE_HANDLER( astinvad_sound2_w )
 	if (bits_gone_hi & 0x08) sample_start(state->samples, 5, SND_FLEET4, 0);
 	if (bits_gone_hi & 0x10) sample_start(state->samples, 4, SND_UFOHIT, 0);
 
-	state->screen_flip = (input_port_read(device->machine, "CABINET") & data & 0x20) ? 0xff : 0x00;
+	state->screen_flip = (input_port_read(device->machine(), "CABINET") & data & 0x20) ? 0xff : 0x00;
 }
 
 
 static WRITE8_HANDLER( spaceint_sound1_w )
 {
-	astinvad_state *state = space->machine->driver_data<astinvad_state>();
+	astinvad_state *state = space->machine().driver_data<astinvad_state>();
 	int bits_gone_hi = data & ~state->sound_state[0];
 	state->sound_state[0] = data;
 
@@ -375,15 +375,15 @@ static WRITE8_HANDLER( spaceint_sound1_w )
 
 static WRITE8_HANDLER( spaceint_sound2_w )
 {
-	astinvad_state *state = space->machine->driver_data<astinvad_state>();
+	astinvad_state *state = space->machine().driver_data<astinvad_state>();
 	int bits_gone_hi = data & ~state->sound_state[1];
 	state->sound_state[1] = data;
 
-	space->machine->sound().system_enable(data & 0x02);
+	space->machine().sound().system_enable(data & 0x02);
 
 	if (bits_gone_hi & 0x04) sample_start(state->samples, 3, SND_INVADERHIT, 0);
 
-	state->screen_flip = (input_port_read(space->machine, "CABINET") & data & 0x80) ? 0xff : 0x00;
+	state->screen_flip = (input_port_read(space->machine(), "CABINET") & data & 0x80) ? 0xff : 0x00;
 }
 
 
@@ -743,7 +743,7 @@ ROM_END
 
 static DRIVER_INIT( kamikaze )
 {
-	astinvad_state *state = machine->driver_data<astinvad_state>();
+	astinvad_state *state = machine.driver_data<astinvad_state>();
 
 	/* the flip screen logic adds 32 to the Y after flipping */
 	state->flip_yoffs = 32;
@@ -752,7 +752,7 @@ static DRIVER_INIT( kamikaze )
 
 static DRIVER_INIT( spcking2 )
 {
-	astinvad_state *state = machine->driver_data<astinvad_state>();
+	astinvad_state *state = machine.driver_data<astinvad_state>();
 
 	/* don't have the schematics, but the blanking must center the screen here */
 	state->flip_yoffs = 0;

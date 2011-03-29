@@ -176,7 +176,7 @@ static TIMER_CALLBACK( cdp1864_dma_tick )
 			}
 		}
 
-		cdp1864->dma_timer->adjust(machine->firstcpu->cycles_to_attotime(CDP1864_CYCLES_DMA_WAIT));
+		cdp1864->dma_timer->adjust(machine.firstcpu->cycles_to_attotime(CDP1864_CYCLES_DMA_WAIT));
 
 		cdp1864->dmaout = 0;
 	}
@@ -190,7 +190,7 @@ static TIMER_CALLBACK( cdp1864_dma_tick )
 			}
 		}
 
-		cdp1864->dma_timer->adjust(machine->firstcpu->cycles_to_attotime(CDP1864_CYCLES_DMA_ACTIVE));
+		cdp1864->dma_timer->adjust(machine.firstcpu->cycles_to_attotime(CDP1864_CYCLES_DMA_ACTIVE));
 
 		cdp1864->dmaout = 1;
 	}
@@ -226,7 +226,7 @@ static void cdp1864_init_palette(device_t *device, const cdp1864_interface *intf
 		g = (i & 1) ? luma : 0;
 		b = (i & 2) ? luma : 0;
 
-		palette_set_color_rgb( device->machine, i, r, g, b );
+		palette_set_color_rgb( device->machine(), i, r, g, b );
 	}
 }
 
@@ -364,7 +364,7 @@ static STREAM_UPDATE( cdp1864_stream_update )
 	if (cdp1864->aoe)
 	{
 		double frequency = cdp1864->cpu->unscaled_clock() / 8 / 4 / (cdp1864->latch + 1) / 2;
-		int rate = device->machine->sample_rate() / 2;
+		int rate = device->machine().sample_rate() / 2;
 
 		/* get progress through wave */
 		int incr = cdp1864->incr;
@@ -410,7 +410,7 @@ void cdp1864_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprec
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(device->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(device->machine()));
 	}
 }
 
@@ -432,26 +432,26 @@ static DEVICE_START( cdp1864 )
 	devcb_resolve_write_line(&cdp1864->out_efx_func, &intf->out_efx_func, device);
 
 	/* get the cpu */
-	cdp1864->cpu = device->machine->device(intf->cpu_tag);
+	cdp1864->cpu = device->machine().device(intf->cpu_tag);
 
 	/* get the screen device */
-	cdp1864->screen = downcast<screen_device *>(device->machine->device(intf->screen_tag));
+	cdp1864->screen = downcast<screen_device *>(device->machine().device(intf->screen_tag));
 	assert(cdp1864->screen != NULL);
 
 	/* allocate the temporary bitmap */
-	cdp1864->bitmap = auto_bitmap_alloc(device->machine, cdp1864->screen->width(), cdp1864->screen->height(), cdp1864->screen->format());
+	cdp1864->bitmap = auto_bitmap_alloc(device->machine(), cdp1864->screen->width(), cdp1864->screen->height(), cdp1864->screen->format());
 	bitmap_fill(cdp1864->bitmap, 0, CDP1864_BACKGROUND_COLOR_SEQUENCE[cdp1864->bgcolor] + 8);
 
 	/* initialize the palette */
 	cdp1864_init_palette(device, intf);
 
 	/* create sound stream */
-	cdp1864->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), cdp1864, cdp1864_stream_update);
+	cdp1864->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), cdp1864, cdp1864_stream_update);
 
 	/* create the timers */
-	cdp1864->int_timer = device->machine->scheduler().timer_alloc(FUNC(cdp1864_int_tick), (void *)device);
-	cdp1864->efx_timer = device->machine->scheduler().timer_alloc(FUNC(cdp1864_efx_tick), (void *)device);
-	cdp1864->dma_timer = device->machine->scheduler().timer_alloc(FUNC(cdp1864_dma_tick), (void *)device);
+	cdp1864->int_timer = device->machine().scheduler().timer_alloc(FUNC(cdp1864_int_tick), (void *)device);
+	cdp1864->efx_timer = device->machine().scheduler().timer_alloc(FUNC(cdp1864_efx_tick), (void *)device);
+	cdp1864->dma_timer = device->machine().scheduler().timer_alloc(FUNC(cdp1864_dma_tick), (void *)device);
 
 	/* register for state saving */
 	device->save_item(NAME(cdp1864->disp));
@@ -477,7 +477,7 @@ static DEVICE_RESET( cdp1864 )
 
 	cdp1864->int_timer->adjust(cdp1864->screen->time_until_pos(CDP1864_SCANLINE_INT_START));
 	cdp1864->efx_timer->adjust(cdp1864->screen->time_until_pos(CDP1864_SCANLINE_EFX_TOP_START));
-	cdp1864->dma_timer->adjust(device->machine->firstcpu->cycles_to_attotime(CDP1864_CYCLES_DMA_START));
+	cdp1864->dma_timer->adjust(device->machine().firstcpu->cycles_to_attotime(CDP1864_CYCLES_DMA_START));
 
 	cdp1864->disp = 0;
 	cdp1864->dmaout = 0;

@@ -22,7 +22,7 @@ PALETTE_INIT( gridlee )
 {
 	int i;
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		palette_set_color_rgb(machine,i,pal4bit(color_prom[0x0000]),pal4bit(color_prom[0x0800]),pal4bit(color_prom[0x1000]));
 		color_prom++;
@@ -39,7 +39,7 @@ PALETTE_INIT( gridlee )
 
 static STATE_POSTLOAD( expand_pixels )
 {
-	gridlee_state *state = machine->driver_data<gridlee_state>();
+	gridlee_state *state = machine.driver_data<gridlee_state>();
 	UINT8 *videoram = state->videoram;
     int offset = 0;
 
@@ -60,7 +60,7 @@ static STATE_POSTLOAD( expand_pixels )
 
 VIDEO_START( gridlee )
 {
-	gridlee_state *state = machine->driver_data<gridlee_state>();
+	gridlee_state *state = machine.driver_data<gridlee_state>();
 	/* allocate a local copy of video RAM */
 	state->local_videoram = auto_alloc_array_clear(machine, UINT8, 256 * 256);
 
@@ -69,7 +69,7 @@ VIDEO_START( gridlee )
 
     state_save_register_global(machine, state->cocktail_flip);
     state_save_register_global(machine, state->palettebank_vis);
-    machine->state().register_postload(expand_pixels, NULL);
+    machine.state().register_postload(expand_pixels, NULL);
 }
 
 
@@ -82,7 +82,7 @@ VIDEO_START( gridlee )
 
 WRITE8_HANDLER( gridlee_cocktail_flip_w )
 {
-	gridlee_state *state = space->machine->driver_data<gridlee_state>();
+	gridlee_state *state = space->machine().driver_data<gridlee_state>();
 	state->cocktail_flip = data & 1;
 }
 
@@ -96,7 +96,7 @@ WRITE8_HANDLER( gridlee_cocktail_flip_w )
 
 WRITE8_HANDLER( gridlee_videoram_w )
 {
-	gridlee_state *state = space->machine->driver_data<gridlee_state>();
+	gridlee_state *state = space->machine().driver_data<gridlee_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
 
@@ -115,9 +115,9 @@ WRITE8_HANDLER( gridlee_videoram_w )
 
 WRITE8_HANDLER( gridlee_palette_select_w )
 {
-	gridlee_state *state = space->machine->driver_data<gridlee_state>();
+	gridlee_state *state = space->machine().driver_data<gridlee_state>();
 	/* update the scanline palette */
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos() - 1 + GRIDLEE_VBEND);
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() - 1 + GRIDLEE_VBEND);
 	state->palettebank_vis = data & 0x3f;
 }
 
@@ -134,8 +134,8 @@ WRITE8_HANDLER( gridlee_palette_select_w )
 
 SCREEN_UPDATE( gridlee )
 {
-	gridlee_state *state = screen->machine->driver_data<gridlee_state>();
-	const pen_t *pens = &screen->machine->pens[state->palettebank_vis * 32];
+	gridlee_state *state = screen->machine().driver_data<gridlee_state>();
+	const pen_t *pens = &screen->machine().pens[state->palettebank_vis * 32];
 	UINT8 *gfx;
 	int x, y, i;
 
@@ -160,7 +160,7 @@ SCREEN_UPDATE( gridlee )
 	}
 
 	/* draw the sprite images */
-	gfx = screen->machine->region("gfx1")->base();
+	gfx = screen->machine().region("gfx1")->base();
 	for (i = 0; i < 32; i++)
 	{
 		UINT8 *sprite = state->spriteram + i * 4;

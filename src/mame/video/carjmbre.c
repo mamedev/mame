@@ -36,7 +36,7 @@ PALETTE_INIT( carjmbre )
 
 	rgb = compute_res_net_all(machine, color_prom, &carjmbre_decode_info, &carjmbre_net_info);
 	palette_set_colors(machine, 0, rgb, 64);
-	palette_normalize_range(machine->palette, 0, 63, 0, 255);
+	palette_normalize_range(machine.palette, 0, 63, 0, 255);
 	auto_free(machine, rgb);
 }
 
@@ -44,15 +44,15 @@ PALETTE_INIT( carjmbre )
 
 WRITE8_HANDLER( carjmbre_flipscreen_w )
 {
-	carjmbre_state *state = space->machine->driver_data<carjmbre_state>();
+	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
 
 	state->flipscreen = (data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
-	tilemap_set_flip_all(space->machine, state->flipscreen);
+	tilemap_set_flip_all(space->machine(), state->flipscreen);
 }
 
 WRITE8_HANDLER( carjmbre_bgcolor_w )
 {
-	carjmbre_state *state = space->machine->driver_data<carjmbre_state>();
+	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
 	data = ~data & 0x3f;
 
 	if (data != state->bgcolor)
@@ -62,11 +62,11 @@ WRITE8_HANDLER( carjmbre_bgcolor_w )
 		state->bgcolor = data;
 		if (data & 3)
 			for (i = 0; i < 64; i += 4)
-				palette_set_color(space->machine, i, palette_get_color(space->machine, data));
+				palette_set_color(space->machine(), i, palette_get_color(space->machine(), data));
 		else
 			// restore to initial state (black)
 			for (i = 0; i < 64; i += 4)
-				palette_set_color(space->machine, i, RGB_BLACK);
+				palette_set_color(space->machine(), i, RGB_BLACK);
 	}
 }
 
@@ -77,7 +77,7 @@ WRITE8_HANDLER( carjmbre_8806_w )
 
 WRITE8_HANDLER( carjmbre_videoram_w )
 {
-	carjmbre_state *state = space->machine->driver_data<carjmbre_state>();
+	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->cj_tilemap, offset & 0x3ff);
@@ -87,7 +87,7 @@ WRITE8_HANDLER( carjmbre_videoram_w )
 
 static TILE_GET_INFO( get_carjmbre_tile_info )
 {
-	carjmbre_state *state = machine->driver_data<carjmbre_state>();
+	carjmbre_state *state = machine.driver_data<carjmbre_state>();
 	UINT32 tile_number = state->videoram[tile_index] & 0xff;
 	UINT8 attr = state->videoram[tile_index + 0x400];
 	tile_number += (attr & 0x80) << 1; /* bank */
@@ -101,7 +101,7 @@ static TILE_GET_INFO( get_carjmbre_tile_info )
 
 VIDEO_START( carjmbre )
 {
-	carjmbre_state *state = machine->driver_data<carjmbre_state>();
+	carjmbre_state *state = machine.driver_data<carjmbre_state>();
 
 	state->cj_tilemap = tilemap_create(machine, get_carjmbre_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->save_item(NAME(state->flipscreen));
@@ -110,7 +110,7 @@ VIDEO_START( carjmbre )
 
 SCREEN_UPDATE( carjmbre )
 {
-	carjmbre_state *state = screen->machine->driver_data<carjmbre_state>();
+	carjmbre_state *state = screen->machine().driver_data<carjmbre_state>();
 	int offs, troffs, sx, sy, flipx, flipy;
 
 	//colorram
@@ -153,7 +153,7 @@ SCREEN_UPDATE( carjmbre )
 				flipy = !flipy;
 			}
 
-			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
+			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
 					state->spriteram[troffs + 1],
 					state->spriteram[troffs + 2] & 0xf,
 					flipx,flipy,

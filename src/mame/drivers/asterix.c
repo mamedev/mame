@@ -33,14 +33,14 @@ static const eeprom_interface eeprom_intf =
 #if 0
 static READ16_HANDLER( control2_r )
 {
-	asterix_state *state = space->machine->driver_data<asterix_state>();
+	asterix_state *state = space->machine().driver_data<asterix_state>();
 	return state->cur_control2;
 }
 #endif
 
 static WRITE16_HANDLER( control2_w )
 {
-	asterix_state *state = space->machine->driver_data<asterix_state>();
+	asterix_state *state = space->machine().driver_data<asterix_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -48,7 +48,7 @@ static WRITE16_HANDLER( control2_w )
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 
 		/* bit 5 is select tile bank */
 		k056832_set_tile_bank(state->k056832, (data & 0x20) >> 5);
@@ -57,7 +57,7 @@ static WRITE16_HANDLER( control2_w )
 
 static INTERRUPT_GEN( asterix_interrupt )
 {
-	asterix_state *state = device->machine->driver_data<asterix_state>();
+	asterix_state *state = device->machine().driver_data<asterix_state>();
 
 	// global interrupt masking
 	if (!k056832_is_irq_enabled(state->k056832, 0))
@@ -73,21 +73,21 @@ static READ8_DEVICE_HANDLER( asterix_sound_r )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	asterix_state *state = machine->driver_data<asterix_state>();
+	asterix_state *state = machine.driver_data<asterix_state>();
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
-	asterix_state *state = space->machine->driver_data<asterix_state>();
+	asterix_state *state = space->machine().driver_data<asterix_state>();
 
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
-	space->machine->scheduler().timer_set(attotime::from_usec(5), FUNC(nmi_callback));
+	space->machine().scheduler().timer_set(attotime::from_usec(5), FUNC(nmi_callback));
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	asterix_state *state = space->machine->driver_data<asterix_state>();
+	asterix_state *state = space->machine().driver_data<asterix_state>();
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
@@ -97,7 +97,7 @@ static WRITE16_HANDLER( sound_irq_w )
 #if 0
 static WRITE16_HANDLER( protection_w )
 {
-	asterix_state *state = space->machine->driver_data<asterix_state>();
+	asterix_state *state = space->machine().driver_data<asterix_state>();
 	COMBINE_DATA(state->prot + offset);
 
 	if (offset == 1)
@@ -136,7 +136,7 @@ static WRITE16_HANDLER( protection_w )
 
 static WRITE16_HANDLER( protection_w )
 {
-	asterix_state *state = space->machine->driver_data<asterix_state>();
+	asterix_state *state = space->machine().driver_data<asterix_state>();
 	COMBINE_DATA(state->prot + offset);
 
 	if (offset == 1)
@@ -250,14 +250,14 @@ static const k05324x_interface asterix_k05324x_intf =
 
 static MACHINE_START( asterix )
 {
-	asterix_state *state = machine->driver_data<asterix_state>();
+	asterix_state *state = machine.driver_data<asterix_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->k053260 = machine->device("k053260");
-	state->k056832 = machine->device("k056832");
-	state->k053244 = machine->device("k053244");
-	state->k053251 = machine->device("k053251");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->k053260 = machine.device("k053260");
+	state->k056832 = machine.device("k056832");
+	state->k053244 = machine.device("k053244");
+	state->k053251 = machine.device("k053251");
 
 	state->save_item(NAME(state->cur_control2));
 	state->save_item(NAME(state->prot));
@@ -272,7 +272,7 @@ static MACHINE_START( asterix )
 
 static MACHINE_RESET( asterix )
 {
-	asterix_state *state = machine->driver_data<asterix_state>();
+	asterix_state *state = machine.driver_data<asterix_state>();
 	int i;
 
 	state->cur_control2 = 0;
@@ -467,8 +467,8 @@ ROM_END
 static DRIVER_INIT( asterix )
 {
 #if 0
-	*(UINT16 *)(machine->region("maincpu")->base() + 0x07f34) = 0x602a;
-	*(UINT16 *)(machine->region("maincpu")->base() + 0x00008) = 0x0400;
+	*(UINT16 *)(machine.region("maincpu")->base() + 0x07f34) = 0x602a;
+	*(UINT16 *)(machine.region("maincpu")->base() + 0x00008) = 0x0400;
 #endif
 }
 

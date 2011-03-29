@@ -49,7 +49,7 @@ static UINT8	jdredd_prot_max;
  *
  *************************************/
 
-static void register_state_saving(running_machine *machine)
+static void register_state_saving(running_machine &machine)
 {
 	state_save_register_global(machine, cmos_write_enable);
 	state_save_register_global(machine, fake_sound_state);
@@ -79,7 +79,7 @@ WRITE16_HANDLER( midtunit_cmos_w )
 {
 	if (1)/*cmos_write_enable)*/
 	{
-		midtunit_state *state = space->machine->driver_data<midtunit_state>();
+		midtunit_state *state = space->machine().driver_data<midtunit_state>();
 		COMBINE_DATA(state->m_nvram+offset);
 		cmos_write_enable = 0;
 	}
@@ -93,7 +93,7 @@ WRITE16_HANDLER( midtunit_cmos_w )
 
 READ16_HANDLER( midtunit_cmos_r )
 {
-	midtunit_state *state = space->machine->driver_data<midtunit_state>();
+	midtunit_state *state = space->machine().driver_data<midtunit_state>();
 	return state->m_nvram[offset];
 }
 
@@ -109,7 +109,7 @@ READ16_HANDLER( midtunit_input_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "DSW" };
 
-	return input_port_read(space->machine, portnames[offset]);
+	return input_port_read(space->machine(), portnames[offset]);
 }
 
 
@@ -184,7 +184,7 @@ static READ16_HANDLER( mkturbo_prot_r )
 {
 	/* the security GAL overlays a counter of some sort at 0xfffff400 in ROM space.
      * A startup protection check expects to read back two different values in succession */
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 
@@ -411,7 +411,7 @@ static READ16_HANDLER( jdredd_hack_r )
  *
  *************************************/
 
-static void init_tunit_generic(running_machine *machine, int sound)
+static void init_tunit_generic(running_machine &machine, int sound)
 {
 	offs_t gfx_chunk = midtunit_gfx_rom_size / 4;
 	UINT8 *base;
@@ -421,7 +421,7 @@ static void init_tunit_generic(running_machine *machine, int sound)
 	register_state_saving(machine);
 
 	/* load the graphics ROMs -- quadruples */
-	base = machine->region("gfx1")->base();
+	base = machine.region("gfx1")->base();
 	for (i = 0; i < midtunit_gfx_rom_size; i += 4)
 	{
 		midtunit_gfx_rom[i + 0] = base[0 * gfx_chunk + i / 4];
@@ -464,22 +464,22 @@ DRIVER_INIT( mktunit )
 	init_tunit_generic(machine, SOUND_ADPCM);
 
 	/* protection */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x1b00000, 0x1b6ffff, FUNC(mk_prot_r), FUNC(mk_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x1b00000, 0x1b6ffff, FUNC(mk_prot_r), FUNC(mk_prot_w));
 
 	/* sound chip protection (hidden RAM) */
-	machine->device("adpcm")->memory().space(AS_PROGRAM)->install_ram(0xfb9c, 0xfbc6);
+	machine.device("adpcm")->memory().space(AS_PROGRAM)->install_ram(0xfb9c, 0xfbc6);
 }
 
 DRIVER_INIT( mkturbo )
 {
 	/* protection */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfffff400, 0xfffff40f, FUNC(mkturbo_prot_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfffff400, 0xfffff40f, FUNC(mkturbo_prot_r));
 
 	DRIVER_INIT_CALL(mktunit);
 }
 
 
-static void init_nbajam_common(running_machine *machine, int te_protection)
+static void init_nbajam_common(running_machine &machine, int te_protection)
 {
 	/* common init */
 	init_tunit_generic(machine, SOUND_ADPCM_LARGE);
@@ -488,20 +488,20 @@ static void init_nbajam_common(running_machine *machine, int te_protection)
 	if (!te_protection)
 	{
 		nbajam_prot_table = nbajam_prot_values;
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x1b14020, 0x1b2503f, FUNC(nbajam_prot_r), FUNC(nbajam_prot_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x1b14020, 0x1b2503f, FUNC(nbajam_prot_r), FUNC(nbajam_prot_w));
 	}
 	else
 	{
 		nbajam_prot_table = nbajamte_prot_values;
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x1b15f40, 0x1b37f5f, FUNC(nbajam_prot_r), FUNC(nbajam_prot_w));
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x1b95f40, 0x1bb7f5f, FUNC(nbajam_prot_r), FUNC(nbajam_prot_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x1b15f40, 0x1b37f5f, FUNC(nbajam_prot_r), FUNC(nbajam_prot_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x1b95f40, 0x1bb7f5f, FUNC(nbajam_prot_r), FUNC(nbajam_prot_w));
 	}
 
 	/* sound chip protection (hidden RAM) */
 	if (!te_protection)
-		machine->device("adpcm")->memory().space(AS_PROGRAM)->install_ram(0xfbaa, 0xfbd4);
+		machine.device("adpcm")->memory().space(AS_PROGRAM)->install_ram(0xfbaa, 0xfbd4);
 	else
-		machine->device("adpcm")->memory().space(AS_PROGRAM)->install_ram(0xfbec, 0xfc16);
+		machine.device("adpcm")->memory().space(AS_PROGRAM)->install_ram(0xfbec, 0xfc16);
 }
 
 DRIVER_INIT( nbajam )
@@ -520,19 +520,19 @@ DRIVER_INIT( jdreddp )
 	init_tunit_generic(machine, SOUND_ADPCM_LARGE);
 
 	/* looks like the watchdog needs to be disabled */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x01d81060, 0x01d8107f);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x01d81060, 0x01d8107f);
 
 	/* protection */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x1b00000, 0x1bfffff, FUNC(jdredd_prot_r), FUNC(jdredd_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x1b00000, 0x1bfffff, FUNC(jdredd_prot_r), FUNC(jdredd_prot_w));
 
 	/* sound chip protection (hidden RAM) */
-	machine->device("adpcm")->memory().space(AS_PROGRAM)->install_read_bank(0xfbcf, 0xfbf9, "bank7");
-	machine->device("adpcm")->memory().space(AS_PROGRAM)->install_write_bank(0xfbcf, 0xfbf9, "bank9");
+	machine.device("adpcm")->memory().space(AS_PROGRAM)->install_read_bank(0xfbcf, 0xfbf9, "bank7");
+	machine.device("adpcm")->memory().space(AS_PROGRAM)->install_write_bank(0xfbcf, 0xfbf9, "bank9");
 	memory_set_bankptr(machine, "bank9", auto_alloc_array(machine, UINT8, 0x80));
 
 #if ENABLE_ALL_JDREDD_LEVELS
 	/* how about the final levels? */
-	jdredd_hack = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xFFBA7FF0, 0xFFBA7FFf, FUNC(jdredd_hack_r));
+	jdredd_hack = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xFFBA7FF0, 0xFFBA7FFf, FUNC(jdredd_hack_r));
 #endif
 }
 
@@ -553,13 +553,13 @@ DRIVER_INIT( mk2 )
 	midtunit_gfx_rom_large = 1;
 
 	/* protection */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00f20c60, 0x00f20c7f, FUNC(mk2_prot_w));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00f42820, 0x00f4283f, FUNC(mk2_prot_w));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01a190e0, 0x01a190ff, FUNC(mk2_prot_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01a191c0, 0x01a191df, FUNC(mk2_prot_shift_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01a3d0c0, 0x01a3d0ff, FUNC(mk2_prot_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01d9d1e0, 0x01d9d1ff, FUNC(mk2_prot_const_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01def920, 0x01def93f, FUNC(mk2_prot_const_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00f20c60, 0x00f20c7f, FUNC(mk2_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00f42820, 0x00f4283f, FUNC(mk2_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01a190e0, 0x01a190ff, FUNC(mk2_prot_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01a191c0, 0x01a191df, FUNC(mk2_prot_shift_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01a3d0c0, 0x01a3d0ff, FUNC(mk2_prot_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01d9d1e0, 0x01d9d1ff, FUNC(mk2_prot_const_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01def920, 0x01def93f, FUNC(mk2_prot_const_r));
 }
 
 

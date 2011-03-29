@@ -151,7 +151,7 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 
 static WRITE16_HANDLER( shadfrce_flip_screen )
 {
-	flip_screen_set(space->machine, data & 0x01);
+	flip_screen_set(space->machine(), data & 0x01);
 }
 
 
@@ -236,22 +236,22 @@ static WRITE16_HANDLER( shadfrce_flip_screen )
 
 static READ16_HANDLER( shadfrce_input_ports_r )
 {
-	shadfrce_state *state = space->machine->driver_data<shadfrce_state>();
+	shadfrce_state *state = space->machine().driver_data<shadfrce_state>();
 	UINT16 data = 0xffff;
 
 	switch (offset)
 	{
 		case 0 :
-			data = (input_port_read(space->machine, "P1") & 0xff) | ((input_port_read(space->machine, "DSW2") & 0xc0) << 6) | ((input_port_read(space->machine, "SYSTEM") & 0x0f) << 8);
+			data = (input_port_read(space->machine(), "P1") & 0xff) | ((input_port_read(space->machine(), "DSW2") & 0xc0) << 6) | ((input_port_read(space->machine(), "SYSTEM") & 0x0f) << 8);
 			break;
 		case 1 :
-			data = (input_port_read(space->machine, "P2") & 0xff) | ((input_port_read(space->machine, "DSW2") & 0x3f) << 8);
+			data = (input_port_read(space->machine(), "P2") & 0xff) | ((input_port_read(space->machine(), "DSW2") & 0x3f) << 8);
 			break;
 		case 2 :
-			data = (input_port_read(space->machine, "EXTRA") & 0xff) | ((input_port_read(space->machine, "DSW1") & 0x3f) << 8);
+			data = (input_port_read(space->machine(), "EXTRA") & 0xff) | ((input_port_read(space->machine(), "DSW1") & 0x3f) << 8);
 			break;
 		case 3 :
-			data = (input_port_read(space->machine, "OTHER") & 0xff) | ((input_port_read(space->machine, "DSW1") & 0xc0) << 2) | ((input_port_read(space->machine, "MISC") & 0x38) << 8) | (state->vblank << 8);
+			data = (input_port_read(space->machine(), "OTHER") & 0xff) | ((input_port_read(space->machine(), "DSW1") & 0xc0) << 2) | ((input_port_read(space->machine(), "MISC") & 0x38) << 8) | (state->vblank << 8);
 			break;
 	}
 
@@ -264,7 +264,7 @@ static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, 1, data >> 8);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 	}
 	else
 	{
@@ -272,18 +272,18 @@ static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 		double brt = (data & 0xff) / 255.0;
 
 		for (i = 0; i < 0x4000; i++)
-			palette_set_pen_contrast(space->machine, i, brt);
+			palette_set_pen_contrast(space->machine(), i, brt);
 	}
 }
 
 static WRITE16_HANDLER( shadfrce_irq_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", offset ^ 3, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", offset ^ 3, CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( shadfrce_irq_w )
 {
-	shadfrce_state *state = space->machine->driver_data<shadfrce_state>();
+	shadfrce_state *state = space->machine().driver_data<shadfrce_state>();
 
 	state->irqs_enable = data & 1;	/* maybe, it's set/unset inside every trap instruction which is executed */
 	state->video_enable = data & 8;	/* probably */
@@ -305,14 +305,14 @@ static WRITE16_HANDLER( shadfrce_irq_w )
 
 static WRITE16_HANDLER( shadfrce_scanline_w )
 {
-	shadfrce_state *state = space->machine->driver_data<shadfrce_state>();
+	shadfrce_state *state = space->machine().driver_data<shadfrce_state>();
 
 	state->raster_scanline = data;	/* guess, 0 is always written */
 }
 
 static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 {
-	shadfrce_state *state = timer.machine->driver_data<shadfrce_state>();
+	shadfrce_state *state = timer.machine().driver_data<shadfrce_state>();
 	int scanline = param;
 
 	/* Vblank is lowered on scanline 0 */
@@ -333,8 +333,8 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 		{
 			state->raster_scanline = (state->raster_scanline + 1) % 240;
 			if (state->raster_scanline > 0)
-				timer.machine->primary_screen->update_partial(state->raster_scanline - 1);
-			cputag_set_input_line(timer.machine, "maincpu", 1, ASSERT_LINE);
+				timer.machine().primary_screen->update_partial(state->raster_scanline - 1);
+			cputag_set_input_line(timer.machine(), "maincpu", 1, ASSERT_LINE);
 		}
 	}
 
@@ -344,8 +344,8 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 		if (scanline % 16 == 0)
 		{
 			if (scanline > 0)
-				timer.machine->primary_screen->update_partial(scanline - 1);
-			cputag_set_input_line(timer.machine, "maincpu", 2, ASSERT_LINE);
+				timer.machine().primary_screen->update_partial(scanline - 1);
+			cputag_set_input_line(timer.machine(), "maincpu", 2, ASSERT_LINE);
 		}
 	}
 
@@ -354,8 +354,8 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 	{
 		if (scanline == 248)
 		{
-			timer.machine->primary_screen->update_partial(scanline - 1);
-			cputag_set_input_line(timer.machine, "maincpu", 3, ASSERT_LINE);
+			timer.machine().primary_screen->update_partial(scanline - 1);
+			cputag_set_input_line(timer.machine(), "maincpu", 3, ASSERT_LINE);
 		}
 	}
 }
@@ -548,7 +548,7 @@ GFXDECODE_END
 
 static void irq_handler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =

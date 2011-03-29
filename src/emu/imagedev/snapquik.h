@@ -39,7 +39,7 @@ DECLARE_LEGACY_IMAGE_DEVICE(Z80BIN, z80bin);
 #define QUICKLOAD_LOAD(name)		int QUICKLOAD_LOAD_NAME(name)(device_image_interface &image, const char *file_type, int quickload_size)
 
 #define Z80BIN_EXECUTE_NAME(name)	z80bin_execute_##name
-#define Z80BIN_EXECUTE(name)		void Z80BIN_EXECUTE_NAME(name)(running_machine *machine, UINT16 start_address, UINT16 end_address, UINT16 execute_address, int autorun)
+#define Z80BIN_EXECUTE(name)		void Z80BIN_EXECUTE_NAME(name)(running_machine &machine, UINT16 start_address, UINT16 end_address, UINT16 execute_address, int autorun)
 
 #define LOAD_REG(_cpu, _reg, _data) \
         do { \
@@ -64,7 +64,7 @@ struct _snapquick_config
 	attoseconds_t		delay_attoseconds;	/* loading delay (attoseconds) */
 };
 
-typedef void (*z80bin_execute_func)(running_machine *machine, UINT16 start_address, UINT16 end_address, UINT16 execute_address, int autorun);
+typedef void (*z80bin_execute_func)(running_machine &machine, UINT16 start_address, UINT16 end_address, UINT16 execute_address, int autorun);
 
 typedef struct _z80bin_config z80bin_config;
 struct _z80bin_config

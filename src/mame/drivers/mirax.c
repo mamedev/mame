@@ -94,9 +94,9 @@ static VIDEO_START(mirax)
 {
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	mirax_state *state = machine->driver_data<mirax_state>();
+	mirax_state *state = machine.driver_data<mirax_state>();
 	UINT8 *spriteram = state->spriteram;
 	int count;
 
@@ -118,14 +118,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		y = 0x100 - spriteram[count];
 		x = spriteram[count+3];
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],spr_offs,color,fx,fy,x,y-16,0);
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],spr_offs,color,fx,fy,x,y-16,0);
 	}
 }
 
 static SCREEN_UPDATE(mirax)
 {
-	mirax_state *state = screen->machine->driver_data<mirax_state>();
-	const gfx_element *gfx = screen->machine->gfx[0];
+	mirax_state *state = screen->machine().driver_data<mirax_state>();
+	const gfx_element *gfx = screen->machine().gfx[0];
 	int count = 0x00000;
 	int y,x;
 
@@ -146,7 +146,7 @@ static SCREEN_UPDATE(mirax)
 		}
 	}
 
-	draw_sprites(screen->machine,bitmap,cliprect);
+	draw_sprites(screen->machine(),bitmap,cliprect);
 
 	count = 0x00000;
 
@@ -177,14 +177,14 @@ static SCREEN_UPDATE(mirax)
 
 static SOUND_START(mirax)
 {
-	mirax_state *state = machine->driver_data<mirax_state>();
+	mirax_state *state = machine.driver_data<mirax_state>();
 	state->nAyCtrl = 0x00;
 	state->nAyData = 0x00;
 }
 
 static WRITE8_HANDLER(audio_w)
 {
-	mirax_state *state = space->machine->driver_data<mirax_state>();
+	mirax_state *state = space->machine().driver_data<mirax_state>();
 	if(cpu_get_previouspc(space->cpu)==0x2fd)
 	{
 		state->nAyCtrl=offset;
@@ -194,8 +194,8 @@ static WRITE8_HANDLER(audio_w)
 
 static WRITE8_DEVICE_HANDLER(ay_sel)
 {
-	mirax_state *state = device->machine->driver_data<mirax_state>();
-	if(cpu_get_previouspc(device->machine->device("audiocpu"))==0x309)
+	mirax_state *state = device->machine().driver_data<mirax_state>();
+	if(cpu_get_previouspc(device->machine().device("audiocpu"))==0x309)
 	{
 		ay8910_address_w(device,0,state->nAyCtrl);
 		ay8910_data_w(device,0,state->nAyData);
@@ -209,7 +209,7 @@ static READ8_HANDLER( unk_r )
 
 static WRITE8_HANDLER( nmi_mask_w )
 {
-	mirax_state *state = space->machine->driver_data<mirax_state>();
+	mirax_state *state = space->machine().driver_data<mirax_state>();
 	state->nmi_mask = data & 1;
 	if(data & 0xfe)
 		printf("Warning: %02x written at $f501\n",data);
@@ -218,7 +218,7 @@ static WRITE8_HANDLER( nmi_mask_w )
 static WRITE8_HANDLER( mirax_sound_cmd_w )
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( mirax_main_map, AS_PROGRAM, 8 )
@@ -364,7 +364,7 @@ static PALETTE_INIT( mirax )
 {
 	int i;
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -389,7 +389,7 @@ static PALETTE_INIT( mirax )
 
 static INTERRUPT_GEN( mirax_vblank_irq )
 {
-	mirax_state *state = device->machine->driver_data<mirax_state>();
+	mirax_state *state = device->machine().driver_data<mirax_state>();
 	if(state->nmi_mask)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -489,8 +489,8 @@ ROM_END
 
 static DRIVER_INIT( mirax )
 {
-	UINT8 *DATA = machine->region("data_code")->base();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *DATA = machine.region("data_code")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	int i;
 
 	for(i=0x0000;i<0x4000;i++)

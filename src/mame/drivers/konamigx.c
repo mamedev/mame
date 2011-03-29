@@ -422,7 +422,7 @@ static WRITE32_HANDLER( esc_w )
 		if (konamigx_wrport1_1 & 0x10)
 		{
 			gx_rdport1_3 &= ~8;
-			cputag_set_input_line(space->machine, "maincpu", 4, HOLD_LINE);
+			cputag_set_input_line(space->machine(), "maincpu", 4, HOLD_LINE);
 		}
 	}
 	else
@@ -465,7 +465,7 @@ static WRITE32_HANDLER( eeprom_w )
           bit 0: eeprom data
         */
 
-		input_port_write(space->machine, "EEPROMOUT", odata, 0xff);
+		input_port_write(space->machine(), "EEPROMOUT", odata, 0xff);
 
 		konamigx_wrport1_0 = odata;
 	}
@@ -512,13 +512,13 @@ static WRITE32_HANDLER( control_w )
 		{
 			// enable 68k
 			// clear the halt condition and reset the 68000
-			cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);
-			cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, PULSE_LINE);
+			cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, PULSE_LINE);
 		}
 		else
 		{
 			// disable 68k
-			cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
 		}
 
 		K053246_set_OBJCHA_line((data&0x100000) ? ASSERT_LINE : CLEAR_LINE);
@@ -581,14 +581,14 @@ static WRITE32_HANDLER( ccu_w )
 		// vblank interrupt ACK
 		if (ACCESSING_BITS_24_31)
 		{
-			cputag_set_input_line(space->machine, "maincpu", 1, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "maincpu", 1, CLEAR_LINE);
 			gx_syncen |= 0x20;
 		}
 
 		// hblank interrupt ACK
 		if (ACCESSING_BITS_8_15)
 		{
-			cputag_set_input_line(space->machine, "maincpu", 2, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "maincpu", 2, CLEAR_LINE);
 			gx_syncen |= 0x40;
 		}
 	}
@@ -606,7 +606,7 @@ static WRITE32_HANDLER( ccu_w )
 static TIMER_CALLBACK( dmaend_callback )
 {
 	// foul-proof (CPU0 could be deactivated while we wait)
-	if (resume_trigger && suspension_active) { suspension_active = 0; machine->scheduler().trigger(resume_trigger); }
+	if (resume_trigger && suspension_active) { suspension_active = 0; machine.scheduler().trigger(resume_trigger); }
 
 	// DMA busy flag must be cleared before triggering IRQ 3
 	gx_rdport1_3 &= ~2;
@@ -642,7 +642,7 @@ static void dmastart_callback(int data)
 static INTERRUPT_GEN(konamigx_vbinterrupt)
 {
 	// lift idle suspension
-	if (resume_trigger && suspension_active) { suspension_active = 0; device->machine->scheduler().trigger(resume_trigger); }
+	if (resume_trigger && suspension_active) { suspension_active = 0; device->machine().scheduler().trigger(resume_trigger); }
 
 	// IRQ 1 is the main 60hz vblank interrupt
 	if (gx_syncen & 0x20)
@@ -662,7 +662,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt)
 static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
 {
 	// lift idle suspension
-	if (resume_trigger && suspension_active) { suspension_active = 0; device->machine->scheduler().trigger(resume_trigger); }
+	if (resume_trigger && suspension_active) { suspension_active = 0; device->machine().scheduler().trigger(resume_trigger); }
 
 	// IRQ 1 is the main 60hz vblank interrupt
 	// the gx_syncen & 0x20 test doesn't work on type 3 or 4 ROM boards, likely because the ROM board
@@ -670,7 +670,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
 
 	// maybe this interupt should only be every 30fps, or maybe there are flags to prevent the game running too fast
 	// the real hardware should output the display for each screen on alternate frames
-//  if(device->machine->primary_screen->frame_number() & 1)
+//  if(device->machine().primary_screen->frame_number() & 1)
 	if (1) // gx_syncen & 0x20)
 	{
 		gx_syncen &= ~0x20;
@@ -839,7 +839,7 @@ static READ32_HANDLER( sound020_r )
 	return(rv);
 }
 
-INLINE void write_snd_020(running_machine *machine, int reg, int val)
+INLINE void write_snd_020(running_machine &machine, int reg, int val)
 {
 	sndto000[reg] = val;
 
@@ -857,14 +857,14 @@ static WRITE32_HANDLER( sound020_w )
 	{
 		reg = offset<<1;
 		val = data>>24;
-		write_snd_020(space->machine, reg, val);
+		write_snd_020(space->machine(), reg, val);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
 		reg = (offset<<1)+1;
 		val = (data>>8)&0xff;
-		write_snd_020(space->machine, reg, val);
+		write_snd_020(space->machine(), reg, val);
 	}
 }
 
@@ -879,9 +879,9 @@ static double adc0834_callback( device_t *device, UINT8 input )
 	switch (input)
 	{
 	case ADC083X_CH0:
-		return (double)(5 * input_port_read(device->machine, "AN0")) / 255.0; // steer
+		return (double)(5 * input_port_read(device->machine(), "AN0")) / 255.0; // steer
 	case ADC083X_CH1:
-		return (double)(5 * input_port_read(device->machine, "AN1")) / 255.0; // gas
+		return (double)(5 * input_port_read(device->machine(), "AN1")) / 255.0; // gas
 	case ADC083X_VREF:
 		return 5;
 	}
@@ -895,16 +895,16 @@ static const adc083x_interface konamigx_adc_interface = {
 
 static READ32_HANDLER( le2_gun_H_r )
 {
-	int p1x = input_port_read(space->machine, "LIGHT0_X")*290/0xff+20;
-	int p2x = input_port_read(space->machine, "LIGHT1_X")*290/0xff+20;
+	int p1x = input_port_read(space->machine(), "LIGHT0_X")*290/0xff+20;
+	int p2x = input_port_read(space->machine(), "LIGHT1_X")*290/0xff+20;
 
 	return (p1x<<16)|p2x;
 }
 
 static READ32_HANDLER( le2_gun_V_r )
 {
-	int p1y = input_port_read(space->machine, "LIGHT0_Y")*224/0xff;
-	int p2y = input_port_read(space->machine, "LIGHT1_Y")*224/0xff;
+	int p1y = input_port_read(space->machine(), "LIGHT0_Y")*224/0xff;
+	int p2y = input_port_read(space->machine(), "LIGHT1_Y")*224/0xff;
 
 	// make "off the bottom" reload too
 	if (p1y >= 0xdf) p1y = 0;
@@ -928,14 +928,14 @@ static READ32_HANDLER( gx6bppspr_r )
 
 static READ32_HANDLER( type1_roz_r1 )
 {
-	UINT32 *ROM = (UINT32 *)space->machine->region("gfx3")->base();
+	UINT32 *ROM = (UINT32 *)space->machine().region("gfx3")->base();
 
 	return ROM[offset];
 }
 
 static READ32_HANDLER( type1_roz_r2 )
 {
-	UINT32 *ROM = (UINT32 *)space->machine->region("gfx3")->base();
+	UINT32 *ROM = (UINT32 *)space->machine().region("gfx3")->base();
 
 	ROM += (0x600000/2);
 
@@ -1138,7 +1138,7 @@ static WRITE32_HANDLER( type4_prot_w )
 				if (konamigx_wrport1_1 & 0x10)
 				{
 					gx_rdport1_3 &= ~8;
-					cputag_set_input_line(space->machine, "maincpu", 4, HOLD_LINE);
+					cputag_set_input_line(space->machine(), "maincpu", 4, HOLD_LINE);
 				}
 
 				// don't accidentally do a phony command
@@ -1152,7 +1152,7 @@ static WRITE32_HANDLER( type4_prot_w )
 // cabinet lamps for type 1 games
 static WRITE32_HANDLER( type1_cablamps_w )
 {
-	set_led_status(space->machine, 0, (data>>24)&1);
+	set_led_status(space->machine(), 0, (data>>24)&1);
 }
 
 /**********************************************************************************/
@@ -1254,9 +1254,9 @@ static READ16_HANDLER( dual539_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_BITS_0_7)
-		ret |= k054539_r(space->machine->device("konami2"), offset);
+		ret |= k054539_r(space->machine().device("konami2"), offset);
 	if (ACCESSING_BITS_8_15)
-		ret |= k054539_r(space->machine->device("konami1"), offset)<<8;
+		ret |= k054539_r(space->machine().device("konami1"), offset)<<8;
 
 	return ret;
 }
@@ -1264,9 +1264,9 @@ static READ16_HANDLER( dual539_r )
 static WRITE16_HANDLER( dual539_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k054539_w(space->machine->device("konami2"), offset, data);
+		k054539_w(space->machine().device("konami2"), offset, data);
 	if (ACCESSING_BITS_8_15)
-		k054539_w(space->machine->device("konami1"), offset, data>>8);
+		k054539_w(space->machine().device("konami1"), offset, data>>8);
 }
 
 static READ16_HANDLER( sndcomm68k_r )
@@ -1287,28 +1287,28 @@ static INTERRUPT_GEN(tms_sync)
 
 static READ16_HANDLER(tms57002_data_word_r)
 {
-	return tms57002_data_r(space->machine->device("dasp"), 0);
+	return tms57002_data_r(space->machine().device("dasp"), 0);
 }
 
 static WRITE16_HANDLER(tms57002_data_word_w)
 {
 	if (ACCESSING_BITS_0_7)
-		tms57002_data_w(space->machine->device("dasp"), 0, data);
+		tms57002_data_w(space->machine().device("dasp"), 0, data);
 }
 
 static READ16_HANDLER(tms57002_status_word_r)
 {
-	return (tms57002_dready_r(space->machine->device("dasp"), 0) ? 4 : 0) |
-		(tms57002_empty_r(space->machine->device("dasp"), 0) ? 1 : 0);
+	return (tms57002_dready_r(space->machine().device("dasp"), 0) ? 4 : 0) |
+		(tms57002_empty_r(space->machine().device("dasp"), 0) ? 1 : 0);
 }
 
 static WRITE16_HANDLER(tms57002_control_word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		tms57002_pload_w(space->machine->device("dasp"), 0, data & 4);
-		tms57002_cload_w(space->machine->device("dasp"), 0, data & 8);
-		cputag_set_input_line(space->machine, "dasp", INPUT_LINE_RESET, !(data & 16) ? ASSERT_LINE : CLEAR_LINE);
+		tms57002_pload_w(space->machine().device("dasp"), 0, data & 4);
+		tms57002_cload_w(space->machine().device("dasp"), 0, data & 8);
+		cputag_set_input_line(space->machine(), "dasp", INPUT_LINE_RESET, !(data & 16) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -3649,7 +3649,7 @@ static MACHINE_START( konamigx )
 
 static MACHINE_RESET(konamigx)
 {
-	device_t *k054539_2 = machine->device("konami2");
+	device_t *k054539_2 = machine.device("konami2");
 	int i;
 
 	konamigx_wrport1_0 = konamigx_wrport1_1 = 0;
@@ -3671,12 +3671,12 @@ static MACHINE_RESET(konamigx)
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
 	cputag_set_input_line(machine, "dasp", INPUT_LINE_RESET, ASSERT_LINE);
 
-	if (!strcmp(machine->system().name, "tkmmpzdm"))
+	if (!strcmp(machine.system().name, "tkmmpzdm"))
 	{
 		// boost voice(chip 1 channel 3-7)
 		for (i=3; i<=7; i++) k054539_set_gain(k054539_2, i, 2.0);
 	}
-	else if ((!strcmp(machine->system().name, "dragoonj")) || (!strcmp(machine->system().name, "dragoona")))
+	else if ((!strcmp(machine.system().name, "dragoonj")) || (!strcmp(machine.system().name, "dragoona")))
 	{
 		// soften percussions(chip 1 channel 0-3), boost voice(chip 1 channel 4-7)
 		for (i=0; i<=3; i++)
@@ -3756,12 +3756,12 @@ static DRIVER_INIT(konamigx)
 	snd020_hack = 0;
 	resume_trigger = 0;
 
-	dmadelay_timer = machine->scheduler().timer_alloc(FUNC(dmaend_callback));
+	dmadelay_timer = machine.scheduler().timer_alloc(FUNC(dmaend_callback));
 
 	i = match = 0;
 	while ((gameDefs[i].cfgport != -1) && (!match))
 	{
-		if (!strcmp(machine->system().name, gameDefs[i].romname))
+		if (!strcmp(machine.system().name, gameDefs[i].romname))
 	{
 			match = 1;
 			konamigx_cfgport = gameDefs[i].cfgport;
@@ -3771,13 +3771,13 @@ static DRIVER_INIT(konamigx)
 			switch (gameDefs[i].special)
 	{
 				case 1:	// LE2 guns
-					machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd44000, 0xd44003, FUNC(le2_gun_H_r) );
-					machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd44004, 0xd44007, FUNC(le2_gun_V_r) );
+					machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd44000, 0xd44003, FUNC(le2_gun_H_r) );
+					machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd44004, 0xd44007, FUNC(le2_gun_V_r) );
 					break;
 
 				case 2:	// tkmmpzdm hack
 	{
-		UINT32 *rom = (UINT32*)machine->region("maincpu")->base();
+		UINT32 *rom = (UINT32*)machine.region("maincpu")->base();
 
 		// The display is initialized after POST but the copyright screen disabled
 		// planes B,C,D and didn't bother restoring them. I've spent a good
@@ -3808,7 +3808,7 @@ static DRIVER_INIT(konamigx)
 					break;
 
 				case 7:	// install type 4 Xilinx protection for non-type 3/4 games
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xcc0000, 0xcc0007, FUNC(type4_prot_w) );
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xcc0000, 0xcc0007, FUNC(type4_prot_w) );
 					break;
 
 				case 8: // tbyahhoo
@@ -3828,14 +3828,14 @@ static DRIVER_INIT(konamigx)
 	switch (readback)
 	{
 		case BPP5:
-			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd4a000, 0xd4a00f, FUNC(gx5bppspr_r));
+			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd4a000, 0xd4a00f, FUNC(gx5bppspr_r));
 		break;
 
 		case BPP66:
-			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd00000, 0xd01fff, FUNC(K056832_6bpp_rom_long_r));
+			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd00000, 0xd01fff, FUNC(K056832_6bpp_rom_long_r));
 
 		case BPP6:
-			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd4a000, 0xd4a00f, FUNC(gx6bppspr_r));
+			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd4a000, 0xd4a00f, FUNC(gx6bppspr_r));
 		break;
 	}
 

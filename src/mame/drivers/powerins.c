@@ -46,10 +46,10 @@ TODO:
 
 static WRITE16_HANDLER( powerins_okibank_w )
 {
-	powerins_state *state = space->machine->driver_data<powerins_state>();
+	powerins_state *state = space->machine().driver_data<powerins_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = space->machine->region("oki1")->base();
+		UINT8 *RAM = space->machine().region("oki1")->base();
 		int new_bank = data & 0x7;
 
 		if (new_bank != state->oki_bank)
@@ -315,13 +315,13 @@ GFXDECODE_END
 
 static MACHINE_RESET( powerins )
 {
-	powerins_state *state = machine->driver_data<powerins_state>();
+	powerins_state *state = machine.driver_data<powerins_state>();
 	state->oki_bank = -1;	// samples bank "unitialised"
 }
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

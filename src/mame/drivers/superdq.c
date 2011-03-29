@@ -44,7 +44,7 @@ public:
 
 static TILE_GET_INFO( get_tile_info )
 {
-	superdq_state *state = machine->driver_data<superdq_state>();
+	superdq_state *state = machine.driver_data<superdq_state>();
 	int tile = state->videoram[tile_index];
 
 	SET_TILE_INFO(0, tile, state->color_bank, 0);
@@ -52,14 +52,14 @@ static TILE_GET_INFO( get_tile_info )
 
 static VIDEO_START( superdq )
 {
-	superdq_state *state = machine->driver_data<superdq_state>();
+	superdq_state *state = machine.driver_data<superdq_state>();
 
 	state->tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE( superdq )
 {
-	superdq_state *state = screen->machine->driver_data<superdq_state>();
+	superdq_state *state = screen->machine().driver_data<superdq_state>();
 
 	tilemap_draw(bitmap, cliprect, state->tilemap, 0, 0);
 
@@ -87,7 +87,7 @@ static PALETTE_INIT( superdq )
 			2,	&resistances[1], bweights, 220, 0);
 
 	/* initialize the palette with these colors */
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;
@@ -115,7 +115,7 @@ static PALETTE_INIT( superdq )
 
 static MACHINE_RESET( superdq )
 {
-	superdq_state *state = machine->driver_data<superdq_state>();
+	superdq_state *state = machine.driver_data<superdq_state>();
 
 	state->ld_in_latch = 0;
 	state->ld_out_latch = 0xff;
@@ -124,7 +124,7 @@ static MACHINE_RESET( superdq )
 
 static INTERRUPT_GEN( superdq_vblank )
 {
-	superdq_state *state = device->machine->driver_data<superdq_state>();
+	superdq_state *state = device->machine().driver_data<superdq_state>();
 
 	/* status is read when the STATUS line from the laserdisc
        toggles (600usec after the vblank). We could set up a
@@ -140,7 +140,7 @@ static INTERRUPT_GEN( superdq_vblank )
 
 static WRITE8_HANDLER( superdq_videoram_w )
 {
-	superdq_state *state = space->machine->driver_data<superdq_state>();
+	superdq_state *state = space->machine().driver_data<superdq_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap,offset);
@@ -148,15 +148,15 @@ static WRITE8_HANDLER( superdq_videoram_w )
 
 static WRITE8_HANDLER( superdq_io_w )
 {
-	superdq_state *state = space->machine->driver_data<superdq_state>();
+	superdq_state *state = space->machine().driver_data<superdq_state>();
 	int 			i;
 	static const UINT8 black_color_entries[] = {7,15,16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 
 	if ( data & 0x40 ) /* bit 6 = irqack */
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 
-	coin_counter_w( space->machine, 0, data & 0x08 );
-	coin_counter_w( space->machine, 1, data & 0x04 );
+	coin_counter_w( space->machine(), 0, data & 0x08 );
+	coin_counter_w( space->machine(), 1, data & 0x04 );
 
 	state->color_bank = ( data & 2 ) ? 1 : 0;
 
@@ -164,9 +164,9 @@ static WRITE8_HANDLER( superdq_io_w )
 	{
 		int index = black_color_entries[i];
 		if (data & 0x80)
-			palette_set_color(space->machine, index, palette_get_color(space->machine, index) & MAKE_ARGB(0,255,255,255));
+			palette_set_color(space->machine(), index, palette_get_color(space->machine(), index) & MAKE_ARGB(0,255,255,255));
 		else
-			palette_set_color(space->machine, index, palette_get_color(space->machine, index) | MAKE_ARGB(255,0,0,0));
+			palette_set_color(space->machine(), index, palette_get_color(space->machine(), index) | MAKE_ARGB(255,0,0,0));
 	}
 
 	/*
@@ -178,14 +178,14 @@ static WRITE8_HANDLER( superdq_io_w )
 
 static READ8_HANDLER( superdq_ld_r )
 {
-	superdq_state *state = space->machine->driver_data<superdq_state>();
+	superdq_state *state = space->machine().driver_data<superdq_state>();
 
 	return state->ld_in_latch;
 }
 
 static WRITE8_HANDLER( superdq_ld_w )
 {
-	superdq_state *state = space->machine->driver_data<superdq_state>();
+	superdq_state *state = space->machine().driver_data<superdq_state>();
 
 	state->ld_out_latch = data;
 }
@@ -316,9 +316,9 @@ GFXDECODE_END
 
 static MACHINE_START( superdq )
 {
-	superdq_state *state = machine->driver_data<superdq_state>();
+	superdq_state *state = machine.driver_data<superdq_state>();
 
-	state->laserdisc = machine->device("laserdisc");
+	state->laserdisc = machine.device("laserdisc");
 }
 
 

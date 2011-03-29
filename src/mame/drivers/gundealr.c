@@ -55,15 +55,15 @@ Runs in interrupt mode 0, the interrupt vectors are 0xcf (RST 08h) and
 
 static INTERRUPT_GEN( yamyam_interrupt )
 {
-	gundealr_state *state = device->machine->driver_data<gundealr_state>();
+	gundealr_state *state = device->machine().driver_data<gundealr_state>();
 
 	if (cpu_getiloops(device) == 0)
 	{
 		if (state->input_ports_hack)
 		{
-			state->rambase[0x004] = input_port_read(device->machine, "IN2");
-			state->rambase[0x005] = input_port_read(device->machine, "IN1");
-			state->rambase[0x006] = input_port_read(device->machine, "IN0");
+			state->rambase[0x004] = input_port_read(device->machine(), "IN2");
+			state->rambase[0x005] = input_port_read(device->machine(), "IN1");
+			state->rambase[0x006] = input_port_read(device->machine(), "IN0");
 		}
 		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h vblank */
 	}
@@ -73,12 +73,12 @@ static INTERRUPT_GEN( yamyam_interrupt )
 
 static WRITE8_HANDLER( yamyam_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x07);
+	memory_set_bank(space->machine(), "bank1", data & 0x07);
 }
 
 static WRITE8_HANDLER( yamyam_protection_w )
 {
-	gundealr_state *state = space->machine->driver_data<gundealr_state>();
+	gundealr_state *state = space->machine().driver_data<gundealr_state>();
 	logerror("e000 = %02x\n", state->rambase[0x000]);
 	state->rambase[0x000] = data;
 	if (data == 0x03) state->rambase[0x001] = 0x03;
@@ -446,8 +446,8 @@ GFXDECODE_END
 
 static MACHINE_START( gundealr )
 {
-	gundealr_state *state = machine->driver_data<gundealr_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	gundealr_state *state = machine.driver_data<gundealr_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 
@@ -457,7 +457,7 @@ static MACHINE_START( gundealr )
 
 static MACHINE_RESET( gundealr )
 {
-	gundealr_state *state = machine->driver_data<gundealr_state>();
+	gundealr_state *state = machine.driver_data<gundealr_state>();
 
 	state->flipscreen = 0;
 	state->scroll[0] = 0;
@@ -571,15 +571,15 @@ ROM_END
 
 static DRIVER_INIT( gundealr )
 {
-	gundealr_state *state = machine->driver_data<gundealr_state>();
+	gundealr_state *state = machine.driver_data<gundealr_state>();
 	state->input_ports_hack = 0;
 }
 
 static DRIVER_INIT( yamyam )
 {
-	gundealr_state *state = machine->driver_data<gundealr_state>();
+	gundealr_state *state = machine.driver_data<gundealr_state>();
 	state->input_ports_hack = 1;
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe000, 0xe000, FUNC(yamyam_protection_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe000, 0xe000, FUNC(yamyam_protection_w));
 }
 
 

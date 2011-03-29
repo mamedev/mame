@@ -30,10 +30,10 @@ public:
 
 /*----------- defined in video/mainevt.c -----------*/
 
-extern void mainevt_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void dv_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void mainevt_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow);
-extern void dv_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
+extern void mainevt_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void dv_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void mainevt_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);
+extern void dv_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
 
 VIDEO_START( mainevt );
 VIDEO_START( dv );

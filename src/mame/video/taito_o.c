@@ -25,12 +25,12 @@ static const int zoomy_conv_table[] =
 };
 
 
-static void parentj_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void parentj_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
 
-	taitoo_state *state = machine->driver_data<taitoo_state>();
+	taitoo_state *state = machine.driver_data<taitoo_state>();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
 	int ysize;
@@ -120,7 +120,7 @@ static void parentj_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 						}
 
 						drawgfxzoom_transpen( bitmap, cliprect,
-								 machine -> gfx[0],
+								 machine.gfx[0],
 								 tile,
 								 color,
 								 flipx, flipy,
@@ -140,7 +140,7 @@ static void parentj_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 
 SCREEN_UPDATE( parentj )
 {
-	taitoo_state *state = screen->machine->driver_data<taitoo_state>();
+	taitoo_state *state = screen->machine().driver_data<taitoo_state>();
 
 	tc0080vco_tilemap_update(state->tc0080vco);
 
@@ -148,8 +148,8 @@ SCREEN_UPDATE( parentj )
 
 	tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 
-	parentj_draw_sprites(screen->machine, bitmap, cliprect, 0);
-	parentj_draw_sprites(screen->machine, bitmap, cliprect, 1);
+	parentj_draw_sprites(screen->machine(), bitmap, cliprect, 0);
+	parentj_draw_sprites(screen->machine(), bitmap, cliprect, 1);
 
 	tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 1, 0, 0);
 	tc0080vco_tilemap_draw(state->tc0080vco, bitmap, cliprect, 2, 0, 0);

@@ -10,15 +10,15 @@ Atari Sky Raider video emulation
 
 VIDEO_START( skyraid )
 {
-	skyraid_state *state = machine->driver_data<skyraid_state>();
+	skyraid_state *state = machine.driver_data<skyraid_state>();
 
-	state->helper = auto_bitmap_alloc(machine, 128, 240, machine->primary_screen->format());
+	state->helper = auto_bitmap_alloc(machine, 128, 240, machine.primary_screen->format());
 }
 
 
-static void draw_text(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
+static void draw_text(running_machine &machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
-	skyraid_state *state = machine->driver_data<skyraid_state>();
+	skyraid_state *state = machine.driver_data<skyraid_state>();
 	const UINT8* p = state->alpha_num_ram;
 
 	int i;
@@ -31,15 +31,15 @@ static void draw_text(running_machine *machine, bitmap_t* bitmap, const rectangl
 		y = 136 + 16 * (i ^ 1);
 
 		for (x = 0; x < bitmap->width; x += 16)
-			drawgfx_transpen(bitmap, cliprect, machine->gfx[0], *p++, 0, 0, 0,	x, y, 0);
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], *p++, 0, 0, 0,	x, y, 0);
 	}
 }
 
 
-static void draw_terrain(running_machine *machine, bitmap_t* bitmap, const rectangle *cliprect)
+static void draw_terrain(running_machine &machine, bitmap_t* bitmap, const rectangle *cliprect)
 {
-	skyraid_state *state = machine->driver_data<skyraid_state>();
-	const UINT8* p = machine->region("user1")->base();
+	skyraid_state *state = machine.driver_data<skyraid_state>();
+	const UINT8* p = machine.region("user1")->base();
 
 	int x;
 	int y;
@@ -72,9 +72,9 @@ static void draw_terrain(running_machine *machine, bitmap_t* bitmap, const recta
 }
 
 
-static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
-	skyraid_state *state = machine->driver_data<skyraid_state>();
+	skyraid_state *state = machine.driver_data<skyraid_state>();
 	int i;
 
 	for (i = 0; i < 4; i++)
@@ -87,16 +87,16 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 		vert -= 31;
 
 		if (flag & 1)
-			drawgfx_transpen(bitmap, cliprect, machine->gfx[1],
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[1],
 				code ^ 15, code >> 3, 0, 0,
 				horz / 2, vert, 2);
 	}
 }
 
 
-static void draw_missiles(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
+static void draw_missiles(running_machine &machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
-	skyraid_state *state = machine->driver_data<skyraid_state>();
+	skyraid_state *state = machine.driver_data<skyraid_state>();
 	int i;
 
 	/* hardware is restricted to one sprite per scanline */
@@ -110,16 +110,16 @@ static void draw_missiles(running_machine *machine, bitmap_t* bitmap, const rect
 		vert -= 15;
 		horz -= 31;
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[2],
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[2],
 			code ^ 15, 0, 0, 0,
 			horz / 2, vert, 0);
 	}
 }
 
 
-static void draw_trapezoid(running_machine *machine, bitmap_t* dst, bitmap_t* src)
+static void draw_trapezoid(running_machine &machine, bitmap_t* dst, bitmap_t* src)
 {
-	const UINT8* p = machine->region("user2")->base();
+	const UINT8* p = machine.region("user2")->base();
 
 	int x;
 	int y;
@@ -140,14 +140,14 @@ static void draw_trapezoid(running_machine *machine, bitmap_t* dst, bitmap_t* sr
 
 SCREEN_UPDATE( skyraid )
 {
-	skyraid_state *state = screen->machine->driver_data<skyraid_state>();
+	skyraid_state *state = screen->machine().driver_data<skyraid_state>();
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	draw_terrain(screen->machine, state->helper, NULL);
-	draw_sprites(screen->machine, state->helper, NULL);
-	draw_missiles(screen->machine, state->helper, NULL);
-	draw_trapezoid(screen->machine, bitmap, state->helper);
-	draw_text(screen->machine, bitmap, cliprect);
+	draw_terrain(screen->machine(), state->helper, NULL);
+	draw_sprites(screen->machine(), state->helper, NULL);
+	draw_missiles(screen->machine(), state->helper, NULL);
+	draw_trapezoid(screen->machine(), bitmap, state->helper);
+	draw_text(screen->machine(), bitmap, cliprect);
 	return 0;
 }

@@ -1215,7 +1215,7 @@ static TIMER_CALLBACK( master_callback )
 void upi41_master_w(device_t *_device, UINT8 a0, UINT8 data)
 {
 	legacy_cpu_device *device = downcast<legacy_cpu_device *>(_device);
-	device->machine->scheduler().synchronize(FUNC(master_callback), (a0 << 8) | data, (void *)device);
+	device->machine().scheduler().synchronize(FUNC(master_callback), (a0 << 8) | data, (void *)device);
 }
 
 

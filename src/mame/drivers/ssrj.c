@@ -36,8 +36,8 @@ HW info :
 
 static MACHINE_RESET(ssrj)
 {
-	ssrj_state *state = machine->driver_data<ssrj_state>();
-	UINT8 *rom = machine->region("maincpu")->base();
+	ssrj_state *state = machine.driver_data<ssrj_state>();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	memset(&rom[0xc000], 0 ,0x3fff); /* req for some control types */
 	state->oldport = 0x80;
@@ -45,8 +45,8 @@ static MACHINE_RESET(ssrj)
 
 static READ8_HANDLER(ssrj_wheel_r)
 {
-	ssrj_state *state = space->machine->driver_data<ssrj_state>();
-	int port = input_port_read(space->machine, "IN1") - 0x80;
+	ssrj_state *state = space->machine().driver_data<ssrj_state>();
+	int port = input_port_read(space->machine(), "IN1") - 0x80;
 	int retval = port - state->oldport;
 
 	state->oldport = port;

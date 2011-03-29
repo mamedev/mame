@@ -45,17 +45,17 @@ public:
 
 static WRITE8_HANDLER( skyarmy_flip_screen_x_w )
 {
-	flip_screen_x_set(space->machine, data & 0x01);
+	flip_screen_x_set(space->machine(), data & 0x01);
 }
 
 static WRITE8_HANDLER( skyarmy_flip_screen_y_w )
 {
-	flip_screen_y_set(space->machine, data & 0x01);
+	flip_screen_y_set(space->machine(), data & 0x01);
 }
 
 static TILE_GET_INFO( get_skyarmy_tile_info )
 {
-	skyarmy_state *state = machine->driver_data<skyarmy_state>();
+	skyarmy_state *state = machine.driver_data<skyarmy_state>();
 	int code = state->videoram[tile_index];
 	int attr = BITSWAP8(state->colorram[tile_index], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
 
@@ -64,7 +64,7 @@ static TILE_GET_INFO( get_skyarmy_tile_info )
 
 static WRITE8_HANDLER( skyarmy_videoram_w )
 {
-	skyarmy_state *state = space->machine->driver_data<skyarmy_state>();
+	skyarmy_state *state = space->machine().driver_data<skyarmy_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap,offset);
@@ -72,7 +72,7 @@ static WRITE8_HANDLER( skyarmy_videoram_w )
 
 static WRITE8_HANDLER( skyarmy_colorram_w )
 {
-	skyarmy_state *state = space->machine->driver_data<skyarmy_state>();
+	skyarmy_state *state = space->machine().driver_data<skyarmy_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap,offset);
@@ -108,7 +108,7 @@ static PALETTE_INIT( skyarmy )
 
 static VIDEO_START( skyarmy )
 {
-	skyarmy_state *state = machine->driver_data<skyarmy_state>();
+	skyarmy_state *state = machine.driver_data<skyarmy_state>();
 
 	state->tilemap = tilemap_create(machine, get_skyarmy_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_cols(state->tilemap,32);
@@ -117,7 +117,7 @@ static VIDEO_START( skyarmy )
 
 static SCREEN_UPDATE( skyarmy )
 {
-	skyarmy_state *state = screen->machine->driver_data<skyarmy_state>();
+	skyarmy_state *state = screen->machine().driver_data<skyarmy_state>();
 	UINT8 *spriteram = state->spriteram;
 	int sx, sy, flipx, flipy, offs,pal;
 	int i;
@@ -136,7 +136,7 @@ static SCREEN_UPDATE( skyarmy )
 		flipy = (spriteram[offs+1]&0x80)>>7;
 		flipx = (spriteram[offs+1]&0x40)>>6;
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],
 			spriteram[offs+1]&0x3f,
 			pal,
 			flipx,flipy,
@@ -148,7 +148,7 @@ static SCREEN_UPDATE( skyarmy )
 
 static INTERRUPT_GEN( skyarmy_nmi_source )
 {
-	skyarmy_state *state = device->machine->driver_data<skyarmy_state>();
+	skyarmy_state *state = device->machine().driver_data<skyarmy_state>();
 
 	if(state->nmi) device_set_input_line(device,INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -156,7 +156,7 @@ static INTERRUPT_GEN( skyarmy_nmi_source )
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	skyarmy_state *state = space->machine->driver_data<skyarmy_state>();
+	skyarmy_state *state = space->machine().driver_data<skyarmy_state>();
 
 	state->nmi=data & 1;
 }

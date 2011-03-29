@@ -1518,7 +1518,7 @@ static DEVICE_START( tms5220 )
 	devcb_resolve_write_line(&tms->readyq_func, &tms->intf->readyq_func, device);
 
 	/* initialize a stream */
-	tms->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() / 80, tms, tms5220_update);
+	tms->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() / 80, tms, tms5220_update);
 
 	/*if (tms->table == NULL)
     {
@@ -1696,7 +1696,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 			tms->io_ready = 0;
 			update_ready_state(tms);
 			/* How long does /READY stay inactive, when /RS is pulled low? I believe its almost always ~16 clocks (25 usec at 800khz as shown on the datasheet) */
-			tms->device->machine->scheduler().timer_set(attotime::from_hz(device->clock()/16), FUNC(io_ready_cb), 1, tms); // this should take around 10-16 (closer to ~11?) cycles to complete
+			tms->device->machine().scheduler().timer_set(attotime::from_hz(device->clock()/16), FUNC(io_ready_cb), 1, tms); // this should take around 10-16 (closer to ~11?) cycles to complete
 		}
 	}
 }
@@ -1759,7 +1759,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
             SET RATE (5220C only): ? cycles (probably ~16)
             */
 			// TODO: actually HANDLE the timing differences! currently just assuming always 16 cycles
-			tms->device->machine->scheduler().timer_set(attotime::from_hz(device->clock()/16), FUNC(io_ready_cb), 1, tms); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
+			tms->device->machine().scheduler().timer_set(attotime::from_hz(device->clock()/16), FUNC(io_ready_cb), 1, tms); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
 		}
 	}
 }

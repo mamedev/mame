@@ -53,21 +53,21 @@ static WRITE8_HANDLER( output_0_w )
 {
 
 	//---- --x- divider?
-	coin_lockout_w(space->machine, 0, ~data & 1);
+	coin_lockout_w(space->machine(), 0, ~data & 1);
 
-//  coin_counter_w(space->machine, 0, ~data & 1);
+//  coin_counter_w(space->machine(), 0, ~data & 1);
 }
 
 
 static READ8_HANDLER( input_1_r )
 {
-	cchance_state *state = space->machine->driver_data<cchance_state>();
-	return (state->hop_io) | (state->bell_io) | (input_port_read(space->machine, "SP") & 0xff);
+	cchance_state *state = space->machine().driver_data<cchance_state>();
+	return (state->hop_io) | (state->bell_io) | (input_port_read(space->machine(), "SP") & 0xff);
 }
 
 static WRITE8_HANDLER( output_1_w )
 {
-	cchance_state *state = space->machine->driver_data<cchance_state>();
+	cchance_state *state = space->machine().driver_data<cchance_state>();
 
 	state->hop_io = (data & 0x40)>>4;
 	state->bell_io = (data & 0x80)>>4;
@@ -195,7 +195,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( cchance )
 {
-	cchance_state *state = machine->driver_data<cchance_state>();
+	cchance_state *state = machine.driver_data<cchance_state>();
 	state->mcu = NULL;
 
 	state->save_item(NAME(state->screenflip));
@@ -205,7 +205,7 @@ static MACHINE_START( cchance )
 
 static MACHINE_RESET( cchance )
 {
-	cchance_state *state = machine->driver_data<cchance_state>();
+	cchance_state *state = machine.driver_data<cchance_state>();
 
 	state->screenflip = 0;
 	state->mcu_type = -1;

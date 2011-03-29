@@ -109,7 +109,7 @@ static TIMER_CALLBACK( irq5_gen )
 static INTERRUPT_GEN( irq4_gen )
 {
 	device_set_input_line(device, R3000_IRQ4, ASSERT_LINE);
-	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_pos(0), FUNC(irq5_gen));
+	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(0), FUNC(irq5_gen));
 }
 
 
@@ -122,7 +122,7 @@ static INTERRUPT_GEN( irq4_gen )
 
 static WRITE32_HANDLER( control_w )
 {
-	policetr_state *state = space->machine->driver_data<policetr_state>();
+	policetr_state *state = space->machine().driver_data<policetr_state>();
 	UINT32 old = state->control_data;
 
 	// bit $80000000 = BSMT access/ROM read
@@ -137,7 +137,7 @@ static WRITE32_HANDLER( control_w )
 	/* handle EEPROM I/O */
 	if (ACCESSING_BITS_16_23)
 	{
-		device_t *device = space->machine->device("eeprom");
+		device_t *device = space->machine().device("eeprom");
 		eeprom_write_bit(device, data & 0x00800000);
 		eeprom_set_cs_line(device, (data & 0x00200000) ? CLEAR_LINE : ASSERT_LINE);
 		eeprom_set_clock_line(device, (data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
@@ -146,7 +146,7 @@ static WRITE32_HANDLER( control_w )
 	/* toggling BSMT off then on causes a reset */
 	if (!(old & 0x80000000) && (state->control_data & 0x80000000))
 	{
-		bsmt2000_device *bsmt = space->machine->device<bsmt2000_device>("bsmt");
+		bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
 		bsmt->reset();
 	}
 
@@ -165,9 +165,9 @@ static WRITE32_HANDLER( control_w )
 
 static WRITE32_HANDLER( policetr_bsmt2000_reg_w )
 {
-	policetr_state *state = space->machine->driver_data<policetr_state>();
+	policetr_state *state = space->machine().driver_data<policetr_state>();
 	if (state->control_data & 0x80000000)
-		space->machine->device<bsmt2000_device>("bsmt")->write_data(data);
+		space->machine().device<bsmt2000_device>("bsmt")->write_data(data);
 	else
 		COMBINE_DATA(&state->bsmt_data_offset);
 }
@@ -175,22 +175,22 @@ static WRITE32_HANDLER( policetr_bsmt2000_reg_w )
 
 static WRITE32_HANDLER( policetr_bsmt2000_data_w )
 {
-	policetr_state *state = space->machine->driver_data<policetr_state>();
-	space->machine->device<bsmt2000_device>("bsmt")->write_reg(data);
+	policetr_state *state = space->machine().driver_data<policetr_state>();
+	space->machine().device<bsmt2000_device>("bsmt")->write_reg(data);
 	COMBINE_DATA(&state->bsmt_data_bank);
 }
 
 
 static CUSTOM_INPUT( bsmt_status_r )
 {
-	return field->port->machine->device<bsmt2000_device>("bsmt")->read_status();
+	return field->port->machine().device<bsmt2000_device>("bsmt")->read_status();
 }
 
 
 static READ32_HANDLER( bsmt2000_data_r )
 {
-	policetr_state *state = space->machine->driver_data<policetr_state>();
-	return space->machine->region("bsmt")->base()[state->bsmt_data_bank * 0x10000 + state->bsmt_data_offset] << 8;
+	policetr_state *state = space->machine().driver_data<policetr_state>();
+	return space->machine().region("bsmt")->base()[state->bsmt_data_bank * 0x10000 + state->bsmt_data_offset] << 8;
 }
 
 
@@ -203,13 +203,13 @@ static READ32_HANDLER( bsmt2000_data_r )
 
 static WRITE32_HANDLER( speedup_w )
 {
-	policetr_state *state = space->machine->driver_data<policetr_state>();
+	policetr_state *state = space->machine().driver_data<policetr_state>();
 	COMBINE_DATA(state->speedup_data);
 
 	/* see if the PC matches */
 	if ((cpu_get_previouspc(space->cpu) & 0x1fffffff) == state->speedup_pc)
 	{
-		UINT64 curr_cycles = space->machine->firstcpu->total_cycles();
+		UINT64 curr_cycles = space->machine().firstcpu->total_cycles();
 
 		/* if less than 50 cycles from the last time, count it */
 		if (curr_cycles - state->last_cycles < 50)
@@ -678,30 +678,30 @@ ROM_END
 
 static DRIVER_INIT( policetr )
 {
-	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00000fc8, 0x00000fcb, FUNC(speedup_w));
+	policetr_state *state = machine.driver_data<policetr_state>();
+	state->speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00000fc8, 0x00000fcb, FUNC(speedup_w));
 	state->speedup_pc = 0x1fc028ac;
 }
 
 static DRIVER_INIT( plctr13b )
 {
-	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00000fc8, 0x00000fcb, FUNC(speedup_w));
+	policetr_state *state = machine.driver_data<policetr_state>();
+	state->speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00000fc8, 0x00000fcb, FUNC(speedup_w));
 	state->speedup_pc = 0x1fc028bc;
 }
 
 
 static DRIVER_INIT( sshooter )
 {
-	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00018fd8, 0x00018fdb, FUNC(speedup_w));
+	policetr_state *state = machine.driver_data<policetr_state>();
+	state->speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00018fd8, 0x00018fdb, FUNC(speedup_w));
 	state->speedup_pc = 0x1fc03470;
 }
 
 static DRIVER_INIT( sshoot12 )
 {
-	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00018fd8, 0x00018fdb, FUNC(speedup_w));
+	policetr_state *state = machine.driver_data<policetr_state>();
+	state->speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00018fd8, 0x00018fdb, FUNC(speedup_w));
 	state->speedup_pc = 0x1fc033e0;
 }
 

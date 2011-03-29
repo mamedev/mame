@@ -83,7 +83,7 @@ public:
 
 static WRITE8_HANDLER( nsmpoker_videoram_w )
 {
-	nsmpoker_state *state = space->machine->driver_data<nsmpoker_state>();
+	nsmpoker_state *state = space->machine().driver_data<nsmpoker_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -91,7 +91,7 @@ static WRITE8_HANDLER( nsmpoker_videoram_w )
 
 static WRITE8_HANDLER( nsmpoker_colorram_w )
 {
-	nsmpoker_state *state = space->machine->driver_data<nsmpoker_state>();
+	nsmpoker_state *state = space->machine().driver_data<nsmpoker_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -99,7 +99,7 @@ static WRITE8_HANDLER( nsmpoker_colorram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	nsmpoker_state *state = machine->driver_data<nsmpoker_state>();
+	nsmpoker_state *state = machine.driver_data<nsmpoker_state>();
 /*  - bits -
     7654 3210
     ---- ----   bank select.
@@ -117,14 +117,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( nsmpoker )
 {
-	nsmpoker_state *state = machine->driver_data<nsmpoker_state>();
+	nsmpoker_state *state = machine.driver_data<nsmpoker_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
 static SCREEN_UPDATE( nsmpoker )
 {
-	nsmpoker_state *state = screen->machine->driver_data<nsmpoker_state>();
+	nsmpoker_state *state = screen->machine().driver_data<nsmpoker_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
@@ -152,7 +152,7 @@ static INTERRUPT_GEN( nsmpoker_interrupt )
 
 static READ8_HANDLER( debug_r )
 {
-	return space->machine->rand() & 0xff;
+	return space->machine().rand() & 0xff;
 }
 
 

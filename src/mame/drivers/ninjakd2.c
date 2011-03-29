@@ -143,7 +143,7 @@ TODO:
 //#define NE555_FREQUENCY   (1.0f / (0.693 * (560 + 2*51) * 0.1e-6))    // theoretical: this gives 21.8kHz which is too high
 
 
-static void omegaf_io_protection_reset(running_machine *machine);
+static void omegaf_io_protection_reset(running_machine &machine);
 
 
 static INTERRUPT_GEN( ninjakd2_interrupt )
@@ -155,15 +155,15 @@ static INTERRUPT_GEN( ninjakd2_interrupt )
 static MACHINE_RESET( ninjakd2 )
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, "bank1", 0, 8, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 }
 
-static void robokid_init_banks(running_machine *machine)
+static void robokid_init_banks(running_machine &machine)
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, "bank1", 0,  2, machine->region("maincpu")->base(), 0x4000);
-	memory_configure_bank(machine, "bank1", 2, 14, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0,  2, machine.region("maincpu")->base(), 0x4000);
+	memory_configure_bank(machine, "bank1", 2, 14, machine.region("maincpu")->base() + 0x10000, 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 }
 
@@ -182,22 +182,22 @@ static MACHINE_RESET( omegaf )
 
 static WRITE8_HANDLER( ninjakd2_bankselect_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x7);
+	memory_set_bank(space->machine(), "bank1", data & 0x7);
 }
 
 static WRITE8_HANDLER( robokid_bankselect_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0xf);
+	memory_set_bank(space->machine(), "bank1", data & 0xf);
 }
 
 
 static WRITE8_HANDLER( ninjakd2_soundreset_w )
 {
 	// bit 4 resets sound CPU
-	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
-	flip_screen_set(space->machine, data & 0x80);
+	flip_screen_set(space->machine(), data & 0x80);
 
 	// other bits unused
 }
@@ -206,10 +206,10 @@ static WRITE8_HANDLER( ninjakd2_soundreset_w )
 
 static SAMPLES_START( ninjakd2_init_samples )
 {
-	ninjakd2_state *state = device->machine->driver_data<ninjakd2_state>();
-	running_machine *machine = device->machine;
-	const UINT8* const rom = machine->region("pcm")->base();
-	const int length = machine->region("pcm")->bytes();
+	ninjakd2_state *state = device->machine().driver_data<ninjakd2_state>();
+	running_machine &machine = device->machine();
+	const UINT8* const rom = machine.region("pcm")->base();
+	const int length = machine.region("pcm")->bytes();
 	INT16* sampledata = auto_alloc_array(machine, INT16, length);
 
 	int i;
@@ -223,14 +223,14 @@ static SAMPLES_START( ninjakd2_init_samples )
 
 static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 {
-	ninjakd2_state *state = space->machine->driver_data<ninjakd2_state>();
-	device_t *samples = space->machine->device("pcm");
-	const UINT8* const rom = space->machine->region("pcm")->base();
+	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
+	device_t *samples = space->machine().device("pcm");
+	const UINT8* const rom = space->machine().region("pcm")->base();
 
 	// only Ninja Kid II uses this
 	if (rom)
 	{
-		const int length = space->machine->region("pcm")->bytes();
+		const int length = space->machine().region("pcm")->bytes();
 
 		const int start = data << 8;
 
@@ -256,9 +256,9 @@ static WRITE8_HANDLER( ninjakd2_pcm_play_w )
  *
  *************************************/
 
-static void omegaf_io_protection_reset(running_machine *machine)
+static void omegaf_io_protection_reset(running_machine &machine)
 {
-	ninjakd2_state *state = machine->driver_data<ninjakd2_state>();
+	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
 	// make sure protection starts in a known state
 	state->omegaf_io_protection[0] = 0;
 	state->omegaf_io_protection[1] = 0;
@@ -269,7 +269,7 @@ static void omegaf_io_protection_reset(running_machine *machine)
 
 static READ8_HANDLER( omegaf_io_protection_r )
 {
-	ninjakd2_state *state = space->machine->driver_data<ninjakd2_state>();
+	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
 	UINT8 result = 0xff;
 
 	switch (state->omegaf_io_protection[1] & 3)
@@ -332,8 +332,8 @@ static READ8_HANDLER( omegaf_io_protection_r )
 		case 1:	// dip switches
 			switch (offset)
 			{
-				case 0: result = input_port_read(space->machine, "DIPSW1"); break;
-				case 1: result = input_port_read(space->machine, "DIPSW2"); break;
+				case 0: result = input_port_read(space->machine(), "DIPSW1"); break;
+				case 1: result = input_port_read(space->machine(), "DIPSW2"); break;
 				case 2: result = 0x02;                         break;
 			}
 			break;
@@ -341,8 +341,8 @@ static READ8_HANDLER( omegaf_io_protection_r )
 		case 2:	// player inputs
 			switch (offset)
 			{
-				case 0: result = input_port_read(space->machine, "PAD1"); break;
-				case 1: result = input_port_read(space->machine, "PAD2"); break;
+				case 0: result = input_port_read(space->machine(), "PAD1"); break;
+				case 1: result = input_port_read(space->machine(), "PAD2"); break;
 				case 2: result = 0x01;                       break;
 			}
 			break;
@@ -353,7 +353,7 @@ static READ8_HANDLER( omegaf_io_protection_r )
 
 static WRITE8_HANDLER( omegaf_io_protection_w )
 {
-	ninjakd2_state *state = space->machine->driver_data<ninjakd2_state>();
+	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
 	// load parameter on c006 bit 0 rise transition
 	if (offset == 2 && (data & 1) && !(state->omegaf_io_protection[2] & 1))
 	{
@@ -876,7 +876,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -1396,11 +1396,11 @@ by one place all the intervening bits.
 
 ******************************************************************************/
 
-static void lineswap_gfx_roms(running_machine *machine, const char *region, const int bit)
+static void lineswap_gfx_roms(running_machine &machine, const char *region, const int bit)
 {
-	const int length = machine->region(region)->bytes();
+	const int length = machine.region(region)->bytes();
 
-	UINT8* const src = machine->region(region)->base();
+	UINT8* const src = machine.region(region)->base();
 
 	UINT8* const temp = auto_alloc_array(machine, UINT8, length);
 
@@ -1420,7 +1420,7 @@ static void lineswap_gfx_roms(running_machine *machine, const char *region, cons
 	auto_free(machine, temp);
 }
 
-static void gfx_unscramble(running_machine *machine)
+static void gfx_unscramble(running_machine &machine)
 {
 	lineswap_gfx_roms(machine, "gfx1", 13);		// fg tiles
 	lineswap_gfx_roms(machine, "gfx2", 14);		// sprites
@@ -1444,8 +1444,8 @@ static DRIVER_INIT( ninjakd2 )
 
 static DRIVER_INIT( bootleg )
 {
-	address_space *space = machine->device("soundcpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine->region("soundcpu")->base() + 0x10000);
+	address_space *space = machine.device("soundcpu")->memory().space(AS_PROGRAM);
+	space->set_decrypted_region(0x0000, 0x7fff, machine.region("soundcpu")->base() + 0x10000);
 
 	gfx_unscramble(machine);
 }

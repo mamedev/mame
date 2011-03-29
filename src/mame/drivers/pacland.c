@@ -181,15 +181,15 @@ Notes:
 static WRITE8_HANDLER( pacland_subreset_w )
 {
 	int bit = !BIT(offset,11);
-	cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( pacland_flipscreen_w )
 {
 	int bit = !BIT(offset,11);
-	/* can't use flip_screen_set(space->machine, ) because the visible area is asymmetrical */
-	flip_screen_set_no_update(space->machine, bit);
-	tilemap_set_flip_all(space->machine,flip_screen_get(space->machine) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	/* can't use flip_screen_set(space->machine(), ) because the visible area is asymmetrical */
+	flip_screen_set_no_update(space->machine(), bit);
+	tilemap_set_flip_all(space->machine(),flip_screen_get(space->machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 
 
@@ -198,39 +198,39 @@ static READ8_HANDLER( pacland_input_r )
 	int shift = 4 * (offset & 1);
 	int port = offset & 2;
 	static const char *const portnames[] = { "DSWA", "DSWB", "IN0", "IN1" };
-	int r = (input_port_read(space->machine, portnames[port]) << shift) & 0xf0;
-	r |= (input_port_read(space->machine, portnames[port+1]) >> (4 - shift)) & 0x0f;
+	int r = (input_port_read(space->machine(), portnames[port]) << shift) & 0xf0;
+	r |= (input_port_read(space->machine(), portnames[port+1]) >> (4 - shift)) & 0x0f;
 
 	return r;
 }
 
 static WRITE8_HANDLER( pacland_coin_w )
 {
-	coin_lockout_global_w(space->machine, data & 1);
-	coin_counter_w(space->machine, 0, ~data & 2);
-	coin_counter_w(space->machine, 1, ~data & 4);
+	coin_lockout_global_w(space->machine(), data & 1);
+	coin_counter_w(space->machine(), 0, ~data & 2);
+	coin_counter_w(space->machine(), 1, ~data & 4);
 }
 
 static WRITE8_HANDLER( pacland_led_w )
 {
-	set_led_status(space->machine, 0, data & 0x08);
-	set_led_status(space->machine, 1, data & 0x10);
+	set_led_status(space->machine(), 0, data & 0x08);
+	set_led_status(space->machine(), 1, data & 0x10);
 }
 
 static WRITE8_HANDLER( pacland_irq_1_ctrl_w )
 {
 	int bit = !BIT(offset, 11);
-	cpu_interrupt_enable(space->machine->device("maincpu"), bit);
+	cpu_interrupt_enable(space->machine().device("maincpu"), bit);
 	if (!bit)
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( pacland_irq_2_ctrl_w )
 {
 	int bit = !BIT(offset, 13);
-	cpu_interrupt_enable(space->machine->device("mcu"), bit);
+	cpu_interrupt_enable(space->machine().device("mcu"), bit);
 	if (!bit)
-		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
 }
 
 

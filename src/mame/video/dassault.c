@@ -11,10 +11,10 @@
 
 /******************************************************************************/
 
-static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int pf_priority )
+static void draw_sprites( running_machine& machine, bitmap_t *bitmap, const rectangle *cliprect, int pf_priority )
 {
-	dassault_state *state = machine->driver_data<dassault_state>();
-	UINT16 *buffered_spriteram = machine->generic.buffered_spriteram.u16;
+	dassault_state *state = machine.driver_data<dassault_state>();
+	UINT16 *buffered_spriteram = machine.generic.buffered_spriteram.u16;
 	int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
 	int offs, bank, gfxbank;
 	const UINT16 *spritebase;
@@ -34,7 +34,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 			}
 			else
 			{
-				spritebase = machine->generic.buffered_spriteram2.u16;
+				spritebase = machine.generic.buffered_spriteram2.u16;
 				gfxbank = 4;
 			}
 
@@ -50,7 +50,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 
 			y = spritebase[offs];
 			flash = y & 0x1000;
-			if (flash && (machine->primary_screen->frame_number() & 1))
+			if (flash && (machine.primary_screen->frame_number() & 1))
 				continue;
 			colour = (x >> 9) & 0x1f;
 			if (y & 0x8000)
@@ -158,7 +158,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 			{
 				decocomn_pdrawgfx(
 						state->decocomn,
-						bitmap,cliprect,machine->gfx[gfxbank],
+						bitmap,cliprect,machine.gfx[gfxbank],
 						sprite - multi * inc,
 						colour,
 						fx, fy,
@@ -175,19 +175,19 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( dassault )
 {
-	dassault_state *state = screen->machine->driver_data<dassault_state>();
+	dassault_state *state = screen->machine().driver_data<dassault_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->deco_tilegen1, 0, 0xffff);
 	UINT16 priority = decocomn_priority_r(state->decocomn, 0, 0xffff);
 
 	/* Update tilemaps */
-	flip_screen_set(screen->machine, BIT(flip, 7));
+	flip_screen_set(screen->machine(), BIT(flip, 7));
 	deco16ic_pf_update(state->deco_tilegen1, 0, state->pf2_rowscroll);
 	deco16ic_pf_update(state->deco_tilegen2, 0, state->pf4_rowscroll);
 
 	/* Draw playfields/update priority bitmap */
 	decocomn_clear_sprite_priority_bitmap(state->decocomn);
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[3072]);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, screen->machine().pens[3072]);
 	deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* The middle playfields can be swapped priority-wise */
@@ -212,7 +212,7 @@ SCREEN_UPDATE( dassault )
 	}
 
 	/* Draw sprites - two sprite generators, with selectable priority */
-	draw_sprites(screen->machine, bitmap, cliprect, priority);
+	draw_sprites(screen->machine(), bitmap, cliprect, priority);
 	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

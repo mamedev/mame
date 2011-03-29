@@ -34,8 +34,8 @@ public:
 
 /*----------- defined in machine/volfied.c -----------*/
 
-void volfied_cchip_init(running_machine *machine);
-void volfied_cchip_reset(running_machine *machine);
+void volfied_cchip_init(running_machine &machine);
+void volfied_cchip_reset(running_machine &machine);
 
 READ16_HANDLER( volfied_cchip_ctrl_r );
 READ16_HANDLER( volfied_cchip_ram_r );

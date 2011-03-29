@@ -38,16 +38,16 @@
 
 extern UINT32 *archimedes_memc_physmem;
 
-void archimedes_init(running_machine *machine);			// call at MACHINE_INIT
-void archimedes_reset(running_machine *machine);		// call at MACHINE_RESET
-void archimedes_driver_init(running_machine *machine);		// call at DRIVER_INIT
+void archimedes_init(running_machine &machine);			// call at MACHINE_INIT
+void archimedes_reset(running_machine &machine);		// call at MACHINE_RESET
+void archimedes_driver_init(running_machine &machine);		// call at DRIVER_INIT
 
-void archimedes_request_irq_a(running_machine *machine, int mask);
-void archimedes_request_irq_b(running_machine *machine, int mask);
-void archimedes_request_fiq(running_machine *machine, int mask);
-void archimedes_clear_irq_a(running_machine *machine, int mask);
-void archimedes_clear_irq_b(running_machine *machine, int mask);
-void archimedes_clear_fiq(running_machine *machine, int mask);
+void archimedes_request_irq_a(running_machine &machine, int mask);
+void archimedes_request_irq_b(running_machine &machine, int mask);
+void archimedes_request_fiq(running_machine &machine, int mask);
+void archimedes_clear_irq_a(running_machine &machine, int mask);
+void archimedes_clear_irq_b(running_machine &machine, int mask);
+void archimedes_clear_fiq(running_machine &machine, int mask);
 
 extern READ32_HANDLER(archimedes_memc_logical_r);
 extern WRITE32_HANDLER(archimedes_memc_logical_w);

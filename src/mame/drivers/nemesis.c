@@ -55,7 +55,7 @@ So this is the correct behavior of real hardware, not an emulation bug.
 
 static INTERRUPT_GEN( nemesis_interrupt )
 {
-	nemesis_state *state = device->machine->driver_data<nemesis_state>();
+	nemesis_state *state = device->machine().driver_data<nemesis_state>();
 
 	if (state->irq_on)
 		device_set_input_line(device, 1, HOLD_LINE);
@@ -63,7 +63,7 @@ static INTERRUPT_GEN( nemesis_interrupt )
 
 static INTERRUPT_GEN( konamigt_interrupt )
 {
-	nemesis_state *state = device->machine->driver_data<nemesis_state>();
+	nemesis_state *state = device->machine().driver_data<nemesis_state>();
 
 	if (cpu_getiloops(device) == 0)
 	{
@@ -79,7 +79,7 @@ static INTERRUPT_GEN( konamigt_interrupt )
 
 static INTERRUPT_GEN( gx400_interrupt )
 {
-	nemesis_state *state = device->machine->driver_data<nemesis_state>();
+	nemesis_state *state = device->machine().driver_data<nemesis_state>();
 
 	switch (cpu_getiloops(device))
 	{
@@ -102,7 +102,7 @@ static INTERRUPT_GEN( gx400_interrupt )
 
 static INTERRUPT_GEN( salamand_interrupt )
 {
-	nemesis_state *state = device->machine->driver_data<nemesis_state>();
+	nemesis_state *state = device->machine().driver_data<nemesis_state>();
 
 	if (state->irq_on)
 		device_set_input_line(device, 1, HOLD_LINE);
@@ -110,7 +110,7 @@ static INTERRUPT_GEN( salamand_interrupt )
 
 static INTERRUPT_GEN( blkpnthr_interrupt )
 {
-	nemesis_state *state = device->machine->driver_data<nemesis_state>();
+	nemesis_state *state = device->machine().driver_data<nemesis_state>();
 
 	if (state->irq_on)
 		device_set_input_line(device, 2, HOLD_LINE);
@@ -119,29 +119,29 @@ static INTERRUPT_GEN( blkpnthr_interrupt )
 
 static WRITE16_HANDLER( gx400_irq1_enable_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 		state->irq1_on = data & 0x0001;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(space->machine, 1, data & 0x0100);
+		coin_lockout_w(space->machine(), 1, data & 0x0100);
 }
 
 static WRITE16_HANDLER( gx400_irq2_enable_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 		state->irq2_on = data & 0x0001;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(space->machine, 0, data & 0x0100);
+		coin_lockout_w(space->machine(), 0, data & 0x0100);
 }
 
 static WRITE16_HANDLER( gx400_irq4_enable_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_8_15)
 		state->irq4_on = data & 0x0100;
@@ -149,47 +149,47 @@ static WRITE16_HANDLER( gx400_irq4_enable_word_w )
 
 static WRITE16_HANDLER( nemesis_irq_enable_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 		state->irq_on = data & 0xff;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_global_w(space->machine, data & 0x0100);
+		coin_lockout_global_w(space->machine(), data & 0x0100);
 }
 
 static WRITE16_HANDLER( konamigt_irq_enable_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 		state->irq_on = data & 0xff;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(space->machine, 1, data & 0x0100);
+		coin_lockout_w(space->machine(), 1, data & 0x0100);
 }
 
 static WRITE16_HANDLER( konamigt_irq2_enable_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 		state->irq2_on = data & 0xff;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(space->machine, 0, data & 0x0100);
+		coin_lockout_w(space->machine(), 0, data & 0x0100);
 }
 
 
 static READ16_HANDLER( gx400_sharedram_word_r )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 	return state->gx400_shared_ram[offset];
 }
 
 static WRITE16_HANDLER( gx400_sharedram_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 		state->gx400_shared_ram[offset] = data;
@@ -205,8 +205,8 @@ static READ16_HANDLER( konamigt_input_word_r )
     bit 12-15: accel
 */
 
-	int data = input_port_read(space->machine, "IN3");
-	int data2 = input_port_read(space->machine, "PADDLE");
+	int data = input_port_read(space->machine(), "IN3");
+	int data2 = input_port_read(space->machine(), "PADDLE");
 
 	int ret=0x0000;
 
@@ -225,7 +225,7 @@ static READ16_HANDLER( konamigt_input_word_r )
 
 static WRITE16_HANDLER( selected_ip_word_w )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 		state->selected_ip = data & 0xff;	// latch the value
@@ -233,14 +233,14 @@ static WRITE16_HANDLER( selected_ip_word_w )
 
 static READ16_HANDLER( selected_ip_word_r )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	switch (state->selected_ip & 0xf)
 	{												// From WEC Le Mans Schems:
-		case 0xc:  return input_port_read(space->machine, "ACCEL");	// Accel - Schems: Accelevr
-		case 0:    return input_port_read(space->machine, "ACCEL");
-		case 0xd:  return input_port_read(space->machine, "WHEEL");	// Wheel - Schems: Handlevr
-		case 1:    return input_port_read(space->machine, "WHEEL");
+		case 0xc:  return input_port_read(space->machine(), "ACCEL");	// Accel - Schems: Accelevr
+		case 0:    return input_port_read(space->machine(), "ACCEL");
+		case 0xd:  return input_port_read(space->machine(), "WHEEL");	// Wheel - Schems: Handlevr
+		case 1:    return input_port_read(space->machine(), "WHEEL");
 
 		default: return ~0;
 	}
@@ -255,7 +255,7 @@ static WRITE16_HANDLER( nemesis_soundlatch_word_w )
 
 static WRITE8_DEVICE_HANDLER( gx400_speech_start_w )
 {
-	nemesis_state *state = device->machine->driver_data<nemesis_state>();
+	nemesis_state *state = device->machine().driver_data<nemesis_state>();
 
 	/* the voice data is not in a rom but in sound RAM at $8000 */
 	vlm5030_set_rom(device, state->gx400_shared_ram + 0x4000);
@@ -277,7 +277,7 @@ static READ8_DEVICE_HANDLER( nemesis_portA_r )
    bit 5:     vlm5030 busy
    bit 7:     unused by this software version. Bubble Memory version uses this bit.
 */
-	nemesis_state *state = device->machine->driver_data<nemesis_state>();
+	nemesis_state *state = device->machine().driver_data<nemesis_state>();
 	int res = (state->audiocpu->total_cycles() / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
 
 	res |= 0xd0;
@@ -571,7 +571,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( wd_r )
 {
-	nemesis_state *state = space->machine->driver_data<nemesis_state>();
+	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 	state->frame_counter ^= 1;
 	return state->frame_counter;
 }
@@ -1617,7 +1617,7 @@ static const ay8910_interface ay8910_interface_2 =
 static void sound_irq(device_t *device, int state)
 {
 /* Interrupts _are_ generated, I wonder where they go.. */
-// nemesis_state *driver_state = device->machine->driver_data<nemesis_state>();
+// nemesis_state *driver_state = device->machine().driver_data<nemesis_state>();
 // device_set_input_line(driver_state->audiocpu, 0, HOLD_LINE);
 }
 
@@ -1646,11 +1646,11 @@ static const k007232_interface k007232_config =
 
 static MACHINE_START( nemesis )
 {
-	nemesis_state *state = machine->driver_data<nemesis_state>();
+	nemesis_state *state = machine.driver_data<nemesis_state>();
 
-	state->maincpu = machine->device<cpu_device>("maincpu");
-	state->audiocpu = machine->device<cpu_device>("audiocpu");
-	state->vlm = machine->device("vlm");
+	state->maincpu = machine.device<cpu_device>("maincpu");
+	state->audiocpu = machine.device<cpu_device>("audiocpu");
+	state->vlm = machine.device("vlm");
 
 	state->save_item(NAME(state->irq_on));
 	state->save_item(NAME(state->irq1_on));
@@ -1667,7 +1667,7 @@ static MACHINE_START( nemesis )
 
 static MACHINE_RESET( nemesis )
 {
-	nemesis_state *state = machine->driver_data<nemesis_state>();
+	nemesis_state *state = machine.driver_data<nemesis_state>();
 
 	state->irq_on = 0;
 	state->irq1_on = 0;

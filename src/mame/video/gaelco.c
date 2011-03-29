@@ -33,7 +33,7 @@
 
 static TILE_GET_INFO( get_tile_info_gaelco_screen0 )
 {
-	gaelco_state *state = machine->driver_data<gaelco_state>();
+	gaelco_state *state = machine.driver_data<gaelco_state>();
 	int data = state->videoram[tile_index << 1];
 	int data2 = state->videoram[(tile_index << 1) + 1];
 	int code = ((data & 0xfffc) >> 2);
@@ -46,7 +46,7 @@ static TILE_GET_INFO( get_tile_info_gaelco_screen0 )
 
 static TILE_GET_INFO( get_tile_info_gaelco_screen1 )
 {
-	gaelco_state *state = machine->driver_data<gaelco_state>();
+	gaelco_state *state = machine.driver_data<gaelco_state>();
 	int data = state->videoram[(0x1000 / 2) + (tile_index << 1)];
 	int data2 = state->videoram[(0x1000 / 2) + (tile_index << 1) + 1];
 	int code = ((data & 0xfffc) >> 2);
@@ -64,7 +64,7 @@ static TILE_GET_INFO( get_tile_info_gaelco_screen1 )
 
 WRITE16_HANDLER( gaelco_vram_w )
 {
-	gaelco_state *state = space->machine->driver_data<gaelco_state>();
+	gaelco_state *state = space->machine().driver_data<gaelco_state>();
 	COMBINE_DATA(&state->videoram[offset]);
 	tilemap_mark_tile_dirty(state->tilemap[offset >> 11], ((offset << 1) & 0x0fff) >> 2);
 }
@@ -77,7 +77,7 @@ WRITE16_HANDLER( gaelco_vram_w )
 
 VIDEO_START( bigkarnk )
 {
-	gaelco_state *state = machine->driver_data<gaelco_state>();
+	gaelco_state *state = machine.driver_data<gaelco_state>();
 	state->tilemap[0] = tilemap_create(machine, get_tile_info_gaelco_screen0, tilemap_scan_rows, 16, 16, 32, 32);
 	state->tilemap[1] = tilemap_create(machine, get_tile_info_gaelco_screen1, tilemap_scan_rows, 16, 16, 32, 32);
 
@@ -87,7 +87,7 @@ VIDEO_START( bigkarnk )
 
 VIDEO_START( maniacsq )
 {
-	gaelco_state *state = machine->driver_data<gaelco_state>();
+	gaelco_state *state = machine.driver_data<gaelco_state>();
 	state->tilemap[0] = tilemap_create(machine, get_tile_info_gaelco_screen0, tilemap_scan_rows, 16, 16, 32, 32);
 	state->tilemap[1] = tilemap_create(machine, get_tile_info_gaelco_screen1, tilemap_scan_rows, 16, 16, 32, 32);
 
@@ -121,11 +121,11 @@ VIDEO_START( maniacsq )
       3  | xxxxxxxx xxxxxx-- | sprite code
 */
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	gaelco_state *state = machine->driver_data<gaelco_state>();
+	gaelco_state *state = machine.driver_data<gaelco_state>();
 	int i, x, y, ex, ey;
-	const gfx_element *gfx = machine->gfx[0];
+	const gfx_element *gfx = machine.gfx[0];
 
 	static const int x_offset[2] = {0x0,0x2};
 	static const int y_offset[2] = {0x0,0x1};
@@ -175,7 +175,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 				pdrawgfx_transpen(bitmap,cliprect,gfx,number + x_offset[ex] + y_offset[ey],
 						color,xflip,yflip,
 						sx-0x0f+x*8,sy+y*8,
-						machine->priority_bitmap,pri_mask,0);
+						machine.priority_bitmap,pri_mask,0);
 			}
 		}
 	}
@@ -189,7 +189,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( maniacsq )
 {
-	gaelco_state *state = screen->machine->driver_data<gaelco_state>();
+	gaelco_state *state = screen->machine().driver_data<gaelco_state>();
 
 	/* set scroll registers */
 	tilemap_set_scrolly(state->tilemap[0], 0, state->vregs[0]);
@@ -197,7 +197,7 @@ SCREEN_UPDATE( maniacsq )
 	tilemap_set_scrolly(state->tilemap[1], 0, state->vregs[2]);
 	tilemap_set_scrollx(state->tilemap[1], 0, state->vregs[3]);
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, state->tilemap[1], 3, 0);
@@ -212,13 +212,13 @@ SCREEN_UPDATE( maniacsq )
 	tilemap_draw(bitmap, cliprect, state->tilemap[1], 0, 4);
 	tilemap_draw(bitmap, cliprect, state->tilemap[0], 0, 4);
 
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( bigkarnk )
 {
-	gaelco_state *state = screen->machine->driver_data<gaelco_state>();
+	gaelco_state *state = screen->machine().driver_data<gaelco_state>();
 
 	/* set scroll registers */
 	tilemap_set_scrolly(state->tilemap[0], 0, state->vregs[0]);
@@ -226,7 +226,7 @@ SCREEN_UPDATE( bigkarnk )
 	tilemap_set_scrolly(state->tilemap[1], 0, state->vregs[2]);
 	tilemap_set_scrollx(state->tilemap[1], 0, state->vregs[3]);
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, state->tilemap[1], TILEMAP_DRAW_LAYER1 | 3, 0);
@@ -253,6 +253,6 @@ SCREEN_UPDATE( bigkarnk )
 	tilemap_draw(bitmap, cliprect, state->tilemap[1], TILEMAP_DRAW_LAYER0 | 0, 8);
 	tilemap_draw(bitmap, cliprect, state->tilemap[0], TILEMAP_DRAW_LAYER0 | 0, 8);
 
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

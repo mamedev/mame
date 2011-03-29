@@ -285,14 +285,14 @@ Stephh's notes (based on the games M6502 code and some tests) :
 /* binary counter (1.4MHz update) */
 static TIMER_DEVICE_CALLBACK( sasuke_update_counter )
 {
-	snk6502_state *state = timer.machine->driver_data<snk6502_state>();
+	snk6502_state *state = timer.machine().driver_data<snk6502_state>();
 
 	state->sasuke_counter += 0x10;
 }
 
-static void sasuke_start_counter(running_machine *machine)
+static void sasuke_start_counter(running_machine &machine)
 {
-	snk6502_state *state = machine->driver_data<snk6502_state>();
+	snk6502_state *state = machine.driver_data<snk6502_state>();
 
 	state->sasuke_counter = 0;
 }
@@ -306,12 +306,12 @@ static void sasuke_start_counter(running_machine *machine)
 
 static CUSTOM_INPUT( snk6502_music0_r )
 {
-	return (snk6502_music0_playing(field->port->machine) ? 0x01 : 0x00);
+	return (snk6502_music0_playing(field->port->machine()) ? 0x01 : 0x00);
 }
 
 static CUSTOM_INPUT( sasuke_count_r )
 {
-	snk6502_state *state = field->port->machine->driver_data<snk6502_state>();
+	snk6502_state *state = field->port->machine().driver_data<snk6502_state>();
 
 	return (state->sasuke_counter >> 4);
 }
@@ -725,9 +725,9 @@ static INTERRUPT_GEN( satansat_interrupt )
 {
 	if (cpu_getiloops(device) != 0)
 	{
-		UINT8 val = input_port_read(device->machine, "IN2");
+		UINT8 val = input_port_read(device->machine(), "IN2");
 
-		coin_counter_w(device->machine, 0, val & 1);
+		coin_counter_w(device->machine(), 0, val & 1);
 
 		/* user asks to insert coin: generate a NMI interrupt. */
 		if (val & 0x01)
@@ -741,10 +741,10 @@ static INTERRUPT_GEN( snk6502_interrupt )
 {
 	if (cpu_getiloops(device) != 0)
 	{
-		UINT8 val = input_port_read(device->machine, "IN2");
+		UINT8 val = input_port_read(device->machine(), "IN2");
 
-		coin_counter_w(device->machine, 0, val & 1);
-		coin_counter_w(device->machine, 1, val & 2);
+		coin_counter_w(device->machine(), 0, val & 1);
+		coin_counter_w(device->machine(), 1, val & 2);
 
 		/* user asks to insert coin: generate a NMI interrupt. */
 		if (val & 0x03)

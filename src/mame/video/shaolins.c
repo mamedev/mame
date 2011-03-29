@@ -39,7 +39,7 @@ PALETTE_INIT( shaolins )
 			4, resistances, bweights, 470, 0);
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x100);
+	machine.colortable = colortable_alloc(machine, 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -68,7 +68,7 @@ PALETTE_INIT( shaolins )
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table,*/
@@ -83,14 +83,14 @@ PALETTE_INIT( shaolins )
 		for (j = 0; j < 8; j++)
 		{
 			UINT8 ctabentry = (j << 5) | ((~i & 0x100) >> 4) | (color_prom[i] & 0x0f);
-			colortable_entry_set_value(machine->colortable, ((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
+			colortable_entry_set_value(machine.colortable, ((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
 		}
 	}
 }
 
 WRITE8_HANDLER( shaolins_videoram_w )
 {
-	shaolins_state *state = space->machine->driver_data<shaolins_state>();
+	shaolins_state *state = space->machine().driver_data<shaolins_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -98,7 +98,7 @@ WRITE8_HANDLER( shaolins_videoram_w )
 
 WRITE8_HANDLER( shaolins_colorram_w )
 {
-	shaolins_state *state = space->machine->driver_data<shaolins_state>();
+	shaolins_state *state = space->machine().driver_data<shaolins_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -106,18 +106,18 @@ WRITE8_HANDLER( shaolins_colorram_w )
 
 WRITE8_HANDLER( shaolins_palettebank_w )
 {
-	shaolins_state *state = space->machine->driver_data<shaolins_state>();
+	shaolins_state *state = space->machine().driver_data<shaolins_state>();
 
 	if (state->palettebank != (data & 0x07))
 	{
 		state->palettebank = data & 0x07;
-		tilemap_mark_all_tiles_dirty_all(space->machine);
+		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 }
 
 WRITE8_HANDLER( shaolins_scroll_w )
 {
-	shaolins_state *state = space->machine->driver_data<shaolins_state>();
+	shaolins_state *state = space->machine().driver_data<shaolins_state>();
 	int col;
 
 	for (col = 4; col < 32; col++)
@@ -126,20 +126,20 @@ WRITE8_HANDLER( shaolins_scroll_w )
 
 WRITE8_HANDLER( shaolins_nmi_w )
 {
-	shaolins_state *state = space->machine->driver_data<shaolins_state>();
+	shaolins_state *state = space->machine().driver_data<shaolins_state>();
 
 	state->nmi_enable = data;
 
-	if (flip_screen_get(space->machine) != (data & 0x01))
+	if (flip_screen_get(space->machine()) != (data & 0x01))
 	{
-		flip_screen_set(space->machine, data & 0x01);
-		tilemap_mark_all_tiles_dirty_all(space->machine);
+		flip_screen_set(space->machine(), data & 0x01);
+		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	shaolins_state *state = machine->driver_data<shaolins_state>();
+	shaolins_state *state = machine.driver_data<shaolins_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + ((attr & 0x40) << 2);
 	int color = (attr & 0x0f) + 16 * state->palettebank;
@@ -150,7 +150,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( shaolins )
 {
-	shaolins_state *state = machine->driver_data<shaolins_state>();
+	shaolins_state *state = machine.driver_data<shaolins_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
@@ -158,9 +158,9 @@ VIDEO_START( shaolins )
 	tilemap_set_scroll_cols(state->bg_tilemap, 32);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	shaolins_state *state = machine->driver_data<shaolins_state>();
+	shaolins_state *state = machine.driver_data<shaolins_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -183,20 +183,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				flipy = !flipy;
 			}
 
-			drawgfx_transmask(bitmap, cliprect,machine->gfx[1],
+			drawgfx_transmask(bitmap, cliprect,machine.gfx[1],
 				code, color,
 				flipx, flipy,
 				sx, sy,
-				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, state->palettebank << 5));
+				colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, state->palettebank << 5));
 		}
 	}
 }
 
 SCREEN_UPDATE( shaolins )
 {
-	shaolins_state *state = screen->machine->driver_data<shaolins_state>();
+	shaolins_state *state = screen->machine().driver_data<shaolins_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

@@ -54,9 +54,9 @@ extern WRITE8_HANDLER( fantasy_speech_w );
 
 DECLARE_LEGACY_SOUND_DEVICE(SNK6502, snk6502_sound);
 
-void snk6502_set_music_clock(running_machine *machine, double clock_time);
-void snk6502_set_music_freq(running_machine *machine, int freq);
-int snk6502_music0_playing(running_machine *machine);
+void snk6502_set_music_clock(running_machine &machine, double clock_time);
+void snk6502_set_music_freq(running_machine &machine, int freq);
+int snk6502_music0_playing(running_machine &machine);
 
 DISCRETE_SOUND_EXTERN( fantasy );
 

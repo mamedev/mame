@@ -50,7 +50,7 @@ Notes:
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	deniam_state *state = space->machine->driver_data<deniam_state>();
+	deniam_state *state = space->machine().driver_data<deniam_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space,offset, (data >> 8) & 0xff);
@@ -75,7 +75,7 @@ static WRITE16_DEVICE_HANDLER( deniam16c_oki_rom_bank_w )
 
 static WRITE16_HANDLER( deniam_irq_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 4, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 4, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( deniam16b_map, AS_PROGRAM, 16 )
@@ -223,7 +223,7 @@ GFXDECODE_END
 
 static void irqhandler( device_t *device, int linestate )
 {
-	deniam_state *state = device->machine->driver_data<deniam_state>();
+	deniam_state *state = device->machine().driver_data<deniam_state>();
 
 	/* system 16c doesn't have the sound CPU */
 	if (state->audio_cpu != NULL)
@@ -239,9 +239,9 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_START( deniam )
 {
-	deniam_state *state = machine->driver_data<deniam_state>();
+	deniam_state *state = machine.driver_data<deniam_state>();
 
-	state->audio_cpu = machine->device("audiocpu");
+	state->audio_cpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->display_enable));
 	state->save_item(NAME(state->coinctrl));
@@ -264,7 +264,7 @@ static MACHINE_START( deniam )
 static MACHINE_RESET( deniam )
 {
 	/* logicpr2 does not reset the bank base on startup */
-	machine->device<okim6295_device>("oki")->set_bank_base(0x00000);
+	machine.device<okim6295_device>("oki")->set_bank_base(0x00000);
 }
 
 static MACHINE_CONFIG_START( deniam16b, deniam_state )

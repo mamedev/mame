@@ -241,10 +241,10 @@ static CPU_INIT(h8bit)
 	h8->direct = &h8->program->direct();
 	h8->io = device->space(AS_IO);
 
-	h8->timer[0] = h8->device->machine->scheduler().timer_alloc(FUNC(h8_timer_0_cb), h8);
-	h8->timer[1] = h8->device->machine->scheduler().timer_alloc(FUNC(h8_timer_1_cb), h8);
-	h8->timer[2] = h8->device->machine->scheduler().timer_alloc(FUNC(h8_timer_2_cb), h8);
-	h8->timer[3] = h8->device->machine->scheduler().timer_alloc(FUNC(h8_timer_3_cb), h8);
+	h8->timer[0] = h8->device->machine().scheduler().timer_alloc(FUNC(h8_timer_0_cb), h8);
+	h8->timer[1] = h8->device->machine().scheduler().timer_alloc(FUNC(h8_timer_1_cb), h8);
+	h8->timer[2] = h8->device->machine().scheduler().timer_alloc(FUNC(h8_timer_2_cb), h8);
+	h8->timer[3] = h8->device->machine().scheduler().timer_alloc(FUNC(h8_timer_3_cb), h8);
 
 	device->save_item(NAME(h8->h8err));
 	device->save_item(NAME(h8->regs));
@@ -259,7 +259,7 @@ static CPU_INIT(h8bit)
 	device->save_item(NAME(h8->h8TSTR));
 	device->save_item(NAME(h8->h8TCNT));
 
-	h8->device->machine->state().register_postload(h8_onstateload, h8);
+	h8->device->machine().state().register_postload(h8_onstateload, h8);
 }
 
 static CPU_RESET(h8bit)

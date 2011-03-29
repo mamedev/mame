@@ -4,13 +4,13 @@
 
 READ32_HANDLER( spi_layer_bank_r )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	return state->layer_bank;
 }
 
 WRITE32_HANDLER( spi_layer_bank_w )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	COMBINE_DATA( &state->layer_bank );
 
 	if (state->layer_bank & 0x80000000) {
@@ -25,9 +25,9 @@ WRITE32_HANDLER( spi_layer_bank_w )
 	}
 }
 
-void rf2_set_layer_banks(running_machine *machine, int banks)
+void rf2_set_layer_banks(running_machine &machine, int banks)
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	if (state->rf2_layer_bank[0] != BIT(banks,0))
 	{
 		state->rf2_layer_bank[0] = BIT(banks,0);
@@ -50,14 +50,14 @@ void rf2_set_layer_banks(running_machine *machine, int banks)
 #ifdef UNUSED_FUNCTION
 READ32_HANDLER( spi_layer_enable_r )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	return state->layer_enable;
 }
 #endif
 
 WRITE32_HANDLER( spi_layer_enable_w )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	COMBINE_DATA( &state->layer_enable );
 	tilemap_set_enable(state->back_layer, (state->layer_enable & 0x1) ^ 0x1);
 	tilemap_set_enable(state->mid_layer, ((state->layer_enable >> 1) & 0x1) ^ 0x1);
@@ -66,7 +66,7 @@ WRITE32_HANDLER( spi_layer_enable_w )
 
 WRITE32_HANDLER( tilemap_dma_start_w )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	if (state->video_dma_address != 0)
 	{
 		int i;
@@ -181,7 +181,7 @@ WRITE32_HANDLER( tilemap_dma_start_w )
 
 WRITE32_HANDLER( palette_dma_start_w )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	if (state->video_dma_address != 0)
 	{
 		int i;
@@ -190,8 +190,8 @@ WRITE32_HANDLER( palette_dma_start_w )
 			UINT32 color = state->spimainram[(state->video_dma_address / 4) + i - 0x200];
 			if (state->palette_ram[i] != color) {
 				state->palette_ram[i] = color;
-				palette_set_color_rgb( space->machine, (i * 2), pal5bit(state->palette_ram[i] >> 0), pal5bit(state->palette_ram[i] >> 5), pal5bit(state->palette_ram[i] >> 10) );
-				palette_set_color_rgb( space->machine, (i * 2) + 1, pal5bit(state->palette_ram[i] >> 16), pal5bit(state->palette_ram[i] >> 21), pal5bit(state->palette_ram[i] >> 26) );
+				palette_set_color_rgb( space->machine(), (i * 2), pal5bit(state->palette_ram[i] >> 0), pal5bit(state->palette_ram[i] >> 5), pal5bit(state->palette_ram[i] >> 10) );
+				palette_set_color_rgb( space->machine(), (i * 2) + 1, pal5bit(state->palette_ram[i] >> 16), pal5bit(state->palette_ram[i] >> 21), pal5bit(state->palette_ram[i] >> 26) );
 			}
 		}
 	}
@@ -199,7 +199,7 @@ WRITE32_HANDLER( palette_dma_start_w )
 
 WRITE32_HANDLER( sprite_dma_start_w )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	if (state->video_dma_address != 0)
 	{
 		memcpy( state->sprite_ram, &state->spimainram[(state->video_dma_address / 4) - 0x200], state->sprite_dma_length);
@@ -208,20 +208,20 @@ WRITE32_HANDLER( sprite_dma_start_w )
 
 WRITE32_HANDLER( video_dma_length_w )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	COMBINE_DATA( &state->video_dma_length );
 }
 
 WRITE32_HANDLER( video_dma_address_w )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	COMBINE_DATA( &state->video_dma_address );
 }
 
 static void drawgfx_blend(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
 {
-	seibuspi_state *state = gfx->machine->driver_data<seibuspi_state>();
-	const pen_t *pens = &gfx->machine->pens[gfx->color_base];
+	seibuspi_state *state = gfx->machine().driver_data<seibuspi_state>();
+	const pen_t *pens = &gfx->machine().pens[gfx->color_base];
 	const UINT8 *dp;
 	int i, j;
 	int x1, x2;
@@ -343,9 +343,9 @@ static const int sprite_ytable[2][8] =
 	{ 7*16, 6*16, 5*16, 4*16, 3*16, 2*16, 1*16, 0*16 }
 };
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri_mask)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri_mask)
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	INT16 xpos, ypos;
 	int tile_num, color;
 	int width, height;
@@ -353,7 +353,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int a;
 	int priority;
 	int x,y, x1, y1;
-	const gfx_element *gfx = machine->gfx[2];
+	const gfx_element *gfx = machine.gfx[2];
 
 	if( state->layer_enable & 0x10 )
 		return;
@@ -411,7 +411,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int offs = tile_index / 2;
 	int tile = (state->tilemap_ram[offs + state->text_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
 	int color = (tile >> 12) & 0xf;
@@ -423,7 +423,7 @@ static TILE_GET_INFO( get_text_tile_info )
 
 static TILE_GET_INFO( get_back_tile_info )
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int offs = tile_index / 2;
 	int tile = (state->tilemap_ram[offs] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
 	int color = (tile >> 13) & 0x7;
@@ -438,7 +438,7 @@ static TILE_GET_INFO( get_back_tile_info )
 
 static TILE_GET_INFO( get_mid_tile_info )
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int offs = tile_index / 2;
 	int tile = (state->tilemap_ram[offs + state->mid_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
 	int color = (tile >> 13) & 0x7;
@@ -454,7 +454,7 @@ static TILE_GET_INFO( get_mid_tile_info )
 
 static TILE_GET_INFO( get_fore_tile_info )
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int offs = tile_index / 2;
 	int tile = (state->tilemap_ram[offs + state->fore_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
 	int color = (tile >> 13) & 0x7;
@@ -472,7 +472,7 @@ static TILE_GET_INFO( get_fore_tile_info )
 
 VIDEO_START( spi )
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int i;
 	int region_length;
 
@@ -517,7 +517,7 @@ VIDEO_START( spi )
 	for (i = 6000; i < 6016; i++) { state->alpha_table[i] = 1; }
 	for (i = 6128; i < 6144; i++) { state->alpha_table[i] = 1; }
 
-	region_length = machine->region("gfx2")->bytes();
+	region_length = machine.region("gfx2")->bytes();
 
 	if (region_length <= 0x300000)
 	{
@@ -536,7 +536,7 @@ VIDEO_START( spi )
 #ifdef UNUSED_FUNCTION
 static void set_rowscroll(tilemap_t *layer, int scroll, INT16* rows)
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int i;
 	int x = state->spi_scrollram[scroll] & 0xffff;
 	int y = (state->spi_scrollram[scroll] >> 16) & 0xffff;
@@ -549,7 +549,7 @@ static void set_rowscroll(tilemap_t *layer, int scroll, INT16* rows)
 
 static void set_scroll(tilemap_t *layer, int scroll)
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int x = state->spi_scrollram[scroll] & 0xffff;
 	int y = (state->spi_scrollram[scroll] >> 16) & 0xffff;
 	tilemap_set_scrollx(layer, 0, x);
@@ -558,9 +558,9 @@ static void set_scroll(tilemap_t *layer, int scroll)
 #endif
 
 
-static void combine_tilemap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tile, int x, int y, int opaque, INT16 *rowscroll)
+static void combine_tilemap(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tile, int x, int y, int opaque, INT16 *rowscroll)
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int i,j;
 	UINT16 *s;
 	UINT32 *d;
@@ -593,11 +593,11 @@ static void combine_tilemap(running_machine *machine, bitmap_t *bitmap, const re
 				UINT8 alpha = state->alpha_table[pen];
 				if (alpha)
 				{
-					*d = alpha_blend_r32(*d, machine->pens[pen], 0x7f);
+					*d = alpha_blend_r32(*d, machine.pens[pen], 0x7f);
 				}
 				else
 				{
-					*d = machine->pens[pen];
+					*d = machine.pens[pen];
 				}
 			}
 			++d;
@@ -609,7 +609,7 @@ static void combine_tilemap(running_machine *machine, bitmap_t *bitmap, const re
 
 SCREEN_UPDATE( spi )
 {
-	seibuspi_state *state = screen->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = screen->machine().driver_data<seibuspi_state>();
 	INT16 *back_rowscroll, *mid_rowscroll, *fore_rowscroll;
 	if( state->layer_bank & 0x80000000 ) {
 		back_rowscroll	= (INT16*)&state->tilemap_ram[0x200];
@@ -625,35 +625,35 @@ SCREEN_UPDATE( spi )
 		bitmap_fill(bitmap, cliprect, 0);
 
 	if (!(state->layer_enable & 0x1))
-		combine_tilemap(screen->machine, bitmap, cliprect, state->back_layer, state->spi_scrollram[0] & 0xffff, (state->spi_scrollram[0] >> 16) & 0xffff, 1, back_rowscroll);
+		combine_tilemap(screen->machine(), bitmap, cliprect, state->back_layer, state->spi_scrollram[0] & 0xffff, (state->spi_scrollram[0] >> 16) & 0xffff, 1, back_rowscroll);
 
-	draw_sprites(screen->machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0);
 
 	// if fore layer is enabled, draw priority 1 sprites behind mid layer
 	if (!(state->layer_enable & 0x4))
-		draw_sprites(screen->machine, bitmap, cliprect, 1);
+		draw_sprites(screen->machine(), bitmap, cliprect, 1);
 
 	if (!(state->layer_enable & 0x2))
-		combine_tilemap(screen->machine, bitmap, cliprect, state->mid_layer, state->spi_scrollram[1] & 0xffff, (state->spi_scrollram[1] >> 16) & 0xffff, 0, mid_rowscroll);
+		combine_tilemap(screen->machine(), bitmap, cliprect, state->mid_layer, state->spi_scrollram[1] & 0xffff, (state->spi_scrollram[1] >> 16) & 0xffff, 0, mid_rowscroll);
 
 	// if fore layer is disabled, draw priority 1 sprites above mid layer
 	if ((state->layer_enable & 0x4))
-		draw_sprites(screen->machine, bitmap, cliprect, 1);
+		draw_sprites(screen->machine(), bitmap, cliprect, 1);
 
-	draw_sprites(screen->machine, bitmap, cliprect, 2);
+	draw_sprites(screen->machine(), bitmap, cliprect, 2);
 
 	if (!(state->layer_enable & 0x4))
-		combine_tilemap(screen->machine, bitmap, cliprect, state->fore_layer, state->spi_scrollram[2] & 0xffff, (state->spi_scrollram[2] >> 16) & 0xffff, 0, fore_rowscroll);
+		combine_tilemap(screen->machine(), bitmap, cliprect, state->fore_layer, state->spi_scrollram[2] & 0xffff, (state->spi_scrollram[2] >> 16) & 0xffff, 0, fore_rowscroll);
 
-	draw_sprites(screen->machine, bitmap, cliprect, 3);
+	draw_sprites(screen->machine(), bitmap, cliprect, 3);
 
-	combine_tilemap(screen->machine, bitmap, cliprect, state->text_layer, 0, 0, 0, NULL);
+	combine_tilemap(screen->machine(), bitmap, cliprect, state->text_layer, 0, 0, 0, NULL);
 	return 0;
 }
 
 VIDEO_START( sys386f2 )
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int i;
 
 	state->palette_ram = auto_alloc_array_clear(machine, UINT32, 0x4000/4);
@@ -673,9 +673,9 @@ VIDEO_START( sys386f2 )
 SCREEN_UPDATE( sys386f2 )
 {
 	bitmap_fill(bitmap, cliprect, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 1);
-	draw_sprites(screen->machine, bitmap, cliprect, 2);
-	draw_sprites(screen->machine, bitmap, cliprect, 3);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0);
+	draw_sprites(screen->machine(), bitmap, cliprect, 1);
+	draw_sprites(screen->machine(), bitmap, cliprect, 2);
+	draw_sprites(screen->machine(), bitmap, cliprect, 3);
 	return 0;
 }

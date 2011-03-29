@@ -81,9 +81,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	arcadecl_state *state = machine->driver_data<arcadecl_state>();
+	arcadecl_state *state = machine.driver_data<arcadecl_state>();
 	cputag_set_input_line(machine, "maincpu", 4, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -92,7 +92,7 @@ static void scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
-		atarigen_scanline_int_gen(screen.machine->device("maincpu"));
+		atarigen_scanline_int_gen(screen.machine().device("maincpu"));
 }
 
 
@@ -111,11 +111,11 @@ static MACHINE_START( arcadecl )
 
 static MACHINE_RESET( arcadecl )
 {
-	arcadecl_state *state = machine->driver_data<arcadecl_state>();
+	arcadecl_state *state = machine.driver_data<arcadecl_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine->primary_screen, scanline_update, 32);
+	atarigen_scanline_timer_reset(*machine.primary_screen, scanline_update, 32);
 }
 
 
@@ -137,9 +137,9 @@ static WRITE16_HANDLER( latch_w )
 	/* lower byte being modified? */
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+		okim6295_device *oki = space->machine().device<okim6295_device>("oki");
 		oki->set_bank_base((data & 0x80) ? 0x40000 : 0x00000);
-		atarigen_set_oki6295_vol(space->machine, (data & 0x001f) * 100 / 0x1f);
+		atarigen_set_oki6295_vol(space->machine(), (data & 0x001f) * 100 / 0x1f);
 	}
 }
 
@@ -398,7 +398,7 @@ ROM_END
 
 static DRIVER_INIT( sparkz )
 {
-	memset(machine->region("gfx1")->base(), 0, machine->region("gfx1")->bytes());
+	memset(machine.region("gfx1")->base(), 0, machine.region("gfx1")->bytes());
 }
 
 

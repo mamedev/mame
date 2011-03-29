@@ -12,31 +12,31 @@
 
 /************ Generic MCR routines ***************/
 
-void mcr_sound_init(running_machine *machine, UINT8 config);
-void mcr_sound_reset(running_machine *machine);
+void mcr_sound_init(running_machine &machine, UINT8 config);
+void mcr_sound_reset(running_machine &machine);
 
 WRITE8_HANDLER( ssio_data_w );
 READ8_HANDLER( ssio_status_r );
 READ8_HANDLER( ssio_input_port_r );
 WRITE8_HANDLER( ssio_output_port_w );
-void ssio_reset_w(running_machine *machine, int state);
+void ssio_reset_w(running_machine &machine, int state);
 void ssio_set_custom_input(int which, int mask, read8_space_func handler);
 void ssio_set_custom_output(int which, int mask, write8_space_func handler);
 
 WRITE8_HANDLER( csdeluxe_data_w );
 READ8_HANDLER( csdeluxe_status_r );
-void csdeluxe_reset_w(running_machine *machine, int state);
+void csdeluxe_reset_w(running_machine &machine, int state);
 
 WRITE8_HANDLER( turbocs_data_w );
 READ8_HANDLER( turbocs_status_r );
-void turbocs_reset_w(running_machine *machine, int state);
+void turbocs_reset_w(running_machine &machine, int state);
 
 WRITE8_HANDLER( soundsgood_data_w );
 READ8_HANDLER( soundsgood_status_r );
-void soundsgood_reset_w(running_machine *machine, int state);
+void soundsgood_reset_w(running_machine &machine, int state);
 
 WRITE8_HANDLER( squawkntalk_data_w );
-void squawkntalk_reset_w(running_machine *machine, int state);
+void squawkntalk_reset_w(running_machine &machine, int state);
 
 
 

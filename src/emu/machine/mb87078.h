@@ -16,7 +16,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*mb87078_gain_changed_cb)(running_machine *machine, int channel, int percent /*, float decibels*/);
+typedef void (*mb87078_gain_changed_cb)(running_machine &machine, int channel, int percent /*, float decibels*/);
 
 typedef struct _mb87078_interface mb87078_interface;
 struct _mb87078_interface

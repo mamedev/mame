@@ -140,15 +140,15 @@ static PALETTE_INIT( skydiver )
 
 static WRITE8_HANDLER( skydiver_nmion_w )
 {
-	skydiver_state *state = space->machine->driver_data<skydiver_state>();
+	skydiver_state *state = space->machine().driver_data<skydiver_state>();
 	state->nmion = offset;
 }
 
 
 static INTERRUPT_GEN( skydiver_interrupt )
 {
-	skydiver_state *state = device->machine->driver_data<skydiver_state>();
-	device_t *discrete = device->machine->device("discrete");
+	skydiver_state *state = device->machine().driver_data<skydiver_state>();
+	device_t *discrete = device->machine().device("discrete");
 
 	/* Convert range data to divide value and write to sound */
 	discrete_sound_w(discrete, SKYDIVER_RANGE_DATA, (0x01 << (~state->videoram[0x394] & 0x07)) & 0xff);	// Range 0-2

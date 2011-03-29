@@ -8,7 +8,7 @@
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	pirates_state *state = machine->driver_data<pirates_state>();
+	pirates_state *state = machine.driver_data<pirates_state>();
 	int code = state->tx_tileram[tile_index*2];
 	int colr = state->tx_tileram[tile_index*2+1];
 
@@ -17,7 +17,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	pirates_state *state = machine->driver_data<pirates_state>();
+	pirates_state *state = machine.driver_data<pirates_state>();
 	int code = state->fg_tileram[tile_index*2];
 	int colr = state->fg_tileram[tile_index*2+1]+0x80;
 
@@ -26,7 +26,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	pirates_state *state = machine->driver_data<pirates_state>();
+	pirates_state *state = machine.driver_data<pirates_state>();
 	int code = state->bg_tileram[tile_index*2];
 	int colr = state->bg_tileram[tile_index*2+1]+ 0x100;
 
@@ -38,7 +38,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START(pirates)
 {
-	pirates_state *state = machine->driver_data<pirates_state>();
+	pirates_state *state = machine.driver_data<pirates_state>();
 	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_cols,8,8,36,32);
 
 	/* Not sure how big they can be, Pirates uses only 32 columns, Genix 44 */
@@ -53,31 +53,31 @@ VIDEO_START(pirates)
 
 WRITE16_HANDLER( pirates_tx_tileram_w )
 {
-	pirates_state *state = space->machine->driver_data<pirates_state>();
+	pirates_state *state = space->machine().driver_data<pirates_state>();
 	COMBINE_DATA(state->tx_tileram+offset);
 	tilemap_mark_tile_dirty(state->tx_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( pirates_fg_tileram_w )
 {
-	pirates_state *state = space->machine->driver_data<pirates_state>();
+	pirates_state *state = space->machine().driver_data<pirates_state>();
 	COMBINE_DATA(state->fg_tileram+offset);
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( pirates_bg_tileram_w )
 {
-	pirates_state *state = space->machine->driver_data<pirates_state>();
+	pirates_state *state = space->machine().driver_data<pirates_state>();
 	COMBINE_DATA(state->bg_tileram+offset);
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset/2);
 }
 
 
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	pirates_state *state = machine->driver_data<pirates_state>();
-	const gfx_element *gfx = machine->gfx[1];
+	pirates_state *state = machine.driver_data<pirates_state>();
+	const gfx_element *gfx = machine.gfx[1];
 	UINT16 *source = state->spriteram + 4;
 	UINT16 *finish = source + 0x800/2-4;
 
@@ -109,12 +109,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE(pirates)
 {
-	pirates_state *state = screen->machine->driver_data<pirates_state>();
+	pirates_state *state = screen->machine().driver_data<pirates_state>();
 	tilemap_set_scrollx(state->bg_tilemap,0,state->scroll[0]);
 	tilemap_set_scrollx(state->fg_tilemap,0,state->scroll[0]);
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	draw_sprites(screen->machine(),bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
 	return 0;
 }

@@ -184,45 +184,45 @@ static READ32_HANDLER( namcofl_sysreg_r )
 
 static WRITE32_HANDLER( namcofl_sysreg_w )
 {
-	namcofl_state *state = space->machine->driver_data<namcofl_state>();
+	namcofl_state *state = space->machine().driver_data<namcofl_state>();
 	if ((offset == 2) && ACCESSING_BITS_0_7)  // address space configuration
 	{
 		if (data == 0)	// RAM at 00000000, ROM at 10000000
 		{
-			memory_set_bankptr(space->machine,  "bank1", state->workram );
-			memory_set_bankptr(space->machine,  "bank2", space->machine->region("maincpu")->base() );
+			memory_set_bankptr(space->machine(),  "bank1", state->workram );
+			memory_set_bankptr(space->machine(),  "bank2", space->machine().region("maincpu")->base() );
 		}
 		else		// ROM at 00000000, RAM at 10000000
 		{
-			memory_set_bankptr(space->machine,  "bank1", space->machine->region("maincpu")->base() );
-			memory_set_bankptr(space->machine,  "bank2", state->workram );
+			memory_set_bankptr(space->machine(),  "bank1", space->machine().region("maincpu")->base() );
+			memory_set_bankptr(space->machine(),  "bank2", state->workram );
 		}
 	}
 }
 
 static WRITE32_HANDLER( namcofl_paletteram_w )
 {
-	namcofl_state *state = space->machine->driver_data<namcofl_state>();
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	namcofl_state *state = space->machine().driver_data<namcofl_state>();
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
 
 	if ((offset == 0x1808/4) && ACCESSING_BITS_16_31)
 	{
-		UINT16 v = space->machine->generic.paletteram.u32[offset] >> 16;
+		UINT16 v = space->machine().generic.paletteram.u32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
 
-		state->raster_interrupt_timer->adjust(space->machine->primary_screen->time_until_pos(triggerscanline));
+		state->raster_interrupt_timer->adjust(space->machine().primary_screen->time_until_pos(triggerscanline));
 	}
 }
 
 static READ32_HANDLER( namcofl_share_r )
 {
-	namcofl_state *state = space->machine->driver_data<namcofl_state>();
+	namcofl_state *state = space->machine().driver_data<namcofl_state>();
 	return (state->shareram[offset*2+1] << 16) | state->shareram[offset*2];
 }
 
 static WRITE32_HANDLER( namcofl_share_w )
 {
-	namcofl_state *state = space->machine->driver_data<namcofl_state>();
+	namcofl_state *state = space->machine().driver_data<namcofl_state>();
 	COMBINE_DATA(state->shareram+offset*2);
 	data >>= 16;
 	mem_mask >>= 16;
@@ -252,7 +252,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( mcu_shared_w )
 {
-	namcofl_state *state = space->machine->driver_data<namcofl_state>();
+	namcofl_state *state = space->machine().driver_data<namcofl_state>();
 	// HACK!  Many games data ROM routines redirect the vector from the sound command read to an RTS.
 	// This needs more investigation.  nebulray and vshoot do NOT do this.
 	// Timers A2 and A3 are set up in "external input counter" mode, this may be related.
@@ -275,32 +275,32 @@ static WRITE16_HANDLER( mcu_shared_w )
 
 static READ8_HANDLER( port6_r )
 {
-	namcofl_state *state = space->machine->driver_data<namcofl_state>();
+	namcofl_state *state = space->machine().driver_data<namcofl_state>();
 	return state->mcu_port6;
 }
 
 static WRITE8_HANDLER( port6_w )
 {
-	namcofl_state *state = space->machine->driver_data<namcofl_state>();
+	namcofl_state *state = space->machine().driver_data<namcofl_state>();
 	state->mcu_port6 = data;
 }
 
 static READ8_HANDLER( port7_r )
 {
-	namcofl_state *state = space->machine->driver_data<namcofl_state>();
+	namcofl_state *state = space->machine().driver_data<namcofl_state>();
 	switch (state->mcu_port6 & 0xf0)
 	{
 		case 0x00:
-			return input_port_read(space->machine, "IN0");
+			return input_port_read(space->machine(), "IN0");
 
 		case 0x20:
-			return input_port_read(space->machine, "MISC");
+			return input_port_read(space->machine(), "MISC");
 
 		case 0x40:
-			return input_port_read(space->machine, "IN1");
+			return input_port_read(space->machine(), "IN1");
 
 		case 0x60:
-			return input_port_read(space->machine, "IN2");
+			return input_port_read(space->machine(), "IN2");
 
 		default:
 			break;
@@ -311,17 +311,17 @@ static READ8_HANDLER( port7_r )
 
 static READ8_HANDLER(dac7_r)
 {
-	return input_port_read_safe(space->machine, "ACCEL", 0xff);
+	return input_port_read_safe(space->machine(), "ACCEL", 0xff);
 }
 
 static READ8_HANDLER(dac6_r)
 {
-	return input_port_read_safe(space->machine, "BRAKE", 0xff);
+	return input_port_read_safe(space->machine(), "BRAKE", 0xff);
 }
 
 static READ8_HANDLER(dac5_r)
 {
-	return input_port_read_safe(space->machine, "WHEEL", 0xff);
+	return input_port_read_safe(space->machine(), "WHEEL", 0xff);
 }
 
 static READ8_HANDLER(dac4_r) { return 0xff; }
@@ -535,23 +535,23 @@ GFXDECODE_END
 static TIMER_CALLBACK( network_interrupt_callback )
 {
 	cputag_set_input_line(machine, "maincpu", I960_IRQ0, ASSERT_LINE);
-	machine->scheduler().timer_set(machine->primary_screen->frame_period(), FUNC(network_interrupt_callback));
+	machine.scheduler().timer_set(machine.primary_screen->frame_period(), FUNC(network_interrupt_callback));
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	cputag_set_input_line(machine, "maincpu", I960_IRQ2, ASSERT_LINE);
-	machine->scheduler().timer_set(machine->primary_screen->frame_period(), FUNC(vblank_interrupt_callback));
+	machine.scheduler().timer_set(machine.primary_screen->frame_period(), FUNC(vblank_interrupt_callback));
 }
 
 
 static TIMER_CALLBACK( raster_interrupt_callback )
 {
-	namcofl_state *state = machine->driver_data<namcofl_state>();
-	machine->primary_screen->update_partial(machine->primary_screen->vpos());
+	namcofl_state *state = machine.driver_data<namcofl_state>();
+	machine.primary_screen->update_partial(machine.primary_screen->vpos());
 	cputag_set_input_line(machine, "maincpu", I960_IRQ1, ASSERT_LINE);
-	state->raster_interrupt_timer->adjust(machine->primary_screen->frame_period());
+	state->raster_interrupt_timer->adjust(machine.primary_screen->frame_period());
 }
 
 static INTERRUPT_GEN( mcu_interrupt )
@@ -572,18 +572,18 @@ static INTERRUPT_GEN( mcu_interrupt )
 
 static MACHINE_START( namcofl )
 {
-	namcofl_state *state = machine->driver_data<namcofl_state>();
-	state->raster_interrupt_timer = machine->scheduler().timer_alloc(FUNC(raster_interrupt_callback));
+	namcofl_state *state = machine.driver_data<namcofl_state>();
+	state->raster_interrupt_timer = machine.scheduler().timer_alloc(FUNC(raster_interrupt_callback));
 }
 
 
 static MACHINE_RESET( namcofl )
 {
-	namcofl_state *state = machine->driver_data<namcofl_state>();
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(machine->primary_screen->visible_area().max_y + 3), FUNC(network_interrupt_callback));
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(machine->primary_screen->visible_area().max_y + 1), FUNC(vblank_interrupt_callback));
+	namcofl_state *state = machine.driver_data<namcofl_state>();
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(machine.primary_screen->visible_area().max_y + 3), FUNC(network_interrupt_callback));
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(machine.primary_screen->visible_area().max_y + 1), FUNC(vblank_interrupt_callback));
 
-	memory_set_bankptr(machine,  "bank1", machine->region("maincpu")->base() );
+	memory_set_bankptr(machine,  "bank1", machine.region("maincpu")->base() );
 	memory_set_bankptr(machine,  "bank2", state->workram );
 
 	memset(state->workram, 0x00, 0x100000);
@@ -807,12 +807,12 @@ ROM_START( finalaprj )
 	ROM_LOAD("finalapr.nv",   0x000000, 0x2000, CRC(d51d65fe) SHA1(8a0a523cb6ba2880951e41ca04db23584f0a108c) )
 ROM_END
 
-static void namcofl_common_init(running_machine *machine)
+static void namcofl_common_init(running_machine &machine)
 {
-	namcofl_state *state = machine->driver_data<namcofl_state>();
+	namcofl_state *state = machine.driver_data<namcofl_state>();
 	state->workram = auto_alloc_array(machine, UINT32, 0x100000/4);
 
-	memory_set_bankptr(machine,  "bank1", machine->region("maincpu")->base() );
+	memory_set_bankptr(machine,  "bank1", machine.region("maincpu")->base() );
 	memory_set_bankptr(machine,  "bank2", state->workram );
 }
 

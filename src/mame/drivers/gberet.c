@@ -88,7 +88,7 @@
 
 static INTERRUPT_GEN( gberet_interrupt )
 {
-	gberet_state *state = device->machine->driver_data<gberet_state>();
+	gberet_state *state = device->machine().driver_data<gberet_state>();
 	if (cpu_getiloops(device) == 0)
 	{
 		if (state->irq_enable)
@@ -112,36 +112,36 @@ static INTERRUPT_GEN( gberet_interrupt )
 static WRITE8_HANDLER( gberet_coin_counter_w )
 {
 	/* bits 0/1 = coin counters */
-	coin_counter_w(space->machine, 0, data & 0x01);
-	coin_counter_w(space->machine, 1, data & 0x02);
+	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(space->machine(), 1, data & 0x02);
 }
 
 static WRITE8_HANDLER( gberet_flipscreen_w )
 {
-	gberet_state *state = space->machine->driver_data<gberet_state>();
+	gberet_state *state = space->machine().driver_data<gberet_state>();
 	state->nmi_enable = data & 0x01;
 	state->irq_enable = data & 0x04;
 
-	flip_screen_set(space->machine, data & 0x08);
+	flip_screen_set(space->machine(), data & 0x08);
 }
 
 static WRITE8_HANDLER( mrgoemon_coin_counter_w )
 {
 	/* bits 0/1 = coin counters */
-	coin_counter_w(space->machine, 0, data & 0x01);
-	coin_counter_w(space->machine, 1, data & 0x02);
+	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(space->machine(), 1, data & 0x02);
 
 	/* bits 5-7 = ROM bank select */
-	memory_set_bank(space->machine, "bank1", ((data & 0xe0) >> 5));
+	memory_set_bank(space->machine(), "bank1", ((data & 0xe0) >> 5));
 }
 
 static WRITE8_HANDLER( mrgoemon_flipscreen_w )
 {
-	gberet_state *state = space->machine->driver_data<gberet_state>();
+	gberet_state *state = space->machine().driver_data<gberet_state>();
 	state->nmi_enable = data & 0x01;
 	state->irq_enable = data & 0x02;
 
-	flip_screen_set(space->machine, data & 0x08);
+	flip_screen_set(space->machine(), data & 0x08);
 }
 
 /*************************************
@@ -371,7 +371,7 @@ GFXDECODE_END
 
 static MACHINE_START( gberet )
 {
-	gberet_state *state = machine->driver_data<gberet_state>();
+	gberet_state *state = machine.driver_data<gberet_state>();
 
 	state->save_item(NAME(state->irq_enable));
 	state->save_item(NAME(state->nmi_enable));
@@ -380,7 +380,7 @@ static MACHINE_START( gberet )
 
 static MACHINE_RESET( gberet )
 {
-	gberet_state *state = machine->driver_data<gberet_state>();
+	gberet_state *state = machine.driver_data<gberet_state>();
 
 	state->irq_enable = 0;
 	state->nmi_enable = 0;
@@ -547,7 +547,7 @@ ROM_END
 
 static DRIVER_INIT( mrgoemon )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x800);
 }
 

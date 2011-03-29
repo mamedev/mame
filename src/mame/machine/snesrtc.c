@@ -39,10 +39,10 @@ static const UINT8 srtc_months[12] =
 	31, 30, 31
 };
 
-static void srtc_update_time( running_machine *machine )
+static void srtc_update_time( running_machine &machine )
 {
 	system_time curtime, *systime = &curtime;
-	machine->current_datetime(curtime);
+	machine.current_datetime(curtime);
 	rtc_state.ram[0] = systime->local_time.second % 10;
 	rtc_state.ram[1] = systime->local_time.second / 10;
 	rtc_state.ram[2] = systime->local_time.minute % 10;
@@ -122,7 +122,7 @@ static UINT8 srtc_read( address_space *space, UINT16 addr )
 
 		if (rtc_state.index < 0)
 		{
-			srtc_update_time(space->machine);
+			srtc_update_time(space->machine());
 			rtc_state.index++;
 			return 0x0f;
 		}
@@ -140,7 +140,7 @@ static UINT8 srtc_read( address_space *space, UINT16 addr )
 	return snes_open_bus_r(space, 0);
 }
 
-static void srtc_write( running_machine *machine, UINT16 addr, UINT8 data )
+static void srtc_write( running_machine &machine, UINT16 addr, UINT8 data )
 {
 	addr &= 0xffff;
 
@@ -210,7 +210,7 @@ static void srtc_write( running_machine *machine, UINT16 addr, UINT8 data )
 	}
 }
 
-static void srtc_init( running_machine *machine )
+static void srtc_init( running_machine &machine )
 {
 	rtc_state.mode = RTCM_Read;
 	rtc_state.index = -1;

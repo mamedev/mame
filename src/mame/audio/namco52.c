@@ -142,7 +142,7 @@ WRITE8_DEVICE_HANDLER( namco_52xx_write )
 {
 	namco_52xx_state *state = get_safe_token(device);
 
-	device->machine->scheduler().synchronize(FUNC(namco_52xx_latch_callback), data, (void *)device);
+	device->machine().scheduler().synchronize(FUNC(namco_52xx_latch_callback), data, (void *)device);
 
 	device_set_input_line(state->cpu, 0, ASSERT_LINE);
 
@@ -154,7 +154,7 @@ WRITE8_DEVICE_HANDLER( namco_52xx_write )
 
 	/* the 52xx uses TSTI to check for an interrupt; it also may be handling
        a timer interrupt, so we need to ensure the IRQ line is held long enough */
-	device->machine->scheduler().timer_set(attotime::from_usec(5*21), FUNC(namco_52xx_irq_clear), 0, (void *)device);
+	device->machine().scheduler().timer_set(attotime::from_usec(5*21), FUNC(namco_52xx_irq_clear), 0, (void *)device);
 }
 
 
@@ -210,7 +210,7 @@ static DEVICE_START( namco_52xx )
 
 	/* find the attached discrete sound device */
 	assert(intf->discrete != NULL);
-	state->discrete = device->machine->device(intf->discrete);
+	state->discrete = device->machine().device(intf->discrete);
 	assert(state->discrete != NULL);
 	state->basenode = intf->firstnode;
 
@@ -220,7 +220,7 @@ static DEVICE_START( namco_52xx )
 
 	/* start the external clock */
 	if (intf->extclock != 0)
-		device->machine->scheduler().timer_pulse(attotime(0, intf->extclock), FUNC(external_clock_pulse), 0, device);
+		device->machine().scheduler().timer_pulse(attotime(0, intf->extclock), FUNC(external_clock_pulse), 0, device);
 }
 
 

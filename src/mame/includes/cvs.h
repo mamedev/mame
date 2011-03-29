@@ -105,7 +105,7 @@ WRITE8_HANDLER( cvs_video_fx_w );
 READ8_HANDLER( cvs_collision_r );
 READ8_HANDLER( cvs_collision_clear );
 
-void cvs_scroll_stars(running_machine *machine);
+void cvs_scroll_stars(running_machine &machine);
 
 PALETTE_INIT( cvs );
 SCREEN_UPDATE( cvs );

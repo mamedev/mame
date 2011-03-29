@@ -22,7 +22,7 @@ Might be some priority glitches
 
 static WRITE8_HANDLER( tbowl_coin_counter_w )
 {
-	coin_counter_w(space->machine, 0, data & 1);
+	coin_counter_w(space->machine(), 0, data & 1);
 }
 
 /*** Banking
@@ -34,23 +34,23 @@ note: check this, its borrowed from tecmo.c / wc90.c at the moment and could wel
 static WRITE8_HANDLER( tbowlb_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);
 }
 
 static WRITE8_HANDLER( tbowlc_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = space->machine->region("sub")->base();
+	UINT8 *RAM = space->machine().region("sub")->base();
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
 
 
-	memory_set_bankptr(space->machine, "bank2", &RAM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank2", &RAM[bankaddress]);
 }
 
 /*** Shared Ram Handlers
@@ -59,20 +59,20 @@ static WRITE8_HANDLER( tbowlc_bankswitch_w )
 
 static READ8_HANDLER( shared_r )
 {
-	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	return state->shared_ram[offset];
 }
 
 static WRITE8_HANDLER( shared_w )
 {
-	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->shared_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( tbowl_sound_command_w )
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -125,7 +125,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER ( tbowl_trigger_nmi )
 {
 	/* trigger NMI on 6206B's Cpu? (guess but seems to work..) */
-	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( 6206C_map, AS_PROGRAM, 8 )
@@ -147,30 +147,30 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tbowl_adpcm_start_w )
 {
-	tbowl_state *state = space->machine->driver_data<tbowl_state>();
-	device_t *adpcm = space->machine->device((offset & 1) ? "msm2" : "msm1");
+	tbowl_state *state = space->machine().driver_data<tbowl_state>();
+	device_t *adpcm = space->machine().device((offset & 1) ? "msm2" : "msm1");
 	state->adpcm_pos[offset & 1] = data << 8;
 	msm5205_reset_w(adpcm,0);
 }
 
 static WRITE8_HANDLER( tbowl_adpcm_end_w )
 {
-	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->adpcm_end[offset & 1] = (data + 1) << 8;
 }
 
 static WRITE8_HANDLER( tbowl_adpcm_vol_w )
 {
-	device_t *adpcm = space->machine->device((offset & 1) ? "msm2" : "msm1");
+	device_t *adpcm = space->machine().device((offset & 1) ? "msm2" : "msm1");
 	msm5205_set_volume(adpcm, (data & 0x7f) * 100 / 0x7f);
 }
 
 static void tbowl_adpcm_int(device_t *device)
 {
-	tbowl_state *state = device->machine->driver_data<tbowl_state>();
+	tbowl_state *state = device->machine().driver_data<tbowl_state>();
 	int num = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
 	if (state->adpcm_pos[num] >= state->adpcm_end[num] ||
-				state->adpcm_pos[num] >= device->machine->region("adpcm")->bytes()/2)
+				state->adpcm_pos[num] >= device->machine().region("adpcm")->bytes()/2)
 		msm5205_reset_w(device,1);
 	else if (state->adpcm_data[num] != -1)
 	{
@@ -179,7 +179,7 @@ static void tbowl_adpcm_int(device_t *device)
 	}
 	else
 	{
-		UINT8 *ROM = device->machine->region("adpcm")->base() + 0x10000 * num;
+		UINT8 *ROM = device->machine().region("adpcm")->base() + 0x10000 * num;
 
 		state->adpcm_data[num] = ROM[state->adpcm_pos[num]++];
 		msm5205_data_w(device,state->adpcm_data[num] >> 4);
@@ -431,7 +431,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -459,7 +459,7 @@ The game is displayed on 2 monitors
 
 static MACHINE_RESET( tbowl )
 {
-	tbowl_state *state = machine->driver_data<tbowl_state>();
+	tbowl_state *state = machine.driver_data<tbowl_state>();
 	state->adpcm_pos[0] = state->adpcm_pos[1] = 0;
 	state->adpcm_end[0] = state->adpcm_end[1] = 0;
 	state->adpcm_data[0] = state->adpcm_data[1] = -1;

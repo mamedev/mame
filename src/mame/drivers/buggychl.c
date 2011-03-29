@@ -89,12 +89,12 @@ Dip locations and factory settings verified from dip listing
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x07);	// shall we check if data&7 < # banks?
+	memory_set_bank(space->machine(), "bank1", data & 0x07);	// shall we check if data&7 < # banks?
 }
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	buggychl_state *state = machine.driver_data<buggychl_state>();
 
 	if (state->sound_nmi_enable)
 		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -105,18 +105,18 @@ static TIMER_CALLBACK( nmi_callback )
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(space, 0, data);
-	space->machine->scheduler().synchronize(FUNC(nmi_callback), data);
+	space->machine().scheduler().synchronize(FUNC(nmi_callback), data);
 }
 
 static WRITE8_HANDLER( nmi_disable_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	buggychl_state *state = space->machine().driver_data<buggychl_state>();
 	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	buggychl_state *state = space->machine().driver_data<buggychl_state>();
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
 	{
@@ -127,7 +127,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 static WRITE8_HANDLER( sound_enable_w )
 {
-	space->machine->sound().system_enable(data & 1);
+	space->machine().sound().system_enable(data & 1);
 }
 
 
@@ -361,12 +361,12 @@ static const msm5232_interface msm5232_config =
 
 static MACHINE_START( buggychl )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	buggychl_state *state = machine.driver_data<buggychl_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x2000);
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->sound_nmi_enable));
 	state->save_item(NAME(state->pending_nmi));
@@ -380,7 +380,7 @@ static MACHINE_START( buggychl )
 
 static MACHINE_RESET( buggychl )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	buggychl_state *state = machine.driver_data<buggychl_state>();
 
 	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
 

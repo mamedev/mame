@@ -40,14 +40,14 @@
 
 WRITE8_HANDLER( cloak_paletteram_w )
 {
-	cloak_state *state = space->machine->driver_data<cloak_state>();
+	cloak_state *state = space->machine().driver_data<cloak_state>();
 	state->palette_ram[offset & 0x3f] = ((offset & 0x40) << 2) | data;
 }
 
 
-static void set_pens(running_machine *machine)
+static void set_pens(running_machine &machine)
 {
-	cloak_state *state = machine->driver_data<cloak_state>();
+	cloak_state *state = machine.driver_data<cloak_state>();
 	UINT16 *palette_ram = state->palette_ram;
 	static const int resistances[3] = { 10000, 4700, 2200 };
 	double weights[3];
@@ -95,9 +95,9 @@ static void set_current_bitmap_videoram_pointer(cloak_state *state)
 
 WRITE8_HANDLER( cloak_clearbmp_w )
 {
-	cloak_state *state = space->machine->driver_data<cloak_state>();
+	cloak_state *state = space->machine().driver_data<cloak_state>();
 
-	space->machine->primary_screen->update_now();
+	space->machine().primary_screen->update_now();
 	state->bitmap_videoram_selected = data & 0x01;
 	set_current_bitmap_videoram_pointer(state);
 
@@ -120,7 +120,7 @@ static void adjust_xy(cloak_state *state, int offset)
 
 READ8_HANDLER( graph_processor_r )
 {
-	cloak_state *state = space->machine->driver_data<cloak_state>();
+	cloak_state *state = space->machine().driver_data<cloak_state>();
 	UINT8 ret = state->current_bitmap_videoram_displayed[(state->bitmap_videoram_address_y << 8) | state->bitmap_videoram_address_x];
 
 	adjust_xy(state, offset);
@@ -130,7 +130,7 @@ READ8_HANDLER( graph_processor_r )
 
 WRITE8_HANDLER( graph_processor_w )
 {
-	cloak_state *state = space->machine->driver_data<cloak_state>();
+	cloak_state *state = space->machine().driver_data<cloak_state>();
 
 	switch (offset)
 	{
@@ -146,7 +146,7 @@ WRITE8_HANDLER( graph_processor_w )
 
 WRITE8_HANDLER( cloak_videoram_w )
 {
-	cloak_state *state = space->machine->driver_data<cloak_state>();
+	cloak_state *state = space->machine().driver_data<cloak_state>();
 	UINT8 *videoram = state->videoram;
 
 	videoram[offset] = data;
@@ -155,12 +155,12 @@ WRITE8_HANDLER( cloak_videoram_w )
 
 WRITE8_HANDLER( cloak_flipscreen_w )
 {
-	flip_screen_set(space->machine, data & 0x80);
+	flip_screen_set(space->machine(), data & 0x80);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	cloak_state *state = machine->driver_data<cloak_state>();
+	cloak_state *state = machine.driver_data<cloak_state>();
 	UINT8 *videoram = state->videoram;
 	int code = videoram[tile_index];
 
@@ -169,14 +169,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static STATE_POSTLOAD( cloak_postload )
 {
-	cloak_state *state = machine->driver_data<cloak_state>();
+	cloak_state *state = machine.driver_data<cloak_state>();
 
 	set_current_bitmap_videoram_pointer(state);
 }
 
 VIDEO_START( cloak )
 {
-	cloak_state *state = machine->driver_data<cloak_state>();
+	cloak_state *state = machine.driver_data<cloak_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
@@ -192,12 +192,12 @@ VIDEO_START( cloak )
 	state->save_pointer(NAME(state->bitmap_videoram1), 256*256);
 	state->save_pointer(NAME(state->bitmap_videoram2), 256*256);
 	state->save_pointer(NAME(state->palette_ram), NUM_PENS);
-	machine->state().register_postload(cloak_postload, NULL);
+	machine.state().register_postload(cloak_postload, NULL);
 }
 
-static void draw_bitmap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_bitmap(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	cloak_state *state = machine->driver_data<cloak_state>();
+	cloak_state *state = machine.driver_data<cloak_state>();
 	int x, y;
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -210,9 +210,9 @@ static void draw_bitmap(running_machine *machine, bitmap_t *bitmap, const rectan
 		}
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	cloak_state *state = machine->driver_data<cloak_state>();
+	cloak_state *state = machine.driver_data<cloak_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -232,16 +232,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, 0, flipx, flipy,	sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, 0, flipx, flipy,	sx, sy, 0);
 	}
 }
 
 SCREEN_UPDATE( cloak )
 {
-	cloak_state *state = screen->machine->driver_data<cloak_state>();
-	set_pens(screen->machine);
+	cloak_state *state = screen->machine().driver_data<cloak_state>();
+	set_pens(screen->machine());
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_bitmap(screen->machine, bitmap, cliprect);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_bitmap(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

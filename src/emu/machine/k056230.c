@@ -74,7 +74,7 @@ void k056230_device::device_start()
 
 	m_is_thunderh = m_config.m_is_thunderh;
 
-	m_ram = auto_alloc_array(&m_machine, UINT32, 0x2000);
+	m_ram = auto_alloc_array(m_machine, UINT32, 0x2000);
 
 	save_pointer(NAME(m_ram), 0x2000);
 }

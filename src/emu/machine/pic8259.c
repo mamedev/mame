@@ -406,7 +406,7 @@ static DEVICE_START( pic8259 )
 
 	assert(intf != NULL);
 
-	pic8259->timer = device->machine->scheduler().timer_alloc( FUNC(pic8259_timerproc), (void *)device );
+	pic8259->timer = device->machine().scheduler().timer_alloc( FUNC(pic8259_timerproc), (void *)device );
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&pic8259->out_int_func, &intf->out_int_func, device);

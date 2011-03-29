@@ -54,17 +54,17 @@ public:
 
 static WRITE16_HANDLER(tomcat_adcon_w)
 {
-	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	tomcat_state *state = space->machine().driver_data<tomcat_state>();
 	state->control_num = data;
 }
 
 static READ16_HANDLER(tomcat_adcread_r)
 {
-	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	tomcat_state *state = space->machine().driver_data<tomcat_state>();
 	switch( state->control_num )
 	{
-	case 0: return input_port_read(space->machine, "STICKY");
-	case 1: return input_port_read(space->machine, "STICKX");
+	case 0: return input_port_read(space->machine(), "STICKY");
+	case 1: return input_port_read(space->machine(), "STICKX");
 	default: return 0x7f7f;
 	}
 }
@@ -73,29 +73,29 @@ static READ16_HANDLER(tomcat_inputs_r)
 {
 	UINT16 result = 0;
 	if (ACCESSING_BITS_8_15)
-		result |= input_port_read(space->machine, "IN0") << 8;
+		result |= input_port_read(space->machine(), "IN0") << 8;
 
 	return result;
 }
 
 static WRITE16_HANDLER(tomcat_led1on_w)
 {
-	set_led_status(space->machine, 1, 1);
+	set_led_status(space->machine(), 1, 1);
 }
 
 static WRITE16_HANDLER(tomcat_led2on_w)
 {
-	set_led_status(space->machine, 2, 1);
+	set_led_status(space->machine(), 2, 1);
 }
 
 static WRITE16_HANDLER(tomcat_led2off_w)
 {
-	set_led_status(space->machine, 2, 0);
+	set_led_status(space->machine(), 2, 0);
 }
 
 static WRITE16_HANDLER(tomcat_led1off_w)
 {
-	set_led_status(space->machine, 1, 0);
+	set_led_status(space->machine(), 1, 0);
 }
 
 static WRITE16_HANDLER(tomcat_lnkmodel_w)
@@ -156,27 +156,27 @@ static WRITE16_HANDLER(tomcat_mresl_w)
 {
 	// 320 Reset Low         (Address Strobe)
 	// Reset TMS320
-	device_set_input_line(space->machine->device("dsp"), INPUT_LINE_RESET, ASSERT_LINE);
+	device_set_input_line(space->machine().device("dsp"), INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER(tomcat_mresh_w)
 {
-	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	tomcat_state *state = space->machine().driver_data<tomcat_state>();
 	// 320 Reset high        (Address Strobe)
 	// Release reset of TMS320
 	state->dsp_BIO = 0;
-	device_set_input_line(space->machine->device("dsp"), INPUT_LINE_RESET, CLEAR_LINE);
+	device_set_input_line(space->machine().device("dsp"), INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE16_HANDLER(tomcat_irqclr_w)
 {
 	// Clear IRQ Latch          (Address Strobe)
-	cputag_set_input_line(space->machine, "maincpu", 1, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 1, CLEAR_LINE);
 }
 
 static READ16_HANDLER(tomcat_inputs2_r)
 {
-	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	tomcat_state *state = space->machine().driver_data<tomcat_state>();
 /*
 *       D15 LNKFLAG     (Game Link)
 *       D14 PC3        "    "
@@ -192,15 +192,15 @@ static READ16_HANDLER(tomcat_inputs2_r)
 
 static READ16_HANDLER(tomcat_320bio_r)
 {
-	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	tomcat_state *state = space->machine().driver_data<tomcat_state>();
 	state->dsp_BIO = 1;
-	space->machine->device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_SPIN, 1);
+	space->machine().device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_SPIN, 1);
 	return 0;
 }
 
 static READ16_HANDLER(dsp_BIO_r)
 {
-	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	tomcat_state *state = space->machine().driver_data<tomcat_state>();
 	if ( cpu_get_pc(space->cpu) == 0x0001 )
 	{
 		if ( state->dsp_idle == 0 )
@@ -216,7 +216,7 @@ static READ16_HANDLER(dsp_BIO_r)
 		{
 			state->dsp_idle = 0;
 			state->dsp_BIO = 0;
-			space->machine->device<cpu_device>("maincpu")->resume(SUSPEND_REASON_SPIN );
+			space->machine().device<cpu_device>("maincpu")->resume(SUSPEND_REASON_SPIN );
 			return 0;
 		}
 		else
@@ -233,25 +233,25 @@ static READ16_HANDLER(dsp_BIO_r)
 
 static READ16_HANDLER(tomcat_shared_ram_r)
 {
-	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	tomcat_state *state = space->machine().driver_data<tomcat_state>();
 	return state->shared_ram[offset];
 }
 
 static WRITE16_HANDLER(tomcat_shared_ram_w)
 {
-	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	tomcat_state *state = space->machine().driver_data<tomcat_state>();
 	COMBINE_DATA(&state->shared_ram[offset]);
 }
 
 static READ8_HANDLER(tomcat_nvram_r)
 {
-	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	tomcat_state *state = space->machine().driver_data<tomcat_state>();
 	return state->nvram[offset];
 }
 
 static WRITE8_HANDLER(tomcat_nvram_w)
 {
-	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	tomcat_state *state = space->machine().driver_data<tomcat_state>();
 	state->nvram[offset] = data;
 }
 
@@ -348,13 +348,13 @@ ROM_END
 
 static MACHINE_START(tomcat)
 {
-	tomcat_state *state = machine->driver_data<tomcat_state>();
+	tomcat_state *state = machine.driver_data<tomcat_state>();
 	((UINT16*)state->shared_ram)[0x0000] = 0xf600;
 	((UINT16*)state->shared_ram)[0x0001] = 0x0000;
 	((UINT16*)state->shared_ram)[0x0002] = 0xf600;
 	((UINT16*)state->shared_ram)[0x0003] = 0x0000;
 
-	machine->device<nvram_device>("nvram")->set_base(state->nvram, 0x800);
+	machine.device<nvram_device>("nvram")->set_base(state->nvram, 0x800);
 
 	state->save_item(NAME(state->nvram));
 	state->save_item(NAME(state->control_num));

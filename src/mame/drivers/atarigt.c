@@ -37,7 +37,7 @@
  *
  *************************************/
 
-static void cage_irq_callback(running_machine *machine, int reason);
+static void cage_irq_callback(running_machine &machine, int reason);
 
 
 
@@ -47,9 +47,9 @@ static void cage_irq_callback(running_machine *machine, int reason);
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	atarigt_state *state = machine->driver_data<atarigt_state>();
+	atarigt_state *state = machine.driver_data<atarigt_state>();
 	cputag_set_input_line(machine, "maincpu", 3, state->sound_int_state    ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 4, state->video_int_state    ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 6, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
@@ -64,11 +64,11 @@ static MACHINE_START( atarigt )
 
 static MACHINE_RESET( atarigt )
 {
-	atarigt_state *state = machine->driver_data<atarigt_state>();
+	atarigt_state *state = machine.driver_data<atarigt_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine->primary_screen, atarigt_scanline_update, 8);
+	atarigen_scanline_timer_reset(*machine.primary_screen, atarigt_scanline_update, 8);
 }
 
 
@@ -79,12 +79,12 @@ static MACHINE_RESET( atarigt )
  *
  *************************************/
 
-static void cage_irq_callback(running_machine *machine, int reason)
+static void cage_irq_callback(running_machine &machine, int reason)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (reason)
-		atarigen_sound_int_gen(machine->device("maincpu"));
+		atarigen_sound_int_gen(machine.device("maincpu"));
 	else
 		atarigen_sound_int_ack_w(space,0,0,0xffff);
 }
@@ -99,7 +99,7 @@ static void cage_irq_callback(running_machine *machine, int reason)
 
 static READ32_HANDLER( special_port2_r )
 {
-	int temp = input_port_read(space->machine, "SERVICE");
+	int temp = input_port_read(space->machine(), "SERVICE");
 	temp ^= 0x0001;		/* /A2DRDY always high for now */
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
 	return (temp << 16) | temp;
@@ -108,8 +108,8 @@ static READ32_HANDLER( special_port2_r )
 
 static READ32_HANDLER( special_port3_r )
 {
-	atarigt_state *state = space->machine->driver_data<atarigt_state>();
-	int temp = input_port_read(space->machine, "COIN");
+	atarigt_state *state = space->machine().driver_data<atarigt_state>();
+	int temp = input_port_read(space->machine(), "COIN");
 	if (state->video_int_state) temp ^= 0x0001;
 	if (state->scanline_int_state) temp ^= 0x0002;
 	return (temp << 16) | temp;
@@ -156,7 +156,7 @@ static READ32_HANDLER( analog_port0_r )
 	compute_fake_pots(pots);
 	return (pots[0] << 24) | (pots[3] << 8);
 #else
-	return (input_port_read(space->machine, "AN1") << 24) | (input_port_read(space->machine, "AN2") << 8);
+	return (input_port_read(space->machine(), "AN1") << 24) | (input_port_read(space->machine(), "AN2") << 8);
 #endif
 }
 
@@ -168,7 +168,7 @@ static READ32_HANDLER( analog_port1_r )
 	compute_fake_pots(pots);
 	return (pots[2] << 24) | (pots[1] << 8);
 #else
-	return (input_port_read(space->machine, "AN3") << 24) | (input_port_read(space->machine, "AN4") << 8);
+	return (input_port_read(space->machine(), "AN3") << 24) | (input_port_read(space->machine(), "AN4") << 8);
 #endif
 }
 
@@ -196,7 +196,7 @@ static WRITE32_HANDLER( latch_w )
 	/* upper byte */
 	if (ACCESSING_BITS_24_31)
 	{
-		atarigt_state *state = space->machine->driver_data<atarigt_state>();
+		atarigt_state *state = space->machine().driver_data<atarigt_state>();
 
 		/* bits 13-11 are the MO control bits */
 		atarirle_control_w(state->rle, (data >> 27) & 7);
@@ -205,15 +205,15 @@ static WRITE32_HANDLER( latch_w )
 	if (ACCESSING_BITS_16_23)
 	{
 //      cage_reset_w(data & 0x00100000);
-		coin_counter_w(space->machine, 0, data & 0x00080000);
-		coin_counter_w(space->machine, 1, data & 0x00010000);
+		coin_counter_w(space->machine(), 0, data & 0x00080000);
+		coin_counter_w(space->machine(), 1, data & 0x00010000);
 	}
 }
 
 
 static WRITE32_HANDLER( mo_command_w )
 {
-	atarigt_state *state = space->machine->driver_data<atarigt_state>();
+	atarigt_state *state = space->machine().driver_data<atarigt_state>();
 	COMBINE_DATA(state->mo_command);
 	if (ACCESSING_BITS_0_15)
 		atarirle_command_w(state->rle, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
@@ -248,7 +248,7 @@ static READ32_HANDLER( sound_data_r )
 static WRITE32_HANDLER( sound_data_w )
 {
 	if (ACCESSING_BITS_0_15)
-		cage_control_w(space->machine, data);
+		cage_control_w(space->machine(), data);
 	if (ACCESSING_BITS_16_31)
 		main_to_cage_w(data >> 16);
 }
@@ -277,7 +277,7 @@ static void tmek_update_mode(atarigt_state *state, offs_t offset)
 
 static void tmek_protection_w(address_space *space, offs_t offset, UINT16 data)
 {
-	atarigt_state *state = space->machine->driver_data<atarigt_state>();
+	atarigt_state *state = space->machine().driver_data<atarigt_state>();
 /*
     T-Mek init:
         ($387C0) = $0001
@@ -301,7 +301,7 @@ static void tmek_protection_w(address_space *space, offs_t offset, UINT16 data)
 
 static void tmek_protection_r(address_space *space, offs_t offset, UINT16 *data)
 {
-	atarigt_state *state = space->machine->driver_data<atarigt_state>();
+	atarigt_state *state = space->machine().driver_data<atarigt_state>();
 	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", cpu_get_previouspc(space->cpu), offset);
 
 	/* track accesses */
@@ -368,7 +368,7 @@ static void primage_update_mode(atarigt_state *state, offs_t offset)
 
 static void primrage_protection_w(address_space *space, offs_t offset, UINT16 data)
 {
-	atarigt_state *state = space->machine->driver_data<atarigt_state>();
+	atarigt_state *state = space->machine().driver_data<atarigt_state>();
 	if (LOG_PROTECTION)
 	{
 	UINT32 pc = cpu_get_previouspc(space->cpu);
@@ -439,7 +439,7 @@ static void primrage_protection_w(address_space *space, offs_t offset, UINT16 da
 
 static void primrage_protection_r(address_space *space, offs_t offset, UINT16 *data)
 {
-	atarigt_state *state = space->machine->driver_data<atarigt_state>();
+	atarigt_state *state = space->machine().driver_data<atarigt_state>();
 	/* track accesses */
 	primage_update_mode(state, offset);
 
@@ -554,7 +554,7 @@ if (LOG_PROTECTION)
 
 static READ32_HANDLER( colorram_protection_r )
 {
-	atarigt_state *state = space->machine->driver_data<atarigt_state>();
+	atarigt_state *state = space->machine().driver_data<atarigt_state>();
 	offs_t address = 0xd80000 + offset * 4;
 	UINT32 result32 = 0;
 	UINT16 result;
@@ -578,7 +578,7 @@ static READ32_HANDLER( colorram_protection_r )
 
 static WRITE32_HANDLER( colorram_protection_w )
 {
-	atarigt_state *state = space->machine->driver_data<atarigt_state>();
+	atarigt_state *state = space->machine().driver_data<atarigt_state>();
 	offs_t address = 0xd80000 + offset * 4;
 
 	if (ACCESSING_BITS_16_31)
@@ -1269,7 +1269,7 @@ static WRITE32_HANDLER( tmek_pf_w )
 
 static DRIVER_INIT( tmek )
 {
-	atarigt_state *state = machine->driver_data<atarigt_state>();
+	atarigt_state *state = machine.driver_data<atarigt_state>();
 
 	state->eeprom_default = NULL;
 	state->is_primrage = 0;
@@ -1282,13 +1282,13 @@ static DRIVER_INIT( tmek )
 	state->protection_w = tmek_protection_w;
 
 	/* temp hack */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd72000, 0xd75fff, FUNC(tmek_pf_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd72000, 0xd75fff, FUNC(tmek_pf_w));
 }
 
 
-static void primrage_init_common(running_machine *machine, offs_t cage_speedup)
+static void primrage_init_common(running_machine &machine, offs_t cage_speedup)
 {
-	atarigt_state *state = machine->driver_data<atarigt_state>();
+	atarigt_state *state = machine.driver_data<atarigt_state>();
 
 	state->eeprom_default = NULL;
 	state->is_primrage = 1;

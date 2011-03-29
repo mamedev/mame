@@ -234,10 +234,10 @@ void video_manager::frame_update(bool debug)
 	}
 
 	// draw the user interface
-	ui_update_and_render(&m_machine, &m_machine.render().ui_container());
+	ui_update_and_render(m_machine, &m_machine.render().ui_container());
 
 	// update the internal render debugger
-	debugint_update_during_game(&m_machine);
+	debugint_update_during_game(m_machine);
 
 	// if we're throttling, synchronize before rendering
 	attotime current_time = m_machine.time();
@@ -265,7 +265,7 @@ void video_manager::frame_update(bool debug)
 	if (phase == MACHINE_PHASE_RUNNING)
 	{
 		// reset partial updates if we're paused or if the debugger is active
-		if (m_machine.primary_screen != NULL && (m_machine.paused() || debug || debugger_within_instruction_hook(&m_machine)))
+		if (m_machine.primary_screen != NULL && (m_machine.paused() || debug || debugger_within_instruction_hook(m_machine)))
 			m_machine.primary_screen->scanline0_callback();
 
 		// otherwise, call the video EOF callback
@@ -452,7 +452,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 	else if (format == MF_MNG)
 	{
 		// create a new movie file and start recording
-		m_mngfile = auto_alloc(&m_machine, emu_file(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS));
+		m_mngfile = auto_alloc(m_machine, emu_file(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS));
 		file_error filerr;
 		if (name != NULL)
 			filerr = m_mngfile->open(name);
@@ -497,7 +497,7 @@ void video_manager::end_recording()
 	if (m_mngfile != NULL)
 	{
 		mng_capture_stop(*m_mngfile);
-		auto_free(&m_machine, m_mngfile);
+		auto_free(m_machine, m_mngfile);
 		m_mngfile = NULL;
 	}
 
@@ -1082,8 +1082,8 @@ void video_manager::create_snapshot_bitmap(device_t *screen)
 	if (m_snap_bitmap == NULL || width != m_snap_bitmap->width || height != m_snap_bitmap->height)
 	{
 		if (m_snap_bitmap != NULL)
-			auto_free(&m_machine, m_snap_bitmap);
-		m_snap_bitmap = auto_alloc(&m_machine, bitmap_t(width, height, BITMAP_FORMAT_RGB32));
+			auto_free(m_machine, m_snap_bitmap);
+		m_snap_bitmap = auto_alloc(m_machine, bitmap_t(width, height, BITMAP_FORMAT_RGB32));
 	}
 
 	// render the screen there
@@ -1294,10 +1294,10 @@ void video_manager::record_frame()
     invalid palette index
 -------------------------------------------------*/
 
-void video_assert_out_of_range_pixels(running_machine *machine, bitmap_t *bitmap)
+void video_assert_out_of_range_pixels(running_machine &machine, bitmap_t *bitmap)
 {
 #ifdef MAME_DEBUG
-	int maxindex = palette_get_max_index(machine->palette);
+	int maxindex = palette_get_max_index(machine.palette);
 	int x, y;
 
 	// this only applies to indexed16 bitmaps

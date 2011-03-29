@@ -75,18 +75,18 @@ typedef UINT32 CMDERR;
 ***************************************************************************/
 
 /* initialization */
-void				debug_console_init(running_machine *machine);
+void				debug_console_init(running_machine &machine);
 
 /* command handling */
-CMDERR				debug_console_execute_command(running_machine *machine, const char *command, int echo);
-CMDERR				debug_console_validate_command(running_machine *machine, const char *command);
-void				debug_console_register_command(running_machine *machine, const char *command, UINT32 flags, int ref, int minparams, int maxparams, void (*handler)(running_machine *machine, int ref, int params, const char **param));
+CMDERR				debug_console_execute_command(running_machine &machine, const char *command, int echo);
+CMDERR				debug_console_validate_command(running_machine &machine, const char *command);
+void				debug_console_register_command(running_machine &machine, const char *command, UINT32 flags, int ref, int minparams, int maxparams, void (*handler)(running_machine &machine, int ref, int params, const char **param));
 const char *		debug_cmderr_to_string(CMDERR error);
 
 /* console management */
-void CLIB_DECL		debug_console_printf(running_machine *machine, const char *format, ...) ATTR_PRINTF(2,3);
-void CLIB_DECL		debug_console_vprintf(running_machine *machine, const char *format, va_list args);
-void CLIB_DECL		debug_console_printf_wrap(running_machine *machine, int wrapcol, const char *format, ...) ATTR_PRINTF(3,4);
+void CLIB_DECL		debug_console_printf(running_machine &machine, const char *format, ...) ATTR_PRINTF(2,3);
+void CLIB_DECL		debug_console_vprintf(running_machine &machine, const char *format, va_list args);
+void CLIB_DECL		debug_console_printf_wrap(running_machine &machine, int wrapcol, const char *format, ...) ATTR_PRINTF(3,4);
 text_buffer *		debug_console_get_textbuf(void);
 
 /* errorlog management */

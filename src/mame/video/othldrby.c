@@ -13,9 +13,9 @@
 
 ***************************************************************************/
 
-INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int plane )
+INLINE void get_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int plane )
 {
-	othldrby_state *state = machine->driver_data<othldrby_state>();
+	othldrby_state *state = machine.driver_data<othldrby_state>();
 	UINT16 attr;
 
 	tile_index = 2 * tile_index + 0x800 * plane;
@@ -53,7 +53,7 @@ static TILE_GET_INFO( get_tile_info2 )
 
 VIDEO_START( othldrby )
 {
-	othldrby_state *state = machine->driver_data<othldrby_state>();
+	othldrby_state *state = machine.driver_data<othldrby_state>();
 
 	state->bg_tilemap[0] = tilemap_create(machine, get_tile_info0, tilemap_scan_rows, 16, 16, 32, 32);
 	state->bg_tilemap[1] = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 16, 32, 32);
@@ -81,13 +81,13 @@ VIDEO_START( othldrby )
 
 WRITE16_HANDLER( othldrby_videoram_addr_w )
 {
-	othldrby_state *state = space->machine->driver_data<othldrby_state>();
+	othldrby_state *state = space->machine().driver_data<othldrby_state>();
 	state->vram_addr = data;
 }
 
 READ16_HANDLER( othldrby_videoram_r )
 {
-	othldrby_state *state = space->machine->driver_data<othldrby_state>();
+	othldrby_state *state = space->machine().driver_data<othldrby_state>();
 
 	if (state->vram_addr < VIDEORAM_SIZE)
 		return state->vram[state->vram_addr++];
@@ -100,7 +100,7 @@ READ16_HANDLER( othldrby_videoram_r )
 
 WRITE16_HANDLER( othldrby_videoram_w )
 {
-	othldrby_state *state = space->machine->driver_data<othldrby_state>();
+	othldrby_state *state = space->machine().driver_data<othldrby_state>();
 
 	if (state->vram_addr < VIDEORAM_SIZE)
 	{
@@ -114,13 +114,13 @@ WRITE16_HANDLER( othldrby_videoram_w )
 
 WRITE16_HANDLER( othldrby_vreg_addr_w )
 {
-	othldrby_state *state = space->machine->driver_data<othldrby_state>();
+	othldrby_state *state = space->machine().driver_data<othldrby_state>();
 	state->vreg_addr = data & 0x7f;	/* bit 7 is set when screen is flipped */
 }
 
 WRITE16_HANDLER( othldrby_vreg_w )
 {
-	othldrby_state *state = space->machine->driver_data<othldrby_state>();
+	othldrby_state *state = space->machine().driver_data<othldrby_state>();
 
 	if (state->vreg_addr < OTHLDRBY_VREG_SIZE)
 		state->vreg[state->vreg_addr++] = data;
@@ -136,9 +136,9 @@ WRITE16_HANDLER( othldrby_vreg_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	othldrby_state *state = machine->driver_data<othldrby_state>();
+	othldrby_state *state = machine.driver_data<othldrby_state>();
 	int offs;
 
 	for (offs = 0; offs < SPRITERAM_SIZE; offs += 4)
@@ -170,7 +170,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		{
 			for (x = 0; x < sizex; x++)
 			{
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 						code + x + sizex * y,
 						color,
 						flipx,flipy,
@@ -182,14 +182,14 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( othldrby )
 {
-	othldrby_state *state = screen->machine->driver_data<othldrby_state>();
+	othldrby_state *state = screen->machine().driver_data<othldrby_state>();
 	int layer;
 
-	flip_screen_set(screen->machine, state->vreg[0x0f] & 0x80);
+	flip_screen_set(screen->machine(), state->vreg[0x0f] & 0x80);
 
 	for (layer = 0; layer < 3; layer++)
 	{
-		if (flip_screen_get(screen->machine))
+		if (flip_screen_get(screen->machine()))
 		{
 			tilemap_set_scrollx(state->bg_tilemap[layer], 0, state->vreg[2 * layer] + 59);
 			tilemap_set_scrolly(state->bg_tilemap[layer], 0, state->vreg[2 * layer + 1] + 248);
@@ -201,32 +201,32 @@ SCREEN_UPDATE( othldrby )
 		}
 	}
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	bitmap_fill(bitmap, cliprect, 0);
 
 	for (layer = 0; layer < 3; layer++)
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap[layer], 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine(), bitmap, cliprect, 0);
 
 	for (layer = 0; layer < 3; layer++)
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap[layer], 1, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 1);
+	draw_sprites(screen->machine(), bitmap, cliprect, 1);
 
 	for (layer = 0; layer < 3; layer++)
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap[layer], 2, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 2);
+	draw_sprites(screen->machine(), bitmap, cliprect, 2);
 
 	for (layer = 0; layer < 3; layer++)
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap[layer], 3, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 3);
+	draw_sprites(screen->machine(), bitmap, cliprect, 3);
 
 	return 0;
 }
 
 SCREEN_EOF( othldrby )
 {
-	othldrby_state *state = machine->driver_data<othldrby_state>();
+	othldrby_state *state = machine.driver_data<othldrby_state>();
 
 	/* sprites need to be delayed two frames */
 	memcpy(state->buf_spriteram, state->buf_spriteram2, SPRITERAM_SIZE * sizeof(state->buf_spriteram[0]));

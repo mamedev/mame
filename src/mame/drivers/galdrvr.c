@@ -2362,7 +2362,7 @@ static CUSTOM_INPUT( moonwar_dial_r )
 
 	static int counter_74ls161[2] = {0, 0};
 	static int direction[2] = {0, 0};
-	signed char dialread = input_port_read(field->port->machine, dialname[p]);
+	signed char dialread = input_port_read(field->port->machine(), dialname[p]);
 
 	UINT8 ret;
 

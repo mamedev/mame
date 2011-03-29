@@ -1326,14 +1326,14 @@ Note: on screen copyright is (c)1998 Coinmaster.
 /*------------------------------
     update timer
 ------------------------------*/
-static void uPD71054_update_timer( running_machine *machine, device_t *cpu, int no )
+static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int no )
 {
-	seta_state *state = machine->driver_data<seta_state>();
+	seta_state *state = machine.driver_data<seta_state>();
 	uPD71054_state *uPD71054 = &state->uPD71054;
 	UINT16 max = uPD71054->max[no]&0xffff;
 
 	if( max != 0 ) {
-		attotime period = attotime::from_hz(machine->device("maincpu")->unscaled_clock()) * (16 * max);
+		attotime period = attotime::from_hz(machine.device("maincpu")->unscaled_clock()) * (16 * max);
 		uPD71054->timer[no]->adjust( period, no );
 	} else {
 		uPD71054->timer[no]->adjust( attotime::never, no);
@@ -1358,9 +1358,9 @@ static TIMER_CALLBACK( uPD71054_timer_callback )
 /*------------------------------
     initialize
 ------------------------------*/
-static void uPD71054_timer_init( running_machine *machine )
+static void uPD71054_timer_init( running_machine &machine )
 {
-	seta_state *state = machine->driver_data<seta_state>();
+	seta_state *state = machine.driver_data<seta_state>();
 	uPD71054_state *uPD71054 = &state->uPD71054;
 	int no;
 
@@ -1370,7 +1370,7 @@ static void uPD71054_timer_init( running_machine *machine )
 		uPD71054->max[no] = 0xffff;
 	}
 	for( no = 0; no < USED_TIMER_NUM; no++ ) {
-		uPD71054->timer[no] = machine->scheduler().timer_alloc( FUNC(uPD71054_timer_callback ));
+		uPD71054->timer[no] = machine.scheduler().timer_alloc( FUNC(uPD71054_timer_callback ));
 	}
 }
 
@@ -1381,7 +1381,7 @@ static void uPD71054_timer_init( running_machine *machine )
 ------------------------------*/
 static WRITE16_HANDLER( timer_regs_w )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 	uPD71054_state *uPD71054 = &state->uPD71054;
 
 	data &= 0xff;
@@ -1401,7 +1401,7 @@ static WRITE16_HANDLER( timer_regs_w )
 			uPD71054->max[offset] = (uPD71054->max[offset]&0x00ff)+(data<<8);
 		}
 		if( uPD71054->max[offset] != 0 ) {
-			uPD71054_update_timer( space->machine, space->cpu, offset );
+			uPD71054_update_timer( space->machine(), space->cpu, offset );
 		}
 		break;
 	  case 0x0003:
@@ -1437,7 +1437,7 @@ static const x1_010_interface seta_sound_intf2 =
 
 static void utoukond_ym3438_interrupt(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, linestate);
+	cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, linestate);
 }
 
 static const ym3438_interface utoukond_ym3438_intf =
@@ -1465,7 +1465,7 @@ static const ym3438_interface utoukond_ym3438_intf =
 
 static READ16_HANDLER( sharedram_68000_r )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 
 	return ((UINT16)state->sharedram[offset]) & 0xff;
 }
@@ -1474,7 +1474,7 @@ static WRITE16_HANDLER( sharedram_68000_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		seta_state *state = space->machine->driver_data<seta_state>();
+		seta_state *state = space->machine().driver_data<seta_state>();
 		state->sharedram[offset] = data & 0xff;
 	}
 }
@@ -1495,10 +1495,10 @@ static WRITE16_HANDLER( sub_ctrl_w )
 		case 0/2:	// bit 0: reset sub cpu?
 			if (ACCESSING_BITS_0_7)
 			{
-				seta_state *state = space->machine->driver_data<seta_state>();
+				seta_state *state = space->machine().driver_data<seta_state>();
 
 				if ( !(state->sub_ctrl_data & 1) && (data & 1) )
-					cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, PULSE_LINE);
+					cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, PULSE_LINE);
 				state->sub_ctrl_data = data;
 			}
 			break;
@@ -1521,7 +1521,7 @@ static WRITE16_HANDLER( sub_ctrl_w )
 /* DSW reading for 16 bit CPUs */
 static READ16_HANDLER( seta_dsw_r )
 {
-	UINT16 dsw = input_port_read(space->machine, "DSW");
+	UINT16 dsw = input_port_read(space->machine(), "DSW");
 	if (offset == 0)	return (dsw >> 8) & 0xff;
 	else				return (dsw >> 0) & 0xff;
 }
@@ -1531,12 +1531,12 @@ static READ16_HANDLER( seta_dsw_r )
 
 static READ8_DEVICE_HANDLER( dsw1_r )
 {
-	return (input_port_read(device->machine, "DSW") >> 8) & 0xff;
+	return (input_port_read(device->machine(), "DSW") >> 8) & 0xff;
 }
 
 static READ8_DEVICE_HANDLER( dsw2_r )
 {
-	return (input_port_read(device->machine, "DSW") >> 0) & 0xff;
+	return (input_port_read(device->machine(), "DSW") >> 0) & 0xff;
 }
 
 
@@ -1547,7 +1547,7 @@ static READ8_DEVICE_HANDLER( dsw2_r )
 */
 static SCREEN_EOF( seta_buffer_sprites )
 {
-	seta_state *state = machine->driver_data<seta_state>();
+	seta_state *state = machine.driver_data<seta_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	int ctrl2	=	spriteram16[ 0x602/2 ];
 
@@ -1636,15 +1636,15 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER ( calibr50_ip_r )
 {
-	int dir1 = input_port_read(space->machine, "ROT1");	// analog port
-	int dir2 = input_port_read(space->machine, "ROT2");	// analog port
+	int dir1 = input_port_read(space->machine(), "ROT1");	// analog port
+	int dir2 = input_port_read(space->machine(), "ROT2");	// analog port
 
 	switch (offset)
 	{
-		case 0x00/2:	return input_port_read(space->machine, "P1");	// p1
-		case 0x02/2:	return input_port_read(space->machine, "P2");	// p2
+		case 0x00/2:	return input_port_read(space->machine(), "P1");	// p1
+		case 0x02/2:	return input_port_read(space->machine(), "P2");	// p2
 
-		case 0x08/2:	return input_port_read(space->machine, "COINS");	// Coins
+		case 0x08/2:	return input_port_read(space->machine(), "COINS");	// Coins
 
 		case 0x10/2:	return (dir1 & 0xff);		// lower 8 bits of p1 rotation
 		case 0x12/2:	return (dir1 >> 8);			// upper 4 bits of p1 rotation
@@ -1662,7 +1662,7 @@ static WRITE16_HANDLER( calibr50_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_word_w(space, 0, data, mem_mask);
-		cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_NMI, PULSE_LINE);
 		device_spin_until_time(space->cpu, attotime::from_usec(50));	// Allow the other cpu to reply
 	}
 }
@@ -1698,10 +1698,10 @@ static READ16_HANDLER( usclssic_dsw_r )
 {
 	switch (offset)
 	{
-		case 0/2:	return (input_port_read(space->machine, "DSW") >>  8) & 0xf;
-		case 2/2:	return (input_port_read(space->machine, "DSW") >> 12) & 0xf;
-		case 4/2:	return (input_port_read(space->machine, "DSW") >>  0) & 0xf;
-		case 6/2:	return (input_port_read(space->machine, "DSW") >>  4) & 0xf;
+		case 0/2:	return (input_port_read(space->machine(), "DSW") >>  8) & 0xf;
+		case 2/2:	return (input_port_read(space->machine(), "DSW") >> 12) & 0xf;
+		case 4/2:	return (input_port_read(space->machine(), "DSW") >>  0) & 0xf;
+		case 6/2:	return (input_port_read(space->machine(), "DSW") >>  4) & 0xf;
 	}
 	return 0;
 }
@@ -1709,12 +1709,12 @@ static READ16_HANDLER( usclssic_dsw_r )
 static READ16_HANDLER( usclssic_trackball_x_r )
 {
 	static const char *const portx_name[2] = { "P1X", "P2X" };
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 
 	switch (offset)
 	{
-		case 0/2:	return (input_port_read(space->machine, portx_name[state->usclssic_port_select]) >> 0) & 0xff;
-		case 2/2:	return (input_port_read(space->machine, portx_name[state->usclssic_port_select]) >> 8) & 0xff;
+		case 0/2:	return (input_port_read(space->machine(), portx_name[state->usclssic_port_select]) >> 0) & 0xff;
+		case 2/2:	return (input_port_read(space->machine(), portx_name[state->usclssic_port_select]) >> 8) & 0xff;
 	}
 	return 0;
 }
@@ -1722,12 +1722,12 @@ static READ16_HANDLER( usclssic_trackball_x_r )
 static READ16_HANDLER( usclssic_trackball_y_r )
 {
 	static const char *const porty_name[2] = { "P1Y", "P2Y" };
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 
 	switch (offset)
 	{
-		case 0/2:	return (input_port_read(space->machine, porty_name[state->usclssic_port_select]) >> 0) & 0xff;
-		case 2/2:	return (input_port_read(space->machine, porty_name[state->usclssic_port_select]) >> 8) & 0xff;
+		case 0/2:	return (input_port_read(space->machine(), porty_name[state->usclssic_port_select]) >> 0) & 0xff;
+		case 2/2:	return (input_port_read(space->machine(), porty_name[state->usclssic_port_select]) >> 8) & 0xff;
 	}
 	return 0;
 }
@@ -1737,16 +1737,16 @@ static WRITE16_HANDLER( usclssic_lockout_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		seta_state *state = space->machine->driver_data<seta_state>();
+		seta_state *state = space->machine().driver_data<seta_state>();
 		int tiles_offset = (data & 0x10) ? 0x4000: 0;
 
 		state->usclssic_port_select = (data & 0x40) >> 6;
 
 		if (tiles_offset != state->tiles_offset)
-			tilemap_mark_all_tiles_dirty_all(space->machine);
+			tilemap_mark_all_tiles_dirty_all(space->machine());
 		state->tiles_offset = tiles_offset;
 
-		seta_coin_lockout_w(space->machine, data);
+		seta_coin_lockout_w(space->machine(), data);
 	}
 }
 
@@ -1871,16 +1871,16 @@ ADDRESS_MAP_END
 static READ16_HANDLER( zombraid_gun_r ) // Serial interface
 {
 	static const char *const portnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 
-	int data = input_port_read(space->machine, portnames[state->gun_input_src]);	// Input Ports 5-8
+	int data = input_port_read(space->machine(), portnames[state->gun_input_src]);	// Input Ports 5-8
 	return (data >> state->gun_input_bit) & 1;
 }
 
 // Bit 0 is clock, 1 is data, 2 is reset
 static WRITE16_HANDLER( zombraid_gun_w )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 
 	if(data&4) { state->gun_bit_count = 0; return; } // Reset
 
@@ -2062,7 +2062,7 @@ static const UINT16 keroppi_protection_word[] = {
 
 static READ16_HANDLER( keroppi_protection_r )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 	UINT16 result = keroppi_protection_word[state->keroppi_protection_count];
 
 	state->keroppi_protection_count++;
@@ -2074,7 +2074,7 @@ static READ16_HANDLER( keroppi_protection_r )
 
 static READ16_HANDLER( keroppi_protection_init_r )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 	state->keroppi_protection_count = 0;
 
 	return 0x00;
@@ -2082,8 +2082,8 @@ static READ16_HANDLER( keroppi_protection_init_r )
 
 static READ16_HANDLER( keroppi_coin_r )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
-	UINT16 result = input_port_read(space->machine, "COINS");
+	seta_state *state = space->machine().driver_data<seta_state>();
+	UINT16 result = input_port_read(space->machine(), "COINS");
 
 	if (state->keroppi_prize_hop == 2)
 	{
@@ -2096,17 +2096,17 @@ static READ16_HANDLER( keroppi_coin_r )
 
 static TIMER_CALLBACK( keroppi_prize_hop_callback )
 {
-	seta_state *state = machine->driver_data<seta_state>();
+	seta_state *state = machine.driver_data<seta_state>();
 	state->keroppi_prize_hop = 2;
 }
 
 static WRITE16_HANDLER( keroppi_prize_w )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 	if ((data & 0x0010) && !state->keroppi_prize_hop)
 	{
 		state->keroppi_prize_hop = 1;
-		space->machine->scheduler().timer_set(attotime::from_seconds(3), FUNC(keroppi_prize_hop_callback), 0x20);		/* 3 seconds */
+		space->machine().scheduler().timer_set(attotime::from_seconds(3), FUNC(keroppi_prize_hop_callback), 0x20);		/* 3 seconds */
 	}
 }
 
@@ -2133,7 +2133,7 @@ ADDRESS_MAP_END
 
 static MACHINE_START( keroppi )
 {
-	seta_state *state = machine->driver_data<seta_state>();
+	seta_state *state = machine.driver_data<seta_state>();
 	state->keroppi_prize_hop = 0;
 	state->keroppi_protection_count = 0;
 }
@@ -2226,44 +2226,44 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( setaroul_c0_r )
 {
-	return 0x00;//space->machine->rand();
+	return 0x00;//space->machine().rand();
 }
 
 static READ16_HANDLER( setaroul_d4_0_r )
 {
-	return 0x00;//space->machine->rand();
+	return 0x00;//space->machine().rand();
 }
 
 static READ16_HANDLER( setaroul_d4_4_r )
 {
-	return 0x00;//space->machine->rand();
+	return 0x00;//space->machine().rand();
 }
 
 static READ16_HANDLER( setaroul_d4_6_r )
 {
-	return 0xffff;//space->machine->rand();
+	return 0xffff;//space->machine().rand();
 }
 
 static READ16_HANDLER( setaroul_d4_8_r )
 {
-	return space->machine->rand()&0x000f;
+	return space->machine().rand()&0x000f;
 }
 
 static READ16_HANDLER( setaroul_d4_a_r )
 {
-	return 0x00;//space->machine->rand();
+	return 0x00;//space->machine().rand();
 }
 
 static READ16_HANDLER( setaroul_d4_10_r )
 {
-	return 0x00;// space->machine->rand();
+	return 0x00;// space->machine().rand();
 }
 
 
 // ?? looks like sprite ram access is 8-bit not 16?
 static WRITE16_HANDLER( setaroul_spr_w )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	int realoffs = offset;
 
@@ -2409,10 +2409,10 @@ ADDRESS_MAP_END
 static READ16_HANDLER( krzybowl_input_r )
 {
 	// analog ports
-	int dir1x = input_port_read(space->machine, "TRACK1_X") & 0xfff;
-	int dir1y = input_port_read(space->machine, "TRACK1_Y") & 0xfff;
-	int dir2x = input_port_read(space->machine, "TRACK2_X") & 0xfff;
-	int dir2y = input_port_read(space->machine, "TRACK2_Y") & 0xfff;
+	int dir1x = input_port_read(space->machine(), "TRACK1_X") & 0xfff;
+	int dir1y = input_port_read(space->machine(), "TRACK1_Y") & 0xfff;
+	int dir2x = input_port_read(space->machine(), "TRACK2_X") & 0xfff;
+	int dir2y = input_port_read(space->machine(), "TRACK2_Y") & 0xfff;
 
 	switch (offset)
 	{
@@ -2557,7 +2557,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( kiwame_nvram_r )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 	return state->kiwame_nvram[offset] & 0xff;
 }
 
@@ -2565,7 +2565,7 @@ static WRITE16_HANDLER( kiwame_nvram_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		seta_state *state = space->machine->driver_data<seta_state>();
+		seta_state *state = space->machine().driver_data<seta_state>();
 		COMBINE_DATA( &state->kiwame_nvram[offset] );
 	}
 }
@@ -2581,9 +2581,9 @@ static READ16_HANDLER( kiwame_input_r )
 
 	switch( offset )
 	{
-		case 0x00/2:	return input_port_read(space->machine, keynames[i]);
+		case 0x00/2:	return input_port_read(space->machine(), keynames[i]);
 		case 0x02/2:	return 0xffff;
-		case 0x04/2:	return input_port_read(space->machine, "COINS");
+		case 0x04/2:	return input_port_read(space->machine(), "COINS");
 //      case 0x06/2:
 		case 0x08/2:	return 0xffff;
 
@@ -2674,17 +2674,17 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( wiggie_soundlatch_r )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 
 	return state->wiggie_soundlatch;
 }
 
 static WRITE16_HANDLER( wiggie_soundlatch_w )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 
 	state->wiggie_soundlatch = data >> 8;
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 
@@ -2748,7 +2748,7 @@ static WRITE16_HANDLER( utoukond_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 		soundlatch_w(space, 0, data & 0xff);
 	}
 }
@@ -2778,7 +2778,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( pairlove_prot_r )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 	int retdata;
 
 	retdata = state->pairslove_protram[offset];
@@ -2789,7 +2789,7 @@ static READ16_HANDLER( pairlove_prot_r )
 
 static WRITE16_HANDLER( pairlove_prot_w )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 	//mame_printf_debug("pairs love protection? write %06x %04x %04x\n",cpu_get_pc(space->cpu), offset,data);
 	state->pairslove_protram_old[offset] = state->pairslove_protram[offset];
 	state->pairslove_protram[offset] = data;
@@ -2848,22 +2848,22 @@ ADDRESS_MAP_END
 static READ16_HANDLER( inttoote_dsw_r )
 {
 	int shift = offset * 4;
-	return	((((input_port_read(space->machine, "DSW1") >> shift)       & 0xf)) << 0) |
-			((((input_port_read(space->machine, "DSW2_3") >> shift)     & 0xf)) << 4) |
-			((((input_port_read(space->machine, "DSW2_3") >> (shift+8)) & 0xf)) << 8) ;
+	return	((((input_port_read(space->machine(), "DSW1") >> shift)       & 0xf)) << 0) |
+			((((input_port_read(space->machine(), "DSW2_3") >> shift)     & 0xf)) << 4) |
+			((((input_port_read(space->machine(), "DSW2_3") >> (shift+8)) & 0xf)) << 8) ;
 }
 
 static READ16_HANDLER( inttoote_key_r )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 
 	switch( *state->inttoote_key_select )
 	{
-		case 0x08:	return input_port_read(space->machine, "BET0");
-		case 0x10:	return input_port_read(space->machine, "BET1");
-		case 0x20:	return input_port_read(space->machine, "BET2");
-		case 0x40:	return input_port_read(space->machine, "BET3");
-		case 0x80:	return input_port_read(space->machine, "BET4");
+		case 0x08:	return input_port_read(space->machine(), "BET0");
+		case 0x10:	return input_port_read(space->machine(), "BET1");
+		case 0x20:	return input_port_read(space->machine(), "BET2");
+		case 0x40:	return input_port_read(space->machine(), "BET3");
+		case 0x80:	return input_port_read(space->machine(), "BET4");
 	}
 
 	logerror("%06X: unknown read, select = %04x\n",cpu_get_pc(space->cpu), *state->inttoote_key_select);
@@ -2872,7 +2872,7 @@ static READ16_HANDLER( inttoote_key_r )
 
 static READ16_HANDLER( inttoote_700000_r )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 
 	return state->inttoote_700000[offset] & 0x3f;
 }
@@ -2912,15 +2912,15 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( jockeyc_mux_r )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 
 	switch( state->jockeyc_key_select )
 	{
-		case 0x08:	return input_port_read(space->machine, "BET0");
-		case 0x10:	return input_port_read(space->machine, "BET1");
-		case 0x20:	return input_port_read(space->machine, "BET2");
-		case 0x40:	return input_port_read(space->machine, "BET3");
-		case 0x80:	return input_port_read(space->machine, "BET4");
+		case 0x08:	return input_port_read(space->machine(), "BET0");
+		case 0x10:	return input_port_read(space->machine(), "BET1");
+		case 0x20:	return input_port_read(space->machine(), "BET2");
+		case 0x40:	return input_port_read(space->machine(), "BET3");
+		case 0x80:	return input_port_read(space->machine(), "BET4");
 	}
 
 	return 0xffff;
@@ -2928,7 +2928,7 @@ static READ16_HANDLER( jockeyc_mux_r )
 
 static WRITE16_HANDLER( jockeyc_mux_w )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 
 	/* other bits used too */
 	state->jockeyc_key_select = data & 0xf8;
@@ -2936,7 +2936,7 @@ static WRITE16_HANDLER( jockeyc_mux_w )
 
 static READ16_HANDLER( unk_r )
 {
-	return 0xffff;//space->machine->rand();
+	return 0xffff;//space->machine().rand();
 }
 
 /* same as International Toote but without the protection and different RTC hook-up */
@@ -2985,16 +2985,16 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sub_bankswitch_w )
 {
-	UINT8 *rom = space->machine->region("sub")->base();
+	UINT8 *rom = space->machine().region("sub")->base();
 	int bank = data >> 4;
 
-	memory_set_bankptr(space->machine, "bank1", &rom[bank * 0x4000 + 0xc000]);
+	memory_set_bankptr(space->machine(), "bank1", &rom[bank * 0x4000 + 0xc000]);
 }
 
 static WRITE8_HANDLER( sub_bankswitch_lockout_w )
 {
 	sub_bankswitch_w(space,offset,data);
-	seta_coin_lockout_w(space->machine, data);
+	seta_coin_lockout_w(space->machine(), data);
 }
 
 
@@ -3047,21 +3047,21 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( downtown_ip_r )
 {
-	int dir1 = input_port_read(space->machine, "ROT1");	// analog port
-	int dir2 = input_port_read(space->machine, "ROT2");	// analog port
+	int dir1 = input_port_read(space->machine(), "ROT1");	// analog port
+	int dir2 = input_port_read(space->machine(), "ROT2");	// analog port
 
 	dir1 = (~ (0x800 >> dir1)) & 0xfff;
 	dir2 = (~ (0x800 >> dir2)) & 0xfff;
 
 	switch (offset)
 	{
-		case 0:	return (input_port_read(space->machine, "COINS") & 0xf0) + (dir1 >> 8);	// upper 4 bits of p1 rotation + coins
+		case 0:	return (input_port_read(space->machine(), "COINS") & 0xf0) + (dir1 >> 8);	// upper 4 bits of p1 rotation + coins
 		case 1:	return (dir1 & 0xff);					// lower 8 bits of p1 rotation
-		case 2:	return input_port_read(space->machine, "P1");	// p1
+		case 2:	return input_port_read(space->machine(), "P1");	// p1
 		case 3:	return 0xff;							// ?
 		case 4:	return (dir2 >> 8);						// upper 4 bits of p2 rotation + ?
 		case 5:	return (dir2 & 0xff);					// lower 8 bits of p2 rotation
-		case 6:	return input_port_read(space->machine, "P2");	// p2
+		case 6:	return input_port_read(space->machine(), "P2");	// p2
 		case 7:	return 0xff;							// ?
 	}
 
@@ -3087,7 +3087,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET(calibr50)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	sub_bankswitch_w(space, 0, 0);
 }
 
@@ -10037,7 +10037,7 @@ static READ16_HANDLER( twineagl_debug_r )
 /* 2000F8 = A3 enables it, 2000F8 = 00 disables? see downtown too */
 static READ16_HANDLER( twineagl_200100_r )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 
 	// protection check at boot
 	logerror("%04x: twineagl_200100_r %d\n",cpu_get_pc(space->cpu),offset);
@@ -10049,7 +10049,7 @@ static WRITE16_HANDLER( twineagl_200100_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		seta_state *state = space->machine->driver_data<seta_state>();
+		seta_state *state = space->machine().driver_data<seta_state>();
 		state->twineagl_xram[offset] = data & 0xff;
 	}
 }
@@ -10057,17 +10057,17 @@ static WRITE16_HANDLER( twineagl_200100_w )
 static DRIVER_INIT( twineagl )
 {
 	/* debug? */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x800000, 0x8000ff, FUNC(twineagl_debug_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x800000, 0x8000ff, FUNC(twineagl_debug_r));
 
 	/* This allows 2 simultaneous players and the use of the "Copyright" Dip Switch. */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x200100, 0x20010f, FUNC(twineagl_200100_r), FUNC(twineagl_200100_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x200100, 0x20010f, FUNC(twineagl_200100_r), FUNC(twineagl_200100_w));
 }
 
 
 /* Protection? NVRAM is handled writing commands here */
 static READ16_HANDLER( downtown_protection_r )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 	int job = state->downtown_protection[0xf8/2] & 0xff;
 
 	switch (job)
@@ -10085,13 +10085,13 @@ static READ16_HANDLER( downtown_protection_r )
 
 static WRITE16_HANDLER( downtown_protection_w )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	seta_state *state = space->machine().driver_data<seta_state>();
 	COMBINE_DATA(&state->downtown_protection[offset]);
 }
 
 static DRIVER_INIT( downtown )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x200000, 0x2001ff, FUNC(downtown_protection_r), FUNC(downtown_protection_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x200000, 0x2001ff, FUNC(downtown_protection_r), FUNC(downtown_protection_w));
 }
 
 
@@ -10111,16 +10111,16 @@ static READ16_HANDLER( arbalest_debug_r )
 
 static DRIVER_INIT( arbalest )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80000, 0x8000f, FUNC(arbalest_debug_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80000, 0x8000f, FUNC(arbalest_debug_r));
 }
 
 
 static DRIVER_INIT( metafox )
 {
-	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *) machine.region("maincpu")->base();
 
 	/* This game uses the 21c000-21ffff area for protection? */
-//  machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x21c000, 0x21ffff);
+//  machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x21c000, 0x21ffff);
 
 	RAM[0x8ab1c/2] = 0x4e71;	// patch protection test: "cp error"
 	RAM[0x8ab1e/2] = 0x4e71;
@@ -10140,7 +10140,7 @@ static DRIVER_INIT ( blandia )
 	rom_size = 0x80000;
 	buf = auto_alloc_array(machine, UINT8, rom_size);
 
-	rom = machine->region("gfx2")->base() + 0x40000;
+	rom = machine.region("gfx2")->base() + 0x40000;
 
 	for (rpos = 0; rpos < rom_size/2; rpos++) {
 		buf[rpos+0x40000] = rom[rpos*2];
@@ -10149,7 +10149,7 @@ static DRIVER_INIT ( blandia )
 
 	memcpy( rom, buf, rom_size );
 
-	rom = machine->region("gfx3")->base() + 0x40000;
+	rom = machine.region("gfx3")->base() + 0x40000;
 
 	for (rpos = 0; rpos < rom_size/2; rpos++) {
 		buf[rpos+0x40000] = rom[rpos*2];
@@ -10164,20 +10164,20 @@ static DRIVER_INIT ( blandia )
 
 static DRIVER_INIT( eightfrc )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x500004, 0x500005);	// watchdog??
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x500004, 0x500005);	// watchdog??
 }
 
 
 static DRIVER_INIT( zombraid )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf00002, 0xf00003, FUNC(zombraid_gun_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf00000, 0xf00001, FUNC(zombraid_gun_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf00002, 0xf00003, FUNC(zombraid_gun_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf00000, 0xf00001, FUNC(zombraid_gun_w));
 }
 
 
 static DRIVER_INIT( kiwame )
 {
-	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *) machine.region("maincpu")->base();
 
 	/* WARNING: This game writes to the interrupt vector
        table. Lev 1 routine address is stored at $100 */
@@ -10189,7 +10189,7 @@ static DRIVER_INIT( kiwame )
 
 static DRIVER_INIT( rezon )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x500006, 0x500007);	// irq ack?
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x500006, 0x500007);	// irq ack?
 }
 
 static DRIVER_INIT( wiggie )
@@ -10199,8 +10199,8 @@ static DRIVER_INIT( wiggie )
 	UINT8 temp[16];
 	int i,j;
 
-	src = machine->region("maincpu")->base();
-	len = machine->region("maincpu")->bytes();
+	src = machine.region("maincpu")->base();
+	len = machine.region("maincpu")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -10221,16 +10221,16 @@ static DRIVER_INIT( wiggie )
 	}
 
 	/* X1_010 is not used. */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x100000, 0x103fff);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x100000, 0x103fff);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xB00008, 0xB00009, FUNC(wiggie_soundlatch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xB00008, 0xB00009, FUNC(wiggie_soundlatch_w));
 
 }
 
 static DRIVER_INIT( crazyfgt )
 {
-	seta_state *state = machine->driver_data<seta_state>();
-	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
+	seta_state *state = machine.driver_data<seta_state>();
+	UINT16 *RAM = (UINT16 *) machine.region("maincpu")->base();
 
 	// protection check at boot
 	RAM[0x1078/2] = 0x4e71;
@@ -10247,8 +10247,8 @@ static DRIVER_INIT( crazyfgt )
 
 static DRIVER_INIT( inttoote )
 {
-	seta_state *state = machine->driver_data<seta_state>();
-	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	seta_state *state = machine.driver_data<seta_state>();
+	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// missing / unused video regs
 	state->vregs = auto_alloc_array_clear(machine, UINT16, 3);
@@ -10262,8 +10262,8 @@ static DRIVER_INIT( inttoote )
 
 static DRIVER_INIT( inttootea )
 {
-	seta_state *state = machine->driver_data<seta_state>();
-	//UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	seta_state *state = machine.driver_data<seta_state>();
+	//UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// missing / unused video regs
 	state->vregs = auto_alloc_array_clear(machine, UINT16, 3);

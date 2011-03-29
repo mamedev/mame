@@ -400,19 +400,19 @@ static INTERRUPT_GEN( s2650_interrupt )
  *
  *************************************/
 
-static void dkong_init_device_driver_data( running_machine *machine )
+static void dkong_init_device_driver_data( running_machine &machine )
 {
-	dkong_state *state = machine->driver_data<dkong_state>();
+	dkong_state *state = machine.driver_data<dkong_state>();
 
-	state->dev_n2a03a = machine->device("n2a03a");
-	state->dev_n2a03b = machine->device("n2a03b");
-	state->dev_6h = machine->device("ls259.6h");
-	state->dev_vp2 = machine->device("virtual_p2");
+	state->dev_n2a03a = machine.device("n2a03a");
+	state->dev_n2a03b = machine.device("n2a03b");
+	state->dev_6h = machine.device("ls259.6h");
+	state->dev_vp2 = machine.device("virtual_p2");
 }
 
 static MACHINE_START( dkong2b )
 {
-	dkong_state *state = machine->driver_data<dkong_state>();
+	dkong_state *state = machine.driver_data<dkong_state>();
 
 	dkong_init_device_driver_data(machine);
 	state->hardware_type = HARDWARE_TKG04;
@@ -423,9 +423,9 @@ static MACHINE_START( dkong2b )
 
 static MACHINE_START( s2650 )
 {
-    dkong_state *state = machine->driver_data<dkong_state>();
-    UINT8   *p = machine->region("user1")->base();
-    const char *game_name = machine->system().name;
+    dkong_state *state = machine.driver_data<dkong_state>();
+    UINT8   *p = machine.region("user1")->base();
+    const char *game_name = machine.system().name;
     int i;
 
     MACHINE_START_CALL(dkong2b);
@@ -457,7 +457,7 @@ static MACHINE_START( s2650 )
 
 static MACHINE_START( radarscp )
 {
-    dkong_state *state = machine->driver_data<dkong_state>();
+    dkong_state *state = machine.driver_data<dkong_state>();
 
     MACHINE_START_CALL(dkong2b);
     state->hardware_type = HARDWARE_TRS02;
@@ -465,7 +465,7 @@ static MACHINE_START( radarscp )
 
 static MACHINE_START( radarscp1 )
 {
-    dkong_state *state = machine->driver_data<dkong_state>();
+    dkong_state *state = machine.driver_data<dkong_state>();
 
     MACHINE_START_CALL(dkong2b);
     state->hardware_type = HARDWARE_TRS01;
@@ -473,7 +473,7 @@ static MACHINE_START( radarscp1 )
 
 static MACHINE_START( dkong3 )
 {
-	dkong_state *state = machine->driver_data<dkong_state>();
+	dkong_state *state = machine.driver_data<dkong_state>();
 
 	dkong_init_device_driver_data(machine);
 	state->hardware_type = HARDWARE_TKG04;
@@ -486,8 +486,8 @@ static MACHINE_RESET( dkong )
 
 static MACHINE_RESET( strtheat )
 {
-    dkong_state *state = machine->driver_data<dkong_state>();
-    UINT8 *ROM = machine->region("maincpu")->base();
+    dkong_state *state = machine.driver_data<dkong_state>();
+    UINT8 *ROM = machine.region("maincpu")->base();
 
     MACHINE_RESET_CALL(dkong);
 
@@ -499,8 +499,8 @@ static MACHINE_RESET( strtheat )
 
 static MACHINE_RESET( drakton )
 {
-    dkong_state *state = machine->driver_data<dkong_state>();
-    UINT8 *ROM = machine->region("maincpu")->base();
+    dkong_state *state = machine.driver_data<dkong_state>();
+    UINT8 *ROM = machine.region("maincpu")->base();
 
     MACHINE_RESET_CALL(dkong);
 
@@ -519,7 +519,7 @@ static MACHINE_RESET( drakton )
 
 static READ8_HANDLER( hb_dma_read_byte )
 {
-    dkong_state *state = space->machine->driver_data<dkong_state>();
+    dkong_state *state = space->machine().driver_data<dkong_state>();
     int   bucket = state->rev_map[(offset>>10) & 0x1ff];
     int   addr;
 
@@ -533,7 +533,7 @@ static READ8_HANDLER( hb_dma_read_byte )
 
 static WRITE8_HANDLER( hb_dma_write_byte )
 {
-    dkong_state *state = space->machine->driver_data<dkong_state>();
+    dkong_state *state = space->machine().driver_data<dkong_state>();
     int   bucket = state->rev_map[(offset>>10) & 0x1ff];
     int   addr;
 
@@ -547,13 +547,13 @@ static WRITE8_HANDLER( hb_dma_write_byte )
 
 static READ8_DEVICE_HANDLER( p8257_ctl_r )
 {
-    dkong_state *state = device->machine->driver_data<dkong_state>();
+    dkong_state *state = device->machine().driver_data<dkong_state>();
     return state->dma_latch;
 }
 
 static WRITE8_DEVICE_HANDLER( p8257_ctl_w )
 {
-    dkong_state *state = device->machine->driver_data<dkong_state>();
+    dkong_state *state = device->machine().driver_data<dkong_state>();
     state->dma_latch = data;
 }
 
@@ -566,7 +566,7 @@ static WRITE8_DEVICE_HANDLER( p8257_ctl_w )
 
 static WRITE8_HANDLER( dkong3_coin_counter_w )
 {
-    coin_counter_w(space->machine, offset, data & 0x01);
+    coin_counter_w(space->machine(), offset, data & 0x01);
 }
 
 static WRITE8_DEVICE_HANDLER( p8257_drq_w )
@@ -577,13 +577,13 @@ static WRITE8_DEVICE_HANDLER( p8257_drq_w )
 
 static READ8_HANDLER( dkong_in2_r )
 {
-	dkong_state *state = space->machine->driver_data<dkong_state>();
+	dkong_state *state = space->machine().driver_data<dkong_state>();
 	/* mcu status (sound feedback) is inverted bit4 from port B (8039) */
 	UINT8 mcustatus = latch8_bit4_q_r(state->dev_vp2, 0);
 	UINT8 r;
 
-	r = (input_port_read(space->machine, "IN2") & 0xBF) | (mcustatus << 6);
-	coin_counter_w(space->machine, offset, r >> 7);
+	r = (input_port_read(space->machine(), "IN2") & 0xBF) | (mcustatus << 6);
+	coin_counter_w(space->machine(), offset, r >> 7);
 	if (r & 0x10)
 		r = (r & ~0x10) | 0x80; /* service ==> coin */
 	return r;
@@ -595,8 +595,8 @@ static READ8_HANDLER( dkongjr_in2_r )
 
     UINT8 r;
 
-    r = (input_port_read(space->machine, "IN2") & 0xBF) | 0x40;
-    coin_counter_w(space->machine, offset, r >> 7);
+    r = (input_port_read(space->machine(), "IN2") & 0xBF) | 0x40;
+    coin_counter_w(space->machine(), offset, r >> 7);
     if (r & 0x10)
         r = (r & ~0x10) | 0x80; /* service ==> coin */
     return r;
@@ -616,7 +616,7 @@ static WRITE8_HANDLER( s2650_mirror_w )
 
 static READ8_HANDLER( epos_decrypt_rom )
 {
-    dkong_state *state = space->machine->driver_data<dkong_state>();
+    dkong_state *state = space->machine().driver_data<dkong_state>();
 
     if (offset & 0x01)
     {
@@ -631,10 +631,10 @@ static READ8_HANDLER( epos_decrypt_rom )
 
     switch(state->decrypt_counter)
     {
-        case 0x08:  memory_set_bank(space->machine, "bank1", 0);      break;
-        case 0x09:  memory_set_bank(space->machine, "bank1", 1);      break;
-        case 0x0A:  memory_set_bank(space->machine, "bank1", 2);      break;
-        case 0x0B:  memory_set_bank(space->machine, "bank1", 3);      break;
+        case 0x08:  memory_set_bank(space->machine(), "bank1", 0);      break;
+        case 0x09:  memory_set_bank(space->machine(), "bank1", 1);      break;
+        case 0x0A:  memory_set_bank(space->machine(), "bank1", 2);      break;
+        case 0x0B:  memory_set_bank(space->machine(), "bank1", 3);      break;
         default:
             logerror("Invalid counter = %02X\n",state->decrypt_counter);
             break;
@@ -646,7 +646,7 @@ static READ8_HANDLER( epos_decrypt_rom )
 
 static WRITE8_HANDLER( s2650_data_w )
 {
-    dkong_state *state = space->machine->driver_data<dkong_state>();
+    dkong_state *state = space->machine().driver_data<dkong_state>();
 #if DEBUG_PROTECTION
     logerror("write : pc = %04x, loopback = %02x\n",cpu_get_pc(space->cpu), data);
 #endif
@@ -656,7 +656,7 @@ static WRITE8_HANDLER( s2650_data_w )
 
 static WRITE8_HANDLER( s2650_fo_w )
 {
-    dkong_state *state = space->machine->driver_data<dkong_state>();
+    dkong_state *state = space->machine().driver_data<dkong_state>();
 #if DEBUG_PROTECTION
     logerror("write : pc = %04x, FO = %02x\n",cpu_get_pc(space->cpu), data);
 #endif
@@ -669,7 +669,7 @@ static WRITE8_HANDLER( s2650_fo_w )
 
 static READ8_HANDLER( s2650_port0_r )
 {
-    dkong_state *state = space->machine->driver_data<dkong_state>();
+    dkong_state *state = space->machine().driver_data<dkong_state>();
 #if DEBUG_PROTECTION
     logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",cpu_get_pc(space->cpu), state->hunchloopback, state->main_fo);
 #endif
@@ -694,7 +694,7 @@ static READ8_HANDLER( s2650_port0_r )
 
 static READ8_HANDLER( s2650_port1_r )
 {
-    dkong_state *state = space->machine->driver_data<dkong_state>();
+    dkong_state *state = space->machine().driver_data<dkong_state>();
 
 #if DEBUG_PROTECTION
     logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",cpu_get_pc(space->cpu), state->hunchloopback, state->main_fo);
@@ -717,7 +717,7 @@ static READ8_HANDLER( s2650_port1_r )
 
 static WRITE8_HANDLER( dkong3_2a03_reset_w )
 {
-     dkong_state *state = space->machine->driver_data<dkong_state>();
+     dkong_state *state = space->machine().driver_data<dkong_state>();
 
 	if (data & 1)
 	{
@@ -733,30 +733,30 @@ static WRITE8_HANDLER( dkong3_2a03_reset_w )
 
 static READ8_HANDLER( strtheat_inputport_0_r )
 {
-    if(input_port_read(space->machine, "DSW0") & 0x40)
+    if(input_port_read(space->machine(), "DSW0") & 0x40)
     {
         /* Joystick inputs */
-        return input_port_read(space->machine, "IN0");
+        return input_port_read(space->machine(), "IN0");
     }
     else
     {
         /* Steering Wheel inputs */
-        return (input_port_read(space->machine, "IN0") & ~3) | (input_port_read(space->machine, "IN4") & 3);
+        return (input_port_read(space->machine(), "IN0") & ~3) | (input_port_read(space->machine(), "IN4") & 3);
     }
 }
 
 
 static READ8_HANDLER( strtheat_inputport_1_r )
 {
-    if(input_port_read(space->machine, "DSW0") & 0x40)
+    if(input_port_read(space->machine(), "DSW0") & 0x40)
     {
         /* Joystick inputs */
-        return input_port_read(space->machine, "IN1");
+        return input_port_read(space->machine(), "IN1");
     }
     else
     {
         /* Steering Wheel inputs */
-        return (input_port_read(space->machine, "IN1") & ~3) | (input_port_read(space->machine, "IN5") & 3);
+        return (input_port_read(space->machine(), "IN1") & ~3) | (input_port_read(space->machine(), "IN5") & 3);
     }
 }
 
@@ -1621,8 +1621,8 @@ static READ8_DEVICE_HANDLER( braze_eeprom_r )
 
 static WRITE8_HANDLER( braze_a15_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x01);
-	memory_set_bank(space->machine, "bank2", data & 0x01);
+	memory_set_bank(space->machine(), "bank1", data & 0x01);
+	memory_set_bank(space->machine(), "bank2", data & 0x01);
 }
 
 static WRITE8_DEVICE_HANDLER( braze_eeprom_w )
@@ -1632,14 +1632,14 @@ static WRITE8_DEVICE_HANDLER( braze_eeprom_w )
 	eeprom_set_clock_line(device, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void braze_decrypt_rom(running_machine *machine, UINT8 *dest)
+static void braze_decrypt_rom(running_machine &machine, UINT8 *dest)
 {
 	UINT8 oldbyte,newbyte;
 	UINT8 *ROM;
 	UINT32 mem;
 	UINT32 newmem;
 
-	ROM = machine->region("braze")->base();
+	ROM = machine.region("braze")->base();
 
 	for (mem=0;mem<0x10000;mem++)
 	{
@@ -2983,13 +2983,13 @@ ROM_END
  *
  *************************************/
 
-static void drakton_decrypt_rom(running_machine *machine, UINT8 mod, int offs, int *bs)
+static void drakton_decrypt_rom(running_machine &machine, UINT8 mod, int offs, int *bs)
 {
     UINT8 oldbyte,newbyte;
     UINT8 *ROM;
     int mem;
 
-    ROM = machine->region("maincpu")->base();
+    ROM = machine.region("maincpu")->base();
 
     for (mem=0;mem<0x4000;mem++)
     {
@@ -3015,7 +3015,7 @@ static void drakton_decrypt_rom(running_machine *machine, UINT8 mod, int offs, i
 static DRIVER_INIT( herodk )
 {
     int A;
-    UINT8 *rom = machine->region("maincpu")->base();
+    UINT8 *rom = machine.region("maincpu")->base();
 
     /* swap data lines D3 and D4 */
     for (A = 0;A < 0x8000;A++)
@@ -3040,7 +3040,7 @@ static DRIVER_INIT( drakton )
             {7,1,4,0,3,6,2,5},
     };
 
-    machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
+    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
 
     /* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -3062,7 +3062,7 @@ static DRIVER_INIT( strtheat )
             {6,3,4,1,0,7,2,5},
     };
 
-    machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
+    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
 
     /* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -3073,21 +3073,21 @@ static DRIVER_INIT( strtheat )
     drakton_decrypt_rom(machine, 0x88, 0x1c000, bs[3]);
 
     /* custom handlers supporting Joystick or Steering Wheel */
-    machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7c00, 0x7c00, FUNC(strtheat_inputport_0_r));
-    machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7c80, 0x7c80, FUNC(strtheat_inputport_1_r));
+    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7c00, 0x7c00, FUNC(strtheat_inputport_0_r));
+    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7c80, 0x7c80, FUNC(strtheat_inputport_1_r));
 }
 
 
 static DRIVER_INIT( dkongx )
 {
 	UINT8 *decrypted;
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *eeprom = machine->device("eeprom");
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	device_t *eeprom = machine.device("eeprom");
 
 	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x5fff, "bank1" );
-    machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xffff, "bank2" );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x5fff, "bank1" );
+    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xffff, "bank2" );
 
 	space->install_legacy_write_handler(0xe000, 0xe000, FUNC(braze_a15_w));
 

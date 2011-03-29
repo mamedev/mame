@@ -31,9 +31,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	relief_state *state = machine->driver_data<relief_state>();
+	relief_state *state = machine.driver_data<relief_state>();
 	cputag_set_input_line(machine, "maincpu", 4, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -47,13 +47,13 @@ static void update_interrupts(running_machine *machine)
 
 static READ16_HANDLER( relief_atarivc_r )
 {
-	return atarivc_r(*space->machine->primary_screen, offset);
+	return atarivc_r(*space->machine().primary_screen, offset);
 }
 
 
 static WRITE16_HANDLER( relief_atarivc_w )
 {
-	atarivc_w(*space->machine->primary_screen, offset, data, mem_mask);
+	atarivc_w(*space->machine().primary_screen, offset, data, mem_mask);
 }
 
 
@@ -72,13 +72,13 @@ static MACHINE_START( relief )
 
 static MACHINE_RESET( relief )
 {
-	relief_state *state = machine->driver_data<relief_state>();
+	relief_state *state = machine.driver_data<relief_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarivc_reset(*machine->primary_screen, state->atarivc_eof_data, 2);
+	atarivc_reset(*machine.primary_screen, state->atarivc_eof_data, 2);
 
-	machine->device<okim6295_device>("oki")->set_bank_base(0);
+	machine.device<okim6295_device>("oki")->set_bank_base(0);
 	state->ym2413_volume = 15;
 	state->overall_volume = 127;
 	state->adpcm_bank_base = 0;
@@ -94,10 +94,10 @@ static MACHINE_RESET( relief )
 
 static READ16_HANDLER( special_port2_r )
 {
-	relief_state *state = space->machine->driver_data<relief_state>();
-	int result = input_port_read(space->machine, "260010");
+	relief_state *state = space->machine().driver_data<relief_state>();
+	int result = input_port_read(space->machine(), "260010");
 	if (state->cpu_to_sound_ready) result ^= 0x0020;
-	if (!(result & 0x0080) || atarigen_get_hblank(*space->machine->primary_screen)) result ^= 0x0001;
+	if (!(result & 0x0080) || atarigen_get_hblank(*space->machine().primary_screen)) result ^= 0x0001;
 	return result;
 }
 
@@ -111,29 +111,29 @@ static READ16_HANDLER( special_port2_r )
 
 static WRITE16_HANDLER( audio_control_w )
 {
-	relief_state *state = space->machine->driver_data<relief_state>();
+	relief_state *state = space->machine().driver_data<relief_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->ym2413_volume = (data >> 1) & 15;
-		atarigen_set_ym2413_vol(space->machine, (state->ym2413_volume * state->overall_volume * 100) / (127 * 15));
+		atarigen_set_ym2413_vol(space->machine(), (state->ym2413_volume * state->overall_volume * 100) / (127 * 15));
 		state->adpcm_bank_base = (0x040000 * ((data >> 6) & 3)) | (state->adpcm_bank_base & 0x100000);
 	}
 	if (ACCESSING_BITS_8_15)
 		state->adpcm_bank_base = (0x100000 * ((data >> 8) & 1)) | (state->adpcm_bank_base & 0x0c0000);
 
-	okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+	okim6295_device *oki = space->machine().device<okim6295_device>("oki");
 	oki->set_bank_base(state->adpcm_bank_base);
 }
 
 
 static WRITE16_HANDLER( audio_volume_w )
 {
-	relief_state *state = space->machine->driver_data<relief_state>();
+	relief_state *state = space->machine().driver_data<relief_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->overall_volume = data & 127;
-		atarigen_set_ym2413_vol(space->machine, (state->ym2413_volume * state->overall_volume * 100) / (127 * 15));
-		atarigen_set_oki6295_vol(space->machine, state->overall_volume * 100 / 127);
+		atarigen_set_ym2413_vol(space->machine(), (state->ym2413_volume * state->overall_volume * 100) / (127 * 15));
+		atarigen_set_oki6295_vol(space->machine(), state->overall_volume * 100 / 127);
 	}
 }
 
@@ -447,7 +447,7 @@ ROM_END
 
 static DRIVER_INIT( relief )
 {
-	UINT8 *sound_base = machine->region("oki")->base();
+	UINT8 *sound_base = machine.region("oki")->base();
 
 	/* expand the ADPCM data to avoid lots of memcpy's during gameplay */
 	/* the upper 128k is fixed, the lower 128k is bankswitched */

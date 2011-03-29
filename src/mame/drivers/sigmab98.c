@@ -150,9 +150,9 @@ public:
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri_mask)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri_mask)
 {
-	sigmab98_state *state = machine->driver_data<sigmab98_state>();
+	sigmab98_state *state = machine.driver_data<sigmab98_state>();
 	UINT8 *end		=	state->spriteram - 0x10;
 	UINT8 *s		=	end + state->spriteram_size;
 
@@ -222,7 +222,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			for (x = x0; x != x1; x += dx)
 			{
-				drawgfxzoom_transpen(	bitmap,	cliprect, machine->gfx[gfx],
+				drawgfxzoom_transpen(	bitmap,	cliprect, machine.gfx[gfx],
 										code++, color,
 										flipx, flipy,
 										(sx + x * dim) / 0x10000, (sy + y * dim) / 0x10000,
@@ -237,24 +237,24 @@ static SCREEN_UPDATE(sigmab98)
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed(screen->machine, KEYCODE_Z))
+	if (input_code_pressed(screen->machine(), KEYCODE_Z))
 	{
 		int msk = 0;
-		if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
-		if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
-		if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 4;
-		if (input_code_pressed(screen->machine, KEYCODE_R))	msk |= 8;
+		if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1;
+		if (input_code_pressed(screen->machine(), KEYCODE_W))	msk |= 2;
+		if (input_code_pressed(screen->machine(), KEYCODE_E))	msk |= 4;
+		if (input_code_pressed(screen->machine(), KEYCODE_R))	msk |= 8;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	// Draw from priority 3 (bottom, converted to a bitmask) to priority 0 (top)
-	draw_sprites(screen->machine, bitmap, cliprect, layers_ctrl & 8);
-	draw_sprites(screen->machine, bitmap, cliprect, layers_ctrl & 4);
-	draw_sprites(screen->machine, bitmap, cliprect, layers_ctrl & 2);
-	draw_sprites(screen->machine, bitmap, cliprect, layers_ctrl & 1);
+	draw_sprites(screen->machine(), bitmap, cliprect, layers_ctrl & 8);
+	draw_sprites(screen->machine(), bitmap, cliprect, layers_ctrl & 4);
+	draw_sprites(screen->machine(), bitmap, cliprect, layers_ctrl & 2);
+	draw_sprites(screen->machine(), bitmap, cliprect, layers_ctrl & 1);
 
 	return 0;
 }
@@ -287,13 +287,13 @@ static WRITE8_HANDLER( regs_w )
 		case 0x1f:
 			rombank = data;
 			if (data >= 0x18)
-				logerror("%s: unknown rom bank = %02x\n", space->machine->describe_context(), data);
+				logerror("%s: unknown rom bank = %02x\n", space->machine().describe_context(), data);
 			else
-				memory_set_bank(space->machine, "rombank", data);
+				memory_set_bank(space->machine(), "rombank", data);
 			break;
 
 		default:
-			logerror("%s: unknown reg written: %02x = %02x\n", space->machine->describe_context(), reg, data);
+			logerror("%s: unknown reg written: %02x = %02x\n", space->machine().describe_context(), reg, data);
 	}
 }
 static READ8_HANDLER( regs_r )
@@ -307,7 +307,7 @@ static READ8_HANDLER( regs_r )
 			return rombank;
 
 		default:
-			logerror("%s: unknown reg read: %02x\n", space->machine->describe_context(), reg);
+			logerror("%s: unknown reg read: %02x\n", space->machine().describe_context(), reg);
 			return 0x00;
 	}
 }
@@ -328,18 +328,18 @@ static WRITE8_HANDLER( regs2_w )
 			switch (data)
 			{
 				case 0x32:
-					memory_set_bank(space->machine, "rambank", 0);
+					memory_set_bank(space->machine(), "rambank", 0);
 					break;
 				case 0x36:
-					memory_set_bank(space->machine, "rambank", 1);
+					memory_set_bank(space->machine(), "rambank", 1);
 					break;
 				default:
-					logerror("%s: unknown ram bank = %02x\n", space->machine->describe_context(), data);
+					logerror("%s: unknown ram bank = %02x\n", space->machine().describe_context(), data);
 			}
 			break;
 
 		default:
-			logerror("%s: unknown reg2 written: %02x = %02x\n", space->machine->describe_context(), reg2, data);
+			logerror("%s: unknown reg2 written: %02x = %02x\n", space->machine().describe_context(), reg2, data);
 	}
 }
 static READ8_HANDLER( regs2_r )
@@ -353,7 +353,7 @@ static READ8_HANDLER( regs2_r )
 			return rambank;
 
 		default:
-			logerror("%s: unknown reg2 read: %02x\n", space->machine->describe_context(), reg2);
+			logerror("%s: unknown reg2 read: %02x\n", space->machine().describe_context(), reg2);
 			return 0x00;
 	}
 }
@@ -390,7 +390,7 @@ static WRITE8_DEVICE_HANDLER( eeprom_w )
 // 10 led?
 static WRITE8_HANDLER( c4_w )
 {
-	set_led_status(space->machine, 0, (data & 0x10));
+	set_led_status(space->machine(), 0, (data & 0x10));
 
 	c4 = data;
 	show_outputs();
@@ -404,13 +404,13 @@ static WRITE8_HANDLER( c4_w )
 // 20 blinks after coin up
 static WRITE8_HANDLER( c6_w )
 {
-	coin_lockout_w(space->machine, 0, (~data) & 0x02);
+	coin_lockout_w(space->machine(), 0, (~data) & 0x02);
 
-	coin_counter_w(space->machine, 0,   data  & 0x04);
+	coin_counter_w(space->machine(), 0,   data  & 0x04);
 
-	set_led_status(space->machine, 1,   data  & 0x08);
-	set_led_status(space->machine, 2,   data  & 0x10);
-	set_led_status(space->machine, 3,   data  & 0x20);	//
+	set_led_status(space->machine(), 1,   data  & 0x08);
+	set_led_status(space->machine(), 2,   data  & 0x10);
+	set_led_status(space->machine(), 3,   data  & 0x20);	//
 
 	c6 = data;
 	show_outputs();
@@ -421,7 +421,7 @@ static WRITE8_HANDLER( c6_w )
 // 02 hopper motor on (active low)?
 static WRITE8_HANDLER( c8_w )
 {
-	ticket_dispenser_w(space->machine->device("hopper"), 0, (!(data & 0x02) && (data & 0x01)) ? 0x00 : 0x80);
+	ticket_dispenser_w(space->machine().device("hopper"), 0, (!(data & 0x02) && (data & 0x01)) ? 0x00 : 0x80);
 
 	c8 = data;
 	show_outputs();
@@ -483,23 +483,23 @@ static WRITE8_HANDLER( animalc_rombank_w )
 		return;
 	}
 
-	UINT8 *rom = space->machine->region("maincpu")->base();
+	UINT8 *rom = space->machine().region("maincpu")->base();
 	switch ( reg )
 	{
 		case 0x0f:
 			rombank = data;
 			switch (data)
 			{
-				case 0x10:	memory_set_bankptr(space->machine, "rombank", rom + 0x400 + 0x4000);	break;
-				case 0x14:	memory_set_bankptr(space->machine, "rombank", rom + 0x400 + 0x8000);	break;
-				case 0x18:	memory_set_bankptr(space->machine, "rombank", rom + 0x400 + 0xc000);	break;
+				case 0x10:	memory_set_bankptr(space->machine(), "rombank", rom + 0x400 + 0x4000);	break;
+				case 0x14:	memory_set_bankptr(space->machine(), "rombank", rom + 0x400 + 0x8000);	break;
+				case 0x18:	memory_set_bankptr(space->machine(), "rombank", rom + 0x400 + 0xc000);	break;
 				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine->describe_context(), data, reg);
+					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine().describe_context(), data, reg);
 			}
 			break;
 
 		default:
-			logerror("%s: unknown reg written: %02x = %02x\n", space->machine->describe_context(), reg, data);
+			logerror("%s: unknown reg written: %02x = %02x\n", space->machine().describe_context(), reg, data);
 	}
 }
 static READ8_HANDLER( animalc_rombank_r )
@@ -513,7 +513,7 @@ static READ8_HANDLER( animalc_rombank_r )
 			return rombank;
 
 		default:
-			logerror("%s: unknown reg read: %02x\n", space->machine->describe_context(), reg);
+			logerror("%s: unknown reg read: %02x\n", space->machine().describe_context(), reg);
 			return 0x00;
 	}
 }
@@ -540,16 +540,16 @@ static WRITE8_HANDLER( animalc_rambank_w )
 				case 0x64:	bank = 3;	break;
 				case 0x65:	bank = 4;	break;
 				default:
-					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", space->machine->describe_context(), data, reg2);
+					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", space->machine().describe_context(), data, reg2);
 					return;
 			}
-			memory_set_bank(space->machine, "rambank", bank);
+			memory_set_bank(space->machine(), "rambank", bank);
 			if ( (bank == 1) || (bank == 2) || (bank == 3) )
-				memory_set_bank(space->machine, "sprbank", bank-1);
+				memory_set_bank(space->machine(), "sprbank", bank-1);
 			break;
 
 		default:
-			logerror("%s: unknown reg2 written: %02x = %02x\n", space->machine->describe_context(), reg2, data);
+			logerror("%s: unknown reg2 written: %02x = %02x\n", space->machine().describe_context(), reg2, data);
 	}
 }
 static READ8_HANDLER( animalc_rambank_r )
@@ -563,7 +563,7 @@ static READ8_HANDLER( animalc_rambank_r )
 			return rambank;
 
 		default:
-			logerror("%s: unknown reg2 read: %02x\n", space->machine->describe_context(), reg2);
+			logerror("%s: unknown reg2 read: %02x\n", space->machine().describe_context(), reg2);
 			return 0x00;
 	}
 }
@@ -586,7 +586,7 @@ static WRITE8_DEVICE_HANDLER( sammymdl_eeprom_w )
 	eeprom_set_clock_line(device, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	if (data & 0x8f)
-		logerror("%s: unknown eeeprom bits written %02x\n", device->machine->describe_context(), data);
+		logerror("%s: unknown eeeprom bits written %02x\n", device->machine().describe_context(), data);
 }
 
 static READ8_HANDLER( unk_34_r )
@@ -624,13 +624,13 @@ static void show_3_outputs()
 // Port 31
 static WRITE8_HANDLER( sammymdl_coin_w )
 {
-	coin_counter_w(space->machine, 0,   data  & 0x01 );	// coin1 in
-	coin_counter_w(space->machine, 1,   data  & 0x02 );	// coin2 in
-	coin_counter_w(space->machine, 2,   data  & 0x04 );	// medal in
+	coin_counter_w(space->machine(), 0,   data  & 0x01 );	// coin1 in
+	coin_counter_w(space->machine(), 1,   data  & 0x02 );	// coin2 in
+	coin_counter_w(space->machine(), 2,   data  & 0x04 );	// medal in
 
-//  coin_lockout_w(space->machine, 1, (~data) & 0x08 ); // coin2 lockout?
-//  coin_lockout_w(space->machine, 0, (~data) & 0x10 ); // coin1 lockout
-//  coin_lockout_w(space->machine, 2, (~data) & 0x20 ); // medal lockout?
+//  coin_lockout_w(space->machine(), 1, (~data) & 0x08 ); // coin2 lockout?
+//  coin_lockout_w(space->machine(), 0, (~data) & 0x10 ); // coin1 lockout
+//  coin_lockout_w(space->machine(), 2, (~data) & 0x20 ); // medal lockout?
 
 	out[0] = data;
 	show_3_outputs();
@@ -639,7 +639,7 @@ static WRITE8_HANDLER( sammymdl_coin_w )
 // Port 32
 static WRITE8_HANDLER( sammymdl_leds_w )
 {
-	set_led_status(space->machine, 0,	data & 0x01);	// button
+	set_led_status(space->machine(), 0,	data & 0x01);	// button
 
 	out[1] = data;
 	show_3_outputs();
@@ -650,7 +650,7 @@ static WRITE8_HANDLER( sammymdl_leds_w )
 // 01 hopper motor on (active low)?
 static WRITE8_HANDLER( sammymdl_hopper_w )
 {
-	ticket_dispenser_w(space->machine->device("hopper"), 0, (!(data & 0x01) && (data & 0x02)) ? 0x00 : 0x80);
+	ticket_dispenser_w(space->machine().device("hopper"), 0, (!(data & 0x01) && (data & 0x02)) ? 0x00 : 0x80);
 
 	out[2] = data;
 	show_3_outputs();
@@ -658,9 +658,9 @@ static WRITE8_HANDLER( sammymdl_hopper_w )
 
 static READ8_HANDLER( sammymdl_coin_hopper_r )
 {
-	UINT8 ret = input_port_read(space->machine, "COIN");
+	UINT8 ret = input_port_read(space->machine(), "COIN");
 
-//  if ( !ticket_dispenser_r(space->machine->device("hopper"), 0) )
+//  if ( !ticket_dispenser_r(space->machine().device("hopper"), 0) )
 //      ret &= ~0x01;
 
 	return ret;
@@ -744,12 +744,12 @@ static WRITE8_HANDLER( haekaka_rombank_w )
 					break;
 
 				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine->describe_context(), data, reg);
+					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine().describe_context(), data, reg);
 			}
 			break;
 
 		default:
-			logerror("%s: unknown reg written: %02x = %02x\n", space->machine->describe_context(), reg, data);
+			logerror("%s: unknown reg written: %02x = %02x\n", space->machine().describe_context(), reg, data);
 	}
 }
 static READ8_HANDLER( haekaka_rombank_r )
@@ -763,7 +763,7 @@ static READ8_HANDLER( haekaka_rombank_r )
 			return rombank;
 
 		default:
-			logerror("%s: unknown reg read: %02x\n", space->machine->describe_context(), reg);
+			logerror("%s: unknown reg read: %02x\n", space->machine().describe_context(), reg);
 			return 0x00;
 	}
 }
@@ -787,12 +787,12 @@ static WRITE8_HANDLER( haekaka_rambank_w )
 					break;
 
 				default:
-					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", space->machine->describe_context(), data, reg2);
+					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", space->machine().describe_context(), data, reg2);
 			}
 			break;
 
 		default:
-			logerror("%s: unknown reg2 written: %02x = %02x\n", space->machine->describe_context(), reg2, data);
+			logerror("%s: unknown reg2 written: %02x = %02x\n", space->machine().describe_context(), reg2, data);
 	}
 }
 static READ8_HANDLER( haekaka_rambank_r )
@@ -806,19 +806,19 @@ static READ8_HANDLER( haekaka_rambank_r )
 			return rambank;
 
 		default:
-			logerror("%s: unknown reg2 read: %02x\n", space->machine->describe_context(), reg2);
+			logerror("%s: unknown reg2 read: %02x\n", space->machine().describe_context(), reg2);
 			return 0x00;
 	}
 }
 
 static READ8_HANDLER( haekaka_vblank_r )
 {
-	return space->machine->primary_screen->vblank() ? 0 : 0x1c;
+	return space->machine().primary_screen->vblank() ? 0 : 0x1c;
 }
 
 static READ8_HANDLER( haekaka_b000_r )
 {
-	sigmab98_state *state = space->machine->driver_data<sigmab98_state>();
+	sigmab98_state *state = space->machine().driver_data<sigmab98_state>();
 	switch (rombank)
 	{
 		case 0x10:	// ROM
@@ -837,7 +837,7 @@ static READ8_HANDLER( haekaka_b000_r )
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:
-			return space->machine->region("maincpu")->base()[offset + 0xb400 + 0x1000 * (rombank-0x10)];
+			return space->machine().region("maincpu")->base()[offset + 0xb400 + 0x1000 * (rombank-0x10)];
 
 		case 0x65:	// SPRITERAM
 			if (offset < 0x1000)
@@ -845,19 +845,19 @@ static READ8_HANDLER( haekaka_b000_r )
 
 		case 0x67:	// PALETTERAM + TABLE? + REGS
 			if (offset < 0x200)
-				return space->machine->generic.paletteram.u8[offset];
+				return space->machine().generic.paletteram.u8[offset];
 			else if (offset == (0xc013-0xb000))
 				return haekaka_vblank_r(space, offset);
 			break;
 	}
 
-	logerror("%s: unknown read from %02x with rombank = %02x\n", space->machine->describe_context(), offset+0xb000, rombank);
+	logerror("%s: unknown read from %02x with rombank = %02x\n", space->machine().describe_context(), offset+0xb000, rombank);
 	return 0x00;
 }
 
 static WRITE8_HANDLER( haekaka_b000_w )
 {
-	sigmab98_state *state = space->machine->driver_data<sigmab98_state>();
+	sigmab98_state *state = space->machine().driver_data<sigmab98_state>();
 	switch (rombank)
 	{
 		case 0x65:	// SPRITERAM
@@ -872,7 +872,7 @@ static WRITE8_HANDLER( haekaka_b000_w )
 			if (offset < 0x200)
 			{
 				paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
-//              space->machine->generic.paletteram.u8[offset] = data;
+//              space->machine().generic.paletteram.u8[offset] = data;
 				return;
 			}
 			else if ((offset >= 0x800) && (offset < 0x880))
@@ -883,20 +883,20 @@ static WRITE8_HANDLER( haekaka_b000_w )
 			break;
 	}
 
-	logerror("%s: unknown write to %02x = %02x with rombank = %02x\n", space->machine->describe_context(), offset+0xb000, data, rombank);
+	logerror("%s: unknown write to %02x = %02x with rombank = %02x\n", space->machine().describe_context(), offset+0xb000, data, rombank);
 }
 
 static WRITE8_HANDLER( haekaka_leds_w )
 {
 	// All used
-	set_led_status(space->machine, 0,	data & 0x01);
-	set_led_status(space->machine, 1,	data & 0x02);
-	set_led_status(space->machine, 2,	data & 0x04);
-	set_led_status(space->machine, 3,	data & 0x08);
-	set_led_status(space->machine, 4,	data & 0x10);
-	set_led_status(space->machine, 5,	data & 0x20);
-	set_led_status(space->machine, 6,	data & 0x40);
-	set_led_status(space->machine, 7,	data & 0x80);
+	set_led_status(space->machine(), 0,	data & 0x01);
+	set_led_status(space->machine(), 1,	data & 0x02);
+	set_led_status(space->machine(), 2,	data & 0x04);
+	set_led_status(space->machine(), 3,	data & 0x08);
+	set_led_status(space->machine(), 4,	data & 0x10);
+	set_led_status(space->machine(), 5,	data & 0x20);
+	set_led_status(space->machine(), 6,	data & 0x40);
+	set_led_status(space->machine(), 7,	data & 0x80);
 
 	out[1] = data;
 	show_3_outputs();
@@ -904,7 +904,7 @@ static WRITE8_HANDLER( haekaka_leds_w )
 
 static WRITE8_HANDLER( haekaka_coin_w )
 {
-	coin_counter_w(space->machine, 0,   data & 0x01 );	// medal out
+	coin_counter_w(space->machine(), 0,   data & 0x01 );	// medal out
 //                                      data & 0x02 ?
 //                                      data & 0x04 ?
 //                                      data & 0x10 ?
@@ -944,14 +944,14 @@ ADDRESS_MAP_END
 // rombank
 static WRITE8_HANDLER( itazuram_rombank_w )
 {
-	sigmab98_state *state = space->machine->driver_data<sigmab98_state>();
+	sigmab98_state *state = space->machine().driver_data<sigmab98_state>();
 	if (offset == 0)
 	{
 		reg = data;
 		return;
 	}
 
-	UINT8 *rom = space->machine->region("maincpu")->base();
+	UINT8 *rom = space->machine().region("maincpu")->base();
 	switch ( reg )
 	{
 		case 0x0d:
@@ -959,14 +959,14 @@ static WRITE8_HANDLER( itazuram_rombank_w )
 			switch (data)
 			{
 				case 0x11:	// 3800 IS ROM
-					memory_set_bankptr(space->machine, "rombank0", rom + 0x4c00);
-					memory_set_bankptr(space->machine, "rombank1", rom + 0x5c00);
-					memory_set_bankptr(space->machine, "sprbank0", state->spriteram + 0x1000*4);	// scratch
-					memory_set_bankptr(space->machine, "sprbank1", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "rombank0", rom + 0x4c00);
+					memory_set_bankptr(space->machine(), "rombank1", rom + 0x5c00);
+					memory_set_bankptr(space->machine(), "sprbank0", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "sprbank1", state->spriteram + 0x1000*4);	// scratch
 					break;
 
 				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine->describe_context(), data, reg);
+					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine().describe_context(), data, reg);
 			}
 			break;
 
@@ -975,14 +975,14 @@ static WRITE8_HANDLER( itazuram_rombank_w )
 			switch (data)
 			{
 				case 0x14:	// 3800 IS ROM
-					memory_set_bankptr(space->machine, "rombank0", rom + 0x8000);
-					memory_set_bankptr(space->machine, "rombank1", rom + 0x9000);
-					memory_set_bankptr(space->machine, "sprbank0", state->spriteram + 0x1000*4);	// scratch
-					memory_set_bankptr(space->machine, "sprbank1", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "rombank0", rom + 0x8000);
+					memory_set_bankptr(space->machine(), "rombank1", rom + 0x9000);
+					memory_set_bankptr(space->machine(), "sprbank0", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "sprbank1", state->spriteram + 0x1000*4);	// scratch
 					break;
 
 				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine->describe_context(), data, reg);
+					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine().describe_context(), data, reg);
 			}
 			break;
 
@@ -991,37 +991,37 @@ static WRITE8_HANDLER( itazuram_rombank_w )
 			switch (data)
 			{
 				case 0x0f:	// 3800 IS ROM
-					memory_set_bankptr(space->machine, "rombank0", rom + 0x3400);
-					memory_set_bankptr(space->machine, "rombank1", rom + 0x4400);
-					memory_set_bankptr(space->machine, "sprbank0", state->spriteram + 0x1000*4);	// scratch
-					memory_set_bankptr(space->machine, "sprbank1", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "rombank0", rom + 0x3400);
+					memory_set_bankptr(space->machine(), "rombank1", rom + 0x4400);
+					memory_set_bankptr(space->machine(), "sprbank0", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "sprbank1", state->spriteram + 0x1000*4);	// scratch
 					break;
 
 				case 0x12:	// 3800 IS ROM
-					memory_set_bankptr(space->machine, "rombank0", rom + 0x6400);
-					memory_set_bankptr(space->machine, "rombank1", rom + 0x7400);
-					memory_set_bankptr(space->machine, "sprbank0", state->spriteram + 0x1000*4);	// scratch
-					memory_set_bankptr(space->machine, "sprbank1", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "rombank0", rom + 0x6400);
+					memory_set_bankptr(space->machine(), "rombank1", rom + 0x7400);
+					memory_set_bankptr(space->machine(), "sprbank0", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "sprbank1", state->spriteram + 0x1000*4);	// scratch
 					break;
 
 				// used in test mode:
-//              case 0x5c:  memory_set_bankptr(space->machine, "rombank", rom + 0x400 + 0x0000);    break;  // 3800 IS RAM! (8000 bytes)
+//              case 0x5c:  memory_set_bankptr(space->machine(), "rombank", rom + 0x400 + 0x0000);    break;  // 3800 IS RAM! (8000 bytes)
 
 				case 0x5e:	// 3800 IS RAM! (1404 bytes)
-					memory_set_bankptr(space->machine, "rombank0", state->spriteram + 0x1000*1);
-					memory_set_bankptr(space->machine, "sprbank0", state->spriteram + 0x1000*1);
-					memory_set_bankptr(space->machine, "rombank1", state->spriteram + 0x1000*2);
-					memory_set_bankptr(space->machine, "sprbank1", state->spriteram + 0x1000*2);
+					memory_set_bankptr(space->machine(), "rombank0", state->spriteram + 0x1000*1);
+					memory_set_bankptr(space->machine(), "sprbank0", state->spriteram + 0x1000*1);
+					memory_set_bankptr(space->machine(), "rombank1", state->spriteram + 0x1000*2);
+					memory_set_bankptr(space->machine(), "sprbank1", state->spriteram + 0x1000*2);
 					break;
 
 				case 0x6c:	// 3800 IS RAM! (1000 bytes) - SPRITERAM
-					memory_set_bankptr(space->machine, "rombank0", state->spriteram);
-					memory_set_bankptr(space->machine, "sprbank0", state->spriteram);
-//                  memory_set_bankptr(space->machine, "sprbank1", state->spriteram + 0x1000*4);    // scratch
+					memory_set_bankptr(space->machine(), "rombank0", state->spriteram);
+					memory_set_bankptr(space->machine(), "sprbank0", state->spriteram);
+//                  memory_set_bankptr(space->machine(), "sprbank1", state->spriteram + 0x1000*4);    // scratch
 					break;
 
 				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine->describe_context(), data, reg);
+					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine().describe_context(), data, reg);
 			}
 			break;
 
@@ -1030,19 +1030,19 @@ static WRITE8_HANDLER( itazuram_rombank_w )
 			switch (data)
 			{
 				case 0x14:	// 3800 IS ROM
-					memory_set_bankptr(space->machine, "rombank0", rom + 0x8800);
-					memory_set_bankptr(space->machine, "rombank1", rom + 0x9800);
-					memory_set_bankptr(space->machine, "sprbank0", state->spriteram + 0x1000*4);	// scratch
-					memory_set_bankptr(space->machine, "sprbank1", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "rombank0", rom + 0x8800);
+					memory_set_bankptr(space->machine(), "rombank1", rom + 0x9800);
+					memory_set_bankptr(space->machine(), "sprbank0", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "sprbank1", state->spriteram + 0x1000*4);	// scratch
 					break;
 
 				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine->describe_context(), data, reg);
+					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine().describe_context(), data, reg);
 			}
 			break;
 
 		default:
-			logerror("%s: unknown reg written: %02x = %02x\n", space->machine->describe_context(), reg, data);
+			logerror("%s: unknown reg written: %02x = %02x\n", space->machine().describe_context(), reg, data);
 	}
 }
 static READ8_HANDLER( itazuram_rombank_r )
@@ -1060,7 +1060,7 @@ static READ8_HANDLER( itazuram_rombank_r )
 			return rombank;
 
 		default:
-			logerror("%s: unknown reg read: %02x\n", space->machine->describe_context(), reg);
+			logerror("%s: unknown reg read: %02x\n", space->machine().describe_context(), reg);
 			return 0x00;
 	}
 }
@@ -1080,16 +1080,16 @@ static WRITE8_HANDLER( itazuram_rambank_w )
 			rambank = data;
 			switch (data)
 			{
-				case 0x52:	memory_set_bankptr(space->machine, "palbank", nvram);									break;
-				case 0x64:	memory_set_bankptr(space->machine, "palbank", space->machine->generic.paletteram.u8);	break;
+				case 0x52:	memory_set_bankptr(space->machine(), "palbank", nvram);									break;
+				case 0x64:	memory_set_bankptr(space->machine(), "palbank", space->machine().generic.paletteram.u8);	break;
 				default:
-					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", space->machine->describe_context(), data, reg2);
+					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", space->machine().describe_context(), data, reg2);
 					return;
 			}
 			break;
 
 		default:
-			logerror("%s: unknown reg2 written: %02x = %02x\n", space->machine->describe_context(), reg2, data);
+			logerror("%s: unknown reg2 written: %02x = %02x\n", space->machine().describe_context(), reg2, data);
 	}
 }
 
@@ -1104,7 +1104,7 @@ static READ8_HANDLER( itazuram_rambank_r )
 			return rambank;
 
 		default:
-			logerror("%s: unknown reg2 read: %02x\n", space->machine->describe_context(), reg2);
+			logerror("%s: unknown reg2 read: %02x\n", space->machine().describe_context(), reg2);
 			return 0x00;
 	}
 }
@@ -1114,7 +1114,7 @@ static WRITE8_HANDLER( itazuram_nvram_palette_w )
 	if (rambank == 0x64)
 	{
 		paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
-//      space->machine->generic.paletteram.u8[offset] = data;
+//      space->machine().generic.paletteram.u8[offset] = data;
 	}
 	else if (rambank == 0x52)
 	{
@@ -1122,7 +1122,7 @@ static WRITE8_HANDLER( itazuram_nvram_palette_w )
 	}
 	else
 	{
-		logerror("%s: itazuram_nvram_palette_w offset = %03x with unknown bank = %02x\n", space->machine->describe_context(), offset, rambank);
+		logerror("%s: itazuram_nvram_palette_w offset = %03x with unknown bank = %02x\n", space->machine().describe_context(), offset, rambank);
 	}
 }
 
@@ -1132,16 +1132,16 @@ static WRITE8_HANDLER( itazuram_palette_w )
 	{
 		if (offset < 0x200)
 			paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
-//          space->machine->generic.paletteram.u8[offset] = data;
+//          space->machine().generic.paletteram.u8[offset] = data;
 	}
 	else
 	{
-		logerror("%s: itazuram_palette_w offset = %03x with unknown bank = %02x\n", space->machine->describe_context(), offset, rombank);
+		logerror("%s: itazuram_palette_w offset = %03x with unknown bank = %02x\n", space->machine().describe_context(), offset, rombank);
 	}
 }
 static READ8_HANDLER( itazuram_palette_r )
 {
-	return space->machine->generic.paletteram.u8[offset];
+	return space->machine().generic.paletteram.u8[offset];
 }
 
 static ADDRESS_MAP_START( itazuram_map, AS_PROGRAM, 8 )
@@ -1227,12 +1227,12 @@ static WRITE8_HANDLER( tdoboon_rombank_w )
 					break;
 
 				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine->describe_context(), data, reg);
+					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine().describe_context(), data, reg);
 			}
 			break;
 
 		default:
-			logerror("%s: unknown reg written: %02x = %02x\n", space->machine->describe_context(), reg, data);
+			logerror("%s: unknown reg written: %02x = %02x\n", space->machine().describe_context(), reg, data);
 	}
 }
 static READ8_HANDLER( tdoboon_rombank_r )
@@ -1246,7 +1246,7 @@ static READ8_HANDLER( tdoboon_rombank_r )
 			return rombank;
 
 		default:
-			logerror("%s: unknown reg read: %02x\n", space->machine->describe_context(), reg);
+			logerror("%s: unknown reg read: %02x\n", space->machine().describe_context(), reg);
 			return 0x00;
 	}
 }
@@ -1270,12 +1270,12 @@ static WRITE8_HANDLER( tdoboon_rambank_w )
 					break;
 
 				default:
-					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", space->machine->describe_context(), data, reg2);
+					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", space->machine().describe_context(), data, reg2);
 			}
 			break;
 
 		default:
-			logerror("%s: unknown reg2 written: %02x = %02x\n", space->machine->describe_context(), reg2, data);
+			logerror("%s: unknown reg2 written: %02x = %02x\n", space->machine().describe_context(), reg2, data);
 	}
 }
 static READ8_HANDLER( tdoboon_rambank_r )
@@ -1289,14 +1289,14 @@ static READ8_HANDLER( tdoboon_rambank_r )
 			return rambank;
 
 		default:
-			logerror("%s: unknown reg2 read: %02x\n", space->machine->describe_context(), reg2);
+			logerror("%s: unknown reg2 read: %02x\n", space->machine().describe_context(), reg2);
 			return 0x00;
 	}
 }
 
 static READ8_HANDLER( tdoboon_c000_r )
 {
-	sigmab98_state *state = space->machine->driver_data<sigmab98_state>();
+	sigmab98_state *state = space->machine().driver_data<sigmab98_state>();
 	switch (rombank)
 	{
 		case 0x10:	// ROM
@@ -1315,7 +1315,7 @@ static READ8_HANDLER( tdoboon_c000_r )
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:
-			return space->machine->region("maincpu")->base()[offset + 0xc400 + 0x1000 * (rombank-0x10)];
+			return space->machine().region("maincpu")->base()[offset + 0xc400 + 0x1000 * (rombank-0x10)];
 
 		case 0x64:	// SPRITERAM
 			if (offset < 0x1000)
@@ -1324,7 +1324,7 @@ static READ8_HANDLER( tdoboon_c000_r )
 
 		case 0x66:	// PALETTERAM + TABLE?
 			if (offset < 0x200)
-				return space->machine->generic.paletteram.u8[offset];
+				return space->machine().generic.paletteram.u8[offset];
 			break;
 
 		case 0x67:	// REGS
@@ -1333,13 +1333,13 @@ static READ8_HANDLER( tdoboon_c000_r )
 			break;
 	}
 
-	logerror("%s: unknown read from %02x with rombank = %02x\n", space->machine->describe_context(), offset+0xc000, rombank);
+	logerror("%s: unknown read from %02x with rombank = %02x\n", space->machine().describe_context(), offset+0xc000, rombank);
 	return 0x00;
 }
 
 static WRITE8_HANDLER( tdoboon_c000_w )
 {
-	sigmab98_state *state = space->machine->driver_data<sigmab98_state>();
+	sigmab98_state *state = space->machine().driver_data<sigmab98_state>();
 	switch (rombank)
 	{
 		case 0x64:	// SPRITERAM
@@ -1354,7 +1354,7 @@ static WRITE8_HANDLER( tdoboon_c000_w )
 			if (offset < 0x200)
 			{
 				paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
-//              space->machine->generic.paletteram.u8[offset] = data;
+//              space->machine().generic.paletteram.u8[offset] = data;
 				return;
 			}
 			else if ((offset >= 0x800) && (offset < 0x880))
@@ -1365,7 +1365,7 @@ static WRITE8_HANDLER( tdoboon_c000_w )
 			break;
 	}
 
-	logerror("%s: unknown write to %02x = %02x with rombank = %02x\n", space->machine->describe_context(), offset+0xc000, data, rombank);
+	logerror("%s: unknown write to %02x = %02x with rombank = %02x\n", space->machine().describe_context(), offset+0xc000, data, rombank);
 }
 
 static ADDRESS_MAP_START( tdoboon_map, AS_PROGRAM, 8 )
@@ -1599,7 +1599,7 @@ static const eeprom_interface eeprom_interface_93C46_8bit =
 
 static MACHINE_RESET( sammymdl )
 {
-	cpu_set_reg(machine->device("maincpu"), Z80_PC, 0x400);	// code starts at 400 ??? (000 = cart header)
+	cpu_set_reg(machine.device("maincpu"), Z80_PC, 0x400);	// code starts at 400 ??? (000 = cart header)
 }
 
 static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
@@ -1804,7 +1804,7 @@ ROM_END
 
 static DRIVER_INIT( gegege )
 {
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	// Protection?
 	rom[0xbd3] = 0x18;
@@ -1916,7 +1916,7 @@ ROM_END
 
 static DRIVER_INIT( animalc )
 {
-	sigmab98_state *state = machine->driver_data<sigmab98_state>();
+	sigmab98_state *state = machine.driver_data<sigmab98_state>();
 	// RAM banks
 	UINT8 *bankedram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
 	memory_configure_bank(machine, "rambank", 0, 1, nvram,     0x1000);
@@ -1954,17 +1954,17 @@ ROM_END
 
 static DRIVER_INIT( itazuram )
 {
-	sigmab98_state *state = machine->driver_data<sigmab98_state>();
+	sigmab98_state *state = machine.driver_data<sigmab98_state>();
 	// ROM banks
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	memory_set_bankptr(machine, "rombank0", rom + 0x3400);
 	memory_set_bankptr(machine, "rombank1", rom + 0x4400);
 	rombank = 0x0f;
 
 	// RAM banks
-	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x3000);
-	memset(machine->generic.paletteram.u8, 0, 0x3000);
-	memory_set_bankptr(machine, "palbank", machine->generic.paletteram.u8);
+	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x3000);
+	memset(machine.generic.paletteram.u8, 0, 0x3000);
+	memory_set_bankptr(machine, "palbank", machine.generic.paletteram.u8);
 	rambank = 0x64;
 
 	state->spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
@@ -2070,10 +2070,10 @@ ROM_END
 
 static DRIVER_INIT( haekaka )
 {
-	sigmab98_state *state = machine->driver_data<sigmab98_state>();
+	sigmab98_state *state = machine.driver_data<sigmab98_state>();
 	// RAM banks
-	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	memset(machine->generic.paletteram.u8, 0, 0x200);
+	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
+	memset(machine.generic.paletteram.u8, 0, 0x200);
 
 	state->spriteram = auto_alloc_array(machine, UINT8, 0x1000);
 	memset(state->spriteram, 0, 0x1000);

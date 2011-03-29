@@ -15,7 +15,7 @@ Ping Pong (c) 1985 Konami
 
 static WRITE8_HANDLER( cashquiz_question_bank_high_w )
 {
-	pingpong_state *state = space->machine->driver_data<pingpong_state>();
+	pingpong_state *state = space->machine().driver_data<pingpong_state>();
 	if( data != 0xff )
 	{
 		switch( ~data & 0xff )
@@ -50,14 +50,14 @@ static WRITE8_HANDLER( cashquiz_question_bank_high_w )
 
 static WRITE8_HANDLER( cashquiz_question_bank_low_w )
 {
-	pingpong_state *state = space->machine->driver_data<pingpong_state>();
+	pingpong_state *state = space->machine().driver_data<pingpong_state>();
 	if(data >= 0x60 && data <= 0xdf)
 	{
 		static const char * const bankname[] = { "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
 		const char *bank = bankname[data & 7];
 		int bankaddr = state->question_addr_high | ((data - 0x60) * 0x100);
-		UINT8 *questions = space->machine->region("user1")->base() + bankaddr;
-		memory_set_bankptr(space->machine, bank,questions);
+		UINT8 *questions = space->machine().region("user1")->base() + bankaddr;
+		memory_set_bankptr(space->machine(), bank,questions);
 
 	}
 }
@@ -65,20 +65,20 @@ static WRITE8_HANDLER( cashquiz_question_bank_low_w )
 
 static WRITE8_HANDLER( coin_w )
 {
-	pingpong_state *state = space->machine->driver_data<pingpong_state>();
+	pingpong_state *state = space->machine().driver_data<pingpong_state>();
 	/* bit 2 = irq enable, bit 3 = nmi enable */
 	state->intenable = data & 0x0c;
 
 	/* bit 0/1 = coin counters */
-	coin_counter_w(space->machine, 0,data & 1);
-	coin_counter_w(space->machine, 1,data & 2);
+	coin_counter_w(space->machine(), 0,data & 1);
+	coin_counter_w(space->machine(), 1,data & 2);
 
 	/* other bits unknown */
 }
 
 static INTERRUPT_GEN( pingpong_interrupt )
 {
-	pingpong_state *state = device->machine->driver_data<pingpong_state>();
+	pingpong_state *state = device->machine().driver_data<pingpong_state>();
 	if (cpu_getiloops(device) == 0)
 	{
 		if (state->intenable & 0x04) device_set_input_line(device, 0, HOLD_LINE);
@@ -567,7 +567,7 @@ ROM_END
 
 static DRIVER_INIT( merlinmm )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	int i;
 
 	/* decrypt program code */
@@ -581,38 +581,38 @@ static DRIVER_INIT( cashquiz )
 	int i;
 
 	/* decrypt program code */
-	ROM = machine->region("maincpu")->base();
+	ROM = machine.region("maincpu")->base();
 	for( i = 0; i < 0x4000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* decrypt questions */
-	ROM = machine->region("user1")->base();
+	ROM = machine.region("user1")->base();
 	for( i = 0; i < 0x40000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* questions banking handlers */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4000, 0x4000, FUNC(cashquiz_question_bank_high_w));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4001, 0x4001, FUNC(cashquiz_question_bank_low_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4000, 0x4000, FUNC(cashquiz_question_bank_high_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4001, 0x4001, FUNC(cashquiz_question_bank_low_w));
 
 	// 8 independents banks for questions
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5000, 0x50ff, "bank1");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5100, 0x51ff, "bank2");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5200, 0x52ff, "bank3");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5300, 0x53ff, "bank4");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5400, 0x54ff, "bank5");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5500, 0x55ff, "bank6");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5600, 0x56ff, "bank7");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5700, 0x57ff, "bank8");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5000, 0x50ff, "bank1");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5100, 0x51ff, "bank2");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5200, 0x52ff, "bank3");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5300, 0x53ff, "bank4");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5400, 0x54ff, "bank5");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5500, 0x55ff, "bank6");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5600, 0x56ff, "bank7");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5700, 0x57ff, "bank8");
 
 	// setup default banks
-	memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + 0x100*0 );
-	memory_set_bankptr(machine, "bank2", machine->region("user1")->base() + 0x100*1 );
-	memory_set_bankptr(machine, "bank3", machine->region("user1")->base() + 0x100*2 );
-	memory_set_bankptr(machine, "bank4", machine->region("user1")->base() + 0x100*3 );
-	memory_set_bankptr(machine, "bank5", machine->region("user1")->base() + 0x100*4 );
-	memory_set_bankptr(machine, "bank6", machine->region("user1")->base() + 0x100*5 );
-	memory_set_bankptr(machine, "bank7", machine->region("user1")->base() + 0x100*6 );
-	memory_set_bankptr(machine, "bank8", machine->region("user1")->base() + 0x100*7 );
+	memory_set_bankptr(machine, "bank1", machine.region("user1")->base() + 0x100*0 );
+	memory_set_bankptr(machine, "bank2", machine.region("user1")->base() + 0x100*1 );
+	memory_set_bankptr(machine, "bank3", machine.region("user1")->base() + 0x100*2 );
+	memory_set_bankptr(machine, "bank4", machine.region("user1")->base() + 0x100*3 );
+	memory_set_bankptr(machine, "bank5", machine.region("user1")->base() + 0x100*4 );
+	memory_set_bankptr(machine, "bank6", machine.region("user1")->base() + 0x100*5 );
+	memory_set_bankptr(machine, "bank7", machine.region("user1")->base() + 0x100*6 );
+	memory_set_bankptr(machine, "bank8", machine.region("user1")->base() + 0x100*7 );
 }
 
 

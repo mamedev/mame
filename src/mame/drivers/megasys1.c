@@ -132,14 +132,14 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 
 static MACHINE_RESET( megasys1 )
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
 	state->ignore_oki_status = 1;	/* ignore oki status due 'protection' */
 	state->ip_select = 0;	/* reset protection */
 }
 
 static MACHINE_RESET( megasys1_hachoo )
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
 	state->ignore_oki_status = 0;	/* strangely hachoo need real oki status */
 	state->ip_select = 0;	/* reset protection */
 }
@@ -214,7 +214,7 @@ static INTERRUPT_GEN( interrupt_B )
 
 static READ16_HANDLER( ip_select_r )
 {
-	megasys1_state *state = space->machine->driver_data<megasys1_state>();
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
 	int i;
 
 //  Coins   P1      P2      DSW1    DSW2
@@ -233,20 +233,20 @@ static READ16_HANDLER( ip_select_r )
 
 	switch (i)
 	{
-			case 0 :	return input_port_read(space->machine, "SYSTEM");
-			case 1 :	return input_port_read(space->machine, "P1");
-			case 2 :	return input_port_read(space->machine, "P2");
-			case 3 :	return input_port_read(space->machine, "DSW1");
-			case 4 :	return input_port_read(space->machine, "DSW2");
+			case 0 :	return input_port_read(space->machine(), "SYSTEM");
+			case 1 :	return input_port_read(space->machine(), "P1");
+			case 2 :	return input_port_read(space->machine(), "P2");
+			case 3 :	return input_port_read(space->machine(), "DSW1");
+			case 4 :	return input_port_read(space->machine(), "DSW2");
 			default	 :	return 0x0006;
 	}
 }
 
 static WRITE16_HANDLER( ip_select_w )
 {
-	megasys1_state *state = space->machine->driver_data<megasys1_state>();
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
 	COMBINE_DATA(&state->ip_select);
-	cputag_set_input_line(space->machine, "maincpu", 2, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 2, HOLD_LINE);
 }
 
 
@@ -373,12 +373,12 @@ ADDRESS_MAP_END
 static void megasys1_sound_irq(device_t *device, int irq)
 {
 	if (irq)
-		cputag_set_input_line(device->machine, "soundcpu", 4, HOLD_LINE);
+		cputag_set_input_line(device->machine(), "soundcpu", 4, HOLD_LINE);
 }
 
 static READ8_DEVICE_HANDLER( oki_status_r )
 {
-	megasys1_state *state = device->machine->driver_data<megasys1_state>();
+	megasys1_state *state = device->machine().driver_data<megasys1_state>();
 	if (state->ignore_oki_status == 1)
 		return 0;
 	else
@@ -1361,25 +1361,25 @@ INPUT_PORTS_END
 /* Read the input ports, through a protection device */
 static READ16_HANDLER( protection_peekaboo_r )
 {
-	megasys1_state *state = space->machine->driver_data<megasys1_state>();
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
 	switch (state->protection_val)
 	{
 		case 0x02:	return 0x03;
-		case 0x51:	return input_port_read(space->machine, "P1");
-		case 0x52:	return input_port_read(space->machine, "P2");
+		case 0x51:	return input_port_read(space->machine(), "P1");
+		case 0x52:	return input_port_read(space->machine(), "P2");
 		default:	return state->protection_val;
 	}
 }
 
 static WRITE16_HANDLER( protection_peekaboo_w )
 {
-	megasys1_state *state = space->machine->driver_data<megasys1_state>();
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
 
 	COMBINE_DATA(&state->protection_val);
 
 	if ((state->protection_val & 0x90) == 0x90)
 	{
-		UINT8 *RAM = space->machine->region("oki1")->base();
+		UINT8 *RAM = space->machine().region("oki1")->base();
 		int new_bank = (state->protection_val & 0x7) % 7;
 
 		if (state->bank != new_bank)
@@ -1389,7 +1389,7 @@ static WRITE16_HANDLER( protection_peekaboo_w )
 		}
 	}
 
-	cputag_set_input_line(space->machine, "maincpu", 4, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 4, HOLD_LINE);
 }
 
 /*************************************
@@ -1639,7 +1639,7 @@ MACHINE_CONFIG_END
 
 static void irq_handler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -3550,10 +3550,10 @@ ROM_START( tshingen )
 ROM_END
 
 
-static void rodlandj_gfx_unmangle(running_machine *machine, const char *region)
+static void rodlandj_gfx_unmangle(running_machine &machine, const char *region)
 {
-	UINT8 *rom = machine->region(region)->base();
-	int size = machine->region(region)->bytes();
+	UINT8 *rom = machine.region(region)->base();
+	int size = machine.region(region)->bytes();
 	UINT8 *buffer;
 	int i;
 
@@ -3582,10 +3582,10 @@ static void rodlandj_gfx_unmangle(running_machine *machine, const char *region)
 	auto_free(machine, buffer);
 }
 
-static void jitsupro_gfx_unmangle(running_machine *machine, const char *region)
+static void jitsupro_gfx_unmangle(running_machine &machine, const char *region)
 {
-	UINT8 *rom = machine->region(region)->base();
-	int size = machine->region(region)->bytes();
+	UINT8 *rom = machine.region(region)->base();
+	int size = machine.region(region)->bytes();
 	UINT8 *buffer;
 	int i;
 
@@ -3617,8 +3617,8 @@ static void jitsupro_gfx_unmangle(running_machine *machine, const char *region)
 
 static DRIVER_INIT( 64street )
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
-//  UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
+//  UINT16 *RAM = (UINT16 *) machine.region("maincpu")->base();
 //  RAM[0x006b8/2] = 0x6004;        // d8001 test
 //  RAM[0x10EDE/2] = 0x6012;        // watchdog
 
@@ -3635,13 +3635,13 @@ static DRIVER_INIT( astyanax )
 
 	astyanax_rom_decode(machine, "maincpu");
 
-	RAM = (UINT16 *) machine->region("maincpu")->base();
+	RAM = (UINT16 *) machine.region("maincpu")->base();
 	RAM[0x0004e6/2] = 0x6040;	// protection
 }
 
 static DRIVER_INIT( avspirit )
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
 	state->ip_select_values[0] = 0x37;
 	state->ip_select_values[1] = 0x35;
 	state->ip_select_values[2] = 0x36;
@@ -3656,7 +3656,7 @@ static DRIVER_INIT( avspirit )
 
 static DRIVER_INIT( bigstrik )
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
 	state->ip_select_values[0] = 0x58;
 	state->ip_select_values[1] = 0x54;
 	state->ip_select_values[2] = 0x55;
@@ -3666,7 +3666,7 @@ static DRIVER_INIT( bigstrik )
 
 static DRIVER_INIT( chimerab )
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
 	/* same as cybattlr */
 	state->ip_select_values[0] = 0x56;
 	state->ip_select_values[1] = 0x52;
@@ -3677,7 +3677,7 @@ static DRIVER_INIT( chimerab )
 
 static DRIVER_INIT( cybattlr )
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
 	state->ip_select_values[0] = 0x56;
 	state->ip_select_values[1] = 0x52;
 	state->ip_select_values[2] = 0x53;
@@ -3687,7 +3687,7 @@ static DRIVER_INIT( cybattlr )
 
 static DRIVER_INIT( edf )
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
 	state->ip_select_values[0] = 0x20;
 	state->ip_select_values[1] = 0x21;
 	state->ip_select_values[2] = 0x22;
@@ -3702,7 +3702,7 @@ static READ16_HANDLER( edfbl_input_r )
 
 static DRIVER_INIT( edfbl )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe0002, 0xe000b, FUNC(edfbl_input_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe0002, 0xe000b, FUNC(edfbl_input_r));
 }
 
 
@@ -3712,13 +3712,13 @@ static DRIVER_INIT( hachoo )
 
 	astyanax_rom_decode(machine, "maincpu");
 
-	RAM  = (UINT16 *) machine->region("maincpu")->base();
+	RAM  = (UINT16 *) machine.region("maincpu")->base();
 	RAM[0x0006da/2] = 0x6000;	// protection
 }
 
 static DRIVER_INIT( hayaosi1 )
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
 	state->ip_select_values[0] = 0x51;
 	state->ip_select_values[1] = 0x52;
 	state->ip_select_values[2] = 0x53;
@@ -3732,7 +3732,7 @@ static DRIVER_INIT( iganinju )
 
 	phantasm_rom_decode(machine, "maincpu");
 
-	RAM  = (UINT16 *) machine->region("maincpu")->base();
+	RAM  = (UINT16 *) machine.region("maincpu")->base();
 	RAM[0x02f000/2] = 0x835d;	// protection
 
 	RAM[0x00006e/2] = 0x0420;	// the only game that does
@@ -3748,9 +3748,9 @@ static WRITE16_DEVICE_HANDLER( okim6295_both_w )
 
 static DRIVER_INIT( jitsupro )
 {
-	device_t *oki1 = machine->device("oki1");
-	device_t *oki2 = machine->device("oki2");
-	UINT16 *RAM  = (UINT16 *) machine->region("maincpu")->base();
+	device_t *oki1 = machine.device("oki1");
+	device_t *oki2 = machine.device("oki2");
+	UINT16 *RAM  = (UINT16 *) machine.region("maincpu")->base();
 
 	astyanax_rom_decode(machine, "maincpu");		// Code
 
@@ -3761,13 +3761,13 @@ static DRIVER_INIT( jitsupro )
 	RAM[0x438/2] = 0x4e71;	//
 
 	/* the sound code writes oki commands to both the lsb and msb */
-	machine->device("soundcpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki1, 0xa0000, 0xa0003, FUNC(okim6295_both_w));
-	machine->device("soundcpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki2, 0xc0000, 0xc0003, FUNC(okim6295_both_w));
+	machine.device("soundcpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki1, 0xa0000, 0xa0003, FUNC(okim6295_both_w));
+	machine.device("soundcpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki2, 0xc0000, 0xc0003, FUNC(okim6295_both_w));
 }
 
 static DRIVER_INIT( peekaboo )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x100000, 0x100001, FUNC(protection_peekaboo_r), FUNC(protection_peekaboo_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x100000, 0x100001, FUNC(protection_peekaboo_r), FUNC(protection_peekaboo_w));
 }
 
 static DRIVER_INIT( phantasm )
@@ -3781,7 +3781,7 @@ static DRIVER_INIT( plusalph )
 
 	astyanax_rom_decode(machine, "maincpu");
 
-	RAM  = (UINT16 *) machine->region("maincpu")->base();
+	RAM  = (UINT16 *) machine.region("maincpu")->base();
 	RAM[0x0012b6/2] = 0x0000;	// protection
 }
 
@@ -3800,12 +3800,12 @@ static DRIVER_INIT( rodlandj )
 
 static READ16_HANDLER( soldamj_spriteram16_r )
 {
-	megasys1_state *state = space->machine->driver_data<megasys1_state>();
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
 	return state->spriteram[offset];
 }
 static WRITE16_HANDLER( soldamj_spriteram16_w )
 {
-	megasys1_state *state = space->machine->driver_data<megasys1_state>();
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
 	if (offset < 0x800/2)	COMBINE_DATA(&state->spriteram[offset]);
 }
 
@@ -3814,7 +3814,7 @@ static DRIVER_INIT( soldamj )
 	astyanax_rom_decode(machine, "maincpu");
 
 	/* Sprite RAM is mirrored */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8c000, 0x8cfff, FUNC(soldamj_spriteram16_r), FUNC(soldamj_spriteram16_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8c000, 0x8cfff, FUNC(soldamj_spriteram16_r), FUNC(soldamj_spriteram16_w));
 }
 
 static DRIVER_INIT( soldam )
@@ -3822,7 +3822,7 @@ static DRIVER_INIT( soldam )
 	phantasm_rom_decode(machine, "maincpu");
 
 	/* Sprite RAM is mirrored */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8c000, 0x8cfff, FUNC(soldamj_spriteram16_r), FUNC(soldamj_spriteram16_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8c000, 0x8cfff, FUNC(soldamj_spriteram16_r), FUNC(soldamj_spriteram16_w));
 }
 
 
@@ -3832,7 +3832,7 @@ static DRIVER_INIT( stdragon )
 
 	phantasm_rom_decode(machine, "maincpu");
 
-	RAM  = (UINT16 *) machine->region("maincpu")->base();
+	RAM  = (UINT16 *) machine.region("maincpu")->base();
 	RAM[0x00045e/2] = 0x0098;	// protection
 }
 
@@ -3843,11 +3843,11 @@ static READ16_HANDLER( monkelf_input_r )
 
 static DRIVER_INIT( monkelf )
 {
-	megasys1_state *state = machine->driver_data<megasys1_state>();
-	UINT16 *ROM = (UINT16*)machine->region("maincpu")->base();
+	megasys1_state *state = machine.driver_data<megasys1_state>();
+	UINT16 *ROM = (UINT16*)machine.region("maincpu")->base();
 	ROM[0x00744/2] = 0x4e71;
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe0000, 0xe000f, FUNC(monkelf_input_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe0000, 0xe000f, FUNC(monkelf_input_r));
 
 	state->ram += 0x10000/2;
 

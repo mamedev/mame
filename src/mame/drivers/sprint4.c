@@ -19,7 +19,7 @@ Atari Sprint 4 driver
 
 static CUSTOM_INPUT( get_lever )
 {
-	sprint4_state *state = field->port->machine->driver_data<sprint4_state>();
+	sprint4_state *state = field->port->machine().driver_data<sprint4_state>();
 	int n = (FPTR) param;
 
 	return 4 * state->gear[n] > state->da_latch;
@@ -28,7 +28,7 @@ static CUSTOM_INPUT( get_lever )
 
 static CUSTOM_INPUT( get_wheel )
 {
-	sprint4_state *state = field->port->machine->driver_data<sprint4_state>();
+	sprint4_state *state = field->port->machine().driver_data<sprint4_state>();
 	int n = (FPTR) param;
 
 	return 8 * state->steer_FF1[n] + 8 * state->steer_FF2[n] > state->da_latch;
@@ -37,7 +37,7 @@ static CUSTOM_INPUT( get_wheel )
 
 static CUSTOM_INPUT( get_collision )
 {
-	sprint4_state *state = field->port->machine->driver_data<sprint4_state>();
+	sprint4_state *state = field->port->machine().driver_data<sprint4_state>();
 	int n = (FPTR) param;
 
 	return state->collision[n];
@@ -46,7 +46,7 @@ static CUSTOM_INPUT( get_collision )
 
 static TIMER_CALLBACK( nmi_callback	)
 {
-	sprint4_state *state = machine->driver_data<sprint4_state>();
+	sprint4_state *state = machine.driver_data<sprint4_state>();
 	int scanline = param;
 
 	/* MAME updates controls only once per frame but the game checks them on every NMI */
@@ -107,14 +107,14 @@ static TIMER_CALLBACK( nmi_callback	)
 	if (input_port_read(machine, "IN0") & 0x40)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(nmi_callback), scanline);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(nmi_callback), scanline);
 }
 
 
 static MACHINE_RESET( sprint4 )
 {
-	sprint4_state *state = machine->driver_data<sprint4_state>();
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(32), FUNC(nmi_callback), 32);
+	sprint4_state *state = machine.driver_data<sprint4_state>();
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(32), FUNC(nmi_callback), 32);
 
 	memset(state->steer_FF1, 0, sizeof state->steer_FF1);
 	memset(state->steer_FF2, 0, sizeof state->steer_FF2);
@@ -130,7 +130,7 @@ static MACHINE_RESET( sprint4 )
 
 static READ8_HANDLER( sprint4_wram_r )
 {
-	sprint4_state *state = space->machine->driver_data<sprint4_state>();
+	sprint4_state *state = space->machine().driver_data<sprint4_state>();
 	UINT8 *videoram = state->videoram;
 	return videoram[0x380 + offset];
 }
@@ -138,27 +138,27 @@ static READ8_HANDLER( sprint4_wram_r )
 
 static READ8_HANDLER( sprint4_analog_r )
 {
-	return (input_port_read(space->machine, "ANALOG") << (~offset & 7)) & 0x80;
+	return (input_port_read(space->machine(), "ANALOG") << (~offset & 7)) & 0x80;
 }
 static READ8_HANDLER( sprint4_coin_r )
 {
-	return (input_port_read(space->machine, "COIN") << (~offset & 7)) & 0x80;
+	return (input_port_read(space->machine(), "COIN") << (~offset & 7)) & 0x80;
 }
 static READ8_HANDLER( sprint4_collision_r )
 {
-	return (input_port_read(space->machine, "COLLISION") << (~offset & 7)) & 0x80;
+	return (input_port_read(space->machine(), "COLLISION") << (~offset & 7)) & 0x80;
 }
 
 
 static READ8_HANDLER( sprint4_options_r )
 {
-	return (input_port_read(space->machine, "DIP") >> (2 * (offset & 3))) & 3;
+	return (input_port_read(space->machine(), "DIP") >> (2 * (offset & 3))) & 3;
 }
 
 
 static WRITE8_HANDLER( sprint4_wram_w )
 {
-	sprint4_state *state = space->machine->driver_data<sprint4_state>();
+	sprint4_state *state = space->machine().driver_data<sprint4_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[0x380 + offset] = data;
 }
@@ -166,28 +166,28 @@ static WRITE8_HANDLER( sprint4_wram_w )
 
 static WRITE8_HANDLER( sprint4_collision_reset_w )
 {
-	sprint4_state *state = space->machine->driver_data<sprint4_state>();
+	sprint4_state *state = space->machine().driver_data<sprint4_state>();
 	state->collision[(offset >> 1) & 3] = 0;
 }
 
 
 static WRITE8_HANDLER( sprint4_da_latch_w )
 {
-	sprint4_state *state = space->machine->driver_data<sprint4_state>();
+	sprint4_state *state = space->machine().driver_data<sprint4_state>();
 	state->da_latch = data & 15;
 }
 
 
 static WRITE8_HANDLER( sprint4_lamp_w )
 {
-	set_led_status(space->machine, (offset >> 1) & 3, offset & 1);
+	set_led_status(space->machine(), (offset >> 1) & 3, offset & 1);
 }
 
 
 #ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( sprint4_lockout_w )
 {
-	coin_lockout_global_w(space->machine, ~offset & 1);
+	coin_lockout_global_w(space->machine(), ~offset & 1);
 }
 #endif
 

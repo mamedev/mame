@@ -162,7 +162,7 @@ static void pandora_draw( device_t *device, bitmap_t *bitmap, const rectangle *c
 			y = dy;
 		}
 
-		if (flip_screen_get(device->machine))
+		if (flip_screen_get(device->machine()))
 		{
 			sx = 240 - x;
 			sy = 240 - y;
@@ -187,7 +187,7 @@ static void pandora_draw( device_t *device, bitmap_t *bitmap, const rectangle *c
 		if (sy & 0x100)
 			sy -= 0x200;
 
-		drawgfx_transpen(bitmap,cliprect,device->machine->gfx[pandora->region],
+		drawgfx_transpen(bitmap,cliprect,device->machine().gfx[pandora->region],
 				tile,
 				(tilecolour & 0xf0) >> 4,
 				flipx, flipy,
@@ -301,13 +301,13 @@ static DEVICE_START( kaneko_pandora )
 	kaneko_pandora_state *pandora = get_safe_token(device);
 	const kaneko_pandora_interface *intf = get_interface(device);
 
-	pandora->screen = device->machine->device<screen_device>(intf->screen);
+	pandora->screen = device->machine().device<screen_device>(intf->screen);
 	pandora->region = intf->gfx_region;
 	pandora->xoffset = intf->x;
 	pandora->yoffset = intf->y;
 	pandora->bg_pen = 0;
 
-	pandora->spriteram = auto_alloc_array(device->machine, UINT8, 0x1000);
+	pandora->spriteram = auto_alloc_array(device->machine(), UINT8, 0x1000);
 
 	pandora->sprites_bitmap = pandora->screen->alloc_compatible_bitmap();
 

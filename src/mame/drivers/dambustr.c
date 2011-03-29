@@ -68,7 +68,7 @@ public:
 /* FIXME: Really needed? - Should be handled by either interface */
 static WRITE8_DEVICE_HANDLER( dambustr_noise_enable_w )
 {
-	dambustr_state *state = device->machine->driver_data<dambustr_state>();
+	dambustr_state *state = device->machine().driver_data<dambustr_state>();
 	if (data != state->noise_data) {
 		state->noise_data = data;
 		galaxian_noise_enable_w(device, offset, data);
@@ -205,9 +205,9 @@ static DRIVER_INIT(dambustr)
 {
 	int i, j, tmp;
 	int tmpram[16];
-	UINT8 *rom = machine->region("maincpu")->base();
-	UINT8 *usr = machine->region("user1")->base();
-	UINT8 *gfx = machine->region("gfx1")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *usr = machine.region("user1")->base();
+	UINT8 *gfx = machine.region("gfx1")->base();
 
 	// Bit swap addresses
 	for(i=0; i<4096*4; i++) {

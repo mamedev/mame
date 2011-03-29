@@ -18,7 +18,7 @@
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	xybots_state *state = machine->driver_data<xybots_state>();
+	xybots_state *state = machine.driver_data<xybots_state>();
 	UINT16 data = state->alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 7;
@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	xybots_state *state = machine->driver_data<xybots_state>();
+	xybots_state *state = machine.driver_data<xybots_state>();
 	UINT16 data = state->playfield[tile_index];
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
@@ -82,7 +82,7 @@ VIDEO_START( xybots )
 		0,					/* resulting value to indicate "special" */
 		NULL				/* callback routine for special entries */
 	};
-	xybots_state *state = machine->driver_data<xybots_state>();
+	xybots_state *state = machine.driver_data<xybots_state>();
 
 	/* initialize the playfield */
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 64,32);
@@ -105,7 +105,7 @@ VIDEO_START( xybots )
 
 SCREEN_UPDATE( xybots )
 {
-	xybots_state *state = screen->machine->driver_data<xybots_state>();
+	xybots_state *state = screen->machine().driver_data<xybots_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

@@ -18,16 +18,16 @@
 
 VIDEO_START( balsente )
 {
-	balsente_state *state = machine->driver_data<balsente_state>();
+	balsente_state *state = machine.driver_data<balsente_state>();
 
 	/* reset the system */
 	state->palettebank_vis = 0;
-	state->sprite_bank[0] = machine->region("gfx1")->base();
-	state->sprite_bank[1] = machine->region("gfx1")->base() + 0x10000;
+	state->sprite_bank[0] = machine.region("gfx1")->base();
+	state->sprite_bank[1] = machine.region("gfx1")->base() + 0x10000;
 
 	/* determine sprite size */
-	state->sprite_data = machine->region("gfx1")->base();
-	state->sprite_mask = machine->region("gfx1")->bytes() - 1;
+	state->sprite_data = machine.region("gfx1")->base();
+	state->sprite_mask = machine.region("gfx1")->bytes() - 1;
 
 	/* register for saving */
 	state->save_item(NAME(state->expanded_videoram));
@@ -44,7 +44,7 @@ VIDEO_START( balsente )
 
 WRITE8_HANDLER( balsente_videoram_w )
 {
-	balsente_state *state = space->machine->driver_data<balsente_state>();
+	balsente_state *state = space->machine().driver_data<balsente_state>();
 
 	/* expand the two pixel values into two bytes */
 	state->videoram[offset] = data;
@@ -63,17 +63,17 @@ WRITE8_HANDLER( balsente_videoram_w )
 
 WRITE8_HANDLER( balsente_palette_select_w )
 {
-	balsente_state *state = space->machine->driver_data<balsente_state>();
+	balsente_state *state = space->machine().driver_data<balsente_state>();
 
 	/* only update if changed */
 	if (state->palettebank_vis != (data & 3))
 	{
 		/* update the scanline palette */
-		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos() - 1 + BALSENTE_VBEND);
+		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() - 1 + BALSENTE_VBEND);
 		state->palettebank_vis = data & 3;
 	}
 
-	logerror("balsente_palette_select_w(%d) scanline=%d\n", data & 3, space->machine->primary_screen->vpos());
+	logerror("balsente_palette_select_w(%d) scanline=%d\n", data & 3, space->machine().primary_screen->vpos());
 }
 
 
@@ -88,13 +88,13 @@ WRITE8_HANDLER( balsente_paletteram_w )
 {
 	int r, g, b;
 
-	space->machine->generic.paletteram.u8[offset] = data & 0x0f;
+	space->machine().generic.paletteram.u8[offset] = data & 0x0f;
 
-	r = space->machine->generic.paletteram.u8[(offset & ~3) + 0];
-	g = space->machine->generic.paletteram.u8[(offset & ~3) + 1];
-	b = space->machine->generic.paletteram.u8[(offset & ~3) + 2];
+	r = space->machine().generic.paletteram.u8[(offset & ~3) + 0];
+	g = space->machine().generic.paletteram.u8[(offset & ~3) + 1];
+	b = space->machine().generic.paletteram.u8[(offset & ~3) + 2];
 
-	palette_set_color_rgb(space->machine, offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(space->machine(), offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 
@@ -107,11 +107,11 @@ WRITE8_HANDLER( balsente_paletteram_w )
 
 WRITE8_HANDLER( shrike_sprite_select_w )
 {
-	balsente_state *state = space->machine->driver_data<balsente_state>();
+	balsente_state *state = space->machine().driver_data<balsente_state>();
 	if( state->sprite_data != state->sprite_bank[(data & 0x80 >> 7) ^ 1 ])
 	{
 		logerror( "shrike_sprite_select_w( 0x%02x )\n", data );
-		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos() - 1 + BALSENTE_VBEND);
+		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() - 1 + BALSENTE_VBEND);
 		state->sprite_data = state->sprite_bank[(data & 0x80 >> 7) ^ 1];
 	}
 
@@ -126,9 +126,9 @@ WRITE8_HANDLER( shrike_sprite_select_w )
  *
  *************************************/
 
-static void draw_one_sprite(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *sprite)
+static void draw_one_sprite(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *sprite)
 {
-	balsente_state *state = machine->driver_data<balsente_state>();
+	balsente_state *state = machine.driver_data<balsente_state>();
 	int flags = sprite[0];
 	int image = sprite[1] | ((flags & 7) << 8);
 	int ypos = sprite[2] + 17 + BALSENTE_VBEND;
@@ -145,7 +145,7 @@ static void draw_one_sprite(running_machine *machine, bitmap_t *bitmap, const re
 	{
 		if (ypos >= (16 + BALSENTE_VBEND) && ypos >= cliprect->min_y && ypos <= cliprect->max_y)
 		{
-			const pen_t *pens = &machine->pens[state->palettebank_vis * 256];
+			const pen_t *pens = &machine.pens[state->palettebank_vis * 256];
 			UINT8 *old = &state->expanded_videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
 			int currx = xpos;
 
@@ -212,8 +212,8 @@ static void draw_one_sprite(running_machine *machine, bitmap_t *bitmap, const re
 
 SCREEN_UPDATE( balsente )
 {
-	balsente_state *state = screen->machine->driver_data<balsente_state>();
-	const pen_t *pens = &screen->machine->pens[state->palettebank_vis * 256];
+	balsente_state *state = screen->machine().driver_data<balsente_state>();
+	const pen_t *pens = &screen->machine().pens[state->palettebank_vis * 256];
 	int y, i;
 
 	/* draw scanlines from the VRAM directly */
@@ -222,7 +222,7 @@ SCREEN_UPDATE( balsente )
 
 	/* draw the sprite images */
 	for (i = 0; i < 40; i++)
-		draw_one_sprite(screen->machine, bitmap, cliprect, &state->spriteram[(0xe0 + i * 4) & 0xff]);
+		draw_one_sprite(screen->machine(), bitmap, cliprect, &state->spriteram[(0xe0 + i * 4) & 0xff]);
 
 	return 0;
 }

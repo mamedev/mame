@@ -110,7 +110,7 @@ static DEVICE_START( dac )
 
 	DAC_build_voltable(info);
 
-	info->channel = device->machine->sound().stream_alloc(*device,0,1,device->clock() ? device->clock() : DEFAULT_SAMPLE_RATE,info,DAC_update);
+	info->channel = device->machine().sound().stream_alloc(*device,0,1,device->clock() ? device->clock() : DEFAULT_SAMPLE_RATE,info,DAC_update);
 	info->output = 0;
 
 	device->save_item(NAME(info->output));

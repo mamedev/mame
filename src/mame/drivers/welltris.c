@@ -322,9 +322,9 @@ TODO:
 
 static WRITE8_HANDLER( welltris_sh_bankswitch_w )
 {
-	UINT8 *rom = space->machine->region("audiocpu")->base() + 0x10000;
+	UINT8 *rom = space->machine().region("audiocpu")->base() + 0x10000;
 
-	memory_set_bankptr(space->machine, "bank1",rom + (data & 0x03) * 0x8000);
+	memory_set_bankptr(space->machine(), "bank1",rom + (data & 0x03) * 0x8000);
 }
 
 
@@ -332,23 +332,23 @@ static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		welltris_state *state = space->machine->driver_data<welltris_state>();
+		welltris_state *state = space->machine().driver_data<welltris_state>();
 
 		state->pending_command = 1;
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static CUSTOM_INPUT( pending_sound_r )
 {
-	welltris_state *state = field->port->machine->driver_data<welltris_state>();
+	welltris_state *state = field->port->machine().driver_data<welltris_state>();
 	return state->pending_command ? 1 : 0;
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	welltris_state *state = space->machine->driver_data<welltris_state>();
+	welltris_state *state = space->machine().driver_data<welltris_state>();
 
 	state->pending_command = 0;
 }
@@ -678,7 +678,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -692,7 +692,7 @@ static DRIVER_INIT( welltris )
 {
 #if WELLTRIS_4P_HACK
 	/* A Hack which shows 4 player mode in code which is disabled */
-	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
 	RAM[0xB91C/2] = 0x4e71;
 	RAM[0xB91E/2] = 0x4e71;
 #endif

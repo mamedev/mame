@@ -59,7 +59,7 @@ public:
 /* I'm using the functions in deco16ic.c ... same chips, why duplicate code? */
 static VIDEO_START( backfire )
 {
-	backfire_state *state = machine->driver_data<backfire_state>();
+	backfire_state *state = machine.driver_data<backfire_state>();
 
 	state->spriteram_1 = auto_alloc_array(machine, UINT16, 0x2000/2);
 	state->spriteram_2 = auto_alloc_array(machine, UINT16, 0x2000/2);
@@ -84,10 +84,10 @@ static VIDEO_START( backfire )
 
 static SCREEN_UPDATE( backfire )
 {
-	backfire_state *state = screen->machine->driver_data<backfire_state>();
+	backfire_state *state = screen->machine().driver_data<backfire_state>();
 
 	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(screen->machine, 1);
+	flip_screen_set_no_update(screen->machine(), 1);
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
@@ -97,40 +97,40 @@ static SCREEN_UPDATE( backfire )
 	if (screen == state->lscreen)
 	{
 
-		bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
+		bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
 		bitmap_fill(bitmap, cliprect, 0x100);
 
 		if (state->left_priority[0] == 0)
 		{
 			deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 1);
 			deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 2);
-			screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_1, 0x800);
+			screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram_1, 0x800);
 		}
 		else if (state->left_priority[0] == 2)
 		{
 			deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 2);
 			deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 4);
-			screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_1, 0x800);
+			screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram_1, 0x800);
 		}
 		else
 			popmessage( "unknown left priority %08x", state->left_priority[0]);
 	}
 	else if (screen == state->rscreen)
 	{
-		bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
+		bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
 		bitmap_fill(bitmap, cliprect, 0x500);
 
 		if (state->right_priority[0] == 0)
 		{
 			deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, 0, 1);
 			deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 2);
-			screen->machine->device<decospr_device>("spritegen2")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_2, 0x800);
+			screen->machine().device<decospr_device>("spritegen2")->draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram_2, 0x800);
 		}
 		else if (state->right_priority[0] == 2)
 		{
 			deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 2);
 			deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, 0, 4);
-			screen->machine->device<decospr_device>("spritegen2")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_2, 0x800);
+			screen->machine().device<decospr_device>("spritegen2")->draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram_2, 0x800);
 		}
 		else
 			popmessage( "unknown right priority %08x", state->right_priority[0]);
@@ -143,34 +143,34 @@ static SCREEN_UPDATE( backfire )
 static READ32_DEVICE_HANDLER( backfire_eeprom_r )
 {
 	/* some kind of screen indicator?  checked by backfirea set before it will boot */
-	int backfire_screen = device->machine->rand() & 1;
-	return ((eeprom_read_bit(device) << 24) | input_port_read(device->machine, "IN0")
-			| ((input_port_read(device->machine, "IN2") & 0xbf) << 16)
-			| ((input_port_read(device->machine, "IN3") & 0x40) << 16)) ^ (backfire_screen << 26) ;
+	int backfire_screen = device->machine().rand() & 1;
+	return ((eeprom_read_bit(device) << 24) | input_port_read(device->machine(), "IN0")
+			| ((input_port_read(device->machine(), "IN2") & 0xbf) << 16)
+			| ((input_port_read(device->machine(), "IN3") & 0x40) << 16)) ^ (backfire_screen << 26) ;
 }
 
 static READ32_HANDLER( backfire_control2_r )
 {
-	backfire_state *state = space->machine->driver_data<backfire_state>();
+	backfire_state *state = space->machine().driver_data<backfire_state>();
 
 //  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(space->cpu), offset << 1, mem_mask);
-	return (eeprom_read_bit(state->eeprom) << 24) | input_port_read(space->machine, "IN1") | (input_port_read(space->machine, "IN1") << 16);
+	return (eeprom_read_bit(state->eeprom) << 24) | input_port_read(space->machine(), "IN1") | (input_port_read(space->machine(), "IN1") << 16);
 }
 
 #ifdef UNUSED_FUNCTION
 static READ32_HANDLER(backfire_control3_r)
 {
-	backfire_state *state = space->machine->driver_data<backfire_state>();
+	backfire_state *state = space->machine().driver_data<backfire_state>();
 
 //  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(space->cpu), offset << 1, mem_mask);
-	return (eeprom_read_bit(state->eeprom) << 24) | input_port_read(space->machine, "IN2") | (input_port_read(space->machine, "IN2") << 16);
+	return (eeprom_read_bit(state->eeprom) << 24) | input_port_read(space->machine(), "IN2") | (input_port_read(space->machine(), "IN2") << 16);
 }
 #endif
 
 
 static WRITE32_DEVICE_HANDLER(backfire_eeprom_w)
 {
-	logerror("%s:write eprom %08x (%08x) %08x\n",device->machine->describe_context(),offset<<1,mem_mask,data);
+	logerror("%s:write eprom %08x (%08x) %08x\n",device->machine().describe_context(),offset<<1,mem_mask,data);
 	if (ACCESSING_BITS_0_7)
 	{
 		eeprom_set_clock_line(device, BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
@@ -182,49 +182,49 @@ static WRITE32_DEVICE_HANDLER(backfire_eeprom_w)
 
 static WRITE32_HANDLER(backfire_nonbuffered_palette_w)
 {
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
-	palette_set_color_rgb(space->machine,offset,pal5bit(space->machine->generic.paletteram.u32[offset] >> 0),pal5bit(space->machine->generic.paletteram.u32[offset] >> 5),pal5bit(space->machine->generic.paletteram.u32[offset] >> 10));
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	palette_set_color_rgb(space->machine(),offset,pal5bit(space->machine().generic.paletteram.u32[offset] >> 0),pal5bit(space->machine().generic.paletteram.u32[offset] >> 5),pal5bit(space->machine().generic.paletteram.u32[offset] >> 10));
 }
 
 /* map 32-bit writes to 16-bit */
 
-static READ32_HANDLER( backfire_pf1_rowscroll_r ) { backfire_state *state = space->machine->driver_data<backfire_state>(); return state->pf1_rowscroll[offset] ^ 0xffff0000; }
-static READ32_HANDLER( backfire_pf2_rowscroll_r ) { backfire_state *state = space->machine->driver_data<backfire_state>(); return state->pf2_rowscroll[offset] ^ 0xffff0000; }
-static READ32_HANDLER( backfire_pf3_rowscroll_r ) { backfire_state *state = space->machine->driver_data<backfire_state>(); return state->pf3_rowscroll[offset] ^ 0xffff0000; }
-static READ32_HANDLER( backfire_pf4_rowscroll_r ) { backfire_state *state = space->machine->driver_data<backfire_state>(); return state->pf4_rowscroll[offset] ^ 0xffff0000; }
-static WRITE32_HANDLER( backfire_pf1_rowscroll_w ) { backfire_state *state = space->machine->driver_data<backfire_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf1_rowscroll[offset]); }
-static WRITE32_HANDLER( backfire_pf2_rowscroll_w ) { backfire_state *state = space->machine->driver_data<backfire_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf2_rowscroll[offset]); }
-static WRITE32_HANDLER( backfire_pf3_rowscroll_w ) { backfire_state *state = space->machine->driver_data<backfire_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf3_rowscroll[offset]); }
-static WRITE32_HANDLER( backfire_pf4_rowscroll_w ) { backfire_state *state = space->machine->driver_data<backfire_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf4_rowscroll[offset]); }
+static READ32_HANDLER( backfire_pf1_rowscroll_r ) { backfire_state *state = space->machine().driver_data<backfire_state>(); return state->pf1_rowscroll[offset] ^ 0xffff0000; }
+static READ32_HANDLER( backfire_pf2_rowscroll_r ) { backfire_state *state = space->machine().driver_data<backfire_state>(); return state->pf2_rowscroll[offset] ^ 0xffff0000; }
+static READ32_HANDLER( backfire_pf3_rowscroll_r ) { backfire_state *state = space->machine().driver_data<backfire_state>(); return state->pf3_rowscroll[offset] ^ 0xffff0000; }
+static READ32_HANDLER( backfire_pf4_rowscroll_r ) { backfire_state *state = space->machine().driver_data<backfire_state>(); return state->pf4_rowscroll[offset] ^ 0xffff0000; }
+static WRITE32_HANDLER( backfire_pf1_rowscroll_w ) { backfire_state *state = space->machine().driver_data<backfire_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf1_rowscroll[offset]); }
+static WRITE32_HANDLER( backfire_pf2_rowscroll_w ) { backfire_state *state = space->machine().driver_data<backfire_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf2_rowscroll[offset]); }
+static WRITE32_HANDLER( backfire_pf3_rowscroll_w ) { backfire_state *state = space->machine().driver_data<backfire_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf3_rowscroll[offset]); }
+static WRITE32_HANDLER( backfire_pf4_rowscroll_w ) { backfire_state *state = space->machine().driver_data<backfire_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf4_rowscroll[offset]); }
 
 
 #ifdef UNUSED_FUNCTION
 READ32_HANDLER( backfire_unknown_wheel_r )
 {
-	return input_port_read(space->machine, "PADDLE0");
+	return input_port_read(space->machine(), "PADDLE0");
 }
 
 READ32_HANDLER( backfire_wheel1_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 READ32_HANDLER( backfire_wheel2_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 #endif
 
 
 static READ32_HANDLER( backfire_spriteram1_r )
 {
-	backfire_state *state = space->machine->driver_data<backfire_state>();
+	backfire_state *state = space->machine().driver_data<backfire_state>();
 	return state->spriteram_1[offset] ^ 0xffff0000;
 }
 
 static WRITE32_HANDLER( backfire_spriteram1_w )
 {
-	backfire_state *state = space->machine->driver_data<backfire_state>();
+	backfire_state *state = space->machine().driver_data<backfire_state>();
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
@@ -233,13 +233,13 @@ static WRITE32_HANDLER( backfire_spriteram1_w )
 
 static READ32_HANDLER( backfire_spriteram2_r )
 {
-	backfire_state *state = space->machine->driver_data<backfire_state>();
+	backfire_state *state = space->machine().driver_data<backfire_state>();
 	return state->spriteram_2[offset] ^ 0xffff0000;
 }
 
 static WRITE32_HANDLER( backfire_spriteram2_w )
 {
-	backfire_state *state = space->machine->driver_data<backfire_state>();
+	backfire_state *state = space->machine().driver_data<backfire_state>();
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
@@ -440,14 +440,14 @@ static const deco16ic_interface backfire_deco16ic_tilegen2_intf =
 
 static MACHINE_START( backfire )
 {
-	backfire_state *state = machine->driver_data<backfire_state>();
+	backfire_state *state = machine.driver_data<backfire_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->deco_tilegen1 = machine->device("tilegen1");
-	state->deco_tilegen2 = machine->device("tilegen2");
-	state->lscreen = machine->device("lscreen");
-	state->rscreen = machine->device("rscreen");
-	state->eeprom = machine->device("eeprom");
+	state->maincpu = machine.device("maincpu");
+	state->deco_tilegen1 = machine.device("tilegen1");
+	state->deco_tilegen2 = machine.device("tilegen2");
+	state->lscreen = machine.device("lscreen");
+	state->rscreen = machine.device("rscreen");
+	state->eeprom = machine.device("eeprom");
 }
 
 UINT16 backfire_pri_callback(UINT16 x)
@@ -639,9 +639,9 @@ ROM_START( backfirea )
 	ROM_LOAD( "mbz-06.19l",    0x200000, 0x080000,  CRC(4a38c635) SHA1(7f0fb6a7a4aa6774c04fa38e53ceff8744fe1e9f) )
 ROM_END
 
-static void descramble_sound( running_machine *machine )
+static void descramble_sound( running_machine &machine )
 {
-	UINT8 *rom = machine->region("ymz")->base();
+	UINT8 *rom = machine.region("ymz")->base();
 	int length = 0x200000; // only the first rom is swapped on backfire!
 	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
 	UINT32 x;
@@ -667,7 +667,7 @@ static void descramble_sound( running_machine *machine )
 
 static READ32_HANDLER( backfire_speedup_r )
 {
-	backfire_state *state = space->machine->driver_data<backfire_state>();
+	backfire_state *state = space->machine().driver_data<backfire_state>();
 
 	//mame_printf_debug( "%08x\n",cpu_get_pc(space->cpu));
 
@@ -683,9 +683,9 @@ static DRIVER_INIT( backfire )
 	deco56_decrypt_gfx(machine, "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine, "gfx2"); /* 141 */
 	deco156_decrypt(machine);
-	machine->device("maincpu")->set_clock_scale(4.0f); /* core timings aren't accurate */
+	machine.device("maincpu")->set_clock_scale(4.0f); /* core timings aren't accurate */
 	descramble_sound(machine);
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0170018, 0x017001b, FUNC(backfire_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0170018, 0x017001b, FUNC(backfire_speedup_r) );
 }
 
 GAME( 1995, backfire,  0,        backfire,   backfire, backfire, ROT0, "Data East Corporation", "Backfire! (set 1)", GAME_SUPPORTS_SAVE )

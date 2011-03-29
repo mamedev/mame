@@ -660,7 +660,7 @@
 static WRITE_LINE_DEVICE_HANDLER( tx_rx_clk )
 {
 	int trx_clk;
-	UINT8 dsw2 = input_port_read(device->machine, "SW2");
+	UINT8 dsw2 = input_port_read(device->machine(), "SW2");
 	trx_clk = UART_CLOCK * dsw2 / 128;
 	acia6850_set_rx_clock(device, trx_clk);
 	acia6850_set_tx_clock(device, trx_clk);
@@ -669,21 +669,21 @@ static WRITE_LINE_DEVICE_HANDLER( tx_rx_clk )
 
 static READ8_DEVICE_HANDLER( s903_mux_port_r )
 {
-	calomega_state *state = device->machine->driver_data<calomega_state>();
+	calomega_state *state = device->machine().driver_data<calomega_state>();
 	switch( state->s903_mux_data & 0xf0 )	/* bits 4-7 */
 	{
-		case 0x10: return input_port_read(device->machine, "IN0-0");
-		case 0x20: return input_port_read(device->machine, "IN0-1");
-		case 0x40: return input_port_read(device->machine, "IN0-2");
-		case 0x80: return input_port_read(device->machine, "IN0-3");
+		case 0x10: return input_port_read(device->machine(), "IN0-0");
+		case 0x20: return input_port_read(device->machine(), "IN0-1");
+		case 0x40: return input_port_read(device->machine(), "IN0-2");
+		case 0x80: return input_port_read(device->machine(), "IN0-3");
 	}
 
-	return input_port_read(device->machine, "FRQ");	/* bit7 used for 50/60 Hz selector */
+	return input_port_read(device->machine(), "FRQ");	/* bit7 used for 50/60 Hz selector */
 }
 
 static WRITE8_DEVICE_HANDLER( s903_mux_w )
 {
-	calomega_state *state = device->machine->driver_data<calomega_state>();
+	calomega_state *state = device->machine().driver_data<calomega_state>();
 	state->s903_mux_data = data ^ 0xff;	/* inverted */
 }
 
@@ -691,21 +691,21 @@ static WRITE8_DEVICE_HANDLER( s903_mux_w )
 
 static READ8_DEVICE_HANDLER( s905_mux_port_r )
 {
-	calomega_state *state = device->machine->driver_data<calomega_state>();
+	calomega_state *state = device->machine().driver_data<calomega_state>();
 	switch( state->s905_mux_data & 0x0f )	/* bits 0-3 */
 	{
-		case 0x01: return input_port_read(device->machine, "IN0-0");
-		case 0x02: return input_port_read(device->machine, "IN0-1");
-		case 0x04: return input_port_read(device->machine, "IN0-2");
-		case 0x08: return input_port_read(device->machine, "IN0-3");
+		case 0x01: return input_port_read(device->machine(), "IN0-0");
+		case 0x02: return input_port_read(device->machine(), "IN0-1");
+		case 0x04: return input_port_read(device->machine(), "IN0-2");
+		case 0x08: return input_port_read(device->machine(), "IN0-3");
 	}
 
-	return input_port_read(device->machine, "FRQ");	/* bit6 used for 50/60 Hz selector */
+	return input_port_read(device->machine(), "FRQ");	/* bit6 used for 50/60 Hz selector */
 }
 
 static WRITE8_DEVICE_HANDLER( s905_mux_w )
 {
-	calomega_state *state = device->machine->driver_data<calomega_state>();
+	calomega_state *state = device->machine().driver_data<calomega_state>();
 	state->s905_mux_data = data ^ 0xff;	/* inverted */
 }
 
@@ -716,7 +716,7 @@ static READ8_DEVICE_HANDLER( pia0_ain_r )
 {
 	/* Valid input port. Each polled value is stored at $0538 */
 	logerror("PIA0: Port A in\n");
-	return input_port_read(device->machine, "IN0");
+	return input_port_read(device->machine(), "IN0");
 }
 
 static READ8_DEVICE_HANDLER( pia0_bin_r )
@@ -2654,13 +2654,13 @@ static const pia6821_interface sys906_pia1_intf =
 
 static READ_LINE_DEVICE_HANDLER( acia_rx_r )
 {
-	calomega_state *state = device->machine->driver_data<calomega_state>();
+	calomega_state *state = device->machine().driver_data<calomega_state>();
 	return state->rx_line;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( acia_tx_w )
 {
-	calomega_state *drvstate = device->machine->driver_data<calomega_state>();
+	calomega_state *drvstate = device->machine().driver_data<calomega_state>();
 	drvstate->tx_line = state;
 }
 
@@ -3916,7 +3916,7 @@ static DRIVER_INIT( standard )
 {
 	/* background color is adjusted through RGB pots */
 	int x;
-	UINT8 *BPR = machine->region( "proms" )->base();
+	UINT8 *BPR = machine.region( "proms" )->base();
 
 	for (x = 0x0000; x < 0x0400; x++)
 	{
@@ -3928,7 +3928,7 @@ static DRIVER_INIT( standard )
 static DRIVER_INIT( elgrande )
 {
 	int x;
-	UINT8 *BPR = machine->region( "proms" )->base();
+	UINT8 *BPR = machine.region( "proms" )->base();
 
 	/* background color is adjusted through RGB pots */
 	for (x = 0x0000; x < 0x0400; x++)
@@ -3942,7 +3942,7 @@ static DRIVER_INIT( jjpoker )
 {
 	/* background color is adjusted through RGB pots */
 	int x;
-	UINT8 *BPR = machine->region( "proms" )->base();
+	UINT8 *BPR = machine.region( "proms" )->base();
 
 	for (x = 0x0000; x < 0x0400; x++)
 	{
@@ -3955,7 +3955,7 @@ static DRIVER_INIT( comg080 )
 {
 	/* background color is adjusted through RGB pots */
 	int x;
-	UINT8 *BPR = machine->region( "proms" )->base();
+	UINT8 *BPR = machine.region( "proms" )->base();
 
 	for (x = 0x0000; x < 0x0400; x++)
 	{
@@ -3967,7 +3967,7 @@ static DRIVER_INIT( comg080 )
        Start = $2042;  NMI = $26f8;
        Also a fake vector at $3ff8-$3ff9. The code checks these values to continue.
     */
-	UINT8 *PRGROM = machine->region( "maincpu" )->base();
+	UINT8 *PRGROM = machine.region( "maincpu" )->base();
 
 	PRGROM[0x3ff8] = 0x8e; /* checked by code */
 	PRGROM[0x3ff9] = 0x97; /* checked by code */

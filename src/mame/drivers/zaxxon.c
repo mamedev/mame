@@ -293,13 +293,13 @@ static INPUT_CHANGED( service_switch )
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static INTERRUPT_GEN( vblank_int )
 {
-	zaxxon_state *state = device->machine->driver_data<zaxxon_state>();
+	zaxxon_state *state = device->machine().driver_data<zaxxon_state>();
 
 	if (state->int_enabled)
 		device_set_input_line(device, 0, ASSERT_LINE);
@@ -308,11 +308,11 @@ static INTERRUPT_GEN( vblank_int )
 
 static WRITE8_HANDLER( int_enable_w )
 {
-	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
+	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
 	state->int_enabled = data & 1;
 	if (!state->int_enabled)
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -325,7 +325,7 @@ static WRITE8_HANDLER( int_enable_w )
 
 static MACHINE_START( zaxxon )
 {
-	zaxxon_state *state = machine->driver_data<zaxxon_state>();
+	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 
 	/* register for save states */
 	state->save_item(NAME(state->int_enabled));
@@ -350,7 +350,7 @@ static MACHINE_RESET( razmataz )
 
 static READ8_HANDLER( razmataz_counter_r )
 {
-	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
+	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
 	/* this behavior is really unknown; however, the code is using this */
 	/* counter as a sort of timeout when talking to the sound board */
@@ -362,12 +362,12 @@ static READ8_HANDLER( razmataz_counter_r )
 
 static CUSTOM_INPUT( razmataz_dial_r )
 {
-	zaxxon_state *state = field->port->machine->driver_data<zaxxon_state>();
+	zaxxon_state *state = field->port->machine().driver_data<zaxxon_state>();
 	static const char *const dialname[2] = { "DIAL0", "DIAL1" };
 	int num = (FPTR)param;
 	int delta, res;
 
-	delta = input_port_read(field->port->machine, dialname[num]);
+	delta = input_port_read(field->port->machine(), dialname[num]);
 
 	if (delta < 0x80)
 	{
@@ -395,7 +395,7 @@ static CUSTOM_INPUT( razmataz_dial_r )
 
 static WRITE8_HANDLER( zaxxon_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset, data & 0x01);
+	coin_counter_w(space->machine(), offset, data & 0x01);
 }
 
 
@@ -403,7 +403,7 @@ static WRITE8_HANDLER( zaxxon_coin_counter_w )
 // the coin input, which then needs to be explicitly cleared by the game.
 static WRITE8_HANDLER( zaxxon_coin_enable_w )
 {
-	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
+	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
 	state->coin_enable[offset] = data & 1;
 	if (!state->coin_enable[offset])
@@ -415,7 +415,7 @@ static INPUT_CHANGED( zaxxon_coin_inserted )
 {
 	if (newval)
 	{
-		zaxxon_state *state = field->port->machine->driver_data<zaxxon_state>();
+		zaxxon_state *state = field->port->machine().driver_data<zaxxon_state>();
 
 		state->coin_status[(int)(FPTR)param] = state->coin_enable[(int)(FPTR)param];
 	}
@@ -424,7 +424,7 @@ static INPUT_CHANGED( zaxxon_coin_inserted )
 
 static CUSTOM_INPUT( zaxxon_coin_r )
 {
-	zaxxon_state *state = field->port->machine->driver_data<zaxxon_state>();
+	zaxxon_state *state = field->port->machine().driver_data<zaxxon_state>();
 
 	return state->coin_status[(int)(FPTR)param];
 }
@@ -1402,7 +1402,7 @@ ROM_END
  *
  *************************************/
 
-static void zaxxonj_decode(running_machine *machine, const char *cputag)
+static void zaxxonj_decode(running_machine &machine, const char *cputag)
 {
 /*
     the values vary, but the translation mask is always laid out like this:
@@ -1447,9 +1447,9 @@ static void zaxxonj_decode(running_machine *machine, const char *cputag)
 	};
 
 	int A;
-	address_space *space = machine->device(cputag)->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine->region(cputag)->base();
-	int size = machine->region(cputag)->bytes();
+	address_space *space = machine.device(cputag)->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine.region(cputag)->base();
+	int size = machine.region(cputag)->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, size);
 
 	space->set_decrypted_region(0x0000, size - 1, decrypt);
@@ -1507,20 +1507,20 @@ static DRIVER_INIT( futspy )
 
 static DRIVER_INIT( razmataz )
 {
-	zaxxon_state *state = machine->driver_data<zaxxon_state>();
+	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 
 	nprinces_decode(machine, "maincpu");
 
 	/* additional input ports are wired */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc004, 0xc004, 0, 0x18f3, "SW04");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc008, 0xc008, 0, 0x18f3, "SW08");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc004, 0xc004, 0, 0x18f3, "SW04");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc008, 0xc008, 0, 0x18f3, "SW08");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc80a, 0xc80a, FUNC(razmataz_counter_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc80a, 0xc80a, FUNC(razmataz_counter_r));
 
 	/* connect the universal sound board */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe03c, 0xe03c, 0, 0x1f00, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe03c, 0xe03c, 0, 0x1f00, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
 
 	/* additional state saving */
 	state->save_item(NAME(state->razmataz_dial_pos));
@@ -1533,7 +1533,7 @@ static DRIVER_INIT( ixion )
 	szaxxon_decode(machine, "maincpu");
 
 	/* connect the universal sound board */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe03c, 0xe03c, 0, 0x1f00, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe03c, 0xe03c, 0, 0x1f00, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
 }
 
 

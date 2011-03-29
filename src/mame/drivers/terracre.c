@@ -134,7 +134,7 @@ static const UINT16 mHoreKidProtData[] =
 
 static READ16_HANDLER( horekid_IN2_r )
 {
-	int data = input_port_read(space->machine, "IN2");
+	int data = input_port_read(space->machine(), "IN2");
 
 	if (!(data & 0x40))		// FAKE button 3 for "Debug Mode"
 	{
@@ -158,7 +158,7 @@ static READ8_HANDLER( soundlatch_clear_r )
 
 static READ16_HANDLER( amazon_protection_r )
 {
-	terracre_state *state = space->machine->driver_data<terracre_state>();
+	terracre_state *state = space->machine().driver_data<terracre_state>();
 	offset = state->mAmazonProtReg[2];
 	if( offset<=0x56 )
 	{
@@ -172,7 +172,7 @@ static READ16_HANDLER( amazon_protection_r )
 
 static WRITE16_HANDLER( amazon_protection_w )
 {
-	terracre_state *state = space->machine->driver_data<terracre_state>();
+	terracre_state *state = space->machine().driver_data<terracre_state>();
 	if( ACCESSING_BITS_0_7 )
 	{
 		if( offset==1 )
@@ -191,7 +191,7 @@ static WRITE16_HANDLER( amazon_protection_w )
 
 static MACHINE_START( amazon )
 {
-	terracre_state *state = machine->driver_data<terracre_state>();
+	terracre_state *state = machine.driver_data<terracre_state>();
 	/* set up for save */
 	state_save_register_global(machine, state->mAmazonProtCmd);
 	state_save_register_global_array(machine, state->mAmazonProtReg);
@@ -1016,21 +1016,21 @@ ROM_END
 
 static DRIVER_INIT( amazon )
 {
-	terracre_state *state = machine->driver_data<terracre_state>();
+	terracre_state *state = machine.driver_data<terracre_state>();
 	state->mpProtData = mAmazonProtData;
 }
 
 static DRIVER_INIT( amatelas )
 {
-	terracre_state *state = machine->driver_data<terracre_state>();
+	terracre_state *state = machine.driver_data<terracre_state>();
 	state->mpProtData = mAmatelasProtData;
 }
 
 static DRIVER_INIT( horekid )
 {
-	terracre_state *state = machine->driver_data<terracre_state>();
+	terracre_state *state = machine.driver_data<terracre_state>();
 	state->mpProtData = mHoreKidProtData;
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x44004, 0x44005, FUNC(horekid_IN2_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x44004, 0x44005, FUNC(horekid_IN2_r));
 }
 
 /*    YEAR, NAME,   PARENT,     MACHINE, INPUT,    INIT,     MONITOR,  COMPANY,      FULLNAME, FLAGS */

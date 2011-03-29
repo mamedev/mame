@@ -27,29 +27,29 @@ Dip locations and factory settings verified with manual
 
 static INTERRUPT_GEN( contra_interrupt )
 {
-	contra_state *state = device->machine->driver_data<contra_state>();
+	contra_state *state = device->machine().driver_data<contra_state>();
 	if (k007121_ctrlram_r(state->k007121_1, 7) & 0x02)
 		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( contra_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 }
 
 static WRITE8_HANDLER( contra_sh_irqtrigger_w )
 {
-	contra_state *state = space->machine->driver_data<contra_state>();
+	contra_state *state = space->machine().driver_data<contra_state>();
 	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( contra_coin_counter_w )
 {
 	if (data & 0x01)
-		coin_counter_w(space->machine, 0, data & 0x01);
+		coin_counter_w(space->machine(), 0, data & 0x01);
 
 	if (data & 0x02)
-		coin_counter_w(space->machine, 1, (data & 0x02) >> 1);
+		coin_counter_w(space->machine(), 1, (data & 0x02) >> 1);
 }
 
 static WRITE8_HANDLER( cpu_sound_command_w )
@@ -178,14 +178,14 @@ GFXDECODE_END
 
 static MACHINE_START( contra )
 {
-	contra_state *state = machine->driver_data<contra_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	contra_state *state = machine.driver_data<contra_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x10000], 0x2000);
 
-	state->audiocpu = machine->device("audiocpu");
-	state->k007121_1 = machine->device("k007121_1");
-	state->k007121_2 = machine->device("k007121_2");
+	state->audiocpu = machine.device("audiocpu");
+	state->k007121_1 = machine.device("k007121_1");
+	state->k007121_2 = machine.device("k007121_2");
 }
 
 static MACHINE_CONFIG_START( contra, contra_state )

@@ -20,27 +20,27 @@ static TIMER_CALLBACK( periodic_callback )
 	if (scanline >= 262)
 		scanline = 0;
 
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(periodic_callback), scanline);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(periodic_callback), scanline);
 }
 
 
 static MACHINE_RESET( wolfpack )
 {
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(periodic_callback));
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(periodic_callback));
 }
 
 
 static CUSTOM_INPUT( wolfpack_dial_r )
 {
 	int bit = (FPTR)param;
-	return ((input_port_read(field->port->machine, "DIAL") + bit) / 2) & 0x01;
+	return ((input_port_read(field->port->machine(), "DIAL") + bit) / 2) & 0x01;
 }
 
 
 static READ8_HANDLER( wolfpack_misc_r )
 {
-	wolfpack_state *state = space->machine->driver_data<wolfpack_state>();
-	device_t *device = space->machine->device("speech");
+	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
+	device_t *device = space->machine().device("speech");
 	UINT8 val = 0;
 
 	/* BIT0 => SPEECH BUSY */
@@ -58,7 +58,7 @@ static READ8_HANDLER( wolfpack_misc_r )
 	if (!state->collision)
 		val |= 0x10;
 
-	if (space->machine->primary_screen->vpos() >= 240)
+	if (space->machine().primary_screen->vpos() >= 240)
 		val |= 0x80;
 
 	return val;
@@ -92,19 +92,19 @@ static WRITE8_DEVICE_HANDLER( wolfpack_start_speech_w )
 
 static WRITE8_HANDLER( wolfpack_attract_w )
 {
-	coin_lockout_global_w(space->machine, !(data & 1));
+	coin_lockout_global_w(space->machine(), !(data & 1));
 }
 
 
 static WRITE8_HANDLER( wolfpack_credit_w )
 {
-	set_led_status(space->machine, 0, !(data & 1));
+	set_led_status(space->machine(), 0, !(data & 1));
 }
 
 
 static WRITE8_HANDLER( wolfpack_coldetres_w )
 {
-	wolfpack_state *state = space->machine->driver_data<wolfpack_state>();
+	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
 	state->collision = 0;
 }
 

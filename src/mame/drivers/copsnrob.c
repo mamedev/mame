@@ -81,16 +81,16 @@ static PALETTE_INIT( copsnrob )
 
 static READ8_HANDLER( copsnrob_misc_r )
 {
-	return input_port_read(space->machine, "IN0") & 0x80;
+	return input_port_read(space->machine(), "IN0") & 0x80;
 }
 
 static WRITE8_HANDLER( copsnrob_misc2_w )
 {
-	copsnrob_state *state = space->machine->driver_data<copsnrob_state>();
+	copsnrob_state *state = space->machine().driver_data<copsnrob_state>();
 
 	state->misc = data & 0x7f;
 	/* Multi Player Start */
-	set_led_status(space->machine, 1, !((data >> 6) & 0x01));
+	set_led_status(space->machine(), 1, !((data >> 6) & 0x01));
 }
 
 
@@ -251,7 +251,7 @@ GFXDECODE_END
 
 static MACHINE_START( copsnrob )
 {
-	copsnrob_state *state = machine->driver_data<copsnrob_state>();
+	copsnrob_state *state = machine.driver_data<copsnrob_state>();
 
 	state->save_item(NAME(state->ic_h3_data));
 	state->save_item(NAME(state->misc));
@@ -259,7 +259,7 @@ static MACHINE_START( copsnrob )
 
 static MACHINE_RESET( copsnrob )
 {
-	copsnrob_state *state = machine->driver_data<copsnrob_state>();
+	copsnrob_state *state = machine.driver_data<copsnrob_state>();
 
 	state->ic_h3_data = 0;
 	state->misc = 0;

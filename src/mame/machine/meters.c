@@ -27,7 +27,7 @@ static TIMER_CALLBACK( meter_callback )
 	meter_info[param].count++;
 }
 
-void MechMtr_config(running_machine *machine, int number)
+void MechMtr_config(running_machine &machine, int number)
 {
 	int i;
 
@@ -39,7 +39,7 @@ void MechMtr_config(running_machine *machine, int number)
 		meter_info[i].state     = 0;
 		meter_info[i].count     = 0;
 		meter_info[i].on		= 0;
-		meter_info[i].meter_timer = machine->scheduler().timer_alloc(FUNC(meter_callback), (void*)(FPTR)i);
+		meter_info[i].meter_timer = machine.scheduler().timer_alloc(FUNC(meter_callback), (void*)(FPTR)i);
 		meter_info[i].meter_timer->reset();
 	}
 	number_mtr = number;

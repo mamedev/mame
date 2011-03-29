@@ -17,7 +17,7 @@
 //  PROTOTYPES
 //============================================================
 
-void debugwin_update_during_game(running_machine *machine);
+void debugwin_update_during_game(running_machine &machine);
 
 #endif
 

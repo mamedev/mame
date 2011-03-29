@@ -70,7 +70,7 @@ static READ16_HANDLER( tumblep_prot_r )
 
 static WRITE16_HANDLER( tumblep_sound_w )
 {
-	tumblep_state *state = space->machine->driver_data<tumblep_state>();
+	tumblep_state *state = space->machine().driver_data<tumblep_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
@@ -78,7 +78,7 @@ static WRITE16_HANDLER( tumblep_sound_w )
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( jumppop_sound_w )
 {
-	tumblep_state *state = space->machine->driver_data<tumblep_state>();
+	tumblep_state *state = space->machine().driver_data<tumblep_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	cputag_set_input_line(state->audiocpu, 0, ASSERT_LINE );
 }
@@ -91,11 +91,11 @@ static READ16_HANDLER( tumblepop_controls_r )
 	switch (offset << 1)
 	{
 		case 0:
-			return input_port_read(space->machine, "PLAYERS");
+			return input_port_read(space->machine(), "PLAYERS");
 		case 2:
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 		case 8:
-			return input_port_read(space->machine, "SYSTEM");
+			return input_port_read(space->machine(), "SYSTEM");
 		case 10: /* ? */
 		case 12:
         	return 0;
@@ -276,7 +276,7 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int state)
 {
-	tumblep_state *driver_state = device->machine->driver_data<tumblep_state>();
+	tumblep_state *driver_state = device->machine().driver_data<tumblep_state>();
 	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
@@ -298,11 +298,11 @@ static const deco16ic_interface tumblep_deco16ic_tilegen1_intf =
 
 static MACHINE_START( tumblep )
 {
-	tumblep_state *state = machine->driver_data<tumblep_state>();
+	tumblep_state *state = machine.driver_data<tumblep_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->deco_tilegen1 = machine->device("tilegen1");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->deco_tilegen1 = machine.device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( tumblep, tumblep_state )
@@ -392,7 +392,7 @@ ROM_END
 void tumblep_patch_code(UINT16 offset)
 {
 	/* A hack which enables all Dip Switches effects */
-	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
 	RAM[(offset + 0)/2] = 0x0240;
 	RAM[(offset + 2)/2] = 0xffff;	// andi.w  #$f3ff, D0
 }

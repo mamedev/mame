@@ -199,27 +199,27 @@ MAIN BOARD:
 
 static WRITE8_HANDLER( coin_w )
 {
-	coin_counter_w(space->machine, offset, data & 1);
+	coin_counter_w(space->machine(), offset, data & 1);
 }
 
 static WRITE8_HANDLER( questions_bank_w )
 {
 	if (!(data & 0x01))
-		memory_set_bank(space->machine, "bank1", 0);
+		memory_set_bank(space->machine(), "bank1", 0);
 	else if (!(data & 0x02))
-		memory_set_bank(space->machine, "bank1", 1);
+		memory_set_bank(space->machine(), "bank1", 1);
 	else if (!(data & 0x04))
-		memory_set_bank(space->machine, "bank1", 2);
+		memory_set_bank(space->machine(), "bank1", 2);
 	else if (!(data & 0x08))
-		memory_set_bank(space->machine, "bank1", 3);
+		memory_set_bank(space->machine(), "bank1", 3);
 	else if (!(data & 0x10))
-		memory_set_bank(space->machine, "bank1", 4);
+		memory_set_bank(space->machine(), "bank1", 4);
 	else if (!(data & 0x20))
-		memory_set_bank(space->machine, "bank1", 5);
+		memory_set_bank(space->machine(), "bank1", 5);
 	else if (!(data & 0x40))
-		memory_set_bank(space->machine, "bank1", 6);
+		memory_set_bank(space->machine(), "bank1", 6);
 	else if (!(data & 0x80))
-		memory_set_bank(space->machine, "bank1", 7);
+		memory_set_bank(space->machine(), "bank1", 7);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
@@ -863,7 +863,7 @@ GFXDECODE_END
 
 static MACHINE_START( trackfld )
 {
-	trackfld_state *state = machine->driver_data<trackfld_state>();
+	trackfld_state *state = machine.driver_data<trackfld_state>();
 
 	/* video */
 	state->save_item(NAME(state->bg_bank));
@@ -874,7 +874,7 @@ static MACHINE_START( trackfld )
 
 static MACHINE_RESET( trackfld )
 {
-	trackfld_state *state = machine->driver_data<trackfld_state>();
+	trackfld_state *state = machine.driver_data<trackfld_state>();
 
 	state->bg_bank = 0;
 	state->sprite_bank1 = 0;
@@ -1412,8 +1412,8 @@ static DRIVER_INIT( trackfld )
 
 static DRIVER_INIT( atlantol )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine->region("maincpu")->base();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine.region("maincpu")->base();
 	UINT8 *decrypt;
 	int A;
 
@@ -1442,7 +1442,7 @@ static DRIVER_INIT( atlantol )
 
 static DRIVER_INIT( mastkin )
 {
-	UINT8 *prom = machine->region("proms")->base();
+	UINT8 *prom = machine.region("proms")->base();
 	int i;
 
 	/* build a fake palette so the screen won't be all black */
@@ -1463,14 +1463,14 @@ static DRIVER_INIT( mastkin )
 
 static DRIVER_INIT( wizzquiz )
 {
-	UINT8 *ROM = machine->region("maincpu")->base() + 0xe000;
+	UINT8 *ROM = machine.region("maincpu")->base() + 0xe000;
 	int i;
 
 	/* decrypt program rom */
 	for (i = 0; i < 0x2000; i++)
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
-	ROM = machine->region("user1")->base();
+	ROM = machine.region("user1")->base();
 
 	/* decrypt questions roms */
 	for (i = 0; i < 0x40000; i++)

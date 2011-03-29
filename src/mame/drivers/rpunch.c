@@ -124,15 +124,15 @@
 
 static void ym2151_irq_gen(device_t *device, int state)
 {
-	rpunch_state *drvstate = device->machine->driver_data<rpunch_state>();
+	rpunch_state *drvstate = device->machine().driver_data<rpunch_state>();
 	drvstate->ym2151_irq = state;
-	cputag_set_input_line(device->machine, "audiocpu", 0, (drvstate->ym2151_irq | drvstate->sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, (drvstate->ym2151_irq | drvstate->sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static MACHINE_RESET( rpunch )
 {
-	UINT8 *snd = machine->region("upd")->base();
+	UINT8 *snd = machine.region("upd")->base();
 	memcpy(snd, snd + 0x20000, 0x20000);
 }
 
@@ -146,7 +146,7 @@ static MACHINE_RESET( rpunch )
 
 static CUSTOM_INPUT( hi_bits_r )
 {
-	return input_port_read(field->port->machine, "SERVICE");
+	return input_port_read(field->port->machine(), "SERVICE");
 }
 
 
@@ -158,7 +158,7 @@ static CUSTOM_INPUT( hi_bits_r )
 
 static TIMER_CALLBACK( sound_command_w_callback )
 {
-	rpunch_state *state = machine->driver_data<rpunch_state>();
+	rpunch_state *state = machine.driver_data<rpunch_state>();
 	state->sound_busy = 1;
 	state->sound_data = param;
 	cputag_set_input_line(machine, "audiocpu", 0, (state->ym2151_irq | state->sound_busy) ? ASSERT_LINE : CLEAR_LINE);
@@ -168,22 +168,22 @@ static TIMER_CALLBACK( sound_command_w_callback )
 static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
-		space->machine->scheduler().synchronize(FUNC(sound_command_w_callback), data & 0xff);
+		space->machine().scheduler().synchronize(FUNC(sound_command_w_callback), data & 0xff);
 }
 
 
 static READ8_HANDLER( sound_command_r )
 {
-	rpunch_state *state = space->machine->driver_data<rpunch_state>();
+	rpunch_state *state = space->machine().driver_data<rpunch_state>();
 	state->sound_busy = 0;
-	cputag_set_input_line(space->machine, "audiocpu", 0, (state->ym2151_irq | state->sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, (state->ym2151_irq | state->sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 	return state->sound_data;
 }
 
 
 static READ16_HANDLER( sound_busy_r )
 {
-	rpunch_state *state = space->machine->driver_data<rpunch_state>();
+	rpunch_state *state = space->machine().driver_data<rpunch_state>();
 	return state->sound_busy;
 }
 
@@ -197,10 +197,10 @@ static READ16_HANDLER( sound_busy_r )
 
 static WRITE8_DEVICE_HANDLER( upd_control_w )
 {
-	rpunch_state *state = device->machine->driver_data<rpunch_state>();
+	rpunch_state *state = device->machine().driver_data<rpunch_state>();
 	if ((data & 1) != state->upd_rom_bank)
 	{
-		UINT8 *snd = device->machine->region("upd")->base();
+		UINT8 *snd = device->machine().region("upd")->base();
 		state->upd_rom_bank = data & 1;
 		memcpy(snd, snd + 0x20000 * (state->upd_rom_bank + 1), 0x20000);
 	}
@@ -697,14 +697,14 @@ ROM_END
 
 static DRIVER_INIT( rabiolep )
 {
-	rpunch_state *state = machine->driver_data<rpunch_state>();
+	rpunch_state *state = machine.driver_data<rpunch_state>();
 	state->sprite_palette = 0x300;
 }
 
 
 static DRIVER_INIT( svolley )
 {
-	rpunch_state *state = machine->driver_data<rpunch_state>();
+	rpunch_state *state = machine.driver_data<rpunch_state>();
 	/* the main differences between Super Volleyball and Rabbit Punch are */
 	/* the lack of direct-mapped bitmap and a different palette base for sprites */
 	state->sprite_palette = 0x080;

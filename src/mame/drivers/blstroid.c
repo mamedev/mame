@@ -31,9 +31,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	blstroid_state *state = machine->driver_data<blstroid_state>();
+	blstroid_state *state = machine.driver_data<blstroid_state>();
 	cputag_set_input_line(machine, "maincpu", 1, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 2, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 4, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
@@ -42,7 +42,7 @@ static void update_interrupts(running_machine *machine)
 
 static WRITE16_HANDLER( blstroid_halt_until_hblank_0_w )
 {
-	atarigen_halt_until_hblank_0(*space->machine->primary_screen);
+	atarigen_halt_until_hblank_0(*space->machine().primary_screen);
 }
 
 
@@ -54,11 +54,11 @@ static MACHINE_START( blstroid )
 
 static MACHINE_RESET( blstroid )
 {
-	blstroid_state *state = machine->driver_data<blstroid_state>();
+	blstroid_state *state = machine.driver_data<blstroid_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine->primary_screen, blstroid_scanline_update, 8);
+	atarigen_scanline_timer_reset(*machine.primary_screen, blstroid_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -73,11 +73,11 @@ static MACHINE_RESET( blstroid )
 static READ16_HANDLER( inputs_r )
 {
 	static const char *const iptnames[] = { "IN0", "IN1" };
-	blstroid_state *state = space->machine->driver_data<blstroid_state>();
-	int temp = input_port_read(space->machine, iptnames[offset & 1]);
+	blstroid_state *state = space->machine().driver_data<blstroid_state>();
+	int temp = input_port_read(space->machine(), iptnames[offset & 1]);
 
 	if (state->cpu_to_sound_ready) temp ^= 0x0040;
-	if (atarigen_get_hblank(*space->machine->primary_screen)) temp ^= 0x0010;
+	if (atarigen_get_hblank(*space->machine().primary_screen)) temp ^= 0x0010;
 	return temp;
 }
 

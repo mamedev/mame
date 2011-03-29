@@ -302,9 +302,9 @@ static const struct cchip_mapping *const levelData[]=
 	level08
 };
 
-static void WriteLevelData( running_machine *machine )
+static void WriteLevelData( running_machine &machine )
 {
-	asuka_state *state = machine->driver_data<asuka_state>();
+	asuka_state *state = machine.driver_data<asuka_state>();
 	int i;
 
 	for (i = 0; i < 13; i++)
@@ -316,7 +316,7 @@ static void WriteLevelData( running_machine *machine )
 	}
 }
 
-static void WriteRestartPos( running_machine *machine, int level )
+static void WriteRestartPos( running_machine &machine, int level )
 {
 	/*
         Cval0/1 = scroll x position
@@ -329,7 +329,7 @@ static void WriteRestartPos( running_machine *machine, int level )
         for the restart position to be returned.
     */
 
-	asuka_state *state = machine->driver_data<asuka_state>();
+	asuka_state *state = machine.driver_data<asuka_state>();
 	int x = state->cval[0] + 256 * state->cval[1] + state->cval[4] + 256 * state->cval[5];
 	int y = state->cval[2] + 256 * state->cval[3] + state->cval[6] + 256 * state->cval[7];
 
@@ -376,13 +376,13 @@ WRITE16_HANDLER( bonzeadv_cchip_ctrl_w )
 
 WRITE16_HANDLER( bonzeadv_cchip_bank_w )
 {
-	asuka_state *state = space->machine->driver_data<asuka_state>();
+	asuka_state *state = space->machine().driver_data<asuka_state>();
 	state->current_bank = data & 7;
 }
 
 WRITE16_HANDLER( bonzeadv_cchip_ram_w )
 {
-	asuka_state *state = space->machine->driver_data<asuka_state>();
+	asuka_state *state = space->machine().driver_data<asuka_state>();
 
 //  if (cpu_get_pc(space->cpu)!=0xa028)
 //  logerror("%08x:  write %04x %04x cchip\n", cpu_get_pc(space->cpu), offset, data);
@@ -393,20 +393,20 @@ WRITE16_HANDLER( bonzeadv_cchip_ram_w )
 		{
 			state->cc_port = data;
 
-			coin_lockout_w(space->machine, 1, data & 0x80);
-			coin_lockout_w(space->machine, 0, data & 0x40);
-			coin_counter_w(space->machine, 1, data & 0x20);
-			coin_counter_w(space->machine, 0, data & 0x10);
+			coin_lockout_w(space->machine(), 1, data & 0x80);
+			coin_lockout_w(space->machine(), 0, data & 0x40);
+			coin_counter_w(space->machine(), 1, data & 0x20);
+			coin_counter_w(space->machine(), 0, data & 0x10);
 		}
 
 		if (offset == 0x0e && data != 0x00)
 		{
-			WriteRestartPos(space->machine, state->current_round);
+			WriteRestartPos(space->machine(), state->current_round);
 		}
 
 		if (offset == 0x0f && data != 0x00)
 		{
-			WriteLevelData(space->machine);
+			WriteLevelData(space->machine());
 		}
 
 		if (offset == 0x10)
@@ -438,7 +438,7 @@ READ16_HANDLER( bonzeadv_cchip_ctrl_r )
 
 READ16_HANDLER( bonzeadv_cchip_ram_r )
 {
-	asuka_state *state = space->machine->driver_data<asuka_state>();
+	asuka_state *state = space->machine().driver_data<asuka_state>();
 
 //  logerror("%08x:  read %04x cchip\n", cpu_get_pc(space->cpu), offset);
 
@@ -446,10 +446,10 @@ READ16_HANDLER( bonzeadv_cchip_ram_r )
 	{
 		switch (offset)
 		{
-		case 0x03: return input_port_read(space->machine, "800007");    /* STARTn + SERVICE1 */
-		case 0x04: return input_port_read(space->machine, "800009");    /* COINn */
-		case 0x05: return input_port_read(space->machine, "80000B");    /* Player controls + TILT */
-		case 0x06: return input_port_read(space->machine, "80000D");    /* Player controls (cocktail) */
+		case 0x03: return input_port_read(space->machine(), "800007");    /* STARTn + SERVICE1 */
+		case 0x04: return input_port_read(space->machine(), "800009");    /* COINn */
+		case 0x05: return input_port_read(space->machine(), "80000B");    /* Player controls + TILT */
+		case 0x06: return input_port_read(space->machine(), "80000D");    /* Player controls (cocktail) */
 		case 0x08: return state->cc_port;
 		}
 

@@ -44,7 +44,7 @@ paradise: I'm not sure it's working correctly:
 static WRITE8_HANDLER( paradise_rombank_w )
 {
 	int bank = data;
-	int bank_n = space->machine->region("maincpu")->bytes() / 0x4000 - 1;
+	int bank_n = space->machine().region("maincpu")->bytes() / 0x4000 - 1;
 
 	if (bank >= bank_n)
 	{
@@ -52,20 +52,20 @@ static WRITE8_HANDLER( paradise_rombank_w )
 		bank %= bank_n;
 	}
 
-	memory_set_bank(space->machine, "bank1", bank);
+	memory_set_bank(space->machine(), "bank1", bank);
 }
 
 static WRITE8_DEVICE_HANDLER( paradise_okibank_w )
 {
 	if (data & ~0x02)
-		logerror("%s: unknown oki bank bits %02X\n", device->machine->describe_context(), data);
+		logerror("%s: unknown oki bank bits %02X\n", device->machine().describe_context(), data);
 
 	downcast<okim6295_device *>(device)->set_bank_base((data & 0x02) ? 0x40000 : 0);
 }
 
 static WRITE8_HANDLER( torus_coin_counter_w )
 {
-	coin_counter_w(space->machine, 0, data ^ 0xff);
+	coin_counter_w(space->machine(), 0, data ^ 0xff);
 }
 
 #define STANDARD_MAP	\
@@ -543,9 +543,9 @@ GFXDECODE_END
 
 static MACHINE_START( paradise )
 {
-	paradise_state *state = machine->driver_data<paradise_state>();
-	int bank_n = machine->region("maincpu")->bytes() / 0x4000 - 1;
-	UINT8 *ROM = machine->region("maincpu")->base();
+	paradise_state *state = machine.driver_data<paradise_state>();
+	int bank_n = machine.region("maincpu")->bytes() / 0x4000 - 1;
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank1", 3, bank_n - 3, &ROM[0x10000], 0x4000);
@@ -556,7 +556,7 @@ static MACHINE_START( paradise )
 
 static MACHINE_RESET( paradise )
 {
-	paradise_state *state = machine->driver_data<paradise_state>();
+	paradise_state *state = machine.driver_data<paradise_state>();
 
 	state->palbank = 0;
 	state->priority = 0;
@@ -1041,23 +1041,23 @@ ROM_END
 
 static DRIVER_INIT (paradise)
 {
-	paradise_state *state = machine->driver_data<paradise_state>();
+	paradise_state *state = machine.driver_data<paradise_state>();
 	state->sprite_inc = 0x20;
 }
 
 // Inverted flipscreen and sprites are packed in less memory (same number though)
 static DRIVER_INIT (tgtball)
 {
-	paradise_state *state = machine->driver_data<paradise_state>();
+	paradise_state *state = machine.driver_data<paradise_state>();
 	state->sprite_inc = 4;
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x2001, 0x2001, FUNC(tgtball_flipscreen_w) );
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x2001, 0x2001, FUNC(tgtball_flipscreen_w) );
 }
 
 static DRIVER_INIT (torus)
 {
-	paradise_state *state = machine->driver_data<paradise_state>();
+	paradise_state *state = machine.driver_data<paradise_state>();
 	state->sprite_inc = 4;
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x2070, 0x2070, FUNC(torus_coin_counter_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x2070, 0x2070, FUNC(torus_coin_counter_w));
 }
 
 

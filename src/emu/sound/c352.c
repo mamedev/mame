@@ -545,7 +545,7 @@ static DEVICE_START( c352 )
 
 	info->sample_rate_base = device->clock() / 192;
 
-	info->stream = device->machine->sound().stream_alloc(*device, 0, 4, info->sample_rate_base, info, c352_update);
+	info->stream = device->machine().sound().stream_alloc(*device, 0, 4, info->sample_rate_base, info, c352_update);
 
 	c352_init(info, device);
 }

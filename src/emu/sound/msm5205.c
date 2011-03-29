@@ -187,8 +187,8 @@ static DEVICE_START( msm5205 )
 	ComputeTables (voice);
 
 	/* stream system initialize */
-	voice->stream = device->machine->sound().stream_alloc(*device,0,1,device->clock(),voice,MSM5205_update);
-	voice->timer = device->machine->scheduler().timer_alloc(FUNC(MSM5205_vclk_callback), voice);
+	voice->stream = device->machine().sound().stream_alloc(*device,0,1,device->clock(),voice,MSM5205_update);
+	voice->timer = device->machine().scheduler().timer_alloc(FUNC(MSM5205_vclk_callback), voice);
 
 	/* initialize */
 	DEVICE_RESET_CALL(msm5205);
@@ -221,7 +221,7 @@ void msm5205_vclk_w (device_t *device, int vclk)
 		if( voice->vclk != vclk)
 		{
 			voice->vclk = vclk;
-			if( !vclk ) MSM5205_vclk_callback(voice->device->machine, voice, 0);
+			if( !vclk ) MSM5205_vclk_callback(voice->device->machine(), voice, 0);
 		}
 	}
 }

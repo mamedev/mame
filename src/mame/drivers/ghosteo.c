@@ -116,7 +116,7 @@ static const UINT8 security_data[] = { 0x01, 0xC4, 0xFF, 0x22 };
 
 static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
 {
-	ghosteo_state *state = device->machine->driver_data<ghosteo_state>();
+	ghosteo_state *state = device->machine().driver_data<ghosteo_state>();
 	UINT32 data = state->bballoon_port[port];
 	switch (port)
 	{
@@ -137,7 +137,7 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
 
 static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data)
 {
-	ghosteo_state *state = device->machine->driver_data<ghosteo_state>();
+	ghosteo_state *state = device->machine().driver_data<ghosteo_state>();
 	UINT32 old_value = state->bballoon_port[port];
 	state->bballoon_port[port] = data;
 	switch (port)
@@ -167,9 +167,9 @@ static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data)
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
 {
-	ghosteo_state *state = device->machine->driver_data<ghosteo_state>();
+	ghosteo_state *state = device->machine().driver_data<ghosteo_state>();
 	struct nand_t &nand = state->nand;
-//  device_t *nand = device->machine->device( "nand");
+//  device_t *nand = device->machine().device( "nand");
 	logerror( "s3c2410_nand_command_w %02X\n", data);
 	switch (data)
 	{
@@ -191,9 +191,9 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
 {
-	ghosteo_state *state = device->machine->driver_data<ghosteo_state>();
+	ghosteo_state *state = device->machine().driver_data<ghosteo_state>();
 	struct nand_t &nand = state->nand;
-//  device_t *nand = device->machine->device( "nand");
+//  device_t *nand = device->machine().device( "nand");
 	logerror( "s3c2410_nand_address_w %02X\n", data);
 	switch (nand.mode)
 	{
@@ -225,9 +225,9 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
 
 static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 {
-	ghosteo_state *state = device->machine->driver_data<ghosteo_state>();
+	ghosteo_state *state = device->machine().driver_data<ghosteo_state>();
 	struct nand_t &nand = state->nand;
-//  device_t *nand = device->machine->device( "nand");
+//  device_t *nand = device->machine().device( "nand");
 	UINT8 data = 0;
 	switch (nand.mode)
 	{
@@ -238,7 +238,7 @@ static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 		break;
 		case NAND_M_READ :
 		{
-			UINT8 *flash = (UINT8 *)device->machine->region( "user1")->base();
+			UINT8 *flash = (UINT8 *)device->machine().region( "user1")->base();
 			if (nand.byte_addr < 0x200)
 			{
 				data = *(flash + nand.page_addr * 0x200 + nand.byte_addr);
@@ -272,20 +272,20 @@ static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_data_w )
 {
-//  device_t *nand = device->machine->device( "nand");
+//  device_t *nand = device->machine().device( "nand");
 	logerror( "s3c2410_nand_data_w %02X\n", data);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( s3c2410_i2c_scl_w )
 {
-	device_t *i2cmem = device->machine->device( "i2cmem");
+	device_t *i2cmem = device->machine().device( "i2cmem");
 //  logerror( "s3c2410_i2c_scl_w %d\n", state ? 1 : 0);
 	i2cmem_scl_write( i2cmem, state);
 }
 
 static READ_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_r )
 {
-	device_t *i2cmem = device->machine->device( "i2cmem");
+	device_t *i2cmem = device->machine().device( "i2cmem");
 	int state;
 	state = i2cmem_sda_read( i2cmem);
 //  logerror( "s3c2410_i2c_sda_r %d\n", state ? 1 : 0);
@@ -294,7 +294,7 @@ static READ_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_r )
 
 static WRITE_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_w )
 {
-	device_t *i2cmem = device->machine->device( "i2cmem");
+	device_t *i2cmem = device->machine().device( "i2cmem");
 //  logerror( "s3c2410_i2c_sda_w %d\n", state ? 1 : 0);
 	i2cmem_sda_write( i2cmem, state);
 }
@@ -437,8 +437,8 @@ static READ32_HANDLER( bballoon_speedup_r )
 
 static MACHINE_RESET( bballoon )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4d000010, 0x4d000013, FUNC(bballoon_speedup_r));
-	s3c2410 = machine->device("s3c2410");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4d000010, 0x4d000013, FUNC(bballoon_speedup_r));
+	s3c2410 = machine.device("s3c2410");
 }
 
 static MACHINE_CONFIG_START( bballoon, ghosteo_state )
@@ -549,8 +549,8 @@ ROM_END
 
 static DRIVER_INIT( bballoon )
 {
-	ghosteo_state *state = machine->driver_data<ghosteo_state>();
-	memcpy( state->steppingstone, machine->region( "user1")->base(), 4 * 1024);
+	ghosteo_state *state = machine.driver_data<ghosteo_state>();
+	memcpy( state->steppingstone, machine.region( "user1")->base(), 4 * 1024);
 }
 
 GAME( 2003, bballoon, 0, bballoon, bballoon, bballoon, ROT0, "Eolith", "BnB Arcade", GAME_NO_SOUND )

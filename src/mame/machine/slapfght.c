@@ -14,7 +14,7 @@
 /* Perform basic machine initialisation */
 MACHINE_RESET( slapfight )
 {
-	slapfght_state *state = machine->driver_data<slapfght_state>();
+	slapfght_state *state = machine.driver_data<slapfght_state>();
 	/* MAIN CPU */
 
 	state->slapfight_status_state=0;
@@ -39,15 +39,15 @@ MACHINE_RESET( slapfight )
 /* Reset and hold sound CPU */
 WRITE8_HANDLER( slapfight_port_00_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 	state->getstar_sh_intenabled = 0;
 }
 
 /* Release reset on sound CPU */
 WRITE8_HANDLER( slapfight_port_01_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 /* Disable and clear hardware interrupt */
@@ -64,23 +64,23 @@ WRITE8_HANDLER( slapfight_port_07_w )
 
 WRITE8_HANDLER( slapfight_port_08_w )
 {
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 
-	memory_set_bankptr(space->machine, "bank1",&RAM[0x10000]);
+	memory_set_bankptr(space->machine(), "bank1",&RAM[0x10000]);
 }
 
 WRITE8_HANDLER( slapfight_port_09_w )
 {
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 
-	memory_set_bankptr(space->machine, "bank1",&RAM[0x14000]);
+	memory_set_bankptr(space->machine(), "bank1",&RAM[0x14000]);
 }
 
 
 /* Status register */
 READ8_HANDLER( slapfight_port_00_r )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	static const int states[3]={ 0xc7, 0x55, 0x00 };
 
 	state->slapfight_status = states[state->slapfight_status_state];
@@ -93,37 +93,37 @@ READ8_HANDLER( slapfight_port_00_r )
 
 READ8_HANDLER( slapfight_68705_portA_r )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	return (state->portA_out & state->ddrA) | (state->portA_in & ~state->ddrA);
 }
 
 WRITE8_HANDLER( slapfight_68705_portA_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->portA_out = data;
 }
 
 WRITE8_HANDLER( slapfight_68705_ddrA_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->ddrA = data;
 }
 
 READ8_HANDLER( slapfight_68705_portB_r )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	return (state->portB_out & state->ddrB) | (state->portB_in & ~state->ddrB);
 }
 
 WRITE8_HANDLER( slapfight_68705_portB_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	if ((state->ddrB & 0x02) && (~data & 0x02) && (state->portB_out & 0x02))
 	{
 		state->portA_in = state->from_main;
 
 		if (state->main_sent)
-			cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
 
 		state->main_sent = 0;
 	}
@@ -146,13 +146,13 @@ WRITE8_HANDLER( slapfight_68705_portB_w )
 
 WRITE8_HANDLER( slapfight_68705_ddrB_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->ddrB = data;
 }
 
 READ8_HANDLER( slapfight_68705_portC_r )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->portC_in = 0;
 
 	if (state->main_sent)
@@ -165,34 +165,34 @@ READ8_HANDLER( slapfight_68705_portC_r )
 
 WRITE8_HANDLER( slapfight_68705_portC_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->portC_out = data;
 }
 
 WRITE8_HANDLER( slapfight_68705_ddrC_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->ddrC = data;
 }
 
 WRITE8_HANDLER( slapfight_mcu_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->from_main = data;
 	state->main_sent = 1;
-	cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "mcu", 0, ASSERT_LINE);
 }
 
 READ8_HANDLER( slapfight_mcu_r )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->mcu_sent = 0;
 	return state->from_mcu;
 }
 
 READ8_HANDLER( slapfight_mcu_status_r )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	int res = 0;
 
 	if (!state->main_sent)
@@ -211,7 +211,7 @@ READ8_HANDLER( slapfight_mcu_status_r )
 
 READ8_HANDLER( getstar_e803_r )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	UINT16 tmp = 0;  /* needed for values computed on 16 bits */
 	UINT8 getstar_val = 0;
 	UINT8 phase_lookup_table[] = {0x00, 0x01, 0x03, 0xff, 0xff, 0x02, 0x05, 0xff, 0xff, 0x05}; /* table at 0x0e05 in 'gtstarb1' */
@@ -313,7 +313,7 @@ READ8_HANDLER( getstar_e803_r )
 
 WRITE8_HANDLER( getstar_e803_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	switch (state->getstar_id)
 	{
 		case GETSTAR:
@@ -769,7 +769,7 @@ WRITE8_HANDLER( getstar_e803_w )
 /* Enable hardware interrupt of sound cpu */
 WRITE8_HANDLER( getstar_sh_intenable_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->getstar_sh_intenabled = 1;
 	logerror("cpu #1 PC=%d: %d written to a0e0\n",cpu_get_pc(space->cpu),data);
 }
@@ -779,7 +779,7 @@ WRITE8_HANDLER( getstar_sh_intenable_w )
 /* Generate interrups only if they have been enabled */
 INTERRUPT_GEN( getstar_interrupt )
 {
-	slapfght_state *state = device->machine->driver_data<slapfght_state>();
+	slapfght_state *state = device->machine().driver_data<slapfght_state>();
 	if (state->getstar_sh_intenabled)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -800,13 +800,13 @@ WRITE8_HANDLER( getstar_port_04_w )
 
 READ8_HANDLER( tigerh_68705_portA_r )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	return (state->portA_out & state->ddrA) | (state->portA_in & ~state->ddrA);
 }
 
 WRITE8_HANDLER( tigerh_68705_portA_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->portA_out = data;//?
 	state->from_mcu = state->portA_out;
 	state->mcu_sent = 1;
@@ -814,24 +814,24 @@ WRITE8_HANDLER( tigerh_68705_portA_w )
 
 WRITE8_HANDLER( tigerh_68705_ddrA_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->ddrA = data;
 }
 
 READ8_HANDLER( tigerh_68705_portB_r )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	return (state->portB_out & state->ddrB) | (state->portB_in & ~state->ddrB);
 }
 
 WRITE8_HANDLER( tigerh_68705_portB_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 
 	if ((state->ddrB & 0x02) && (~data & 0x02) && (state->portB_out & 0x02))
 	{
 		state->portA_in = state->from_main;
-		if (state->main_sent) cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
+		if (state->main_sent) cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
 		state->main_sent = 0;
 	}
 	if ((state->ddrB & 0x04) && (data & 0x04) && (~state->portB_out & 0x04))
@@ -845,14 +845,14 @@ WRITE8_HANDLER( tigerh_68705_portB_w )
 
 WRITE8_HANDLER( tigerh_68705_ddrB_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->ddrB = data;
 }
 
 
 READ8_HANDLER( tigerh_68705_portC_r )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->portC_in = 0;
 	if (!state->main_sent) state->portC_in |= 0x01;
 	if (state->mcu_sent) state->portC_in |= 0x02;
@@ -861,35 +861,35 @@ READ8_HANDLER( tigerh_68705_portC_r )
 
 WRITE8_HANDLER( tigerh_68705_portC_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->portC_out = data;
 }
 
 WRITE8_HANDLER( tigerh_68705_ddrC_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->ddrC = data;
 }
 
 WRITE8_HANDLER( tigerh_mcu_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->from_main = data;
 	state->main_sent = 1;
 	state->mcu_sent = 0;
-	cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "mcu", 0, ASSERT_LINE);
 }
 
 READ8_HANDLER( tigerh_mcu_r )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->mcu_sent = 0;
 	return state->from_mcu;
 }
 
 READ8_HANDLER( tigerh_mcu_status_r )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	int res = 0;
 	if (!state->main_sent) res |= 0x02;
 	if (!state->mcu_sent) res |= 0x04;
@@ -899,7 +899,7 @@ READ8_HANDLER( tigerh_mcu_status_r )
 
 READ8_HANDLER( tigerhb_e803_r )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	UINT8 tigerhb_val = 0;
 	switch (state->tigerhb_cmd)
 	{
@@ -915,7 +915,7 @@ READ8_HANDLER( tigerhb_e803_r )
 
 WRITE8_HANDLER( tigerhb_e803_w )
 {
-	slapfght_state *state = space->machine->driver_data<slapfght_state>();
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	switch (data)
 	{
 		/* hardware test */
@@ -939,5 +939,5 @@ WRITE8_HANDLER( tigerhb_e803_w )
 READ8_HANDLER( perfrman_port_00_r )
 {
 	/* TODO */
-	return space->machine->rand() & 1;
+	return space->machine().rand() & 1;
 }

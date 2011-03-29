@@ -140,14 +140,14 @@ Current Problem(s) - in order of priority
 #include "sound/okim6295.h"
 #include "includes/raiden2.h"
 
-static UINT16 rps(running_machine *machine)
+static UINT16 rps(running_machine &machine)
 {
-	return cpu_get_reg(machine->device("maincpu"), NEC_CS);
+	return cpu_get_reg(machine.device("maincpu"), NEC_CS);
 }
 
-static UINT16 rpc(running_machine *machine)
+static UINT16 rpc(running_machine &machine)
 {
-	return cpu_get_reg(machine->device("maincpu"), NEC_IP);
+	return cpu_get_reg(machine.device("maincpu"), NEC_IP);
 }
 
 WRITE16_MEMBER(raiden2_state::cop_pgm_data_w)
@@ -450,7 +450,7 @@ WRITE16_MEMBER(raiden2_state::cop_reg_low_w)
 	cop_regs[offset] = (cop_regs[offset] & ~UINT32(mem_mask)) | (data & mem_mask);
 }
 
-UINT8 raiden2_state::cop_calculate_collsion_detection(running_machine *machine)
+UINT8 raiden2_state::cop_calculate_collsion_detection(running_machine &machine)
 {
 	static UINT8 res;
 
@@ -588,7 +588,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 		cop_collision_info[0].max_y = cop_collision_info[0].y + (0x10 << 16);
 
 		/* do the math */
-		cop_hit_status = cop_calculate_collsion_detection(space.machine);
+		cop_hit_status = cop_calculate_collsion_detection(space.machine());
 		break;
 
 	case 0xb900:
@@ -601,17 +601,17 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 		cop_collision_info[1].max_y = cop_collision_info[1].y + (0x10 << 16);
 
 		/* do the math */
-		cop_hit_status = cop_calculate_collsion_detection(space.machine);
+		cop_hit_status = cop_calculate_collsion_detection(space.machine());
 		break;
 
 	default:
-		logerror("pcall %04x (%04x:%04x) [%x %x %x %x]\n", data, rps(space.machine), rpc(space.machine), cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3]);
+		logerror("pcall %04x (%04x:%04x) [%x %x %x %x]\n", data, rps(space.machine()), rpc(space.machine()), cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3]);
 	}
 }
 
 //  case 0x6ca:
 //      logerror("select bank %d %04x\n", (data >> 15) & 1, data);
-//      memory_set_bank(space.machine, "bank1", (data >> 15) & 1);
+//      memory_set_bank(space.machine(), "bank1", (data >> 15) & 1);
 
 
 static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
@@ -624,11 +624,11 @@ static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
 
 /* SPRITE DRAWING (move to video file) */
 
-void raiden2_state::draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect ,int pri_mask )
+void raiden2_state::draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect ,int pri_mask )
 {
 	UINT16 *source = sprites + sprites_cur_start/2 - 4;
 
-	const gfx_element *gfx = machine->gfx[2];
+	const gfx_element *gfx = machine.gfx[2];
 
 //  static int ytlim = 1;
 //  static int xtlim = 1;
@@ -811,7 +811,7 @@ WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
 
 		/* probably bit 3 is from 6c9 */
 		/* TODO: this doesn't work! */
-		memory_set_bank(space.machine, "mainbank", 8 | (cop_bank & 0x7000) >> 12);
+		memory_set_bank(space.machine(), "mainbank", 8 | (cop_bank & 0x7000) >> 12);
 	}
 }
 
@@ -821,7 +821,7 @@ WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
 
 static TILE_GET_INFO( get_back_tile_info )
 {
-	raiden2_state *state = machine->driver_data<raiden2_state>();
+	raiden2_state *state = machine.driver_data<raiden2_state>();
 	int tile = state->back_data[tile_index];
 	int color = (tile >> 12) | (0 << 4);
 
@@ -832,7 +832,7 @@ static TILE_GET_INFO( get_back_tile_info )
 
 static TILE_GET_INFO( get_mid_tile_info )
 {
-	raiden2_state *state = machine->driver_data<raiden2_state>();
+	raiden2_state *state = machine.driver_data<raiden2_state>();
 	int tile = state->mid_data[tile_index];
 	int color = (tile >> 12) | (2 << 4);
 
@@ -843,7 +843,7 @@ static TILE_GET_INFO( get_mid_tile_info )
 
 static TILE_GET_INFO( get_fore_tile_info )
 {
-	raiden2_state *state = machine->driver_data<raiden2_state>();
+	raiden2_state *state = machine.driver_data<raiden2_state>();
 	int tile = state->fore_data[tile_index];
 	int color = (tile >> 12) | (1 << 4);
 
@@ -854,7 +854,7 @@ static TILE_GET_INFO( get_fore_tile_info )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	raiden2_state *state = machine->driver_data<raiden2_state>();
+	raiden2_state *state = machine.driver_data<raiden2_state>();
 	int tile = state->text_data[tile_index];
 	int color = (tile>>12)&0xf;
 
@@ -868,7 +868,7 @@ static TILE_GET_INFO( get_text_tile_info )
 
 static VIDEO_START( raiden2 )
 {
-	raiden2_state *state = machine->driver_data<raiden2_state>();
+	raiden2_state *state = machine.driver_data<raiden2_state>();
 	state->text_layer       = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows,  8, 8, 64,32 );
 	state->background_layer = tilemap_create(machine, get_back_tile_info, tilemap_scan_rows, 16,16, 32,32 );
 	state->midground_layer  = tilemap_create(machine, get_mid_tile_info,  tilemap_scan_rows, 16,16, 32,32 );
@@ -883,34 +883,34 @@ static VIDEO_START( raiden2 )
 
 static SCREEN_UPDATE( raiden2 )
 {
-	raiden2_state *state = screen->machine->driver_data<raiden2_state>();
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	raiden2_state *state = screen->machine().driver_data<raiden2_state>();
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
-	//if (!input_code_pressed(screen->machine, KEYCODE_Q))
+	//if (!input_code_pressed(screen->machine(), KEYCODE_Q))
 	{
 		if (!(state->raiden2_tilemap_enable & 1))
 			tilemap_draw(bitmap, cliprect, state->background_layer, 0, 0);
 	}
 
-	//if (!input_code_pressed(screen->machine, KEYCODE_W))
+	//if (!input_code_pressed(screen->machine(), KEYCODE_W))
 	{
 		if (!(state->raiden2_tilemap_enable & 2))
 			tilemap_draw(bitmap, cliprect, state->midground_layer, 0, 0);
 	}
 
-	//if (!input_code_pressed(screen->machine, KEYCODE_E))
+	//if (!input_code_pressed(screen->machine(), KEYCODE_E))
 	{
 		if (!(state->raiden2_tilemap_enable & 4))
 			tilemap_draw(bitmap, cliprect, state->foreground_layer, 0, 0);
 	}
 
-	//if (!input_code_pressed(screen->machine, KEYCODE_S))
+	//if (!input_code_pressed(screen->machine(), KEYCODE_S))
 	{
 		//if (!(raiden2_tilemap_enable & 0x10))
-			state->draw_sprites(screen->machine, bitmap, cliprect, 0);
+			state->draw_sprites(screen->machine(), bitmap, cliprect, 0);
 	}
 
-	//if (!input_code_pressed(screen->machine, KEYCODE_A))
+	//if (!input_code_pressed(screen->machine(), KEYCODE_A))
 	{
 		if (!(state->raiden2_tilemap_enable & 8))
 			tilemap_draw(bitmap, cliprect, state->text_layer, 0, 0);
@@ -1052,7 +1052,7 @@ void raiden2_state::common_reset()
 
 static MACHINE_RESET(raiden2)
 {
-	raiden2_state *state = machine->driver_data<raiden2_state>();
+	raiden2_state *state = machine.driver_data<raiden2_state>();
 	state->common_reset();
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
@@ -1065,7 +1065,7 @@ static MACHINE_RESET(raiden2)
 
 static MACHINE_RESET(raidendx)
 {
-	raiden2_state *state = machine->driver_data<raiden2_state>();
+	raiden2_state *state = machine.driver_data<raiden2_state>();
 	state->common_reset();
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
@@ -1079,7 +1079,7 @@ static MACHINE_RESET(raidendx)
 
 static MACHINE_RESET(zeroteam)
 {
-	raiden2_state *state = machine->driver_data<raiden2_state>();
+	raiden2_state *state = machine.driver_data<raiden2_state>();
 	state->bg_bank = 0;
 	state->fg_bank = 2;
 	state->mid_bank = 1;
@@ -1094,7 +1094,7 @@ static MACHINE_RESET(zeroteam)
 
 static MACHINE_RESET(xsedae)
 {
-	raiden2_state *state = machine->driver_data<raiden2_state>();
+	raiden2_state *state = machine.driver_data<raiden2_state>();
 	state->bg_bank = 0;
 	state->fg_bank = 2;
 	state->mid_bank = 1;
@@ -1120,7 +1120,7 @@ WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
 {
 	if(ACCESSING_BITS_8_15) {
 		logerror("select bank %d %04x\n", (data >> 15) & 1, data);
-		memory_set_bank(space.machine, "mainbank", !((data >> 15) & 1));
+		memory_set_bank(space.machine(), "mainbank", !((data >> 15) & 1));
 		prg_bank = ((data >> 15) & 1);
 	}
 }
@@ -2623,25 +2623,25 @@ ROM_END
 
 static DRIVER_INIT (raiden2)
 {
-	memory_configure_bank(machine, "mainbank", 0, 2, machine->region("mainprg")->base(), 0x20000);
+	memory_configure_bank(machine, "mainbank", 0, 2, machine.region("mainprg")->base(), 0x20000);
 	raiden2_decrypt_sprites(machine);
 }
 
 static DRIVER_INIT (raidendx)
 {
-	memory_configure_bank(machine, "mainbank", 0, 0x10, machine->region("mainprg")->base(), 0x20000);
+	memory_configure_bank(machine, "mainbank", 0, 0x10, machine.region("mainprg")->base(), 0x20000);
 	raiden2_decrypt_sprites(machine);
 }
 
 static DRIVER_INIT (xsedae)
 {
 	/* doesn't have banking */
-	//memory_configure_bank(machine, "mainbank", 0, 2, machine->region("mainprg")->base(), 0x20000);
+	//memory_configure_bank(machine, "mainbank", 0, 2, machine.region("mainprg")->base(), 0x20000);
 }
 
 static DRIVER_INIT (zeroteam)
 {
-	memory_configure_bank(machine, "mainbank", 0, 2, machine->region("mainprg")->base(), 0x20000);
+	memory_configure_bank(machine, "mainbank", 0, 2, machine.region("mainprg")->base(), 0x20000);
 	zeroteam_decrypt_sprites(machine);
 }
 

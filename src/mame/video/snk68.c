@@ -24,7 +24,7 @@ Notes:
 
 static TILE_GET_INFO( get_pow_tile_info )
 {
-	snk68_state *state = machine->driver_data<snk68_state>();
+	snk68_state *state = machine.driver_data<snk68_state>();
 	int tile = state->fg_tile_offset + (state->pow_fg_videoram[2*tile_index] & 0xff);
 	int color = state->pow_fg_videoram[2*tile_index+1] & 0x07;
 
@@ -33,7 +33,7 @@ static TILE_GET_INFO( get_pow_tile_info )
 
 static TILE_GET_INFO( get_searchar_tile_info )
 {
-	snk68_state *state = machine->driver_data<snk68_state>();
+	snk68_state *state = machine.driver_data<snk68_state>();
 	int data = state->pow_fg_videoram[2*tile_index];
 	int tile = data & 0x7ff;
 	int color = (data & 0x7000) >> 12;
@@ -50,19 +50,19 @@ static TILE_GET_INFO( get_searchar_tile_info )
 
 ***************************************************************************/
 
-static void common_video_start(running_machine *machine)
+static void common_video_start(running_machine &machine)
 {
-	snk68_state *state = machine->driver_data<snk68_state>();
+	snk68_state *state = machine.driver_data<snk68_state>();
 
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
-	tilemap_set_scrolldx(state->fg_tilemap, 0, machine->primary_screen->width() - 256);
-	tilemap_set_scrolldy(state->fg_tilemap, 0, machine->primary_screen->height() - 256);
+	tilemap_set_scrolldx(state->fg_tilemap, 0, machine.primary_screen->width() - 256);
+	tilemap_set_scrolldy(state->fg_tilemap, 0, machine.primary_screen->height() - 256);
 }
 
 VIDEO_START( pow )
 {
-	snk68_state *state = machine->driver_data<snk68_state>();
+	snk68_state *state = machine.driver_data<snk68_state>();
 
 	state->fg_tilemap = tilemap_create(machine, get_pow_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 	state->fg_tile_offset = 0;
@@ -72,7 +72,7 @@ VIDEO_START( pow )
 
 VIDEO_START( searchar )
 {
-	snk68_state *state = machine->driver_data<snk68_state>();
+	snk68_state *state = machine.driver_data<snk68_state>();
 
 	state->fg_tilemap = tilemap_create(machine, get_searchar_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
@@ -87,7 +87,7 @@ VIDEO_START( searchar )
 
 READ16_HANDLER( pow_spriteram_r )
 {
-	snk68_state *state = space->machine->driver_data<snk68_state>();
+	snk68_state *state = space->machine().driver_data<snk68_state>();
 
 	// streetsj expects the MSB of every 32-bit word to be FF. Presumably RAM
 	// exists only for 3 bytes out of 4 and the fourth is unmapped.
@@ -99,7 +99,7 @@ READ16_HANDLER( pow_spriteram_r )
 
 WRITE16_HANDLER( pow_spriteram_w )
 {
-	snk68_state *state = space->machine->driver_data<snk68_state>();
+	snk68_state *state = space->machine().driver_data<snk68_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	UINT16 newword = spriteram16[offset];
 
@@ -110,10 +110,10 @@ WRITE16_HANDLER( pow_spriteram_w )
 
 	if (spriteram16[offset] != newword)
 	{
-		int vpos = space->machine->primary_screen->vpos();
+		int vpos = space->machine().primary_screen->vpos();
 
 		if (vpos > 0)
-			space->machine->primary_screen->update_partial(vpos - 1);
+			space->machine().primary_screen->update_partial(vpos - 1);
 
 		spriteram16[offset] = newword;
 	}
@@ -121,7 +121,7 @@ WRITE16_HANDLER( pow_spriteram_w )
 
 READ16_HANDLER( pow_fg_videoram_r )
 {
-	snk68_state *state = space->machine->driver_data<snk68_state>();
+	snk68_state *state = space->machine().driver_data<snk68_state>();
 
 	// RAM is only 8-bit
 	return state->pow_fg_videoram[offset] | 0xff00;
@@ -129,7 +129,7 @@ READ16_HANDLER( pow_fg_videoram_r )
 
 WRITE16_HANDLER( pow_fg_videoram_w )
 {
-	snk68_state *state = space->machine->driver_data<snk68_state>();
+	snk68_state *state = space->machine().driver_data<snk68_state>();
 
 	data |= 0xff00;
 	COMBINE_DATA(&state->pow_fg_videoram[offset]);
@@ -138,7 +138,7 @@ WRITE16_HANDLER( pow_fg_videoram_w )
 
 WRITE16_HANDLER( searchar_fg_videoram_w )
 {
-	snk68_state *state = space->machine->driver_data<snk68_state>();
+	snk68_state *state = space->machine().driver_data<snk68_state>();
 
 	// RAM is full 16-bit, though only half of it is used by the hardware
 	COMBINE_DATA(&state->pow_fg_videoram[offset]);
@@ -149,9 +149,9 @@ WRITE16_HANDLER( pow_flipscreen16_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		snk68_state *state = space->machine->driver_data<snk68_state>();
+		snk68_state *state = space->machine().driver_data<snk68_state>();
 		state->flipscreen = data & 0x08;
-		tilemap_set_flip_all(space->machine, state->flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(space->machine(), state->flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 		state->sprite_flip_axis = data & 0x04;	// for streetsm? though might not be present on this board
 
@@ -167,10 +167,10 @@ WRITE16_HANDLER( searchar_flipscreen16_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		snk68_state *state = space->machine->driver_data<snk68_state>();
+		snk68_state *state = space->machine().driver_data<snk68_state>();
 
 		state->flipscreen = data & 0x08;
-		tilemap_set_flip_all(space->machine, state->flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(space->machine(), state->flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 		state->sprite_flip_axis = data & 0x04;
 	}
@@ -178,7 +178,7 @@ WRITE16_HANDLER( searchar_flipscreen16_w )
 
 WRITE16_HANDLER( pow_paletteram16_word_w )
 {
-	snk68_state *state = space->machine->driver_data<snk68_state>();
+	snk68_state *state = space->machine().driver_data<snk68_state>();
 	UINT16 newword;
 	int r,g,b;
 
@@ -189,7 +189,7 @@ WRITE16_HANDLER( pow_paletteram16_word_w )
 	g = ((newword >> 3) & 0x1e) | ((newword >> 13) & 0x01) ;
 	b = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01) ;
 
-	palette_set_color_rgb(space->machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(space->machine(),offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 
@@ -199,9 +199,9 @@ WRITE16_HANDLER( pow_paletteram16_word_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int group)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int group)
 {
-	snk68_state *state = machine->driver_data<snk68_state>();
+	snk68_state *state = machine.driver_data<snk68_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	int flipscreen = state->flipscreen;
 	int sprite_flip_axis = state->sprite_flip_axis;
@@ -210,7 +210,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	// pow has 0x4000 tiles and independent x/y flipping
 	// the other games have > 0x4000 tiles and flipping in only one direction
 	// (globally selected)
-	int const is_pow = (machine->gfx[1]->total_elements <= 0x4000);
+	int const is_pow = (machine.gfx[1]->total_elements <= 0x4000);
 	int offs;
 
 	for (offs = 0; offs < 0x800; offs += 0x40)
@@ -268,7 +268,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					fy = !fy;
 				}
 
-				drawgfx_transpen(bitmap,cliprect, machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect, machine.gfx[1],
 						tile,
 						color,
 						fx, fy,
@@ -290,14 +290,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( pow )
 {
-	snk68_state *state = screen->machine->driver_data<snk68_state>();
+	snk68_state *state = screen->machine().driver_data<snk68_state>();
 
 	bitmap_fill(bitmap, cliprect, 0x7ff);
 
 	/* This appears to be the correct priority order */
-	draw_sprites(screen->machine, bitmap, cliprect, 2);
-	draw_sprites(screen->machine, bitmap, cliprect, 3);
-	draw_sprites(screen->machine, bitmap, cliprect, 1);
+	draw_sprites(screen->machine(), bitmap, cliprect, 2);
+	draw_sprites(screen->machine(), bitmap, cliprect, 3);
+	draw_sprites(screen->machine(), bitmap, cliprect, 1);
 
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;

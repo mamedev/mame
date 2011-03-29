@@ -11,8 +11,8 @@
 
 typedef void (*pc_video_update_proc)(bitmap_t *bitmap);
 
-void pc_video_start(running_machine *machine,
-	pc_video_update_proc (*choosevideomode)(running_machine *machine, int *width, int *height),
+void pc_video_start(running_machine &machine,
+	pc_video_update_proc (*choosevideomode)(running_machine &machine, int *width, int *height),
 	size_t vramsize);
 
 SCREEN_UPDATE( pc_video );

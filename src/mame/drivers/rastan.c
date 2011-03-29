@@ -168,13 +168,13 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 static WRITE8_DEVICE_HANDLER( rastan_bankswitch_w )
 {
-	memory_set_bank(device->machine,  "bank1", data & 3);
+	memory_set_bank(device->machine(),  "bank1", data & 3);
 }
 
 
 static void rastan_msm5205_vck( device_t *device )
 {
-	rastan_state *state = device->machine->driver_data<rastan_state>();
+	rastan_state *state = device->machine().driver_data<rastan_state>();
 	if (state->adpcm_data != -1)
 	{
 		msm5205_data_w(device, state->adpcm_data & 0x0f);
@@ -182,7 +182,7 @@ static void rastan_msm5205_vck( device_t *device )
 	}
 	else
 	{
-		state->adpcm_data = device->machine->region("adpcm")->base()[state->adpcm_pos];
+		state->adpcm_data = device->machine().region("adpcm")->base()[state->adpcm_pos];
 		state->adpcm_pos = (state->adpcm_pos + 1) & 0xffff;
 		msm5205_data_w(device, state->adpcm_data >> 4);
 	}
@@ -190,7 +190,7 @@ static void rastan_msm5205_vck( device_t *device )
 
 static WRITE8_HANDLER( rastan_msm5205_address_w )
 {
-	rastan_state *state = space->machine->driver_data<rastan_state>();
+	rastan_state *state = space->machine().driver_data<rastan_state>();
 	state->adpcm_pos = (state->adpcm_pos & 0x00ff) | (data << 8);
 }
 
@@ -201,7 +201,7 @@ static WRITE8_DEVICE_HANDLER( rastan_msm5205_start_w )
 
 static WRITE8_DEVICE_HANDLER( rastan_msm5205_stop_w )
 {
-	rastan_state *state = device->machine->driver_data<rastan_state>();
+	rastan_state *state = device->machine().driver_data<rastan_state>();
 	msm5205_reset_w(device, 1);
 	state->adpcm_pos &= 0xff00;
 }
@@ -346,7 +346,7 @@ GFXDECODE_END
 /* handler called by the YM2151 emulator when the internal timers cause an IRQ */
 static void irqhandler( device_t *device, int irq )
 {
-	rastan_state *state = device->machine->driver_data<rastan_state>();
+	rastan_state *state = device->machine().driver_data<rastan_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -364,16 +364,16 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( rastan )
 {
-	rastan_state *state = machine->driver_data<rastan_state>();
-	UINT8 *ROM = machine->region("audiocpu")->base();
+	rastan_state *state = machine.driver_data<rastan_state>();
+	UINT8 *ROM = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 1, &ROM[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank1", 1, 3, &ROM[0x10000], 0x4000);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->pc080sn = machine->device("pc080sn");
-	state->pc090oj = machine->device("pc090oj");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->pc080sn = machine.device("pc080sn");
+	state->pc090oj = machine.device("pc090oj");
 
 	state->save_item(NAME(state->sprite_ctrl));
 	state->save_item(NAME(state->sprites_flipscreen));
@@ -384,7 +384,7 @@ static MACHINE_START( rastan )
 
 static MACHINE_RESET( rastan )
 {
-	rastan_state *state = machine->driver_data<rastan_state>();
+	rastan_state *state = machine.driver_data<rastan_state>();
 
 	state->sprite_ctrl = 0;
 	state->sprites_flipscreen = 0;

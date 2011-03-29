@@ -118,9 +118,9 @@ SOUND_RESET( m72 )
 void m72_ym2151_irq_handler(device_t *device, int irq)
 {
 	if (irq)
-		device->machine->scheduler().synchronize(FUNC(setvector_callback), YM2151_ASSERT);
+		device->machine().scheduler().synchronize(FUNC(setvector_callback), YM2151_ASSERT);
 	else
-		device->machine->scheduler().synchronize(FUNC(setvector_callback), YM2151_CLEAR);
+		device->machine().scheduler().synchronize(FUNC(setvector_callback), YM2151_CLEAR);
 }
 
 WRITE16_HANDLER( m72_sound_command_w )
@@ -128,19 +128,19 @@ WRITE16_HANDLER( m72_sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space,offset,data);
-		space->machine->scheduler().synchronize(FUNC(setvector_callback), Z80_ASSERT);
+		space->machine().scheduler().synchronize(FUNC(setvector_callback), Z80_ASSERT);
 	}
 }
 
 WRITE8_HANDLER( m72_sound_command_byte_w )
 {
 	soundlatch_w(space,offset,data);
-	space->machine->scheduler().synchronize(FUNC(setvector_callback), Z80_ASSERT);
+	space->machine().scheduler().synchronize(FUNC(setvector_callback), Z80_ASSERT);
 }
 
 WRITE8_HANDLER( m72_sound_irq_ack_w )
 {
-	space->machine->scheduler().synchronize(FUNC(setvector_callback), Z80_CLEAR);
+	space->machine().scheduler().synchronize(FUNC(setvector_callback), Z80_CLEAR);
 }
 
 
@@ -200,11 +200,11 @@ WRITE8_HANDLER( poundfor_sample_addr_w )
 
 READ8_HANDLER( m72_sample_r )
 {
-	return space->machine->region("samples")->base()[sample_addr];
+	return space->machine().region("samples")->base()[sample_addr];
 }
 
 WRITE8_DEVICE_HANDLER( m72_sample_w )
 {
 	dac_signed_data_w(device, data);
-	sample_addr = (sample_addr + 1) & (device->machine->region("samples")->bytes() - 1);
+	sample_addr = (sample_addr + 1) & (device->machine().region("samples")->bytes() - 1);
 }

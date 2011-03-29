@@ -118,9 +118,9 @@ enum {
  *
  *************************************/
 
-void vertigo_vproc_init(running_machine *machine)
+void vertigo_vproc_init(running_machine &machine)
 {
-	vertigo_state *state = machine->driver_data<vertigo_state>();
+	vertigo_state *state = machine.driver_data<vertigo_state>();
 	state_save_register_item_array(machine, "vector_proc", NULL, 0, state->vs.sram);
 	state_save_register_item(machine, "vector_proc", NULL, 0, state->vs.ramlatch);
 	state_save_register_item(machine, "vector_proc", NULL, 0, state->vs.rom_adr);
@@ -154,14 +154,14 @@ void vertigo_vproc_init(running_machine *machine)
 }
 
 
-void vertigo_vproc_reset(running_machine *machine)
+void vertigo_vproc_reset(running_machine &machine)
 {
-	vertigo_state *state = machine->driver_data<vertigo_state>();
+	vertigo_state *state = machine.driver_data<vertigo_state>();
 	int i;
 	UINT64 *mcode;
 
-	state->vectorrom = (UINT16 *)machine->region("user1")->base();
-	mcode = (UINT64 *)machine->region("proms")->base();
+	state->vectorrom = (UINT16 *)machine.region("user1")->base();
+	mcode = (UINT64 *)machine.region("proms")->base();
 
 	/* Decode microcode */
 	for (i = 0; i < MC_LENGTH; i++)
@@ -187,7 +187,7 @@ void vertigo_vproc_reset(running_machine *machine)
 	memset(&state->vs, 0, sizeof(state->vs));
 	memset(&state->bsp, 0, sizeof(state->bsp));
 	memset(&state->vgen, 0, sizeof(state->vgen));
-	state->vgen.machine = machine;
+	state->vgen.m_machine = &machine;
 }
 
 
@@ -371,9 +371,9 @@ static void vertigo_vgen (vector_generator *vg)
 	if (vg->brez ^ vg->ven)
 	{
 		if (vg->brez)
-		V_ADDPOINT (vg->machine, vg->c_h, vg->c_v, 0, 0);
+		V_ADDPOINT (vg->machine(), vg->c_h, vg->c_v, 0, 0);
 		else
-			V_ADDPOINT (vg->machine, vg->c_h, vg->c_v, vg->color, vg->intensity);
+			V_ADDPOINT (vg->machine(), vg->c_h, vg->c_v, vg->color, vg->intensity);
 		vg->ven = vg->brez;
 	}
 }
@@ -384,9 +384,9 @@ static void vertigo_vgen (vector_generator *vg)
  *
  *************************************/
 
-void vertigo_vproc(running_machine *machine, int cycles, int irq4)
+void vertigo_vproc(running_machine &machine, int cycles, int irq4)
 {
-	vertigo_state *state = machine->driver_data<vertigo_state>();
+	vertigo_state *state = machine.driver_data<vertigo_state>();
 	int jcond;
 	microcode *cmc;
 

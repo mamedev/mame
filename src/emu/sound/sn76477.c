@@ -253,7 +253,7 @@ struct _sn76477_state
 
 	/* others */
 	sound_stream *channel;				/* returned by stream_create() */
-	int sample_rate;					/* from machine->sample_rate() */
+	int sample_rate;					/* from machine.sample_rate() */
 	device_t *device;
 
 	wav_file *file;						/* handle of the wave file to produce */
@@ -1988,13 +1988,13 @@ static STREAM_UPDATE( SN76477_update )
 
 
 #if TEST_MODE
-	static int recursing = 0;	/* we need to prevent recursion since enable_w calls input_code_pressed_once(device->machine, KEYCODE_SPACE->update */
+	static int recursing = 0;	/* we need to prevent recursion since enable_w calls input_code_pressed_once(device->machine(), KEYCODE_SPACE->update */
 
 	if () && !recursing)
 	{
 		recursing = 1;
 
-		device->machine->sound().system_enable();
+		device->machine().sound().system_enable();
 		SN76477_test_enable_w(sn, !sn->enable);
 	}
 
@@ -2406,7 +2406,7 @@ static DEVICE_START( sn76477 )
 
 	sn->device = device;
 
-	sn->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), sn, SN76477_update);
+	sn->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), sn, SN76477_update);
 
 	if (device->clock() > 0)
 	{
@@ -2414,7 +2414,7 @@ static DEVICE_START( sn76477 )
 	}
 	else
 	{
-		sn->sample_rate = device->machine->sample_rate();
+		sn->sample_rate = device->machine().sample_rate();
 	}
 
 	intialize_noise(sn);

@@ -58,7 +58,7 @@ READ8_DEVICE_HANDLER( msm6242_r )
 	}
 	else /* otherwise, use the current time */
 	{
-		device->machine->current_datetime(curtime);
+		device->machine().current_datetime(curtime);
 	}
 
 	switch(offset)
@@ -103,7 +103,7 @@ READ8_DEVICE_HANDLER( msm6242_r )
 		case MSM6242_REG_CF: return msm6242->reg[2];
 	}
 
-	logerror("%s: MSM6242 unmapped offset %02x read\n", device->machine->describe_context(), offset);
+	logerror("%s: MSM6242 unmapped offset %02x read\n", device->machine().describe_context(), offset);
 	return 0;
 }
 
@@ -120,7 +120,7 @@ WRITE8_DEVICE_HANDLER( msm6242_w )
 
 			if (data & 1)	/* was Hold set? */
 			{
-				device->machine->current_datetime(msm6242->hold_time);
+				device->machine().current_datetime(msm6242->hold_time);
 			}
 
 			return;
@@ -146,7 +146,7 @@ WRITE8_DEVICE_HANDLER( msm6242_w )
 		}
 	}
 
-	logerror("%s: MSM6242 unmapped offset %02x written with %02x\n", device->machine->describe_context(), offset, data);
+	logerror("%s: MSM6242 unmapped offset %02x written with %02x\n", device->machine().describe_context(), offset, data);
 }
 
 

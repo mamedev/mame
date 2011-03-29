@@ -20,7 +20,7 @@ PALETTE_INIT( hanaawas )
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x10);
+	machine.colortable = colortable_alloc(machine, 0x10);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x10; i++)
@@ -46,7 +46,7 @@ PALETTE_INIT( hanaawas )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -58,40 +58,40 @@ PALETTE_INIT( hanaawas )
 	{
 		int swapped_i = BITSWAP8(i,2,7,6,5,4,3,1,0);
 		UINT8 ctabentry = color_prom[swapped_i] & 0x0f;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 }
 
 WRITE8_HANDLER( hanaawas_videoram_w )
 {
-	hanaawas_state *state = space->machine->driver_data<hanaawas_state>();
+	hanaawas_state *state = space->machine().driver_data<hanaawas_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( hanaawas_colorram_w )
 {
-	hanaawas_state *state = space->machine->driver_data<hanaawas_state>();
+	hanaawas_state *state = space->machine().driver_data<hanaawas_state>();
 	state->colorram[offset] = data;
 
 	/* dirty both current and next offsets */
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
-	tilemap_mark_tile_dirty(state->bg_tilemap, (offset + (flip_screen_get(space->machine) ? -1 : 1)) & 0x03ff);
+	tilemap_mark_tile_dirty(state->bg_tilemap, (offset + (flip_screen_get(space->machine()) ? -1 : 1)) & 0x03ff);
 }
 
 WRITE8_DEVICE_HANDLER( hanaawas_portB_w )
 {
 	/* bit 7 is flip screen */
-	if (flip_screen_get(device->machine) != (~data & 0x80))
+	if (flip_screen_get(device->machine()) != (~data & 0x80))
 	{
-		flip_screen_set(device->machine, ~data & 0x80);
-		tilemap_mark_all_tiles_dirty_all(device->machine);
+		flip_screen_set(device->machine(), ~data & 0x80);
+		tilemap_mark_all_tiles_dirty_all(device->machine());
 	}
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	hanaawas_state *state = machine->driver_data<hanaawas_state>();
+	hanaawas_state *state = machine.driver_data<hanaawas_state>();
 	/* the color is determined by the current color byte, but the bank is via the previous one!!! */
 	int offset = (tile_index + (flip_screen_get(machine) ? 1 : -1)) & 0x3ff;
 	int attr = state->colorram[offset];
@@ -104,13 +104,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( hanaawas )
 {
-	hanaawas_state *state = machine->driver_data<hanaawas_state>();
+	hanaawas_state *state = machine.driver_data<hanaawas_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 SCREEN_UPDATE( hanaawas )
 {
-	hanaawas_state *state = screen->machine->driver_data<hanaawas_state>();
+	hanaawas_state *state = screen->machine().driver_data<hanaawas_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }

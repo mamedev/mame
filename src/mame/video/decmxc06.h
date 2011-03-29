@@ -20,7 +20,7 @@ class deco_mxc06_device : public device_t
 	deco_mxc06_device(running_machine &_machine, const deco_mxc06_device_config &config);
 public:
 	void set_gfxregion(int region) { m_gfxregion = region; };
-	void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16* spriteram16, int pri_mask, int pri_val, int col_mask );
+	void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16* spriteram16, int pri_mask, int pri_val, int col_mask );
 	void set_pri_type( int type ) { m_priority_type = type; }
 protected:
 	virtual void device_start();

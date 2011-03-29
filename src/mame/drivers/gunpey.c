@@ -64,13 +64,13 @@ public:
 
 static VIDEO_START( gunpey )
 {
-	gunpey_state *state = machine->driver_data<gunpey_state>();
+	gunpey_state *state = machine.driver_data<gunpey_state>();
 	state->blit_buffer = auto_alloc_array(machine, UINT16, 512*512);
 }
 
 static SCREEN_UPDATE( gunpey )
 {
-	gunpey_state *state = screen->machine->driver_data<gunpey_state>();
+	gunpey_state *state = screen->machine().driver_data<gunpey_state>();
 	UINT16 *blit_buffer = state->blit_buffer;
 	int x,y;
 	int count;
@@ -116,11 +116,11 @@ static READ8_HANDLER( gunpey_inputs_r )
 {
 	switch(offset+0x7f40)
 	{
-		case 0x7f40: return input_port_read(space->machine, "DSW1");
-		case 0x7f41: return input_port_read(space->machine, "DSW2");
-		case 0x7f42: return input_port_read(space->machine, "P1");
-		case 0x7f43: return input_port_read(space->machine, "P2");
-		case 0x7f44: return input_port_read(space->machine, "SYSTEM");
+		case 0x7f40: return input_port_read(space->machine(), "DSW1");
+		case 0x7f41: return input_port_read(space->machine(), "DSW2");
+		case 0x7f42: return input_port_read(space->machine(), "P1");
+		case 0x7f43: return input_port_read(space->machine(), "P2");
+		case 0x7f44: return input_port_read(space->machine(), "SYSTEM");
 	}
 
 	return 0xff;
@@ -128,10 +128,10 @@ static READ8_HANDLER( gunpey_inputs_r )
 
 static WRITE8_HANDLER( gunpey_blitter_w )
 {
-	gunpey_state *state = space->machine->driver_data<gunpey_state>();
+	gunpey_state *state = space->machine().driver_data<gunpey_state>();
 	UINT16 *blit_buffer = state->blit_buffer;
 	UINT16 *blit_ram = state->blit_ram;
-	UINT8 *blit_rom = space->machine->region("blit_data")->base();
+	UINT8 *blit_rom = space->machine().region("blit_data")->base();
 	int x,y;
 
 	blit_ram[offset] = data;
@@ -304,7 +304,7 @@ INPUT_PORTS_END
 static PALETTE_INIT( gunpey )
 {
 	int i,r,g,b,val;
-	UINT8 *blit_rom = machine->region("blit_data")->base();
+	UINT8 *blit_rom = machine.region("blit_data")->base();
 
 	for (i = 0; i < 512; i+=2)
 	{
@@ -382,7 +382,7 @@ ROM_END
 
 static DRIVER_INIT( gunpey )
 {
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	/* patch SLOOOOW cycle checks ... */
 	rom[0x848b5] = 0x7e;

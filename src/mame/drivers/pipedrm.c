@@ -187,7 +187,7 @@ static WRITE8_HANDLER( pipedrm_bankswitch_w )
     */
 
 	/* set the memory bank on the Z80 using the low 3 bits */
-	memory_set_bank(space->machine, "bank1", data & 0x7);
+	memory_set_bank(space->machine(), "bank1", data & 0x7);
 
 	/* map to the fromance gfx register */
 	fromance_gfxreg_w(space, offset, ((data >> 6) & 0x01) | 	/* flipscreen */
@@ -197,7 +197,7 @@ static WRITE8_HANDLER( pipedrm_bankswitch_w )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank2", data & 0x01);
+	memory_set_bank(space->machine(), "bank2", data & 0x01);
 }
 
 
@@ -210,7 +210,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static TIMER_CALLBACK( delayed_command_w	)
 {
-	fromance_state *state = machine->driver_data<fromance_state>();
+	fromance_state *state = machine.driver_data<fromance_state>();
 	state->sound_command = param & 0xff;
 	state->pending_command = 1;
 
@@ -224,19 +224,19 @@ static TIMER_CALLBACK( delayed_command_w	)
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	space->machine->scheduler().synchronize(FUNC(delayed_command_w), data | 0x100);
+	space->machine().scheduler().synchronize(FUNC(delayed_command_w), data | 0x100);
 }
 
 
 static WRITE8_HANDLER( sound_command_nonmi_w )
 {
-	space->machine->scheduler().synchronize(FUNC(delayed_command_w), data);
+	space->machine().scheduler().synchronize(FUNC(delayed_command_w), data);
 }
 
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	fromance_state *state = space->machine->driver_data<fromance_state>();
+	fromance_state *state = space->machine().driver_data<fromance_state>();
 	state->pending_command = 0;
 	device_set_input_line(state->subcpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -244,14 +244,14 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 static READ8_HANDLER( pending_command_r )
 {
-	fromance_state *state = space->machine->driver_data<fromance_state>();
+	fromance_state *state = space->machine().driver_data<fromance_state>();
 	return state->pending_command;
 }
 
 
 static READ8_HANDLER( sound_command_r )
 {
-	fromance_state *state = space->machine->driver_data<fromance_state>();
+	fromance_state *state = space->machine().driver_data<fromance_state>();
 	return state->sound_command;
 }
 
@@ -558,7 +558,7 @@ GFXDECODE_END
 
 static void irqhandler( device_t *device, int irq )
 {
-	fromance_state *state = device->machine->driver_data<fromance_state>();
+	fromance_state *state = device->machine().driver_data<fromance_state>();
 	device_set_input_line(state->subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -589,16 +589,16 @@ static const ym2610_interface ym2610_config =
 
 static MACHINE_START( pipedrm )
 {
-	fromance_state *state = machine->driver_data<fromance_state>();
+	fromance_state *state = machine.driver_data<fromance_state>();
 
-	state->subcpu = machine->device("sub");
+	state->subcpu = machine.device("sub");
 
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, "bank1", 0, 8, machine->region("maincpu")->base() + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 8, machine.region("maincpu")->base() + 0x10000, 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* initialize sound bank */
-	memory_configure_bank(machine, "bank2", 0, 2, machine->region("sub")->base() + 0x10000, 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 2, machine.region("sub")->base() + 0x10000, 0x8000);
 	memory_set_bank(machine, "bank2", 0);
 
 	/* state save */
@@ -610,7 +610,7 @@ static MACHINE_START( pipedrm )
 
 static MACHINE_RESET( pipedrm )
 {
-	fromance_state *state = machine->driver_data<fromance_state>();
+	fromance_state *state = machine.driver_data<fromance_state>();
 	int i;
 
 	state->pending_command = 0;
@@ -877,19 +877,19 @@ ROM_END
 
 static DRIVER_INIT( pipedrm )
 {
-	fromance_state *state = machine->driver_data<fromance_state>();
+	fromance_state *state = machine.driver_data<fromance_state>();
 
 	/* sprite RAM lives at the end of palette RAM */
-	state->spriteram = &machine->generic.paletteram.u8[0xc00];
+	state->spriteram = &machine.generic.paletteram.u8[0xc00];
 	state->spriteram_size = 0x400;
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xcc00, 0xcfff, state->spriteram);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xcc00, 0xcfff, state->spriteram);
 }
 
 
 static DRIVER_INIT( hatris )
 {
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x20, 0x20, FUNC(sound_command_nonmi_w));
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x21, 0x21, FUNC(fromance_gfxreg_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x20, 0x20, FUNC(sound_command_nonmi_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x21, 0x21, FUNC(fromance_gfxreg_w));
 }
 
 

@@ -23,7 +23,7 @@ inline void ATTR_PRINTF(3,4) x76f100_device::verboselog(int n_level, const char 
 		va_start(v, s_fmt);
 		vsprintf(buf, s_fmt, v);
 		va_end(v);
-		logerror("x76f100 %s %s: %s", config.tag(), machine->describe_context(), buf);
+		logerror("x76f100 %s %s: %s", config.tag(), m_machine.describe_context(), buf);
 	}
 }
 
@@ -41,7 +41,7 @@ device_config *x76f100_device_config::static_alloc_device_config(const machine_c
 
 device_t *x76f100_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, x76f100_device(machine, *this));
+	return auto_alloc(machine, x76f100_device(machine, *this));
 }
 
 x76f100_device::x76f100_device(running_machine &_machine, const x76f100_device_config &_config)

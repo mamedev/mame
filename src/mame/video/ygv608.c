@@ -57,10 +57,10 @@ static tilemap_t *tilemap_A = NULL;
 static tilemap_t *tilemap_B = NULL;
 static bitmap_t *work_bitmap = NULL;
 
-static void HandleYGV608Reset( running_machine *machine );
-static void HandleRomTransfers( running_machine *machine );
+static void HandleYGV608Reset( running_machine &machine );
+static void HandleRomTransfers( running_machine &machine );
 static void SetPreShortcuts( int reg, int data );
-static void SetPostShortcuts( running_machine *machine, int reg );
+static void SetPostShortcuts( running_machine &machine, int reg );
 
 #ifdef MAME_DEBUG
 static void ShowYGV608Registers( void );
@@ -113,7 +113,7 @@ static TILEMAP_MAPPER( get_tile_offset )
 }
 
 #define layout_total(x) \
-(machine->config().m_gfxdecodeinfo[x].gfxlayout->total)
+(machine.config().m_gfxdecodeinfo[x].gfxlayout->total)
 
 static TILE_GET_INFO( get_tile_info_A_8 )
 {
@@ -495,7 +495,7 @@ static STATE_POSTLOAD( ygv608_postload )
 		SetPostShortcuts(machine, i);
 }
 
-static void ygv608_register_state_save(running_machine *machine)
+static void ygv608_register_state_save(running_machine &machine)
 {
 	state_save_register_item_array(machine, "ygv608", NULL, 0, ygv608.ports.b);
 	state_save_register_item_array(machine, "ygv608", NULL, 0, ygv608.regs.b);
@@ -504,7 +504,7 @@ static void ygv608_register_state_save(running_machine *machine)
 	state_save_register_item_2d_array(machine, "ygv608", NULL, 0, ygv608.scroll_data_table);
 	state_save_register_item_2d_array(machine, "ygv608", NULL, 0, ygv608.colour_palette);
 
-	machine->state().register_postload(ygv608_postload, NULL);
+	machine.state().register_postload(ygv608_postload, NULL);
 }
 
 static void ygv608_exit(running_machine &machine)
@@ -544,10 +544,10 @@ VIDEO_START( ygv608 )
 	tilemap_B = NULL;
 
 	ygv608_register_state_save(machine);
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, ygv608_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, ygv608_exit);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 #ifdef _ENABLE_SPRITES
 
@@ -600,20 +600,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	    logerror( "SZ_8X8: sprite=%d\n", code );
 	    code = 0;
       }
-      drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_8X8_4BIT],
+      drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_8X8_4BIT],
 	       code+namcond1_gfxbank*0x10000,
 	       color,
 	       flipx,flipy,
 	       sx,sy,0x00);
       // redraw with wrap-around
       if( sx > 512-8 )
-        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_8X8_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_8X8_4BIT],
 	        code+namcond1_gfxbank*0x10000,
 	        color,
 	        flipx,flipy,
 	        sx-512,sy,0x00);
       if( sy > 512-8 )
-        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_8X8_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_8X8_4BIT],
 	        code+namcond1_gfxbank*0x10000,
 	        color,
 	        flipx,flipy,
@@ -630,20 +630,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	    logerror( "SZ_8X8: sprite=%d\n", code );
 	    code = 0;
       }
-      drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_16X16_4BIT],
+      drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_16X16_4BIT],
 	       code+namcond1_gfxbank*0x4000,
 	       color,
 	       flipx,flipy,
 	       sx,sy,0x00);
       // redraw with wrap-around
       if( sx > 512-16 )
-        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_16X16_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_16X16_4BIT],
 	        code+namcond1_gfxbank*0x4000,
 	        color,
 	        flipx,flipy,
 	        sx-512,sy,0x00);
       if( sy > 512-16 )
-        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_16X16_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_16X16_4BIT],
 	        code+namcond1_gfxbank*0x4000,
 	        color,
 	        flipx,flipy,
@@ -660,20 +660,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	  logerror( "SZ_32X32: sprite=%d\n", code );
 	code = 0;
       }
-      drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_32X32_4BIT],
+      drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_32X32_4BIT],
 	       code+namcond1_gfxbank*0x1000,
 	       color,
 	       flipx,flipy,
 	       sx,sy,0x00);
       // redraw with wrap-around
       if( sx > 512-32 )
-        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_32X32_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_32X32_4BIT],
 	        code+namcond1_gfxbank*0x1000,
 	        color,
 	        flipx,flipy,
 	        sx-512,sy,0x00);
       if( sy > 512-32 )
-        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_32X32_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_32X32_4BIT],
 	        code+namcond1_gfxbank*0x1000,
 	        color,
 	        flipx,flipy,
@@ -690,20 +690,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	    logerror( "SZ_64X64: sprite=%d\n", code );
 	    code = 0;
       }
-      drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_64X64_4BIT],
+      drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_64X64_4BIT],
 	       code+namcond1_gfxbank*0x400,
 	       color,
 	       flipx,flipy,
 	       sx,sy,0x00);
       // redraw with wrap-around
       if( sx > 512-64 )
-        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_64X64_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_64X64_4BIT],
 	        code+namcond1_gfxbank*0x400,
 	        color,
 	        flipx,flipy,
 	        sx-512,sy,0x00);
       if( sy > 512-64 )
-        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_64X64_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_64X64_4BIT],
 	        code+namcond1_gfxbank*0x400,
 	        color,
 	        flipx,flipy,
@@ -770,7 +770,7 @@ SCREEN_UPDATE( ygv608 )
 						  0, ((int)(ygv608.regs.s.vdw)<<3)-1 );
 #endif
 
-		auto_free( screen->machine, work_bitmap );
+		auto_free( screen->machine(), work_bitmap );
 		work_bitmap = screen->alloc_compatible_bitmap();
 
 		// reset resize flag
@@ -902,7 +902,7 @@ SCREEN_UPDATE( ygv608 )
 
 	if ((ygv608.regs.s.r11 & r11_prm) == PRM_ASBDEX ||
 		(ygv608.regs.s.r11 & r11_prm) == PRM_ASEBDX )
-		draw_sprites(screen->machine, bitmap,cliprect );
+		draw_sprites(screen->machine(), bitmap,cliprect );
 
 	tilemap_draw( work_bitmap,cliprect, tilemap_A, 0, 0 );
 
@@ -919,7 +919,7 @@ SCREEN_UPDATE( ygv608 )
 
 	if ((ygv608.regs.s.r11 & r11_prm) == PRM_SABDEX ||
 		(ygv608.regs.s.r11 & r11_prm) == PRM_SEABDX)
-		draw_sprites(screen->machine, bitmap,cliprect );
+		draw_sprites(screen->machine(), bitmap,cliprect );
 
 
 #ifdef _SHOW_VIDEO_DEBUG
@@ -1215,7 +1215,7 @@ WRITE16_HANDLER( ygv608_w )
 			if (++p3_state == 3)
 			{
 				p3_state = 0;
-				palette_set_color_rgb(space->machine,ygv608.regs.s.cc,
+				palette_set_color_rgb(space->machine(),ygv608.regs.s.cc,
 			    	pal6bit(ygv608.colour_palette[ygv608.regs.s.cc][0]),
 			    	pal6bit(ygv608.colour_palette[ygv608.regs.s.cc][1]),
 			    	pal6bit(ygv608.colour_palette[ygv608.regs.s.cc][2]) );
@@ -1232,7 +1232,7 @@ WRITE16_HANDLER( ygv608_w )
 #endif
 			SetPreShortcuts (regNum, data);
 			ygv608.regs.b[regNum] = data;
-			SetPostShortcuts (space->machine, regNum);
+			SetPostShortcuts (space->machine(), regNum);
 			if (ygv608.ports.s.p5 & p5_rwai)
 			{
 				regNum ++;
@@ -1259,9 +1259,9 @@ WRITE16_HANDLER( ygv608_w )
 		case 0x07: /* P#7 - system control port */
 			ygv608.ports.b[7] = data;
 			if (ygv608.ports.b[7] & 0x3e)
-				HandleRomTransfers(space->machine);
+				HandleRomTransfers(space->machine());
 			if (ygv608.ports.b[7] & 0x01)
-				HandleYGV608Reset(space->machine);
+				HandleYGV608Reset(space->machine());
 			break;
 
 		default:
@@ -1270,7 +1270,7 @@ WRITE16_HANDLER( ygv608_w )
 	}
 }
 
-static void HandleYGV608Reset( running_machine *machine )
+static void HandleYGV608Reset( running_machine &machine )
 {
     int i;
 
@@ -1302,14 +1302,14 @@ static void HandleYGV608Reset( running_machine *machine )
     - So leave it in!
  */
 
-static void HandleRomTransfers(running_machine *machine)
+static void HandleRomTransfers(running_machine &machine)
 {
 #if 0
   static UINT8 *sdt = (UINT8 *)ygv608.scroll_data_table;
   static UINT8 *sat = (UINT8 *)ygv608.sprite_attribute_table.b;
 
   /* fudge copy from sprite data for now... */
-  UINT8 *RAM = machine->memory_region[0];
+  UINT8 *RAM = machine.memory_region[0];
   int i;
 
   int src = ( ( (int)ygv608.regs.s.tb13 << 8 ) +
@@ -1414,7 +1414,7 @@ static void SetPreShortcuts( int reg, int data )
 // Set any "short-cut" variables after we have updated the YGV608 registers
 // - these are used only in optimisation of the emulation
 
-static void SetPostShortcuts( running_machine *machine, int reg )
+static void SetPostShortcuts( running_machine &machine, int reg )
 {
   int plane, addr;
 
@@ -1425,7 +1425,7 @@ static void SetPostShortcuts( running_machine *machine, int reg )
       UINT8 yTile = ygv608.regs.s.r0 & r0_pny;
 
       if (yTile >= ygv608.page_y)
-        logerror ("%s:setting pny(%d) >= page_y(%d)\n", machine->describe_context(),
+        logerror ("%s:setting pny(%d) >= page_y(%d)\n", machine.describe_context(),
             yTile, ygv608.page_y );
       yTile &= (ygv608.page_y - 1);
       ygv608.regs.s.r0 &= ~r0_pny;
@@ -1438,7 +1438,7 @@ static void SetPostShortcuts( running_machine *machine, int reg )
       UINT8 xTile = ygv608.regs.s.r1 & r1_pnx;
 
       if (xTile >= ygv608.page_x)
-        logerror ("%s:setting pnx(%d) >= page_x(%d)\n", machine->describe_context(),
+        logerror ("%s:setting pnx(%d) >= page_x(%d)\n", machine.describe_context(),
             xTile, ygv608.page_x );
       xTile &= (ygv608.page_x - 1);
       ygv608.regs.s.r1 &= ~r1_pnx;

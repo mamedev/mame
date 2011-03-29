@@ -41,8 +41,8 @@ public:
 
 /*----------- defined in video/moo.c -----------*/
 
-extern void moo_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
-extern void moo_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
+extern void moo_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
+extern void moo_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
 
 VIDEO_START(moo);
 SCREEN_UPDATE(moo);

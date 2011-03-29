@@ -65,8 +65,8 @@ Notes:
 
 static WRITE8_HANDLER( sprcros2_m_port7_w )
 {
-	sprcros2_state *state = space->machine->driver_data<sprcros2_state>();
-	UINT8 *RAM = space->machine->region("master")->base();
+	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
+	UINT8 *RAM = space->machine().region("master")->base();
 
 	//76543210
 	//x------- unused
@@ -78,17 +78,17 @@ static WRITE8_HANDLER( sprcros2_m_port7_w )
 	//-------x nmi enable
 
 	if((state->m_port7^data)&0x40)
-		memory_set_bankptr(space->machine, "bank1",&RAM[0x10000+((data&0x40)<<7)]);
+		memory_set_bankptr(space->machine(), "bank1",&RAM[0x10000+((data&0x40)<<7)]);
 
-	tilemap_set_flip_all( space->machine,data&0x02?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
+	tilemap_set_flip_all( space->machine(),data&0x02?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
 
 	state->m_port7 = data;
 }
 
 static WRITE8_HANDLER( sprcros2_s_port3_w )
 {
-	sprcros2_state *state = space->machine->driver_data<sprcros2_state>();
-	UINT8 *RAM = space->machine->region("slave")->base();
+	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
+	UINT8 *RAM = space->machine().region("slave")->base();
 
 	//76543210
 	//xxxx---- unused
@@ -97,7 +97,7 @@ static WRITE8_HANDLER( sprcros2_s_port3_w )
 	//-------x nmi enable
 
 	if((state->s_port3^data)&0x08)
-		memory_set_bankptr(space->machine, "bank2",&RAM[0x10000+((data&0x08)<<10)]);
+		memory_set_bankptr(space->machine(), "bank2",&RAM[0x10000+((data&0x08)<<10)]);
 
 	state->s_port3 = data;
 }
@@ -233,7 +233,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( sprcros2_m_interrupt )
 {
-	sprcros2_state *state = device->machine->driver_data<sprcros2_state>();
+	sprcros2_state *state = device->machine().driver_data<sprcros2_state>();
 
 	if (cpu_getiloops(device) == 0)
 	{
@@ -249,7 +249,7 @@ static INTERRUPT_GEN( sprcros2_m_interrupt )
 
 static INTERRUPT_GEN( sprcros2_s_interrupt )
 {
-	sprcros2_state *state = device->machine->driver_data<sprcros2_state>();
+	sprcros2_state *state = device->machine().driver_data<sprcros2_state>();
 
 	if(state->s_port3&0x01)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
@@ -257,7 +257,7 @@ static INTERRUPT_GEN( sprcros2_s_interrupt )
 
 static MACHINE_START( sprcros2 )
 {
-	sprcros2_state *state = machine->driver_data<sprcros2_state>();
+	sprcros2_state *state = machine.driver_data<sprcros2_state>();
 
 	state->save_item(NAME(state->m_port7));
 	state->save_item(NAME(state->s_port3));

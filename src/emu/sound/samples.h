@@ -42,7 +42,7 @@ int sample_playing(device_t *device,int channel);
 
 /* helper function that reads samples from disk - this can be used by other */
 /* drivers as well (e.g. a sound chip emulator needing drum samples) */
-loaded_samples *readsamples(running_machine *machine, const char *const *samplenames, const char *name);
+loaded_samples *readsamples(running_machine &machine, const char *const *samplenames, const char *name);
 
 DECLARE_LEGACY_SOUND_DEVICE(SAMPLES, samples);
 

@@ -171,7 +171,7 @@ static int gsword_coins_in(void)
 /* (4004,4005) clear down counter , if (4004,4005)==0 then (402E)=0 */
 static READ8_HANDLER( gsword_hack_r )
 {
-	gsword_state *state = space->machine->driver_data<gsword_state>();
+	gsword_state *state = space->machine().driver_data<gsword_state>();
 	UINT8 data = state->cpu2_ram[offset + 4];
 
 	/*if(offset==1)mame_printf_debug("CNT %02X%02X\n",state->cpu2_ram[5],state->cpu2_ram[4]); */
@@ -193,11 +193,11 @@ static READ8_HANDLER( gsword_8741_2_r )
 	switch (offset)
 	{
 	case 0x01: /* start button , coins */
-		return input_port_read(space->machine, "IN0");
+		return input_port_read(space->machine(), "IN0");
 	case 0x02: /* Player 1 Controller */
-		return input_port_read(space->machine, "IN1");
+		return input_port_read(space->machine(), "IN1");
 	case 0x04: /* Player 2 Controller */
-		return input_port_read(space->machine, "IN3");
+		return input_port_read(space->machine(), "IN3");
 //  default:
 //      logerror("8741-2 unknown read %d PC=%04x\n",offset,cpu_get_pc(space->cpu));
 	}
@@ -210,11 +210,11 @@ static READ8_HANDLER( gsword_8741_3_r )
 	switch (offset)
 	{
 	case 0x01: /* start button  */
-		return input_port_read(space->machine, "IN2");
+		return input_port_read(space->machine(), "IN2");
 	case 0x02: /* Player 1 Controller? */
-		return input_port_read(space->machine, "IN1");
+		return input_port_read(space->machine(), "IN1");
 	case 0x04: /* Player 2 Controller? */
-		return input_port_read(space->machine, "IN3");
+		return input_port_read(space->machine(), "IN3");
 	}
 	/* unknown */
 //  logerror("8741-3 unknown read %d PC=%04x\n",offset,cpu_get_pc(space->cpu));
@@ -232,7 +232,7 @@ static const struct TAITO8741interface gsword_8741interface=
 
 static MACHINE_RESET( gsword )
 {
-	gsword_state *state = machine->driver_data<gsword_state>();
+	gsword_state *state = machine.driver_data<gsword_state>();
 	int i;
 
 	for(i=0;i<4;i++) TAITO8741_reset(i);
@@ -252,7 +252,7 @@ static MACHINE_RESET( josvolly )
 
 static INTERRUPT_GEN( gsword_snd_interrupt )
 {
-	gsword_state *state = device->machine->driver_data<gsword_state>();
+	gsword_state *state = device->machine().driver_data<gsword_state>();
 	if(state->nmi_enable)
 	{
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
@@ -261,7 +261,7 @@ static INTERRUPT_GEN( gsword_snd_interrupt )
 
 static WRITE8_DEVICE_HANDLER( gsword_nmi_set_w )
 {
-	gsword_state *state = device->machine->driver_data<gsword_state>();
+	gsword_state *state = device->machine().driver_data<gsword_state>();
 /*  mame_printf_debug("AY write %02X\n",data);*/
 
 	state->protect_hack = (data&0x80) ? 0 : 1;
@@ -297,25 +297,25 @@ static WRITE8_DEVICE_HANDLER( gsword_nmi_set_w )
 
 static WRITE8_DEVICE_HANDLER( gsword_AY8910_control_port_0_w )
 {
-	gsword_state *state = device->machine->driver_data<gsword_state>();
+	gsword_state *state = device->machine().driver_data<gsword_state>();
 	ay8910_address_w(device,offset,data);
 	state->fake8910_0 = data;
 }
 static WRITE8_DEVICE_HANDLER( gsword_AY8910_control_port_1_w )
 {
-	gsword_state *state = device->machine->driver_data<gsword_state>();
+	gsword_state *state = device->machine().driver_data<gsword_state>();
 	ay8910_address_w(device,offset,data);
 	state->fake8910_1 = data;
 }
 
 static READ8_DEVICE_HANDLER( gsword_fake_0_r )
 {
-	gsword_state *state = device->machine->driver_data<gsword_state>();
+	gsword_state *state = device->machine().driver_data<gsword_state>();
 	return state->fake8910_0+1;
 }
 static READ8_DEVICE_HANDLER( gsword_fake_1_r )
 {
-	gsword_state *state = device->machine->driver_data<gsword_state>();
+	gsword_state *state = device->machine().driver_data<gsword_state>();
 	return state->fake8910_1+1;
 }
 
@@ -329,7 +329,7 @@ static WRITE8_DEVICE_HANDLER( gsword_adpcm_data_w )
 static WRITE8_HANDLER( adpcm_soundcommand_w )
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM , 8 )
@@ -909,7 +909,7 @@ ROM_END
 static DRIVER_INIT( gsword )
 {
 #if 0
-	UINT8 *ROM2 = machine->region("sub")->base();
+	UINT8 *ROM2 = machine.region("sub")->base();
 	ROM2[0x1da] = 0xc3; /* patch for rom self check */
 
 	ROM2[0x71e] = 0;    /* patch for sound protection or time out function */
@@ -917,14 +917,14 @@ static DRIVER_INIT( gsword )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4004, 0x4005, FUNC(gsword_hack_r));
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4004, 0x4005, FUNC(gsword_hack_r));
 #endif
 }
 
 static DRIVER_INIT( gsword2 )
 {
 #if 0
-	UINT8 *ROM2 = machine->region("sub")->base();
+	UINT8 *ROM2 = machine.region("sub")->base();
 
 	ROM2[0x1da] = 0xc3; /* patch for rom self check */
 	ROM2[0x726] = 0;    /* patch for sound protection or time out function */
@@ -932,7 +932,7 @@ static DRIVER_INIT( gsword2 )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4004, 0x4005, FUNC(gsword_hack_r));
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4004, 0x4005, FUNC(gsword_hack_r));
 #endif
 }
 

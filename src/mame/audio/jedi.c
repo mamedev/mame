@@ -22,7 +22,7 @@
 
 static SOUND_START( jedi )
 {
-	jedi_state *state = machine->driver_data<jedi_state>();
+	jedi_state *state = machine.driver_data<jedi_state>();
 
 	/* set up save state */
 	state->save_item(NAME(state->audio_latch));
@@ -40,7 +40,7 @@ static SOUND_START( jedi )
 
 static SOUND_RESET( jedi )
 {
-	jedi_state *state = machine->driver_data<jedi_state>();
+	jedi_state *state = machine.driver_data<jedi_state>();
 
 	/* init globals */
 	state->audio_latch = 0;
@@ -60,7 +60,7 @@ static SOUND_RESET( jedi )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -73,13 +73,13 @@ static WRITE8_HANDLER( irq_ack_w )
 
 WRITE8_HANDLER( jedi_audio_reset_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 static TIMER_CALLBACK( delayed_audio_latch_w )
 {
-	jedi_state *state = machine->driver_data<jedi_state>();
+	jedi_state *state = machine.driver_data<jedi_state>();
 
 	state->audio_latch = param;
 	*state->audio_comm_stat |= 0x80;
@@ -88,13 +88,13 @@ static TIMER_CALLBACK( delayed_audio_latch_w )
 
 WRITE8_HANDLER( jedi_audio_latch_w )
 {
-	space->machine->scheduler().synchronize(FUNC(delayed_audio_latch_w), data);
+	space->machine().scheduler().synchronize(FUNC(delayed_audio_latch_w), data);
 }
 
 
 static READ8_HANDLER( audio_latch_r )
 {
-	jedi_state *state = space->machine->driver_data<jedi_state>();
+	jedi_state *state = space->machine().driver_data<jedi_state>();
 
 	*state->audio_comm_stat &= ~0x80;
 	return state->audio_latch;
@@ -103,7 +103,7 @@ static READ8_HANDLER( audio_latch_r )
 
 CUSTOM_INPUT( jedi_audio_comm_stat_r )
 {
-	jedi_state *state = field->port->machine->driver_data<jedi_state>();
+	jedi_state *state = field->port->machine().driver_data<jedi_state>();
 	return *state->audio_comm_stat >> 6;
 }
 
@@ -117,7 +117,7 @@ CUSTOM_INPUT( jedi_audio_comm_stat_r )
 
 READ8_HANDLER( jedi_audio_ack_latch_r )
 {
-	jedi_state *state = space->machine->driver_data<jedi_state>();
+	jedi_state *state = space->machine().driver_data<jedi_state>();
 
 	*state->audio_comm_stat &= ~0x40;
 	return state->audio_ack_latch;
@@ -126,7 +126,7 @@ READ8_HANDLER( jedi_audio_ack_latch_r )
 
 static WRITE8_HANDLER( audio_ack_latch_w )
 {
-	jedi_state *state = space->machine->driver_data<jedi_state>();
+	jedi_state *state = space->machine().driver_data<jedi_state>();
 
 	state->audio_ack_latch = data;
 	*state->audio_comm_stat |= 0x40;
@@ -142,12 +142,12 @@ static WRITE8_HANDLER( audio_ack_latch_w )
 
 static WRITE8_HANDLER( speech_strobe_w )
 {
-	jedi_state *state = space->machine->driver_data<jedi_state>();
+	jedi_state *state = space->machine().driver_data<jedi_state>();
 	int new_speech_strobe_state = (~offset >> 8) & 1;
 
 	if ((new_speech_strobe_state != state->speech_strobe_state) && new_speech_strobe_state)
 	{
-		device_t *tms = space->machine->device("tms");
+		device_t *tms = space->machine().device("tms");
 		tms5220_data_w(tms, 0, *state->speech_data);
 	}
 	state->speech_strobe_state = new_speech_strobe_state;
@@ -156,7 +156,7 @@ static WRITE8_HANDLER( speech_strobe_w )
 
 static READ8_HANDLER( speech_ready_r )
 {
-	return (tms5220_readyq_r(space->machine->device("tms"))) << 7;
+	return (tms5220_readyq_r(space->machine().device("tms"))) << 7;
 }
 
 

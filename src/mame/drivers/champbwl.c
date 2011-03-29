@@ -171,10 +171,10 @@ public:
 
 static READ8_HANDLER( trackball_r )
 {
-	champbwl_state *state = space->machine->driver_data<champbwl_state>();
+	champbwl_state *state = space->machine().driver_data<champbwl_state>();
 	UINT8 ret;
-	UINT8 port4 = input_port_read(space->machine, "FAKEX");
-	UINT8 port5 = input_port_read(space->machine, "FAKEY");
+	UINT8 port4 = input_port_read(space->machine(), "FAKEX");
+	UINT8 port5 = input_port_read(space->machine(), "FAKEY");
 
 	ret = (((port4 - state->last_trackball_val[0]) & 0x0f)<<4) | ((port5 - state->last_trackball_val[1]) & 0x0f);
 
@@ -186,18 +186,18 @@ static READ8_HANDLER( trackball_r )
 
 static WRITE8_HANDLER( champbwl_misc_w )
 {
-	coin_counter_w(space->machine, 0, data & 1);
-	coin_counter_w(space->machine, 1, data & 2);
+	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(space->machine(), 1, data & 2);
 
-	coin_lockout_w(space->machine, 0, ~data & 8);
-	coin_lockout_w(space->machine, 1, ~data & 4);
+	coin_lockout_w(space->machine(), 0, ~data & 8);
+	coin_lockout_w(space->machine(), 1, ~data & 4);
 
-	memory_set_bank(space->machine, "bank1", (data & 0x30) >> 4);
+	memory_set_bank(space->machine(), "bank1", (data & 0x30) >> 4);
 }
 
 static WRITE8_HANDLER( champbwl_objctrl_w )
 {
-	champbwl_state *state = space->machine->driver_data<champbwl_state>();
+	champbwl_state *state = space->machine().driver_data<champbwl_state>();
 	if(offset != 0)
 		data ^= 0xff;
 
@@ -345,8 +345,8 @@ static const x1_010_interface champbwl_sound_intf =
 
 static MACHINE_START( champbwl )
 {
-	champbwl_state *state = machine->driver_data<champbwl_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	champbwl_state *state = machine.driver_data<champbwl_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	state->mcu = NULL;
 
@@ -358,7 +358,7 @@ static MACHINE_START( champbwl )
 
 static MACHINE_RESET( champbwl )
 {
-	champbwl_state *state = machine->driver_data<champbwl_state>();
+	champbwl_state *state = machine.driver_data<champbwl_state>();
 
 	state->screenflip = 0;
 	state->mcu_type = -1;

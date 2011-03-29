@@ -38,13 +38,13 @@ static READ16_HANDLER( zerozone_input_r )
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_read(space->machine, "SYSTEM");
+			return input_port_read(space->machine(), "SYSTEM");
 		case 0x01:
-			return input_port_read(space->machine, "INPUTS");
+			return input_port_read(space->machine(), "INPUTS");
 		case 0x04:
-			return input_port_read(space->machine, "DSWB");
+			return input_port_read(space->machine(), "DSWB");
 		case 0x05:
-			return input_port_read(space->machine, "DSWA");
+			return input_port_read(space->machine(), "DSWA");
 	}
 
 	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(space->cpu), 0x800000 + offset);
@@ -54,7 +54,7 @@ static READ16_HANDLER( zerozone_input_r )
 
 static WRITE16_HANDLER( zerozone_sound_w )
 {
-	zerozone_state *state = space->machine->driver_data<zerozone_state>();
+	zerozone_state *state = space->machine().driver_data<zerozone_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -171,16 +171,16 @@ GFXDECODE_END
 
 static MACHINE_START( zerozone )
 {
-	zerozone_state *state = machine->driver_data<zerozone_state>();
+	zerozone_state *state = machine.driver_data<zerozone_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->tilebank));
 }
 
 static MACHINE_RESET( zerozone )
 {
-	zerozone_state *state = machine->driver_data<zerozone_state>();
+	zerozone_state *state = machine.driver_data<zerozone_state>();
 	state->tilebank = 0;
 }
 

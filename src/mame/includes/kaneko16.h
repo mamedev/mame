@@ -31,13 +31,13 @@ WRITE16_HANDLER( toybox_mcu_com2_w );
 WRITE16_HANDLER( toybox_mcu_com3_w );
 READ16_HANDLER( toybox_mcu_status_r );
 
-extern void (*toybox_mcu_run)(running_machine *machine);	/* one of the following */
-void bloodwar_mcu_run(running_machine *machine);
-void bonkadv_mcu_run(running_machine *machine);
-void gtmr_mcu_run(running_machine *machine);
-void calc3_mcu_run(running_machine *machine);
+extern void (*toybox_mcu_run)(running_machine &machine);	/* one of the following */
+void bloodwar_mcu_run(running_machine &machine);
+void bonkadv_mcu_run(running_machine &machine);
+void gtmr_mcu_run(running_machine &machine);
+void calc3_mcu_run(running_machine &machine);
 
-void toxboy_handle_04_subcommand(running_machine* machine,UINT8 mcu_subcmd, UINT16*mcu_ram);
+void toxboy_handle_04_subcommand(running_machine& machine,UINT8 mcu_subcmd, UINT16*mcu_ram);
 
 DRIVER_INIT( decrypt_toybox_rom );
 DRIVER_INIT( decrypt_toybox_rom_alt );
@@ -80,7 +80,7 @@ extern UINT16 *kaneko16_sprites_regs;
 READ16_HANDLER ( kaneko16_sprites_regs_r );
 WRITE16_HANDLER( kaneko16_sprites_regs_w );
 
-void kaneko16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+void kaneko16_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect);
 
 /* Pixel Layer: */
 

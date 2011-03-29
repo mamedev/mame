@@ -33,7 +33,7 @@ public:
 
 static SCREEN_UPDATE( minivadr )
 {
-	minivadr_state *state = screen->machine->driver_data<minivadr_state>();
+	minivadr_state *state = screen->machine().driver_data<minivadr_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->videoram_size; offs++)

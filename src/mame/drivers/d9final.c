@@ -40,7 +40,7 @@ public:
 
 static TILE_GET_INFO( get_sc0_tile_info )
 {
-	d9final_state *state = machine->driver_data<d9final_state>();
+	d9final_state *state = machine.driver_data<d9final_state>();
 	int tile = ((state->hi_vram[tile_index] & 0x3f)<<8) | state->lo_vram[tile_index];
 	int color = state->cram[tile_index] & 0x3f;
 
@@ -53,45 +53,45 @@ static TILE_GET_INFO( get_sc0_tile_info )
 
 static VIDEO_START(d9final)
 {
-	d9final_state *state = machine->driver_data<d9final_state>();
+	d9final_state *state = machine.driver_data<d9final_state>();
 	state->sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,64,32);
 }
 
 static SCREEN_UPDATE(d9final)
 {
-	d9final_state *state = screen->machine->driver_data<d9final_state>();
+	d9final_state *state = screen->machine().driver_data<d9final_state>();
 	tilemap_draw(bitmap,cliprect,state->sc0_tilemap,0,0);
 	return 0;
 }
 
 static WRITE8_HANDLER( sc0_lovram )
 {
-	d9final_state *state = space->machine->driver_data<d9final_state>();
+	d9final_state *state = space->machine().driver_data<d9final_state>();
 	state->lo_vram[offset] = data;
 	tilemap_mark_tile_dirty(state->sc0_tilemap,offset);
 }
 
 static WRITE8_HANDLER( sc0_hivram )
 {
-	d9final_state *state = space->machine->driver_data<d9final_state>();
+	d9final_state *state = space->machine().driver_data<d9final_state>();
 	state->hi_vram[offset] = data;
 	tilemap_mark_tile_dirty(state->sc0_tilemap,offset);
 }
 
 static WRITE8_HANDLER( sc0_cram )
 {
-	d9final_state *state = space->machine->driver_data<d9final_state>();
+	d9final_state *state = space->machine().driver_data<d9final_state>();
 	state->cram[offset] = data;
 	tilemap_mark_tile_dirty(state->sc0_tilemap,offset);
 }
 
 static WRITE8_HANDLER( d9final_bank_w )
 {
-	UINT8 *ROM = space->machine->region("maincpu")->base();
+	UINT8 *ROM = space->machine().region("maincpu")->base();
 	UINT32 bankaddress;
 
 	bankaddress = 0x10000+(0x4000 * (data & 0x7));
-	memory_set_bankptr(space->machine, "bank1", &ROM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank1", &ROM[bankaddress]);
 }
 
 /* game checks this after three attract cycles, otherwise coin inputs stop to work. */
@@ -268,7 +268,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( d9final )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_set_bankptr(machine, "bank1", &ROM[0x10000]);
 }

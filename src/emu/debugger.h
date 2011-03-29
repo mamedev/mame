@@ -24,10 +24,10 @@
 /* ----- core debugger functions ----- */
 
 /* initialize the debugger */
-void debugger_init(running_machine *machine);
+void debugger_init(running_machine &machine);
 
 /* redraw the current video display */
-void debugger_refresh_display(running_machine *machine);
+void debugger_refresh_display(running_machine &machine);
 
 /* OSD can call this to safely flush all traces in the event of a crash */
 void debugger_flush_all_traces_on_abnormal_exit(void);
@@ -45,7 +45,7 @@ void debugger_flush_all_traces_on_abnormal_exit(void);
 
 INLINE void debugger_instruction_hook(device_t *device, offs_t curpc)
 {
-	if ((device->machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
+	if ((device->machine().debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
 		device->debug()->instruction_hook(curpc);
 }
 
@@ -57,7 +57,7 @@ INLINE void debugger_instruction_hook(device_t *device, offs_t curpc)
 
 INLINE void debugger_exception_hook(device_t *device, int exception)
 {
-	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		device->debug()->exception_hook(exception);
 }
 
@@ -75,7 +75,7 @@ INLINE void debugger_exception_hook(device_t *device, int exception)
 
 INLINE void debugger_start_cpu_hook(device_t *device, attotime endtime)
 {
-	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		device->debug()->start_hook(endtime);
 }
 
@@ -88,7 +88,7 @@ INLINE void debugger_start_cpu_hook(device_t *device, attotime endtime)
 
 INLINE void debugger_stop_cpu_hook(device_t *device)
 {
-	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		device->debug()->stop_hook();
 }
 
@@ -101,7 +101,7 @@ INLINE void debugger_stop_cpu_hook(device_t *device)
 
 INLINE void debugger_interrupt_hook(device_t *device, int irqline)
 {
-	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		device->debug()->interrupt_hook(irqline);
 }
 
@@ -116,9 +116,9 @@ INLINE void debugger_interrupt_hook(device_t *device, int irqline)
     next opportunity
 -------------------------------------------------*/
 
-INLINE void debugger_break(running_machine *machine)
+INLINE void debugger_break(running_machine &machine)
 {
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		debug_cpu_get_visible_cpu(machine)->debug()->halt_on_next_instruction("Internal breakpoint\n");
 }
 
@@ -129,9 +129,9 @@ INLINE void debugger_break(running_machine *machine)
     halted within the instruction hook
 -------------------------------------------------*/
 
-INLINE int debugger_within_instruction_hook(running_machine *machine)
+INLINE int debugger_within_instruction_hook(running_machine &machine)
 {
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		return debug_cpu_within_instruction_hook(machine);
 	return FALSE;
 }

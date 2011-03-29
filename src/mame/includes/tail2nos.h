@@ -30,7 +30,7 @@ public:
 
 /*----------- defined in video/tail2nos.c -----------*/
 
-extern void tail2nos_zoom_callback(running_machine *machine, int *code,int *color,int *flags);
+extern void tail2nos_zoom_callback(running_machine &machine, int *code,int *color,int *flags);
 
 WRITE16_HANDLER( tail2nos_bgvideoram_w );
 READ16_HANDLER( tail2nos_zoomdata_r );

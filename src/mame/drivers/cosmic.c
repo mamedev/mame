@@ -39,7 +39,7 @@ a physical DSW B but only read when SWA:3,4 are both set to OFF. Currently,
 
 static WRITE8_HANDLER( panic_sound_output_w )
 {
-	cosmic_state *state = space->machine->driver_data<cosmic_state>();
+	cosmic_state *state = space->machine().driver_data<cosmic_state>();
 
 	/* Sound Enable / Disable */
 	if (offset == 11)
@@ -115,7 +115,7 @@ static WRITE8_HANDLER( panic_sound_output2_w )
 
 static WRITE8_HANDLER( cosmicg_output_w )
 {
-	cosmic_state *state = space->machine->driver_data<cosmic_state>();
+	cosmic_state *state = space->machine().driver_data<cosmic_state>();
 
 	/* Sound Enable / Disable */
 	if (offset == 12)
@@ -179,7 +179,7 @@ static WRITE8_HANDLER( cosmicg_output_w )
 
 static WRITE8_HANDLER( cosmica_sound_output_w )
 {
-	cosmic_state *state = space->machine->driver_data<cosmic_state>();
+	cosmic_state *state = space->machine().driver_data<cosmic_state>();
 
 	/* Sound Enable / Disable */
 	if (offset == 11)
@@ -318,7 +318,7 @@ static INTERRUPT_GEN( panic_interrupt )
 		/* mostly not noticed since sound is */
 		/* only enabled if game in progress! */
 
-		if ((input_port_read(device->machine, "SYSTEM") & 0xc0) != 0xc0)
+		if ((input_port_read(device->machine(), "SYSTEM") & 0xc0) != 0xc0)
 			panic_sound_output_w(device->memory().space(AS_PROGRAM), 17, 1);
 
 		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
@@ -329,12 +329,12 @@ static INTERRUPT_GEN( panic_interrupt )
 
 static INTERRUPT_GEN( cosmica_interrupt )
 {
-	cosmic_state *state = device->machine->driver_data<cosmic_state>();
+	cosmic_state *state = device->machine().driver_data<cosmic_state>();
 	state->pixel_clock = (state->pixel_clock + 2) & 0x3f;
 
 	if (state->pixel_clock == 0)
 	{
-		if (input_port_read(device->machine, "FAKE") & 1)	/* Left Coin */
+		if (input_port_read(device->machine(), "FAKE") & 1)	/* Left Coin */
 			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -348,7 +348,7 @@ static INTERRUPT_GEN( cosmicg_interrupt )
     It makes sense and works fine, but I cannot be 100% sure this is correct,
     as I have no Cosmic Guerilla console :-) . */
 
-	if ((input_port_read(device->machine, "IN2") & 1))	/* Coin */
+	if ((input_port_read(device->machine(), "IN2") & 1))	/* Coin */
 		/* on tms9980, a 6 on the interrupt bus means level 4 interrupt */
 		device_set_input_line_and_vector(device, 0, ASSERT_LINE, 6);
 	else
@@ -358,35 +358,35 @@ static INTERRUPT_GEN( cosmicg_interrupt )
 static INTERRUPT_GEN( magspot_interrupt )
 {
 	/* Coin 1 causes an IRQ, Coin 2 an NMI */
-	if (input_port_read(device->machine, "COINS") & 0x01)
+	if (input_port_read(device->machine(), "COINS") & 0x01)
 		device_set_input_line(device, 0, HOLD_LINE);
-	else if (input_port_read(device->machine, "COINS") & 0x02)
+	else if (input_port_read(device->machine(), "COINS") & 0x02)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( nomnlnd_interrupt )
 {
 	/* Coin causes an NMI */
-	if (input_port_read(device->machine, "COIN") & 0x01)
+	if (input_port_read(device->machine(), "COIN") & 0x01)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static READ8_HANDLER( cosmica_pixel_clock_r )
 {
-	cosmic_state *state = space->machine->driver_data<cosmic_state>();
+	cosmic_state *state = space->machine().driver_data<cosmic_state>();
 	return state->pixel_clock;
 }
 
 static READ8_HANDLER( cosmicg_port_0_r )
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
-	return (input_port_read(space->machine, "IN0") & 0xf0) | ((space->machine->primary_screen->vpos() & 0xf0) >> 4);
+	return (input_port_read(space->machine(), "IN0") & 0xf0) | ((space->machine().primary_screen->vpos() & 0xf0) >> 4);
 }
 
 static READ8_HANDLER( magspot_coinage_dip_r )
 {
-	return (input_port_read_safe(space->machine, "DSW", 0) & (1 << (7 - offset))) ? 0 : 1;
+	return (input_port_read_safe(space->machine(), "DSW", 0) & (1 << (7 - offset))) ? 0 : 1;
 }
 
 
@@ -394,8 +394,8 @@ static READ8_HANDLER( magspot_coinage_dip_r )
 
 static READ8_HANDLER( nomnlnd_port_0_1_r )
 {
-	int control = input_port_read(space->machine, offset ? "IN1" : "IN0");
-	int fire = input_port_read(space->machine, "IN3");
+	int control = input_port_read(space->machine(), offset ? "IN1" : "IN0");
+	int fire = input_port_read(space->machine(), "IN3");
 
 	/* If firing - stop tank */
 	if ((fire & 0xc0) == 0) return 0xff;
@@ -413,7 +413,7 @@ static READ8_HANDLER( nomnlnd_port_0_1_r )
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(space->machine, data & 0x80);
+	flip_screen_set(space->machine(), data & 0x80);
 }
 
 
@@ -1012,10 +1012,10 @@ static const samples_interface cosmicg_samples_interface =
 
 static MACHINE_START( cosmic )
 {
-	cosmic_state *state = machine->driver_data<cosmic_state>();
+	cosmic_state *state = machine.driver_data<cosmic_state>();
 
-	state->samples = machine->device("samples");
-	state->dac = machine->device("dac");
+	state->samples = machine.device("samples");
+	state->dac = machine.device("dac");
 
 	state->save_item(NAME(state->sound_enabled));
 	state->save_item(NAME(state->march_select));
@@ -1029,7 +1029,7 @@ static MACHINE_START( cosmic )
 
 static MACHINE_RESET( cosmic )
 {
-	cosmic_state *state = machine->driver_data<cosmic_state>();
+	cosmic_state *state = machine.driver_data<cosmic_state>();
 
 	state->pixel_clock = 0;
 	state->background_enable = 0;
@@ -1563,11 +1563,11 @@ ROM_END
 static DRIVER_INIT( cosmicg )
 {
 	/* Program ROMs have data pins connected different from normal */
-	cosmic_state *state = machine->driver_data<cosmic_state>();
+	cosmic_state *state = machine.driver_data<cosmic_state>();
 	offs_t offs, len;
 	UINT8 *rom;
-	len = machine->region("maincpu")->bytes();
-	rom = machine->region("maincpu")->base();
+	len = machine.region("maincpu")->bytes();
+	rom = machine.region("maincpu")->base();
 	for (offs = 0; offs < len; offs++)
 	{
 		UINT8 scrambled = rom[offs];
@@ -1588,7 +1588,7 @@ static DRIVER_INIT( cosmicg )
 
 static DRIVER_INIT( cosmica )
 {
-	cosmic_state *state = machine->driver_data<cosmic_state>();
+	cosmic_state *state = machine.driver_data<cosmic_state>();
 	state->sound_enabled = 1;
 	state->dive_bomb_b_select = 0;
 }
@@ -1596,22 +1596,22 @@ static DRIVER_INIT( cosmica )
 
 static DRIVER_INIT( devzone )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4807, 0x4807, FUNC(cosmic_background_enable_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4807, 0x4807, FUNC(cosmic_background_enable_w));
 }
 
 
 static DRIVER_INIT( nomnlnd )
 {
-	device_t *dac = machine->device("dac");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x5000, 0x5001, FUNC(nomnlnd_port_0_1_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x4800, 0x4800);
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4807, 0x4807, FUNC(cosmic_background_enable_w));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*dac, 0x480a, 0x480a, FUNC(dac_w));
+	device_t *dac = machine.device("dac");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x5000, 0x5001, FUNC(nomnlnd_port_0_1_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x4800, 0x4800);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4807, 0x4807, FUNC(cosmic_background_enable_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*dac, 0x480a, 0x480a, FUNC(dac_w));
 }
 
 static DRIVER_INIT( panic )
 {
-	cosmic_state *state = machine->driver_data<cosmic_state>();
+	cosmic_state *state = machine.driver_data<cosmic_state>();
 	state->sound_enabled = 1;
 }
 

@@ -58,7 +58,7 @@ void sid6581_init (_SID6581 *This);
 
 int sidEmuReset(_SID6581 *This);
 
-int sid6581_port_r (running_machine *machine, _SID6581 *This, int offset);
+int sid6581_port_r (running_machine &machine, _SID6581 *This, int offset);
 void sid6581_port_w (_SID6581 *This, int offset, int data);
 
 void sidEmuFillBuffer(_SID6581 *This, stream_sample_t *buffer, UINT32 bufferLen );

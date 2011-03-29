@@ -70,12 +70,12 @@ WRITE8_HANDLER( jrpacman_bgpriority_w );
 
 /*----------- defined in machine/pacplus.c -----------*/
 
-void pacplus_decode(running_machine *machine);
+void pacplus_decode(running_machine &machine);
 
 
 /*----------- defined in machine/jumpshot.c -----------*/
 
-void jumpshot_decode(running_machine *machine);
+void jumpshot_decode(running_machine &machine);
 
 
 /*----------- defined in machine/theglobp.c -----------*/

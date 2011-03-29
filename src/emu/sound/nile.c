@@ -227,7 +227,7 @@ static DEVICE_START( nile )
 
 	info->sound_ram = *device->region();
 
-	info->stream = device->machine->sound().stream_alloc(*device, 0, 2, 44100, info, nile_update);
+	info->stream = device->machine().sound().stream_alloc(*device, 0, 2, 44100, info, nile_update);
 }
 
 

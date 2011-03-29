@@ -61,13 +61,13 @@ Head Panic
 
 static WRITE16_HANDLER( esd16_spriteram_w )
 {
-	esd16_state *state = space->machine->driver_data<esd16_state>();
+	esd16_state *state = space->machine().driver_data<esd16_state>();
 	COMBINE_DATA(&state->spriteram[offset]);
 }
 
 static WRITE16_HANDLER( esd16_sound_command_w )
 {
-	esd16_state *state = space->machine->driver_data<esd16_state>();
+	esd16_state *state = space->machine().driver_data<esd16_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
@@ -106,7 +106,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER(hedpanic_platform_w)
 {
-	esd16_state *state = space->machine->driver_data<esd16_state>();
+	esd16_state *state = space->machine().driver_data<esd16_state>();
 	int offsets = state->headpanic_platform_x[0] + 0x40 * state->headpanic_platform_y[0];
 
 	state->vram_1[offsets] = data;
@@ -116,7 +116,7 @@ static WRITE16_HANDLER(hedpanic_platform_w)
 
 static READ16_HANDLER( esd_eeprom_r )
 {
-	esd16_state *state = space->machine->driver_data<esd16_state>();
+	esd16_state *state = space->machine().driver_data<esd16_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		return ((eeprom_read_bit(state->eeprom) & 0x01) << 15);
@@ -129,7 +129,7 @@ static READ16_HANDLER( esd_eeprom_r )
 static WRITE16_HANDLER( esd_eeprom_w )
 {
 	if (ACCESSING_BITS_8_15)
-		input_port_write(space->machine, "EEPROMOUT", data, 0xffff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xffff);
 
 //  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", cpu_get_pc(space->cpu), data, mem_mask);
 }
@@ -230,7 +230,7 @@ static WRITE8_HANDLER( esd16_sound_rombank_w )
 	int bank = data & 0xf;
 	if (data != bank)	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(space->cpu), data);
 	if (bank >= 3)	bank += 1;
-	memory_set_bank(space->machine, "bank1", bank);
+	memory_set_bank(space->machine(), "bank1", bank);
 }
 
 static ADDRESS_MAP_START( multchmp_sound_map, AS_PROGRAM, 8 )
@@ -241,7 +241,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( esd16_sound_command_r )
 {
-	esd16_state *state = space->machine->driver_data<esd16_state>();
+	esd16_state *state = space->machine().driver_data<esd16_state>();
 
 	/* Clear IRQ only after reading the command, or some get lost */
 	device_set_input_line(state->audio_cpu, 0, CLEAR_LINE);
@@ -519,20 +519,20 @@ GFXDECODE_END
 
 static MACHINE_START( esd16 )
 {
-	esd16_state *state = machine->driver_data<esd16_state>();
-	UINT8 *AUDIO = machine->region("audiocpu")->base();
+	esd16_state *state = machine.driver_data<esd16_state>();
+	UINT8 *AUDIO = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 17, &AUDIO[0x0000], 0x4000);
 
-	state->audio_cpu = machine->device("audiocpu");
-	state->eeprom = machine->device("eeprom");
+	state->audio_cpu = machine.device("audiocpu");
+	state->eeprom = machine.device("eeprom");
 
 	state->save_item(NAME(state->tilemap0_color));
 }
 
 static MACHINE_RESET( esd16 )
 {
-	esd16_state *state = machine->driver_data<esd16_state>();
+	esd16_state *state = machine.driver_data<esd16_state>();
 
 	state->tilemap0_color = 0;
 }

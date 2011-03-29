@@ -183,130 +183,130 @@ Notes:
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", (data - 1) & 3);
+	memory_set_bank(space->machine(), "bank1", (data - 1) & 3);
 }
 
 static TIMER_CALLBACK( rsaga2_interrupt2  )
 {
-	taitob_state *state = machine->driver_data<taitob_state>();
+	taitob_state *state = machine.driver_data<taitob_state>();
 	device_set_input_line(state->maincpu, 2, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( rastansaga2_interrupt )
 {
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(rsaga2_interrupt2));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(rsaga2_interrupt2));
 	device_set_input_line(device, 4, HOLD_LINE);
 }
 
 
 static TIMER_CALLBACK( crimec_interrupt3 )
 {
-	taitob_state *state = machine->driver_data<taitob_state>();
+	taitob_state *state = machine.driver_data<taitob_state>();
 	device_set_input_line(state->maincpu, 3, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( crimec_interrupt )
 {
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(crimec_interrupt3));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(crimec_interrupt3));
 	device_set_input_line(device, 5, HOLD_LINE);
 }
 
 
 static TIMER_CALLBACK( hitice_interrupt6 )
 {
-	taitob_state *state = machine->driver_data<taitob_state>();
+	taitob_state *state = machine.driver_data<taitob_state>();
 	device_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( hitice_interrupt )
 {
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(hitice_interrupt6));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(hitice_interrupt6));
 	device_set_input_line(device, 4, HOLD_LINE);
 }
 
 
 static TIMER_CALLBACK( rambo3_interrupt1 )
 {
-	taitob_state *state = machine->driver_data<taitob_state>();
+	taitob_state *state = machine.driver_data<taitob_state>();
 	device_set_input_line(state->maincpu, 1, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( rambo3_interrupt )
 {
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(rambo3_interrupt1));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(rambo3_interrupt1));
 	device_set_input_line(device, 6, HOLD_LINE);
 }
 
 
 static TIMER_CALLBACK( pbobble_interrupt5 )
 {
-	taitob_state *state = machine->driver_data<taitob_state>();
+	taitob_state *state = machine.driver_data<taitob_state>();
 	device_set_input_line(state->maincpu, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( pbobble_interrupt )
 {
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(pbobble_interrupt5));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(pbobble_interrupt5));
 	device_set_input_line(device, 3, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( viofight_interrupt1 )
 {
-	taitob_state *state = machine->driver_data<taitob_state>();
+	taitob_state *state = machine.driver_data<taitob_state>();
 	device_set_input_line(state->maincpu, 1, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( viofight_interrupt )
 {
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(viofight_interrupt1));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(viofight_interrupt1));
 	device_set_input_line(device, 4, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( masterw_interrupt4 )
 {
-	taitob_state *state = machine->driver_data<taitob_state>();
+	taitob_state *state = machine.driver_data<taitob_state>();
 	device_set_input_line(state->maincpu, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( masterw_interrupt )
 {
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(masterw_interrupt4));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(masterw_interrupt4));
 	device_set_input_line(device, 5, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( silentd_interrupt4 )
 {
-	taitob_state *state = machine->driver_data<taitob_state>();
+	taitob_state *state = machine.driver_data<taitob_state>();
 	device_set_input_line(state->maincpu, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( silentd_interrupt )
 {
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(silentd_interrupt4));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(silentd_interrupt4));
 	device_set_input_line(device, 6, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( selfeena_interrupt4 )
 {
-	taitob_state *state = machine->driver_data<taitob_state>();
+	taitob_state *state = machine.driver_data<taitob_state>();
 	device_set_input_line(state->maincpu, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( selfeena_interrupt )
 {
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(selfeena_interrupt4));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(5000), FUNC(selfeena_interrupt4));
 	device_set_input_line(device, 6, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( sbm_interrupt5 )//4
 {
-	taitob_state *state = machine->driver_data<taitob_state>();
+	taitob_state *state = machine.driver_data<taitob_state>();
 	device_set_input_line(state->maincpu, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( sbm_interrupt )//5
 {
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(10000), FUNC(sbm_interrupt5));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(10000), FUNC(sbm_interrupt5));
 	device_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -314,48 +314,48 @@ static INTERRUPT_GEN( sbm_interrupt )//5
 
 static READ16_HANDLER( tracky1_hi_r )
 {
-	return input_port_read(space->machine, "TRACKX1");
+	return input_port_read(space->machine(), "TRACKX1");
 }
 
 static READ16_HANDLER( tracky1_lo_r )
 {
-	return (input_port_read(space->machine, "TRACKX1") & 0xff) << 8;
+	return (input_port_read(space->machine(), "TRACKX1") & 0xff) << 8;
 }
 
 static READ16_HANDLER( trackx1_hi_r )
 {
-	return input_port_read(space->machine, "TRACKY1");
+	return input_port_read(space->machine(), "TRACKY1");
 }
 
 static READ16_HANDLER( trackx1_lo_r )
 {
-	return (input_port_read(space->machine, "TRACKY1") & 0xff) << 8;
+	return (input_port_read(space->machine(), "TRACKY1") & 0xff) << 8;
 }
 
 static READ16_HANDLER( tracky2_hi_r )
 {
-	return input_port_read(space->machine, "TRACKX2");
+	return input_port_read(space->machine(), "TRACKX2");
 }
 
 static READ16_HANDLER( tracky2_lo_r )
 {
-	return (input_port_read(space->machine, "TRACKX2") & 0xff) << 8;
+	return (input_port_read(space->machine(), "TRACKX2") & 0xff) << 8;
 }
 
 static READ16_HANDLER( trackx2_hi_r )
 {
-	return input_port_read(space->machine, "TRACKY2");
+	return input_port_read(space->machine(), "TRACKY2");
 }
 
 static READ16_HANDLER( trackx2_lo_r )
 {
-	return (input_port_read(space->machine, "TRACKY2") & 0xff) << 8;
+	return (input_port_read(space->machine(), "TRACKY2") & 0xff) << 8;
 }
 
 
 static WRITE16_HANDLER( gain_control_w )
 {
-	taitob_state *state = space->machine->driver_data<taitob_state>();
+	taitob_state *state = space->machine().driver_data<taitob_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		if (offset == 0)
@@ -390,13 +390,13 @@ static const eeprom_interface taitob_eeprom_intf =
 
 static READ16_HANDLER( eep_latch_r )
 {
-	taitob_state *state = space->machine->driver_data<taitob_state>();
+	taitob_state *state = space->machine().driver_data<taitob_state>();
 	return state->eep_latch;
 }
 
 static WRITE16_HANDLER( eeprom_w )
 {
-	taitob_state *state = space->machine->driver_data<taitob_state>();
+	taitob_state *state = space->machine().driver_data<taitob_state>();
 
 	COMBINE_DATA(&state->eep_latch);
 
@@ -414,7 +414,7 @@ static WRITE16_HANDLER( eeprom_w )
 		/* bit 7 - set all the time (Chip Select?) */
 
 		/* EEPROM */
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 	}
 }
 
@@ -431,30 +431,30 @@ static WRITE16_HANDLER( eeprom_w )
 
 static READ16_HANDLER( player_34_coin_ctrl_r )
 {
-	taitob_state *state = space->machine->driver_data<taitob_state>();
+	taitob_state *state = space->machine().driver_data<taitob_state>();
 	return state->coin_word;
 }
 
 static WRITE16_HANDLER( player_34_coin_ctrl_w )
 {
-	taitob_state *state = space->machine->driver_data<taitob_state>();
+	taitob_state *state = space->machine().driver_data<taitob_state>();
 
 	COMBINE_DATA(&state->coin_word);
 
 	/* coin counters and lockout */
-	coin_lockout_w(space->machine, 2, ~data & 0x0100);
-	coin_lockout_w(space->machine, 3, ~data & 0x0200);
-	coin_counter_w(space->machine, 2,  data & 0x0400);
-	coin_counter_w(space->machine, 3,  data & 0x0800);
+	coin_lockout_w(space->machine(), 2, ~data & 0x0100);
+	coin_lockout_w(space->machine(), 3, ~data & 0x0200);
+	coin_counter_w(space->machine(), 2,  data & 0x0400);
+	coin_counter_w(space->machine(), 3,  data & 0x0800);
 }
 
 static READ16_HANDLER( pbobble_input_bypass_r )
 {
-	taitob_state *state = space->machine->driver_data<taitob_state>();
+	taitob_state *state = space->machine().driver_data<taitob_state>();
 	switch (offset)
 	{
 		case 0x01:
-			return input_port_read(space->machine, "COIN") << 8;
+			return input_port_read(space->machine(), "COIN") << 8;
 
 		default:
 			return tc0640fio_r(state->tc0640fio, offset) << 8;
@@ -463,7 +463,7 @@ static READ16_HANDLER( pbobble_input_bypass_r )
 
 static WRITE16_HANDLER( spacedxo_tc0220ioc_w )
 {
-	taitob_state *state = space->machine->driver_data<taitob_state>();
+	taitob_state *state = space->machine().driver_data<taitob_state>();
 	if (ACCESSING_BITS_0_7)
 		tc0220ioc_w(state->tc0220ioc, offset, data & 0xff);
 	else
@@ -2091,7 +2091,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler( device_t *device, int irq )
 {
-	taitob_state *state = device->machine->driver_data<taitob_state>();
+	taitob_state *state = device->machine().driver_data<taitob_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -2124,9 +2124,9 @@ static const ym2203_interface ym2203_config =
     Both ym2610 and ym2610b generate 3 (PSG like) + 2 (fm left,right) channels.
     I use mixer_set_volume() to emulate the effect.
 */
-static void mb87078_gain_changed( running_machine *machine, int channel, int percent )
+static void mb87078_gain_changed( running_machine &machine, int channel, int percent )
 {
-	taitob_state *state = machine->driver_data<taitob_state>();
+	taitob_state *state = machine.driver_data<taitob_state>();
 
 	if (channel == 1)
 	{
@@ -2194,15 +2194,15 @@ static const tc0140syt_interface taitob_tc0140syt_intf =
 
 static MACHINE_START( taitob )
 {
-	taitob_state *state = machine->driver_data<taitob_state>();
+	taitob_state *state = machine.driver_data<taitob_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->mb87078 = machine->device("mb87078");
-	state->ym = machine->device("ymsnd");
-	state->tc0180vcu = machine->device("tc0180vcu");
-	state->tc0640fio = machine->device("tc0640fio");
-	state->tc0220ioc = machine->device("tc0220ioc");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->mb87078 = machine.device("mb87078");
+	state->ym = machine.device("ymsnd");
+	state->tc0180vcu = machine.device("tc0180vcu");
+	state->tc0640fio = machine.device("tc0640fio");
+	state->tc0220ioc = machine.device("tc0220ioc");
 
 	state->save_item(NAME(state->eep_latch));
 	state->save_item(NAME(state->coin_word));
@@ -2210,7 +2210,7 @@ static MACHINE_START( taitob )
 
 static MACHINE_RESET( taitob )
 {
-	taitob_state *state = machine->driver_data<taitob_state>();
+	taitob_state *state = machine.driver_data<taitob_state>();
 
 	state->eep_latch = 0;
 	state->coin_word = 0;
@@ -2989,7 +2989,7 @@ MACHINE_CONFIG_END
 #if 0
 static void ryujin_patch(void)
 {
-	UINT16 *rom = (UINT16*)machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16*)machine.region("maincpu")->base();
 	rom[ 0x62/2 ] = 1;
 	//0 (already in rom) - Taito Corporation 1993
 	//1 - Taito America corp with blue FBI logo
@@ -3045,7 +3045,7 @@ MACHINE_CONFIG_END
 #if 0
 static void sbm_patch(void)
 {
-	UINT16 *rom = (UINT16*)machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16*)machine.region("maincpu")->base();
 	rom[ 0x7ffff/2 ] = 2; //US version
 }
 #endif
@@ -3827,7 +3827,7 @@ ROM_END
 
 static DRIVER_INIT( taito_b )
 {
-	memory_configure_bank(machine, "bank1", 0, 4, machine->region("audiocpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 GAME( 1989, masterw,  0,       masterw,  masterw,  taito_b, ROT270, "Taito Corporation Japan", "Master of Weapon (World)", GAME_SUPPORTS_SAVE )

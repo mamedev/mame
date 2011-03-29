@@ -642,9 +642,9 @@ static const UINT32 cchip_round_address[] =
 	0x042C60, 0x042D38
 };
 
-static void request_round_data( running_machine *machine )
+static void request_round_data( running_machine &machine )
 {
-	rainbow_state *state = machine->driver_data<rainbow_state>();
+	rainbow_state *state = machine.driver_data<rainbow_state>();
 	int round = state->CRAM[1][0x141]; /* 0...49 */
 
 	memcpy(state->CRAM[1], CROM_BANK1, sizeof CROM_BANK1);
@@ -663,9 +663,9 @@ static void request_round_data( running_machine *machine )
 	state->CRAM[1][0x148] = (round >= 40 || round % 4 == 3);
 }
 
-static void request_world_data( running_machine *machine )
+static void request_world_data( running_machine &machine )
 {
-	rainbow_state *state = machine->driver_data<rainbow_state>();
+	rainbow_state *state = machine.driver_data<rainbow_state>();
 	int world = state->CRAM[0][0x00d] / 4; /* 0...9 */
 
 	/* the extra version has the world data swapped around */
@@ -711,10 +711,10 @@ static void request_world_data( running_machine *machine )
 	}
 }
 
-static void request_goalin_data( running_machine *machine )
+static void request_goalin_data( running_machine &machine )
 {
-	rainbow_state *state = machine->driver_data<rainbow_state>();
-	int n = machine->rand() % 15;
+	rainbow_state *state = machine.driver_data<rainbow_state>();
+	int n = machine.rand() % 15;
 
 	state->CRAM[1][0x14B] = 0x00; /* x coordinates */
 	state->CRAM[1][0x14D] = 0x10;
@@ -733,7 +733,7 @@ static void request_goalin_data( running_machine *machine )
 
 static TIMER_CALLBACK( cchip_timer )
 {
-	rainbow_state *state = machine->driver_data<rainbow_state>();
+	rainbow_state *state = machine.driver_data<rainbow_state>();
 
 	if (state->CRAM[1][0x100] == 1)
 	{
@@ -780,13 +780,13 @@ WRITE16_HANDLER( rainbow_cchip_ctrl_w )
 
 WRITE16_HANDLER( rainbow_cchip_bank_w )
 {
-	rainbow_state *state = space->machine->driver_data<rainbow_state>();
+	rainbow_state *state = space->machine().driver_data<rainbow_state>();
 	state->current_bank = data & 7;
 }
 
 WRITE16_HANDLER( rainbow_cchip_ram_w )
 {
-	rainbow_state *state = space->machine->driver_data<rainbow_state>();
+	rainbow_state *state = space->machine().driver_data<rainbow_state>();
 	state->CRAM[state->current_bank][offset] = data;
 }
 
@@ -807,7 +807,7 @@ READ16_HANDLER( rainbow_cchip_ctrl_r )
 
 READ16_HANDLER( rainbow_cchip_ram_r )
 {
-	rainbow_state *state = space->machine->driver_data<rainbow_state>();
+	rainbow_state *state = space->machine().driver_data<rainbow_state>();
 	return state->CRAM[state->current_bank][offset];
 }
 
@@ -817,9 +817,9 @@ READ16_HANDLER( rainbow_cchip_ram_r )
  *
  *************************************/
 
-void rainbow_cchip_init( running_machine *machine, int version )
+void rainbow_cchip_init( running_machine &machine, int version )
 {
-	rainbow_state *state = machine->driver_data<rainbow_state>();
+	rainbow_state *state = machine.driver_data<rainbow_state>();
 	int i;
 
 	state->extra_version = version;
@@ -833,5 +833,5 @@ void rainbow_cchip_init( running_machine *machine, int version )
 
 	state_save_register_item(machine, "cchip", NULL, 0, state->current_bank);
 
-	machine->scheduler().timer_pulse(attotime::from_hz(60), FUNC(cchip_timer));
+	machine.scheduler().timer_pulse(attotime::from_hz(60), FUNC(cchip_timer));
 }

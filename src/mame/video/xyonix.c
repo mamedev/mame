@@ -6,7 +6,7 @@ PALETTE_INIT( xyonix )
 	int i;
 
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -32,7 +32,7 @@ PALETTE_INIT( xyonix )
 
 static TILE_GET_INFO( get_xyonix_tile_info )
 {
-	xyonix_state *state = machine->driver_data<xyonix_state>();
+	xyonix_state *state = machine.driver_data<xyonix_state>();
 	int tileno;
 	int attr = state->vidram[tile_index+0x1000+1];
 
@@ -43,7 +43,7 @@ static TILE_GET_INFO( get_xyonix_tile_info )
 
 WRITE8_HANDLER( xyonix_vidram_w )
 {
-	xyonix_state *state = space->machine->driver_data<xyonix_state>();
+	xyonix_state *state = space->machine().driver_data<xyonix_state>();
 
 	state->vidram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap,(offset-1)&0x0fff);
@@ -51,14 +51,14 @@ WRITE8_HANDLER( xyonix_vidram_w )
 
 VIDEO_START(xyonix)
 {
-	xyonix_state *state = machine->driver_data<xyonix_state>();
+	xyonix_state *state = machine.driver_data<xyonix_state>();
 
 	state->tilemap = tilemap_create(machine, get_xyonix_tile_info, tilemap_scan_rows, 4, 8, 80, 32);
 }
 
 SCREEN_UPDATE(xyonix)
 {
-	xyonix_state *state = screen->machine->driver_data<xyonix_state>();
+	xyonix_state *state = screen->machine().driver_data<xyonix_state>();
 
 	tilemap_draw(bitmap, cliprect, state->tilemap, 0, 0);
 	return 0;

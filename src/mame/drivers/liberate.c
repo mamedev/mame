@@ -27,8 +27,8 @@
 
 static READ8_HANDLER( deco16_bank_r )
 {
-	liberate_state *state = space->machine->driver_data<liberate_state>();
-	const UINT8 *ROM = space->machine->region("user1")->base();
+	liberate_state *state = space->machine().driver_data<liberate_state>();
+	const UINT8 *ROM = space->machine().region("user1")->base();
 
 	/* The tilemap bank can be swapped into main memory */
 	if (state->bank)
@@ -55,11 +55,11 @@ static READ8_HANDLER( deco16_bank_r )
 
 static READ8_HANDLER( deco16_io_r )
 {
-	if (offset == 0) return input_port_read(space->machine, "IN1"); /* Player 1 controls */
-	if (offset == 1) return input_port_read(space->machine, "IN2"); /* Player 2 controls */
-	if (offset == 2) return input_port_read(space->machine, "IN3"); /* Vblank, coins */
-	if (offset == 3) return input_port_read(space->machine, "DSW1"); /* Dip 1 */
-	if (offset == 4) return input_port_read(space->machine, "DSW2"); /* Dip 2 */
+	if (offset == 0) return input_port_read(space->machine(), "IN1"); /* Player 1 controls */
+	if (offset == 1) return input_port_read(space->machine(), "IN2"); /* Player 2 controls */
+	if (offset == 2) return input_port_read(space->machine(), "IN3"); /* Vblank, coins */
+	if (offset == 3) return input_port_read(space->machine(), "DSW1"); /* Dip 1 */
+	if (offset == 4) return input_port_read(space->machine(), "DSW2"); /* Dip 2 */
 
 	logerror("%04x:  Read input %d\n", cpu_get_pc(space->cpu), offset);
 	return 0xff;
@@ -67,7 +67,7 @@ static READ8_HANDLER( deco16_io_r )
 
 static WRITE8_HANDLER( deco16_bank_w )
 {
-	liberate_state *state = space->machine->driver_data<liberate_state>();
+	liberate_state *state = space->machine().driver_data<liberate_state>();
 	state->bank = data;
 
 	if (state->bank)
@@ -78,8 +78,8 @@ static WRITE8_HANDLER( deco16_bank_w )
 
 static READ8_HANDLER( prosoccr_bank_r )
 {
-	liberate_state *state = space->machine->driver_data<liberate_state>();
-	const UINT8 *ROM = space->machine->region("user1")->base();
+	liberate_state *state = space->machine().driver_data<liberate_state>();
+	const UINT8 *ROM = space->machine().region("user1")->base();
 
 	/* The tilemap bank can be swapped into main memory */
 	if (state->bank)
@@ -108,8 +108,8 @@ static READ8_HANDLER( prosoccr_bank_r )
 
 static READ8_HANDLER( prosoccr_charram_r )
 {
-	liberate_state *state = space->machine->driver_data<liberate_state>();
-	UINT8 *SRC_GFX = space->machine->region("shared_gfx")->base();
+	liberate_state *state = space->machine().driver_data<liberate_state>();
+	UINT8 *SRC_GFX = space->machine().region("shared_gfx")->base();
 
 	if (state->gfx_rom_readback)
 	{
@@ -130,8 +130,8 @@ static READ8_HANDLER( prosoccr_charram_r )
 
 static WRITE8_HANDLER( prosoccr_charram_w )
 {
-	liberate_state *state = space->machine->driver_data<liberate_state>();
-	UINT8 *FG_GFX = space->machine->region("fg_gfx")->base();
+	liberate_state *state = space->machine().driver_data<liberate_state>();
+	UINT8 *FG_GFX = space->machine().region("fg_gfx")->base();
 
 	if (state->bank)
 	{
@@ -162,13 +162,13 @@ static WRITE8_HANDLER( prosoccr_charram_w )
 	offset &= 0x7ff;
 
 	/* dirty char */
-	gfx_element_mark_dirty(space->machine->gfx[0], offset >> 3);
-//  gfx_element_mark_dirty(space->machine->gfx[0], (offset | 0x1800) >> 3);
+	gfx_element_mark_dirty(space->machine().gfx[0], offset >> 3);
+//  gfx_element_mark_dirty(space->machine().gfx[0], (offset | 0x1800) >> 3);
 }
 
 static WRITE8_HANDLER( prosoccr_char_bank_w )
 {
-	liberate_state *state = space->machine->driver_data<liberate_state>();
+	liberate_state *state = space->machine().driver_data<liberate_state>();
 	state->gfx_rom_readback = data & 1; //enable GFX rom read-back
 
 	if (data & 0xfe)
@@ -177,7 +177,7 @@ static WRITE8_HANDLER( prosoccr_char_bank_w )
 
 static WRITE8_HANDLER( prosoccr_io_bank_w )
 {
-	liberate_state *state = space->machine->driver_data<liberate_state>();
+	liberate_state *state = space->machine().driver_data<liberate_state>();
 	state->bank = data & 1;
 
 	if (state->bank)
@@ -189,7 +189,7 @@ static WRITE8_HANDLER( prosoccr_io_bank_w )
 
 static READ8_HANDLER( prosport_charram_r )
 {
-	UINT8 *FG_GFX = space->machine->region("progolf_fg_gfx")->base();
+	UINT8 *FG_GFX = space->machine().region("progolf_fg_gfx")->base();
 
 	switch (offset & 0x1800)
 	{
@@ -209,7 +209,7 @@ static READ8_HANDLER( prosport_charram_r )
 
 static WRITE8_HANDLER( prosport_charram_w )
 {
-	UINT8 *FG_GFX = space->machine->region("progolf_fg_gfx")->base();
+	UINT8 *FG_GFX = space->machine().region("progolf_fg_gfx")->base();
 
 	switch (offset & 0x1800)
 	{
@@ -230,8 +230,8 @@ static WRITE8_HANDLER( prosport_charram_w )
 	offset &= 0x7ff;
 
 	/* dirty char */
-	gfx_element_mark_dirty(space->machine->gfx[3], (offset + 0x800) >> 3);
-	gfx_element_mark_dirty(space->machine->gfx[3 + 4], (offset + 0x800) >> 5);
+	gfx_element_mark_dirty(space->machine().gfx[3], (offset + 0x800) >> 3);
+	gfx_element_mark_dirty(space->machine().gfx[3 + 4], (offset + 0x800) >> 5);
 }
 
 
@@ -769,8 +769,8 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( deco16_interrupt )
 {
-	liberate_state *state = device->machine->driver_data<liberate_state>();
-	int p = ~input_port_read(device->machine, "IN3");
+	liberate_state *state = device->machine().driver_data<liberate_state>();
+	int p = ~input_port_read(device->machine(), "IN3");
 	if ((p & 0x43) && !state->latch)
 	{
 		device_set_input_line(device, DECO16_IRQ_LINE, ASSERT_LINE);
@@ -799,10 +799,10 @@ static INTERRUPT_GEN( prosport_interrupt )
 
 static MACHINE_START( liberate )
 {
-	liberate_state *state = machine->driver_data<liberate_state>();
+	liberate_state *state = machine.driver_data<liberate_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->background_disable));
 	state->save_item(NAME(state->background_color));
@@ -815,7 +815,7 @@ static MACHINE_START( liberate )
 
 static MACHINE_RESET( liberate )
 {
-	liberate_state *state = machine->driver_data<liberate_state>();
+	liberate_state *state = machine.driver_data<liberate_state>();
 
 	memset(state->io_ram, 0, ARRAY_LENGTH(state->io_ram));
 
@@ -1355,11 +1355,11 @@ ROM_END
  *
  *************************************/
 
-static void sound_cpu_decrypt(running_machine *machine)
+static void sound_cpu_decrypt(running_machine &machine)
 {
-	address_space *space = machine->device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
-	UINT8 *rom = machine->region("audiocpu")->base();
+	UINT8 *rom = machine.region("audiocpu")->base();
 	int i;
 
 	/* Bit swapping on sound cpu - Opcodes only */
@@ -1371,7 +1371,7 @@ static void sound_cpu_decrypt(running_machine *machine)
 
 static DRIVER_INIT( prosport )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine.region("maincpu")->base();
 	int i;
 
 	/* Main cpu has the nibbles swapped */
@@ -1385,15 +1385,15 @@ static DRIVER_INIT( yellowcb )
 {
 	DRIVER_INIT_CALL(prosport);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xa000, 0xa000, "IN0");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xa000, 0xa000, "IN0");
 }
 
 static DRIVER_INIT( liberate )
 {
 	int A;
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	space->set_decrypted_region(0x0000, 0xffff, decrypted);
 

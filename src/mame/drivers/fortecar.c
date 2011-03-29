@@ -49,7 +49,7 @@ static VIDEO_START(fortecar)
 
 static SCREEN_UPDATE(fortecar)
 {
-	fortecar_state *state = screen->machine->driver_data<fortecar_state>();
+	fortecar_state *state = screen->machine().driver_data<fortecar_state>();
 	int x,y,count;
 	count = 0;
 
@@ -62,7 +62,7 @@ static SCREEN_UPDATE(fortecar)
 			tile = (state->ram[(count*4)+1] | (state->ram[(count*4)+2]<<8)) & 0xfff;
 			color = state->ram[(count*4)+3] & 3;
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tile,color,0,0,x*8,y*8);
 			count++;
 
 		}
@@ -80,7 +80,7 @@ static WRITE8_DEVICE_HANDLER( ppi0_portc_w )
 
 static READ8_DEVICE_HANDLER( ppi0_portc_r )
 {
-//  popmessage("%s",device->machine->describe_context());
+//  popmessage("%s",device->machine().describe_context());
 	return (~(eeprom_read_bit(device)<<1) & 2);
 }
 
@@ -254,7 +254,7 @@ GFXDECODE_END
 
 static MACHINE_RESET(fortecar)
 {
-	fortecar_state *state = machine->driver_data<fortecar_state>();
+	fortecar_state *state = machine.driver_data<fortecar_state>();
 	state->bank = -1;
 }
 

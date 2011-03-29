@@ -13,7 +13,7 @@
 
 ***************************************************************************/
 
-INLINE void m72_get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
+INLINE void m72_get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
 {
 	int code,attr,color,pri;
 
@@ -36,7 +36,7 @@ INLINE void m72_get_tile_info(running_machine *machine,tile_data *tileinfo,int t
 	tileinfo->group = pri;
 }
 
-INLINE void rtype2_get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
+INLINE void rtype2_get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
 {
 	int code,attr,color,pri;
 
@@ -64,31 +64,31 @@ INLINE void rtype2_get_tile_info(running_machine *machine,tile_data *tileinfo,in
 
 static TILE_GET_INFO( m72_get_bg_tile_info )
 {
-	m72_state *state = machine->driver_data<m72_state>();
+	m72_state *state = machine.driver_data<m72_state>();
 	m72_get_tile_info(machine,tileinfo,tile_index,state->videoram2,2);
 }
 
 static TILE_GET_INFO( m72_get_fg_tile_info )
 {
-	m72_state *state = machine->driver_data<m72_state>();
+	m72_state *state = machine.driver_data<m72_state>();
 	m72_get_tile_info(machine,tileinfo,tile_index,state->videoram1,1);
 }
 
 static TILE_GET_INFO( hharry_get_bg_tile_info )
 {
-	m72_state *state = machine->driver_data<m72_state>();
+	m72_state *state = machine.driver_data<m72_state>();
 	m72_get_tile_info(machine,tileinfo,tile_index,state->videoram2,1);
 }
 
 static TILE_GET_INFO( rtype2_get_bg_tile_info )
 {
-	m72_state *state = machine->driver_data<m72_state>();
+	m72_state *state = machine.driver_data<m72_state>();
 	rtype2_get_tile_info(machine,tileinfo,tile_index,state->videoram2,1);
 }
 
 static TILE_GET_INFO( rtype2_get_fg_tile_info )
 {
-	m72_state *state = machine->driver_data<m72_state>();
+	m72_state *state = machine.driver_data<m72_state>();
 	rtype2_get_tile_info(machine,tileinfo,tile_index,state->videoram1,1);
 }
 
@@ -106,9 +106,9 @@ static TILEMAP_MAPPER( majtitle_scan_rows )
 
 ***************************************************************************/
 
-static void register_savestate(running_machine *machine)
+static void register_savestate(running_machine &machine)
 {
-	m72_state *state = machine->driver_data<m72_state>();
+	m72_state *state = machine.driver_data<m72_state>();
 	state->save_item(NAME(state->raster_irq_position));
 	state->save_item(NAME(state->video_off));
 	state->save_item(NAME(state->scrollx1));
@@ -121,7 +121,7 @@ static void register_savestate(running_machine *machine)
 
 VIDEO_START( m72 )
 {
-	m72_state *state = machine->driver_data<m72_state>();
+	m72_state *state = machine.driver_data<m72_state>();
 	state->bg_tilemap = tilemap_create(machine, m72_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	state->fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
@@ -149,7 +149,7 @@ VIDEO_START( m72 )
 
 VIDEO_START( rtype2 )
 {
-	m72_state *state = machine->driver_data<m72_state>();
+	m72_state *state = machine.driver_data<m72_state>();
 	state->bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	state->fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
@@ -176,7 +176,7 @@ VIDEO_START( rtype2 )
 
 VIDEO_START( poundfor )
 {
-	m72_state *state = machine->driver_data<m72_state>();
+	m72_state *state = machine.driver_data<m72_state>();
 	VIDEO_START_CALL(rtype2);
 
 	tilemap_set_scrolldx(state->fg_tilemap,6,0);
@@ -187,7 +187,7 @@ VIDEO_START( poundfor )
 /* Major Title has a larger background RAM, and rowscroll */
 VIDEO_START( majtitle )
 {
-	m72_state *state = machine->driver_data<m72_state>();
+	m72_state *state = machine.driver_data<m72_state>();
 // The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
 // The layout ramains 256x64, the right half is just not displayed.
 //  state->bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,256,64);
@@ -217,7 +217,7 @@ VIDEO_START( majtitle )
 
 VIDEO_START( hharry )
 {
-	m72_state *state = machine->driver_data<m72_state>();
+	m72_state *state = machine.driver_data<m72_state>();
 	state->bg_tilemap = tilemap_create(machine, hharry_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	state->fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,   tilemap_scan_rows,8,8,64,64);
 
@@ -254,7 +254,7 @@ READ16_HANDLER( m72_palette1_r )
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	return space->machine->generic.paletteram.u16[offset] | 0xffe0;	/* only D0-D4 are connected */
+	return space->machine().generic.paletteram.u16[offset] | 0xffe0;	/* only D0-D4 are connected */
 }
 
 READ16_HANDLER( m72_palette2_r )
@@ -262,10 +262,10 @@ READ16_HANDLER( m72_palette2_r )
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	return space->machine->generic.paletteram2.u16[offset] | 0xffe0;	/* only D0-D4 are connected */
+	return space->machine().generic.paletteram2.u16[offset] | 0xffe0;	/* only D0-D4 are connected */
 }
 
-INLINE void changecolor(running_machine *machine,int color,int r,int g,int b)
+INLINE void changecolor(running_machine &machine,int color,int r,int g,int b)
 {
 	palette_set_color_rgb(machine,color,pal5bit(r),pal5bit(g),pal5bit(b));
 }
@@ -275,13 +275,13 @@ WRITE16_HANDLER( m72_palette1_w )
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 	offset &= 0x0ff;
-	changecolor(space->machine,
+	changecolor(space->machine(),
 			offset,
-			space->machine->generic.paletteram.u16[offset + 0x000],
-			space->machine->generic.paletteram.u16[offset + 0x200],
-			space->machine->generic.paletteram.u16[offset + 0x400]);
+			space->machine().generic.paletteram.u16[offset + 0x000],
+			space->machine().generic.paletteram.u16[offset + 0x200],
+			space->machine().generic.paletteram.u16[offset + 0x400]);
 }
 
 WRITE16_HANDLER( m72_palette2_w )
@@ -289,62 +289,62 @@ WRITE16_HANDLER( m72_palette2_w )
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	COMBINE_DATA(&space->machine->generic.paletteram2.u16[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram2.u16[offset]);
 	offset &= 0x0ff;
-	changecolor(space->machine,
+	changecolor(space->machine(),
 			offset + 256,
-			space->machine->generic.paletteram2.u16[offset + 0x000],
-			space->machine->generic.paletteram2.u16[offset + 0x200],
-			space->machine->generic.paletteram2.u16[offset + 0x400]);
+			space->machine().generic.paletteram2.u16[offset + 0x000],
+			space->machine().generic.paletteram2.u16[offset + 0x200],
+			space->machine().generic.paletteram2.u16[offset + 0x400]);
 }
 
 WRITE16_HANDLER( m72_videoram1_w )
 {
-	m72_state *state = space->machine->driver_data<m72_state>();
+	m72_state *state = space->machine().driver_data<m72_state>();
 	COMBINE_DATA(&state->videoram1[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( m72_videoram2_w )
 {
-	m72_state *state = space->machine->driver_data<m72_state>();
+	m72_state *state = space->machine().driver_data<m72_state>();
 	COMBINE_DATA(&state->videoram2[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( m72_irq_line_w )
 {
-	m72_state *state = space->machine->driver_data<m72_state>();
+	m72_state *state = space->machine().driver_data<m72_state>();
 	COMBINE_DATA(&state->raster_irq_position);
 }
 
 WRITE16_HANDLER( m72_scrollx1_w )
 {
-	m72_state *state = space->machine->driver_data<m72_state>();
+	m72_state *state = space->machine().driver_data<m72_state>();
 	COMBINE_DATA(&state->scrollx1);
 }
 
 WRITE16_HANDLER( m72_scrollx2_w )
 {
-	m72_state *state = space->machine->driver_data<m72_state>();
+	m72_state *state = space->machine().driver_data<m72_state>();
 	COMBINE_DATA(&state->scrollx2);
 }
 
 WRITE16_HANDLER( m72_scrolly1_w )
 {
-	m72_state *state = space->machine->driver_data<m72_state>();
+	m72_state *state = space->machine().driver_data<m72_state>();
 	COMBINE_DATA(&state->scrolly1);
 }
 
 WRITE16_HANDLER( m72_scrolly2_w )
 {
-	m72_state *state = space->machine->driver_data<m72_state>();
+	m72_state *state = space->machine().driver_data<m72_state>();
 	COMBINE_DATA(&state->scrolly2);
 }
 
 WRITE16_HANDLER( m72_dmaon_w )
 {
-	m72_state *state = space->machine->driver_data<m72_state>();
+	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
 		memcpy(state->buffered_spriteram, state->spriteram, state->spriteram_size);
 }
@@ -352,26 +352,26 @@ WRITE16_HANDLER( m72_dmaon_w )
 
 WRITE16_HANDLER( m72_port02_w )
 {
-	m72_state *state = space->machine->driver_data<m72_state>();
+	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
 		/* bits 0/1 are coin counters */
-		coin_counter_w(space->machine, 0,data & 0x01);
-		coin_counter_w(space->machine, 1,data & 0x02);
+		coin_counter_w(space->machine(), 0,data & 0x01);
+		coin_counter_w(space->machine(), 1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(space->machine, ((data & 0x04) >> 2) ^ ((~input_port_read(space->machine, "DSW") >> 8) & 1));
+		flip_screen_set(space->machine(), ((data & 0x04) >> 2) ^ ((~input_port_read(space->machine(), "DSW") >> 8) & 1));
 
 		/* bit 3 is display disable */
 		state->video_off = data & 0x08;
 
 		/* bit 4 resets sound CPU (active low) */
 		if (data & 0x10)
-			cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bit 5 = "bank"? */
 	}
@@ -379,17 +379,17 @@ WRITE16_HANDLER( m72_port02_w )
 
 WRITE16_HANDLER( rtype2_port02_w )
 {
-	m72_state *state = space->machine->driver_data<m72_state>();
+	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
 		/* bits 0/1 are coin counters */
-		coin_counter_w(space->machine, 0,data & 0x01);
-		coin_counter_w(space->machine, 1,data & 0x02);
+		coin_counter_w(space->machine(), 0,data & 0x01);
+		coin_counter_w(space->machine(), 1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(space->machine, ((data & 0x04) >> 2) ^ ((~input_port_read(space->machine, "DSW") >> 8) & 1));
+		flip_screen_set(space->machine(), ((data & 0x04) >> 2) ^ ((~input_port_read(space->machine(), "DSW") >> 8) & 1));
 
 		/* bit 3 is display disable */
 		state->video_off = data & 0x08;
@@ -403,7 +403,7 @@ WRITE16_HANDLER( rtype2_port02_w )
 /* the following is mostly a kludge. This register seems to be used for something else */
 WRITE16_HANDLER( majtitle_gfx_ctrl_w )
 {
-	m72_state *state = space->machine->driver_data<m72_state>();
+	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		if (data & 0xff00) state->majtitle_rowscroll = 1;
@@ -418,9 +418,9 @@ WRITE16_HANDLER( majtitle_gfx_ctrl_w )
 
 ***************************************************************************/
 
-static void m72_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void m72_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	m72_state *state = machine->driver_data<m72_state>();
+	m72_state *state = machine.driver_data<m72_state>();
 	UINT16 *spriteram = state->buffered_spriteram;
 	int offs;
 
@@ -460,7 +460,7 @@ static void m72_draw_sprites(running_machine *machine, bitmap_t *bitmap,const re
 				if (flipy) c += h-1-y;
 				else c += y;
 
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 						c,
 						color,
 						flipx,flipy,
@@ -472,9 +472,9 @@ static void m72_draw_sprites(running_machine *machine, bitmap_t *bitmap,const re
 	}
 }
 
-static void majtitle_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void majtitle_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	m72_state *state = machine->driver_data<m72_state>();
+	m72_state *state = machine.driver_data<m72_state>();
 	UINT16 *spriteram16_2 = state->spriteram2;
 	int offs;
 
@@ -513,7 +513,7 @@ static void majtitle_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 				if (flipy) c += h-1-y;
 				else c += y;
 
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+				drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 						c,
 						color,
 						flipx,flipy,
@@ -525,10 +525,10 @@ static void majtitle_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 SCREEN_UPDATE( m72 )
 {
-	m72_state *state = screen->machine->driver_data<m72_state>();
+	m72_state *state = screen->machine().driver_data<m72_state>();
 	if (state->video_off)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 		return 0;
 	}
 
@@ -540,7 +540,7 @@ SCREEN_UPDATE( m72 )
 
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER1,0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,TILEMAP_DRAW_LAYER1,0);
-	m72_draw_sprites(screen->machine, bitmap,cliprect);
+	m72_draw_sprites(screen->machine(), bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	return 0;
@@ -548,13 +548,13 @@ SCREEN_UPDATE( m72 )
 
 SCREEN_UPDATE( majtitle )
 {
-	m72_state *state = screen->machine->driver_data<m72_state>();
+	m72_state *state = screen->machine().driver_data<m72_state>();
 	int i;
 
 
 	if (state->video_off)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 		return 0;
 	}
 
@@ -577,8 +577,8 @@ SCREEN_UPDATE( majtitle )
 
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER1,0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,TILEMAP_DRAW_LAYER1,0);
-	majtitle_draw_sprites(screen->machine, bitmap,cliprect);
-	m72_draw_sprites(screen->machine, bitmap,cliprect);
+	majtitle_draw_sprites(screen->machine(), bitmap,cliprect);
+	m72_draw_sprites(screen->machine(), bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	return 0;

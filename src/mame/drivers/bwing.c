@@ -36,7 +36,7 @@ Known issues:
 
 static INTERRUPT_GEN ( bwp1_interrupt )
 {
-	bwing_state *state = device->machine->driver_data<bwing_state>();
+	bwing_state *state = device->machine().driver_data<bwing_state>();
 	UINT8 latch_data;
 
 	switch (cpu_getiloops(device))
@@ -53,7 +53,7 @@ static INTERRUPT_GEN ( bwp1_interrupt )
 		break;
 
 		case 1:
-			if (~input_port_read(device->machine, "IN2") & 0x03)
+			if (~input_port_read(device->machine(), "IN2") & 0x03)
 			{
 				if (!state->coin)
 				{
@@ -66,7 +66,7 @@ static INTERRUPT_GEN ( bwp1_interrupt )
 		break;
 
 		case 2:
-			if (input_port_read(device->machine, "IN3"))
+			if (input_port_read(device->machine(), "IN3"))
 				device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 	}
@@ -75,7 +75,7 @@ static INTERRUPT_GEN ( bwp1_interrupt )
 
 static INTERRUPT_GEN ( bwp3_interrupt )
 {
-	bwing_state *state = device->machine->driver_data<bwing_state>();
+	bwing_state *state = device->machine().driver_data<bwing_state>();
 
 	if (!state->bwp3_nmimask)
 		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
@@ -86,38 +86,38 @@ static INTERRUPT_GEN ( bwp3_interrupt )
 
 static WRITE8_HANDLER( bwp12_sharedram1_w )
 {
-	bwing_state *state = space->machine->driver_data<bwing_state>();
+	bwing_state *state = space->machine().driver_data<bwing_state>();
 	state->bwp1_sharedram1[offset] = state->bwp2_sharedram1[offset] = data;
 }
 
 static WRITE8_HANDLER( bwp3_u8F_w )
 {
-	bwing_state *state = space->machine->driver_data<bwing_state>();
+	bwing_state *state = space->machine().driver_data<bwing_state>();
 	state->bwp3_u8F_d = data;  // prepares custom chip for various operations
 }
 
 static WRITE8_HANDLER( bwp3_nmimask_w )
 {
-	bwing_state *state = space->machine->driver_data<bwing_state>();
+	bwing_state *state = space->machine().driver_data<bwing_state>();
 	state->bwp3_nmimask = data & 0x80;
 }
 
 static WRITE8_HANDLER( bwp3_nmiack_w )
 {
-	bwing_state *state = space->machine->driver_data<bwing_state>();
+	bwing_state *state = space->machine().driver_data<bwing_state>();
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
 static READ8_HANDLER( bwp1_io_r )
 {
-	bwing_state *state = space->machine->driver_data<bwing_state>();
+	bwing_state *state = space->machine().driver_data<bwing_state>();
 
-	if (offset == 0) return(input_port_read(space->machine, "DSW0"));
-	if (offset == 1) return(input_port_read(space->machine, "DSW1"));
-	if (offset == 2) return(input_port_read(space->machine, "IN0"));
-	if (offset == 3) return(input_port_read(space->machine, "IN1"));
-	if (offset == 4) return(input_port_read(space->machine, "IN2"));
+	if (offset == 0) return(input_port_read(space->machine(), "DSW0"));
+	if (offset == 1) return(input_port_read(space->machine(), "DSW1"));
+	if (offset == 2) return(input_port_read(space->machine(), "IN0"));
+	if (offset == 3) return(input_port_read(space->machine(), "IN1"));
+	if (offset == 4) return(input_port_read(space->machine(), "IN2"));
 
 	return((state->bwp123_membase[0])[0x1b00 + offset]);
 }
@@ -125,7 +125,7 @@ static READ8_HANDLER( bwp1_io_r )
 
 static WRITE8_HANDLER( bwp1_ctrl_w )
 {
-	bwing_state *state = space->machine->driver_data<bwing_state>();
+	bwing_state *state = space->machine().driver_data<bwing_state>();
 
 	switch (offset)
 	{
@@ -171,7 +171,7 @@ static WRITE8_HANDLER( bwp1_ctrl_w )
 
 static WRITE8_HANDLER( bwp2_ctrl_w )
 {
-	bwing_state *state = space->machine->driver_data<bwing_state>();
+	bwing_state *state = space->machine().driver_data<bwing_state>();
 	switch (offset)
 	{
 		case 0: device_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE); break; // SMSTB
@@ -374,11 +374,11 @@ GFXDECODE_END
 
 static MACHINE_START( bwing )
 {
-	bwing_state *state = machine->driver_data<bwing_state>();
+	bwing_state *state = machine.driver_data<bwing_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->subcpu = machine->device("sub");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->subcpu = machine.device("sub");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->coin));
 	state->save_item(NAME(state->palatch));
@@ -397,7 +397,7 @@ static MACHINE_START( bwing )
 
 static MACHINE_RESET( bwing )
 {
-	bwing_state *state = machine->driver_data<bwing_state>();
+	bwing_state *state = machine.driver_data<bwing_state>();
 	int i;
 
 	state->coin = 0;
@@ -624,9 +624,9 @@ ROM_END
 //****************************************************************************
 // Initializations
 
-static void fix_bwp3( running_machine *machine )
+static void fix_bwp3( running_machine &machine )
 {
-	bwing_state *state = machine->driver_data<bwing_state>();
+	bwing_state *state = machine.driver_data<bwing_state>();
 	UINT8 *rom = state->bwp3_rombase;
 	int i, j = state->bwp3_romsize;
 	UINT8 ah, al;
@@ -642,11 +642,11 @@ static void fix_bwp3( running_machine *machine )
 
 static DRIVER_INIT( bwing )
 {
-	bwing_state *state = machine->driver_data<bwing_state>();
+	bwing_state *state = machine.driver_data<bwing_state>();
 
-	state->bwp123_membase[0] = machine->region("maincpu")->base();
-	state->bwp123_membase[1] = machine->region("sub")->base();
-	state->bwp123_membase[2] = machine->region("audiocpu")->base();
+	state->bwp123_membase[0] = machine.region("maincpu")->base();
+	state->bwp123_membase[1] = machine.region("sub")->base();
+	state->bwp123_membase[2] = machine.region("audiocpu")->base();
 
 	fix_bwp3(machine);
 }

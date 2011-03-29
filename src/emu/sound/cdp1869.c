@@ -101,7 +101,7 @@ device_config *cdp1869_device_config::static_alloc_device_config(const machine_c
 
 device_t *cdp1869_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, cdp1869_device(machine, *this));
+	return auto_alloc(machine, cdp1869_device(machine, *this));
 }
 
 
@@ -496,7 +496,7 @@ void cdp1869_device::initialize_palette()
 
 	for (i = 0; i < 8; i++)
 	{
-		palette_set_color(machine, i, get_rgb(i, i, 15));
+		palette_set_color(m_machine, i, get_rgb(i, i, 15));
 	}
 
 	// tone-on-tone display (CFC=1)
@@ -504,7 +504,7 @@ void cdp1869_device::initialize_palette()
 	{
 		for (int l = 0; l < 8; l++)
 		{
-			palette_set_color(machine, i, get_rgb(i, c, l));
+			palette_set_color(m_machine, i, get_rgb(i, c, l));
 			i++;
 		}
 	}

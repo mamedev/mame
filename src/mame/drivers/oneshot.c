@@ -38,8 +38,8 @@ TO DO :
 
 static READ16_HANDLER( oneshot_in0_word_r )
 {
-	oneshot_state *state = space->machine->driver_data<oneshot_state>();
-	int data = input_port_read(space->machine, "DSW1");
+	oneshot_state *state = space->machine().driver_data<oneshot_state>();
+	int data = input_port_read(space->machine(), "DSW1");
 
 	switch (data & 0x0c)
 	{
@@ -62,7 +62,7 @@ static READ16_HANDLER( oneshot_in0_word_r )
 
 static READ16_HANDLER( oneshot_gun_x_p1_r )
 {
-	oneshot_state *state = space->machine->driver_data<oneshot_state>();
+	oneshot_state *state = space->machine().driver_data<oneshot_state>();
 
 	/* shots must be in a different location to register */
 	state->p1_wobble ^= 1;
@@ -72,13 +72,13 @@ static READ16_HANDLER( oneshot_gun_x_p1_r )
 
 static READ16_HANDLER( oneshot_gun_y_p1_r )
 {
-	oneshot_state *state = space->machine->driver_data<oneshot_state>();
+	oneshot_state *state = space->machine().driver_data<oneshot_state>();
 	return state->gun_y_p1;
 }
 
 static READ16_HANDLER( oneshot_gun_x_p2_r )
 {
-	oneshot_state *state = space->machine->driver_data<oneshot_state>();
+	oneshot_state *state = space->machine().driver_data<oneshot_state>();
 
 	/* shots must be in a different location to register */
 	state->p2_wobble ^= 1;
@@ -88,7 +88,7 @@ static READ16_HANDLER( oneshot_gun_x_p2_r )
 
 static READ16_HANDLER( oneshot_gun_y_p2_r )
 {
-	oneshot_state *state = space->machine->driver_data<oneshot_state>();
+	oneshot_state *state = space->machine().driver_data<oneshot_state>();
 	return state->gun_y_p2;
 }
 
@@ -332,7 +332,7 @@ GFXDECODE_END
 
 static void irq_handler(device_t *device, int irq)
 {
-	oneshot_state *state = device->machine->driver_data<oneshot_state>();
+	oneshot_state *state = device->machine().driver_data<oneshot_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -343,10 +343,10 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_START( oneshot )
 {
-	oneshot_state *state = machine->driver_data<oneshot_state>();
+	oneshot_state *state = machine.driver_data<oneshot_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->gun_x_p1));
 	state->save_item(NAME(state->gun_y_p1));
@@ -359,7 +359,7 @@ static MACHINE_START( oneshot )
 
 static MACHINE_RESET( oneshot )
 {
-	oneshot_state *state = machine->driver_data<oneshot_state>();
+	oneshot_state *state = machine.driver_data<oneshot_state>();
 
 	state->gun_x_p1 = 0;
 	state->gun_y_p1 = 0;

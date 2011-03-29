@@ -123,7 +123,7 @@ static DEVICE_START( qsound )
 
 	{
 		/* Allocate stream */
-		chip->stream = device->machine->sound().stream_alloc(
+		chip->stream = device->machine().sound().stream_alloc(
 			*device, 0, 2,
 			device->clock() / QSOUND_CLOCKDIV,
 			chip,
@@ -187,7 +187,7 @@ WRITE8_DEVICE_HANDLER( qsound_w )
 			break;
 
 		default:
-			logerror("%s: unexpected qsound write to offset %d == %02X\n", device->machine->describe_context(), offset, data);
+			logerror("%s: unexpected qsound write to offset %d == %02X\n", device->machine().describe_context(), offset, data);
 			break;
 	}
 }

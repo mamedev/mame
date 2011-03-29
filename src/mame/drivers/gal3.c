@@ -159,7 +159,7 @@ static VIDEO_START(gal3)
 
 }
 
-static void update_palette( running_machine *machine )
+static void update_palette( running_machine &machine )
 {
 	int i;
 	INT16 data1,data2;
@@ -167,8 +167,8 @@ static void update_palette( running_machine *machine )
 
 	for( i=0; i<NAMCOS21_NUM_COLORS; i++ )
 	{
-		data1 = machine->generic.paletteram.u16[0x00000/2+i];
-		data2 = machine->generic.paletteram.u16[0x10000/2+i];
+		data1 = machine.generic.paletteram.u16[0x00000/2+i];
+		data2 = machine.generic.paletteram.u16[0x10000/2+i];
 
 		r = data1>>8;
 		g = data1&0xff;
@@ -180,27 +180,27 @@ static void update_palette( running_machine *machine )
 
 static SCREEN_UPDATE(gal3)
 {
-	gal3_state *state = screen->machine->driver_data<gal3_state>();
+	gal3_state *state = screen->machine().driver_data<gal3_state>();
 	int i;
 	char mst[18], slv[18];
 	static int pivot = 15;
 	int pri;
 
-	update_palette(screen->machine);
+	update_palette(screen->machine());
 
-	if( input_code_pressed_once(screen->machine, KEYCODE_H)&&(pivot<15) )	pivot+=1;
-	if( input_code_pressed_once(screen->machine, KEYCODE_J)&&(pivot>0) )	pivot-=1;
+	if( input_code_pressed_once(screen->machine(), KEYCODE_H)&&(pivot<15) )	pivot+=1;
+	if( input_code_pressed_once(screen->machine(), KEYCODE_J)&&(pivot>0) )	pivot-=1;
 
 	for( pri=0; pri<pivot; pri++ )
 	{
-		namco_obj_draw(screen->machine, bitmap, cliprect, pri );
+		namco_obj_draw(screen->machine(), bitmap, cliprect, pri );
 	}
 
 /*  CopyVisiblePolyFrameBuffer( bitmap, cliprect,0,0x7fbf );
 
     for( pri=pivot; pri<15; pri++ )
     {
-        namco_obj_draw(screen->machine, bitmap, cliprect, pri );
+        namco_obj_draw(screen->machine(), bitmap, cliprect, pri );
     }*/
 
 	// CPU Diag LEDs
@@ -234,7 +234,7 @@ static SCREEN_UPDATE(gal3)
 
 static NVRAM_HANDLER( gal3 )
 {
-	gal3_state *state = machine->driver_data<gal3_state>();
+	gal3_state *state = machine.driver_data<gal3_state>();
 	int i;
 	UINT8 data[4];
 	if( read_or_write )
@@ -271,26 +271,26 @@ static NVRAM_HANDLER( gal3 )
 
 static READ32_HANDLER( shareram0_r )
 {
-	gal3_state *state = space->machine->driver_data<gal3_state>();
+	gal3_state *state = space->machine().driver_data<gal3_state>();
 	return state->mpSharedRAM0[offset];
 }
 
 static WRITE32_HANDLER( shareram0_w )
 {
-	gal3_state *state = space->machine->driver_data<gal3_state>();
+	gal3_state *state = space->machine().driver_data<gal3_state>();
 	COMBINE_DATA( &state->mpSharedRAM0[offset] );
 }
 
 #if 0
 static READ32_HANDLER( shareram1_r )
 {
-	gal3_state *state = space->machine->driver_data<gal3_state>();
+	gal3_state *state = space->machine().driver_data<gal3_state>();
 	return state->mpSharedRAM1[offset];
 }
 
 static WRITE32_HANDLER( shareram1_w )
 {
-	gal3_state *state = space->machine->driver_data<gal3_state>();
+	gal3_state *state = space->machine().driver_data<gal3_state>();
 	COMBINE_DATA( &state->mpSharedRAM1[offset] );
 }
 #endif
@@ -299,25 +299,25 @@ static WRITE32_HANDLER( shareram1_w )
 
 static READ32_HANDLER( led_mst_r )
 {
-	gal3_state *state = space->machine->driver_data<gal3_state>();
+	gal3_state *state = space->machine().driver_data<gal3_state>();
 	return state->led_mst;
 }
 
 static WRITE32_HANDLER( led_mst_w )
 {
-	gal3_state *state = space->machine->driver_data<gal3_state>();
+	gal3_state *state = space->machine().driver_data<gal3_state>();
 	COMBINE_DATA(&state->led_mst);
 }
 
 static READ32_HANDLER( led_slv_r )
 {
-	gal3_state *state = space->machine->driver_data<gal3_state>();
+	gal3_state *state = space->machine().driver_data<gal3_state>();
 	return state->led_slv;
 }
 
 static WRITE32_HANDLER( led_slv_w )
 {
-	gal3_state *state = space->machine->driver_data<gal3_state>();
+	gal3_state *state = space->machine().driver_data<gal3_state>();
 	COMBINE_DATA(&state->led_slv);
 }
 
@@ -326,28 +326,28 @@ static WRITE32_HANDLER( led_slv_w )
 static READ32_HANDLER( paletteram32_r )
 {
 	offset *= 2;
-	return (space->machine->generic.paletteram.u16[offset]<<16)|space->machine->generic.paletteram.u16[offset+1];
+	return (space->machine().generic.paletteram.u16[offset]<<16)|space->machine().generic.paletteram.u16[offset+1];
 }
 
 static WRITE32_HANDLER( paletteram32_w )
 {
 	UINT32 v;
 	offset *= 2;
-	v = (space->machine->generic.paletteram.u16[offset]<<16)|space->machine->generic.paletteram.u16[offset+1];
+	v = (space->machine().generic.paletteram.u16[offset]<<16)|space->machine().generic.paletteram.u16[offset+1];
 	COMBINE_DATA( &v );
-	space->machine->generic.paletteram.u16[offset+0] = v>>16;
-	space->machine->generic.paletteram.u16[offset+1] = v&0xffff;
+	space->machine().generic.paletteram.u16[offset+0] = v>>16;
+	space->machine().generic.paletteram.u16[offset+1] = v&0xffff;
 }
 
 static READ32_HANDLER(namcos21_video_enable_r)
 {
-	gal3_state *state = space->machine->driver_data<gal3_state>();
+	gal3_state *state = space->machine().driver_data<gal3_state>();
 	return state->namcos21_video_enable<<16;
 }
 
 static WRITE32_HANDLER(namcos21_video_enable_w)
 {
-	gal3_state *state = space->machine->driver_data<gal3_state>();
+	gal3_state *state = space->machine().driver_data<gal3_state>();
 	UINT32 v;
 	v = state->namcos21_video_enable<<16;
 	COMBINE_DATA( &v ); // 0xff53, instead of 0x40 in namcos21
@@ -356,7 +356,7 @@ static WRITE32_HANDLER(namcos21_video_enable_w)
 
 static READ32_HANDLER(rso_r)
 {
-	gal3_state *state = space->machine->driver_data<gal3_state>();
+	gal3_state *state = space->machine().driver_data<gal3_state>();
 	/*store $5555 @$0046, and readback @$0000
     read @$0144 and store at A6_21e & A4_5c
     Check @$009a==1 to start DEMO
@@ -367,7 +367,7 @@ static READ32_HANDLER(rso_r)
 
 static WRITE32_HANDLER(rso_w)
 {
-	gal3_state *state = space->machine->driver_data<gal3_state>();
+	gal3_state *state = space->machine().driver_data<gal3_state>();
 	UINT32 v;
 	offset *= 2;
 	v = (state->rsoSharedRAM[offset]<<16)|state->rsoSharedRAM[offset+1];

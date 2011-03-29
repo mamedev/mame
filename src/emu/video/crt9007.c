@@ -255,7 +255,7 @@ device_config *crt9007_device_config::static_alloc_device_config(const machine_c
 
 device_t *crt9007_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, crt9007_device(machine, *this));
+	return auto_alloc(machine, crt9007_device(machine, *this));
 }
 
 
@@ -566,7 +566,7 @@ void crt9007_device::device_start()
 	devcb_resolve_write_line(&m_out_sld_func, &m_config.out_sld_func, this);
 
 	// get the screen device
-	m_screen = machine->device<screen_device>(m_config.screen_tag);
+	m_screen = m_machine.device<screen_device>(m_config.screen_tag);
 	assert(m_screen != NULL);
 
 	// set horizontal pixels per column

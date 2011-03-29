@@ -19,10 +19,10 @@
 
 VIDEO_START( mlc )
 {
-	deco_mlc_state *state = machine->driver_data<deco_mlc_state>();
-	if (machine->gfx[0]->color_granularity==16)
+	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
+	if (machine.gfx[0]->color_granularity==16)
 		state->colour_mask=0x7f;
-	else if (machine->gfx[0]->color_granularity==32)
+	else if (machine.gfx[0]->color_granularity==32)
 		state->colour_mask=0x3f;
 	else
 		state->colour_mask=0x1f;
@@ -32,9 +32,9 @@ VIDEO_START( mlc )
 }
 
 #ifdef UNUSED_FUNCTION
-static void blitRaster(running_machine *machine, bitmap_t *bitmap, int rasterMode)
+static void blitRaster(running_machine &machine, bitmap_t *bitmap, int rasterMode)
 {
-	deco_mlc_state *state = machine->driver_data<deco_mlc_state>();
+	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
 	int x,y;
 	for (y=0; y<256; y++) //todo
 	{
@@ -97,7 +97,7 @@ static void mlc_drawgfxzoom(
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			const UINT8 *code_base1 = gfx_element_get_data(gfx, code1 % gfx->total_elements);
 			const UINT8 *code_base2 = gfx_element_get_data(gfx, code2 % gfx->total_elements);
 
@@ -225,14 +225,14 @@ static void mlc_drawgfxzoom(
 	}
 }
 
-static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine& machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	deco_mlc_state *state = machine->driver_data<deco_mlc_state>();
+	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
 	UINT32 *index_ptr=0;
 	int offs,fx=0,fy=0,x,y,color,colorOffset,sprite,indx,h,w,bx,by,fx1,fy1;
 	int xoffs,yoffs;
-	UINT8 *rom = machine->region("gfx2")->base() + 0x20000, *index_ptr8;
-	UINT8 *rawrom = machine->region("gfx2")->base();
+	UINT8 *rom = machine.region("gfx2")->base() + 0x20000, *index_ptr8;
+	UINT8 *rawrom = machine.region("gfx2")->base();
 	int blockIsTilemapIndex=0;
 	int sprite2=0,indx2=0,use8bppMode=0;
 	int yscale,xscale;
@@ -252,7 +252,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 	{
 		if ((mlc_spriteram[offs+0]&0x8000)==0)
 			continue;
-		if ((mlc_spriteram[offs+1]&0x2000) && (machine->primary_screen->frame_number() & 1))
+		if ((mlc_spriteram[offs+1]&0x2000) && (machine.primary_screen->frame_number() & 1))
 			continue;
 
 		/*
@@ -482,7 +482,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 //                  rasterDirty=1;
 
 				mlc_drawgfxzoom(
-								/*rasterMode ? temp_bitmap : */bitmap,&user_clip,machine->gfx[0],
+								/*rasterMode ? temp_bitmap : */bitmap,&user_clip,machine.gfx[0],
 								tile,tile2,
 								color + colorOffset,fx,fy,xbase,ybase,
 								0,
@@ -511,7 +511,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 
 SCREEN_EOF( mlc )
 {
-	deco_mlc_state *state = machine->driver_data<deco_mlc_state>();
+	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
 	/* Spriteram is definitely double buffered, as the vram lookup tables
     are often updated a frame after spriteram is setup to point to a new
     lookup table.  Without buffering incorrect one frame glitches are seen
@@ -523,7 +523,7 @@ SCREEN_EOF( mlc )
 SCREEN_UPDATE( mlc )
 {
 //  bitmap_fill(temp_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,screen->machine->pens[0]); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
-	draw_sprites(screen->machine,bitmap,cliprect);
+	bitmap_fill(bitmap,cliprect,screen->machine().pens[0]); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
+	draw_sprites(screen->machine(),bitmap,cliprect);
 	return 0;
 }

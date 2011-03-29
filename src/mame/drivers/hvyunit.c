@@ -114,20 +114,20 @@ public:
 
 static MACHINE_START( hvyunit )
 {
-	hvyunit_state *state = machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = machine.driver_data<hvyunit_state>();
 
-	state->master_cpu = machine->device("master");
-	state->slave_cpu = machine->device("slave");
-	state->sound_cpu = machine->device("soundcpu");
-	state->mermaid = machine->device("mermaid");
-	state->pandora = machine->device("pandora");
+	state->master_cpu = machine.device("master");
+	state->slave_cpu = machine.device("slave");
+	state->sound_cpu = machine.device("soundcpu");
+	state->mermaid = machine.device("mermaid");
+	state->pandora = machine.device("pandora");
 
 	// TODO: Save state
 }
 
 static MACHINE_RESET( hvyunit )
 {
-	hvyunit_state *state = machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = machine.driver_data<hvyunit_state>();
 
 	state->int_vector = 0xff;
 	state->mermaid_int0_l = 1;
@@ -144,7 +144,7 @@ static MACHINE_RESET( hvyunit )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	hvyunit_state *state = machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = machine.driver_data<hvyunit_state>();
 
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + ((attr & 0x0f) << 8);
@@ -155,7 +155,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( hvyunit )
 {
-	hvyunit_state *state = machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = machine.driver_data<hvyunit_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 }
 
@@ -163,11 +163,11 @@ static SCREEN_UPDATE( hvyunit )
 {
 #define SX_POS	96
 #define SY_POS	0
-	hvyunit_state *state = screen->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = screen->machine().driver_data<hvyunit_state>();
 
 	tilemap_set_scrollx(state->bg_tilemap, 0, ((state->port0_data & 0x40) << 2) + state->scrollx + SX_POS); // TODO
 	tilemap_set_scrolly(state->bg_tilemap, 0, ((state->port0_data & 0x80) << 1) + state->scrolly + SY_POS); // TODO
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	pandora_update(state->pandora, bitmap, cliprect);
 
@@ -176,7 +176,7 @@ static SCREEN_UPDATE( hvyunit )
 
 static SCREEN_EOF( hvyunit )
 {
-	hvyunit_state *state = machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = machine.driver_data<hvyunit_state>();
 	pandora_eof(state->pandora);
 }
 
@@ -189,21 +189,21 @@ static SCREEN_EOF( hvyunit )
 
 static WRITE8_HANDLER( trigger_nmi_on_slave_cpu )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 	device_set_input_line(state->slave_cpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( master_bankswitch_w )
 {
-	unsigned char *ROM = space->machine->region("master")->base();
+	unsigned char *ROM = space->machine().region("master")->base();
 	int bank = data & 7;
 	ROM = &ROM[0x4000 * bank];
-	memory_set_bankptr(space->machine, "bank1", ROM);
+	memory_set_bankptr(space->machine(), "bank1", ROM);
 }
 
 static WRITE8_HANDLER( mermaid_data_w )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
 	state->data_to_mermaid = data;
 	state->z80_to_mermaid_full = 1;
@@ -213,7 +213,7 @@ static WRITE8_HANDLER( mermaid_data_w )
 
 static READ8_HANDLER( mermaid_data_r )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
 	state->mermaid_to_z80_full = 0;
 	return state->data_to_z80;
@@ -221,7 +221,7 @@ static READ8_HANDLER( mermaid_data_r )
 
 static READ8_HANDLER( mermaid_status_r )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
 	return (!state->mermaid_to_z80_full << 2) | (state->z80_to_mermaid_full << 3);
 }
@@ -235,7 +235,7 @@ static READ8_HANDLER( mermaid_status_r )
 
 static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
 	soundlatch_w(space, 0, data);
 	device_set_input_line(state->sound_cpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -243,7 +243,7 @@ static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 
 static WRITE8_HANDLER( hu_videoram_w )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -251,7 +251,7 @@ static WRITE8_HANDLER( hu_videoram_w )
 
 static WRITE8_HANDLER( hu_colorram_w )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -259,32 +259,32 @@ static WRITE8_HANDLER( hu_colorram_w )
 
 static WRITE8_HANDLER( slave_bankswitch_w )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
-	unsigned char *ROM = space->machine->region("slave")->base();
+	unsigned char *ROM = space->machine().region("slave")->base();
 	int bank = (data & 0x03);
 	state->port0_data = data;
 	ROM = &ROM[0x4000 * bank];
 
-	memory_set_bankptr(space->machine, "bank2", ROM);
+	memory_set_bankptr(space->machine(), "bank2", ROM);
 }
 
 static WRITE8_HANDLER( hu_scrollx_w )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 	state->scrollx = data;
 }
 
 static WRITE8_HANDLER( hu_scrolly_w )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 	state->scrolly = data;
 }
 
 static WRITE8_HANDLER( coin_count_w )
 {
-	coin_counter_w(space->machine, 0, data & 1);
-	coin_counter_w(space->machine, 1, data & 2);
+	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(space->machine(), 1, data & 2);
 }
 
 
@@ -296,11 +296,11 @@ static WRITE8_HANDLER( coin_count_w )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	unsigned char *ROM = space->machine->region("soundcpu")->base();
+	unsigned char *ROM = space->machine().region("soundcpu")->base();
 	int bank = data & 0x3;
 	ROM = &ROM[0x4000 * bank];
 
-	memory_set_bankptr(space->machine, "bank3", ROM);
+	memory_set_bankptr(space->machine(), "bank3", ROM);
 }
 
 
@@ -318,7 +318,7 @@ static READ8_HANDLER( mermaid_p0_r )
 
 static WRITE8_HANDLER( mermaid_p0_w )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
 	if (!BIT(state->mermaid_p[0], 1) && BIT(data, 1))
 	{
@@ -334,7 +334,7 @@ static WRITE8_HANDLER( mermaid_p0_w )
 
 static READ8_HANDLER( mermaid_p1_r )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
 	if (BIT(state->mermaid_p[0], 0) == 0)
 		return state->data_to_mermaid;
@@ -344,7 +344,7 @@ static READ8_HANDLER( mermaid_p1_r )
 
 static WRITE8_HANDLER( mermaid_p1_w )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
 	if (data == 0xff)
 	{
@@ -357,31 +357,31 @@ static WRITE8_HANDLER( mermaid_p1_w )
 
 static READ8_HANDLER( mermaid_p2_r )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
 	switch ((state->mermaid_p[0] >> 2) & 3)
 	{
-		case 0: return input_port_read(space->machine, "IN1");
-		case 1: return input_port_read(space->machine, "IN2");
-		case 2: return input_port_read(space->machine, "IN0");
+		case 0: return input_port_read(space->machine(), "IN1");
+		case 1: return input_port_read(space->machine(), "IN2");
+		case 2: return input_port_read(space->machine(), "IN0");
 		default: return 0xff;
 	}
 }
 
 static WRITE8_HANDLER( mermaid_p2_w )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
 	state->mermaid_p[2] = data;
 }
 
 static READ8_HANDLER( mermaid_p3_r )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
 	UINT8 dsw = 0;
-	UINT8 dsw1 = input_port_read(space->machine, "DSW1");
-	UINT8 dsw2 = input_port_read(space->machine, "DSW2");
+	UINT8 dsw1 = input_port_read(space->machine(), "DSW1");
+	UINT8 dsw2 = input_port_read(space->machine(), "DSW2");
 
 	switch ((state->mermaid_p[0] >> 5) & 3)
 	{
@@ -396,7 +396,7 @@ static READ8_HANDLER( mermaid_p3_r )
 
 static WRITE8_HANDLER( mermaid_p3_w )
 {
-	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
 	state->mermaid_p[3] = data;
 	device_set_input_line(state->slave_cpu, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
@@ -620,7 +620,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( hvyunit_interrupt )
 {
-	hvyunit_state *state = device->machine->driver_data<hvyunit_state>();
+	hvyunit_state *state = device->machine().driver_data<hvyunit_state>();
 
 	state->int_vector ^= 0x02;
 	device_set_input_line_and_vector(device, 0, HOLD_LINE, state->int_vector);

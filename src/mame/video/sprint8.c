@@ -13,18 +13,18 @@ PALETTE_INIT( sprint8 )
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x12);
+	machine.colortable = colortable_alloc(machine, 0x12);
 
 	for (i = 0; i < 0x10; i++)
 	{
-		colortable_entry_set_value(machine->colortable, 2 * i + 0, 0x10);
-		colortable_entry_set_value(machine->colortable, 2 * i + 1, i);
+		colortable_entry_set_value(machine.colortable, 2 * i + 0, 0x10);
+		colortable_entry_set_value(machine.colortable, 2 * i + 1, i);
 	}
 
-	colortable_entry_set_value(machine->colortable, 0x20, 0x10);
-	colortable_entry_set_value(machine->colortable, 0x21, 0x10);
-	colortable_entry_set_value(machine->colortable, 0x22, 0x10);
-	colortable_entry_set_value(machine->colortable, 0x23, 0x11);
+	colortable_entry_set_value(machine.colortable, 0x20, 0x10);
+	colortable_entry_set_value(machine.colortable, 0x21, 0x10);
+	colortable_entry_set_value(machine.colortable, 0x22, 0x10);
+	colortable_entry_set_value(machine.colortable, 0x23, 0x11);
 }
 
 
@@ -65,7 +65,7 @@ static void set_pens(sprint8_state *state, colortable_t *colortable)
 
 static TILE_GET_INFO( get_tile_info1 )
 {
-	sprint8_state *state = machine->driver_data<sprint8_state>();
+	sprint8_state *state = machine.driver_data<sprint8_state>();
 	UINT8 code = state->video_ram[tile_index];
 
 	int color = 0;
@@ -91,7 +91,7 @@ static TILE_GET_INFO( get_tile_info1 )
 
 static TILE_GET_INFO( get_tile_info2 )
 {
-	sprint8_state *state = machine->driver_data<sprint8_state>();
+	sprint8_state *state = machine.driver_data<sprint8_state>();
 	UINT8 code = state->video_ram[tile_index];
 
 	int color = 0;
@@ -107,7 +107,7 @@ static TILE_GET_INFO( get_tile_info2 )
 
 WRITE8_HANDLER( sprint8_video_ram_w )
 {
-	sprint8_state *state = space->machine->driver_data<sprint8_state>();
+	sprint8_state *state = space->machine().driver_data<sprint8_state>();
 	state->video_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap1, offset);
 	tilemap_mark_tile_dirty(state->tilemap2, offset);
@@ -116,9 +116,9 @@ WRITE8_HANDLER( sprint8_video_ram_w )
 
 VIDEO_START( sprint8 )
 {
-	sprint8_state *state = machine->driver_data<sprint8_state>();
-	state->helper1 = machine->primary_screen->alloc_compatible_bitmap();
-	state->helper2 = machine->primary_screen->alloc_compatible_bitmap();
+	sprint8_state *state = machine.driver_data<sprint8_state>();
+	state->helper1 = machine.primary_screen->alloc_compatible_bitmap();
+	state->helper2 = machine.primary_screen->alloc_compatible_bitmap();
 
 	state->tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 8, 32, 32);
 	state->tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 16, 8, 32, 32);
@@ -128,9 +128,9 @@ VIDEO_START( sprint8 )
 }
 
 
-static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const rectangle *cliprect)
 {
-	sprint8_state *state = machine->driver_data<sprint8_state>();
+	sprint8_state *state = machine.driver_data<sprint8_state>();
 	int i;
 
 	for (i = 0; i < 16; i++)
@@ -143,7 +143,7 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 		if (code & 0x80)
 			x |= 0x100;
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[2],
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[2],
 			code ^ 7,
 			i,
 			!(code & 0x10), !(code & 0x08),
@@ -160,20 +160,20 @@ static TIMER_CALLBACK( sprint8_collision_callback )
 
 SCREEN_UPDATE( sprint8 )
 {
-	sprint8_state *state = screen->machine->driver_data<sprint8_state>();
-	set_pens(state, screen->machine->colortable);
+	sprint8_state *state = screen->machine().driver_data<sprint8_state>();
+	set_pens(state, screen->machine().colortable);
 	tilemap_draw(bitmap, cliprect, state->tilemap1, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
 
 SCREEN_EOF( sprint8 )
 {
-	sprint8_state *state = machine->driver_data<sprint8_state>();
+	sprint8_state *state = machine.driver_data<sprint8_state>();
 	int x;
 	int y;
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	tilemap_draw(state->helper2, &visarea, state->tilemap2, 0, 0);
 
@@ -188,8 +188,8 @@ SCREEN_EOF( sprint8 )
 
 		for (x = visarea.min_x; x <= visarea.max_x; x++)
 			if (p1[x] != 0x20 && p2[x] == 0x23)
-				machine->scheduler().timer_set(machine->primary_screen->time_until_pos(y + 24, x),
+				machine.scheduler().timer_set(machine.primary_screen->time_until_pos(y + 24, x),
 						FUNC(sprint8_collision_callback),
-						colortable_entry_get_value(machine->colortable, p1[x]));
+						colortable_entry_get_value(machine.colortable, p1[x]));
 	}
 }

@@ -19,9 +19,9 @@ static TIMER_CALLBACK( crtc_interrupt_gen );
  *
  *************************************/
 
-INLINE void get_fromance_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int layer )
+INLINE void get_fromance_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int layer )
 {
-	fromance_state *state = machine->driver_data<fromance_state>();
+	fromance_state *state = machine.driver_data<fromance_state>();
 	int tile = ((state->local_videoram[layer][0x0000 + tile_index] & 0x80) << 9) |
 				(state->local_videoram[layer][0x1000 + tile_index] << 8) |
 				state->local_videoram[layer][0x2000 + tile_index];
@@ -34,9 +34,9 @@ static TILE_GET_INFO( get_fromance_bg_tile_info ) { get_fromance_tile_info(machi
 static TILE_GET_INFO( get_fromance_fg_tile_info ) { get_fromance_tile_info(machine, tileinfo, tile_index, 1); }
 
 
-INLINE void get_nekkyoku_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int layer )
+INLINE void get_nekkyoku_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int layer )
 {
-	fromance_state *state = machine->driver_data<fromance_state>();
+	fromance_state *state = machine.driver_data<fromance_state>();
 	int tile = (state->local_videoram[layer][0x0000 + tile_index] << 8) |
 				state->local_videoram[layer][0x1000 + tile_index];
 	int color = state->local_videoram[layer][tile_index + 0x2000] & 0x3f;
@@ -55,9 +55,9 @@ static TILE_GET_INFO( get_nekkyoku_fg_tile_info ) { get_nekkyoku_tile_info(machi
  *
  *************************************/
 
-static void init_common( running_machine *machine )
+static void init_common( running_machine &machine )
 {
-	fromance_state *state = machine->driver_data<fromance_state>();
+	fromance_state *state = machine.driver_data<fromance_state>();
 
 	/* allocate local videoram */
 	state->local_videoram[0] = auto_alloc_array(machine, UINT8, 0x1000 * 3);
@@ -70,7 +70,7 @@ static void init_common( running_machine *machine )
 	tilemap_set_transparent_pen(state->fg_tilemap, 15);
 
 	/* reset the timer */
-	state->crtc_timer = machine->scheduler().timer_alloc(FUNC(crtc_interrupt_gen));
+	state->crtc_timer = machine.scheduler().timer_alloc(FUNC(crtc_interrupt_gen));
 
 	/* state save */
 	state->save_item(NAME(state->selected_videoram));
@@ -91,7 +91,7 @@ static void init_common( running_machine *machine )
 
 VIDEO_START( fromance )
 {
-	fromance_state *state = machine->driver_data<fromance_state>();
+	fromance_state *state = machine.driver_data<fromance_state>();
 
 	/* allocate tilemaps */
 	state->bg_tilemap = tilemap_create(machine, get_fromance_bg_tile_info, tilemap_scan_rows, 8, 4, 64, 64);
@@ -102,7 +102,7 @@ VIDEO_START( fromance )
 
 VIDEO_START( nekkyoku )
 {
-	fromance_state *state = machine->driver_data<fromance_state>();
+	fromance_state *state = machine.driver_data<fromance_state>();
 
 	/* allocate tilemaps */
 	state->bg_tilemap = tilemap_create(machine, get_nekkyoku_bg_tile_info, tilemap_scan_rows, 8, 4, 64, 64);
@@ -113,7 +113,7 @@ VIDEO_START( nekkyoku )
 
 VIDEO_START( pipedrm )
 {
-	fromance_state *state = machine->driver_data<fromance_state>();
+	fromance_state *state = machine.driver_data<fromance_state>();
 
 	VIDEO_START_CALL(fromance);
 	state->scrolly_ofs = 0x00;
@@ -121,7 +121,7 @@ VIDEO_START( pipedrm )
 
 VIDEO_START( hatris )
 {
-	fromance_state *state = machine->driver_data<fromance_state>();
+	fromance_state *state = machine.driver_data<fromance_state>();
 
 	VIDEO_START_CALL(fromance);
 	state->scrollx_ofs = 0xB9;
@@ -136,7 +136,7 @@ VIDEO_START( hatris )
 
 WRITE8_HANDLER( fromance_gfxreg_w )
 {
-	fromance_state *state = space->machine->driver_data<fromance_state>();
+	fromance_state *state = space->machine().driver_data<fromance_state>();
 
 	state->gfxreg = data;
 	state->flipscreen = (data & 0x01);
@@ -146,7 +146,7 @@ WRITE8_HANDLER( fromance_gfxreg_w )
 	if (state->flipscreen != state->flipscreen_old)
 	{
 		state->flipscreen_old = state->flipscreen;
-		tilemap_set_flip_all(space->machine, state->flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(space->machine(), state->flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 }
 
@@ -160,7 +160,7 @@ WRITE8_HANDLER( fromance_gfxreg_w )
 
 READ8_HANDLER( fromance_paletteram_r )
 {
-	fromance_state *state = space->machine->driver_data<fromance_state>();
+	fromance_state *state = space->machine().driver_data<fromance_state>();
 
 	/* adjust for banking and read */
 	offset |= state->selected_paletteram << 11;
@@ -170,7 +170,7 @@ READ8_HANDLER( fromance_paletteram_r )
 
 WRITE8_HANDLER( fromance_paletteram_w )
 {
-	fromance_state *state = space->machine->driver_data<fromance_state>();
+	fromance_state *state = space->machine().driver_data<fromance_state>();
 	int palword;
 
 	/* adjust for banking and modify */
@@ -179,7 +179,7 @@ WRITE8_HANDLER( fromance_paletteram_w )
 
 	/* compute R,G,B */
 	palword = (state->local_paletteram[offset | 1] << 8) | state->local_paletteram[offset & ~1];
-	palette_set_color_rgb(space->machine, offset / 2, pal5bit(palword >> 10), pal5bit(palword >> 5), pal5bit(palword >> 0));
+	palette_set_color_rgb(space->machine(), offset / 2, pal5bit(palword >> 10), pal5bit(palword >> 5), pal5bit(palword >> 0));
 }
 
 
@@ -192,14 +192,14 @@ WRITE8_HANDLER( fromance_paletteram_w )
 
 READ8_HANDLER( fromance_videoram_r )
 {
-	fromance_state *state = space->machine->driver_data<fromance_state>();
+	fromance_state *state = space->machine().driver_data<fromance_state>();
 	return state->local_videoram[state->selected_videoram][offset];
 }
 
 
 WRITE8_HANDLER( fromance_videoram_w )
 {
-	fromance_state *state = space->machine->driver_data<fromance_state>();
+	fromance_state *state = space->machine().driver_data<fromance_state>();
 	state->local_videoram[state->selected_videoram][offset] = data;
 	tilemap_mark_tile_dirty(state->selected_videoram ? state->fg_tilemap : state->bg_tilemap, offset & 0x0fff);
 }
@@ -214,7 +214,7 @@ WRITE8_HANDLER( fromance_videoram_w )
 
 WRITE8_HANDLER( fromance_scroll_w )
 {
-	fromance_state *state = space->machine->driver_data<fromance_state>();
+	fromance_state *state = space->machine().driver_data<fromance_state>();
 	if (state->flipscreen)
 	{
 		switch (offset)
@@ -263,23 +263,23 @@ WRITE8_HANDLER( fromance_scroll_w )
 
 static TIMER_CALLBACK( crtc_interrupt_gen )
 {
-	fromance_state *state = machine->driver_data<fromance_state>();
+	fromance_state *state = machine.driver_data<fromance_state>();
 	device_set_input_line(state->subcpu, 0, HOLD_LINE);
 	if (param != 0)
-		state->crtc_timer->adjust(machine->primary_screen->frame_period() / param, 0, machine->primary_screen->frame_period() / param);
+		state->crtc_timer->adjust(machine.primary_screen->frame_period() / param, 0, machine.primary_screen->frame_period() / param);
 }
 
 
 WRITE8_HANDLER( fromance_crtc_data_w )
 {
-	fromance_state *state = space->machine->driver_data<fromance_state>();
+	fromance_state *state = space->machine().driver_data<fromance_state>();
 	state->crtc_data[state->crtc_register] = data;
 
 	switch (state->crtc_register)
 	{
 		/* only register we know about.... */
 		case 0x0b:
-			state->crtc_timer->adjust(space->machine->primary_screen->time_until_vblank_start(), (data > 0x80) ? 2 : 1);
+			state->crtc_timer->adjust(space->machine().primary_screen->time_until_vblank_start(), (data > 0x80) ? 2 : 1);
 			break;
 
 		default:
@@ -291,7 +291,7 @@ WRITE8_HANDLER( fromance_crtc_data_w )
 
 WRITE8_HANDLER( fromance_crtc_register_w )
 {
-	fromance_state *state = space->machine->driver_data<fromance_state>();
+	fromance_state *state = space->machine().driver_data<fromance_state>();
 	state->crtc_register = data;
 }
 
@@ -305,7 +305,7 @@ WRITE8_HANDLER( fromance_crtc_register_w )
 
 static void draw_sprites( screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int draw_priority )
 {
-	fromance_state *state = screen.machine->driver_data<fromance_state>();
+	fromance_state *state = screen.machine().driver_data<fromance_state>();
 	static const UINT8 zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 	const rectangle &visarea = screen.visible_area();
 	UINT8 *spriteram = state->spriteram;
@@ -361,10 +361,10 @@ static void draw_sprites( screen_device &screen, bitmap_t *bitmap, const rectang
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 0, 0,
+							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 0, 0,
 									x + xt * 16, y + yt * 16, 15);
 						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 0, 0,
+							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 0, 0,
 									x + xt * xzoom, y + yt * yzoom,
 									0x1000 * xzoom, 0x1000 * yzoom, 15);
 			}
@@ -375,10 +375,10 @@ static void draw_sprites( screen_device &screen, bitmap_t *bitmap, const rectang
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 1, 0,
+							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 1, 0,
 									x + (xtiles - 1 - xt) * 16, y + yt * 16, 15);
 						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 1, 0,
+							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 1, 0,
 									x + (xtiles - 1 - xt) * xzoom, y + yt * yzoom,
 									0x1000 * xzoom, 0x1000 * yzoom, 15);
 			}
@@ -389,10 +389,10 @@ static void draw_sprites( screen_device &screen, bitmap_t *bitmap, const rectang
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 0, 1,
+							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 0, 1,
 									x + xt * 16, y + (ytiles - 1 - yt) * 16, 15);
 						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 0, 1,
+							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 0, 1,
 									x + xt * xzoom, y + (ytiles - 1 - yt) * yzoom,
 									0x1000 * xzoom, 0x1000 * yzoom, 15);
 			}
@@ -403,10 +403,10 @@ static void draw_sprites( screen_device &screen, bitmap_t *bitmap, const rectang
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 1, 1,
+							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 1, 1,
 									x + (xtiles - 1 - xt) * 16, y + (ytiles - 1 - yt) * 16, 15);
 						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 1, 1,
+							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 1, 1,
 									x + (xtiles - 1 - xt) * xzoom, y + (ytiles - 1 - yt) * yzoom,
 									0x1000 * xzoom, 0x1000 * yzoom, 15);
 			}
@@ -424,7 +424,7 @@ static void draw_sprites( screen_device &screen, bitmap_t *bitmap, const rectang
 
 SCREEN_UPDATE( fromance )
 {
-	fromance_state *state = screen->machine->driver_data<fromance_state>();
+	fromance_state *state = screen->machine().driver_data<fromance_state>();
 
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scrollx[0]);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->scrolly[0]);
@@ -439,7 +439,7 @@ SCREEN_UPDATE( fromance )
 
 SCREEN_UPDATE( pipedrm )
 {
-	fromance_state *state = screen->machine->driver_data<fromance_state>();
+	fromance_state *state = screen->machine().driver_data<fromance_state>();
 
 	/* there seems to be no logical mapping for the X scroll register -- maybe it's gone */
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->scrolly[1]);

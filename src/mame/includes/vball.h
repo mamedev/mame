@@ -24,8 +24,8 @@ public:
 
 VIDEO_START( vb );
 SCREEN_UPDATE( vb );
-void vb_bgprombank_w(running_machine *machine, int bank);
-void vb_spprombank_w(running_machine *machine, int bank);
+void vb_bgprombank_w(running_machine &machine, int bank);
+void vb_spprombank_w(running_machine &machine, int bank);
 WRITE8_HANDLER( vb_attrib_w );
 WRITE8_HANDLER( vb_videoram_w );
-void vb_mark_all_dirty(running_machine *machine);
+void vb_mark_all_dirty(running_machine &machine);

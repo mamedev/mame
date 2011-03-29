@@ -48,6 +48,6 @@ struct _DView
 
 
 GtkWidget *dview_new(const gchar *widget_name, const gchar *string1, const gchar *string2, gint int1, gint int2);
-void dview_set_debug_view(DView *dv, running_machine *machine, debug_view_type type);
+void dview_set_debug_view(DView *dv, running_machine &machine, debug_view_type type);
 
 #endif

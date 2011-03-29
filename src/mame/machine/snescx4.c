@@ -19,9 +19,9 @@ static UINT8 CX4_read(UINT32 addr);
 static UINT16 CX4_readw(UINT16 addr);
 static UINT32 CX4_readl(UINT16 addr);
 
-static void CX4_write(running_machine *machine, UINT32 addr, UINT8 data);
-static void CX4_writew(running_machine *machine, UINT16 addr, UINT16 data);
-//static void CX4_writel(running_machine *machine, UINT16 addr, UINT32 data);
+static void CX4_write(running_machine &machine, UINT32 addr, UINT8 data);
+static void CX4_writew(running_machine &machine, UINT16 addr, UINT16 data);
+//static void CX4_writel(running_machine &machine, UINT16 addr, UINT32 data);
 
 static void CX4_C4DrawLine(INT32 X1, INT32 Y1, INT16 Z1, INT32 X2, INT32 Y2, INT16 Z2, UINT8 Color);
 
@@ -98,7 +98,7 @@ static void CX4_immediate_reg(UINT32 start)
 	CX4_str(0, cx4.r0);
 }
 
-static void CX4_transfer_data(running_machine *machine)
+static void CX4_transfer_data(running_machine &machine)
 {
 	UINT32 src;
 	UINT16 dest, count;
@@ -108,7 +108,7 @@ static void CX4_transfer_data(running_machine *machine)
 	count = (cx4.reg[0x43]) | (cx4.reg[0x44] << 8);
 	dest  = (cx4.reg[0x45]) | (cx4.reg[0x46] << 8);
 
-	address_space *space = machine->device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	address_space *space = machine.device<cpu_device>("maincpu")->space(AS_PROGRAM);
 	for(i=0;i<count;i++)
 	{
 		CX4_write(machine, dest++, space->read_byte(src++));
@@ -118,7 +118,7 @@ static void CX4_transfer_data(running_machine *machine)
 #include "cx4oam.c"
 #include "cx4ops.c"
 
-static void CX4_write(running_machine *machine, UINT32 addr, UINT8 data)
+static void CX4_write(running_machine &machine, UINT32 addr, UINT8 data)
 {
 	addr &= 0x1fff;
 
@@ -193,20 +193,20 @@ static void CX4_write(running_machine *machine, UINT32 addr, UINT8 data)
 }
 
 #ifdef UNUSED_FUNCTION
-void CX4_writeb(running_machine *machine, UINT16 addr, UINT8 data)
+void CX4_writeb(running_machine &machine, UINT16 addr, UINT8 data)
 {
 	CX4_write(machine, addr,     data);
 }
 #endif
 
-static void CX4_writew(running_machine *machine, UINT16 addr, UINT16 data)
+static void CX4_writew(running_machine &machine, UINT16 addr, UINT16 data)
 {
 	CX4_write(machine, addr + 0, data >> 0);
 	CX4_write(machine, addr + 1, data >> 8);
 }
 
 #ifdef UNUSED_FUNCTION
-void CX4_writel(running_machine *machine, UINT16 addr, UINT32 data)
+void CX4_writel(running_machine &machine, UINT16 addr, UINT32 data)
 {
 	CX4_write(machine, addr + 0, data >>  0);
 	CX4_write(machine, addr + 1, data >>  8);

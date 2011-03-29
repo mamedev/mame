@@ -240,11 +240,11 @@ WRITE32_HANDLER ( skns_palette_ram_w )
 		r <<= 3;
 	}
 
-	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
 }
 
 
-static void palette_set_rgb_brightness (running_machine *machine, int offset, UINT8 brightness_r, UINT8 brightness_g, UINT8 brightness_b)
+static void palette_set_rgb_brightness (running_machine &machine, int offset, UINT8 brightness_r, UINT8 brightness_g, UINT8 brightness_b)
 {
 	int use_bright, r, g, b/*, alpha*/;
 
@@ -277,7 +277,7 @@ static void palette_set_rgb_brightness (running_machine *machine, int offset, UI
 }
 
 
-static void palette_update(running_machine *machine)
+static void palette_update(running_machine &machine)
 {
 	int i;
 
@@ -374,9 +374,9 @@ WRITE32_HANDLER ( skns_v3_regs_w )
 
 VIDEO_START(skns)
 {
-	skns_state *state = machine->driver_data<skns_state>();
+	skns_state *state = machine.driver_data<skns_state>();
 
-	state->spritegen = machine->device<sknsspr_device>("spritegen");
+	state->spritegen = machine.device<sknsspr_device>("spritegen");
 
 	skns_tilemap_A = tilemap_create(machine, get_tilemap_A_tile_info,tilemap_scan_rows,16,16,64, 64);
 		tilemap_set_transparent_pen(skns_tilemap_A,0);
@@ -392,8 +392,8 @@ VIDEO_START(skns)
 	tilemap_bitmap_higher = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
 	tilemap_bitmapflags_higher = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED8);
 
-	machine->gfx[2]->color_granularity=256;
-	machine->gfx[3]->color_granularity=256;
+	machine.gfx[2]->color_granularity=256;
+	machine.gfx[3]->color_granularity=256;
 }
 
 VIDEO_RESET( skns )
@@ -471,11 +471,11 @@ static void supernova_draw_b( bitmap_t *bitmap, bitmap_t* bitmap_flags, const re
 
 SCREEN_UPDATE(skns)
 {
-	skns_state *state = screen->machine->driver_data<skns_state>();
+	skns_state *state = screen->machine().driver_data<skns_state>();
 
-	palette_update(screen->machine);
+	palette_update(screen->machine());
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	bitmap_fill(tilemap_bitmap_lower, NULL, 0);
 	bitmap_fill(tilemap_bitmapflags_lower, NULL, 0);
 	bitmap_fill(tilemap_bitmap_higher, NULL, 0);
@@ -502,7 +502,7 @@ SCREEN_UPDATE(skns)
 			UINT32* dst;
 			UINT16 pri, pri2, pri3;
 			UINT16 bgpri;
-			const pen_t *clut = &screen->machine->pens[0];
+			const pen_t *clut = &screen->machine().pens[0];
 //          int drawpri;
 
 
@@ -647,7 +647,7 @@ SCREEN_UPDATE(skns)
 	bitmap_fill(sprite_bitmap, cliprect, 0x0000);
 
 	if (suprnova_alt_enable_sprites)
-		state->spritegen->skns_draw_sprites(screen->machine, sprite_bitmap, cliprect, screen->machine->generic.spriteram.u32, screen->machine->generic.spriteram_size, screen->machine->region("gfx1")->base(), screen->machine->region ("gfx1")->bytes(), skns_spc_regs );
+		state->spritegen->skns_draw_sprites(screen->machine(), sprite_bitmap, cliprect, screen->machine().generic.spriteram.u32, screen->machine().generic.spriteram_size, screen->machine().region("gfx1")->base(), screen->machine().region ("gfx1")->bytes(), skns_spc_regs );
 
 
 	return 0;

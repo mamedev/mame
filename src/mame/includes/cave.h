@@ -57,8 +57,8 @@ public:
 	} blit;
 
 
-	void (*get_sprite_info)(running_machine *machine);
-	void (*sprite_draw)(running_machine *machine, int priority);
+	void (*get_sprite_info)(running_machine &machine);
+	void (*sprite_draw)(running_machine &machine, int priority);
 
 	tilemap_t    *tilemap_0, *tilemap_1, *tilemap_2, *tilemap_3;
 	int          tiledim_0, old_tiledim_0;
@@ -146,5 +146,5 @@ VIDEO_START( sailormn_3_layers );
 
 SCREEN_UPDATE( cave );
 
-void cave_get_sprite_info(running_machine *machine);
-void sailormn_tilebank_w(running_machine *machine, int bank);
+void cave_get_sprite_info(running_machine &machine);
+void sailormn_tilebank_w(running_machine &machine, int bank);

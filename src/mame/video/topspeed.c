@@ -26,9 +26,9 @@
 
 ********************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	topspeed_state *state = machine->driver_data<topspeed_state>();
+	topspeed_state *state = machine.driver_data<topspeed_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs, map_offset, x, y, curx, cury, sprite_chunk;
 	UINT16 *spritemap = state->spritemap;
@@ -92,13 +92,13 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			zx = x + (((k + 1) * zoomx) / 8) - curx;
 			zy = y + (((j + 1) * zoomy) / 16) - cury;
 
-			pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
+			pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[0],
 					code,
 					color,
 					flipx,flipy,
 					curx,cury,
 					zx<<12,zy<<13,
-					machine->priority_bitmap,primasks[priority],0);
+					machine.priority_bitmap,primasks[priority],0);
 		}
 
 		if (bad_chunks)
@@ -111,35 +111,35 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( topspeed )
 {
-	topspeed_state *state = screen->machine->driver_data<topspeed_state>();
+	topspeed_state *state = screen->machine().driver_data<topspeed_state>();
 	UINT8 layer[4];
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed_once (screen->machine, KEYCODE_V))
+	if (input_code_pressed_once (screen->machine(), KEYCODE_V))
 	{
 		state->dislayer[0] ^= 1;
 		popmessage("bg: %01x", state->dislayer[0]);
 	}
 
-	if (input_code_pressed_once (screen->machine, KEYCODE_B))
+	if (input_code_pressed_once (screen->machine(), KEYCODE_B))
 	{
 		state->dislayer[1] ^= 1;
 		popmessage("fg: %01x", state->dislayer[1]);
 	}
 
-	if (input_code_pressed_once (screen->machine, KEYCODE_N))
+	if (input_code_pressed_once (screen->machine(), KEYCODE_N))
 	{
 		state->dislayer[2] ^= 1;
 		popmessage("bg2: %01x", state->dislayer[2]);
 	}
 
-	if (input_code_pressed_once (screen->machine, KEYCODE_M))
+	if (input_code_pressed_once (screen->machine(), KEYCODE_M))
 	{
 		state->dislayer[3] ^= 1;
 		popmessage("fg2: %01x", state->dislayer[3]);
 	}
 
-	if (input_code_pressed_once (screen->machine, KEYCODE_C))
+	if (input_code_pressed_once (screen->machine(), KEYCODE_C))
 	{
 		state->dislayer[4] ^= 1;
 		popmessage("sprites: %01x", state->dislayer[4]);
@@ -155,7 +155,7 @@ SCREEN_UPDATE( topspeed )
 	layer[2] = 1;
 	layer[3] = 0;
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
@@ -182,6 +182,6 @@ SCREEN_UPDATE( topspeed )
 	if (state->dislayer[4] == 0)
 #endif
 
-	draw_sprites(screen->machine, bitmap,cliprect);
+	draw_sprites(screen->machine(), bitmap,cliprect);
 	return 0;
 }

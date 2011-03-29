@@ -56,7 +56,7 @@ public:
 
 static READ8_HANDLER( palette_r )
 {
-	slotcarn_state *state = space->machine->driver_data<slotcarn_state>();
+	slotcarn_state *state = space->machine().driver_data<slotcarn_state>();
 	int co;
 
 	co = ((state->ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
@@ -65,10 +65,10 @@ static READ8_HANDLER( palette_r )
 
 static WRITE8_HANDLER( palette_w )
 {
-	slotcarn_state *state = space->machine->driver_data<slotcarn_state>();
+	slotcarn_state *state = space->machine().driver_data<slotcarn_state>();
 	int co;
 
-	space->machine->primary_screen->update_now();
+	space->machine().primary_screen->update_now();
 	data &= 0x0f;
 
 	co = ((state->ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
@@ -79,7 +79,7 @@ static WRITE8_HANDLER( palette_w )
 
 static MC6845_BEGIN_UPDATE( begin_update )
 {
-	slotcarn_state *state = device->machine->driver_data<slotcarn_state>();
+	slotcarn_state *state = device->machine().driver_data<slotcarn_state>();
 	int i;
 	int dim, bit0, bit1, bit2;
 
@@ -98,7 +98,7 @@ static MC6845_BEGIN_UPDATE( begin_update )
 
 static MC6845_UPDATE_ROW( update_row )
 {
-	slotcarn_state *state = device->machine->driver_data<slotcarn_state>();
+	slotcarn_state *state = device->machine().driver_data<slotcarn_state>();
 	int extra_video_bank_bit = 0; // not used?
 	int lscnblk = 0; // not used?
 
@@ -109,9 +109,9 @@ static MC6845_UPDATE_ROW( update_row )
 	UINT16 x = 0;
 	int rlen;
 
-	gfx[0] = device->machine->region("gfx1")->base();
-	gfx[1] = device->machine->region("gfx2")->base();
-	rlen = device->machine->region("gfx2")->bytes();
+	gfx[0] = device->machine().region("gfx1")->base();
+	gfx[1] = device->machine().region("gfx2")->base();
+	rlen = device->machine().region("gfx2")->bytes();
 
 	//ma = ma ^ 0x7ff;
 	for (cx = 0; cx < x_count; cx++)
@@ -152,12 +152,12 @@ static MC6845_UPDATE_ROW( update_row )
 static WRITE_LINE_DEVICE_HANDLER(hsync_changed)
 {
 	/* update any video up to the current scanline */
-	device->machine->primary_screen->update_now();
+	device->machine().primary_screen->update_now();
 }
 
 static WRITE_LINE_DEVICE_HANDLER(vsync_changed)
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =
@@ -537,7 +537,7 @@ GFXDECODE_END
 
 static SCREEN_UPDATE( slotcarn )
 {
-	device_t *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine().device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
@@ -546,7 +546,7 @@ static SCREEN_UPDATE( slotcarn )
 
 static MACHINE_START(merit)
 {
-	slotcarn_state *state = machine->driver_data<slotcarn_state>();
+	slotcarn_state *state = machine.driver_data<slotcarn_state>();
 	state->ram_palette = auto_alloc_array(machine, UINT8, RAM_PALETTE_SIZE);
 	state_save_register_global_pointer(machine, state->ram_palette, RAM_PALETTE_SIZE);
 }

@@ -102,7 +102,7 @@ static PALETTE_INIT( wallc )
 			2,	resistances_rg,	weights_g,	330,	0,
 			3,	resistances_b,	weights_b,	330,	655+220);
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0,bit1,bit7,r,g,b;
 
@@ -128,7 +128,7 @@ static PALETTE_INIT( wallc )
 
 static WRITE8_HANDLER( wallc_videoram_w )
 {
-	wallc_state *state = space->machine->driver_data<wallc_state>();
+	wallc_state *state = space->machine().driver_data<wallc_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -136,27 +136,27 @@ static WRITE8_HANDLER( wallc_videoram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	wallc_state *state = machine->driver_data<wallc_state>();
+	wallc_state *state = machine.driver_data<wallc_state>();
 	UINT8 *videoram = state->videoram;
 	SET_TILE_INFO(0, videoram[tile_index] + 0x100, 1, 0);
 }
 
 static VIDEO_START( wallc )
 {
-	wallc_state *state = machine->driver_data<wallc_state>();
+	wallc_state *state = machine.driver_data<wallc_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_y,	8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE( wallc )
 {
-	wallc_state *state = screen->machine->driver_data<wallc_state>();
+	wallc_state *state = screen->machine().driver_data<wallc_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
 
 static WRITE8_HANDLER( wallc_coin_counter_w )
 {
-	coin_counter_w(space->machine, 0,data & 2);
+	coin_counter_w(space->machine(), 0,data & 2);
 }
 
 static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8 )
@@ -256,7 +256,7 @@ static DRIVER_INIT( wallc )
 	UINT8 c;
 	UINT32 i;
 
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	for (i=0; i<0x2000*2; i++)
 	{
@@ -271,7 +271,7 @@ static DRIVER_INIT( wallca )
 	UINT8 c;
 	UINT32 i;
 
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	for (i=0; i<0x4000; i++)
 	{

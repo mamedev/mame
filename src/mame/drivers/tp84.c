@@ -76,14 +76,14 @@ C004      76489 #4 trigger
 
 static MACHINE_START( tp84 )
 {
-	tp84_state *state = machine->driver_data<tp84_state>();
-	state->audiocpu = machine->device<cpu_device>("audiocpu");
+	tp84_state *state = machine.driver_data<tp84_state>();
+	state->audiocpu = machine.device<cpu_device>("audiocpu");
 }
 
 
 static READ8_HANDLER( tp84_sh_timer_r )
 {
-	tp84_state *state = space->machine->driver_data<tp84_state>();
+	tp84_state *state = space->machine().driver_data<tp84_state>();
 	/* main xtal 14.318MHz, divided by 4 to get the CPU clock, further */
 	/* divided by 2048 to get this timer */
 	/* (divide by (2048/2), and not 1024, because the CPU cycle counter is */
@@ -100,28 +100,28 @@ static WRITE8_HANDLER( tp84_filter_w )
 	C = 0;
 	if (offset & 0x008) C +=  47000;	/*  47000pF = 0.047uF */
 	if (offset & 0x010) C += 470000;	/* 470000pF = 0.47uF */
-	filter_rc_set_RC(space->machine->device("filter1"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
+	filter_rc_set_RC(space->machine().device("filter1"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #1 (optional) */
 	C = 0;
 	if (offset & 0x020) C +=  47000;	/*  47000pF = 0.047uF */
 	if (offset & 0x040) C += 470000;	/* 470000pF = 0.47uF */
-//  filter_rc_set_RC(space->machine->device("filter2"),1000,2200,1000,C);
+//  filter_rc_set_RC(space->machine().device("filter2"),1000,2200,1000,C);
 
 	/* 76489 #2 */
 	C = 0;
 	if (offset & 0x080) C += 470000;	/* 470000pF = 0.47uF */
-	filter_rc_set_RC(space->machine->device("filter2"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
+	filter_rc_set_RC(space->machine().device("filter2"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #3 */
 	C = 0;
 	if (offset & 0x100) C += 470000;	/* 470000pF = 0.47uF */
-	filter_rc_set_RC(space->machine->device("filter3"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
+	filter_rc_set_RC(space->machine().device("filter3"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 }
 
 static WRITE8_HANDLER( tp84_sh_irqtrigger_w )
 {
-	cputag_set_input_line_and_vector(space->machine, "audiocpu",0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine(), "audiocpu",0,HOLD_LINE,0xff);
 }
 
 

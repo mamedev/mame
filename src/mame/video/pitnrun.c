@@ -23,7 +23,7 @@ In debug build press 'w' for spotlight and 'e' for lightning
 
 static TILE_GET_INFO( get_tile_info1 )
 {
-	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	UINT8 *videoram = state->videoram;
 	int code;
 	code = videoram[tile_index];
@@ -36,7 +36,7 @@ static TILE_GET_INFO( get_tile_info1 )
 
 static TILE_GET_INFO( get_tile_info2 )
 {
-	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	int code;
 	code = state->videoram2[tile_index];
 	SET_TILE_INFO(
@@ -48,7 +48,7 @@ static TILE_GET_INFO( get_tile_info2 )
 
 WRITE8_HANDLER( pitnrun_videoram_w )
 {
-	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
 	tilemap_mark_all_tiles_dirty( state->fg );
@@ -56,14 +56,14 @@ WRITE8_HANDLER( pitnrun_videoram_w )
 
 WRITE8_HANDLER( pitnrun_videoram2_w )
 {
-	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
 	state->videoram2[offset] = data;
 	tilemap_mark_all_tiles_dirty( state->bg );
 }
 
 WRITE8_HANDLER( pitnrun_char_bank_select )
 {
-	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
 	if(state->char_bank!=data)
 	{
 		tilemap_mark_all_tiles_dirty( state->bg );
@@ -74,41 +74,41 @@ WRITE8_HANDLER( pitnrun_char_bank_select )
 
 WRITE8_HANDLER( pitnrun_scroll_w )
 {
-	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
 	state->scroll = (state->scroll & (0xff<<((offset)?0:8))) |( data<<((offset)?8:0));
 	tilemap_set_scrollx( state->bg, 0, state->scroll);
 }
 
 WRITE8_HANDLER(pitnrun_ha_w)
 {
-	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
 	state->ha=data;
 }
 
 WRITE8_HANDLER(pitnrun_h_heed_w)
 {
-	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
 	state->h_heed=data;
 }
 
 WRITE8_HANDLER(pitnrun_v_heed_w)
 {
-	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
 	state->v_heed=data;
 }
 
 WRITE8_HANDLER(pitnrun_color_select_w)
 {
-	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
 	state->color_select=data;
-	tilemap_mark_all_tiles_dirty_all(space->machine);
+	tilemap_mark_all_tiles_dirty_all(space->machine());
 }
 
-static void pitnrun_spotlights(running_machine *machine)
+static void pitnrun_spotlights(running_machine &machine)
 {
-	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	int x,y,i,b,datapix;
-	UINT8 *ROM = machine->region("user1")->base();
+	UINT8 *ROM = machine.region("user1")->base();
 	for(i=0;i<4;i++)
 	 for(y=0;y<128;y++)
 	  for(x=0;x<16;x++)
@@ -171,20 +171,20 @@ PALETTE_INIT (pitnrun)
 
 VIDEO_START(pitnrun)
 {
-	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	state->fg = tilemap_create( machine, get_tile_info1,tilemap_scan_rows,8,8,32,32 );
 	state->bg = tilemap_create( machine, get_tile_info2,tilemap_scan_rows,8,8,32*4,32 );
 	tilemap_set_transparent_pen( state->fg, 0 );
-	state->tmp_bitmap[0] = auto_bitmap_alloc(machine,128,128,machine->primary_screen->format());
-	state->tmp_bitmap[1] = auto_bitmap_alloc(machine,128,128,machine->primary_screen->format());
-	state->tmp_bitmap[2] = auto_bitmap_alloc(machine,128,128,machine->primary_screen->format());
-	state->tmp_bitmap[3] = auto_bitmap_alloc(machine,128,128,machine->primary_screen->format());
+	state->tmp_bitmap[0] = auto_bitmap_alloc(machine,128,128,machine.primary_screen->format());
+	state->tmp_bitmap[1] = auto_bitmap_alloc(machine,128,128,machine.primary_screen->format());
+	state->tmp_bitmap[2] = auto_bitmap_alloc(machine,128,128,machine.primary_screen->format());
+	state->tmp_bitmap[3] = auto_bitmap_alloc(machine,128,128,machine.primary_screen->format());
 	pitnrun_spotlights(machine);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	UINT8 *spriteram = state->spriteram;
 	int sx, sy, flipx, flipy, offs,pal;
 
@@ -209,7 +209,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 			(spriteram[offs+1]&0x3f)+((spriteram[offs+2]&0x80)>>1)+((spriteram[offs+2]&0x40)<<1),
 			pal,
 			flipx,flipy,
@@ -219,26 +219,26 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( pitnrun )
 {
-	pitnrun_state *state = screen->machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = screen->machine().driver_data<pitnrun_state>();
 	int dx=0,dy=0;
 	rectangle myclip=*cliprect;
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed_once(screen->machine, KEYCODE_Q))
+	if (input_code_pressed_once(screen->machine(), KEYCODE_Q))
 	{
-		UINT8 *ROM = screen->machine->region("maincpu")->base();
+		UINT8 *ROM = screen->machine().region("maincpu")->base();
 		ROM[0x84f6]=0; /* lap 0 - normal */
 	}
 
-	if (input_code_pressed_once(screen->machine, KEYCODE_W))
+	if (input_code_pressed_once(screen->machine(), KEYCODE_W))
 	{
-		UINT8 *ROM = screen->machine->region("maincpu")->base();
+		UINT8 *ROM = screen->machine().region("maincpu")->base();
 		ROM[0x84f6]=6; /* lap 6 = spotlight */
 	}
 
-	if (input_code_pressed_once(screen->machine, KEYCODE_E))
+	if (input_code_pressed_once(screen->machine(), KEYCODE_E))
 	{
-		UINT8 *ROM = screen->machine->region("maincpu")->base();
+		UINT8 *ROM = screen->machine().region("maincpu")->base();
 		ROM[0x84f6]=2; /* lap 3 (trial 2)= lightnings */
 		ROM[0x8102]=1;
 	}
@@ -253,10 +253,10 @@ SCREEN_UPDATE( pitnrun )
 		dx=128-state->h_heed+((state->ha&8)<<5)+3;
 		dy=128-state->v_heed+((state->ha&0x10)<<4);
 
-		if (flip_screen_x_get(screen->machine))
+		if (flip_screen_x_get(screen->machine()))
 			dx=128-dx+16;
 
-		if (flip_screen_y_get(screen->machine))
+		if (flip_screen_y_get(screen->machine()))
 			dy=128-dy;
 
 		myclip.min_x=dx;
@@ -274,10 +274,10 @@ SCREEN_UPDATE( pitnrun )
 		tilemap_draw(bitmap,&myclip,state->bg, 0,0);
 	}
 
-	draw_sprites(screen->machine,bitmap,&myclip);
+	draw_sprites(screen->machine(),bitmap,&myclip);
 
 	if(state->ha&4)
-		copybitmap_trans(bitmap,state->tmp_bitmap[state->ha&3],flip_screen_x_get(screen->machine),flip_screen_y_get(screen->machine),dx,dy,&myclip, 1);
+		copybitmap_trans(bitmap,state->tmp_bitmap[state->ha&3],flip_screen_x_get(screen->machine()),flip_screen_y_get(screen->machine()),dx,dy,&myclip, 1);
 	tilemap_draw(bitmap,cliprect,state->fg, 0,0);
 	return 0;
 }

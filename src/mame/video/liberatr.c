@@ -68,8 +68,8 @@ void liberatr_state::init_planet(planet &liberatr_planet, UINT8 *planet_rom)
 {
 	UINT16 longitude;
 
-	const UINT8 *latitude_scale = machine->region("user1")->base();
-	const UINT8 *longitude_scale = machine->region("user2")->base();
+	const UINT8 *latitude_scale = m_machine.region("user1")->base();
+	const UINT8 *longitude_scale = m_machine.region("user2")->base();
 
 	/* for each starting longitude */
 	for (longitude = 0; longitude < 0x100; longitude++)
@@ -171,7 +171,7 @@ void liberatr_state::init_planet(planet &liberatr_planet, UINT8 *planet_rom)
            many segments it will take to store the description, allocate the
            space for it and copy the data to it.
         */
-		buffer = auto_alloc_array(machine, UINT8, 2*(128 + total_segment_count));
+		buffer = auto_alloc_array(m_machine, UINT8, 2*(128 + total_segment_count));
 
 		liberatr_planet.frames[longitude] = buffer;
 
@@ -187,7 +187,7 @@ void liberatr_state::init_planet(planet &liberatr_planet, UINT8 *planet_rom)
 
 			/* calculate the bitmap's x coordinate for the western horizon
                center of bitmap - (the number of planet pixels) / 4 */
-			*buffer++ = (machine->primary_screen->width() / 2) - ((line->max_x + 2) / 4);
+			*buffer++ = (m_machine.primary_screen->width() / 2) - ((line->max_x + 2) / 4);
 
 			for (i = 0; i < segment_count; i++)
 			{
@@ -212,8 +212,8 @@ void liberatr_state::init_planet(planet &liberatr_planet, UINT8 *planet_rom)
 void liberatr_state::video_start()
 {
 	// for each planet in the planet ROMs
-	init_planet(m_planets[0], &machine->region("gfx1")->base()[0x2000]);
-	init_planet(m_planets[1], &machine->region("gfx1")->base()[0x0000]);
+	init_planet(m_planets[0], &m_machine.region("gfx1")->base()[0x2000]);
+	init_planet(m_planets[1], &m_machine.region("gfx1")->base()[0x0000]);
 }
 
 

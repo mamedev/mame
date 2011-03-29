@@ -574,10 +574,10 @@ void windows_osd_interface::init(running_machine &machine)
 	}
 
 	// initialize the subsystems
-	winvideo_init(&machine);
-	winsound_init(&machine);
-	wininput_init(&machine);
-	winoutput_init(&machine);
+	winvideo_init(machine);
+	winsound_init(machine);
+	wininput_init(machine);
+	winoutput_init(machine);
 
 	// notify listeners of screen configuration
 	astring tempstring;
@@ -664,7 +664,7 @@ void windows_osd_interface::osd_exit(running_machine &machine)
 		timeEndPeriod(caps.wPeriodMin);
 
 	// one last pass at events
-	winwindow_process_events(&machine, 0);
+	winwindow_process_events(machine, 0);
 }
 
 
@@ -860,7 +860,7 @@ bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chn
 	bitmap_t *bitmap = NULL;
 	if (actbounds.max_x >= actbounds.min_x && actbounds.max_y >= actbounds.min_y)
 	{
-		bitmap = auto_alloc(&machine(), bitmap_t(actbounds.max_x + 1 - actbounds.min_x, actbounds.max_y + 1 - actbounds.min_y, BITMAP_FORMAT_ARGB32));
+		bitmap = auto_alloc(machine(), bitmap_t(actbounds.max_x + 1 - actbounds.min_x, actbounds.max_y + 1 - actbounds.min_y, BITMAP_FORMAT_ARGB32));
 
 		// copy the bits into it
 		for (int y = 0; y < bitmap->height; y++)

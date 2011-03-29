@@ -46,7 +46,7 @@ public:
 
 static TIMER_CALLBACK( pot_interrupt )
 {
-	boxer_state *state = machine->driver_data<boxer_state>();
+	boxer_state *state = machine.driver_data<boxer_state>();
 	int mask = param;
 
 	if (state->pot_latch & mask)
@@ -58,7 +58,7 @@ static TIMER_CALLBACK( pot_interrupt )
 
 static TIMER_CALLBACK( periodic_callback )
 {
-	boxer_state *state = machine->driver_data<boxer_state>();
+	boxer_state *state = machine.driver_data<boxer_state>();
 	int scanline = param;
 
 	device_set_input_line(state->maincpu, 0, ASSERT_LINE);
@@ -80,7 +80,7 @@ static TIMER_CALLBACK( periodic_callback )
 
 		for (i = 1; i < 256; i++)
 			if (mask[i] != 0)
-				machine->scheduler().timer_set(machine->primary_screen->time_until_pos(i), FUNC(pot_interrupt), mask[i]);
+				machine.scheduler().timer_set(machine.primary_screen->time_until_pos(i), FUNC(pot_interrupt), mask[i]);
 
 		state->pot_state = 0;
 	}
@@ -90,7 +90,7 @@ static TIMER_CALLBACK( periodic_callback )
 	if (scanline >= 262)
 		scanline = 0;
 
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(periodic_callback), scanline);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(periodic_callback), scanline);
 }
 
 
@@ -109,14 +109,14 @@ static PALETTE_INIT( boxer )
 	palette_set_color(machine,3, MAKE_RGB(0x00,0x00,0x00));
 }
 
-static void draw_boxer( running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect )
+static void draw_boxer( running_machine &machine, bitmap_t* bitmap, const rectangle* cliprect )
 {
-	boxer_state *state = machine->driver_data<boxer_state>();
+	boxer_state *state = machine.driver_data<boxer_state>();
 	int n;
 
 	for (n = 0; n < 2; n++)
 	{
-		const UINT8* p = machine->region(n == 0 ? "user1" : "user2")->base();
+		const UINT8* p = machine.region(n == 0 ? "user1" : "user2")->base();
 
 		int i, j;
 
@@ -135,7 +135,7 @@ static void draw_boxer( running_machine *machine, bitmap_t* bitmap, const rectan
 				code = p[32 * l + 4 * i + j];
 
 				drawgfx_transpen(bitmap, cliprect,
-					machine->gfx[n],
+					machine.gfx[n],
 					code,
 					0,
 					code & 0x80, 0,
@@ -145,7 +145,7 @@ static void draw_boxer( running_machine *machine, bitmap_t* bitmap, const rectan
 				code = p[32 * r + 4 * i - j + 3];
 
 				drawgfx_transpen(bitmap, cliprect,
-					machine->gfx[n],
+					machine.gfx[n],
 					code,
 					0,
 					!(code & 0x80), 0,
@@ -159,7 +159,7 @@ static void draw_boxer( running_machine *machine, bitmap_t* bitmap, const rectan
 
 static SCREEN_UPDATE( boxer )
 {
-	boxer_state *state = screen->machine->driver_data<boxer_state>();
+	boxer_state *state = screen->machine().driver_data<boxer_state>();
 	int i, j;
 
 	bitmap_fill(bitmap, cliprect, 1);
@@ -171,7 +171,7 @@ static SCREEN_UPDATE( boxer )
 			UINT8 code = state->tile_ram[32 * i + j];
 
 			drawgfx_transpen(bitmap, cliprect,
-				screen->machine->gfx[2],
+				screen->machine().gfx[2],
 				code,
 				0,
 				code & 0x40, code & 0x40,
@@ -180,7 +180,7 @@ static SCREEN_UPDATE( boxer )
 		}
 	}
 
-	draw_boxer(screen->machine, bitmap, cliprect);
+	draw_boxer(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -193,9 +193,9 @@ static SCREEN_UPDATE( boxer )
 
 static READ8_HANDLER( boxer_input_r )
 {
-	UINT8 val = input_port_read(space->machine, "IN0");
+	UINT8 val = input_port_read(space->machine(), "IN0");
 
-	if (input_port_read(space->machine, "IN3") < space->machine->primary_screen->vpos())
+	if (input_port_read(space->machine(), "IN3") < space->machine().primary_screen->vpos())
 		val |= 0x02;
 
 	return (val << ((offset & 7) ^ 7)) & 0x80;
@@ -204,7 +204,7 @@ static READ8_HANDLER( boxer_input_r )
 
 static READ8_HANDLER( boxer_misc_r )
 {
-	boxer_state *state = space->machine->driver_data<boxer_state>();
+	boxer_state *state = space->machine().driver_data<boxer_state>();
 	UINT8 val = 0;
 
 	switch (offset & 3)
@@ -214,15 +214,15 @@ static READ8_HANDLER( boxer_misc_r )
 		break;
 
 	case 1:
-		val = space->machine->primary_screen->vpos();
+		val = space->machine().primary_screen->vpos();
 		break;
 
 	case 2:
-		val = input_port_read(space->machine, "IN1");
+		val = input_port_read(space->machine(), "IN1");
 		break;
 
 	case 3:
-		val = input_port_read(space->machine, "IN2");
+		val = input_port_read(space->machine(), "IN2");
 		break;
 	}
 
@@ -244,7 +244,7 @@ static WRITE8_HANDLER( boxer_sound_w )
 
 static WRITE8_HANDLER( boxer_pot_w )
 {
-	boxer_state *state = space->machine->driver_data<boxer_state>();
+	boxer_state *state = space->machine().driver_data<boxer_state>();
 	/* BIT0 => HPOT1 */
 	/* BIT1 => VPOT1 */
 	/* BIT2 => RPOT1 */
@@ -260,7 +260,7 @@ static WRITE8_HANDLER( boxer_pot_w )
 
 static WRITE8_HANDLER( boxer_irq_reset_w )
 {
-	boxer_state *state = space->machine->driver_data<boxer_state>();
+	boxer_state *state = space->machine().driver_data<boxer_state>();
 	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
@@ -272,14 +272,14 @@ static WRITE8_HANDLER( boxer_crowd_w )
 	/* BIT2 => CROWD-2 */
 	/* BIT3 => CROWD-3 */
 
-	coin_lockout_global_w(space->machine, data & 1);
+	coin_lockout_global_w(space->machine(), data & 1);
 }
 
 
 static WRITE8_HANDLER( boxer_led_w )
 {
-	set_led_status(space->machine, 1, !(data & 1));
-	set_led_status(space->machine, 0, !(data & 2));
+	set_led_status(space->machine(), 1, !(data & 1));
+	set_led_status(space->machine(), 0, !(data & 2));
 }
 
 
@@ -417,9 +417,9 @@ GFXDECODE_END
 
 static MACHINE_START( boxer )
 {
-	boxer_state *state = machine->driver_data<boxer_state>();
+	boxer_state *state = machine.driver_data<boxer_state>();
 
-	state->maincpu = machine->device("maincpu");
+	state->maincpu = machine.device("maincpu");
 
 	state->save_item(NAME(state->pot_state));
 	state->save_item(NAME(state->pot_latch));
@@ -427,8 +427,8 @@ static MACHINE_START( boxer )
 
 static MACHINE_RESET( boxer )
 {
-	boxer_state *state = machine->driver_data<boxer_state>();
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(periodic_callback));
+	boxer_state *state = machine.driver_data<boxer_state>();
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(periodic_callback));
 
 	state->pot_state = 0;
 	state->pot_latch = 0;

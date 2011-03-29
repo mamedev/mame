@@ -69,53 +69,53 @@ public:
 
 static VIDEO_START( mirage )
 {
-	machine->device<decospr_device>("spritegen")->alloc_sprite_bitmap(machine);
+	machine.device<decospr_device>("spritegen")->alloc_sprite_bitmap(machine);
 }
 
 static SCREEN_UPDATE( mirage )
 {
-	mirage_state *state = screen->machine->driver_data<mirage_state>();
+	mirage_state *state = screen->machine().driver_data<mirage_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->deco_tilegen1, 0, 0xffff);
 
-	flip_screen_set(screen->machine, BIT(flip, 7));
+	flip_screen_set(screen->machine(), BIT(flip, 7));
 
-	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u16, 0x400); 
+	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().generic.buffered_spriteram.u16, 0x400); 
 
 	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 256); /* not verified */
 
 	deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0800, 0x0800, 0x200, 0x1ff);
+	screen->machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine(), bitmap, cliprect, 0x0800, 0x0800, 0x200, 0x1ff);
 	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
-	screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0000, 0x0800, 0x200, 0x1ff);
+	screen->machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine(), bitmap, cliprect, 0x0000, 0x0800, 0x200, 0x1ff);
 
 	return 0;
 }
 
 static SCREEN_EOF( mirage )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	buffer_spriteram16_w(space,0,0,0xffff);
 }
 
 
 static WRITE16_HANDLER( mirage_mux_w )
 {
-	mirage_state *state = space->machine->driver_data<mirage_state>();
+	mirage_state *state = space->machine().driver_data<mirage_state>();
 	state->mux_data = data & 0x1f;
 }
 
 static READ16_HANDLER( mirage_input_r )
 {
-	mirage_state *state = space->machine->driver_data<mirage_state>();
+	mirage_state *state = space->machine().driver_data<mirage_state>();
 	switch (state->mux_data & 0x1f)
 	{
-		case 0x01: return input_port_read(space->machine, "KEY0");
-		case 0x02: return input_port_read(space->machine, "KEY1");
-		case 0x04: return input_port_read(space->machine, "KEY2");
-		case 0x08: return input_port_read(space->machine, "KEY3");
-		case 0x10: return input_port_read(space->machine, "KEY4");
+		case 0x01: return input_port_read(space->machine(), "KEY0");
+		case 0x02: return input_port_read(space->machine(), "KEY1");
+		case 0x04: return input_port_read(space->machine(), "KEY2");
+		case 0x08: return input_port_read(space->machine(), "KEY3");
+		case 0x10: return input_port_read(space->machine(), "KEY4");
 	}
 
 	return 0xffff;
@@ -123,13 +123,13 @@ static READ16_HANDLER( mirage_input_r )
 
 static WRITE16_HANDLER( okim1_rombank_w )
 {
-	mirage_state *state = space->machine->driver_data<mirage_state>();
+	mirage_state *state = space->machine().driver_data<mirage_state>();
 	state->oki_sfx->set_bank_base(0x40000 * (data & 0x3));
 }
 
 static WRITE16_HANDLER( okim0_rombank_w )
 {
-	mirage_state *state = space->machine->driver_data<mirage_state>();
+	mirage_state *state = space->machine().driver_data<mirage_state>();
 
 	/*bits 4-6 used on POST? */
 	state->oki_bgm->set_bank_base(0x40000 * (data & 0x7));
@@ -302,14 +302,14 @@ static const deco16ic_interface mirage_deco16ic_tilegen1_intf =
 
 static MACHINE_START( mirage )
 {
-	mirage_state *state = machine->driver_data<mirage_state>();
+	mirage_state *state = machine.driver_data<mirage_state>();
 
 	state->save_item(NAME(state->mux_data));
 }
 
 static MACHINE_RESET( mirage )
 {
-	mirage_state *state = machine->driver_data<mirage_state>();
+	mirage_state *state = machine.driver_data<mirage_state>();
 
 	state->mux_data = 0;
 }

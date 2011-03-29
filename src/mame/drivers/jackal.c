@@ -85,67 +85,67 @@ Address          Dir Data     Description
 
 static READ8_HANDLER( topgunbl_rotary_r )
 {
-	return (1 << input_port_read_safe(space->machine, offset ? "DIAL1" : "DIAL0", 0x00)) ^ 0xff;
+	return (1 << input_port_read_safe(space->machine(), offset ? "DIAL1" : "DIAL0", 0x00)) ^ 0xff;
 }
 
 static WRITE8_HANDLER( jackal_flipscreen_w )
 {
-	jackal_state *state = space->machine->driver_data<jackal_state>();
+	jackal_state *state = space->machine().driver_data<jackal_state>();
 	state->irq_enable = data & 0x02;
-	flip_screen_set(space->machine, data & 0x08);
+	flip_screen_set(space->machine(), data & 0x08);
 }
 
 static READ8_HANDLER( jackal_zram_r )
 {
-	jackal_state *state = space->machine->driver_data<jackal_state>();
+	jackal_state *state = space->machine().driver_data<jackal_state>();
 	return state->rambank[0x0020 + offset];
 }
 
 
 static READ8_HANDLER( jackal_voram_r )
 {
-	jackal_state *state = space->machine->driver_data<jackal_state>();
+	jackal_state *state = space->machine().driver_data<jackal_state>();
 	return state->rambank[0x2000 + offset];
 }
 
 
 static READ8_HANDLER( jackal_spriteram_r )
 {
-	jackal_state *state = space->machine->driver_data<jackal_state>();
+	jackal_state *state = space->machine().driver_data<jackal_state>();
 	return state->spritebank[0x3000 + offset];
 }
 
 
 static WRITE8_HANDLER( jackal_rambank_w )
 {
-	jackal_state *state = space->machine->driver_data<jackal_state>();
-	UINT8 *rgn = space->machine->region("master")->base();
+	jackal_state *state = space->machine().driver_data<jackal_state>();
+	UINT8 *rgn = space->machine().region("master")->base();
 
 	if (data & 0x04)
 		popmessage("jackal_rambank_w %02x", data);
 
-	coin_counter_w(space->machine, 0, data & 0x01);
-	coin_counter_w(space->machine, 1, data & 0x02);
+	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(space->machine(), 1, data & 0x02);
 
 	state->spritebank = &rgn[((data & 0x08) << 13)];
 	state->rambank = &rgn[((data & 0x10) << 12)];
-	memory_set_bank(space->machine, "bank1", (data & 0x20) ? 1 : 0);
+	memory_set_bank(space->machine(), "bank1", (data & 0x20) ? 1 : 0);
 }
 
 
 static WRITE8_HANDLER( jackal_zram_w )
 {
-	jackal_state *state = space->machine->driver_data<jackal_state>();
+	jackal_state *state = space->machine().driver_data<jackal_state>();
 	state->rambank[0x0020 + offset] = data;
 }
 
 
 static WRITE8_HANDLER( jackal_voram_w )
 {
-	jackal_state *state = space->machine->driver_data<jackal_state>();
+	jackal_state *state = space->machine().driver_data<jackal_state>();
 
 	if ((offset & 0xf800) == 0)
-		jackal_mark_tile_dirty(space->machine, offset & 0x3ff);
+		jackal_mark_tile_dirty(space->machine(), offset & 0x3ff);
 
 	state->rambank[0x2000 + offset] = data;
 }
@@ -153,7 +153,7 @@ static WRITE8_HANDLER( jackal_voram_w )
 
 static WRITE8_HANDLER( jackal_spriteram_w )
 {
-	jackal_state *state = space->machine->driver_data<jackal_state>();
+	jackal_state *state = space->machine().driver_data<jackal_state>();
 	state->spritebank[0x3000 + offset] = data;
 }
 
@@ -317,7 +317,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( jackal_interrupt )
 {
-	jackal_state *state = device->machine->driver_data<jackal_state>();
+	jackal_state *state = device->machine().driver_data<jackal_state>();
 
 	if (state->irq_enable)
 	{
@@ -335,27 +335,27 @@ static INTERRUPT_GEN( jackal_interrupt )
 
 static MACHINE_START( jackal )
 {
-	jackal_state *state = machine->driver_data<jackal_state>();
-	UINT8 *ROM = machine->region("master")->base();
+	jackal_state *state = machine.driver_data<jackal_state>();
+	UINT8 *ROM = machine.region("master")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 1, &ROM[0x04000], 0x8000);
 	memory_configure_bank(machine, "bank1", 1, 1, &ROM[0x14000], 0x8000);
 	memory_set_bank(machine, "bank1", 0);
 
-	state->mastercpu = machine->device("master");
-	state->slavecpu = machine->device("slave");
+	state->mastercpu = machine.device("master");
+	state->slavecpu = machine.device("slave");
 
 	state->save_item(NAME(state->irq_enable));
 }
 
 static MACHINE_RESET( jackal )
 {
-	jackal_state *state = machine->driver_data<jackal_state>();
-	UINT8 *rgn = machine->region("master")->base();
+	jackal_state *state = machine.driver_data<jackal_state>();
+	UINT8 *rgn = machine.region("master")->base();
 
 	// HACK: running at the nominal clock rate, music stops working
 	// at the beginning of the game. This fixes it.
-	machine->device("slave")->set_clock_scale(1.2f);
+	machine.device("slave")->set_clock_scale(1.2f);
 
 	state->rambank = rgn;
 	state->spritebank = rgn;

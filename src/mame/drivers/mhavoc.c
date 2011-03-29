@@ -206,9 +206,9 @@ static READ8_HANDLER( dual_pokey_r )
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		return pokey_r(space->machine->device("pokey1"), pokey_reg);
+		return pokey_r(space->machine().device("pokey1"), pokey_reg);
 	else
-		return pokey_r(space->machine->device("pokey2"), pokey_reg);
+		return pokey_r(space->machine().device("pokey2"), pokey_reg);
 }
 
 
@@ -219,9 +219,9 @@ static WRITE8_HANDLER( dual_pokey_w )
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		pokey_w(space->machine->device("pokey1"), pokey_reg, data);
+		pokey_w(space->machine().device("pokey1"), pokey_reg, data);
 	else
-		pokey_w(space->machine->device("pokey2"), pokey_reg, data);
+		pokey_w(space->machine().device("pokey2"), pokey_reg, data);
 }
 
 
@@ -320,7 +320,7 @@ ADDRESS_MAP_END
 static CUSTOM_INPUT( clock_r )
 {
 	/* 2.4kHz (divide 2.5MHz by 1024) */
-	return (field->port->machine->device<cpu_device>("alpha")->total_cycles() & 0x400) ? 0 : 1;
+	return (field->port->machine().device<cpu_device>("alpha")->total_cycles() & 0x400) ? 0 : 1;
 }
 
 

@@ -35,9 +35,9 @@ public:
 
 /*----------- defined in video/chqflag.c -----------*/
 
-extern void chqflag_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
-extern void chqflag_zoom_callback_0(running_machine *machine, int *code,int *color,int *flags);
-extern void chqflag_zoom_callback_1(running_machine *machine, int *code,int *color,int *flags);
+extern void chqflag_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
+extern void chqflag_zoom_callback_0(running_machine &machine, int *code,int *color,int *flags);
+extern void chqflag_zoom_callback_1(running_machine &machine, int *code,int *color,int *flags);
 
 VIDEO_START( chqflag );
 SCREEN_UPDATE( chqflag );

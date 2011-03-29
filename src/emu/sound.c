@@ -86,12 +86,12 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 	  m_attoseconds_per_sample(0),
 	  m_max_samples_per_update(0),
 	  m_inputs(inputs),
-	  m_input((inputs == 0) ? NULL : auto_alloc_array_clear(device.machine, stream_input, inputs)),
-	  m_input_array((inputs == 0) ? NULL : auto_alloc_array_clear(device.machine, stream_sample_t *, inputs)),
+	  m_input((inputs == 0) ? NULL : auto_alloc_array_clear(device.machine(), stream_input, inputs)),
+	  m_input_array((inputs == 0) ? NULL : auto_alloc_array_clear(device.machine(), stream_sample_t *, inputs)),
 	  m_resample_bufalloc(0),
 	  m_outputs(outputs),
-	  m_output((outputs == 0) ? NULL : auto_alloc_array_clear(device.machine, stream_output, outputs)),
-	  m_output_array((outputs == 0) ? NULL : auto_alloc_array_clear(device.machine, stream_sample_t *, outputs)),
+	  m_output((outputs == 0) ? NULL : auto_alloc_array_clear(device.machine(), stream_output, outputs)),
+	  m_output_array((outputs == 0) ? NULL : auto_alloc_array_clear(device.machine(), stream_sample_t *, outputs)),
 	  m_output_bufalloc(0),
 	  m_output_sampindex(0),
 	  m_output_update_sampindex(0),
@@ -110,17 +110,17 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 
 	// create a unique tag for saving
 	astring state_tag;
-	state_tag.printf("%d", m_device.machine->sound().m_stream_list.count());
-	m_device.machine->state().save_item("stream", state_tag, 0, NAME(m_sample_rate));
-	m_device.machine->state().register_postload(state_postload_stub<sound_stream, &sound_stream::postload>, this);
+	state_tag.printf("%d", m_device.machine().sound().m_stream_list.count());
+	m_device.machine().state().save_item("stream", state_tag, 0, NAME(m_sample_rate));
+	m_device.machine().state().register_postload(state_postload_stub<sound_stream, &sound_stream::postload>, this);
 
 	// save the gain of each input and output
 	for (int inputnum = 0; inputnum < m_inputs; inputnum++)
-		m_device.machine->state().save_item("stream", state_tag, inputnum, NAME(m_input[inputnum].m_gain));
+		m_device.machine().state().save_item("stream", state_tag, inputnum, NAME(m_input[inputnum].m_gain));
 	for (int outputnum = 0; outputnum < m_outputs; outputnum++)
 	{
 		m_output[outputnum].m_stream = this;
-		m_device.machine->state().save_item("stream", state_tag, outputnum, NAME(m_output[outputnum].m_gain));
+		m_device.machine().state().save_item("stream", state_tag, outputnum, NAME(m_output[outputnum].m_gain));
 	}
 
 	// force an update to the sample rates; this will cause everything to be recomputed
@@ -139,7 +139,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 
 attotime sound_stream::sample_time() const
 {
-	return attotime(m_device.machine->sound().last_update().seconds, 0) + attotime(0, m_output_sampindex * m_attoseconds_per_sample);
+	return attotime(m_device.machine().sound().last_update().seconds, 0) + attotime(0, m_output_sampindex * m_attoseconds_per_sample);
 }
 
 
@@ -258,11 +258,11 @@ void sound_stream::set_input(int index, sound_stream *input_stream, int output_i
 void sound_stream::update()
 {
 	// determine the number of samples since the start of this second
-	attotime time = m_device.machine->time();
+	attotime time = m_device.machine().time();
 	INT32 update_sampindex = INT32(time.attoseconds / m_attoseconds_per_sample);
 
 	// if we're ahead of the last update, then adjust upwards
-	attotime last_update = m_device.machine->sound().last_update();
+	attotime last_update = m_device.machine().sound().last_update();
 	if (time.seconds > last_update.seconds)
 	{
 		assert(time.seconds == last_update.seconds + 1);
@@ -439,7 +439,7 @@ STREAM_UPDATE( sound_stream::device_stream_update_stub )
 void sound_stream::recompute_sample_rate_data()
 {
 	// recompute the timing parameters
-	attoseconds_t update_attoseconds = m_device.machine->sound().update_attoseconds();
+	attoseconds_t update_attoseconds = m_device.machine().sound().update_attoseconds();
 	m_attoseconds_per_sample = ATTOSECONDS_PER_SECOND / m_sample_rate;
 	m_max_samples_per_update = (update_attoseconds + m_attoseconds_per_sample - 1) / m_attoseconds_per_sample;
 
@@ -498,9 +498,9 @@ void sound_stream::allocate_resample_buffers()
 		for (int inputnum = 0; inputnum < m_inputs; inputnum++)
 		{
 			stream_input &input = m_input[inputnum];
-			stream_sample_t *newbuffer = auto_alloc_array(m_device.machine, stream_sample_t, m_resample_bufalloc);
+			stream_sample_t *newbuffer = auto_alloc_array(m_device.machine(), stream_sample_t, m_resample_bufalloc);
 			memcpy(newbuffer, input.m_resample, oldsize * sizeof(stream_sample_t));
-			auto_free(m_device.machine, input.m_resample);
+			auto_free(m_device.machine(), input.m_resample);
 			input.m_resample = newbuffer;
 		}
 	}
@@ -526,10 +526,10 @@ void sound_stream::allocate_output_buffers()
 		for (int outputnum = 0; outputnum < m_outputs; outputnum++)
 		{
 			stream_output &output = m_output[outputnum];
-			stream_sample_t *newbuffer = auto_alloc_array(m_device.machine, stream_sample_t, m_output_bufalloc);
+			stream_sample_t *newbuffer = auto_alloc_array(m_device.machine(), stream_sample_t, m_output_bufalloc);
 			memcpy(newbuffer, output.m_buffer, oldsize * sizeof(stream_sample_t));
 			memset(newbuffer + oldsize, 0, (m_output_bufalloc - oldsize) * sizeof(stream_sample_t));
-			auto_free(m_device.machine, output.m_buffer);
+			auto_free(m_device.machine(), output.m_buffer);
 			output.m_buffer = newbuffer;
 		}
 	}
@@ -550,7 +550,7 @@ void sound_stream::postload()
 		memset(m_output[outputnum].m_buffer, 0, m_output_bufalloc * sizeof(m_output[outputnum].m_buffer[0]));
 
 	// recompute the sample indexes to make sense
-	m_output_sampindex = m_device.machine->sound().last_update().attoseconds / m_attoseconds_per_sample;
+	m_output_sampindex = m_device.machine().sound().last_update().attoseconds / m_attoseconds_per_sample;
 	m_output_update_sampindex = m_output_sampindex;
 	m_output_base_sampindex = m_output_sampindex - m_max_samples_per_update;
 }
@@ -791,22 +791,22 @@ sound_manager::sound_manager(running_machine &machine)
 	VPRINTF(("total speakers = %d\n", machine.m_devicelist.count(SPEAKER)));
 
 	// allocate memory for mix buffers
-	m_leftmix = auto_alloc_array(&machine, INT32, machine.sample_rate());
-	m_rightmix = auto_alloc_array(&machine, INT32, machine.sample_rate());
-	m_finalmix = auto_alloc_array(&machine, INT16, machine.sample_rate());
+	m_leftmix = auto_alloc_array(machine, INT32, machine.sample_rate());
+	m_rightmix = auto_alloc_array(machine, INT32, machine.sample_rate());
+	m_finalmix = auto_alloc_array(machine, INT16, machine.sample_rate());
 
 	// open the output WAV file if specified
 	if (wavfile[0] != 0)
 		m_wavfile = wav_open(wavfile, machine.sample_rate(), 2);
 
 	// register callbacks
-	config_register(&machine, "mixer", &sound_manager::config_load, &sound_manager::config_save);
+	config_register(machine, "mixer", &sound_manager::config_load, &sound_manager::config_save);
 	machine.add_notifier(MACHINE_NOTIFY_PAUSE, &sound_manager::pause);
 	machine.add_notifier(MACHINE_NOTIFY_RESUME, &sound_manager::resume);
 	machine.add_notifier(MACHINE_NOTIFY_RESET, &sound_manager::reset);
 
 	// register global states
-	state_save_register_global(&machine, m_last_update);
+	state_save_register_global(machine, m_last_update);
 
 	// set the starting attenuation
 	set_attenuation(machine.options().volume());
@@ -836,9 +836,9 @@ sound_manager::~sound_manager()
 sound_stream *sound_manager::stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, void *param, sound_stream::stream_update_func callback)
 {
 	if (callback != NULL)
-		return &m_stream_list.append(*auto_alloc(device.machine, sound_stream(device, inputs, outputs, sample_rate, param, callback)));
+		return &m_stream_list.append(*auto_alloc(device.machine(), sound_stream(device, inputs, outputs, sample_rate, param, callback)));
 	else
-		return &m_stream_list.append(*auto_alloc(device.machine, sound_stream(device, inputs, outputs, sample_rate)));
+		return &m_stream_list.append(*auto_alloc(device.machine(), sound_stream(device, inputs, outputs, sample_rate)));
 }
 
 
@@ -930,7 +930,7 @@ void sound_manager::resume(running_machine &machine)
 //  configuration file
 //-------------------------------------------------
 
-void sound_manager::config_load(running_machine *machine, int config_type, xml_data_node *parentnode)
+void sound_manager::config_load(running_machine &machine, int config_type, xml_data_node *parentnode)
 {
 	// we only care about game files
 	if (config_type != CONFIG_TYPE_GAME)
@@ -944,7 +944,7 @@ void sound_manager::config_load(running_machine *machine, int config_type, xml_d
 	for (xml_data_node *channelnode = xml_get_sibling(parentnode->child, "channel"); channelnode != NULL; channelnode = xml_get_sibling(channelnode->next, "channel"))
 	{
 		speaker_input info;
-		if (machine->sound().indexed_speaker_input(xml_get_attribute_int(channelnode, "index", -1), info))
+		if (machine.sound().indexed_speaker_input(xml_get_attribute_int(channelnode, "index", -1), info))
 		{
 			float defvol = xml_get_attribute_float(channelnode, "defvol", -1000.0);
 			float newvol = xml_get_attribute_float(channelnode, "newvol", -1000.0);
@@ -960,7 +960,7 @@ void sound_manager::config_load(running_machine *machine, int config_type, xml_d
 //  file
 //-------------------------------------------------
 
-void sound_manager::config_save(running_machine *machine, int config_type, xml_data_node *parentnode)
+void sound_manager::config_save(running_machine &machine, int config_type, xml_data_node *parentnode)
 {
 	// we only care about game files
 	if (config_type != CONFIG_TYPE_GAME)
@@ -971,7 +971,7 @@ void sound_manager::config_save(running_machine *machine, int config_type, xml_d
 		for (int mixernum = 0; ; mixernum++)
 		{
 			speaker_input info;
-			if (!machine->sound().indexed_speaker_input(mixernum, info))
+			if (!machine.sound().indexed_speaker_input(mixernum, info))
 				break;
 			float defvol = info.stream->initial_input_gain(info.inputnum);
 			float newvol = info.stream->input_gain(info.inputnum);

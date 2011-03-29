@@ -28,7 +28,7 @@ static DEVICE_START( tia )
 {
 	tia_state *info = get_safe_token(device);
 
-	info->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->clock(), info, tia_update);
+	info->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), info, tia_update);
 
 	info->chip = tia_sound_init(device->clock(), device->clock(), 16);
 	assert_always(info->chip != NULL, "Error creating TIA chip");

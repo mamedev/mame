@@ -29,7 +29,7 @@
 
 static MACHINE_START( btoads )
 {
-	btoads_state *state = machine->driver_data<btoads_state>();
+	btoads_state *state = machine.driver_data<btoads_state>();
 	state_save_register_global(machine, state->main_to_sound_data);
 	state_save_register_global(machine, state->main_to_sound_ready);
 	state_save_register_global(machine, state->sound_to_main_data);
@@ -47,26 +47,26 @@ static MACHINE_START( btoads )
 
 static TIMER_CALLBACK( delayed_sound_w )
 {
-	btoads_state *state = machine->driver_data<btoads_state>();
+	btoads_state *state = machine.driver_data<btoads_state>();
 	state->main_to_sound_data = param;
 	state->main_to_sound_ready = 1;
-	device_triggerint(machine->device("audiocpu"));
+	device_triggerint(machine.device("audiocpu"));
 
 	/* use a timer to make long transfers faster */
-	machine->scheduler().timer_set(attotime::from_usec(50), FUNC(NULL));
+	machine.scheduler().timer_set(attotime::from_usec(50), FUNC(NULL));
 }
 
 
 static WRITE16_HANDLER( main_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
-		space->machine->scheduler().synchronize(FUNC(delayed_sound_w), data & 0xff);
+		space->machine().scheduler().synchronize(FUNC(delayed_sound_w), data & 0xff);
 }
 
 
 static READ16_HANDLER( main_sound_r )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	state->sound_to_main_ready = 0;
 	return state->sound_to_main_data;
 }
@@ -74,14 +74,14 @@ static READ16_HANDLER( main_sound_r )
 
 static CUSTOM_INPUT( main_to_sound_r )
 {
-	btoads_state *state = field->port->machine->driver_data<btoads_state>();
+	btoads_state *state = field->port->machine().driver_data<btoads_state>();
 	return state->main_to_sound_ready;
 }
 
 
 static CUSTOM_INPUT( sound_to_main_r )
 {
-	btoads_state *state = field->port->machine->driver_data<btoads_state>();
+	btoads_state *state = field->port->machine().driver_data<btoads_state>();
 	return state->sound_to_main_ready;
 }
 
@@ -94,7 +94,7 @@ static CUSTOM_INPUT( sound_to_main_r )
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	state->sound_to_main_data = data;
 	state->sound_to_main_ready = 1;
 }
@@ -102,7 +102,7 @@ static WRITE8_HANDLER( sound_data_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	state->main_to_sound_ready = 0;
 	return state->main_to_sound_data;
 }
@@ -110,14 +110,14 @@ static READ8_HANDLER( sound_data_r )
 
 static READ8_HANDLER( sound_ready_to_send_r )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	return state->sound_to_main_ready ? 0x00 : 0x80;
 }
 
 
 static READ8_HANDLER( sound_data_ready_r )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	if (cpu_get_pc(space->cpu) == 0xd50 && !state->main_to_sound_ready)
 		device_spin_until_interrupt(space->cpu);
 	return state->main_to_sound_ready ? 0x00 : 0x80;
@@ -133,13 +133,13 @@ static READ8_HANDLER( sound_data_ready_r )
 
 static WRITE8_HANDLER( sound_int_state_w )
 {
-	btoads_state *state = space->machine->driver_data<btoads_state>();
+	btoads_state *state = space->machine().driver_data<btoads_state>();
 	/* top bit controls BSMT2000 reset */
 	if (!(state->sound_int_state & 0x80) && (data & 0x80))
-		devtag_reset(space->machine, "bsmt");
+		devtag_reset(space->machine(), "bsmt");
 
 	/* also clears interrupts */
-	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
 	state->sound_int_state = data;
 }
 
@@ -153,14 +153,14 @@ static WRITE8_HANDLER( sound_int_state_w )
 
 static READ8_HANDLER( bsmt_ready_r )
 {
-	bsmt2000_device *bsmt = space->machine->device<bsmt2000_device>("bsmt");
+	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
 	return bsmt->read_status() << 7;
 }
 
 
 static WRITE8_HANDLER( bsmt2000_port_w )
 {
-	bsmt2000_device *bsmt = space->machine->device<bsmt2000_device>("bsmt");
+	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
 	bsmt->write_reg(offset >> 8);
 	bsmt->write_data(((offset & 0xff) << 8) | data);
 }

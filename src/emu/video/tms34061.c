@@ -75,12 +75,12 @@ static TIMER_CALLBACK( tms34061_interrupt );
  *
  *************************************/
 
-void tms34061_start(running_machine *machine, const struct tms34061_interface *interface)
+void tms34061_start(running_machine &machine, const struct tms34061_interface *interface)
 {
 	/* reset the data */
 	memset(&tms34061, 0, sizeof(tms34061));
 	tms34061.intf = *interface;
-	tms34061.screen = downcast<screen_device *>(machine->device(tms34061.intf.screen_tag));
+	tms34061.screen = downcast<screen_device *>(machine.device(tms34061.intf.screen_tag));
 	tms34061.vrammask = tms34061.intf.vramsize - 1;
 
 	/* allocate memory for VRAM */
@@ -119,7 +119,7 @@ void tms34061_start(running_machine *machine, const struct tms34061_interface *i
 	tms34061.regs[TMS34061_VERCOUNTER]   = 0x0000;
 
 	/* start vertical interrupt timer */
-	tms34061.timer = machine->scheduler().timer_alloc(FUNC(tms34061_interrupt));
+	tms34061.timer = machine.scheduler().timer_alloc(FUNC(tms34061_interrupt));
 }
 
 
@@ -137,9 +137,9 @@ INLINE void update_interrupts(void)
 	{
 		/* if the status bit is set, and ints are enabled, turn it on */
 		if ((tms34061.regs[TMS34061_STATUS] & 0x0001) && (tms34061.regs[TMS34061_CONTROL1] & 0x0400))
-			(*tms34061.intf.interrupt)(tms34061.screen->machine, ASSERT_LINE);
+			(*tms34061.intf.interrupt)(tms34061.screen->machine(), ASSERT_LINE);
 		else
-			(*tms34061.intf.interrupt)(tms34061.screen->machine, CLEAR_LINE);
+			(*tms34061.intf.interrupt)(tms34061.screen->machine(), CLEAR_LINE);
 	}
 }
 
@@ -184,7 +184,7 @@ static void register_w(address_space *space, offs_t offset, UINT8 data)
 	}
 
 	/* log it */
-	if (VERBOSE) logerror("%s:tms34061 %s = %04x\n", space->machine->describe_context(), regnames[regnum], tms34061.regs[regnum]);
+	if (VERBOSE) logerror("%s:tms34061 %s = %04x\n", space->machine().describe_context(), regnames[regnum], tms34061.regs[regnum]);
 
 	/* update the state of things */
 	switch (regnum)
@@ -262,7 +262,7 @@ static UINT8 register_r(address_space *space, offs_t offset)
 	}
 
 	/* log it */
-	if (VERBOSE) logerror("%s:tms34061 %s read = %04X\n", space->machine->describe_context(), regnames[regnum], result);
+	if (VERBOSE) logerror("%s:tms34061 %s read = %04X\n", space->machine().describe_context(), regnames[regnum], result);
 	return (offset & 0x02) ? (result >> 8) : result;
 }
 
@@ -369,7 +369,7 @@ static void xypixel_w(address_space *space, int offset, UINT8 data)
 
 	/* mask to the VRAM size */
 	pixeloffs &= tms34061.vrammask;
-	if (VERBOSE) logerror("%s:tms34061 xy (%04x) = %02x/%02x\n", space->machine->describe_context(), pixeloffs, data, tms34061.latchdata);
+	if (VERBOSE) logerror("%s:tms34061 xy (%04x) = %02x/%02x\n", space->machine().describe_context(), pixeloffs, data, tms34061.latchdata);
 
 	/* set the pixel data */
 	tms34061.vram[pixeloffs] = data;
@@ -425,7 +425,7 @@ void tms34061_w(address_space *space, int col, int row, int func, UINT8 data)
 			offs = ((row << tms34061.intf.rowshift) | col) & tms34061.vrammask;
 			if (tms34061.regs[TMS34061_CONTROL2] & 0x0040)
 				offs |= (tms34061.regs[TMS34061_CONTROL2] & 3) << 16;
-			if (VERBOSE) logerror("%s:tms34061 direct (%04x) = %02x/%02x\n", space->machine->describe_context(), offs, data, tms34061.latchdata);
+			if (VERBOSE) logerror("%s:tms34061 direct (%04x) = %02x/%02x\n", space->machine().describe_context(), offs, data, tms34061.latchdata);
 			if (tms34061.vram[offs] != data || tms34061.latchram[offs] != tms34061.latchdata)
 			{
 				tms34061.vram[offs] = data;
@@ -439,7 +439,7 @@ void tms34061_w(address_space *space, int col, int row, int func, UINT8 data)
 			if (tms34061.regs[TMS34061_CONTROL2] & 0x0040)
 				offs |= (tms34061.regs[TMS34061_CONTROL2] & 3) << 16;
 			offs &= tms34061.vrammask;
-			if (VERBOSE) logerror("%s:tms34061 shiftreg write (%04x)\n", space->machine->describe_context(), offs);
+			if (VERBOSE) logerror("%s:tms34061 shiftreg write (%04x)\n", space->machine().describe_context(), offs);
 
 			memcpy(&tms34061.vram[offs], tms34061.shiftreg, (size_t)1 << tms34061.intf.rowshift);
 			memset(&tms34061.latchram[offs], tms34061.latchdata, (size_t)1 << tms34061.intf.rowshift);
@@ -451,14 +451,14 @@ void tms34061_w(address_space *space, int col, int row, int func, UINT8 data)
 			if (tms34061.regs[TMS34061_CONTROL2] & 0x0040)
 				offs |= (tms34061.regs[TMS34061_CONTROL2] & 3) << 16;
 			offs &= tms34061.vrammask;
-			if (VERBOSE) logerror("%s:tms34061 shiftreg read (%04x)\n", space->machine->describe_context(), offs);
+			if (VERBOSE) logerror("%s:tms34061 shiftreg read (%04x)\n", space->machine().describe_context(), offs);
 
 			tms34061.shiftreg = &tms34061.vram[offs];
 			break;
 
 		/* log anything else */
 		default:
-			logerror("%s:Unsupported TMS34061 function %d\n", space->machine->describe_context(), func);
+			logerror("%s:Unsupported TMS34061 function %d\n", space->machine().describe_context(), func);
 			break;
 	}
 }
@@ -512,7 +512,7 @@ UINT8 tms34061_r(address_space *space, int col, int row, int func)
 
 		/* log anything else */
 		default:
-			logerror("%s:Unsupported TMS34061 function %d\n", space->machine->describe_context(),
+			logerror("%s:Unsupported TMS34061 function %d\n", space->machine().describe_context(),
 					func);
 			break;
 	}

@@ -251,58 +251,58 @@ a tilemap-like structure, from which data is copied)
 /* We need to always initialize 6 buttons pad */
 static TIMER_CALLBACK( mess_io_timeout_timer_callback )
 {
-	md_cons_state *state = machine->driver_data<md_cons_state>();
+	md_cons_state *state = machine.driver_data<md_cons_state>();
 	state->mess_io_stage[(int)(FPTR)ptr] = -1;
 }
 
 /* J-Cart controller port */
 WRITE16_HANDLER( jcart_ctrl_w )
 {
-	md_cons_state *state = space->machine->driver_data<md_cons_state>();
+	md_cons_state *state = space->machine().driver_data<md_cons_state>();
 	state->jcart_io_data[0] = (data & 1) << 6;
 	state->jcart_io_data[1] = (data & 1) << 6;
 }
 
 READ16_HANDLER( jcart_ctrl_r )
 {
-	md_cons_state *state = space->machine->driver_data<md_cons_state>();
+	md_cons_state *state = space->machine().driver_data<md_cons_state>();
 	UINT16 retdata = 0;
 	UINT8 joy[2];
 
 	if (state->jcart_io_data[0] & 0x40)
 	{
-		joy[0] = input_port_read_safe(space->machine, "JCART3_3B", 0);
-		joy[1] = input_port_read_safe(space->machine, "JCART4_3B", 0);
+		joy[0] = input_port_read_safe(space->machine(), "JCART3_3B", 0);
+		joy[1] = input_port_read_safe(space->machine(), "JCART4_3B", 0);
 		retdata = (state->jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 	}
 	else
 	{
-		joy[0] = ((input_port_read_safe(space->machine, "JCART3_3B", 0) & 0xc0) >> 2) |
-		  (input_port_read_safe(space->machine, "JCART3_3B", 0) & 0x03);
-		joy[1] = ((input_port_read_safe(space->machine, "JCART4_3B", 0) & 0xc0) >> 2) |
-		  (input_port_read_safe(space->machine, "JCART4_3B", 0) & 0x03);
+		joy[0] = ((input_port_read_safe(space->machine(), "JCART3_3B", 0) & 0xc0) >> 2) |
+		  (input_port_read_safe(space->machine(), "JCART3_3B", 0) & 0x03);
+		joy[1] = ((input_port_read_safe(space->machine(), "JCART4_3B", 0) & 0xc0) >> 2) |
+		  (input_port_read_safe(space->machine(), "JCART4_3B", 0) & 0x03);
 		retdata = (state->jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 	}
 	return retdata;
 }
 
-static void mess_init_6buttons_pad(running_machine *machine)
+static void mess_init_6buttons_pad(running_machine &machine)
 {
-	md_cons_state *state = machine->driver_data<md_cons_state>();
+	md_cons_state *state = machine.driver_data<md_cons_state>();
 	int i;
 
 	for (i = 0; i < 3; i++)
 	{
-		state->mess_io_timeout[i] = machine->scheduler().timer_alloc(FUNC(mess_io_timeout_timer_callback), (void*)(FPTR)i);
+		state->mess_io_timeout[i] = machine.scheduler().timer_alloc(FUNC(mess_io_timeout_timer_callback), (void*)(FPTR)i);
 		state->mess_io_stage[i] = -1;
 	}
 }
 
 /* These overwrite the MAME ones in DRIVER_INIT */
 /* They're needed to give the users the choice between different controllers */
-static UINT8 mess_md_io_read_data_port(running_machine *machine, int portnum)
+static UINT8 mess_md_io_read_data_port(running_machine &machine, int portnum)
 {
-	md_cons_state *state = machine->driver_data<md_cons_state>();
+	md_cons_state *state = machine.driver_data<md_cons_state>();
 	static const char *const pad6names[2][4] = {
 		{ "PAD1_6B", "PAD2_6B", "UNUSED", "UNUSED" },
 		{ "EXTRA1", "EXTRA2", "UNUSED", "UNUSED" }
@@ -397,9 +397,9 @@ static UINT8 mess_md_io_read_data_port(running_machine *machine, int portnum)
 }
 
 
-static void mess_md_io_write_data_port(running_machine *machine, int portnum, UINT16 data)
+static void mess_md_io_write_data_port(running_machine &machine, int portnum, UINT16 data)
 {
-	md_cons_state *state = machine->driver_data<md_cons_state>();
+	md_cons_state *state = machine.driver_data<md_cons_state>();
 	int controller;
 
 	switch (portnum)
@@ -424,7 +424,7 @@ static void mess_md_io_write_data_port(running_machine *machine, int portnum, UI
 			if (((megadrive_io_data_regs[portnum] & 0x40) == 0x00) && ((data & 0x40) == 0x40))
 			{
 				state->mess_io_stage[portnum]++;
-				state->mess_io_timeout[portnum]->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+				state->mess_io_timeout[portnum]->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 			}
 
 		}
@@ -891,7 +891,7 @@ ROM_END
 #define PICO_PENX	1
 #define PICO_PENY	2
 
-static UINT16 pico_read_penpos(running_machine *machine, int pen)
+static UINT16 pico_read_penpos(running_machine &machine, int pen)
 {
 	UINT16 penpos = 0;
 
@@ -916,7 +916,7 @@ static UINT16 pico_read_penpos(running_machine *machine, int pen)
 
 static READ16_HANDLER( pico_68k_io_read )
 {
-	pico_state *state = space->machine->driver_data<pico_state>();
+	pico_state *state = space->machine().driver_data<pico_state>();
 	UINT8 retdata = 0;
 
 	switch (offset)
@@ -925,7 +925,7 @@ static READ16_HANDLER( pico_68k_io_read )
 			retdata = (megadrive_region_export << 6) | (megadrive_region_pal << 5);
 			break;
 		case 1:
-			retdata = input_port_read_safe(space->machine, "PAD", 0);
+			retdata = input_port_read_safe(space->machine(), "PAD", 0);
 			break;
 
 			/*
@@ -940,16 +940,16 @@ static READ16_HANDLER( pico_68k_io_read )
               0x2f8 - 0x3f3 (storyware)
            */
 		case 2:
-			retdata = pico_read_penpos(space->machine, PICO_PENX) >> 8;
+			retdata = pico_read_penpos(space->machine(), PICO_PENX) >> 8;
 			break;
 		case 3:
-			retdata = pico_read_penpos(space->machine, PICO_PENX) & 0x00ff;
+			retdata = pico_read_penpos(space->machine(), PICO_PENX) & 0x00ff;
 			break;
 		case 4:
-			retdata = pico_read_penpos(space->machine, PICO_PENY) >> 8;
+			retdata = pico_read_penpos(space->machine(), PICO_PENY) >> 8;
 			break;
 		case 5:
-			retdata = pico_read_penpos(space->machine, PICO_PENY) & 0x00ff;
+			retdata = pico_read_penpos(space->machine(), PICO_PENY) & 0x00ff;
 			break;
 		case 6:
 	    /* Page register :
@@ -958,7 +958,7 @@ static READ16_HANDLER( pico_68k_io_read )
            either page 5 or page 6 is often unused.
         */
 			{
-				UINT8 tmp = input_port_read_safe(space->machine, "PAGE", 0);
+				UINT8 tmp = input_port_read_safe(space->machine(), "PAGE", 0);
 				if (tmp == 2 && state->page_register != 0x3f)
 				{
 					state->page_register <<= 1;

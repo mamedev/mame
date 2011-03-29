@@ -11,8 +11,8 @@
 #include "includes/nbmj8891.h"
 
 
-static void nbmj8891_vramflip(running_machine *machine, int vram);
-static void nbmj8891_gfxdraw(running_machine *machine);
+static void nbmj8891_vramflip(running_machine &machine, int vram);
+static void nbmj8891_gfxdraw(running_machine &machine);
 
 
 /******************************************************************************
@@ -21,13 +21,13 @@ static void nbmj8891_gfxdraw(running_machine *machine);
 ******************************************************************************/
 READ8_HANDLER( nbmj8891_palette_type1_r )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	return state->palette[offset];
 }
 
 WRITE8_HANDLER( nbmj8891_palette_type1_w )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	int r, g, b;
 
 	state->palette[offset] = data;
@@ -40,18 +40,18 @@ WRITE8_HANDLER( nbmj8891_palette_type1_w )
 	g = ((state->palette[offset + 1] & 0xf0) >> 4);
 	b = ((state->palette[offset + 1] & 0x0f) >> 0);
 
-	palette_set_color_rgb(space->machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(space->machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 READ8_HANDLER( nbmj8891_palette_type2_r )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	return state->palette[offset];
 }
 
 WRITE8_HANDLER( nbmj8891_palette_type2_w )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	int r, g, b;
 
 	state->palette[offset] = data;
@@ -64,18 +64,18 @@ WRITE8_HANDLER( nbmj8891_palette_type2_w )
 	g = ((state->palette[offset + 0x000] & 0xf0) >> 4);
 	b = ((state->palette[offset + 0x100] & 0x0f) >> 0);
 
-	palette_set_color_rgb(space->machine, (offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(space->machine(), (offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 READ8_HANDLER( nbmj8891_palette_type3_r )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	return state->palette[offset];
 }
 
 WRITE8_HANDLER( nbmj8891_palette_type3_w )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	int r, g, b;
 
 	state->palette[offset] = data;
@@ -88,24 +88,24 @@ WRITE8_HANDLER( nbmj8891_palette_type3_w )
 	g = ((state->palette[offset + 0] & 0xf0) >> 4);
 	b = ((state->palette[offset + 0] & 0x0f) >> 0);
 
-	palette_set_color_rgb(space->machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(space->machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 WRITE8_HANDLER( nbmj8891_clutsel_w )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	state->clutsel = data;
 }
 
 READ8_HANDLER( nbmj8891_clut_r )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	return state->clut[offset];
 }
 
 WRITE8_HANDLER( nbmj8891_clut_w )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	state->clut[((state->clutsel & 0x7f) * 0x10) + (offset & 0x0f)] = data;
 }
 
@@ -115,7 +115,7 @@ WRITE8_HANDLER( nbmj8891_clut_w )
 ******************************************************************************/
 WRITE8_HANDLER( nbmj8891_blitter_w )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	switch (offset)
 	{
 		case 0x00:	state->blitter_src_addr = (state->blitter_src_addr & 0xff00) | data; break;
@@ -125,14 +125,14 @@ WRITE8_HANDLER( nbmj8891_blitter_w )
 		case 0x04:	state->blitter_sizex = data; break;
 		case 0x05:	state->blitter_sizey = data;
 					/* writing here also starts the blit */
-					nbmj8891_gfxdraw(space->machine);
+					nbmj8891_gfxdraw(space->machine());
 					break;
 		case 0x06:	state->blitter_direction_x = (data & 0x01) ? 1 : 0;
 					state->blitter_direction_y = (data & 0x02) ? 1 : 0;
 					state->flipscreen = (data & 0x04) ? 1 : 0;
 					state->dispflag = (data & 0x08) ? 0 : 1;
-					if (state->gfxdraw_mode) nbmj8891_vramflip(space->machine, 1);
-					nbmj8891_vramflip(space->machine, 0);
+					if (state->gfxdraw_mode) nbmj8891_vramflip(space->machine(), 1);
+					nbmj8891_vramflip(space->machine(), 0);
 					break;
 		case 0x07:	break;
 	}
@@ -140,7 +140,7 @@ WRITE8_HANDLER( nbmj8891_blitter_w )
 
 WRITE8_HANDLER( nbmj8891_taiwanmb_blitter_w )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	switch (offset)
 	{
 		case 0:	state->blitter_src_addr = (state->blitter_src_addr & 0xff00) | data; break;
@@ -154,20 +154,20 @@ WRITE8_HANDLER( nbmj8891_taiwanmb_blitter_w )
 
 WRITE8_HANDLER( nbmj8891_taiwanmb_gfxdraw_w )
 {
-//  nbmj8891_gfxdraw(space->machine);
+//  nbmj8891_gfxdraw(space->machine());
 }
 
 WRITE8_HANDLER( nbmj8891_taiwanmb_gfxflag_w )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	state->flipscreen = (data & 0x04) ? 1 : 0;
 
-	nbmj8891_vramflip(space->machine, 0);
+	nbmj8891_vramflip(space->machine(), 0);
 }
 
 WRITE8_HANDLER( nbmj8891_taiwanmb_mcu_w )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 
 	state->param_old[state->param_cnt & 0x0f] = data;
 
@@ -240,7 +240,7 @@ WRITE8_HANDLER( nbmj8891_taiwanmb_mcu_w )
 			state->blitter_sizey ^= 0x00;
 		}
 
-		nbmj8891_gfxdraw(space->machine);
+		nbmj8891_gfxdraw(space->machine());
 	}
 
 //  state->blitter_direction_x = 0;                // for debug
@@ -252,13 +252,13 @@ WRITE8_HANDLER( nbmj8891_taiwanmb_mcu_w )
 
 WRITE8_HANDLER( nbmj8891_scrolly_w )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	state->scrolly = data;
 }
 
 WRITE8_HANDLER( nbmj8891_vramsel_w )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	/* protection - not sure about this */
 	nb1413m3_sndromrgntag = (data & 0x20) ? "protection" : "voice";
 
@@ -267,8 +267,8 @@ WRITE8_HANDLER( nbmj8891_vramsel_w )
 
 WRITE8_HANDLER( nbmj8891_romsel_w )
 {
-	nbmj8891_state *state = space->machine->driver_data<nbmj8891_state>();
-	int gfxlen = space->machine->region("gfx1")->bytes();
+	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
+	int gfxlen = space->machine().region("gfx1")->bytes();
 	state->gfxrom = (data & 0x0f);
 
 	if ((0x20000 * state->gfxrom) > (gfxlen - 1))
@@ -284,15 +284,15 @@ WRITE8_HANDLER( nbmj8891_romsel_w )
 
 
 ******************************************************************************/
-void nbmj8891_vramflip(running_machine *machine, int vram)
+void nbmj8891_vramflip(running_machine &machine, int vram)
 {
-	nbmj8891_state *state = machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = machine.driver_data<nbmj8891_state>();
 	int x, y;
 	UINT8 color1, color2;
 	UINT8 *vidram;
 
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	if (state->flipscreen == state->flipscreen_old) return;
 
@@ -314,17 +314,17 @@ void nbmj8891_vramflip(running_machine *machine, int vram)
 }
 
 
-static void update_pixel0(running_machine *machine, int x, int y)
+static void update_pixel0(running_machine &machine, int x, int y)
 {
-	nbmj8891_state *state = machine->driver_data<nbmj8891_state>();
-	UINT8 color = state->videoram0[(y * machine->primary_screen->width()) + x];
+	nbmj8891_state *state = machine.driver_data<nbmj8891_state>();
+	UINT8 color = state->videoram0[(y * machine.primary_screen->width()) + x];
 	*BITMAP_ADDR16(state->tmpbitmap0, y, x) = color;
 }
 
-static void update_pixel1(running_machine *machine, int x, int y)
+static void update_pixel1(running_machine &machine, int x, int y)
 {
-	nbmj8891_state *state = machine->driver_data<nbmj8891_state>();
-	UINT8 color = state->videoram1[(y * machine->primary_screen->width()) + x];
+	nbmj8891_state *state = machine.driver_data<nbmj8891_state>();
+	UINT8 color = state->videoram1[(y * machine.primary_screen->width()) + x];
 	*BITMAP_ADDR16(state->tmpbitmap1, y, x) = (color == 0x7f) ? 0xff : color;
 }
 
@@ -333,11 +333,11 @@ static TIMER_CALLBACK( blitter_timer_callback )
 	nb1413m3_busyflag = 1;
 }
 
-static void nbmj8891_gfxdraw(running_machine *machine)
+static void nbmj8891_gfxdraw(running_machine &machine)
 {
-	nbmj8891_state *state = machine->driver_data<nbmj8891_state>();
-	UINT8 *GFX = machine->region("gfx1")->base();
-	int width = machine->primary_screen->width();
+	nbmj8891_state *state = machine.driver_data<nbmj8891_state>();
+	UINT8 *GFX = machine.region("gfx1")->base();
+	int width = machine.primary_screen->width();
 
 	int x, y;
 	int dx1, dx2, dy1, dy2;
@@ -375,7 +375,7 @@ static void nbmj8891_gfxdraw(running_machine *machine)
 		skipy = -1;
 	}
 
-	gfxlen = machine->region("gfx1")->bytes();
+	gfxlen = machine.region("gfx1")->bytes();
 	gfxaddr = (state->gfxrom << 17) + (state->blitter_src_addr << 1);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
@@ -484,7 +484,7 @@ static void nbmj8891_gfxdraw(running_machine *machine)
 	}
 
 	nb1413m3_busyflag = 0;
-	machine->scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, FUNC(blitter_timer_callback));
+	machine.scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, FUNC(blitter_timer_callback));
 }
 
 /******************************************************************************
@@ -493,13 +493,13 @@ static void nbmj8891_gfxdraw(running_machine *machine)
 ******************************************************************************/
 VIDEO_START( nbmj8891_1layer )
 {
-	nbmj8891_state *state = machine->driver_data<nbmj8891_state>();
-	UINT8 *CLUT = machine->region("protection")->base();
+	nbmj8891_state *state = machine.driver_data<nbmj8891_state>();
+	UINT8 *CLUT = machine.region("protection")->base();
 	int i;
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
-	state->tmpbitmap0 = machine->primary_screen->alloc_compatible_bitmap();
+	state->tmpbitmap0 = machine.primary_screen->alloc_compatible_bitmap();
 	state->videoram0 = auto_alloc_array(machine, UINT8, width * height);
 	state->palette = auto_alloc_array(machine, UINT8, 0x200);
 	state->clut = auto_alloc_array(machine, UINT8, 0x800);
@@ -512,12 +512,12 @@ VIDEO_START( nbmj8891_1layer )
 
 VIDEO_START( nbmj8891_2layer )
 {
-	nbmj8891_state *state = machine->driver_data<nbmj8891_state>();
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	nbmj8891_state *state = machine.driver_data<nbmj8891_state>();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
-	state->tmpbitmap0 = machine->primary_screen->alloc_compatible_bitmap();
-	state->tmpbitmap1 = machine->primary_screen->alloc_compatible_bitmap();
+	state->tmpbitmap0 = machine.primary_screen->alloc_compatible_bitmap();
+	state->tmpbitmap1 = machine.primary_screen->alloc_compatible_bitmap();
 	state->videoram0 = auto_alloc_array(machine, UINT8, width * height);
 	state->videoram1 = auto_alloc_array(machine, UINT8, width * height);
 	state->palette = auto_alloc_array(machine, UINT8, 0x200);
@@ -533,7 +533,7 @@ VIDEO_START( nbmj8891_2layer )
 ******************************************************************************/
 SCREEN_UPDATE( nbmj8891 )
 {
-	nbmj8891_state *state = screen->machine->driver_data<nbmj8891_state>();
+	nbmj8891_state *state = screen->machine().driver_data<nbmj8891_state>();
 	int x, y;
 
 	if (state->screen_refresh)
@@ -544,12 +544,12 @@ SCREEN_UPDATE( nbmj8891 )
 		state->screen_refresh = 0;
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
-				update_pixel0(screen->machine, x, y);
+				update_pixel0(screen->machine(), x, y);
 
 		if (state->gfxdraw_mode)
 			for (y = 0; y < height; y++)
 				for (x = 0; x < width; x++)
-					update_pixel1(screen->machine, x, y);
+					update_pixel1(screen->machine(), x, y);
 	}
 
 	if (state->dispflag)

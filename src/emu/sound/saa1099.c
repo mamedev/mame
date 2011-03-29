@@ -327,7 +327,7 @@ static DEVICE_START( saa1099 )
 	saa->sample_rate = device->clock() / 256;
 
 	/* for each chip allocate one stream */
-	saa->stream = device->machine->sound().stream_alloc(*device, 0, 2, saa->sample_rate, saa, saa1099_update);
+	saa->stream = device->machine().sound().stream_alloc(*device, 0, 2, saa->sample_rate, saa, saa1099_update);
 }
 
 WRITE8_DEVICE_HANDLER( saa1099_control_w )
@@ -337,7 +337,7 @@ WRITE8_DEVICE_HANDLER( saa1099_control_w )
 	if ((data & 0xff) > 0x1c)
 	{
 		/* Error! */
-                logerror("%s: (SAA1099 '%s') Unknown register selected\n",device->machine->describe_context(), device->tag());
+                logerror("%s: (SAA1099 '%s') Unknown register selected\n",device->machine().describe_context(), device->tag());
 	}
 
 	saa->selected_reg = data & 0x1f;
@@ -423,7 +423,7 @@ WRITE8_DEVICE_HANDLER( saa1099_data_w )
 			int i;
 
 			/* Synch & Reset generators */
-			logerror("%s: (SAA1099 '%s') -reg 0x1c- Chip reset\n",device->machine->describe_context(), device->tag());
+			logerror("%s: (SAA1099 '%s') -reg 0x1c- Chip reset\n",device->machine().describe_context(), device->tag());
 			for (i = 0; i < 6; i++)
 			{
                 saa->channels[i].level = 0;
@@ -432,7 +432,7 @@ WRITE8_DEVICE_HANDLER( saa1099_data_w )
 		}
 		break;
 	default:	/* Error! */
-		logerror("%s: (SAA1099 '%s') Unknown operation (reg:%02x, data:%02x)\n",device->machine->describe_context(), device->tag(), reg, data);
+		logerror("%s: (SAA1099 '%s') Unknown operation (reg:%02x, data:%02x)\n",device->machine().describe_context(), device->tag(), reg, data);
 	}
 }
 

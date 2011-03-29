@@ -205,8 +205,8 @@ WRITE16_DEVICE_HANDLER( kickgoal_snd_w )
 
 static WRITE16_DEVICE_HANDLER( actionhw_snd_w )
 {
-	kickgoal_state *state = device->machine->driver_data<kickgoal_state>();
-	logerror("%s: Writing %04x to Sound CPU - mask %04x\n",device->machine->describe_context(),data,mem_mask);
+	kickgoal_state *state = device->machine().driver_data<kickgoal_state>();
+	logerror("%s: Writing %04x to Sound CPU - mask %04x\n",device->machine().describe_context(),data,mem_mask);
 
 	if (!ACCESSING_BITS_0_7)
 		data >>= 8;
@@ -294,7 +294,7 @@ static WRITE16_DEVICE_HANDLER( actionhw_snd_w )
 
 static INTERRUPT_GEN( kickgoal_interrupt )
 {
-	kickgoal_state *state = device->machine->driver_data<kickgoal_state>();
+	kickgoal_state *state = device->machine().driver_data<kickgoal_state>();
 
 	if ((state->adpcm->read_status() & 0x08) == 0)
 	{
@@ -329,7 +329,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 			state->adpcm->write_command(0x81);
 		}
 	}
-	if (input_code_pressed_once(device->machine, KEYCODE_PGUP))
+	if (input_code_pressed_once(device->machine(), KEYCODE_PGUP))
 	{
 		if (state->m6295_key_delay >= (0x60 * oki_time_base))
 		{
@@ -348,7 +348,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		else
 			state->m6295_key_delay += (0x01 * oki_time_base);
 	}
-	else if (input_code_pressed_once(device->machine, KEYCODE_PGDN))
+	else if (input_code_pressed_once(device->machine(), KEYCODE_PGDN))
 	{
 		if (state->m6295_key_delay >= (0x60 * oki_time_base))
 		{
@@ -367,7 +367,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		else
 			state->m6295_key_delay += (0x01 * oki_time_base);
 	}
-	else if (input_code_pressed_once(device->machine, KEYCODE_INSERT))
+	else if (input_code_pressed_once(device->machine(), KEYCODE_INSERT))
 	{
 		if (state->m6295_key_delay >= (0x60 * oki_time_base))
 		{
@@ -388,7 +388,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		else
 			state->m6295_key_delay += (0x01 * oki_time_base);
 	}
-	else if (input_code_pressed_once(device->machine, KEYCODE_DEL))
+	else if (input_code_pressed_once(device->machine(), KEYCODE_DEL))
 	{
 		if (state->m6295_key_delay >= (0x60 * oki_time_base))
 		{
@@ -409,7 +409,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		else
 			state->m6295_key_delay += (0x01 * oki_time_base);
 	}
-	else if (input_code_pressed_once(device->machine, KEYCODE_Z))
+	else if (input_code_pressed_once(device->machine(), KEYCODE_Z))
 	{
 		if (state->m6295_key_delay >= (0x80 * oki_time_base))
 		{
@@ -448,7 +448,7 @@ static const UINT16 kickgoal_default_eeprom_type1[64] = {
 
 static READ16_HANDLER( kickgoal_eeprom_r )
 {
-	kickgoal_state *state = space->machine->driver_data<kickgoal_state>();
+	kickgoal_state *state = space->machine().driver_data<kickgoal_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		return eeprom_read_bit(state->eeprom);
@@ -459,7 +459,7 @@ static READ16_HANDLER( kickgoal_eeprom_r )
 
 static WRITE16_HANDLER( kickgoal_eeprom_w )
 {
-	kickgoal_state *state = space->machine->driver_data<kickgoal_state>();
+	kickgoal_state *state = space->machine().driver_data<kickgoal_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		switch (offset)
@@ -647,7 +647,7 @@ GFXDECODE_END
 
 static MACHINE_START( kickgoal )
 {
-	kickgoal_state *state = machine->driver_data<kickgoal_state>();
+	kickgoal_state *state = machine.driver_data<kickgoal_state>();
 
 	state->save_item(NAME(state->snd_sam));
 	state->save_item(NAME(state->melody_loop));
@@ -659,7 +659,7 @@ static MACHINE_START( kickgoal )
 
 static MACHINE_RESET( kickgoal )
 {
-	kickgoal_state *state = machine->driver_data<kickgoal_state>();
+	kickgoal_state *state = machine.driver_data<kickgoal_state>();
 
 	state->melody_loop = 0;
 	state->snd_new = 0;
@@ -814,7 +814,7 @@ ROM_END
 static DRIVER_INIT( kickgoal )
 {
 #if 0 /* we should find a real fix instead  */
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 
 	/* fix "bug" that prevents game from writing to EEPROM */
 	rom[0x12b0/2] = 0x0001;

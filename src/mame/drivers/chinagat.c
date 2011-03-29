@@ -110,15 +110,15 @@ INLINE int scanline_to_vcount( int scanline )
 
 static TIMER_DEVICE_CALLBACK( chinagat_scanline )
 {
-	ddragon_state *state = timer.machine->driver_data<ddragon_state>();
+	ddragon_state *state = timer.machine().driver_data<ddragon_state>();
 	int scanline = param;
-	int screen_height = timer.machine->primary_screen->height();
+	int screen_height = timer.machine().primary_screen->height();
 	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
 	int vcount = scanline_to_vcount(scanline);
 
 	/* update to the current point */
 	if (scanline > 0)
-		timer.machine->primary_screen->update_partial(scanline - 1);
+		timer.machine().primary_screen->update_partial(scanline - 1);
 
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
@@ -135,7 +135,7 @@ static TIMER_DEVICE_CALLBACK( chinagat_scanline )
 
 static WRITE8_HANDLER( chinagat_interrupt_w )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 
 	switch (offset)
 	{
@@ -170,31 +170,31 @@ static WRITE8_HANDLER( chinagat_video_ctrl_w )
     ---- -x--   Flip screen
     --x- ----   Enable video ???
     ****************************/
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 
 	state->scrolly_hi = ((data & 0x02) >> 1);
 	state->scrollx_hi = data & 0x01;
 
-	flip_screen_set(space->machine, ~data & 0x04);
+	flip_screen_set(space->machine(), ~data & 0x04);
 }
 
 static WRITE8_HANDLER( chinagat_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
+	memory_set_bank(space->machine(), "bank1", data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
 }
 
 static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank4", data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
+	memory_set_bank(space->machine(), "bank4", data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
 }
 
 static READ8_HANDLER( saiyugoub1_mcu_command_r )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 #if 0
 	if (state->mcu_command == 0x78)
 	{
-		space->machine->device<cpu_device>("mcu")->suspend(SUSPEND_REASON_HALT, 1);	/* Suspend (speed up) */
+		space->machine().device<cpu_device>("mcu")->suspend(SUSPEND_REASON_HALT, 1);	/* Suspend (speed up) */
 	}
 #endif
 	return state->mcu_command;
@@ -202,29 +202,29 @@ static READ8_HANDLER( saiyugoub1_mcu_command_r )
 
 static WRITE8_HANDLER( saiyugoub1_mcu_command_w )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 	state->mcu_command = data;
 #if 0
 	if (data != 0x78)
 	{
-		space->machine->device<cpu_device>("mcu")->resume(SUSPEND_REASON_HALT);	/* Wake up */
+		space->machine().device<cpu_device>("mcu")->resume(SUSPEND_REASON_HALT);	/* Wake up */
 	}
 #endif
 }
 
 static WRITE8_HANDLER( saiyugoub1_adpcm_rom_addr_w )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 	/* i8748 Port 1 write */
 	state->i8748_P1 = data;
 }
 
 static WRITE8_DEVICE_HANDLER( saiyugoub1_adpcm_control_w )
 {
-	ddragon_state *state = device->machine->driver_data<ddragon_state>();
+	ddragon_state *state = device->machine().driver_data<ddragon_state>();
 
 	/* i8748 Port 2 write */
-	UINT8 *saiyugoub1_adpcm_rom = device->machine->region("adpcm")->base();
+	UINT8 *saiyugoub1_adpcm_rom = device->machine().region("adpcm")->base();
 
 	if (data & 0x80)	/* Reset m5205 and disable ADPCM ROM outputs */
 	{
@@ -275,7 +275,7 @@ static WRITE8_DEVICE_HANDLER( saiyugoub1_m5205_clk_w )
 
 	/* Actually, T0 output clk mode is not supported by the i8048 core */
 #if 0
-	ddragon_state *state = device->machine->driver_data<ddragon_state>();
+	ddragon_state *state = device->machine().driver_data<ddragon_state>();
 
 	state->m5205_clk++;
 	if (state->m5205_clk == 8)
@@ -290,7 +290,7 @@ static WRITE8_DEVICE_HANDLER( saiyugoub1_m5205_clk_w )
 
 static READ8_HANDLER( saiyugoub1_m5205_irq_r )
 {
-	ddragon_state *state = space->machine->driver_data<ddragon_state>();
+	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 	if (state->adpcm_sound_irq)
 	{
 		state->adpcm_sound_irq = 0;
@@ -301,7 +301,7 @@ static READ8_HANDLER( saiyugoub1_m5205_irq_r )
 
 static void saiyugoub1_m5205_irq_w( device_t *device )
 {
-	ddragon_state *state = device->machine->driver_data<ddragon_state>();
+	ddragon_state *state = device->machine().driver_data<ddragon_state>();
 	state->adpcm_sound_irq = 1;
 }
 
@@ -494,7 +494,7 @@ GFXDECODE_END
 
 static void chinagat_irq_handler( device_t *device, int irq )
 {
-	ddragon_state *state = device->machine->driver_data<ddragon_state>();
+	ddragon_state *state = device->machine().driver_data<ddragon_state>();
 	device_set_input_line(state->snd_cpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
@@ -524,14 +524,14 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( chinagat )
 {
-	ddragon_state *state = machine->driver_data<ddragon_state>();
+	ddragon_state *state = machine.driver_data<ddragon_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->sub_cpu = machine->device("sub");
-	state->snd_cpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->sub_cpu = machine.device("sub");
+	state->snd_cpu = machine.device("audiocpu");
 
 	/* configure banks */
-	memory_configure_bank(machine, "bank1", 0, 8, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* register for save states */
 	state->save_item(NAME(state->scrollx_hi));
@@ -551,7 +551,7 @@ static MACHINE_START( chinagat )
 
 static MACHINE_RESET( chinagat )
 {
-	ddragon_state *state = machine->driver_data<ddragon_state>();
+	ddragon_state *state = machine.driver_data<ddragon_state>();
 
 	state->scrollx_hi = 0;
 	state->scrolly_hi = 0;
@@ -914,9 +914,9 @@ ROM_END
 
 static DRIVER_INIT( chinagat )
 {
-	ddragon_state *state = machine->driver_data<ddragon_state>();
-	UINT8 *MAIN = machine->region("maincpu")->base();
-	UINT8 *SUB = machine->region("sub")->base();
+	ddragon_state *state = machine.driver_data<ddragon_state>();
+	UINT8 *MAIN = machine.region("maincpu")->base();
+	UINT8 *SUB = machine.region("sub")->base();
 
 	state->technos_video_hw = 1;
 	state->sprite_irq = M6809_IRQ_LINE;

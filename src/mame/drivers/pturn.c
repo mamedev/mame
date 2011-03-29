@@ -113,7 +113,7 @@ static const UINT8 tile_lookup[0x10]=
 
 static TILE_GET_INFO( get_pturn_tile_info )
 {
-	pturn_state *state = machine->driver_data<pturn_state>();
+	pturn_state *state = machine.driver_data<pturn_state>();
 	UINT8 *videoram = state->videoram;
 	int tileno;
 	tileno = videoram[tile_index];
@@ -127,9 +127,9 @@ static TILE_GET_INFO( get_pturn_tile_info )
 
 static TILE_GET_INFO( get_pturn_bg_tile_info )
 {
-	pturn_state *state = machine->driver_data<pturn_state>();
+	pturn_state *state = machine.driver_data<pturn_state>();
 	int tileno,palno;
-	tileno = machine->region("user1")->base()[tile_index];
+	tileno = machine.region("user1")->base()[tile_index];
 	palno=state->bgpalette;
 	if(palno==1)
 	{
@@ -140,7 +140,7 @@ static TILE_GET_INFO( get_pturn_bg_tile_info )
 
 static VIDEO_START(pturn)
 {
-	pturn_state *state = machine->driver_data<pturn_state>();
+	pturn_state *state = machine.driver_data<pturn_state>();
 	state->fgmap = tilemap_create(machine, get_pturn_tile_info,tilemap_scan_rows,8, 8,32,32);
 	tilemap_set_transparent_pen(state->fgmap,0);
 	state->bgmap = tilemap_create(machine, get_pturn_bg_tile_info,tilemap_scan_rows,8, 8,32,32*8);
@@ -149,7 +149,7 @@ static VIDEO_START(pturn)
 
 static SCREEN_UPDATE(pturn)
 {
-	pturn_state *state = screen->machine->driver_data<pturn_state>();
+	pturn_state *state = screen->machine().driver_data<pturn_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 	int sx, sy;
@@ -166,13 +166,13 @@ static SCREEN_UPDATE(pturn)
 		flipy=spriteram[offs+1]&0x80;
 
 
-		if (flip_screen_x_get(screen->machine))
+		if (flip_screen_x_get(screen->machine()))
 		{
 			sx = 224 - sx;
 			flipx ^= 0x40;
 		}
 
-		if (flip_screen_y_get(screen->machine))
+		if (flip_screen_y_get(screen->machine()))
 		{
 			flipy ^= 0x80;
 			sy = 224 - sy;
@@ -180,7 +180,7 @@ static SCREEN_UPDATE(pturn)
 
 		if(sx|sy)
 		{
-			drawgfx_transpen(bitmap, cliprect,screen->machine->gfx[2],
+			drawgfx_transpen(bitmap, cliprect,screen->machine().gfx[2],
 			spriteram[offs+1] & 0x3f ,
 			(spriteram[offs+2] & 0x1f),
 			flipx, flipy,
@@ -205,7 +205,7 @@ READ8_HANDLER (pturn_protection2_r)
 
 static WRITE8_HANDLER( pturn_videoram_w )
 {
-	pturn_state *state = space->machine->driver_data<pturn_state>();
+	pturn_state *state = space->machine().driver_data<pturn_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset]=data;
 	tilemap_mark_tile_dirty(state->fgmap,offset);
@@ -214,13 +214,13 @@ static WRITE8_HANDLER( pturn_videoram_w )
 
 static WRITE8_HANDLER( nmi_main_enable_w )
 {
-	pturn_state *state = space->machine->driver_data<pturn_state>();
+	pturn_state *state = space->machine().driver_data<pturn_state>();
 	state->nmi_main = data;
 }
 
 static WRITE8_HANDLER( nmi_sub_enable_w )
 {
-	pturn_state *state = space->machine->driver_data<pturn_state>();
+	pturn_state *state = space->machine().driver_data<pturn_state>();
 	state->nmi_sub = data;
 }
 
@@ -232,13 +232,13 @@ static WRITE8_HANDLER(sound_w)
 
 static WRITE8_HANDLER(bgcolor_w)
 {
-	pturn_state *state = space->machine->driver_data<pturn_state>();
+	pturn_state *state = space->machine().driver_data<pturn_state>();
 	state->bgcolor=data;
 }
 
 static WRITE8_HANDLER(bg_scrollx_w)
 {
-	pturn_state *state = space->machine->driver_data<pturn_state>();
+	pturn_state *state = space->machine().driver_data<pturn_state>();
 	tilemap_set_scrolly(state->bgmap, 0, (data>>5)*32*8);
 	state->bgpalette=data&0x1f;
 	tilemap_mark_all_tiles_dirty(state->bgmap);
@@ -246,34 +246,34 @@ static WRITE8_HANDLER(bg_scrollx_w)
 
 static WRITE8_HANDLER(fgpalette_w)
 {
-	pturn_state *state = space->machine->driver_data<pturn_state>();
+	pturn_state *state = space->machine().driver_data<pturn_state>();
 	state->fgpalette=data&0x1f;
 	tilemap_mark_all_tiles_dirty(state->fgmap);
 }
 
 static WRITE8_HANDLER(bg_scrolly_w)
 {
-	pturn_state *state = space->machine->driver_data<pturn_state>();
+	pturn_state *state = space->machine().driver_data<pturn_state>();
 	tilemap_set_scrollx(state->bgmap, 0, data);
 }
 
 static WRITE8_HANDLER(fgbank_w)
 {
-	pturn_state *state = space->machine->driver_data<pturn_state>();
+	pturn_state *state = space->machine().driver_data<pturn_state>();
 	state->fgbank=data&1;
 	tilemap_mark_all_tiles_dirty(state->fgmap);
 }
 
 static WRITE8_HANDLER(bgbank_w)
 {
-	pturn_state *state = space->machine->driver_data<pturn_state>();
+	pturn_state *state = space->machine().driver_data<pturn_state>();
 	state->bgbank=data&1;
 	tilemap_mark_all_tiles_dirty(state->bgmap);
 }
 
 static WRITE8_HANDLER(flip_w)
 {
-	flip_screen_set(space->machine, data);
+	flip_screen_set(space->machine(), data);
 }
 
 
@@ -454,7 +454,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( pturn_sub_intgen )
 {
-	pturn_state *state = device->machine->driver_data<pturn_state>();
+	pturn_state *state = device->machine().driver_data<pturn_state>();
 	if(state->nmi_sub)
 	{
 		device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
@@ -463,7 +463,7 @@ static INTERRUPT_GEN( pturn_sub_intgen )
 
 static INTERRUPT_GEN( pturn_main_intgen )
 {
-	pturn_state *state = device->machine->driver_data<pturn_state>();
+	pturn_state *state = device->machine().driver_data<pturn_state>();
 	if (state->nmi_main)
 	{
 		device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
@@ -472,7 +472,7 @@ static INTERRUPT_GEN( pturn_main_intgen )
 
 static MACHINE_RESET( pturn )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	soundlatch_clear_w(space,0,0);
 }
 
@@ -552,8 +552,8 @@ ROM_END
 static DRIVER_INIT(pturn)
 {
 	/*
-    machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc0dd, 0xc0dd, FUNC(pturn_protection_r));
-    machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc0db, 0xc0db, FUNC(pturn_protection2_r));
+    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc0dd, 0xc0dd, FUNC(pturn_protection_r));
+    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc0db, 0xc0db, FUNC(pturn_protection2_r));
     */
 }
 

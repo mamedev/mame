@@ -222,13 +222,13 @@ GFXDECODE_END
 
 static WRITE16_HANDLER( sharedram_sub_w )
 {
-	namcond1_state *state = space->machine->driver_data<namcond1_state>();
+	namcond1_state *state = space->machine().driver_data<namcond1_state>();
 	COMBINE_DATA(&state->shared_ram[offset]);
 }
 
 static READ16_HANDLER( sharedram_sub_r )
 {
-	namcond1_state *state = space->machine->driver_data<namcond1_state>();
+	namcond1_state *state = space->machine().driver_data<namcond1_state>();
 	return state->shared_ram[offset];
 }
 
@@ -245,7 +245,7 @@ static READ8_HANDLER( mcu_pa_read )
 
 static WRITE8_HANDLER( mcu_pa_write )
 {
-	namcond1_state *state = space->machine->driver_data<namcond1_state>();
+	namcond1_state *state = space->machine().driver_data<namcond1_state>();
 	state->p8 = data;
 }
 
@@ -269,7 +269,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( mcu_interrupt )
 {
-	namcond1_state *state = device->machine->driver_data<namcond1_state>();
+	namcond1_state *state = device->machine().driver_data<namcond1_state>();
 	if( state->h8_irq5_enabled )
 	{
 		generic_pulse_irq_line(device, H8_IRQ5);

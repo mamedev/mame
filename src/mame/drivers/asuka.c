@@ -232,13 +232,13 @@ DIP locations verified for:
 
 static TIMER_CALLBACK( cadash_interrupt5 )
 {
-	asuka_state *state = machine->driver_data<asuka_state>();
+	asuka_state *state = machine.driver_data<asuka_state>();
 	device_set_input_line(state->maincpu, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( cadash_interrupt )
 {
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(500), FUNC(cadash_interrupt5));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(500), FUNC(cadash_interrupt5));
 	device_set_input_line(device, 4, HOLD_LINE);  /* interrupt vector 4 */
 }
 
@@ -249,19 +249,19 @@ static INTERRUPT_GEN( cadash_interrupt )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x03);
+	memory_set_bank(space->machine(), "bank1", data & 0x03);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_2151_w )
 {
-	memory_set_bank(device->machine,  "bank1", data & 0x03);
+	memory_set_bank(device->machine(),  "bank1", data & 0x03);
 }
 
 
 
 static void asuka_msm5205_vck( device_t *device )
 {
-	asuka_state *state = device->machine->driver_data<asuka_state>();
+	asuka_state *state = device->machine().driver_data<asuka_state>();
 
 	if (state->adpcm_data != -1)
 	{
@@ -270,7 +270,7 @@ static void asuka_msm5205_vck( device_t *device )
 	}
 	else
 	{
-		state->adpcm_data = device->machine->region("ymsnd")->base()[state->adpcm_pos];
+		state->adpcm_data = device->machine().region("ymsnd")->base()[state->adpcm_pos];
 		state->adpcm_pos = (state->adpcm_pos + 1) & 0xffff;
 		msm5205_data_w(device, state->adpcm_data >> 4);
 	}
@@ -278,7 +278,7 @@ static void asuka_msm5205_vck( device_t *device )
 
 static WRITE8_HANDLER( asuka_msm5205_address_w )
 {
-	asuka_state *state = space->machine->driver_data<asuka_state>();
+	asuka_state *state = space->machine().driver_data<asuka_state>();
 	state->adpcm_pos = (state->adpcm_pos & 0x00ff) | (data << 8);
 }
 
@@ -289,7 +289,7 @@ static WRITE8_DEVICE_HANDLER( asuka_msm5205_start_w )
 
 static WRITE8_DEVICE_HANDLER( asuka_msm5205_stop_w )
 {
-	asuka_state *state = device->machine->driver_data<asuka_state>();
+	asuka_state *state = device->machine().driver_data<asuka_state>();
 	msm5205_reset_w(device, 1);
 	state->adpcm_pos &= 0xff00;
 }
@@ -771,7 +771,7 @@ GFXDECODE_END
 
 static void irq_handler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -835,16 +835,16 @@ static const tc0110pcr_interface asuka_tc0110pcr_intf =
 
 static MACHINE_START( asuka )
 {
-	asuka_state *state = machine->driver_data<asuka_state>();
+	asuka_state *state = machine.driver_data<asuka_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->pc090oj = machine->device("pc090oj");
-	state->tc0100scn = machine->device("tc0100scn");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->pc090oj = machine.device("pc090oj");
+	state->tc0100scn = machine.device("tc0100scn");
 
 	/* configure the banks */
-	memory_configure_bank(machine, "bank1", 0, 1, machine->region("audiocpu")->base(), 0);
-	memory_configure_bank(machine, "bank1", 1, 3, machine->region("audiocpu")->base() + 0x10000, 0x04000);
+	memory_configure_bank(machine, "bank1", 0, 1, machine.region("audiocpu")->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 3, machine.region("audiocpu")->base() + 0x10000, 0x04000);
 
 	state->save_item(NAME(state->adpcm_pos));
 	state->save_item(NAME(state->adpcm_data));
@@ -860,7 +860,7 @@ static MACHINE_START( asuka )
 
 static MACHINE_RESET( asuka )
 {
-	asuka_state *state = machine->driver_data<asuka_state>();
+	asuka_state *state = machine.driver_data<asuka_state>();
 
 	state->adpcm_pos = 0;
 	state->adpcm_data = -1;
@@ -876,7 +876,7 @@ static MACHINE_RESET( asuka )
 
 static SCREEN_EOF( asuka )
 {
-	asuka_state *state = machine->driver_data<asuka_state>();
+	asuka_state *state = machine.driver_data<asuka_state>();
 	pc090oj_eof_callback(state->pc090oj);
 }
 

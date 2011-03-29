@@ -46,7 +46,7 @@ public:
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	bestleag_state *state = machine->driver_data<bestleag_state>();
+	bestleag_state *state = machine.driver_data<bestleag_state>();
 	int code = state->txram[tile_index];
 
 	SET_TILE_INFO(
@@ -58,7 +58,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	bestleag_state *state = machine->driver_data<bestleag_state>();
+	bestleag_state *state = machine.driver_data<bestleag_state>();
 	int code = state->bgram[tile_index];
 
 	SET_TILE_INFO(
@@ -70,7 +70,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	bestleag_state *state = machine->driver_data<bestleag_state>();
+	bestleag_state *state = machine.driver_data<bestleag_state>();
 	int code = state->fgram[tile_index];
 
 	SET_TILE_INFO(
@@ -93,7 +93,7 @@ static TILEMAP_MAPPER( bsb_bg_scan )
 
 static VIDEO_START(bestleag)
 {
-	bestleag_state *state = machine->driver_data<bestleag_state>();
+	bestleag_state *state = machine.driver_data<bestleag_state>();
 	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_cols,8,8,256, 32);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,bsb_bg_scan,16,16,128, 64);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,bsb_bg_scan,16,16,128, 64);
@@ -107,9 +107,9 @@ Note: sprite chip is different than the other Big Striker sets and they
       include several similiarities with other Playmark games (including
       the sprite end code and the data being offset (i.e. spriteram starting from 0x16/2))
 */
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	bestleag_state *state = machine->driver_data<bestleag_state>();
+	bestleag_state *state = machine.driver_data<bestleag_state>();
 	UINT16 *spriteram16 = state->spriteram;
 
 	/*
@@ -136,26 +136,26 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if(state->vregs[0x00/2] & 0x1000)
 			color &= 7;
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 					code,
 					color,
 					flipx, 0,
 					flipx ? (sx+16) : (sx),sy,15);
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 					code+1,
 					color,
 					flipx, 0,
 					flipx ? (sx) : (sx+16),sy,15);
 
 		/* wraparound x */
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 					code,
 					color,
 					flipx, 0,
 					flipx ? (sx+16 - 512) : (sx - 512),sy,15);
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 					code+1,
 					color,
 					flipx, 0,
@@ -165,7 +165,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static SCREEN_UPDATE(bestleag)
 {
-	bestleag_state *state = screen->machine->driver_data<bestleag_state>();
+	bestleag_state *state = screen->machine().driver_data<bestleag_state>();
 	tilemap_set_scrollx(state->bg_tilemap,0,(state->vregs[0x00/2] & 0xfff) + (state->vregs[0x08/2] & 0x7) - 3);
 	tilemap_set_scrolly(state->bg_tilemap,0,state->vregs[0x02/2]);
 	tilemap_set_scrollx(state->tx_tilemap,0,state->vregs[0x04/2]);
@@ -175,14 +175,14 @@ static SCREEN_UPDATE(bestleag)
 
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	draw_sprites(screen->machine(),bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
 	return 0;
 }
 
 static SCREEN_UPDATE(bestleaw)
 {
-	bestleag_state *state = screen->machine->driver_data<bestleag_state>();
+	bestleag_state *state = screen->machine().driver_data<bestleag_state>();
 	tilemap_set_scrollx(state->bg_tilemap,0,state->vregs[0x08/2]);
 	tilemap_set_scrolly(state->bg_tilemap,0,state->vregs[0x0a/2]);
 	tilemap_set_scrollx(state->tx_tilemap,0,state->vregs[0x00/2]);
@@ -192,28 +192,28 @@ static SCREEN_UPDATE(bestleaw)
 
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	draw_sprites(screen->machine(),bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
 	return 0;
 }
 
 static WRITE16_HANDLER( bestleag_txram_w )
 {
-	bestleag_state *state = space->machine->driver_data<bestleag_state>();
+	bestleag_state *state = space->machine().driver_data<bestleag_state>();
 	state->txram[offset] = data;
 	tilemap_mark_tile_dirty(state->tx_tilemap,offset);
 }
 
 static WRITE16_HANDLER( bestleag_bgram_w )
 {
-	bestleag_state *state = space->machine->driver_data<bestleag_state>();
+	bestleag_state *state = space->machine().driver_data<bestleag_state>();
 	state->bgram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
 
 static WRITE16_HANDLER( bestleag_fgram_w )
 {
-	bestleag_state *state = space->machine->driver_data<bestleag_state>();
+	bestleag_state *state = space->machine().driver_data<bestleag_state>();
 	state->fgram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
 }

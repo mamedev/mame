@@ -208,15 +208,15 @@ Extract a standard version of this
 static WRITE32_HANDLER( color_ram_w )
 {
 	int a,r,g,b;
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
 
 	{
-		a = space->machine->generic.paletteram.u32[offset];
+		a = space->machine().generic.paletteram.u32[offset];
 		r = (a & 0xff0000) >> 16;
 		g = (a & 0xff00) >> 8;
 		b = (a & 0xff);
 
-		palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
+		palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -253,23 +253,23 @@ static const eeprom_interface undrfire_eeprom_interface =
 
 static CUSTOM_INPUT(frame_counter_r)
 {
-	undrfire_state *state = field->port->machine->driver_data<undrfire_state>();
+	undrfire_state *state = field->port->machine().driver_data<undrfire_state>();
 	return state->frame_counter;
 }
 
 static READ32_HANDLER( undrfire_input_r )
 {
-	undrfire_state *state = space->machine->driver_data<undrfire_state>();
+	undrfire_state *state = space->machine().driver_data<undrfire_state>();
 	switch (offset)
 	{
 		case 0x00:
 		{
-			return input_port_read(space->machine, "INPUTS");
+			return input_port_read(space->machine(), "INPUTS");
 		}
 
 		case 0x01:
 		{
-			return input_port_read(space->machine, "SYSTEM") | (state->coin_word << 16);
+			return input_port_read(space->machine(), "SYSTEM") | (state->coin_word << 16);
 		}
 	}
 
@@ -278,19 +278,19 @@ static READ32_HANDLER( undrfire_input_r )
 
 static WRITE32_HANDLER( undrfire_input_w )
 {
-	undrfire_state *state = space->machine->driver_data<undrfire_state>();
+	undrfire_state *state = space->machine().driver_data<undrfire_state>();
 	switch (offset)
 	{
 		case 0x00:
 		{
 			if (ACCESSING_BITS_24_31)	/* $500000 is watchdog */
 			{
-				watchdog_reset(space->machine);
+				watchdog_reset(space->machine());
 			}
 
 			if (ACCESSING_BITS_0_7)
 			{
-				device_t *device = space->machine->device("eeprom");
+				device_t *device = space->machine().device("eeprom");
 				eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 				eeprom_write_bit(device, data & 0x40);
 				eeprom_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
@@ -304,10 +304,10 @@ static WRITE32_HANDLER( undrfire_input_w )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(space->machine, 0,~data & 0x01000000);
-				coin_lockout_w(space->machine, 1,~data & 0x02000000);
-				coin_counter_w(space->machine, 0, data & 0x04000000);
-				coin_counter_w(space->machine, 1, data & 0x08000000);
+				coin_lockout_w(space->machine(), 0,~data & 0x01000000);
+				coin_lockout_w(space->machine(), 1,~data & 0x02000000);
+				coin_counter_w(space->machine(), 0, data & 0x04000000);
+				coin_counter_w(space->machine(), 1, data & 0x08000000);
 				state->coin_word = (data >> 16) &0xffff;
 			}
 		}
@@ -317,14 +317,14 @@ static WRITE32_HANDLER( undrfire_input_w )
 
 static READ16_HANDLER( shared_ram_r )
 {
-	undrfire_state *state = space->machine->driver_data<undrfire_state>();
+	undrfire_state *state = space->machine().driver_data<undrfire_state>();
 	if ((offset&1)==0) return (state->shared_ram[offset/2]&0xffff0000)>>16;
 	return (state->shared_ram[offset/2]&0x0000ffff);
 }
 
 static WRITE16_HANDLER( shared_ram_w )
 {
-	undrfire_state *state = space->machine->driver_data<undrfire_state>();
+	undrfire_state *state = space->machine().driver_data<undrfire_state>();
 	if ((offset&1)==0) {
 		if (ACCESSING_BITS_8_15)
 			state->shared_ram[offset/2]=(state->shared_ram[offset/2]&0x00ffffff)|((data&0xff00)<<16);
@@ -364,7 +364,7 @@ static READ32_HANDLER( unknown_hardware_r )
 static WRITE32_HANDLER( unknown_int_req_w )
 {
 	/* 10000 cycle delay is arbitrary */
-	space->machine->scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(10000), FUNC(interrupt5));
+	space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(10000), FUNC(interrupt5));
 }
 
 
@@ -381,8 +381,8 @@ static READ32_HANDLER( undrfire_lightgun_r )
 
 		case 0x00:	/* P1 */
 		{
-			x = input_port_read(space->machine, "GUNX1") << 6;
-			y = input_port_read(space->machine, "GUNY1") << 6;
+			x = input_port_read(space->machine(), "GUNX1") << 6;
+			y = input_port_read(space->machine(), "GUNY1") << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 				 | ((y << 8) &0xff00) | ((y >> 8) &0xff) ;
@@ -390,8 +390,8 @@ static READ32_HANDLER( undrfire_lightgun_r )
 
 		case 0x01:	/* P2 */
 		{
-			x = input_port_read(space->machine, "GUNX2") << 6;
-			y = input_port_read(space->machine, "GUNY2") << 6;
+			x = input_port_read(space->machine(), "GUNX2") << 6;
+			y = input_port_read(space->machine(), "GUNY2") << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 				 | ((y << 8) &0xff00) | ((y >> 8) &0xff) ;
@@ -406,7 +406,7 @@ logerror("CPU #0 PC %06x: warning - read unmapped lightgun offset %06x\n",cpu_ge
 
 static WRITE32_HANDLER( rotate_control_w )	/* only a guess that it's rotation */
 {
-	undrfire_state *state = space->machine->driver_data<undrfire_state>();
+	undrfire_state *state = space->machine().driver_data<undrfire_state>();
 	if (ACCESSING_BITS_0_15)
 	{
 		state->rotate_ctrl[state->port_sel] = data;
@@ -443,19 +443,19 @@ static WRITE32_HANDLER( cbombers_cpua_ctrl_w )
     ........ .x......   Vibration
 */
 
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static READ32_HANDLER( cbombers_adc_r )
 {
-	return (input_port_read(space->machine, "STEER") << 24);
+	return (input_port_read(space->machine(), "STEER") << 24);
 }
 
 static WRITE32_HANDLER( cbombers_adc_w )
 {
 	/* One interrupt per input port (4 per frame, though only 2 used).
         1000 cycle delay is arbitrary */
-	space->machine->scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(1000), FUNC(interrupt5));
+	space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(1000), FUNC(interrupt5));
 }
 
 /***********************************************************
@@ -690,7 +690,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( undrfire_interrupt )
 {
-	undrfire_state *state = device->machine->driver_data<undrfire_state>();
+	undrfire_state *state = device->machine().driver_data<undrfire_state>();
 	state->frame_counter ^= 1;
 	device_set_input_line(device, 4, HOLD_LINE);
 }
@@ -963,8 +963,8 @@ ROM_END
 static DRIVER_INIT( undrfire )
 {
 	UINT32 offset,i;
-	UINT8 *gfx = machine->region("gfx3")->base();
-	int size=machine->region("gfx3")->bytes();
+	UINT8 *gfx = machine.region("gfx3")->base();
+	int size=machine.region("gfx3")->bytes();
 	int data;
 
 	/* make piv tile GFX format suitable for gfxdecode */
@@ -992,8 +992,8 @@ static DRIVER_INIT( undrfire )
 static DRIVER_INIT( cbombers )
 {
 	UINT32 offset,i;
-	UINT8 *gfx = machine->region("gfx3")->base();
-	int size=machine->region("gfx3")->bytes();
+	UINT8 *gfx = machine.region("gfx3")->base();
+	int size=machine.region("gfx3")->bytes();
 	int data;
 
 

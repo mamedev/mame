@@ -35,7 +35,7 @@ static PALETTE_INIT( sspeedr )
 
 static WRITE8_HANDLER( sspeedr_int_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -43,7 +43,7 @@ static WRITE8_HANDLER( sspeedr_lamp_w )
 {
 	output_set_value("lampGO", (data >> 0) & 1);
 	output_set_value("lampEP", (data >> 1) & 1);
-	coin_counter_w(space->machine, 0, data & 8);
+	coin_counter_w(space->machine(), 0, data & 8);
 }
 
 
@@ -53,7 +53,7 @@ static const UINT8 ls48_map[16] =
 
 static WRITE8_HANDLER( sspeedr_time_w )
 {
-	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	data = data & 15;
 	output_set_digit_value(0x18 + offset, ls48_map[data]);
 	state->led_TIME[offset] = data;
@@ -62,7 +62,7 @@ static WRITE8_HANDLER( sspeedr_time_w )
 
 static WRITE8_HANDLER( sspeedr_score_w )
 {
-	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
+	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	char buf[20];
 	sprintf(buf, "LED%02d", offset);
 	data = ~data & 15;

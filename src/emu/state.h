@@ -68,20 +68,20 @@ enum state_save_error
 //**************************************************************************
 
 // macros to declare presave/postload functions with the appropriate parameters
-#define STATE_PRESAVE(name) void name(running_machine *machine, void *param)
-#define STATE_POSTLOAD(name) void name(running_machine *machine, void *param)
+#define STATE_PRESAVE(name) void name(running_machine &machine, void *param)
+#define STATE_POSTLOAD(name) void name(running_machine &machine, void *param)
 
 
 // templates to assume the 'param' of a presave/postload function is a class pointer
 template<class T, void (T::*func)()>
-void state_presave_stub(running_machine *machine, void *param)
+void state_presave_stub(running_machine &machine, void *param)
 {
 	T *target = reinterpret_cast<T *>(param);
 	(target->*func)();
 }
 
 template<class T, void (T::*func)()>
-void state_postload_stub(running_machine *machine, void *param)
+void state_postload_stub(running_machine &machine, void *param)
 {
 	T *target = reinterpret_cast<T *>(param);
 	(target->*func)();
@@ -97,37 +97,37 @@ void state_postload_stub(running_machine *machine, void *param)
 
 // register items with explicit tags
 #define state_save_register_item(_mach, _mod, _tag, _index, _val) \
-	(_mach)->state().save_item(_mod, _tag, _index, _val, #_val)
+	(_mach).state().save_item(_mod, _tag, _index, _val, #_val)
 
 #define state_save_register_item_pointer(_mach, _mod, _tag, _index, _val, _count) \
-	(_mach)->state().save_pointer(_mod, _tag, _index, _val, #_val, _count)
+	(_mach).state().save_pointer(_mod, _tag, _index, _val, #_val, _count)
 
 #define state_save_register_item_array(_mach, _mod, _tag, _index, _val) \
-	(_mach)->state().save_item(_mod, _tag, _index, _val, #_val)
+	(_mach).state().save_item(_mod, _tag, _index, _val, #_val)
 
 #define state_save_register_item_2d_array(_mach, _mod, _tag, _index, _val) \
-	(_mach)->state().save_item(_mod, _tag, _index, _val, #_val)
+	(_mach).state().save_item(_mod, _tag, _index, _val, #_val)
 
 #define state_save_register_item_bitmap(_mach, _mod, _tag, _index, _val) \
-	(_mach)->state().save_item(_mod, _tag, _index, *(_val), #_val)
+	(_mach).state().save_item(_mod, _tag, _index, *(_val), #_val)
 
 
 
 // register global items
 #define state_save_register_global(_mach, _val) \
-	(_mach)->state().save_item(_val, #_val)
+	(_mach).state().save_item(_val, #_val)
 
 #define state_save_register_global_pointer(_mach, _val, _count) \
-	(_mach)->state().save_pointer(_val, #_val, _count)
+	(_mach).state().save_pointer(_val, #_val, _count)
 
 #define state_save_register_global_array(_mach, _val) \
-	(_mach)->state().save_item(_val, #_val)
+	(_mach).state().save_item(_val, #_val)
 
 #define state_save_register_global_2d_array(_mach, _val) \
-	(_mach)->state().save_item(_val, #_val)
+	(_mach).state().save_item(_val, #_val)
 
 #define state_save_register_global_bitmap(_mach, _val) \
-	(_mach)->state().save_item(*(_val), #_val)
+	(_mach).state().save_item(*(_val), #_val)
 
 
 
@@ -142,7 +142,7 @@ class state_manager
 	template<typename T> struct type_checker<T*> { static const bool is_atom = false; static const bool is_pointer = true; };
 
 public:
-	typedef void (*prepost_func)(running_machine *machine, void *param);
+	typedef void (*prepost_func)(running_machine &machine, void *param);
 
 	// construction/destruction
 	state_manager(running_machine &machine);
@@ -202,7 +202,7 @@ public:
 	void save_pointer(T *value, const char *valname, UINT32 count, int index = 0) { save_pointer("global", NULL, index, value, valname, count); }
 
 	// file processing
-	static state_save_error check_file(running_machine *machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
+	static state_save_error check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
 	state_save_error write_file(emu_file &file);
 	state_save_error read_file(emu_file &file);
 

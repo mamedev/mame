@@ -30,9 +30,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	offtwall_state *state = machine->driver_data<offtwall_state>();
+	offtwall_state *state = machine.driver_data<offtwall_state>();
 	cputag_set_input_line(machine, "maincpu", 4, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 6, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -53,11 +53,11 @@ static MACHINE_START( offtwall )
 
 static MACHINE_RESET( offtwall )
 {
-	offtwall_state *state = machine->driver_data<offtwall_state>();
+	offtwall_state *state = machine.driver_data<offtwall_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarivc_reset(*machine->primary_screen, state->atarivc_eof_data, 1);
+	atarivc_reset(*machine.primary_screen, state->atarivc_eof_data, 1);
 	atarijsa_reset();
 }
 
@@ -71,13 +71,13 @@ static MACHINE_RESET( offtwall )
 
 static READ16_HANDLER( offtwall_atarivc_r )
 {
-	return atarivc_r(*space->machine->primary_screen, offset);
+	return atarivc_r(*space->machine().primary_screen, offset);
 }
 
 
 static WRITE16_HANDLER( offtwall_atarivc_w )
 {
-	atarivc_w(*space->machine->primary_screen, offset, data, mem_mask);
+	atarivc_w(*space->machine().primary_screen, offset, data, mem_mask);
 }
 
 
@@ -90,8 +90,8 @@ static WRITE16_HANDLER( offtwall_atarivc_w )
 
 static READ16_HANDLER( special_port3_r )
 {
-	offtwall_state *state = space->machine->driver_data<offtwall_state>();
-	int result = input_port_read(space->machine, "260010");
+	offtwall_state *state = space->machine().driver_data<offtwall_state>();
+	int result = input_port_read(space->machine(), "260010");
 	if (state->cpu_to_sound_ready) result ^= 0x0020;
 	return result;
 }
@@ -103,7 +103,7 @@ static WRITE16_HANDLER( io_latch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 4 resets the sound CPU */
-		cputag_set_input_line(space->machine, "jsa", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "jsa", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 		if (!(data & 0x10)) atarijsa_reset();
 	}
 
@@ -150,7 +150,7 @@ static WRITE16_HANDLER( io_latch_w )
 
 static READ16_HANDLER( bankswitch_r )
 {
-	offtwall_state *state = space->machine->driver_data<offtwall_state>();
+	offtwall_state *state = space->machine().driver_data<offtwall_state>();
 
 	/* this is the table lookup; the bank is determined by the address that was requested */
 	state->bank_offset = (offset & 3) * 0x1000;
@@ -162,7 +162,7 @@ static READ16_HANDLER( bankswitch_r )
 
 static READ16_HANDLER( bankrom_r )
 {
-	offtwall_state *state = space->machine->driver_data<offtwall_state>();
+	offtwall_state *state = space->machine().driver_data<offtwall_state>();
 
 	/* this is the banked ROM read */
 	logerror("%06X: %04X\n", cpu_get_previouspc(space->cpu), offset);
@@ -204,7 +204,7 @@ static READ16_HANDLER( bankrom_r )
 
 static READ16_HANDLER( spritecache_count_r )
 {
-	offtwall_state *state = space->machine->driver_data<offtwall_state>();
+	offtwall_state *state = space->machine().driver_data<offtwall_state>();
 	int prevpc = cpu_get_previouspc(space->cpu);
 
 	/* if this read is coming from $99f8 or $9992, it's in the sprite copy loop */
@@ -259,7 +259,7 @@ static READ16_HANDLER( spritecache_count_r )
 
 static READ16_HANDLER( unknown_verify_r )
 {
-	offtwall_state *state = space->machine->driver_data<offtwall_state>();
+	offtwall_state *state = space->machine().driver_data<offtwall_state>();
 	int prevpc = cpu_get_previouspc(space->cpu);
 	if (prevpc < 0x5c5e || prevpc > 0xc432)
 		return state->unknown_verify_base[offset];
@@ -492,27 +492,27 @@ ROM_END
 
 static DRIVER_INIT( offtwall )
 {
-	offtwall_state *state = machine->driver_data<offtwall_state>();
+	offtwall_state *state = machine.driver_data<offtwall_state>();
 
 	atarijsa_init(machine, "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
-	state->spritecache_count = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fde42, 0x3fde43, FUNC(spritecache_count_r));
-	state->bankswitch_base = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x037ec2, 0x037f39, FUNC(bankswitch_r));
-	state->unknown_verify_base = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fdf1e, 0x3fdf1f, FUNC(unknown_verify_r));
+	state->spritecache_count = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fde42, 0x3fde43, FUNC(spritecache_count_r));
+	state->bankswitch_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x037ec2, 0x037f39, FUNC(bankswitch_r));
+	state->unknown_verify_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fdf1e, 0x3fdf1f, FUNC(unknown_verify_r));
 }
 
 
 static DRIVER_INIT( offtwalc )
 {
-	offtwall_state *state = machine->driver_data<offtwall_state>();
+	offtwall_state *state = machine.driver_data<offtwall_state>();
 
 	atarijsa_init(machine, "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
-	state->spritecache_count = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fde42, 0x3fde43, FUNC(spritecache_count_r));
-	state->bankswitch_base = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x037eca, 0x037f43, FUNC(bankswitch_r));
-	state->unknown_verify_base = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fdf24, 0x3fdf25, FUNC(unknown_verify_r));
+	state->spritecache_count = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fde42, 0x3fde43, FUNC(spritecache_count_r));
+	state->bankswitch_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x037eca, 0x037f43, FUNC(bankswitch_r));
+	state->unknown_verify_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fdf24, 0x3fdf25, FUNC(unknown_verify_r));
 }
 
 

@@ -12,9 +12,9 @@
 
 ***************************************************************************/
 
-void gradius3_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+void gradius3_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	gradius3_state *state = machine->driver_data<gradius3_state>();
+	gradius3_state *state = machine.driver_data<gradius3_state>();
 
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x1c) << 7);
@@ -28,7 +28,7 @@ void gradius3_tile_callback( running_machine *machine, int layer, int bank, int 
 
 ***************************************************************************/
 
-void gradius3_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask, int *shadow )
+void gradius3_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask, int *shadow )
 {
 	#define L0 0xaa
 	#define L1 0xcc
@@ -38,7 +38,7 @@ void gradius3_sprite_callback( running_machine *machine, int *code, int *color, 
 		{ L0|L2, L0, L0|L2, L0|L1|L2 },
 		{ L1|L2, L2, 0,     L0|L1|L2 }
 	};
-	gradius3_state *state = machine->driver_data<gradius3_state>();
+	gradius3_state *state = machine.driver_data<gradius3_state>();
 	int pri = ((*color & 0x60) >> 5);
 
 	if (state->priority == 0)
@@ -64,13 +64,13 @@ static STATE_POSTLOAD( gradius3_postload )
 
 	for (i = 0; i < 0x20000; i += 16)
 	{
-		gfx_element_mark_dirty(machine->gfx[0], i / 16);
+		gfx_element_mark_dirty(machine.gfx[0], i / 16);
 	}
 }
 
 VIDEO_START( gradius3 )
 {
-	gradius3_state *state = machine->driver_data<gradius3_state>();
+	gradius3_state *state = machine.driver_data<gradius3_state>();
 	int i;
 
 	state->layer_colorbase[0] = 0;
@@ -84,11 +84,11 @@ VIDEO_START( gradius3 )
 	/* re-decode the sprites because the ROMs are connected to the custom IC differently
        from how they are connected to the CPU. */
 	for (i = 0; i < TOTAL_SPRITES; i++)
-		gfx_element_mark_dirty(machine->gfx[1], i);
+		gfx_element_mark_dirty(machine.gfx[1], i);
 
-	gfx_element_set_source(machine->gfx[0], (UINT8 *)state->gfxram);
+	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->gfxram);
 
-	machine->state().register_postload(gradius3_postload, NULL);
+	machine.state().register_postload(gradius3_postload, NULL);
 }
 
 
@@ -101,20 +101,20 @@ VIDEO_START( gradius3 )
 
 READ16_HANDLER( gradius3_gfxrom_r )
 {
-	UINT8 *gfxdata = space->machine->region("gfx2")->base();
+	UINT8 *gfxdata = space->machine().region("gfx2")->base();
 
 	return (gfxdata[2 * offset + 1] << 8) | gfxdata[2 * offset];
 }
 
 WRITE16_HANDLER( gradius3_gfxram_w )
 {
-	gradius3_state *state = space->machine->driver_data<gradius3_state>();
+	gradius3_state *state = space->machine().driver_data<gradius3_state>();
 	int oldword = state->gfxram[offset];
 
 	COMBINE_DATA(&state->gfxram[offset]);
 
 	if (oldword != state->gfxram[offset])
-		gfx_element_mark_dirty(space->machine->gfx[0], offset / 16);
+		gfx_element_mark_dirty(space->machine().gfx[0], offset / 16);
 }
 
 /***************************************************************************
@@ -125,7 +125,7 @@ WRITE16_HANDLER( gradius3_gfxram_w )
 
 SCREEN_UPDATE( gradius3 )
 {
-	gradius3_state *state = screen->machine->driver_data<gradius3_state>();
+	gradius3_state *state = screen->machine().driver_data<gradius3_state>();
 
 	/* TODO: this kludge enforces the char banks. For some reason, they don't work otherwise. */
 	k052109_w(state->k052109, 0x1d80, 0x10);
@@ -133,7 +133,7 @@ SCREEN_UPDATE( gradius3 )
 
 	k052109_tilemap_update(state->k052109);
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	if (state->priority == 0)
 	{
 		k052109_tilemap_draw(state->k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 2);

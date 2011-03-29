@@ -36,7 +36,7 @@
 
 static WRITE8_HANDLER( kyugo_sub_cpu_control_w )
 {
-	kyugo_state *state = space->machine->driver_data<kyugo_state>();
+	kyugo_state *state = space->machine().driver_data<kyugo_state>();
 	device_set_input_line(state->subcpu, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -449,10 +449,10 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( kyugo )
 {
-	kyugo_state *state = machine->driver_data<kyugo_state>();
+	kyugo_state *state = machine.driver_data<kyugo_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->subcpu = machine->device("sub");
+	state->maincpu = machine.device("maincpu");
+	state->subcpu = machine.device("sub");
 
 	state->save_item(NAME(state->scroll_x_lo));
 	state->save_item(NAME(state->scroll_x_hi));
@@ -464,10 +464,10 @@ static MACHINE_START( kyugo )
 
 static MACHINE_RESET( kyugo )
 {
-	kyugo_state *state = machine->driver_data<kyugo_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	kyugo_state *state = machine.driver_data<kyugo_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	// must start with interrupts and sub CPU disabled
-	cpu_interrupt_enable(machine->device("maincpu"), 0);
+	cpu_interrupt_enable(machine.device("maincpu"), 0);
 	kyugo_sub_cpu_control_w(space, 0, 0);
 
 	state->scroll_x_lo = 0;
@@ -1333,19 +1333,19 @@ ROM_END
 static DRIVER_INIT( gyrodine )
 {
 	/* add watchdog */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe000, 0xe000, FUNC(watchdog_reset_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe000, 0xe000, FUNC(watchdog_reset_w));
 }
 
 
 static DRIVER_INIT( srdmissn )
 {
-	kyugo_state *state = machine->driver_data<kyugo_state>();
+	kyugo_state *state = machine.driver_data<kyugo_state>();
 
 	/* shared RAM is mapped at 0xe000 as well  */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xe000, 0xe7ff, state->shared_ram);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xe000, 0xe7ff, state->shared_ram);
 
 	/* extra RAM on sub CPU  */
-	machine->device("sub")->memory().space(AS_PROGRAM)->install_ram(0x8800, 0x8fff);
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_ram(0x8800, 0x8fff);
 }
 
 

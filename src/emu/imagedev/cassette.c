@@ -71,7 +71,7 @@ INLINE int cassette_is_motor_on(device_t *device)
 static void cassette_update(device_t *device)
 {
 	dev_cassette_t	*cassette = get_safe_token( device );
-	double cur_time = device->machine->time().as_double();
+	double cur_time = device->machine().time().as_double();
 
 	if (cassette_is_motor_on(device))
 	{
@@ -187,7 +187,7 @@ double cassette_get_position(device_t *device)
 	position = cassette->position;
 
 	if (cassette_is_motor_on(device))
-		position += device->machine->time().as_double() - cassette->position_time;
+		position += device->machine().time().as_double() - cassette->position_time;
 	return position;
 }
 
@@ -273,7 +273,7 @@ static DEVICE_IMAGE_LOAD( cassette )
 	{
 		/* creating an image */
 		create_opts = cassette->config->create_opts;
-		err = cassette_create(device->machine, (void *) &image, &image_ioprocs, &wavfile_format, create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &cassette->cassette);
+		err = cassette_create(device->machine(), (void *) &image, &image_ioprocs, &wavfile_format, create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &cassette->cassette);
 		if (err)
 			goto error;
 	}
@@ -285,7 +285,7 @@ static DEVICE_IMAGE_LOAD( cassette )
 			is_writable = image.is_writable();
 			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
 			extension = image.filetype();
-			err = cassette_open_choices(device->machine,(void *) &image, &image_ioprocs, extension, formats, cassette_flags, &cassette->cassette);
+			err = cassette_open_choices(device->machine(),(void *) &image, &image_ioprocs, extension, formats, cassette_flags, &cassette->cassette);
 
 			/* this is kind of a hack */
 			if (err && is_writable)
@@ -302,7 +302,7 @@ static DEVICE_IMAGE_LOAD( cassette )
 
 	/* reset the position */
 	cassette->position = 0.0;
-	cassette->position_time = device->machine->time().as_double();
+	cassette->position_time = device->machine().time().as_double();
 
 	return IMAGE_INIT_PASS;
 
@@ -360,7 +360,7 @@ static DEVICE_IMAGE_DISPLAY(cassette)
 	x = 0.2f;
 	y = 0.5f;
 
-	dev = device->machine->m_devicelist.first(CASSETTE );
+	dev = device->machine().m_devicelist.first(CASSETTE );
 
 	while ( dev && strcmp( dev->tag(), device->tag() ) )
 	{
@@ -368,7 +368,7 @@ static DEVICE_IMAGE_DISPLAY(cassette)
 		dev = dev->typenext();
 	}
 
-	y *= ui_get_line_height(*device->machine) + 2.0f * UI_BOX_TB_BORDER;
+	y *= ui_get_line_height(device->machine()) + 2.0f * UI_BOX_TB_BORDER;
 	/* choose which frame of the animation we are at */
 	n = ((int) position / ANIMATION_FPS) % ANIMATION_FRAMES;
 	/* Since you can have anything in a BDF file, we will use crude ascii characters instead */
@@ -393,7 +393,7 @@ static DEVICE_IMAGE_DISPLAY(cassette)
 		(int) length);
 
 	/* draw the cassette */
-	ui_draw_text_box(&device->machine->render().ui_container(), buf, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
+	ui_draw_text_box(&device->machine().render().ui_container(), buf, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
 }
 
 /*-------------------------------------------------

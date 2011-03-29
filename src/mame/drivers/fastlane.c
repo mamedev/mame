@@ -20,7 +20,7 @@
 
 static INTERRUPT_GEN( fastlane_interrupt )
 {
-	fastlane_state *state = device->machine->driver_data<fastlane_state>();
+	fastlane_state *state = device->machine().driver_data<fastlane_state>();
 
 	if (cpu_getiloops(device) == 0)
 	{
@@ -36,7 +36,7 @@ static INTERRUPT_GEN( fastlane_interrupt )
 
 static WRITE8_HANDLER( k007121_registers_w )
 {
-	fastlane_state *state = space->machine->driver_data<fastlane_state>();
+	fastlane_state *state = space->machine().driver_data<fastlane_state>();
 
 	if (offset < 8)
 		k007121_ctrl_w(state->k007121, offset, data);
@@ -46,14 +46,14 @@ static WRITE8_HANDLER( k007121_registers_w )
 
 static WRITE8_HANDLER( fastlane_bankswitch_w )
 {
-	fastlane_state *state = space->machine->driver_data<fastlane_state>();
+	fastlane_state *state = space->machine().driver_data<fastlane_state>();
 
 	/* bits 0 & 1 coin counters */
-	coin_counter_w(space->machine, 0,data & 0x01);
-	coin_counter_w(space->machine, 1,data & 0x02);
+	coin_counter_w(space->machine(), 0,data & 0x01);
+	coin_counter_w(space->machine(), 1,data & 0x02);
 
 	/* bits 2 & 3 = bank number */
-	memory_set_bank(space->machine, "bank1", (data & 0x0c) >> 2);
+	memory_set_bank(space->machine(), "bank1", (data & 0x0c) >> 2);
 
 	/* bit 4: bank # for the 007232 (chip 2) */
 	k007232_set_bank(state->konami2, 0 + ((data & 0x10) >> 4), 2 + ((data & 0x10) >> 4));
@@ -201,13 +201,13 @@ static const k007232_interface k007232_interface_2 =
 
 static MACHINE_START( fastlane )
 {
-	fastlane_state *state = machine->driver_data<fastlane_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	fastlane_state *state = machine.driver_data<fastlane_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 
-	state->konami2 = machine->device("konami2");
-	state->k007121 = machine->device("k007121");
+	state->konami2 = machine.device("konami2");
+	state->k007121 = machine.device("k007121");
 }
 
 static MACHINE_CONFIG_START( fastlane, fastlane_state )

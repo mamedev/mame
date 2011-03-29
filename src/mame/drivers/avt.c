@@ -434,7 +434,7 @@ public:
 
 static WRITE8_HANDLER( avt_videoram_w )
 {
-	avt_state *state = space->machine->driver_data<avt_state>();
+	avt_state *state = space->machine().driver_data<avt_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -442,7 +442,7 @@ static WRITE8_HANDLER( avt_videoram_w )
 
 static WRITE8_HANDLER( avt_colorram_w )
 {
-	avt_state *state = space->machine->driver_data<avt_state>();
+	avt_state *state = space->machine().driver_data<avt_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -450,7 +450,7 @@ static WRITE8_HANDLER( avt_colorram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	avt_state *state = machine->driver_data<avt_state>();
+	avt_state *state = machine.driver_data<avt_state>();
 /*  - bits -
     7654 3210
     xxxx ----   color code.
@@ -466,14 +466,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( avt )
 {
-	avt_state *state = machine->driver_data<avt_state>();
+	avt_state *state = machine.driver_data<avt_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 28, 32);
 }
 
 
 static SCREEN_UPDATE( avt )
 {
-	avt_state *state = screen->machine->driver_data<avt_state>();
+	avt_state *state = screen->machine().driver_data<avt_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
@@ -494,7 +494,7 @@ static PALETTE_INIT( avt )
 	/* 0000BGRI */
 	if (color_prom == 0) return;
 
-	for (j = 0; j < machine->total_colors(); j++)
+	for (j = 0; j < machine.total_colors(); j++)
 	{
 		int bit1, bit2, bit3, r, g, b, inten, intenmin, intenmax, i;
 

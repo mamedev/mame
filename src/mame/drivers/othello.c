@@ -78,12 +78,12 @@ public:
 
 static MC6845_UPDATE_ROW( update_row )
 {
-	othello_state *state = device->machine->driver_data<othello_state>();
+	othello_state *state = device->machine().driver_data<othello_state>();
 	int cx, x;
 	UINT32 data_address;
 	UINT32 tmp;
 
-	const UINT8 *gfx = device->machine->region("gfx")->base();
+	const UINT8 *gfx = device->machine().region("gfx")->base();
 
 	for(cx = 0; cx < x_count; ++cx)
 	{
@@ -101,7 +101,7 @@ static MC6845_UPDATE_ROW( update_row )
 static PALETTE_INIT( othello )
 {
 	int i;
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		palette_set_color(machine, i, MAKE_RGB(0xff, 0x00, 0xff));
 	}
@@ -118,7 +118,7 @@ static PALETTE_INIT( othello )
 
 static SCREEN_UPDATE( othello )
 {
-	othello_state *state = screen->machine->driver_data<othello_state>();
+	othello_state *state = screen->machine().driver_data<othello_state>();
 
 	mc6845_update(state->mc6845, bitmap, cliprect);
 	return 0;
@@ -134,18 +134,18 @@ ADDRESS_MAP_END
 static READ8_HANDLER( unk_87_r )
 {
 	/* n7751_status_r ?  bit 7 = ack/status from device connected  to port 8a? */
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static WRITE8_HANDLER( unk_8a_w )
 {
 	/*
-    othello_state *state = space->machine->driver_data<othello_state>();
+    othello_state *state = space->machine().driver_data<othello_state>();
 
     state->n7751_command = (data & 0x07);
     device_set_input_line(state->n7751, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
     //device_set_input_line(state->n7751, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-    space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+    space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
     */
 
 	logerror("8a -> %x\n", data);
@@ -158,12 +158,12 @@ static WRITE8_HANDLER( unk_8c_w )
 
 static READ8_HANDLER( unk_8c_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static READ8_HANDLER( sound_ack_r )
 {
-	othello_state *state = space->machine->driver_data<othello_state>();
+	othello_state *state = space->machine().driver_data<othello_state>();
 	return state->ack_data;
 }
 
@@ -174,7 +174,7 @@ static WRITE8_HANDLER( unk_8f_w )
 
 static WRITE8_HANDLER( tilebank_w )
 {
-	othello_state *state = space->machine->driver_data<othello_state>();
+	othello_state *state = space->machine().driver_data<othello_state>();
 	state->tile_bank = (data == 0x0f) ? 0x100 : 0x00;
 	logerror("tilebank -> %x\n", data);
 }
@@ -203,19 +203,19 @@ static READ8_HANDLER( latch_r )
 
 static WRITE8_HANDLER( ay_select_w )
 {
-	othello_state *state = space->machine->driver_data<othello_state>();
+	othello_state *state = space->machine().driver_data<othello_state>();
 	state->ay_select = data;
 }
 
 static WRITE8_HANDLER( ack_w )
 {
-	othello_state *state = space->machine->driver_data<othello_state>();
+	othello_state *state = space->machine().driver_data<othello_state>();
 	state->ack_data = data;
 }
 
 static WRITE8_HANDLER( ay_address_w )
 {
-	othello_state *state = space->machine->driver_data<othello_state>();
+	othello_state *state = space->machine().driver_data<othello_state>();
 
 	if (state->ay_select & 1) ay8910_address_w(state->ay1, 0, data);
 	if (state->ay_select & 2) ay8910_address_w(state->ay2, 0, data);
@@ -223,7 +223,7 @@ static WRITE8_HANDLER( ay_address_w )
 
 static WRITE8_HANDLER( ay_data_w )
 {
-	othello_state *state = space->machine->driver_data<othello_state>();
+	othello_state *state = space->machine().driver_data<othello_state>();
 
 	if (state->ay_select & 1) ay8910_data_w(state->ay1, 0, data);
 	if (state->ay_select & 2) ay8910_data_w(state->ay2, 0, data);
@@ -245,7 +245,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 {
-	othello_state *state = device->machine->driver_data<othello_state>();
+	othello_state *state = device->machine().driver_data<othello_state>();
 
 	/* P4 - address lines 0-3 */
 	/* P5 - address lines 4-7 */
@@ -280,19 +280,19 @@ static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 
 static READ8_HANDLER( n7751_rom_r )
 {
-	othello_state *state = space->machine->driver_data<othello_state>();
-	return space->machine->region("n7751data")->base()[state->sound_addr];
+	othello_state *state = space->machine().driver_data<othello_state>();
+	return space->machine().region("n7751data")->base()[state->sound_addr];
 }
 
 static READ8_HANDLER( n7751_command_r )
 {
-	othello_state *state = space->machine->driver_data<othello_state>();
+	othello_state *state = space->machine().driver_data<othello_state>();
 	return 0x80 | ((state->n7751_command & 0x07) << 4);
 }
 
 static WRITE8_DEVICE_HANDLER( n7751_p2_w )
 {
-	othello_state *state = device->machine->driver_data<othello_state>();
+	othello_state *state = device->machine().driver_data<othello_state>();
 
 	/* write to P2; low 4 bits go to 8243 */
 	i8243_p2_w(device, offset, data & 0x0f);
@@ -380,13 +380,13 @@ static const mc6845_interface h46505_intf =
 
 static MACHINE_START( othello )
 {
-	othello_state *state = machine->driver_data<othello_state>();
+	othello_state *state = machine.driver_data<othello_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->mc6845 = machine->device("crtc");
-	state->n7751 = machine->device("n7751");
-	state->ay1 = machine->device("ay1");
-	state->ay2 = machine->device("ay2");
+	state->maincpu = machine.device("maincpu");
+	state->mc6845 = machine.device("crtc");
+	state->n7751 = machine.device("n7751");
+	state->ay1 = machine.device("ay1");
+	state->ay2 = machine.device("ay2");
 
 	state->save_item(NAME(state->tile_bank));
 	state->save_item(NAME(state->ay_select));
@@ -398,7 +398,7 @@ static MACHINE_START( othello )
 
 static MACHINE_RESET( othello )
 {
-	othello_state *state = machine->driver_data<othello_state>();
+	othello_state *state = machine.driver_data<othello_state>();
 
 	state->tile_bank = 0;
 	state->ay_select = 0;

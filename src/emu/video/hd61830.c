@@ -105,7 +105,7 @@ device_config *hd61830_device_config::static_alloc_device_config(const machine_c
 
 device_t *hd61830_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, hd61830_device(machine, *this));
+	return auto_alloc(machine, hd61830_device(machine, *this));
 }
 
 
@@ -208,7 +208,7 @@ void hd61830_device::device_start()
 	// resolve callbacks
     devcb_resolve_read8(&m_in_rd_func, &m_config.m_in_rd_func, this);
 
-	m_screen = machine->device<screen_device>(m_config.screen_tag);
+	m_screen = m_machine.device<screen_device>(m_config.screen_tag);
 
 	// register for state saving
 	save_item(NAME(m_bf));

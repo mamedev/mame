@@ -45,7 +45,7 @@
 #include "segacrp2.h"
 
 
-static void sega_decode_2(running_machine *machine,const char *cputag,
+static void sega_decode_2(running_machine &machine,const char *cputag,
 		const UINT8 xor_table[128],const int swap_table[128])
 {
 	int A;
@@ -60,8 +60,8 @@ static void sega_decode_2(running_machine *machine,const char *cputag,
 	};
 
 
-	address_space *space = machine->device(cputag)->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine->region(cputag)->base();
+	address_space *space = machine.device(cputag)->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine.region(cputag)->base();
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x8000);
 
 	space->set_decrypted_region(0x0000, 0x7fff, decrypted);
@@ -92,7 +92,7 @@ static void sega_decode_2(running_machine *machine,const char *cputag,
 
 
 
-void sega_315_5162_decode(running_machine *machine, const char *cputag)
+void sega_315_5162_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 xor_table[128] =
 	{
@@ -125,7 +125,7 @@ void sega_315_5162_decode(running_machine *machine, const char *cputag)
 }
 
 
-void sega_315_5177_decode(running_machine *machine, const char *cputag)
+void sega_315_5177_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 xor_table[128] =
 	{
@@ -182,7 +182,7 @@ void sega_315_5177_decode(running_machine *machine, const char *cputag)
 }
 
 
-void sega_315_5178_decode(running_machine *machine, const char *cputag)
+void sega_315_5178_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 xor_table[128] =
 	{
@@ -229,7 +229,7 @@ void sega_315_5178_decode(running_machine *machine, const char *cputag)
 }
 
 
-void sega_315_5179_decode(running_machine *machine, const char *cputag)
+void sega_315_5179_decode(running_machine &machine, const char *cputag)
 {
 	static const UINT8 xor_table[128] =
 	{
@@ -279,7 +279,7 @@ void sega_315_5179_decode(running_machine *machine, const char *cputag)
 
 ******************************************************************************/
 
-static void sega_decode_317(running_machine *machine, const char *cputag, int shift)
+static void sega_decode_317(running_machine &machine, const char *cputag, int shift)
 {
 	static const UINT8 xor_table[128+3] =
 	{
@@ -310,7 +310,7 @@ static void sega_decode_317(running_machine *machine, const char *cputag, int sh
 	sega_decode_2( machine, cputag, xor_table + shift, swap_table + shift );
 }
 
-void sega_317_0004_decode(running_machine *machine, const char *cputag)	{ sega_decode_317( machine, cputag, 0 ); }
-void sega_317_0005_decode(running_machine *machine, const char *cputag)	{ sega_decode_317( machine, cputag, 1 ); }
-void sega_317_0006_decode(running_machine *machine, const char *cputag)	{ sega_decode_317( machine, cputag, 2 ); }
-void sega_317_0007_decode(running_machine *machine, const char *cputag)	{ sega_decode_317( machine, cputag, 3 ); }
+void sega_317_0004_decode(running_machine &machine, const char *cputag)	{ sega_decode_317( machine, cputag, 0 ); }
+void sega_317_0005_decode(running_machine &machine, const char *cputag)	{ sega_decode_317( machine, cputag, 1 ); }
+void sega_317_0006_decode(running_machine &machine, const char *cputag)	{ sega_decode_317( machine, cputag, 2 ); }
+void sega_317_0007_decode(running_machine &machine, const char *cputag)	{ sega_decode_317( machine, cputag, 3 ); }

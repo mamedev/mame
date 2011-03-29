@@ -91,8 +91,8 @@ C102 - Controls CPU access to ROZ Memory Area.
 /*----------- defined in drivers/namcoic.c -----------*/
 
 void namco_tilemap_init(
-		running_machine *machine, int gfxbank, void *pMaskROM,
-		void (*cb)( running_machine *machine, UINT16 code, int *gfx, int *mask) );
+		running_machine &machine, int gfxbank, void *pMaskROM,
+		void (*cb)( running_machine &machine, UINT16 code, int *gfx, int *mask) );
 void namco_tilemap_draw( bitmap_t *bitmap, const rectangle *cliprect, int pri );
 void namco_tilemap_invalidate( void );
 WRITE16_HANDLER( namco_tilemapvideoram16_w );
@@ -113,16 +113,16 @@ WRITE32_HANDLER( namco_tilemapcontrol32_le_w );
 /***********************************************************************************/
 
 /* Namco System II Sprite Rendering */
-void namcos2_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri, int control );
+void namcos2_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri, int control );
 
-void namcos2_draw_sprites_metalhawk( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri );
+void namcos2_draw_sprites_metalhawk( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri );
 
 /***********************************************************************************/
 /* C355 Motion Object Emulation */
 
 /* for palXOR, supply either 0x0 (normal) or 0xf (palette mapping reversed) */
-void namco_obj_init( running_machine *machine, int gfxbank, int palXOR, int (*code2tile)( running_machine *machine, int code ) );
-void namco_obj_draw( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri );
+void namco_obj_init( running_machine &machine, int gfxbank, int palXOR, int (*code2tile)( running_machine &machine, int code ) );
+void namco_obj_draw( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri );
 
 WRITE16_HANDLER( namco_obj16_w );
 READ16_HANDLER( namco_obj16_r );
@@ -141,7 +141,7 @@ READ32_HANDLER( namco_spritepos32_r );
 /***********************************************************************************/
 /* C169 ROZ Layer Emulation */
 
-void namco_roz_init( running_machine *machine, int gfxbank, const char *maskregion );
+void namco_roz_init( running_machine &machine, int gfxbank, const char *maskregion );
 void namco_roz_draw( bitmap_t *bitmap, const rectangle *cliprect, int pri );
 
 READ16_HANDLER( namco_rozcontrol16_r );
@@ -163,9 +163,9 @@ WRITE32_HANDLER( namco_rozvideoram32_le_w );
 /***********************************************************************************/
 /* C45 Land (Road) Emulation */
 
-void namco_road_init( running_machine *machine, int gfxbank );
+void namco_road_init( running_machine &machine, int gfxbank );
 void namco_road_set_transparent_color(pen_t pen);
-void namco_road_draw( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri );
+void namco_road_draw( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri );
 
 READ16_HANDLER( namco_road16_r );
 WRITE16_HANDLER( namco_road16_w );

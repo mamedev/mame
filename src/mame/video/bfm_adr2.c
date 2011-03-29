@@ -186,7 +186,7 @@ VIDEO_RESET( adder2 )
 	adder2_data_to_sc2       = 0;
 
 	{
-		UINT8 *rom = machine->region("adder2")->base();
+		UINT8 *rom = machine.region("adder2")->base();
 
 		memory_configure_bank(machine, "bank2", 0, 4, &rom[0x00000], 0x08000);
 
@@ -289,7 +289,7 @@ static WRITE8_HANDLER( screen_ram_w )
 		r = ((data & 0x18)>>3) *  85;  // 00011000b = 0x18
 		g = ((data & 0x06)>>1) *  85;  // 00000110b = 0x06
 		b = ((data & 0x01)   ) * 255;
-		palette_set_color(space->machine, pal, MAKE_RGB(r,g,b));
+		palette_set_color(space->machine(), pal, MAKE_RGB(r,g,b));
 	}
 
 	if ( adder2_screen_page_reg & SL_ACCESS )
@@ -323,7 +323,7 @@ static WRITE8_HANDLER( normal_ram_w )
 
 static WRITE8_HANDLER( adder2_rom_page_w )
 {
-	memory_set_bank(space->machine, "bank2",data&0x03);
+	memory_set_bank(space->machine(), "bank2",data&0x03);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -448,11 +448,11 @@ int adder2_status()
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 
-void adder2_decode_char_roms(running_machine *machine)
+void adder2_decode_char_roms(running_machine &machine)
 {
 	UINT8 *p;
 
-	p = machine->region("gfx1")->base();
+	p = machine.region("gfx1")->base();
 
 	if ( p )
 	{

@@ -102,9 +102,9 @@ public:
 };
 
 
-static void pcat_nit_microtouch_tx_callback(running_machine *machine, UINT8 data)
+static void pcat_nit_microtouch_tx_callback(running_machine &machine, UINT8 data)
 {
-	ins8250_receive(machine->device("ns16450_0"), data);
+	ins8250_receive(machine.device("ns16450_0"), data);
 };
 
 static INS8250_TRANSMIT( pcat_nit_com_transmit )
@@ -115,7 +115,7 @@ static INS8250_TRANSMIT( pcat_nit_com_transmit )
 
 static INS8250_INTERRUPT( at_com_interrupt_1 )
 {
-	pic8259_ir4_w(device->machine->device("pic8259_1"), state);
+	pic8259_ir4_w(device->machine().device("pic8259_1"), state);
 }
 
 static const ins8250_interface pcat_nit_com0_interface =
@@ -135,7 +135,7 @@ static const ins8250_interface pcat_nit_com0_interface =
 
 static WRITE8_HANDLER(pcat_nit_rombank_w)
 {
-	pcat_nit_state *state = space->machine->driver_data<pcat_nit_state>();
+	pcat_nit_state *state = space->machine().driver_data<pcat_nit_state>();
 	logerror( "rom bank #%02x at PC=%08X\n", data, cpu_get_pc(space->cpu) );
 	if ( data & 0x40 )
 	{
@@ -145,11 +145,11 @@ static WRITE8_HANDLER(pcat_nit_rombank_w)
 
 		if ( data & 0x80 )
 		{
-			memory_set_bank(space->machine, "rombank", (data & 0x3f) | 0x40 );
+			memory_set_bank(space->machine(), "rombank", (data & 0x3f) | 0x40 );
 		}
 		else
 		{
-			memory_set_bank(space->machine, "rombank", data & 0x3f );
+			memory_set_bank(space->machine(), "rombank", data & 0x3f );
 		}
 	}
 	else
@@ -159,7 +159,7 @@ static WRITE8_HANDLER(pcat_nit_rombank_w)
 
 		space->install_readwrite_bank(0x000d8000, 0x000d9fff, "nvrambank" );
 
-		memory_set_bankptr(space->machine, "nvrambank", state->banked_nvram);
+		memory_set_bankptr(space->machine(), "nvrambank", state->banked_nvram);
 
 	}
 }
@@ -182,7 +182,7 @@ static READ8_HANDLER(pcat_nit_io_r)
 		case 0: /* 278 */
 			return 0xff;
 		case 1: /* 279 */
-			return input_port_read(space->machine, "IN0");
+			return input_port_read(space->machine(), "IN0");
 		case 7: /* 27f dips */
 			return 0xff;
 		default:
@@ -207,9 +207,9 @@ static INPUT_PORTS_START( pcat_nit )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN3) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
-static void streetg2_set_keyb_int(running_machine *machine, int state)
+static void streetg2_set_keyb_int(running_machine &machine, int state)
 {
-	pic8259_ir1_w(machine->device("pic8259_1"), state);
+	pic8259_ir1_w(machine.device("pic8259_1"), state);
 }
 
 static const struct pc_vga_interface vga_interface =
@@ -223,11 +223,11 @@ static const struct pc_vga_interface vga_interface =
 
 static MACHINE_START( streetg2 )
 {
-	device_set_irq_callback(machine->device("maincpu"), pcat_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), pcat_irq_callback);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, streetg2_set_keyb_int);
 
-	memory_configure_bank(machine, "rombank", 0, 0x80, machine->region("game_prg")->base(), 0x8000 );
+	memory_configure_bank(machine, "rombank", 0, 0x80, machine.region("game_prg")->base(), 0x8000 );
 	memory_set_bank(machine, "rombank", 0);
 
 	microtouch_init(machine, pcat_nit_microtouch_tx_callback, NULL);
@@ -389,7 +389,7 @@ ROM_END
 
 static DRIVER_INIT(pcat_nit)
 {
-	pcat_nit_state *state = machine->driver_data<pcat_nit_state>();
+	pcat_nit_state *state = machine.driver_data<pcat_nit_state>();
 	state->banked_nvram = auto_alloc_array(machine, UINT8, 0x2000);
 
 	pc_vga_init(machine, &vga_interface, NULL);

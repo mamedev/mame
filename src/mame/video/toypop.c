@@ -23,7 +23,7 @@ PALETTE_INIT( toypop )
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 256);
+	machine.colortable = colortable_alloc(machine, 256);
 
 	for (i = 0;i < 256;i++)
 	{
@@ -48,7 +48,7 @@ PALETTE_INIT( toypop )
 		bit3 = (color_prom[i+0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r,g,b));
 	}
 
 	for (i = 0;i < 256;i++)
@@ -56,17 +56,17 @@ PALETTE_INIT( toypop )
 		UINT8 entry;
 
 		// characters
-		colortable_entry_set_value(machine->colortable, i + 0*256, (color_prom[i + 0x300] & 0x0f) | 0x70);
-		colortable_entry_set_value(machine->colortable, i + 1*256, (color_prom[i + 0x300] & 0x0f) | 0xf0);
+		colortable_entry_set_value(machine.colortable, i + 0*256, (color_prom[i + 0x300] & 0x0f) | 0x70);
+		colortable_entry_set_value(machine.colortable, i + 1*256, (color_prom[i + 0x300] & 0x0f) | 0xf0);
 		// sprites
 		entry = color_prom[i + 0x500];
-		colortable_entry_set_value(machine->colortable, i + 2*256, entry);
+		colortable_entry_set_value(machine.colortable, i + 2*256, entry);
 	}
 	for (i = 0;i < 16;i++)
 	{
 		// background
-		colortable_entry_set_value(machine->colortable, i + 3*256 + 0*16, 0x60 + i);
-		colortable_entry_set_value(machine->colortable, i + 3*256 + 1*16, 0xe0 + i);
+		colortable_entry_set_value(machine.colortable, i + 3*256 + 0*16, 0x60 + i);
+		colortable_entry_set_value(machine.colortable, i + 3*256 + 1*16, 0xe0 + i);
 	}
 }
 
@@ -95,7 +95,7 @@ static TILEMAP_MAPPER( tilemap_scan )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	toypop_state *state = machine->driver_data<toypop_state>();
+	toypop_state *state = machine.driver_data<toypop_state>();
 	UINT8 attr = state->videoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
@@ -114,7 +114,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( toypop )
 {
-	toypop_state *state = machine->driver_data<toypop_state>();
+	toypop_state *state = machine.driver_data<toypop_state>();
 	state->bg_tilemap = tilemap_create(machine,get_tile_info,tilemap_scan,8,8,36,28);
 
 	tilemap_set_transparent_pen(state->bg_tilemap, 0);
@@ -130,30 +130,30 @@ VIDEO_START( toypop )
 
 WRITE8_HANDLER( toypop_videoram_w )
 {
-	toypop_state *state = space->machine->driver_data<toypop_state>();
+	toypop_state *state = space->machine().driver_data<toypop_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( toypop_palettebank_w )
 {
-	toypop_state *state = space->machine->driver_data<toypop_state>();
+	toypop_state *state = space->machine().driver_data<toypop_state>();
 	if (state->palettebank != (offset & 1))
 	{
 		state->palettebank = offset & 1;
-		tilemap_mark_all_tiles_dirty_all(space->machine);
+		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 }
 
 WRITE16_HANDLER( toypop_flipscreen_w )
 {
-	toypop_state *state = space->machine->driver_data<toypop_state>();
+	toypop_state *state = space->machine().driver_data<toypop_state>();
 	state->bitmapflip = offset & 1;
 }
 
 READ16_HANDLER( toypop_merged_background_r )
 {
-	toypop_state *state = space->machine->driver_data<toypop_state>();
+	toypop_state *state = space->machine().driver_data<toypop_state>();
 	int data1, data2;
 
 	// 0x0a0b0c0d is read as 0xabcd
@@ -164,7 +164,7 @@ READ16_HANDLER( toypop_merged_background_r )
 
 WRITE16_HANDLER( toypop_merged_background_w )
 {
-	toypop_state *state = space->machine->driver_data<toypop_state>();
+	toypop_state *state = space->machine().driver_data<toypop_state>();
 
 	// 0xabcd is written as 0x0a0b0c0d in the background image
 	if (ACCESSING_BITS_8_15)
@@ -174,9 +174,9 @@ WRITE16_HANDLER( toypop_merged_background_w )
 		state->bg_image[2*offset+1] = (data & 0xf) | ((data & 0xf0) << 4);
 }
 
-static void draw_background(running_machine *machine, bitmap_t *bitmap)
+static void draw_background(running_machine &machine, bitmap_t *bitmap)
 {
-	toypop_state *state = machine->driver_data<toypop_state>();
+	toypop_state *state = machine.driver_data<toypop_state>();
 	int offs, x, y;
 	pen_t pen_base = 0x300 + 0x10*state->palettebank;
 
@@ -222,7 +222,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap)
 ***************************************************************************/
 
 
-void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *spriteram_base)
+void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *spriteram_base)
 {
 	UINT8 *spriteram = spriteram_base + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
@@ -267,12 +267,12 @@ void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *c
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					drawgfx_transmask(bitmap,cliprect,machine->gfx[1],
+					drawgfx_transmask(bitmap,cliprect,machine.gfx[1],
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
-						colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0xff));
+						colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0xff));
 				}
 			}
 		}
@@ -282,9 +282,9 @@ void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *c
 
 SCREEN_UPDATE( toypop )
 {
-	toypop_state *state = screen->machine->driver_data<toypop_state>();
-	draw_background(screen->machine, bitmap);
+	toypop_state *state = screen->machine().driver_data<toypop_state>();
+	draw_background(screen->machine(), bitmap);
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap, cliprect, state->spriteram);
+	draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram);
 	return 0;
 }

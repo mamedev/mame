@@ -50,7 +50,7 @@ $305.b invincibility
 
 static INTERRUPT_GEN( galastrm_interrupt )
 {
-	galastrm_state *state = device->machine->driver_data<galastrm_state>();
+	galastrm_state *state = device->machine().driver_data<galastrm_state>();
 	state->frame_counter ^= 1;
 	device_set_input_line(device, 5, HOLD_LINE);
 }
@@ -64,16 +64,16 @@ static TIMER_CALLBACK( galastrm_interrupt6 )
 
 static WRITE32_HANDLER( galastrm_palette_w )
 {
-	galastrm_state *state = space->machine->driver_data<galastrm_state>();
+	galastrm_state *state = space->machine().driver_data<galastrm_state>();
 	if (ACCESSING_BITS_16_31)
 		state->tc0110pcr_addr = data >> 16;
 	if ((ACCESSING_BITS_0_15) && (state->tc0110pcr_addr < 4096))
-		palette_set_color_rgb(space->machine, state->tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+		palette_set_color_rgb(space->machine(), state->tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static WRITE32_HANDLER( galastrm_tc0610_0_w )
 {
-	galastrm_state *state = space->machine->driver_data<galastrm_state>();
+	galastrm_state *state = space->machine().driver_data<galastrm_state>();
 	if (ACCESSING_BITS_16_31)
 		state->tc0610_0_addr = data >> 16;
 	if ((ACCESSING_BITS_0_15) && (state->tc0610_0_addr < 8))
@@ -82,7 +82,7 @@ static WRITE32_HANDLER( galastrm_tc0610_0_w )
 
 static WRITE32_HANDLER( galastrm_tc0610_1_w )
 {
-	galastrm_state *state = space->machine->driver_data<galastrm_state>();
+	galastrm_state *state = space->machine().driver_data<galastrm_state>();
 	if (ACCESSING_BITS_16_31)
 		state->tc0610_1_addr = data >> 16;
 	if ((ACCESSING_BITS_0_15) && (state->tc0610_1_addr < 8))
@@ -92,19 +92,19 @@ static WRITE32_HANDLER( galastrm_tc0610_1_w )
 
 static CUSTOM_INPUT( frame_counter_r )
 {
-	galastrm_state *state = field->port->machine->driver_data<galastrm_state>();
+	galastrm_state *state = field->port->machine().driver_data<galastrm_state>();
 	return state->frame_counter;
 }
 
 static CUSTOM_INPUT( coin_word_r )
 {
-	galastrm_state *state = field->port->machine->driver_data<galastrm_state>();
+	galastrm_state *state = field->port->machine().driver_data<galastrm_state>();
 	return state->coin_word;
 }
 
 static WRITE32_HANDLER( galastrm_input_w )
 {
-	galastrm_state *state = space->machine->driver_data<galastrm_state>();
+	galastrm_state *state = space->machine().driver_data<galastrm_state>();
 
 #if 0
 {
@@ -122,12 +122,12 @@ popmessage(t);
 		{
 			if (ACCESSING_BITS_24_31)	/* $400000 is watchdog */
 			{
-				watchdog_reset(space->machine);
+				watchdog_reset(space->machine());
 			}
 
 			if (ACCESSING_BITS_0_7)
 			{
-				device_t *device = space->machine->device("eeprom");
+				device_t *device = space->machine().device("eeprom");
 				eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 				eeprom_write_bit(device, data & 0x40);
 				eeprom_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
@@ -140,10 +140,10 @@ popmessage(t);
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(space->machine, 0, ~data & 0x01000000);
-				coin_lockout_w(space->machine, 1, ~data & 0x02000000);
-				coin_counter_w(space->machine, 0, data & 0x04000000);
-				coin_counter_w(space->machine, 1, data & 0x04000000);
+				coin_lockout_w(space->machine(), 0, ~data & 0x01000000);
+				coin_lockout_w(space->machine(), 1, ~data & 0x02000000);
+				coin_counter_w(space->machine(), 0, data & 0x04000000);
+				coin_counter_w(space->machine(), 1, data & 0x04000000);
 				state->coin_word = (data >> 16) &0xffff;
 			}
 //logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(space->cpu),offset);
@@ -156,16 +156,16 @@ static READ32_HANDLER( galastrm_adstick_ctrl_r )
 	if (offset == 0x00)
 	{
 		if (ACCESSING_BITS_24_31)
-			return input_port_read(space->machine, "STICKX") << 24;
+			return input_port_read(space->machine(), "STICKX") << 24;
 		if (ACCESSING_BITS_16_23)
-			return input_port_read(space->machine, "STICKY") << 16;
+			return input_port_read(space->machine(), "STICKY") << 16;
 	}
 	return 0;
 }
 
 static WRITE32_HANDLER( galastrm_adstick_ctrl_w )
 {
-	space->machine->scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(1000), FUNC(galastrm_interrupt6));
+	space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(1000), FUNC(galastrm_interrupt6));
 }
 
 /***********************************************************

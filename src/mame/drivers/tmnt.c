@@ -83,7 +83,7 @@ Updates:
 
 static READ16_HANDLER( k052109_word_noA12_r )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
@@ -93,7 +93,7 @@ static READ16_HANDLER( k052109_word_noA12_r )
 
 static WRITE16_HANDLER( k052109_word_noA12_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
@@ -103,7 +103,7 @@ static WRITE16_HANDLER( k052109_word_noA12_w )
 
 static WRITE16_HANDLER( punkshot_k052109_word_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
@@ -127,7 +127,7 @@ static WRITE16_HANDLER( punkshot_k052109_word_noA12_w )
 /* A1, A5 and A6 don't go to the 053245. */
 static READ16_HANDLER( k053245_scattered_word_r )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (offset & 0x0031)
 		return state->spriteram[offset];
@@ -140,7 +140,7 @@ static READ16_HANDLER( k053245_scattered_word_r )
 
 static WRITE16_HANDLER( k053245_scattered_word_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	COMBINE_DATA(state->spriteram + offset);
 
@@ -153,7 +153,7 @@ static WRITE16_HANDLER( k053245_scattered_word_w )
 
 static READ16_HANDLER( k053244_word_noA1_r )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	offset &= ~1;	/* handle mirror address */
 
@@ -162,7 +162,7 @@ static READ16_HANDLER( k053244_word_noA1_r )
 
 static WRITE16_HANDLER( k053244_word_noA1_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	offset &= ~1;	/* handle mirror address */
 
@@ -174,7 +174,7 @@ static WRITE16_HANDLER( k053244_word_noA1_w )
 
 static INTERRUPT_GEN(cuebrick_interrupt)
 {
-	tmnt_state *state = device->machine->driver_data<tmnt_state>();
+	tmnt_state *state = device->machine().driver_data<tmnt_state>();
 
 	// cheap IRQ multiplexing to avoid losing sound IRQs
 	switch (cpu_getiloops(device))
@@ -192,7 +192,7 @@ static INTERRUPT_GEN(cuebrick_interrupt)
 
 static INTERRUPT_GEN( punkshot_interrupt )
 {
-	tmnt_state *state = device->machine->driver_data<tmnt_state>();
+	tmnt_state *state = device->machine().driver_data<tmnt_state>();
 
 	if (k052109_is_irq_enabled(state->k052109))
 		irq4_line_hold(device);
@@ -200,7 +200,7 @@ static INTERRUPT_GEN( punkshot_interrupt )
 
 static INTERRUPT_GEN( lgtnfght_interrupt )
 {
-	tmnt_state *state = device->machine->driver_data<tmnt_state>();
+	tmnt_state *state = device->machine().driver_data<tmnt_state>();
 
 	if (k052109_is_irq_enabled(state->k052109))
 		irq5_line_hold(device);
@@ -223,7 +223,7 @@ static READ8_DEVICE_HANDLER( punkshot_sound_r )
 
 static WRITE8_DEVICE_HANDLER( glfgreat_sound_w )
 {
-	tmnt_state *state = device->machine->driver_data<tmnt_state>();
+	tmnt_state *state = device->machine().driver_data<tmnt_state>();
 	k053260_w(device, offset, data);
 
 	if (offset)
@@ -249,25 +249,25 @@ static WRITE16_HANDLER( prmrsocr_sound_cmd_w )
 
 static WRITE16_HANDLER( prmrsocr_sound_irq_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( prmrsocr_audio_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 7);
+	memory_set_bank(space->machine(), "bank1", data & 7);
 }
 
 
 static READ8_HANDLER( tmnt_sres_r )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	return state->tmnt_soundlatch;
 }
 
 static WRITE8_HANDLER( tmnt_sres_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	/* bit 1 resets the UPD7795C sound chip */
 	upd7759_reset_w(state->upd, data & 2);
@@ -296,10 +296,10 @@ static READ8_DEVICE_HANDLER( tmnt_upd_busy_r )
 
 static SAMPLES_START( tmnt_decode_sample )
 {
-	running_machine *machine = device->machine;
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	running_machine &machine = device->machine();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 	int i;
-	UINT8 *source = machine->region("title")->base();
+	UINT8 *source = machine.region("title")->base();
 
 	state->save_item(NAME(state->sampledata));
 
@@ -338,16 +338,16 @@ static void sound_nmi_callback( int param )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 //  sound_nmi_enabled = 1;
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
-	space->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
+	space->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 
 
@@ -357,14 +357,14 @@ static READ16_HANDLER( punkshot_kludge_r )
 	/* 0xffffff, and returning 0 causes the game to mess up - locking up in a */
 	/* loop where the ball is continuously bouncing from the basket. Returning */
 	/* a random number seems to prevent that. */
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 
 /* protection simulation derived from a bootleg */
 static READ16_HANDLER( ssriders_protection_r )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	int data = space->read_word(0x105a0a);
 	int cmd = space->read_word(0x1058fc);
 
@@ -408,7 +408,7 @@ static READ16_HANDLER( ssriders_protection_r )
 
 static WRITE16_HANDLER( ssriders_protection_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (offset == 1)
 	{
@@ -454,12 +454,12 @@ static const eeprom_interface eeprom_intf =
 
 static READ16_HANDLER( blswhstl_coin_r )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	int res;
 
 	/* bit 3 is service button */
 	/* bit 6 is ??? VBLANK? OBJMPX? */
-	res = input_port_read(space->machine, "COINS");
+	res = input_port_read(space->machine(), "COINS");
 
 	state->toggle ^= 0x40;
 	return res ^ state->toggle;
@@ -467,14 +467,14 @@ static READ16_HANDLER( blswhstl_coin_r )
 
 static READ16_HANDLER( ssriders_eeprom_r )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	int res;
 
 	/* bit 0 is EEPROM data */
 	/* bit 1 is EEPROM ready */
 	/* bit 2 is VBLANK (???) */
 	/* bit 7 is service button */
-	res = input_port_read(space->machine, "EEPROM");
+	res = input_port_read(space->machine(), "EEPROM");
 
 	state->toggle ^= 0x04;
 	return res ^ state->toggle;
@@ -482,14 +482,14 @@ static READ16_HANDLER( ssriders_eeprom_r )
 
 static READ16_HANDLER( sunsetbl_eeprom_r )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	int res;
 
 	/* bit 0 is EEPROM data */
 	/* bit 1 is EEPROM ready */
 	/* bit 2 is VBLANK (???) */
 	/* bit 3 is service button */
-	res = input_port_read(space->machine, "EEPROM");
+	res = input_port_read(space->machine(), "EEPROM");
 
 	state->toggle ^= 0x04;
 	return res ^ state->toggle;
@@ -502,7 +502,7 @@ static WRITE16_HANDLER( blswhstl_eeprom_w )
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 	}
 }
 
@@ -519,28 +519,28 @@ static const eeprom_interface thndrx2_eeprom_intf =
 
 static READ16_HANDLER( thndrx2_eeprom_r )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	int res;
 
 	/* bit 0 is EEPROM data */
 	/* bit 1 is EEPROM ready */
 	/* bit 3 is VBLANK (???) */
 	/* bit 7 is service button */
-	res = input_port_read(space->machine, "P2/EEPROM");
+	res = input_port_read(space->machine(), "P2/EEPROM");
 	state->toggle ^= 0x0800;
 	return (res ^ state->toggle);
 }
 
 static WRITE16_HANDLER( thndrx2_eeprom_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 
 		/* bit 5 triggers IRQ on sound cpu */
 		if (state->last == 0 && (data & 0x20) != 0)
@@ -564,25 +564,25 @@ static WRITE16_HANDLER( prmrsocr_eeprom_w )
 		/* bit 8 is data */
 		/* bit 9 is cs (active low) */
 		/* bit 10 is clock (active high) */
-		input_port_write(space->machine, "EEPROMOUT", data, 0xffff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xffff);
 	}
 }
 
 static READ16_HANDLER( cuebrick_nv_r )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	return state->m_cuebrick_nvram[offset + (state->cuebrick_nvram_bank * 0x400 / 2)];
 }
 
 static WRITE16_HANDLER( cuebrick_nv_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
        COMBINE_DATA(&state->m_cuebrick_nvram[offset + (state->cuebrick_nvram_bank * 0x400 / 2)]);
 }
 
 static WRITE16_HANDLER( cuebrick_nvbank_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	state->cuebrick_nvram_bank = data >> 8;
 }
 
@@ -693,7 +693,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( ssriders_soundkludge_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	/* I think this is more than just a trigger */
 	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
@@ -723,7 +723,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( k053251_glfgreat_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	int i;
 
 	if (ACCESSING_BITS_8_15)
@@ -791,9 +791,9 @@ ADDRESS_MAP_END
 
 
 #if 1
-INLINE UINT32 tmnt2_get_word( running_machine *machine, UINT32 addr )
+INLINE UINT32 tmnt2_get_word( running_machine &machine, UINT32 addr )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 
 	if (addr <= 0x07ffff / 2)
 		return(state->tmnt2_rom[addr]);
@@ -806,7 +806,7 @@ INLINE UINT32 tmnt2_get_word( running_machine *machine, UINT32 addr )
 
 static void tmnt2_put_word( address_space *space, UINT32 addr, UINT16 data )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	UINT32 offs;
 	if (addr >= 0x180000 / 2 && addr <= 0x183fff / 2)
@@ -825,7 +825,7 @@ static void tmnt2_put_word( address_space *space, UINT32 addr, UINT16 data )
 
 static WRITE16_HANDLER( tmnt2_1c0800_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	UINT32 src_addr, dst_addr, mod_addr, attr1, code, attr2, cbase, cmod, color;
 	int xoffs, yoffs, xmod, ymod, zmod, xzoom, yzoom, i;
 	UINT16 *mcu;
@@ -847,9 +847,9 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 	zlock    = (mcu[8] & 0xff) == 0x0001;
 
 	for (i = 0; i < 4; i++)
-		src[i] = tmnt2_get_word(space->machine, src_addr + i);
+		src[i] = tmnt2_get_word(space->machine(), src_addr + i);
 	for (i = 0; i < 24; i++) mod[i] =
-		tmnt2_get_word(space->machine, mod_addr + i);
+		tmnt2_get_word(space->machine(), mod_addr + i);
 
 	code = src[0];			// code
 
@@ -946,7 +946,7 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 #else // for reference; do not remove
 static WRITE16_HANDLER( tmnt2_1c0800_w )
 {
-	tmnt_state *state = space->machine->driver_data<tmnt_state>();
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	COMBINE_DATA(state->tmnt2_1c0800 + offset);
 	if (offset == 0x0008 && (state->tmnt2_1c0800[0x8] & 0xff00) == 0x8200)
 	{
@@ -961,7 +961,7 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 		CellSrc = state->tmnt2_1c0800[0x00] | (state->tmnt2_1c0800[0x01] << 16 );
 //        if (CellDest >= 0x180000 && CellDest < 0x183fe0) {
 		CellVar -= 0x104000;
-		src = (UINT16 *)(space->machine->region("maincpu")->base() + CellSrc);
+		src = (UINT16 *)(space->machine().region("maincpu")->base() + CellSrc);
 
 		CellVar >>= 1;
 
@@ -2061,7 +2061,7 @@ INPUT_PORTS_END
 
 static void cuebrick_irq_handler( device_t *device, int state )
 {
-	tmnt_state *tmnt = device->machine->driver_data<tmnt_state>();
+	tmnt_state *tmnt = device->machine().driver_data<tmnt_state>();
 	tmnt->cuebrick_snd_irqlatch = state;
 }
 
@@ -2231,21 +2231,21 @@ static const k053936_interface prmrsocr_k053936_interface =
 
 static MACHINE_START( common )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->k007232 = machine->device("k007232");
-	state->k053260 = machine->device("k053260");
-	state->k054539 = machine->device("k054539");
-	state->upd = machine->device("upd");
-	state->samples = machine->device("samples");
-	state->k052109 = machine->device("k052109");
-	state->k051960 = machine->device("k051960");
-	state->k053245 = machine->device("k053245");
-	state->k053251 = machine->device("k053251");
-	state->k053936 = machine->device("k053936");
-	state->k054000 = machine->device("k054000");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->k007232 = machine.device("k007232");
+	state->k053260 = machine.device("k053260");
+	state->k054539 = machine.device("k054539");
+	state->upd = machine.device("upd");
+	state->samples = machine.device("samples");
+	state->k052109 = machine.device("k052109");
+	state->k051960 = machine.device("k051960");
+	state->k053245 = machine.device("k053245");
+	state->k053251 = machine.device("k053251");
+	state->k053936 = machine.device("k053936");
+	state->k054000 = machine.device("k054000");
 
 	state->save_item(NAME(state->toggle));
 	state->save_item(NAME(state->last));
@@ -2260,7 +2260,7 @@ static MACHINE_START( common )
 
 static MACHINE_RESET( common )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 
 	state->toggle = 0;
 	state->last = 0;
@@ -2356,7 +2356,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_RESET( tmnt )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
+	tmnt_state *state = machine.driver_data<tmnt_state>();
 
 	/* the UPD7759 control flip-flops are cleared: /ST is 1, /RESET is 0 */
 	upd7759_start_w(state->upd, 0);
@@ -2616,7 +2616,7 @@ MACHINE_CONFIG_END
 
 static void sound_nmi( device_t *device )
 {
-	tmnt_state *state = device->machine->driver_data<tmnt_state>();
+	tmnt_state *state = device->machine().driver_data<tmnt_state>();
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -2630,7 +2630,7 @@ static const k054539_interface k054539_config =
 static MACHINE_START( prmrsocr )
 {
 	MACHINE_START_CALL(common);
-	UINT8 *ROM = machine->region("audiocpu")->base();
+	UINT8 *ROM = machine.region("audiocpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 }
 
@@ -4111,8 +4111,8 @@ static DRIVER_INIT( mia )
         be shuffled around because the ROMs are connected differently to the
         051962 custom IC.
     */
-	gfxdata = machine->region("gfx1")->base();
-	len = machine->region("gfx1")->bytes();
+	gfxdata = machine.region("gfx1")->base();
+	len = machine.region("gfx1")->bytes();
 	for (i = 0; i < len; i += 4)
 	{
 		for (j = 0; j < 4; j++)
@@ -4132,8 +4132,8 @@ static DRIVER_INIT( mia )
         be shuffled around because the ROMs are connected differently to the
         051937 custom IC.
     */
-	gfxdata = machine->region("gfx2")->base();
-	len = machine->region("gfx2")->bytes();
+	gfxdata = machine.region("gfx2")->base();
+	len = machine.region("gfx2")->bytes();
 	for (i = 0; i < len; i += 4)
 	{
 		for (j = 0; j < 4; j++)
@@ -4204,8 +4204,8 @@ static DRIVER_INIT( tmnt )
         be shuffled around because the ROMs are connected differently to the
         051962 custom IC.
     */
-	gfxdata = machine->region("gfx1")->base();
-	len = machine->region("gfx1")->bytes();
+	gfxdata = machine.region("gfx1")->base();
+	len = machine.region("gfx1")->bytes();
 	for (i = 0; i < len; i += 4)
 	{
 		for (j = 0; j < 4; j++)
@@ -4225,8 +4225,8 @@ static DRIVER_INIT( tmnt )
         be shuffled around because the ROMs are connected differently to the
         051937 custom IC.
     */
-	gfxdata = machine->region("gfx2")->base();
-	len = machine->region("gfx2")->bytes();
+	gfxdata = machine.region("gfx2")->base();
+	len = machine.region("gfx2")->bytes();
 	for (i = 0; i < len; i += 4)
 	{
 		for (j = 0; j < 4; j++)
@@ -4243,7 +4243,7 @@ static DRIVER_INIT( tmnt )
 
 	temp = auto_alloc_array(machine, UINT8, len);
 	memcpy(temp, gfxdata, len);
-	code_conv_table = &machine->region("proms")->base()[0x0000];
+	code_conv_table = &machine.region("proms")->base()[0x0000];
 	for (A = 0; A < len / 4; A++)
 	{
 #define CA0 0
@@ -4298,8 +4298,8 @@ static DRIVER_INIT( tmnt )
 
 static DRIVER_INIT( cuebrick )
 {
-	tmnt_state *state = machine->driver_data<tmnt_state>();
-	machine->device<nvram_device>("nvram")->set_base(state->m_cuebrick_nvram, sizeof(state->m_cuebrick_nvram));
+	tmnt_state *state = machine.driver_data<tmnt_state>();
+	machine.device<nvram_device>("nvram")->set_base(state->m_cuebrick_nvram, sizeof(state->m_cuebrick_nvram));
 }
 
 GAME( 1989, cuebrick,    0,        cuebrick, cuebrick, cuebrick, ROT0,  "Konami", "Cue Brick (World version D)", GAME_SUPPORTS_SAVE )

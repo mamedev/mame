@@ -795,7 +795,7 @@ static UINT8 bit_xor;
 static struct slapstic_data slapstic;
 
 
-static void slapstic_log(running_machine *machine, offs_t offset);
+static void slapstic_log(running_machine &machine, offs_t offset);
 static FILE *slapsticlog;
 
 
@@ -805,9 +805,9 @@ static FILE *slapsticlog;
  *
  *************************************/
 
-void slapstic_init(running_machine *machine, int chip)
+void slapstic_init(running_machine &machine, int chip)
 {
-	device_type cputype = machine->device("maincpu")->type();
+	device_type cputype = machine.device("maincpu")->type();
 
 	/* only a small number of chips are known to exist */
 	if (chip < 101 || chip > 118)
@@ -1121,7 +1121,7 @@ int slapstic_tweak(address_space *space, offs_t offset)
 
 	/* log this access */
 	if (LOG_SLAPSTIC)
-		slapstic_log(space->machine, offset);
+		slapstic_log(space->machine(), offset);
 
 	/* return the active bank */
 	return current_bank;
@@ -1135,7 +1135,7 @@ int slapstic_tweak(address_space *space, offs_t offset)
  *
  *************************************/
 
-static void slapstic_log(running_machine *machine, offs_t offset)
+static void slapstic_log(running_machine &machine, offs_t offset)
 {
 	static attotime last_time;
 
@@ -1143,13 +1143,13 @@ static void slapstic_log(running_machine *machine, offs_t offset)
 		slapsticlog = fopen("slapstic.log", "w");
 	if (slapsticlog)
 	{
-		attotime time = machine->time();
+		attotime time = machine.time();
 
 		if ((time - last_time) > attotime::from_seconds(1))
 			fprintf(slapsticlog, "------------------------------------\n");
 		last_time = time;
 
-		fprintf(slapsticlog, "%s: %04X B=%d ", machine->describe_context(), offset, current_bank);
+		fprintf(slapsticlog, "%s: %04X B=%d ", machine.describe_context(), offset, current_bank);
 		switch (state)
 		{
 			case DISABLED:

@@ -100,7 +100,7 @@ typedef void (*poly_draw_scanline_func)(void *dest, INT32 scanline, const poly_e
 /* ----- initialization/teardown ----- */
 
 /* allocate a new poly manager that can render triangles */
-poly_manager *poly_alloc(running_machine *machine, int max_polys, size_t extra_data_size, UINT8 flags);
+poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t extra_data_size, UINT8 flags);
 
 /* free a poly manager */
 void poly_free(poly_manager *poly);

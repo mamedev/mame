@@ -16,14 +16,14 @@ Atari Starship 1 driver
 
 static INTERRUPT_GEN( starshp1_interrupt )
 {
-	if ((input_port_read(device->machine, "SYSTEM") & 0x90) != 0x90)
+	if ((input_port_read(device->machine(), "SYSTEM") & 0x90) != 0x90)
 		generic_pulse_irq_line(device, 0);
 }
 
 
 static WRITE8_DEVICE_HANDLER( starshp1_audio_w )
 {
-	starshp1_state *state = device->machine->driver_data<starshp1_state>();
+	starshp1_state *state = device->machine().driver_data<starshp1_state>();
 	data &= 1;
 
 	switch (offset & 7)
@@ -53,36 +53,36 @@ static WRITE8_DEVICE_HANDLER( starshp1_audio_w )
 		break;
 	}
 
-	coin_lockout_w(device->machine, 0, !state->attract);
-	coin_lockout_w(device->machine, 1, !state->attract);
+	coin_lockout_w(device->machine(), 0, !state->attract);
+	coin_lockout_w(device->machine(), 1, !state->attract);
 }
 
 
 static WRITE8_HANDLER( starshp1_collision_reset_w )
 {
-	starshp1_state *state = space->machine->driver_data<starshp1_state>();
+	starshp1_state *state = space->machine().driver_data<starshp1_state>();
 	state->collision_latch = 0;
 }
 
 
 static CUSTOM_INPUT( starshp1_analog_r )
 {
-	starshp1_state *state = field->port->machine->driver_data<starshp1_state>();
+	starshp1_state *state = field->port->machine().driver_data<starshp1_state>();
 	int val = 0;
 
 	switch (state->analog_in_select)
 	{
 	case 0:
-		val = input_port_read(field->port->machine, "STICKY");
+		val = input_port_read(field->port->machine(), "STICKY");
 		break;
 	case 1:
-		val = input_port_read(field->port->machine, "STICKX");
+		val = input_port_read(field->port->machine(), "STICKX");
 		break;
 	case 2:
 		val = 0x20; /* DAC feedback, not used */
 		break;
 	case 3:
-		val = input_port_read(field->port->machine, "PLAYTIME");
+		val = input_port_read(field->port->machine(), "PLAYTIME");
 		break;
 	}
 
@@ -92,21 +92,21 @@ static CUSTOM_INPUT( starshp1_analog_r )
 
 static CUSTOM_INPUT( collision_latch_r )
 {
-	starshp1_state *state = field->port->machine->driver_data<starshp1_state>();
+	starshp1_state *state = field->port->machine().driver_data<starshp1_state>();
 	return state->collision_latch & 0x0f;
 }
 
 
 static WRITE8_HANDLER( starshp1_analog_in_w )
 {
-	starshp1_state *state = space->machine->driver_data<starshp1_state>();
+	starshp1_state *state = space->machine().driver_data<starshp1_state>();
 	state->analog_in_select = offset & 3;
 }
 
 
 static WRITE8_DEVICE_HANDLER( starshp1_analog_out_w )
 {
-	starshp1_state *state = device->machine->driver_data<starshp1_state>();
+	starshp1_state *state = device->machine().driver_data<starshp1_state>();
 	switch (offset & 7)
 	{
 	case 1:
@@ -136,7 +136,7 @@ static WRITE8_DEVICE_HANDLER( starshp1_analog_out_w )
 
 static WRITE8_HANDLER( starshp1_misc_w )
 {
-	starshp1_state *state = space->machine->driver_data<starshp1_state>();
+	starshp1_state *state = space->machine().driver_data<starshp1_state>();
 	data &= 1;
 
 	switch (offset & 7)
@@ -163,7 +163,7 @@ static WRITE8_HANDLER( starshp1_misc_w )
 		state->mux = data;
 		break;
 	case 7:
-		set_led_status(space->machine, 0, !data);
+		set_led_status(space->machine(), 0, !data);
 		break;
 	}
 }

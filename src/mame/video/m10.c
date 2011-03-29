@@ -48,9 +48,9 @@ static UINT32 tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_
 }
 
 
-static void get_tile_info( running_machine *machine, tile_data *tileinfo, tilemap_memory_index tile_index, void *param )
+static void get_tile_info( running_machine &machine, tile_data *tileinfo, tilemap_memory_index tile_index, void *param )
 {
-	m10_state *state = machine->driver_data<m10_state>();
+	m10_state *state = machine.driver_data<m10_state>();
 
 	SET_TILE_INFO(0, state->videoram[tile_index], state->colorram[tile_index] & 0x07, 0);
 }
@@ -58,7 +58,7 @@ static void get_tile_info( running_machine *machine, tile_data *tileinfo, tilema
 
 WRITE8_HANDLER( m10_colorram_w )
 {
-	m10_state *state = space->machine->driver_data<m10_state>();
+	m10_state *state = space->machine().driver_data<m10_state>();
 
 	if (state->colorram[offset] != data)
 	{
@@ -70,7 +70,7 @@ WRITE8_HANDLER( m10_colorram_w )
 
 WRITE8_HANDLER( m10_chargen_w )
 {
-	m10_state *state = space->machine->driver_data<m10_state>();
+	m10_state *state = space->machine().driver_data<m10_state>();
 
 	if (state->chargen[offset] != data)
 	{
@@ -82,19 +82,19 @@ WRITE8_HANDLER( m10_chargen_w )
 
 WRITE8_HANDLER( m15_chargen_w )
 {
-	m10_state *state = space->machine->driver_data<m10_state>();
+	m10_state *state = space->machine().driver_data<m10_state>();
 
 	if (state->chargen[offset] != data)
 	{
 		state->chargen[offset] = data;
-		gfx_element_mark_dirty(space->machine->gfx[0], offset >> 3);
+		gfx_element_mark_dirty(space->machine().gfx[0], offset >> 3);
 	}
 }
 
 
-INLINE void plot_pixel_m10( running_machine *machine, bitmap_t *bm, int x, int y, int col )
+INLINE void plot_pixel_m10( running_machine &machine, bitmap_t *bm, int x, int y, int col )
 {
-	m10_state *state = machine->driver_data<m10_state>();
+	m10_state *state = machine.driver_data<m10_state>();
 
 	if (!state->flip)
 		*BITMAP_ADDR16(bm, y, x) = col;
@@ -105,7 +105,7 @@ INLINE void plot_pixel_m10( running_machine *machine, bitmap_t *bm, int x, int y
 
 VIDEO_START( m10 )
 {
-	m10_state *state = machine->driver_data<m10_state>();
+	m10_state *state = machine.driver_data<m10_state>();
 
 	state->tx_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(state->tx_tilemap, 0);
@@ -114,15 +114,15 @@ VIDEO_START( m10 )
 
 	state->back_gfx = gfx_element_alloc(machine, &backlayout, state->chargen, 8, 0);
 
-	machine->gfx[1] = state->back_gfx;
+	machine.gfx[1] = state->back_gfx;
 	return ;
 }
 
 VIDEO_START( m15 )
 {
-	m10_state *state = machine->driver_data<m10_state>();
+	m10_state *state = machine.driver_data<m10_state>();
 
-	machine->gfx[0] = gfx_element_alloc(machine, &charlayout, state->chargen, 8, 0);
+	machine.gfx[0] = gfx_element_alloc(machine, &charlayout, state->chargen, 8, 0);
 
 	state->tx_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan, 8, 8, 32, 32);
 	tilemap_set_scrolldx(state->tx_tilemap, 0, 116);
@@ -139,7 +139,7 @@ VIDEO_START( m15 )
 
 SCREEN_UPDATE( m10 )
 {
-	m10_state *state = screen->machine->driver_data<m10_state>();
+	m10_state *state = screen->machine().driver_data<m10_state>();
 	int offs;
 	static const int color[4]= { 3, 3, 5, 5 };
 	static const int xpos[4] = { 4*8, 26*8, 7*8, 6*8};
@@ -158,7 +158,7 @@ SCREEN_UPDATE( m10 )
 		int y;
 
 		for (y = IREMM10_VBEND; y < IREMM10_VBSTART; y++)
-			plot_pixel_m10(screen->machine, bitmap, 16, y, 1);
+			plot_pixel_m10(screen->machine(), bitmap, 16, y, 1);
 	}
 
 	for (offs = state->videoram_size - 1; offs >= 0; offs--)
@@ -179,7 +179,7 @@ SCREEN_UPDATE( m10 )
 
 SCREEN_UPDATE( m15 )
 {
-	m10_state *state = screen->machine->driver_data<m10_state>();
+	m10_state *state = screen->machine().driver_data<m10_state>();
 	int offs;
 
 	for (offs = state->videoram_size - 1; offs >= 0; offs--)

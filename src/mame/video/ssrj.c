@@ -5,7 +5,7 @@
 
 WRITE8_HANDLER(ssrj_vram1_w)
 {
-	ssrj_state *state = space->machine->driver_data<ssrj_state>();
+	ssrj_state *state = space->machine().driver_data<ssrj_state>();
 
 	state->vram1[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap1, offset>>1);
@@ -13,7 +13,7 @@ WRITE8_HANDLER(ssrj_vram1_w)
 
 static TILE_GET_INFO( get_tile_info1 )
 {
-	ssrj_state *state = machine->driver_data<ssrj_state>();
+	ssrj_state *state = machine.driver_data<ssrj_state>();
 	int code;
 	code = state->vram1[tile_index<<1] + (state->vram1[(tile_index<<1)+1]<<8);
 	SET_TILE_INFO(
@@ -27,7 +27,7 @@ static TILE_GET_INFO( get_tile_info1 )
 
 WRITE8_HANDLER(ssrj_vram2_w)
 {
-	ssrj_state *state = space->machine->driver_data<ssrj_state>();
+	ssrj_state *state = space->machine().driver_data<ssrj_state>();
 
 	state->vram2[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap2, offset>>1);
@@ -35,7 +35,7 @@ WRITE8_HANDLER(ssrj_vram2_w)
 
 static TILE_GET_INFO( get_tile_info2 )
 {
-	ssrj_state *state = machine->driver_data<ssrj_state>();
+	ssrj_state *state = machine.driver_data<ssrj_state>();
 	int code;
 	code = state->vram2[tile_index<<1] + (state->vram2[(tile_index<<1)+1]<<8);
 	SET_TILE_INFO(
@@ -49,7 +49,7 @@ static TILE_GET_INFO( get_tile_info2 )
 
 WRITE8_HANDLER(ssrj_vram4_w)
 {
-	ssrj_state *state = space->machine->driver_data<ssrj_state>();
+	ssrj_state *state = space->machine().driver_data<ssrj_state>();
 
 	state->vram4[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap4, offset>>1);
@@ -57,7 +57,7 @@ WRITE8_HANDLER(ssrj_vram4_w)
 
 static TILE_GET_INFO( get_tile_info4 )
 {
-	ssrj_state *state = machine->driver_data<ssrj_state>();
+	ssrj_state *state = machine.driver_data<ssrj_state>();
 	int code;
 	code = state->vram4[tile_index<<1] + (state->vram4[(tile_index<<1)+1]<<8);
 	SET_TILE_INFO(
@@ -224,7 +224,7 @@ static const UINT8 fakecols[4*4][8][3]=
 
 VIDEO_START( ssrj )
 {
-	ssrj_state *state = machine->driver_data<ssrj_state>();
+	ssrj_state *state = machine.driver_data<ssrj_state>();
 
 	state->tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 8, 8, 32, 32);
 	state->tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 8, 8, 32, 32);
@@ -234,9 +234,9 @@ VIDEO_START( ssrj )
 }
 
 
-static void draw_objects(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_objects(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	ssrj_state *state = machine->driver_data<ssrj_state>();
+	ssrj_state *state = machine.driver_data<ssrj_state>();
 	int i,j,k,x,y;
 
 	for(i=0;i<6;i++)
@@ -252,7 +252,7 @@ static void draw_objects(running_machine *machine, bitmap_t *bitmap, const recta
 
 					code = state->vram3[offs] + 256 * state->vram3[offs + 1];
 					drawgfx_transpen(bitmap,
-						cliprect,machine->gfx[0],
+						cliprect,machine.gfx[0],
 						code&1023,
 						((code>>12)&0x3)+8,
 						code&0x8000,
@@ -275,12 +275,12 @@ PALETTE_INIT( ssrj )
 
 SCREEN_UPDATE( ssrj )
 {
-	ssrj_state *state = screen->machine->driver_data<ssrj_state>();
+	ssrj_state *state = screen->machine().driver_data<ssrj_state>();
 
 	tilemap_set_scrolly(state->tilemap1, 0, 0xff-state->scrollram[2] );
 	tilemap_set_scrollx(state->tilemap1, 0, state->scrollram[0] );
 	tilemap_draw(bitmap, cliprect, state->tilemap1, 0, 0);
-	draw_objects(screen->machine, bitmap, cliprect);
+	draw_objects(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->tilemap2, 0, 0);
 
 	if (state->scrollram[0x101] == 0xb) tilemap_draw(bitmap, cliprect, state->tilemap4, 0, 0);/* hack to display 4th tilemap */

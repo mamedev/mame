@@ -76,7 +76,7 @@ static PALETTE_INIT(quizo)
 
 static SCREEN_UPDATE( quizo )
 {
-	quizo_state *state = screen->machine->driver_data<quizo_state>();
+	quizo_state *state = screen->machine().driver_data<quizo_state>();
 	UINT8 *videoram = state->videoram;
 	int x,y;
 	for(y=0;y<200;y++)
@@ -108,7 +108,7 @@ static SCREEN_UPDATE( quizo )
 
 static WRITE8_HANDLER(vram_w)
 {
-	quizo_state *state = space->machine->driver_data<quizo_state>();
+	quizo_state *state = space->machine().driver_data<quizo_state>();
 	UINT8 *videoram = state->videoram;
 	int bank=(port70&8)?1:0;
 	videoram[offset+bank*0x4000]=data;
@@ -127,7 +127,7 @@ static WRITE8_HANDLER(port60_w)
 		data=0;
 	}
 	port60=data;
-	memory_set_bankptr(space->machine,  "bank1", &space->machine->region("user1")->base()[rombankLookup[data]*0x4000] );
+	memory_set_bankptr(space->machine(),  "bank1", &space->machine().region("user1")->base()[rombankLookup[data]*0x4000] );
 }
 
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
@@ -258,7 +258,7 @@ ROM_END
 
 static DRIVER_INIT(quizo)
 {
-	quizo_state *state = machine->driver_data<quizo_state>();
+	quizo_state *state = machine.driver_data<quizo_state>();
 	state->videoram=auto_alloc_array(machine, UINT8, 0x4000*2);
 }
 

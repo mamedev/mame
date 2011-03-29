@@ -10,13 +10,13 @@
 
 
 
-void qdrmfgp_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags)
+void qdrmfgp_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags)
 {
-	qdrmfgp_state *state = machine->driver_data<qdrmfgp_state>();
+	qdrmfgp_state *state = machine.driver_data<qdrmfgp_state>();
 	*color = ((*color>>2) & 0x0f) | state->pal;
 }
 
-void qdrmfgp2_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags)
+void qdrmfgp2_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags)
 {
 	*color = (*color>>1) & 0x7f;
 }
@@ -29,7 +29,7 @@ void qdrmfgp2_tile_callback(running_machine *machine, int layer, int *code, int 
 
 VIDEO_START( qdrmfgp )
 {
-	device_t *k056832 = machine->device("k056832");
+	device_t *k056832 = machine.device("k056832");
 
 	k056832_set_layer_association(k056832, 0);
 
@@ -41,7 +41,7 @@ VIDEO_START( qdrmfgp )
 
 VIDEO_START( qdrmfgp2 )
 {
-	device_t *k056832 = machine->device("k056832");
+	device_t *k056832 = machine.device("k056832");
 
 	k056832_set_layer_association(k056832, 0);
 
@@ -59,8 +59,8 @@ VIDEO_START( qdrmfgp2 )
 
 SCREEN_UPDATE( qdrmfgp )
 {
-	device_t *k056832 = screen->machine->device("k056832");
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	device_t *k056832 = screen->machine().device("k056832");
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 3, 0, 1);
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 2, 0, 2);

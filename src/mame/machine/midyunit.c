@@ -28,7 +28,7 @@
 
 WRITE16_HANDLER( midyunit_cmos_w )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	logerror("%08x:CMOS Write @ %05X\n", cpu_get_pc(space->cpu), offset);
 	COMBINE_DATA(&state->cmos_ram[offset + state->cmos_page]);
 }
@@ -36,7 +36,7 @@ WRITE16_HANDLER( midyunit_cmos_w )
 
 READ16_HANDLER( midyunit_cmos_r )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	return state->cmos_ram[offset + state->cmos_page];
 }
 
@@ -50,7 +50,7 @@ READ16_HANDLER( midyunit_cmos_r )
 
 WRITE16_HANDLER( midyunit_cmos_enable_w )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	state->cmos_w_enable = (~data >> 9) & 1;
 
 	logerror("%08x:Protection write = %04X\n", cpu_get_pc(space->cpu), data);
@@ -101,7 +101,7 @@ WRITE16_HANDLER( midyunit_cmos_enable_w )
 
 READ16_HANDLER( midyunit_protection_r )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	/* return the most recently clocked value */
 	logerror("%08X:Protection read = %04X\n", cpu_get_pc(space->cpu), state->prot_result);
 	return state->prot_result;
@@ -119,7 +119,7 @@ READ16_HANDLER( midyunit_input_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "DSW", "UNK0", "UNK1" };
 
-	return input_port_read(space->machine, portnames[offset]);
+	return input_port_read(space->machine(), portnames[offset]);
 }
 
 
@@ -132,25 +132,25 @@ READ16_HANDLER( midyunit_input_r )
 
 static READ16_HANDLER( term2_input_r )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	static const char *const portnames[] = { "IN0", "IN1", NULL, "DSW", "UNK0", "UNK1" };
 
 	if (offset != 2)
-		return input_port_read(space->machine, portnames[offset]);
+		return input_port_read(space->machine(), portnames[offset]);
 
 	switch (state->term2_analog_select)
 	{
 		default:
-		case 0:  return input_port_read(space->machine, "STICK0_X");
-		case 1:  return input_port_read(space->machine, "STICK0_Y");
-		case 2:  return input_port_read(space->machine, "STICK1_X");
-		case 3:  return input_port_read(space->machine, "STICK1_Y");
+		case 0:  return input_port_read(space->machine(), "STICK0_X");
+		case 1:  return input_port_read(space->machine(), "STICK0_Y");
+		case 2:  return input_port_read(space->machine(), "STICK1_X");
+		case 3:  return input_port_read(space->machine(), "STICK1_Y");
 	}
 }
 
 static WRITE16_HANDLER( term2_sound_w )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	/* Flash Lamp Output Data */
 	if  ( ((data & 0x800) != 0x800) && ((data & 0x400) == 0x400 ) )
 	{
@@ -192,7 +192,7 @@ static WRITE16_HANDLER( term2_sound_w )
 
 static WRITE16_HANDLER( term2_hack_w )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	if (offset == 1 && cpu_get_pc(space->cpu) == 0xffce6520)
 	{
 		state->t2_hack_mem[offset] = 0;
@@ -203,7 +203,7 @@ static WRITE16_HANDLER( term2_hack_w )
 
 static WRITE16_HANDLER( term2la3_hack_w )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce5230)
 	{
 		state->t2_hack_mem[offset] = 0;
@@ -214,7 +214,7 @@ static WRITE16_HANDLER( term2la3_hack_w )
 
 static WRITE16_HANDLER( term2la2_hack_w )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce4b80)
 	{
 		state->t2_hack_mem[offset] = 0;
@@ -225,7 +225,7 @@ static WRITE16_HANDLER( term2la2_hack_w )
 
 static WRITE16_HANDLER( term2la1_hack_w )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce33f0)
 	{
 		state->t2_hack_mem[offset] = 0;
@@ -244,7 +244,7 @@ static WRITE16_HANDLER( term2la1_hack_w )
 
 static WRITE8_HANDLER( cvsd_protection_w )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	/* because the entire CVSD ROM is banked, we have to make sure that writes */
 	/* go to the proper location (i.e., bank 0); currently bank 0 always lives */
 	/* in the 0x10000-0x17fff space, so we just need to add 0x8000 to get the  */
@@ -253,16 +253,16 @@ static WRITE8_HANDLER( cvsd_protection_w )
 }
 
 
-static void init_generic(running_machine *machine, int bpp, int sound, int prot_start, int prot_end)
+static void init_generic(running_machine &machine, int bpp, int sound, int prot_start, int prot_end)
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	offs_t gfx_chunk = state->gfx_rom_size / 4;
 	UINT8 d1, d2, d3, d4, d5, d6;
 	UINT8 *base;
 	int i;
 
 	/* load graphics ROMs */
-	base = machine->region("gfx1")->base();
+	base = machine.region("gfx1")->base();
 	switch (bpp)
 	{
 		case 4:
@@ -310,23 +310,23 @@ static void init_generic(running_machine *machine, int bpp, int sound, int prot_
 	{
 		case SOUND_CVSD_SMALL:
 			williams_cvsd_init(machine);
-			machine->device("cvsdcpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(prot_start, prot_end, FUNC(cvsd_protection_w));
-			state->cvsd_protection_base = machine->region("cvsdcpu")->base() + 0x10000 + (prot_start - 0x8000);
+			machine.device("cvsdcpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(prot_start, prot_end, FUNC(cvsd_protection_w));
+			state->cvsd_protection_base = machine.region("cvsdcpu")->base() + 0x10000 + (prot_start - 0x8000);
 			break;
 
 		case SOUND_CVSD:
 			williams_cvsd_init(machine);
-			machine->device("cvsdcpu")->memory().space(AS_PROGRAM)->install_ram(prot_start, prot_end);
+			machine.device("cvsdcpu")->memory().space(AS_PROGRAM)->install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_ADPCM:
 			williams_adpcm_init(machine);
-			machine->device("adpcm")->memory().space(AS_PROGRAM)->install_ram(prot_start, prot_end);
+			machine.device("adpcm")->memory().space(AS_PROGRAM)->install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_NARC:
 			williams_narc_init(machine);
-			machine->device("narc1cpu")->memory().space(AS_PROGRAM)->install_ram(prot_start, prot_end);
+			machine.device("narc1cpu")->memory().space(AS_PROGRAM)->install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_YAWDIM:
@@ -366,7 +366,7 @@ DRIVER_INIT( narc )
 
 DRIVER_INIT( trog )
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
 	static const struct protection_data trog_protection_data =
 	{
@@ -396,7 +396,7 @@ DRIVER_INIT( smashtv )
 
 DRIVER_INIT( hiimpact )
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
 	static const struct protection_data hiimpact_protection_data =
 	{
@@ -415,7 +415,7 @@ DRIVER_INIT( hiimpact )
 
 DRIVER_INIT( shimpact )
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
 	static const struct protection_data shimpact_protection_data =
 	{
@@ -434,7 +434,7 @@ DRIVER_INIT( shimpact )
 
 DRIVER_INIT( strkforc )
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
 	static const struct protection_data strkforc_protection_data =
 	{
@@ -461,7 +461,7 @@ DRIVER_INIT( strkforc )
 
 DRIVER_INIT( mkyunit )
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
 	static const struct protection_data mk_protection_data =
 	{
@@ -493,22 +493,22 @@ static READ16_HANDLER( mkturbo_prot_r )
 {
 	/* the security GAL overlays a counter of some sort at 0xfffff400 in ROM space.
      * A startup protection check expects to read back two different values in succession */
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 DRIVER_INIT( mkyturbo )
 {
 	/* protection */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfffff400, 0xfffff40f, FUNC(mkturbo_prot_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfffff400, 0xfffff40f, FUNC(mkturbo_prot_r));
 
 	DRIVER_INIT_CALL(mkyunit);
 }
 
 /********************** Terminator 2 **********************/
 
-static void term2_init_common(running_machine *machine, write16_space_func hack_w)
+static void term2_init_common(running_machine &machine, write16_space_func hack_w)
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
 	static const struct protection_data term2_protection_data =
 	{
@@ -521,12 +521,12 @@ static void term2_init_common(running_machine *machine, write16_space_func hack_
 	init_generic(machine, 6, SOUND_ADPCM, 0xfa8d, 0xfa9c);
 
 	/* special inputs */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01c00000, 0x01c0005f, FUNC(term2_input_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01e00000, 0x01e0001f, FUNC(term2_sound_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01c00000, 0x01c0005f, FUNC(term2_input_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01e00000, 0x01e0001f, FUNC(term2_sound_w));
 
 	/* HACK: this prevents the freeze on the movies */
 	/* until we figure whats causing it, this is better than nothing */
-	state->t2_hack_mem = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x010aa0e0, 0x010aa0ff, FUNC(hack_w));
+	state->t2_hack_mem = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x010aa0e0, 0x010aa0ff, FUNC(hack_w));
 }
 
 DRIVER_INIT( term2 ) { term2_init_common(machine, term2_hack_w); }
@@ -540,7 +540,7 @@ DRIVER_INIT( term2la1 ) { term2_init_common(machine, term2la1_hack_w); }
 
 DRIVER_INIT( totcarn )
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
 	static const struct protection_data totcarn_protection_data =
 	{
@@ -564,7 +564,7 @@ DRIVER_INIT( totcarn )
 
 MACHINE_RESET( midyunit )
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* reset sound */
 	switch (state->chip_type)
 	{
@@ -599,7 +599,7 @@ MACHINE_RESET( midyunit )
 
 WRITE16_HANDLER( midyunit_sound_w )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
@@ -618,7 +618,7 @@ WRITE16_HANDLER( midyunit_sound_w )
 			case SOUND_CVSD_SMALL:
 			case SOUND_CVSD:
 				williams_cvsd_reset_w((~data & 0x100) >> 8);
-				williams_cvsd_data_w(space->machine, (data & 0xff) | ((data & 0x200) >> 1));
+				williams_cvsd_data_w(space->machine(), (data & 0xff) | ((data & 0x200) >> 1));
 				break;
 
 			case SOUND_ADPCM:
@@ -628,7 +628,7 @@ WRITE16_HANDLER( midyunit_sound_w )
 
 			case SOUND_YAWDIM:
 				soundlatch_w(space, 0, data);
-				cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 				break;
 		}
 }

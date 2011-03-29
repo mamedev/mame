@@ -328,7 +328,7 @@ PALETTE_INIT( galaga )
 {
 	int i;
 
-	machine->colortable = colortable_alloc(machine, 32+64);
+	machine.colortable = colortable_alloc(machine, 32+64);
 
 	/* core palette */
 	for (i = 0;i < 32;i++)
@@ -348,7 +348,7 @@ PALETTE_INIT( galaga )
 		bit2 = ((*color_prom) >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine.colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -365,20 +365,20 @@ PALETTE_INIT( galaga )
 		bits = (i >> 4) & 0x03;
 		b = map[bits];
 
-		colortable_palette_set_color(machine->colortable,32 + i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine.colortable,32 + i,MAKE_RGB(r,g,b));
 	}
 
 	/* characters */
 	for (i = 0;i < 64*4;i++)
-		colortable_entry_set_value(machine->colortable, i, (*(color_prom++) & 0x0f) + 0x10);	/* chars */
+		colortable_entry_set_value(machine.colortable, i, (*(color_prom++) & 0x0f) + 0x10);	/* chars */
 
 	/* sprites */
 	for (i = 0;i < 64*4;i++)
-		colortable_entry_set_value(machine->colortable, 64*4+i, (*(color_prom++) & 0x0f));
+		colortable_entry_set_value(machine.colortable, 64*4+i, (*(color_prom++) & 0x0f));
 
 	/* now the stars */
 	for (i = 0;i < 64;i++)
-		colortable_entry_set_value(machine->colortable, 64*4+64*4+i, 32 + i);
+		colortable_entry_set_value(machine.colortable, 64*4+64*4+i, 32 + i);
 }
 
 
@@ -412,7 +412,7 @@ static TILE_GET_INFO( get_tile_info )
        timing signals, while x flip is done by selecting the 2nd character set.
        We reproduce this here, but since the tilemap system automatically flips
        characters when screen is flipped, we have to flip them back. */
-	galaga_state *state =  machine->driver_data<galaga_state>();
+	galaga_state *state =  machine.driver_data<galaga_state>();
     int color = state->videoram[tile_index + 0x400] & 0x3f;
 	SET_TILE_INFO(
 			0,
@@ -432,9 +432,9 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( galaga )
 {
-	galaga_state *state =  machine->driver_data<galaga_state>();
+	galaga_state *state =  machine.driver_data<galaga_state>();
 	state->fg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan,8,8,36,28);
-	colortable_configure_tilemap_groups(machine->colortable, state->fg_tilemap, machine->gfx[0], 0x1f);
+	colortable_configure_tilemap_groups(machine.colortable, state->fg_tilemap, machine.gfx[0], 0x1f);
 
 	state->galaga_gfxbank = 0;
 
@@ -454,7 +454,7 @@ VIDEO_START( galaga )
 
 WRITE8_HANDLER( galaga_videoram_w )
 {
-	galaga_state *state =  space->machine->driver_data<galaga_state>();
+	galaga_state *state =  space->machine().driver_data<galaga_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset & 0x3ff);
@@ -462,7 +462,7 @@ WRITE8_HANDLER( galaga_videoram_w )
 
 WRITE8_HANDLER ( gatsbee_bank_w )
 {
-	galaga_state *state =  space->machine->driver_data<galaga_state>();
+	galaga_state *state =  space->machine().driver_data<galaga_state>();
 
 	state->galaga_gfxbank = data & 0x1;
 	tilemap_mark_all_tiles_dirty(state->fg_tilemap);
@@ -476,9 +476,9 @@ WRITE8_HANDLER ( gatsbee_bank_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	galaga_state *state =  machine->driver_data<galaga_state>();
+	galaga_state *state =  machine.driver_data<galaga_state>();
 
 	UINT8 *spriteram = state->galaga_ram1 + 0x380;
 	UINT8 *spriteram_2 = state->galaga_ram2 + 0x380;
@@ -517,21 +517,21 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			for (x = 0;x <= sizex;x++)
 			{
-				drawgfx_transmask(bitmap,cliprect,machine->gfx[1],
+				drawgfx_transmask(bitmap,cliprect,machine.gfx[1],
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 					color,
 					flipx,flipy,
 					sx + 16*x, sy + 16*y,
-					colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0x0f));
+					colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0x0f));
 			}
 		}
 	}
 }
 
 
-static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_stars(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	galaga_state *state =  machine->driver_data<galaga_state>();
+	galaga_state *state =  machine.driver_data<galaga_state>();
 	/* draw the stars */
 
 	/* $a005 controls the stars ON/OFF */
@@ -568,11 +568,11 @@ static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectang
 
 SCREEN_UPDATE( galaga )
 {
-	galaga_state *state =  screen->machine->driver_data<galaga_state>();
+	galaga_state *state =  screen->machine().driver_data<galaga_state>();
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
-	draw_stars(screen->machine,bitmap,cliprect);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	draw_stars(screen->machine(),bitmap,cliprect);
+	draw_sprites(screen->machine(),bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
 	return 0;
 }
@@ -581,7 +581,7 @@ SCREEN_UPDATE( galaga )
 
 SCREEN_EOF( galaga )
 {
-	galaga_state *state =  machine->driver_data<galaga_state>();
+	galaga_state *state =  machine.driver_data<galaga_state>();
 	/* this function is called by galaga_interrupt_1() */
 	int s0,s1,s2;
 	static const int speeds[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };

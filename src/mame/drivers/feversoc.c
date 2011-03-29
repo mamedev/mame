@@ -84,11 +84,11 @@ static VIDEO_START( feversoc )
 
 static SCREEN_UPDATE( feversoc )
 {
-	feversoc_state *state = screen->machine->driver_data<feversoc_state>();
+	feversoc_state *state = screen->machine().driver_data<feversoc_state>();
 	UINT32 *spriteram32 = state->spriteram;
 	int offs,spr_offs,colour,sx,sy,h,w,dx,dy;
 
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]); //black pen
+	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]); //black pen
 
 	for(offs=(0x2000/4)-2;offs>-1;offs-=2)
 	{
@@ -106,7 +106,7 @@ static SCREEN_UPDATE( feversoc )
 
 		for(dx=0;dx<w;dx++)
 			for(dy=0;dy<h;dy++)
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),0x3f);
+				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),0x3f);
 	}
 
 	return 0;
@@ -115,27 +115,27 @@ static SCREEN_UPDATE( feversoc )
 static WRITE32_HANDLER( fs_paletteram_w )
 {
 	int r,g,b;
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
 
-	r = ((space->machine->generic.paletteram.u32[offset] & 0x001f0000)>>16) << 3;
-	g = ((space->machine->generic.paletteram.u32[offset] & 0x03e00000)>>16) >> 2;
-	b = ((space->machine->generic.paletteram.u32[offset] & 0x7c000000)>>16) >> 7;
+	r = ((space->machine().generic.paletteram.u32[offset] & 0x001f0000)>>16) << 3;
+	g = ((space->machine().generic.paletteram.u32[offset] & 0x03e00000)>>16) >> 2;
+	b = ((space->machine().generic.paletteram.u32[offset] & 0x7c000000)>>16) >> 7;
 
-	palette_set_color(space->machine,offset*2+0,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine(),offset*2+0,MAKE_RGB(r,g,b));
 
-	r = (space->machine->generic.paletteram.u32[offset] & 0x001f) << 3;
-	g = (space->machine->generic.paletteram.u32[offset] & 0x03e0) >> 2;
-	b = (space->machine->generic.paletteram.u32[offset] & 0x7c00) >> 7;
+	r = (space->machine().generic.paletteram.u32[offset] & 0x001f) << 3;
+	g = (space->machine().generic.paletteram.u32[offset] & 0x03e0) >> 2;
+	b = (space->machine().generic.paletteram.u32[offset] & 0x7c00) >> 7;
 
-	palette_set_color(space->machine,offset*2+1,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine(),offset*2+1,MAKE_RGB(r,g,b));
 }
 
 static READ32_HANDLER( in0_r )
 {
-	feversoc_state *state = space->machine->driver_data<feversoc_state>();
+	feversoc_state *state = space->machine().driver_data<feversoc_state>();
 
 	state->x^=0x40; //vblank? eeprom read bit?
-	return (input_port_read(space->machine, "IN0") | state->x) | (input_port_read(space->machine, "IN1")<<16);
+	return (input_port_read(space->machine(), "IN0") | state->x) | (input_port_read(space->machine(), "IN1")<<16);
 }
 
 static WRITE32_HANDLER( output_w )
@@ -143,19 +143,19 @@ static WRITE32_HANDLER( output_w )
 	if(ACCESSING_BITS_16_31)
 	{
 		/* probably eeprom stuff too */
-		coin_lockout_w(space->machine, 0,~data>>16 & 0x40);
-		coin_lockout_w(space->machine, 1,~data>>16 & 0x40);
-		coin_counter_w(space->machine, 0,data>>16 & 1);
+		coin_lockout_w(space->machine(), 0,~data>>16 & 0x40);
+		coin_lockout_w(space->machine(), 1,~data>>16 & 0x40);
+		coin_counter_w(space->machine(), 0,data>>16 & 1);
 		//data>>16 & 2 coin out
-		coin_counter_w(space->machine, 1,data>>16 & 4);
+		coin_counter_w(space->machine(), 1,data>>16 & 4);
 		//data>>16 & 8 coin hopper
-		okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+		okim6295_device *oki = space->machine().device<okim6295_device>("oki");
 		oki->set_bank_base(0x40000 * (((data>>16) & 0x20)>>5));
 	}
 	if(ACCESSING_BITS_0_15)
 	{
 		/* -xxx xxxx lamps*/
-		coin_counter_w(space->machine, 2,data & 0x2000); //key in
+		coin_counter_w(space->machine(), 2,data & 0x2000); //key in
 		//data & 0x4000 key out
 	}
 }
@@ -244,7 +244,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( feversoc_irq )
 {
-	cputag_set_input_line(device->machine, "maincpu", 8, HOLD_LINE );
+	cputag_set_input_line(device->machine(), "maincpu", 8, HOLD_LINE );
 }
 
 static MACHINE_CONFIG_START( feversoc, feversoc_state )
@@ -296,7 +296,7 @@ ROM_END
 
 static DRIVER_INIT( feversoc )
 {
-	seibuspi_rise11_sprite_decrypt_feversoc(machine->region("gfx1")->base(), 0x200000);
+	seibuspi_rise11_sprite_decrypt_feversoc(machine.region("gfx1")->base(), 0x200000);
 }
 
 GAME( 2004, feversoc,  0,       feversoc,  feversoc,  feversoc, ROT0, "Seibu Kaihatsu", "Fever Soccer", 0 )

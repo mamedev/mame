@@ -109,7 +109,7 @@
 
 static INTERRUPT_GEN( redalert_vblank_interrupt )
 {
-	if( input_port_read(device->machine, "COIN") )
+	if( input_port_read(device->machine(), "COIN") )
 		/* the service coin as conntected to the CPU's RDY pin as well */
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 
@@ -119,10 +119,10 @@ static INTERRUPT_GEN( redalert_vblank_interrupt )
 
 static READ8_HANDLER( redalert_interrupt_clear_r )
 {
-	cputag_set_input_line(space->machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 
 	/* the result never seems to be actually used */
-	return space->machine->primary_screen->vpos();
+	return space->machine().primary_screen->vpos();
 }
 
 
@@ -134,14 +134,14 @@ static WRITE8_HANDLER( redalert_interrupt_clear_w )
 
 static READ8_HANDLER( panther_interrupt_clear_r )
 {
-	cputag_set_input_line(space->machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 
-	return input_port_read(space->machine, "STICK0");
+	return input_port_read(space->machine(), "STICK0");
 }
 
 static READ8_HANDLER( panther_unk_r )
 {
-	return ((space->machine->rand() & 0x01) | (input_port_read(space->machine, "C020") & 0xfe));
+	return ((space->machine().rand() & 0x01) | (input_port_read(space->machine(), "C020") & 0xfe));
 }
 
 /*************************************

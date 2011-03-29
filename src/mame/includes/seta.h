@@ -88,7 +88,7 @@ public:
 
 /*----------- defined in video/seta.c -----------*/
 
-void seta_coin_lockout_w(running_machine *machine, int data);
+void seta_coin_lockout_w(running_machine &machine, int data);
 
 WRITE16_HANDLER( twineagl_tilebank_w );
 

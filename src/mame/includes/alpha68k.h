@@ -58,8 +58,8 @@ SCREEN_UPDATE( alpha68k_II );
 SCREEN_UPDATE( alpha68k_V );
 SCREEN_UPDATE( alpha68k_V_sb );
 
-void alpha68k_V_video_bank_w(running_machine *machine, int bank);
-void alpha68k_flipscreen_w(running_machine *machine, int flip);
+void alpha68k_V_video_bank_w(running_machine &machine, int bank);
+void alpha68k_flipscreen_w(running_machine &machine, int flip);
 
 WRITE16_HANDLER( alpha68k_paletteram_w );
 WRITE16_HANDLER( alpha68k_videoram_w );

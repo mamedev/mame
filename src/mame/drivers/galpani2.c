@@ -37,13 +37,13 @@ To Do:
 
 static READ16_DEVICE_HANDLER(galpani2_eeprom_r)
 {
-	galpani2_state *state = device->machine->driver_data<galpani2_state>();
+	galpani2_state *state = device->machine().driver_data<galpani2_state>();
 	return (state->eeprom_word & ~1) | (eeprom_read_bit(device) & 1);
 }
 
 static WRITE16_DEVICE_HANDLER(galpani2_eeprom_w)
 {
-	galpani2_state *state = device->machine->driver_data<galpani2_state>();
+	galpani2_state *state = device->machine().driver_data<galpani2_state>();
 	COMBINE_DATA( &state->eeprom_word );
 	if ( ACCESSING_BITS_0_7 )
 	{
@@ -78,7 +78,7 @@ static MACHINE_RESET( galpani2 )
 
 	kaneko16_sprite_xoffs = 0x10000 - 0x16c0 + 0xc00;
 	kaneko16_sprite_yoffs = 0x000;
-	machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); //initial mcu xchk
+	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); //initial mcu xchk
 }
 
 static void galpani2_write_kaneko(device_t *device)
@@ -112,9 +112,9 @@ static void galpani2_write_kaneko(device_t *device)
 
 static WRITE8_HANDLER( galpani2_mcu_init_w )
 {
-	running_machine *machine = space->machine;
-	address_space *srcspace = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	address_space *dstspace = machine->device("sub")->memory().space(AS_PROGRAM);
+	running_machine &machine = space->machine();
+	address_space *srcspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *dstspace = machine.device("sub")->memory().space(AS_PROGRAM);
 	UINT32 mcu_address, mcu_data;
 
 	for ( mcu_address = 0x100010; mcu_address < (0x100010 + 6); mcu_address += 1 )
@@ -125,10 +125,10 @@ static WRITE8_HANDLER( galpani2_mcu_init_w )
 	cputag_set_input_line(machine, "sub", INPUT_LINE_IRQ7, HOLD_LINE); //MCU Initialised
 }
 
-static void galpani2_mcu_nmi1(running_machine *machine)
+static void galpani2_mcu_nmi1(running_machine &machine)
 {
-	address_space *srcspace = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	address_space *dstspace = machine->device("sub")->memory().space(AS_PROGRAM);
+	address_space *srcspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *dstspace = machine.device("sub")->memory().space(AS_PROGRAM);
 	UINT32 mcu_list, mcu_command, mcu_address, mcu_extra, mcu_src, mcu_dst, mcu_size;
 
 	for ( mcu_list = 0x100021; mcu_list < (0x100021 + 0x40); mcu_list += 4 )
@@ -144,7 +144,7 @@ static void galpani2_mcu_nmi1(running_machine *machine)
 		if (mcu_command != 0)
 		{
 			logerror("%s : MCU [$%06X] endidx = $%02X / command = $%02X addr = $%04X ? = $%02X.\n",
-			machine->describe_context(),
+			machine.describe_context(),
 			mcu_list,
 			srcspace->read_byte(0x100020),
 			mcu_command,
@@ -167,7 +167,7 @@ static void galpani2_mcu_nmi1(running_machine *machine)
 
 			mcu_size	=	(srcspace->read_byte(mcu_address + 8)<<8) +
 							(srcspace->read_byte(mcu_address + 9)<<0) ;
-			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",machine->describe_context(),mcu_command,mcu_src,mcu_size,mcu_dst);
+			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",machine.describe_context(),mcu_command,mcu_src,mcu_size,mcu_dst);
 
 			for( ; mcu_size > 0 ; mcu_size-- )
 			{
@@ -192,7 +192,7 @@ static void galpani2_mcu_nmi1(running_machine *machine)
 			mcu_size	=	(srcspace->read_byte(mcu_address + 8)<<8) +
 							(srcspace->read_byte(mcu_address + 9)<<0) ;
 
-			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",machine->describe_context(),mcu_command,mcu_src,mcu_size,mcu_dst);
+			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",machine.describe_context(),mcu_command,mcu_src,mcu_size,mcu_dst);
 
 			for( ; mcu_size > 0 ; mcu_size-- )
 			{
@@ -220,7 +220,7 @@ static void galpani2_mcu_nmi1(running_machine *machine)
 			srcspace->write_byte(mcu_address+0,0xff);
 			srcspace->write_byte(mcu_address+1,0xff);
 
-			logerror("%s : MCU ERROR, unknown command $%02X\n",machine->describe_context(),mcu_command);
+			logerror("%s : MCU ERROR, unknown command $%02X\n",machine.describe_context(),mcu_command);
 		}
 
 		/* Erase command (so that it won't be processed again)? */
@@ -228,29 +228,29 @@ static void galpani2_mcu_nmi1(running_machine *machine)
 	}
 }
 
-static void galpani2_mcu_nmi2(running_machine *machine)
+static void galpani2_mcu_nmi2(running_machine &machine)
 {
-		galpani2_write_kaneko(machine->device("maincpu"));
-		//logerror("%s : MCU executes CHECKs synchro\n", machine->describe_context());
+		galpani2_write_kaneko(machine.device("maincpu"));
+		//logerror("%s : MCU executes CHECKs synchro\n", machine.describe_context());
 }
 
 static WRITE8_HANDLER( galpani2_mcu_nmi1_w ) //driven by CPU1's int5 ISR
 {
-	galpani2_state *state = space->machine->driver_data<galpani2_state>();
+	galpani2_state *state = space->machine().driver_data<galpani2_state>();
 //for galpan2t:
 //Triggered from 'maincpu' (00007D60),once, with no command, using alternate line, during init
 //Triggered from 'maincpu' (000080BE),once, for unknown command, during init
 //Triggered from 'maincpu' (0000741E),from here on...driven by int5, even if there's no command
-	if ( (data & 1) && !(state->old_mcu_nmi1 & 1) )	galpani2_mcu_nmi1(space->machine);
-	//if ( (data & 0x10) && !(state->old_mcu_nmi1 & 0x10) )    galpani2_mcu_nmi1(space->machine);
+	if ( (data & 1) && !(state->old_mcu_nmi1 & 1) )	galpani2_mcu_nmi1(space->machine());
+	//if ( (data & 0x10) && !(state->old_mcu_nmi1 & 0x10) )    galpani2_mcu_nmi1(space->machine());
 	//alternate line, same function?
 	state->old_mcu_nmi1 = data;
 }
 
 static WRITE8_HANDLER( galpani2_mcu_nmi2_w ) //driven by CPU2's int5 ISR
 {
-	galpani2_state *state = space->machine->driver_data<galpani2_state>();
-	if ( (data & 1) && !(state->old_mcu_nmi2 & 1) )	galpani2_mcu_nmi2(space->machine);
+	galpani2_state *state = space->machine().driver_data<galpani2_state>();
+	if ( (data & 1) && !(state->old_mcu_nmi2 & 1) )	galpani2_mcu_nmi2(space->machine());
 	state->old_mcu_nmi2 = data;
 }
 
@@ -265,10 +265,10 @@ static WRITE8_HANDLER( galpani2_mcu_nmi2_w ) //driven by CPU2's int5 ISR
 
 static WRITE8_HANDLER( galpani2_coin_lockout_w )
 {
-		coin_counter_w(space->machine, 0, data & 0x01);
-		coin_counter_w(space->machine, 1, data & 0x02);
-		coin_lockout_w(space->machine, 0,~data & 0x04);
-		coin_lockout_w(space->machine, 1,~data & 0x08);
+		coin_counter_w(space->machine(), 0, data & 0x01);
+		coin_counter_w(space->machine(), 1, data & 0x02);
+		coin_lockout_w(space->machine(), 0,~data & 0x04);
+		coin_lockout_w(space->machine(), 1,~data & 0x08);
 		// & 0x10     CARD in lockout?
 		// & 0x20     CARD in lockout?
 		// & 0x40     CARD out
@@ -276,8 +276,8 @@ static WRITE8_HANDLER( galpani2_coin_lockout_w )
 
 static WRITE8_DEVICE_HANDLER( galpani2_oki1_bank_w )
 {
-	UINT8 *ROM = device->machine->region("oki1")->base();
-	logerror("%s : %s bank %08X\n",device->machine->describe_context(),device->tag(),data);
+	UINT8 *ROM = device->machine().region("oki1")->base();
+	logerror("%s : %s bank %08X\n",device->machine().describe_context(),device->tag(),data);
 	memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 }
 
@@ -285,7 +285,7 @@ static WRITE8_DEVICE_HANDLER( galpani2_oki2_bank_w )
 {
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	oki->set_bank_base(0x40000 * (data & 0xf) );
-	logerror("%s : %s bank %08X\n",device->machine->describe_context(),device->tag(),data);
+	logerror("%s : %s bank %08X\n",device->machine().describe_context(),device->tag(),data);
 }
 
 
@@ -350,9 +350,9 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( galpani2_bankedrom_r )
 {
-	galpani2_state *state = space->machine->driver_data<galpani2_state>();
-	UINT16 *ROM = (UINT16 *) space->machine->region( "user1" )->base();
-	size_t    len = space->machine->region( "user1" )->bytes() / 2;
+	galpani2_state *state = space->machine().driver_data<galpani2_state>();
+	UINT16 *ROM = (UINT16 *) space->machine().region( "user1" )->base();
+	size_t    len = space->machine().region( "user1" )->bytes() / 2;
 
 	offset += (0x800000/2) * (*state->rombank & 0x0003);
 

@@ -66,7 +66,7 @@ public:
 
 static READ8_HANDLER( hotblock_video_read )
 {
-	hotblock_state *state = space->machine->driver_data<hotblock_state>();
+	hotblock_state *state = space->machine().driver_data<hotblock_state>();
 	/* right?, anything else?? */
 	if (state->port0 & 0x20) // port 0 = a8 e8 -- palette
 	{
@@ -90,7 +90,7 @@ static WRITE8_HANDLER( hotblock_port4_w )
 {
 //  mame_printf_debug("port4_w: pc = %06x : data %04x\n", cpu_get_pc(space->cpu), data);
 //  popmessage("port4_w: pc = %06x : data %04x", cpu_get_pc(space->cpu), data);
-	hotblock_state *state = space->machine->driver_data<hotblock_state>();
+	hotblock_state *state = space->machine().driver_data<hotblock_state>();
 	state->port4 = data;
 }
 
@@ -99,13 +99,13 @@ static WRITE8_HANDLER( hotblock_port4_w )
 static WRITE8_HANDLER( hotblock_port0_w )
 {
 //  popmessage("port4_w: pc = %06x : data %04x", cpu_get_pc(space->cpu), data);
-	hotblock_state *state = space->machine->driver_data<hotblock_state>();
+	hotblock_state *state = space->machine().driver_data<hotblock_state>();
 	state->port0 = data;
 }
 
 static WRITE8_HANDLER( hotblock_video_write )
 {
-	hotblock_state *state = space->machine->driver_data<hotblock_state>();
+	hotblock_state *state = space->machine().driver_data<hotblock_state>();
 	/* right?, anything else?? */
 	if (state->port0 & 0x20) // port 0 = a8 e8 -- palette
 	{
@@ -134,23 +134,23 @@ ADDRESS_MAP_END
 
 static VIDEO_START(hotblock)
 {
-	hotblock_state *state = machine->driver_data<hotblock_state>();
+	hotblock_state *state = machine.driver_data<hotblock_state>();
 	state->save_item(NAME(state->pal));
 }
 
 static SCREEN_UPDATE(hotblock)
 {
-	hotblock_state *state = screen->machine->driver_data<hotblock_state>();
+	hotblock_state *state = screen->machine().driver_data<hotblock_state>();
 	int y, x, count;
 	int i;
 	static const int xxx = 320, yyy = 204;
 
-	bitmap_fill(bitmap, 0, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, 0, get_black_pen(screen->machine()));
 
 	for (i = 0; i < 256; i++)
 	{
 		int dat = (state->pal[i * 2 + 1] << 8) | state->pal[i * 2];
-		palette_set_color_rgb(screen->machine, i, pal5bit(dat >> 0), pal5bit(dat >> 5), pal5bit(dat >> 10));
+		palette_set_color_rgb(screen->machine(), i, pal5bit(dat >> 0), pal5bit(dat >> 5), pal5bit(dat >> 10));
 	}
 
 	count = 0;

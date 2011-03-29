@@ -73,12 +73,12 @@ struct sprite
 
 ***************************************************************************/
 
-static void get_sprite_info(running_machine *machine)
+static void get_sprite_info(running_machine &machine)
 {
-	wecleman_state *state = machine->driver_data<wecleman_state>();
-	const pen_t *base_pal = machine->pens;
-	UINT8 *base_gfx = machine->region("gfx1")->base();
-	int gfx_max     = machine->region("gfx1")->bytes();
+	wecleman_state *state = machine.driver_data<wecleman_state>();
+	const pen_t *base_pal = machine.pens;
+	UINT8 *base_gfx = machine.region("gfx1")->base();
+	int gfx_max     = machine.region("gfx1")->bytes();
 
 	UINT16 *source = state->spriteram;
 
@@ -330,9 +330,9 @@ static void do_blit_zoom32(wecleman_state *state, bitmap_t *bitmap, const rectan
 	}
 }
 
-static void sprite_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void sprite_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	wecleman_state *state = machine->driver_data<wecleman_state>();
+	wecleman_state *state = machine.driver_data<wecleman_state>();
 	int i;
 
 	if (state->gameid == 0)	// Wec Le Mans
@@ -419,14 +419,14 @@ static void sprite_draw(running_machine *machine, bitmap_t *bitmap, const rectan
 
 static TILE_GET_INFO( wecleman_get_txt_tile_info )
 {
-	wecleman_state *state = machine->driver_data<wecleman_state>();
+	wecleman_state *state = machine.driver_data<wecleman_state>();
 	int code = state->txtram[tile_index];
 	SET_TILE_INFO(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
 }
 
 WRITE16_HANDLER( wecleman_txtram_w )
 {
-	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	wecleman_state *state = space->machine().driver_data<wecleman_state>();
 	UINT16 old_data = state->txtram[offset];
 	UINT16 new_data = COMBINE_DATA(&state->txtram[offset]);
 
@@ -467,7 +467,7 @@ WRITE16_HANDLER( wecleman_txtram_w )
 
 static TILE_GET_INFO( wecleman_get_bg_tile_info )
 {
-	wecleman_state *state = machine->driver_data<wecleman_state>();
+	wecleman_state *state = machine.driver_data<wecleman_state>();
 	int page = state->bgpage[((tile_index&0x7f)>>6) + ((tile_index>>12)<<1)];
 	int code = state->pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];
 
@@ -480,7 +480,7 @@ static TILE_GET_INFO( wecleman_get_bg_tile_info )
 
 static TILE_GET_INFO( wecleman_get_fg_tile_info )
 {
-	wecleman_state *state = machine->driver_data<wecleman_state>();
+	wecleman_state *state = machine.driver_data<wecleman_state>();
 	int page = state->fgpage[((tile_index&0x7f)>>6) + ((tile_index>>12)<<1)];
 	int code = state->pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];
 
@@ -495,7 +495,7 @@ static TILE_GET_INFO( wecleman_get_fg_tile_info )
 /* Pages that compose both the background and the foreground */
 WRITE16_HANDLER( wecleman_pageram_w )
 {
-	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	wecleman_state *state = space->machine().driver_data<wecleman_state>();
 	COMBINE_DATA(&state->pageram[offset]);
 
 	{
@@ -539,9 +539,9 @@ WRITE16_HANDLER( wecleman_pageram_w )
 
 ------------------------------------------------------------------------*/
 
-static void wecleman_draw_road(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void wecleman_draw_road(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
-	wecleman_state *state = machine->driver_data<wecleman_state>();
+	wecleman_state *state = machine.driver_data<wecleman_state>();
 // must be powers of 2
 #define XSIZE 512
 #define YSIZE 256
@@ -571,7 +571,7 @@ static void wecleman_draw_road(running_machine *machine, bitmap_t *bitmap, const
 	int scrollx, sy, sx;
 	int mdy, tdy, i;
 
-	rgb_ptr = machine->pens;
+	rgb_ptr = machine.pens;
 
 	if (priority == 0x02)
 	{
@@ -612,14 +612,14 @@ static void wecleman_draw_road(running_machine *machine, bitmap_t *bitmap, const
 			if ((road>>8) != 0x04) continue;
 			road &= YMASK;
 
-			src_ptr = gfx_element_get_data(machine->gfx[1], (road << 3));
-			gfx_element_get_data(machine->gfx[1], (road << 3) + 1);
-			gfx_element_get_data(machine->gfx[1], (road << 3) + 2);
-			gfx_element_get_data(machine->gfx[1], (road << 3) + 3);
-			gfx_element_get_data(machine->gfx[1], (road << 3) + 4);
-			gfx_element_get_data(machine->gfx[1], (road << 3) + 5);
-			gfx_element_get_data(machine->gfx[1], (road << 3) + 6);
-			gfx_element_get_data(machine->gfx[1], (road << 3) + 7);
+			src_ptr = gfx_element_get_data(machine.gfx[1], (road << 3));
+			gfx_element_get_data(machine.gfx[1], (road << 3) + 1);
+			gfx_element_get_data(machine.gfx[1], (road << 3) + 2);
+			gfx_element_get_data(machine.gfx[1], (road << 3) + 3);
+			gfx_element_get_data(machine.gfx[1], (road << 3) + 4);
+			gfx_element_get_data(machine.gfx[1], (road << 3) + 5);
+			gfx_element_get_data(machine.gfx[1], (road << 3) + 6);
+			gfx_element_get_data(machine.gfx[1], (road << 3) + 7);
 			mdy = ((road * MIDCURB_DY) >> 8) * bitmap->rowpixels;
 			tdy = ((road * TOPCURB_DY) >> 8) * bitmap->rowpixels;
 
@@ -666,7 +666,7 @@ static void draw_cloud(bitmap_t *bitmap,
 				 int tmw_l2, int tmh_l2,		// tilemap width and height in log(2)
 				 int alpha, int pal_offset )	// alpha(0-3f), # of color codes to shift
 {
-	wecleman_state *state = gfx->machine->driver_data<wecleman_state>();
+	wecleman_state *state = gfx->machine().driver_data<wecleman_state>();
 	const UINT8 *src_ptr;
 	UINT16 *tmap_ptr;
 	UINT32 *dst_base, *dst_ptr;
@@ -695,7 +695,7 @@ static void draw_cloud(bitmap_t *bitmap,
 
 	dst_base = BITMAP_ADDR32(bitmap, y0+dy, x0+dx);
 
-	pal_base = gfx->machine->pens + pal_offset * gfx->color_granularity;
+	pal_base = gfx->machine().pens + pal_offset * gfx->color_granularity;
 
 	alpha <<= 6;
 
@@ -792,15 +792,15 @@ static void draw_cloud(bitmap_t *bitmap,
 
 ------------------------------------------------------------------------*/
 
-static void hotchase_draw_road(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void hotchase_draw_road(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	wecleman_state *state = machine->driver_data<wecleman_state>();
+	wecleman_state *state = machine.driver_data<wecleman_state>();
 /* Referred to what's in the ROMs */
 #define XSIZE 512
 #define YSIZE 512
 
 	int sx, sy;
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	/* Let's draw from the top to the bottom of the visible screen */
 	for (sy = visarea.min_y;sy <= visarea.max_y;sy++)
@@ -816,7 +816,7 @@ static void hotchase_draw_road(running_machine *machine, bitmap_t *bitmap, const
 
 		for (sx=0; sx<2*XSIZE; sx+=64)
 		{
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 					code++,
 					color,
 					0,0,
@@ -836,7 +836,7 @@ static void hotchase_draw_road(running_machine *machine, bitmap_t *bitmap, const
 // new video and palette code
 WRITE16_HANDLER( wecleman_videostatus_w )
 {
-	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	wecleman_state *state = space->machine().driver_data<wecleman_state>();
 	COMBINE_DATA(state->videostatus);
 
 	// bit0-6: background transition, 0=off, 1=on
@@ -859,24 +859,24 @@ WRITE16_HANDLER( hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w )
 {
 	int newword, r, g, b;
 
-	newword = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	newword = COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 
 	r = ((newword << 1) & 0x1E ) | ((newword >> 12) & 0x01);
 	g = ((newword >> 3) & 0x1E ) | ((newword >> 13) & 0x01);
 	b = ((newword >> 7) & 0x1E ) | ((newword >> 14) & 0x01);
 
-	palette_set_color_rgb(space->machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(space->machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	r>>=1; g>>=1; b>>=1;
-	palette_set_color_rgb(space->machine, offset+0x800, pal5bit(r)/2, pal5bit(g)/2, pal5bit(b)/2);
+	palette_set_color_rgb(space->machine(), offset+0x800, pal5bit(r)/2, pal5bit(g)/2, pal5bit(b)/2);
 }
 
 WRITE16_HANDLER( wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w )
 {
-	int newword = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	int newword = COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 
 	// the highest nibble has some unknown functions
 //  if (newword & 0xf000) logerror("MSN set on color %03x: %1x\n", offset, newword>>12);
-	palette_set_color_rgb(space->machine, offset, pal4bit(newword >> 0), pal4bit(newword >> 4), pal4bit(newword >> 8));
+	palette_set_color_rgb(space->machine(), offset, pal4bit(newword >> 0), pal4bit(newword >> 4), pal4bit(newword >> 8));
 }
 
 
@@ -886,7 +886,7 @@ WRITE16_HANDLER( wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w )
 
 VIDEO_START( wecleman )
 {
-	wecleman_state *state = machine->driver_data<wecleman_state>();
+	wecleman_state *state = machine.driver_data<wecleman_state>();
 	/*
         Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)
         This game has ROMs for 16 banks
@@ -902,7 +902,7 @@ VIDEO_START( wecleman )
 	UINT8 *buffer;
 	int i, j;
 
-	assert(machine->primary_screen->format() == BITMAP_FORMAT_RGB32);
+	assert(machine.primary_screen->format() == BITMAP_FORMAT_RGB32);
 	buffer = auto_alloc_array(machine, UINT8, 0x12c00);	// working buffer for sprite operations
 
 	state->gameid = 0;
@@ -970,18 +970,18 @@ VIDEO_START( wecleman )
 	tilemap_set_scrolly(state->txt_tilemap, 0, -BMP_PAD );
 
 	// patches out a mysterious pixel floating in the sky (tile decoding bug?)
-	*(machine->gfx[0]->gfxdata + (machine->gfx[0]->char_modulo*0xaca+7)) = 0;
+	*(machine.gfx[0]->gfxdata + (machine.gfx[0]->char_modulo*0xaca+7)) = 0;
 }
 
 //  Callbacks for the K051316
 
-void hotchase_zoom_callback_0(running_machine *machine, int *code,int *color,int *flags)
+void hotchase_zoom_callback_0(running_machine &machine, int *code,int *color,int *flags)
 {
 	*code |= (*color & 0x03) << 8;
 	*color = (*color & 0xfc) >> 2;
 }
 
-void hotchase_zoom_callback_1(running_machine *machine, int *code,int *color,int *flags)
+void hotchase_zoom_callback_1(running_machine &machine, int *code,int *color,int *flags)
 {
 	*code |= (*color & 0x01) << 8;
 	*color = ((*color & 0x3f) << 1) | ((*code & 0x80) >> 7);
@@ -989,7 +989,7 @@ void hotchase_zoom_callback_1(running_machine *machine, int *code,int *color,int
 
 VIDEO_START( hotchase )
 {
-	wecleman_state *state = machine->driver_data<wecleman_state>();
+	wecleman_state *state = machine.driver_data<wecleman_state>();
 	/*
         Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)
         This game has ROMs for 0x30 banks
@@ -1024,18 +1024,18 @@ VIDEO_START( hotchase )
 
 SCREEN_UPDATE( wecleman )
 {
-	wecleman_state *state = screen->machine->driver_data<wecleman_state>();
+	wecleman_state *state = screen->machine().driver_data<wecleman_state>();
 	const pen_t *mrct;
 	int video_on;
 	int fg_x, bg_x, fg_y, bg_y;
 	int cloud_sx, cloud_sy;
 	int i, j, k;
 
-	mrct = screen->machine->pens;
+	mrct = screen->machine().pens;
 
 	video_on = state->irqctrl & 0x40;
 
-	set_led_status(screen->machine, 0, state->selected_ip & 0x04);	// Start lamp
+	set_led_status(screen->machine(), 0, state->selected_ip & 0x04);	// Start lamp
 
 	fg_y = (state->txtram[0x0f24>>1] & (TILEMAP_DIMY - 1));
 	bg_y = (state->txtram[0x0f26>>1] & (TILEMAP_DIMY - 1));
@@ -1063,12 +1063,12 @@ SCREEN_UPDATE( wecleman )
 	/* palette hacks! */
 	((pen_t *)mrct)[0x27] = mrct[0x24];
 
-	get_sprite_info(screen->machine);
+	get_sprite_info(screen->machine());
 
 	bitmap_fill(bitmap, cliprect, state->black_pen);
 
 	/* Draw the road (lines which have priority 0x02) */
-	if (video_on) wecleman_draw_road(screen->machine, bitmap, cliprect, 0x02);
+	if (video_on) wecleman_draw_road(screen->machine(), bitmap, cliprect, 0x02);
 
 	/* Draw the background */
 	if (video_on) tilemap_draw(bitmap,cliprect, state->bg_tilemap, 0, 0);
@@ -1082,7 +1082,7 @@ SCREEN_UPDATE( wecleman )
 		if (video_on)
 			draw_cloud(
 			bitmap,
-			screen->machine->gfx[0],
+			screen->machine().gfx[0],
 			state->pageram+0x1800,
 			BMP_PAD, BMP_PAD,
 			41, 20,
@@ -1102,10 +1102,10 @@ SCREEN_UPDATE( wecleman )
 	if (video_on) tilemap_draw(bitmap,cliprect, state->fg_tilemap, 0, 0);
 
 	/* Draw the road (lines which have priority 0x04) */
-	if (video_on) wecleman_draw_road(screen->machine, bitmap,cliprect, 0x04);
+	if (video_on) wecleman_draw_road(screen->machine(), bitmap,cliprect, 0x04);
 
 	/* Draw the sprites */
-	if (video_on) sprite_draw(screen->machine, bitmap,cliprect);
+	if (video_on) sprite_draw(screen->machine(), bitmap,cliprect);
 
 	/* Draw the text layer */
 	if (video_on) tilemap_draw(bitmap,cliprect, state->txt_tilemap, 0, 0);
@@ -1118,16 +1118,16 @@ SCREEN_UPDATE( wecleman )
 
 SCREEN_UPDATE( hotchase )
 {
-	wecleman_state *state = screen->machine->driver_data<wecleman_state>();
-	device_t *k051316_1 = screen->machine->device("k051316_1");
-	device_t *k051316_2 = screen->machine->device("k051316_2");
+	wecleman_state *state = screen->machine().driver_data<wecleman_state>();
+	device_t *k051316_1 = screen->machine().device("k051316_1");
+	device_t *k051316_2 = screen->machine().device("k051316_2");
 	int video_on;
 
 	video_on = state->irqctrl & 0x40;
 
-	set_led_status(screen->machine, 0, state->selected_ip & 0x04);	// Start lamp
+	set_led_status(screen->machine(), 0, state->selected_ip & 0x04);	// Start lamp
 
-	get_sprite_info(screen->machine);
+	get_sprite_info(screen->machine());
 
 	bitmap_fill(bitmap, cliprect, state->black_pen);
 
@@ -1137,11 +1137,11 @@ SCREEN_UPDATE( hotchase )
 
 	/* Draw the road */
 	if (video_on)
-		hotchase_draw_road(screen->machine, bitmap, cliprect);
+		hotchase_draw_road(screen->machine(), bitmap, cliprect);
 
 	/* Draw the sprites */
 	if (video_on)
-		sprite_draw(screen->machine, bitmap,cliprect);
+		sprite_draw(screen->machine(), bitmap,cliprect);
 
 	/* Draw the foreground (text) */
 	if (video_on)

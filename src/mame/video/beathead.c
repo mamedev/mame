@@ -17,11 +17,11 @@
 
 void beathead_state::video_start()
 {
-	state_save_register_global(&m_machine, m_finescroll);
-	state_save_register_global(&m_machine, m_vram_latch_offset);
-	state_save_register_global(&m_machine, m_hsyncram_offset);
-	state_save_register_global(&m_machine, m_hsyncram_start);
-	state_save_register_global_array(&m_machine, m_hsyncram);
+	state_save_register_global(m_machine, m_finescroll);
+	state_save_register_global(m_machine, m_vram_latch_offset);
+	state_save_register_global(m_machine, m_hsyncram_offset);
+	state_save_register_global(m_machine, m_hsyncram_start);
+	state_save_register_global_array(m_machine, m_hsyncram);
 }
 
 
@@ -86,10 +86,10 @@ WRITE32_MEMBER( beathead_state::finescroll_w )
 	UINT32 newword = COMBINE_DATA(&m_finescroll);
 
 	/* if VBLANK is going off on a scanline other than the last, suspend time */
-	if ((oldword & 8) && !(newword & 8) && space.machine->primary_screen->vpos() != 261)
+	if ((oldword & 8) && !(newword & 8) && space.machine().primary_screen->vpos() != 261)
 	{
-		logerror("Suspending time! (scanline = %d)\n", space.machine->primary_screen->vpos());
-		cputag_set_input_line(space.machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+		logerror("Suspending time! (scanline = %d)\n", space.machine().primary_screen->vpos());
+		cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
@@ -107,7 +107,7 @@ WRITE32_MEMBER( beathead_state::palette_w )
 	int r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 0x01);
 	int g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 0x01);
 	int b = ((newword << 1) & 0x3e) | ((newword >> 15) & 0x01);
-	palette_set_color_rgb(space.machine, offset, pal6bit(r), pal6bit(g), pal6bit(b));
+	palette_set_color_rgb(space.machine(), offset, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
 

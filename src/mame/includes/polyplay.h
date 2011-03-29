@@ -28,10 +28,10 @@ public:
 
 /*----------- defined in audio/polyplay.c -----------*/
 
-void polyplay_set_channel1(running_machine *machine, int active);
-void polyplay_set_channel2(running_machine *machine, int active);
-void polyplay_play_channel1(running_machine *machine, int data);
-void polyplay_play_channel2(running_machine *machine, int data);
+void polyplay_set_channel1(running_machine &machine, int active);
+void polyplay_set_channel2(running_machine &machine, int active);
+void polyplay_play_channel1(running_machine &machine, int data);
+void polyplay_play_channel2(running_machine &machine, int data);
 SAMPLES_START( polyplay_sh_start );
 
 

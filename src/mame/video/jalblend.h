@@ -1,4 +1,4 @@
-void jal_blend_init(running_machine *machine, int enable);
+void jal_blend_init(running_machine &machine, int enable);
 void jal_blend_set(int color, UINT8 val);
 
 rgb_t jal_blend_func(rgb_t dest, rgb_t addMe, UINT8 alpha);

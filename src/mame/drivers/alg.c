@@ -56,8 +56,8 @@ static int get_lightgun_pos(screen_device &screen, int player, int *x, int *y)
 {
 	const rectangle &visarea = screen.visible_area();
 
-	int xpos = input_port_read_safe(screen.machine, (player == 0) ? "GUN1X" : "GUN2X", 0xffffffff);
-	int ypos = input_port_read_safe(screen.machine, (player == 0) ? "GUN1Y" : "GUN2Y", 0xffffffff);
+	int xpos = input_port_read_safe(screen.machine(), (player == 0) ? "GUN1X" : "GUN2X", 0xffffffff);
+	int ypos = input_port_read_safe(screen.machine(), (player == 0) ? "GUN1Y" : "GUN2Y", 0xffffffff);
 
 	if (xpos == -1 || ypos == -1)
 		return FALSE;
@@ -95,10 +95,10 @@ static VIDEO_START( alg )
 
 static MACHINE_START( alg )
 {
-	alg_state *state = machine->driver_data<alg_state>();
-	state->laserdisc = machine->device("laserdisc");
+	alg_state *state = machine.driver_data<alg_state>();
+	state->laserdisc = machine.device("laserdisc");
 
-	state->serial_timer = machine->scheduler().timer_alloc(FUNC(response_timer));
+	state->serial_timer = machine.scheduler().timer_alloc(FUNC(response_timer));
 	state->serial_timer_active = FALSE;
 }
 
@@ -118,7 +118,7 @@ static MACHINE_RESET( alg )
 
 static TIMER_CALLBACK( response_timer )
 {
-	alg_state *state = machine->driver_data<alg_state>();
+	alg_state *state = machine.driver_data<alg_state>();
 
 	/* if we still have data to send, do it now */
 	if (laserdisc_line_r(state->laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
@@ -137,9 +137,9 @@ static TIMER_CALLBACK( response_timer )
 }
 
 
-static void vsync_callback(running_machine *machine)
+static void vsync_callback(running_machine &machine)
 {
-	alg_state *state = machine->driver_data<alg_state>();
+	alg_state *state = machine.driver_data<alg_state>();
 
 	/* if we have data available, set a timer to read it */
 	if (!state->serial_timer_active && laserdisc_line_r(state->laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
@@ -150,9 +150,9 @@ static void vsync_callback(running_machine *machine)
 }
 
 
-static void serial_w(running_machine *machine, UINT16 data)
+static void serial_w(running_machine &machine, UINT16 data)
 {
-	alg_state *state = machine->driver_data<alg_state>();
+	alg_state *state = machine.driver_data<alg_state>();
 
 	/* write to the laserdisc player */
 	laserdisc_data_w(state->laserdisc, data & 0xff);
@@ -173,9 +173,9 @@ static void serial_w(running_machine *machine, UINT16 data)
  *
  *************************************/
 
-static void alg_potgo_w(running_machine *machine, UINT16 data)
+static void alg_potgo_w(running_machine &machine, UINT16 data)
 {
-	alg_state *state = machine->driver_data<alg_state>();
+	alg_state *state = machine.driver_data<alg_state>();
 
 	/* bit 15 controls whether pin 9 is input/output */
 	/* bit 14 controls the value, which selects which player's controls to read */
@@ -185,30 +185,30 @@ static void alg_potgo_w(running_machine *machine, UINT16 data)
 
 static CUSTOM_INPUT( lightgun_pos_r )
 {
-	alg_state *state = field->port->machine->driver_data<alg_state>();
+	alg_state *state = field->port->machine().driver_data<alg_state>();
 	int x = 0, y = 0;
 
 	/* get the position based on the input select */
-	get_lightgun_pos(*field->port->machine->primary_screen, state->input_select, &x, &y);
+	get_lightgun_pos(*field->port->machine().primary_screen, state->input_select, &x, &y);
 	return (y << 8) | (x >> 2);
 }
 
 
 static CUSTOM_INPUT( lightgun_trigger_r )
 {
-	alg_state *state = field->port->machine->driver_data<alg_state>();
+	alg_state *state = field->port->machine().driver_data<alg_state>();
 
 	/* read the trigger control based on the input select */
-	return (input_port_read(field->port->machine, "TRIGGERS") >> state->input_select) & 1;
+	return (input_port_read(field->port->machine(), "TRIGGERS") >> state->input_select) & 1;
 }
 
 
 static CUSTOM_INPUT( lightgun_holster_r )
 {
-	alg_state *state = field->port->machine->driver_data<alg_state>();
+	alg_state *state = field->port->machine().driver_data<alg_state>();
 
 	/* read the holster control based on the input select */
-	return (input_port_read(field->port->machine, "TRIGGERS") >> (2 + state->input_select)) & 1;
+	return (input_port_read(field->port->machine(), "TRIGGERS") >> (2 + state->input_select)) & 1;
 }
 
 
@@ -221,10 +221,10 @@ static CUSTOM_INPUT( lightgun_holster_r )
 
 static WRITE8_DEVICE_HANDLER( alg_cia_0_porta_w )
 {
-	address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* switch banks as appropriate */
-	memory_set_bank(device->machine, "bank1", data & 1);
+	memory_set_bank(device->machine(), "bank1", data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
@@ -239,13 +239,13 @@ static WRITE8_DEVICE_HANDLER( alg_cia_0_porta_w )
 
 static READ8_DEVICE_HANDLER( alg_cia_0_porta_r )
 {
-	return input_port_read(device->machine, "FIRE") | 0x3f;
+	return input_port_read(device->machine(), "FIRE") | 0x3f;
 }
 
 
 static READ8_DEVICE_HANDLER( alg_cia_0_portb_r )
 {
-	logerror("%s:alg_cia_0_portb_r\n", device->machine->describe_context());
+	logerror("%s:alg_cia_0_portb_r\n", device->machine().describe_context());
 	return 0xff;
 }
 
@@ -253,20 +253,20 @@ static READ8_DEVICE_HANDLER( alg_cia_0_portb_r )
 static WRITE8_DEVICE_HANDLER( alg_cia_0_portb_w )
 {
 	/* parallel port */
-	logerror("%s:alg_cia_0_portb_w(%02x)\n", device->machine->describe_context(), data);
+	logerror("%s:alg_cia_0_portb_w(%02x)\n", device->machine().describe_context(), data);
 }
 
 
 static READ8_DEVICE_HANDLER( alg_cia_1_porta_r )
 {
-	logerror("%s:alg_cia_1_porta_r\n", device->machine->describe_context());
+	logerror("%s:alg_cia_1_porta_r\n", device->machine().describe_context());
 	return 0xff;
 }
 
 
 static WRITE8_DEVICE_HANDLER( alg_cia_1_porta_w )
 {
-	logerror("%s:alg_cia_1_porta_w(%02x)\n", device->machine->describe_context(), data);
+	logerror("%s:alg_cia_1_porta_w(%02x)\n", device->machine().describe_context(), data);
 }
 
 
@@ -678,9 +678,9 @@ ROM_END
  *
  *************************************/
 
-static void alg_init(running_machine *machine)
+static void alg_init(running_machine &machine)
 {
-	alg_state *state = machine->driver_data<alg_state>();
+	alg_state *state = machine.driver_data<alg_state>();
 	static const amiga_machine_interface alg_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
@@ -696,7 +696,7 @@ static void alg_init(running_machine *machine)
 
 	/* set up memory */
 	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user1")->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
 }
 
 
@@ -709,8 +709,8 @@ static void alg_init(running_machine *machine)
 
 static DRIVER_INIT( palr1 )
 {
-	UINT32 length = machine->region("user2")->bytes();
-	UINT8 *rom = machine->region("user2")->base();
+	UINT32 length = machine.region("user2")->bytes();
+	UINT8 *rom = machine.region("user2")->base();
 	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
@@ -729,8 +729,8 @@ static DRIVER_INIT( palr1 )
 
 static DRIVER_INIT( palr3 )
 {
-	UINT32 length = machine->region("user2")->bytes();
-	UINT8 *rom = machine->region("user2")->base();
+	UINT32 length = machine.region("user2")->bytes();
+	UINT8 *rom = machine.region("user2")->base();
 	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
@@ -748,8 +748,8 @@ static DRIVER_INIT( palr3 )
 
 static DRIVER_INIT( palr6 )
 {
-	UINT32 length = machine->region("user2")->bytes();
-	UINT8 *rom = machine->region("user2")->base();
+	UINT32 length = machine.region("user2")->bytes();
+	UINT8 *rom = machine.region("user2")->base();
 	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
@@ -770,7 +770,7 @@ static DRIVER_INIT( palr6 )
 static DRIVER_INIT( aplatoon )
 {
 	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
-	UINT8 *rom = machine->region("user2")->base();
+	UINT8 *rom = machine.region("user2")->base();
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x40000);
 	int i;
 

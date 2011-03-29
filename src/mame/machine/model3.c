@@ -122,9 +122,9 @@ static int shift(UINT8 *data, INT32 num_bits)
  *      TDO.
  */
 
-int model3_tap_read(running_machine *machine)
+int model3_tap_read(running_machine &machine)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
     return state->tdo;
 }
 
@@ -141,9 +141,9 @@ int model3_tap_read(running_machine *machine)
  *      trst = Reset.
  */
 
-void model3_tap_write(running_machine *machine, int tck, int tms, int tdi, int trst)
+void model3_tap_write(running_machine &machine, int tck, int tms, int tdi, int trst)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
     if (!tck)
         return;
 
@@ -252,9 +252,9 @@ void model3_tap_write(running_machine *machine, int tck, int tms, int tdi, int t
  * Resets the TAP (simulating a power up or SCAN_RST signal.)
  */
 
-void model3_tap_reset(running_machine *machine)
+void model3_tap_reset(running_machine &machine)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
     state->id_size = 197;  // 197 bits
 
     state->tap_state = 0;  // test-logic/reset
@@ -267,20 +267,20 @@ void model3_tap_reset(running_machine *machine)
  *
  */
 
-void model3_machine_init(running_machine *machine, int step)
+void model3_machine_init(running_machine &machine, int step)
 {
-	model3_state *state = machine->driver_data<model3_state>();
+	model3_state *state = machine.driver_data<model3_state>();
 	state->m3_step = step;
 }
 
 /*****************************************************************************/
 /* Epson RTC-72421 */
 
-static UINT8 rtc_get_reg(running_machine *machine, int reg)
+static UINT8 rtc_get_reg(running_machine &machine, int reg)
 {
 	system_time systime;
 
-	machine->current_datetime(systime);
+	machine.current_datetime(systime);
 
 	switch(reg)
 	{
@@ -342,7 +342,7 @@ READ32_HANDLER(rtc72421_r)
 {
 	int reg = offset;
 	UINT32 data;
-	data = rtc_get_reg(space->machine, reg) << 24;
+	data = rtc_get_reg(space->machine(), reg) << 24;
 	data |= 0x30000;	/* these bits are set to pass the battery voltage test */
 	return data;
 }

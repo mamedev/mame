@@ -499,7 +499,7 @@ public:
 static STATE_POSTLOAD( vegas_postload );
 static TIMER_CALLBACK( nile_timer_callback );
 static void ide_interrupt(device_t *device, int state);
-static void remap_dynamic_addresses(running_machine *machine);
+static void remap_dynamic_addresses(running_machine &machine);
 
 
 
@@ -511,7 +511,7 @@ static void remap_dynamic_addresses(running_machine *machine);
 
 static SCREEN_UPDATE( vegas )
 {
-	vegas_state *state = screen->machine->driver_data<vegas_state>();
+	vegas_state *state = screen->machine().driver_data<vegas_state>();
 	return voodoo_update(state->voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
@@ -524,29 +524,29 @@ static SCREEN_UPDATE( vegas )
 
 static MACHINE_START( vegas )
 {
-	vegas_state *state = machine->driver_data<vegas_state>();
-	state->voodoo = machine->device("voodoo");
+	vegas_state *state = machine.driver_data<vegas_state>();
+	state->voodoo = machine.device("voodoo");
 
 	/* allocate timers for the NILE */
-	state->timer[0] = machine->scheduler().timer_alloc(FUNC(NULL));
-	state->timer[1] = machine->scheduler().timer_alloc(FUNC(NULL));
-	state->timer[2] = machine->scheduler().timer_alloc(FUNC(nile_timer_callback));
-	state->timer[3] = machine->scheduler().timer_alloc(FUNC(nile_timer_callback));
+	state->timer[0] = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->timer[1] = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->timer[2] = machine.scheduler().timer_alloc(FUNC(nile_timer_callback));
+	state->timer[3] = machine.scheduler().timer_alloc(FUNC(nile_timer_callback));
 
 	/* identify our sound board */
-	if (machine->device("dsio") != NULL)
+	if (machine.device("dsio") != NULL)
 		state->dcs_idma_cs = 6;
-	else if (machine->device("denver") != NULL)
+	else if (machine.device("denver") != NULL)
 		state->dcs_idma_cs = 7;
 	else
 		state->dcs_idma_cs = 0;
 
 	/* set the fastest DRC options, but strict verification */
-	mips3drc_set_options(machine->device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
+	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine->device("maincpu"), 0x00000000, state->ramsize - 1, FALSE, state->rambase);
-	mips3drc_add_fastram(machine->device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE, state->rombase);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, state->ramsize - 1, FALSE, state->rambase);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE, state->rombase);
 
 	/* register for save states */
 	state_save_register_global(machine, state->nile_irq_state);
@@ -562,20 +562,20 @@ static MACHINE_START( vegas )
 	state_save_register_global(machine, state->sio_led_state);
 	state_save_register_global(machine, state->pending_analog_read);
 	state_save_register_global(machine, state->cmos_unlocked);
-	machine->state().register_postload(vegas_postload, NULL);
+	machine.state().register_postload(vegas_postload, NULL);
 }
 
 
 static MACHINE_RESET( vegas )
 {
-	vegas_state *state = machine->driver_data<vegas_state>();
+	vegas_state *state = machine.driver_data<vegas_state>();
 	/* reset dynamic addressing */
 	memset(state->nile_regs, 0, 0x1000);
 	memset(state->pci_ide_regs, 0, sizeof(state->pci_ide_regs));
 	memset(state->pci_3dfx_regs, 0, sizeof(state->pci_3dfx_regs));
 
 	/* reset the DCS system if we have one */
-	if (machine->device("dcs2") != NULL || machine->device("dsio") != NULL || machine->device("denver") != NULL)
+	if (machine.device("dcs2") != NULL || machine.device("dsio") != NULL || machine.device("denver") != NULL)
 	{
 		dcs_reset_w(1);
 		dcs_reset_w(0);
@@ -602,14 +602,14 @@ static STATE_POSTLOAD( vegas_postload )
 
 static WRITE32_HANDLER( cmos_unlock_w )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	state->cmos_unlocked = 1;
 }
 
 
 static WRITE32_HANDLER( timekeeper_w )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	if (state->cmos_unlocked)
 	{
 		if ((mem_mask & 0x000000ff) != 0)
@@ -631,7 +631,7 @@ static WRITE32_HANDLER( timekeeper_w )
 
 static READ32_HANDLER( timekeeper_r )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	UINT32 result = 0xffffffff;
 	if ((mem_mask & 0x000000ff) != 0)
 		result = (result & ~0x000000ff) | (state->timekeeper->read(offset * 4 + 0) << 0);
@@ -656,7 +656,7 @@ static READ32_HANDLER( timekeeper_r )
 
 static READ32_HANDLER( pci_bridge_r )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	UINT32 result = state->pci_bridge_regs[offset];
 
 	switch (offset)
@@ -678,7 +678,7 @@ static READ32_HANDLER( pci_bridge_r )
 
 static WRITE32_HANDLER( pci_bridge_w )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	state->pci_bridge_regs[offset] = data;
 	if (LOG_PCI)
 		logerror("%06X:PCI bridge write: reg %d = %08X\n", cpu_get_pc(space->cpu), offset, data);
@@ -694,7 +694,7 @@ static WRITE32_HANDLER( pci_bridge_w )
 
 static READ32_HANDLER( pci_ide_r )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	UINT32 result = state->pci_ide_regs[offset];
 
 	switch (offset)
@@ -718,29 +718,29 @@ static READ32_HANDLER( pci_ide_r )
 
 static WRITE32_HANDLER( pci_ide_w )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	state->pci_ide_regs[offset] = data;
 
 	switch (offset)
 	{
 		case 0x04:		/* address register */
 			state->pci_ide_regs[offset] &= 0xfffffff0;
-			remap_dynamic_addresses(space->machine);
+			remap_dynamic_addresses(space->machine());
 			break;
 
 		case 0x05:		/* address register */
 			state->pci_ide_regs[offset] &= 0xfffffffc;
-			remap_dynamic_addresses(space->machine);
+			remap_dynamic_addresses(space->machine());
 			break;
 
 		case 0x08:		/* address register */
 			state->pci_ide_regs[offset] &= 0xfffffff0;
-			remap_dynamic_addresses(space->machine);
+			remap_dynamic_addresses(space->machine());
 			break;
 
 		case 0x14:		/* interrupt pending */
 			if (data & 4)
-				ide_interrupt(space->machine->device("ide"), 0);
+				ide_interrupt(space->machine().device("ide"), 0);
 			break;
 	}
 	if (LOG_PCI)
@@ -757,7 +757,7 @@ static WRITE32_HANDLER( pci_ide_w )
 
 static READ32_HANDLER( pci_3dfx_r )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	int voodoo_type = voodoo_get_type(state->voodoo);
 	UINT32 result = state->pci_3dfx_regs[offset];
 
@@ -791,7 +791,7 @@ static READ32_HANDLER( pci_3dfx_r )
 
 static WRITE32_HANDLER( pci_3dfx_w )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	int voodoo_type = voodoo_get_type(state->voodoo);
 
 	state->pci_3dfx_regs[offset] = data;
@@ -803,14 +803,14 @@ static WRITE32_HANDLER( pci_3dfx_w )
 				state->pci_3dfx_regs[offset] &= 0xff000000;
 			else
 				state->pci_3dfx_regs[offset] &= 0xfe000000;
-			remap_dynamic_addresses(space->machine);
+			remap_dynamic_addresses(space->machine());
 			break;
 
 		case 0x05:		/* address register */
 			if (voodoo_type >= VOODOO_BANSHEE)
 			{
 				state->pci_3dfx_regs[offset] &= 0xfe000000;
-				remap_dynamic_addresses(space->machine);
+				remap_dynamic_addresses(space->machine());
 			}
 			break;
 
@@ -818,7 +818,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			if (voodoo_type >= VOODOO_BANSHEE)
 			{
 				state->pci_3dfx_regs[offset] &= 0xffffff00;
-				remap_dynamic_addresses(space->machine);
+				remap_dynamic_addresses(space->machine());
 			}
 			break;
 
@@ -826,7 +826,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			if (voodoo_type >= VOODOO_BANSHEE)
 			{
 				state->pci_3dfx_regs[offset] &= 0xffff0000;
-				remap_dynamic_addresses(space->machine);
+				remap_dynamic_addresses(space->machine());
 			}
 			break;
 
@@ -847,9 +847,9 @@ static WRITE32_HANDLER( pci_3dfx_w )
  *
  *************************************/
 
-static void update_nile_irqs(running_machine *machine)
+static void update_nile_irqs(running_machine &machine)
 {
-	vegas_state *state = machine->driver_data<vegas_state>();
+	vegas_state *state = machine.driver_data<vegas_state>();
 	UINT32 intctll = state->nile_regs[NREG_INTCTRL+0];
 	UINT32 intctlh = state->nile_regs[NREG_INTCTRL+1];
 	UINT8 irq[6];
@@ -914,7 +914,7 @@ static void update_nile_irqs(running_machine *machine)
 
 static TIMER_CALLBACK( nile_timer_callback )
 {
-	vegas_state *state = machine->driver_data<vegas_state>();
+	vegas_state *state = machine.driver_data<vegas_state>();
 	int which = param;
 	UINT32 *regs = &state->nile_regs[NREG_T0CTRL + which * 4];
 	if (LOG_TIMERS) logerror("timer %d fired\n", which);
@@ -947,7 +947,7 @@ static TIMER_CALLBACK( nile_timer_callback )
 
 static READ32_HANDLER( nile_r )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	UINT32 result = state->nile_regs[offset];
 	int logit = 1, which;
 
@@ -1060,7 +1060,7 @@ static READ32_HANDLER( nile_r )
 
 static WRITE32_HANDLER( nile_w )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	UINT32 olddata = state->nile_regs[offset];
 	int logit = 1, which;
 
@@ -1078,21 +1078,21 @@ static WRITE32_HANDLER( nile_w )
 		case NREG_INTCTRL+1:	/* Interrupt control */
 			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt control(%03X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 			logit = 0;
-			update_nile_irqs(space->machine);
+			update_nile_irqs(space->machine());
 			break;
 
 		case NREG_INTSTAT0+0:	/* Interrupt status 0 */
 		case NREG_INTSTAT0+1:	/* Interrupt status 0 */
 			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 0(%03X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 			logit = 0;
-			update_nile_irqs(space->machine);
+			update_nile_irqs(space->machine());
 			break;
 
 		case NREG_INTSTAT1+0:	/* Interrupt status 1 */
 		case NREG_INTSTAT1+1:	/* Interrupt status 1 */
 			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 1/enable(%03X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 			logit = 0;
-			update_nile_irqs(space->machine);
+			update_nile_irqs(space->machine());
 			break;
 
 		case NREG_INTCLR+0:		/* Interrupt clear */
@@ -1100,7 +1100,7 @@ static WRITE32_HANDLER( nile_w )
 			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt clear(%03X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 			logit = 0;
 			state->nile_irq_state &= ~(state->nile_regs[offset] & ~0xf00);
-			update_nile_irqs(space->machine);
+			update_nile_irqs(space->machine());
 			break;
 
 		case NREG_INTPPES+0:	/* PCI Interrupt control */
@@ -1121,7 +1121,7 @@ static WRITE32_HANDLER( nile_w )
 
 		case NREG_PCIINIT1+0:	/* PCI master */
 			if (((olddata & 0xe) == 0xa) != ((state->nile_regs[offset] & 0xe) == 0xa))
-				remap_dynamic_addresses(space->machine);
+				remap_dynamic_addresses(space->machine());
 			logit = 0;
 			break;
 
@@ -1175,7 +1175,7 @@ static WRITE32_HANDLER( nile_w )
 			logit = 0;
 			break;
 		case NREG_UARTIER:		/* serial interrupt enable */
-			update_nile_irqs(space->machine);
+			update_nile_irqs(space->machine());
 			break;
 
 		case NREG_VID:
@@ -1209,7 +1209,7 @@ static WRITE32_HANDLER( nile_w )
 		case NREG_DCS8:
 		case NREG_PCIW0:
 		case NREG_PCIW1:
-			remap_dynamic_addresses(space->machine);
+			remap_dynamic_addresses(space->machine());
 			break;
 	}
 
@@ -1227,13 +1227,13 @@ static WRITE32_HANDLER( nile_w )
 
 static void ide_interrupt(device_t *device, int state)
 {
-	vegas_state *drvstate = device->machine->driver_data<vegas_state>();
+	vegas_state *drvstate = device->machine().driver_data<vegas_state>();
 	drvstate->ide_irq_state = state;
 	if (state)
 		drvstate->nile_irq_state |= 0x800;
 	else
 		drvstate->nile_irq_state &= ~0x800;
-	update_nile_irqs(device->machine);
+	update_nile_irqs(device->machine());
 }
 
 
@@ -1244,9 +1244,9 @@ static void ide_interrupt(device_t *device, int state)
  *
  *************************************/
 
-static void update_sio_irqs(running_machine *machine)
+static void update_sio_irqs(running_machine &machine)
 {
-	vegas_state *state = machine->driver_data<vegas_state>();
+	vegas_state *state = machine.driver_data<vegas_state>();
 	if (state->sio_irq_state & state->sio_irq_enable)
 		state->nile_irq_state |= 0x400;
 	else
@@ -1257,11 +1257,11 @@ static void update_sio_irqs(running_machine *machine)
 
 static void vblank_assert(device_t *device, int state)
 {
-	vegas_state *drvstate = device->machine->driver_data<vegas_state>();
+	vegas_state *drvstate = device->machine().driver_data<vegas_state>();
 	if (!drvstate->vblank_state && state)
 	{
 		drvstate->sio_irq_state |= 0x20;
-		update_sio_irqs(device->machine);
+		update_sio_irqs(device->machine());
 	}
 	drvstate->vblank_state = state;
 
@@ -1273,9 +1273,9 @@ static void vblank_assert(device_t *device, int state)
 }
 
 
-static void ioasic_irq(running_machine *machine, int state)
+static void ioasic_irq(running_machine &machine, int state)
 {
-	vegas_state *drvstate = machine->driver_data<vegas_state>();
+	vegas_state *drvstate = machine.driver_data<vegas_state>();
 	if (state)
 		drvstate->sio_irq_state |= 0x04;
 	else
@@ -1286,25 +1286,25 @@ static void ioasic_irq(running_machine *machine, int state)
 
 static void ethernet_interrupt(device_t *device, int state)
 {
-	vegas_state *drvstate = device->machine->driver_data<vegas_state>();
+	vegas_state *drvstate = device->machine().driver_data<vegas_state>();
 	if (state)
 		drvstate->sio_irq_state |= 0x10;
 	else
 		drvstate->sio_irq_state &= ~0x10;
-	update_sio_irqs(device->machine);
+	update_sio_irqs(device->machine());
 }
 
 
 static READ32_HANDLER( sio_irq_clear_r )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	return state->sio_irq_clear;
 }
 
 
 static WRITE32_HANDLER( sio_irq_clear_w )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->sio_irq_clear = data;
@@ -1312,7 +1312,7 @@ static WRITE32_HANDLER( sio_irq_clear_w )
 		/* bit 0x01 seems to be used to reset the IOASIC */
 		if (!(data & 0x01))
 		{
-			midway_ioasic_reset(space->machine);
+			midway_ioasic_reset(space->machine());
 			dcs_reset_w(data & 0x01);
 		}
 
@@ -1320,7 +1320,7 @@ static WRITE32_HANDLER( sio_irq_clear_w )
 		if (!(data & 0x08))
 		{
 			state->sio_irq_state &= ~0x20;
-			update_sio_irqs(space->machine);
+			update_sio_irqs(space->machine());
 		}
 	}
 }
@@ -1328,39 +1328,39 @@ static WRITE32_HANDLER( sio_irq_clear_w )
 
 static READ32_HANDLER( sio_irq_enable_r )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	return state->sio_irq_enable;
 }
 
 
 static WRITE32_HANDLER( sio_irq_enable_w )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->sio_irq_enable = data;
-		update_sio_irqs(space->machine);
+		update_sio_irqs(space->machine());
 	}
 }
 
 
 static READ32_HANDLER( sio_irq_cause_r )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	return state->sio_irq_state & state->sio_irq_enable;
 }
 
 
 static READ32_HANDLER( sio_irq_status_r )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	return state->sio_irq_state;
 }
 
 
 static WRITE32_HANDLER( sio_led_w )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	if (ACCESSING_BITS_0_7)
 		state->sio_led_state = data;
 }
@@ -1368,7 +1368,7 @@ static WRITE32_HANDLER( sio_led_w )
 
 static READ32_HANDLER( sio_led_r )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	return state->sio_led_state;
 }
 
@@ -1382,7 +1382,7 @@ static READ32_HANDLER( sio_led_r )
 
 static WRITE32_HANDLER( sio_w )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	if (ACCESSING_BITS_0_7) offset += 0;
 	if (ACCESSING_BITS_8_15) offset += 1;
 	if (ACCESSING_BITS_16_23) offset += 2;
@@ -1398,7 +1398,7 @@ static WRITE32_HANDLER( sio_w )
 
 static READ32_HANDLER( sio_r )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	UINT32 result = 0;
 	if (ACCESSING_BITS_0_7) offset += 0;
 	if (ACCESSING_BITS_8_15) offset += 1;
@@ -1421,19 +1421,19 @@ static READ32_HANDLER( sio_r )
 
 static READ32_HANDLER( analog_port_r )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	return state->pending_analog_read;
 }
 
 
 static WRITE32_HANDLER( analog_port_w )
 {
-	vegas_state *state = space->machine->driver_data<vegas_state>();
+	vegas_state *state = space->machine().driver_data<vegas_state>();
 	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
 
 	if (data < 8 || data > 15)
 		logerror("%08X:Unexpected analog port select = %08X\n", cpu_get_pc(space->cpu), data);
-	state->pending_analog_read = input_port_read_safe(space->machine, portnames[data & 7], 0);
+	state->pending_analog_read = input_port_read_safe(space->machine(), portnames[data & 7], 0);
 }
 
 
@@ -1452,7 +1452,7 @@ static WRITE32_HANDLER( vegas_watchdog_w )
 
 static WRITE32_HANDLER( asic_fifo_w )
 {
-	midway_ioasic_fifo_w(space->machine, data);
+	midway_ioasic_fifo_w(space->machine(), data);
 }
 
 
@@ -1502,7 +1502,7 @@ static WRITE32_DEVICE_HANDLER( ethernet_w )
 
 static WRITE32_HANDLER( dcs3_fifo_full_w )
 {
-	midway_ioasic_fifo_full_w(space->machine, data);
+	midway_ioasic_fifo_full_w(space->machine(), data);
 }
 
 
@@ -1547,19 +1547,19 @@ INLINE void _add_dynamic_device_address(vegas_state *state, device_t *device, of
 }
 
 
-static void remap_dynamic_addresses(running_machine *machine)
+static void remap_dynamic_addresses(running_machine &machine)
 {
-	vegas_state *state = machine->driver_data<vegas_state>();
+	vegas_state *state = machine.driver_data<vegas_state>();
 	dynamic_address *dynamic = state->dynamic;
-	device_t *ethernet = machine->device("ethernet");
-	device_t *ide = machine->device("ide");
+	device_t *ethernet = machine.device("ethernet");
+	device_t *ide = machine.device("ide");
 	int voodoo_type = voodoo_get_type(state->voodoo);
 	offs_t base;
 	int addr;
 
 	/* unmap everything we know about */
 	for (addr = 0; addr < state->dynamic_count; addr++)
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_readwrite(dynamic[addr].start, dynamic[addr].end);
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_readwrite(dynamic[addr].start, dynamic[addr].end);
 
 	/* the build the list of stuff */
 	state->dynamic_count = 0;
@@ -1675,14 +1675,14 @@ static void remap_dynamic_addresses(running_machine *machine)
 
 	/* now remap everything */
 	if (LOG_DYNAMIC) logerror("remap_dynamic_addresses:\n");
-	address_space *space = const_cast<address_space *>(machine->device<cpu_device>("maincpu")->space(AS_PROGRAM));
+	address_space *space = const_cast<address_space *>(machine.device<cpu_device>("maincpu")->space(AS_PROGRAM));
 	assert(space != NULL);
 	for (addr = 0; addr < state->dynamic_count; addr++)
 	{
 		if (LOG_DYNAMIC) logerror("  installing: %08X-%08X %s,%s\n", dynamic[addr].start, dynamic[addr].end, dynamic[addr].rdname, dynamic[addr].wrname);
 
 		if (dynamic[addr].mread == NOP_HANDLER)
-			machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_read(dynamic[addr].start, dynamic[addr].end);
+			machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_read(dynamic[addr].start, dynamic[addr].end);
 		else if (dynamic[addr].mread != NULL)
 			space->install_legacy_read_handler(dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mread, dynamic[addr].rdname);
 		if (dynamic[addr].mwrite != NULL)
@@ -2467,7 +2467,7 @@ ROM_END
  *
  *************************************/
 
-static void init_common(running_machine *machine, int ioasic, int serialnum)
+static void init_common(running_machine &machine, int ioasic, int serialnum)
 {
 	/* initialize the subsystems */
 	midway_ioasic_init(machine, ioasic, serialnum, 80, ioasic_irq);
@@ -2481,10 +2481,10 @@ static DRIVER_INIT( gauntleg )
 	init_common(machine, MIDWAY_IOASIC_CALSPEED, 340/* 340=39", 322=27", others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine->device("maincpu"), 0x80015430, 0x8CC38060, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->device("maincpu"), 0x80015464, 0x3C09801E, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->device("maincpu"), 0x800C8918, 0x8FA2004C, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->device("maincpu"), 0x800C8890, 0x8FA20024, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine.device("maincpu"), 0x80015430, 0x8CC38060, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine.device("maincpu"), 0x80015464, 0x3C09801E, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine.device("maincpu"), 0x800C8918, 0x8FA2004C, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine.device("maincpu"), 0x800C8890, 0x8FA20024, 250);		/* confirmed */
 }
 
 
@@ -2494,10 +2494,10 @@ static DRIVER_INIT( gauntdl )
 	init_common(machine, MIDWAY_IOASIC_GAUNTDL, 346/* 347, others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine->device("maincpu"), 0x800158B8, 0x8CC3CC40, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->device("maincpu"), 0x800158EC, 0x3C0C8022, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->device("maincpu"), 0x800D40C0, 0x8FA2004C, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->device("maincpu"), 0x800D4038, 0x8FA20024, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine.device("maincpu"), 0x800158B8, 0x8CC3CC40, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine.device("maincpu"), 0x800158EC, 0x3C0C8022, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine.device("maincpu"), 0x800D40C0, 0x8FA2004C, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine.device("maincpu"), 0x800D4038, 0x8FA20024, 250);		/* confirmed */
 }
 
 
@@ -2507,7 +2507,7 @@ static DRIVER_INIT( warfa )
 	init_common(machine, MIDWAY_IOASIC_MACE, 337/* others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine->device("maincpu"), 0x8009436C, 0x0C031663, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine.device("maincpu"), 0x8009436C, 0x0C031663, 250);		/* confirmed */
 }
 
 
@@ -2517,10 +2517,10 @@ static DRIVER_INIT( tenthdeg )
 	init_common(machine, MIDWAY_IOASIC_GAUNTDL, 330/* others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine->device("maincpu"), 0x80051CD8, 0x0C023C15, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->device("maincpu"), 0x8005E674, 0x3C028017, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->device("maincpu"), 0x8002DBCC, 0x8FA2002C, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->device("maincpu"), 0x80015930, 0x8FC20244, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine.device("maincpu"), 0x80051CD8, 0x0C023C15, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine.device("maincpu"), 0x8005E674, 0x3C028017, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine.device("maincpu"), 0x8002DBCC, 0x8FA2002C, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine.device("maincpu"), 0x80015930, 0x8FC20244, 250);		/* confirmed */
 }
 
 

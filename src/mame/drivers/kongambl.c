@@ -30,7 +30,7 @@ public:
 
 static VIDEO_START(kongambl)
 {
-	device_t *k056832 = machine->device("k056832");
+	device_t *k056832 = machine.device("k056832");
 
 	k056832_set_layer_association(k056832, 0);
 	k056832_set_layer_offs(k056832, 0, -2, 0);
@@ -41,10 +41,10 @@ static VIDEO_START(kongambl)
 
 static SCREEN_UPDATE(kongambl)
 {
-	device_t *k056832 = screen->machine->device("k056832");
+	device_t *k056832 = screen->machine().device("k056832");
 
 	bitmap_fill(bitmap, cliprect, 0);
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 //  k056832_tilemap_draw(k056832, bitmap, cliprect, 3, 0, 0);
 //  k056832_tilemap_draw(k056832, bitmap, cliprect, 2, 0, 0);
@@ -57,7 +57,7 @@ static READ32_HANDLER( eeprom_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT32 rv = input_port_read(space->machine, "SYSTEM") & ~0x1;
+		UINT32 rv = input_port_read(space->machine(), "SYSTEM") & ~0x1;
 
 		return rv;	// bit 0 freezes the game if 1
 	}
@@ -69,7 +69,7 @@ static WRITE32_HANDLER( eeprom_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		input_port_write(space->machine, "EEPROMOUT", (data>>8)&0xf, 0xff);
+		input_port_write(space->machine(), "EEPROMOUT", (data>>8)&0xf, 0xff);
 	}
 }
 
@@ -109,11 +109,11 @@ static ADDRESS_MAP_START( kongamaud_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x2000ff) AM_RAM	// unknown (YMZ280b?  Shared with 68020?)
 ADDRESS_MAP_END
 
-static void kongambl_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
+static void kongambl_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
 {
 }
 
-static void kongambl_tile_callback( running_machine *machine, int layer, int *code, int *color, int *flags )
+static void kongambl_tile_callback( running_machine &machine, int layer, int *code, int *color, int *flags )
 {
 }
 

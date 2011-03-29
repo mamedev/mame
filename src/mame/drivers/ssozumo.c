@@ -17,7 +17,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 static WRITE8_HANDLER( ssozumo_sh_command_w )
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -51,7 +51,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( ssozumo )

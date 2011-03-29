@@ -13,26 +13,26 @@
 
 WRITE8_HANDLER( circus_videoram_w )
 {
-	circus_state *state = space->machine->driver_data<circus_state>();
+	circus_state *state = space->machine().driver_data<circus_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( circus_clown_x_w )
 {
-	circus_state *state = space->machine->driver_data<circus_state>();
+	circus_state *state = space->machine().driver_data<circus_state>();
 	state->clown_x = 240 - data;
 }
 
 WRITE8_HANDLER( circus_clown_y_w )
 {
-	circus_state *state = space->machine->driver_data<circus_state>();
+	circus_state *state = space->machine().driver_data<circus_state>();
 	state->clown_y = 240 - data;
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	circus_state *state = machine->driver_data<circus_state>();
+	circus_state *state = machine.driver_data<circus_state>();
 	int code = state->videoram[tile_index];
 
 	SET_TILE_INFO(0, code, 0, 0);
@@ -40,7 +40,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( circus )
 {
-	circus_state *state = machine->driver_data<circus_state>();
+	circus_state *state = machine.driver_data<circus_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
@@ -63,10 +63,10 @@ static void draw_line( bitmap_t *bitmap, const rectangle *cliprect, int x1, int 
 			*BITMAP_ADDR16(bitmap, y1, count) = 1;
 }
 
-static void draw_sprite_collision( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprite_collision( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	circus_state *state = machine->driver_data<circus_state>();
-	const gfx_element *sprite_gfx = machine->gfx[1];
+	circus_state *state = machine.driver_data<circus_state>();
+	const gfx_element *sprite_gfx = machine.gfx[1];
 	const UINT8 *sprite_data = gfx_element_get_data(sprite_gfx, state->clown_z);
 	int sx, sy, dx, dy;
 	int pixel, collision = 0;
@@ -86,7 +86,7 @@ static void draw_sprite_collision( running_machine *machine, bitmap_t *bitmap, c
 					if (pixel)
 					{
 						collision |= *BITMAP_ADDR16(bitmap, dy, dx);
-						*BITMAP_ADDR16(bitmap, dy, dx) = machine->pens[pixel];
+						*BITMAP_ADDR16(bitmap, dy, dx) = machine.pens[pixel];
 					}
 				}
 			}
@@ -97,7 +97,7 @@ static void draw_sprite_collision( running_machine *machine, bitmap_t *bitmap, c
 		device_set_input_line(state->maincpu, 0, ASSERT_LINE);
 }
 
-static void circus_draw_fg( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void circus_draw_fg( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	/* The sync generator hardware is used to   */
 	/* draw the border and diving boards        */
@@ -115,10 +115,10 @@ static void circus_draw_fg( running_machine *machine, bitmap_t *bitmap, const re
 
 SCREEN_UPDATE( circus )
 {
-	circus_state *state = screen->machine->driver_data<circus_state>();
+	circus_state *state = screen->machine().driver_data<circus_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	circus_draw_fg(screen->machine, bitmap, cliprect);
-	draw_sprite_collision(screen->machine, bitmap, cliprect);
+	circus_draw_fg(screen->machine(), bitmap, cliprect);
+	draw_sprite_collision(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -173,11 +173,11 @@ static void robotbwl_draw_bowling_alley( bitmap_t *bitmap, const rectangle *clip
 	draw_line(bitmap, cliprect, 144, 17, 144, 203, 1);
 }
 
-static void robotbwl_draw_ball( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void robotbwl_draw_ball( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	circus_state *state = machine->driver_data<circus_state>();
+	circus_state *state = machine.driver_data<circus_state>();
 	drawgfx_transpen(bitmap,/* Y is horizontal position */
-			cliprect,machine->gfx[1],
+			cliprect,machine.gfx[1],
 			state->clown_z,
 			0,
 			0,0,
@@ -186,19 +186,19 @@ static void robotbwl_draw_ball( running_machine *machine, bitmap_t *bitmap, cons
 
 SCREEN_UPDATE( robotbwl )
 {
-	circus_state *state = screen->machine->driver_data<circus_state>();
+	circus_state *state = screen->machine().driver_data<circus_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	robotbwl_draw_scoreboard(bitmap, cliprect);
 	robotbwl_draw_bowling_alley(bitmap, cliprect);
-	robotbwl_draw_ball(screen->machine, bitmap, cliprect);
+	robotbwl_draw_ball(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
-static void crash_draw_car( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void crash_draw_car( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	circus_state *state = machine->driver_data<circus_state>();
+	circus_state *state = machine.driver_data<circus_state>();
 	drawgfx_transpen(bitmap,/* Y is horizontal position */
-		cliprect,machine->gfx[1],
+		cliprect,machine.gfx[1],
 		state->clown_z,
 		0,
 		0,0,
@@ -207,16 +207,16 @@ static void crash_draw_car( running_machine *machine, bitmap_t *bitmap, const re
 
 SCREEN_UPDATE( crash )
 {
-	circus_state *state = screen->machine->driver_data<circus_state>();
+	circus_state *state = screen->machine().driver_data<circus_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	crash_draw_car(screen->machine, bitmap, cliprect);
+	crash_draw_car(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( ripcord )
 {
-	circus_state *state = screen->machine->driver_data<circus_state>();
+	circus_state *state = screen->machine().driver_data<circus_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprite_collision(screen->machine, bitmap, cliprect);
+	draw_sprite_collision(screen->machine(), bitmap, cliprect);
 	return 0;
 }

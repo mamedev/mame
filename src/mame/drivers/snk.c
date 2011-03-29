@@ -89,7 +89,7 @@ Notes:
   a bug. The service mode functionality is very limited anyway. To get past the
   failed ROM test and see the service mode, use this ROM patch:
 
-    UINT8 *mem = machine->region("maincpu")->base();
+    UINT8 *mem = machine.region("maincpu")->base();
     mem[0x3a5d] = mem[0x3a5e] = mem[0x3a5f] = 0;
 
 - The "SNK Wave" custom sound circuitry is only actually used by marvins and
@@ -275,28 +275,28 @@ static READ8_HANDLER ( snk_cpuA_nmi_trigger_r )
 {
 	if(!space->debugger_access())
 	{
-		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	return 0xff;
 }
 
 static WRITE8_HANDLER( snk_cpuA_nmi_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static READ8_HANDLER ( snk_cpuB_nmi_trigger_r )
 {
 	if(!space->debugger_access())
 	{
-		cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	return 0xff;
 }
 
 static WRITE8_HANDLER( snk_cpuB_nmi_ack_w )
 {
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 /*********************************************************************/
@@ -316,16 +316,16 @@ enum
 
 static WRITE8_HANDLER( marvins_soundlatch_w )
 {
-	snk_state *state = space->machine->driver_data<snk_state>();
+	snk_state *state = space->machine().driver_data<snk_state>();
 
 	state->marvins_sound_busy_flag = 1;
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( marvins_soundlatch_r )
 {
-	snk_state *state = space->machine->driver_data<snk_state>();
+	snk_state *state = space->machine().driver_data<snk_state>();
 
 	state->marvins_sound_busy_flag = 0;
 	return soundlatch_r(space, 0);
@@ -333,14 +333,14 @@ static READ8_HANDLER( marvins_soundlatch_r )
 
 static CUSTOM_INPUT( marvins_sound_busy )
 {
-	snk_state *state = field->port->machine->driver_data<snk_state>();
+	snk_state *state = field->port->machine().driver_data<snk_state>();
 
 	return state->marvins_sound_busy_flag;
 }
 
 static READ8_HANDLER( marvins_sound_nmi_ack_r )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -348,7 +348,7 @@ static READ8_HANDLER( marvins_sound_nmi_ack_r )
 
 static TIMER_CALLBACK( sgladiat_sndirq_update_callback )
 {
-	snk_state *state = machine->driver_data<snk_state>();
+	snk_state *state = machine.driver_data<snk_state>();
 
 	switch(param)
 	{
@@ -372,24 +372,24 @@ static TIMER_CALLBACK( sgladiat_sndirq_update_callback )
 static WRITE8_HANDLER( sgladiat_soundlatch_w )
 {
 	soundlatch_w(space, offset, data);
-	space->machine->scheduler().synchronize(FUNC(sgladiat_sndirq_update_callback), CMDIRQ_BUSY_ASSERT);
+	space->machine().scheduler().synchronize(FUNC(sgladiat_sndirq_update_callback), CMDIRQ_BUSY_ASSERT);
 }
 
 static READ8_HANDLER( sgladiat_soundlatch_r )
 {
-	space->machine->scheduler().synchronize(FUNC(sgladiat_sndirq_update_callback), BUSY_CLEAR);
+	space->machine().scheduler().synchronize(FUNC(sgladiat_sndirq_update_callback), BUSY_CLEAR);
 	return soundlatch_r(space,0);
 }
 
 static READ8_HANDLER( sgladiat_sound_nmi_ack_r )
 {
-	space->machine->scheduler().synchronize(FUNC(sgladiat_sndirq_update_callback), CMDIRQ_CLEAR);
+	space->machine().scheduler().synchronize(FUNC(sgladiat_sndirq_update_callback), CMDIRQ_CLEAR);
 	return 0xff;
 }
 
 static READ8_HANDLER( sgladiat_sound_irq_ack_r )
 {
-	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -419,7 +419,7 @@ static READ8_HANDLER( sgladiat_sound_irq_ack_r )
 
 static TIMER_CALLBACK( sndirq_update_callback )
 {
-	snk_state *state = machine->driver_data<snk_state>();
+	snk_state *state = machine.driver_data<snk_state>();
 
 	switch(param)
 	{
@@ -460,13 +460,13 @@ static TIMER_CALLBACK( sndirq_update_callback )
 static void ymirq_callback_1(device_t *device, int irq)
 {
 	if (irq)
-		device->machine->scheduler().synchronize(FUNC(sndirq_update_callback), YM1IRQ_ASSERT);
+		device->machine().scheduler().synchronize(FUNC(sndirq_update_callback), YM1IRQ_ASSERT);
 }
 
 static void ymirq_callback_2(device_t *device, int irq)
 {
 	if (irq)
-		device->machine->scheduler().synchronize(FUNC(sndirq_update_callback), YM2IRQ_ASSERT);
+		device->machine().scheduler().synchronize(FUNC(sndirq_update_callback), YM2IRQ_ASSERT);
 }
 
 
@@ -495,12 +495,12 @@ static const y8950_interface y8950_config_2 =
 static WRITE8_HANDLER( snk_soundlatch_w )
 {
 	soundlatch_w(space, offset, data);
-	space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), CMDIRQ_BUSY_ASSERT);
+	space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), CMDIRQ_BUSY_ASSERT);
 }
 
 static CUSTOM_INPUT( snk_sound_busy )
 {
-	snk_state *state = field->port->machine->driver_data<snk_state>();
+	snk_state *state = field->port->machine().driver_data<snk_state>();
 
 	return (state->sound_status & 4) ? 1 : 0;
 }
@@ -509,7 +509,7 @@ static CUSTOM_INPUT( snk_sound_busy )
 
 static READ8_HANDLER( snk_sound_status_r )
 {
-	snk_state *state = space->machine->driver_data<snk_state>();
+	snk_state *state = space->machine().driver_data<snk_state>();
 
 	return state->sound_status;
 }
@@ -517,29 +517,29 @@ static READ8_HANDLER( snk_sound_status_r )
 static WRITE8_HANDLER( snk_sound_status_w )
 {
 	if (~data & 0x10)	// ack YM1 irq
-		space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), YM1IRQ_CLEAR);
+		space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), YM1IRQ_CLEAR);
 
 	if (~data & 0x20)	// ack YM2 irq
-		space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), YM2IRQ_CLEAR);
+		space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), YM2IRQ_CLEAR);
 
 	if (~data & 0x40)	// clear busy flag
-		space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), BUSY_CLEAR);
+		space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), BUSY_CLEAR);
 
 	if (~data & 0x80)	// ack command from main cpu
-		space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), CMDIRQ_CLEAR);
+		space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), CMDIRQ_CLEAR);
 }
 
 
 
 static READ8_HANDLER( tnk3_cmdirq_ack_r )
 {
-	space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), CMDIRQ_CLEAR);
+	space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), CMDIRQ_CLEAR);
 	return 0xff;
 }
 
 static READ8_HANDLER( tnk3_ymirq_ack_r )
 {
-	space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), YM1IRQ_CLEAR);
+	space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), YM1IRQ_CLEAR);
 	return 0xff;
 }
 
@@ -547,7 +547,7 @@ static READ8_HANDLER( tnk3_busy_clear_r )
 {
 	// it's uncertain whether the latch should be cleared here or when it's read
 	soundlatch_clear_w(space, 0, 0);
-	space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), BUSY_CLEAR);
+	space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), BUSY_CLEAR);
 	return 0xff;
 }
 
@@ -573,28 +573,28 @@ A trojan could be used on the board to verify the exact behaviour.
 
 static WRITE8_HANDLER( hardflags_scrollx_w )
 {
-	snk_state *state = space->machine->driver_data<snk_state>();
+	snk_state *state = space->machine().driver_data<snk_state>();
 	state->hf_posx = (state->hf_posx & ~0xff) | data;
 }
 
 static WRITE8_HANDLER( hardflags_scrolly_w )
 {
-	snk_state *state = space->machine->driver_data<snk_state>();
+	snk_state *state = space->machine().driver_data<snk_state>();
 	state->hf_posy = (state->hf_posy & ~0xff) | data;
 }
 
 static WRITE8_HANDLER( hardflags_scroll_msb_w )
 {
-	snk_state *state = space->machine->driver_data<snk_state>();
+	snk_state *state = space->machine().driver_data<snk_state>();
 	state->hf_posx = (state->hf_posx & 0xff) | ((data & 0x80) << 1);
 	state->hf_posy = (state->hf_posy & 0xff) | ((data & 0x40) << 2);
 
 	// low 6 bits might indicate radius, but it's not clear
 }
 
-static int hardflags_check(running_machine *machine, int num)
+static int hardflags_check(running_machine &machine, int num)
 {
-	snk_state *state = machine->driver_data<snk_state>();
+	snk_state *state = machine.driver_data<snk_state>();
 	const UINT8 *sr = &state->spriteram[0x800 + 4*num];
 	int x = sr[2] + ((sr[3] & 0x80) << 1);
 	int y = sr[0] + ((sr[3] & 0x10) << 4);
@@ -608,7 +608,7 @@ static int hardflags_check(running_machine *machine, int num)
 		return 1;
 }
 
-static int hardflags_check8(running_machine *machine, int num)
+static int hardflags_check8(running_machine &machine, int num)
 {
 	return
 		(hardflags_check(machine, num + 0) << 0) |
@@ -621,20 +621,20 @@ static int hardflags_check8(running_machine *machine, int num)
 		(hardflags_check(machine, num + 7) << 7);
 }
 
-static READ8_HANDLER( hardflags1_r )	{ return hardflags_check8(space->machine, 0*8); }
-static READ8_HANDLER( hardflags2_r )	{ return hardflags_check8(space->machine, 1*8); }
-static READ8_HANDLER( hardflags3_r )	{ return hardflags_check8(space->machine, 2*8); }
-static READ8_HANDLER( hardflags4_r )	{ return hardflags_check8(space->machine, 3*8); }
-static READ8_HANDLER( hardflags5_r )	{ return hardflags_check8(space->machine, 4*8); }
-static READ8_HANDLER( hardflags6_r )	{ return hardflags_check8(space->machine, 5*8); }
+static READ8_HANDLER( hardflags1_r )	{ return hardflags_check8(space->machine(), 0*8); }
+static READ8_HANDLER( hardflags2_r )	{ return hardflags_check8(space->machine(), 1*8); }
+static READ8_HANDLER( hardflags3_r )	{ return hardflags_check8(space->machine(), 2*8); }
+static READ8_HANDLER( hardflags4_r )	{ return hardflags_check8(space->machine(), 3*8); }
+static READ8_HANDLER( hardflags5_r )	{ return hardflags_check8(space->machine(), 4*8); }
+static READ8_HANDLER( hardflags6_r )	{ return hardflags_check8(space->machine(), 5*8); }
 static READ8_HANDLER( hardflags7_r )
 {
 	// apparently the startup tests use bits 0&1 while the game uses bits 4&5
 	return
-		(hardflags_check(space->machine, 6*8 + 0) << 0) |
-		(hardflags_check(space->machine, 6*8 + 1) << 1) |
-		(hardflags_check(space->machine, 6*8 + 0) << 4) |
-		(hardflags_check(space->machine, 6*8 + 1) << 5);
+		(hardflags_check(space->machine(), 6*8 + 0) << 0) |
+		(hardflags_check(space->machine(), 6*8 + 1) << 1) |
+		(hardflags_check(space->machine(), 6*8 + 0) << 4) |
+		(hardflags_check(space->machine(), 6*8 + 1) << 5);
 }
 
 
@@ -657,31 +657,31 @@ A trojan could be used on the board to verify the exact behaviour.
 
 static WRITE8_HANDLER( turbocheck16_1_w )
 {
-	snk_state *state = space->machine->driver_data<snk_state>();
+	snk_state *state = space->machine().driver_data<snk_state>();
 	state->tc16_posy = (state->tc16_posy & ~0xff) | data;
 }
 
 static WRITE8_HANDLER( turbocheck16_2_w )
 {
-	snk_state *state = space->machine->driver_data<snk_state>();
+	snk_state *state = space->machine().driver_data<snk_state>();
 	state->tc16_posx = (state->tc16_posx & ~0xff) | data;
 }
 
 static WRITE8_HANDLER( turbocheck32_1_w )
 {
-	snk_state *state = space->machine->driver_data<snk_state>();
+	snk_state *state = space->machine().driver_data<snk_state>();
 	state->tc32_posy = (state->tc32_posy & ~0xff) | data;
 }
 
 static WRITE8_HANDLER( turbocheck32_2_w )
 {
-	snk_state *state = space->machine->driver_data<snk_state>();
+	snk_state *state = space->machine().driver_data<snk_state>();
 	state->tc32_posx = (state->tc32_posx & ~0xff) | data;
 }
 
 static WRITE8_HANDLER( turbocheck_msb_w )
 {
-	snk_state *state = space->machine->driver_data<snk_state>();
+	snk_state *state = space->machine().driver_data<snk_state>();
 	state->tc16_posx = (state->tc16_posx & 0xff) | ((data & 0x80) << 1);
 	state->tc16_posy = (state->tc16_posy & 0xff) | ((data & 0x40) << 2);
 	state->tc32_posx = (state->tc32_posx & 0xff) | ((data & 0x80) << 1);
@@ -690,9 +690,9 @@ static WRITE8_HANDLER( turbocheck_msb_w )
 	// low 6 bits might indicate radius, but it's not clear
 }
 
-static int turbofront_check(running_machine *machine, int small, int num)
+static int turbofront_check(running_machine &machine, int small, int num)
 {
-	snk_state *state = machine->driver_data<snk_state>();
+	snk_state *state = machine.driver_data<snk_state>();
 	const UINT8 *sr = &state->spriteram[0x800*small + 4*num];
 	int x = sr[2] + ((sr[3] & 0x80) << 1);
 	int y = sr[0] + ((sr[3] & 0x10) << 4);
@@ -706,7 +706,7 @@ static int turbofront_check(running_machine *machine, int small, int num)
 		return 1;
 }
 
-static int turbofront_check8(running_machine *machine, int small, int num)
+static int turbofront_check8(running_machine &machine, int small, int num)
 {
 	return
 		(turbofront_check(machine, small, num + 0) << 0) |
@@ -719,18 +719,18 @@ static int turbofront_check8(running_machine *machine, int small, int num)
 		(turbofront_check(machine, small, num + 7) << 7);
 }
 
-static READ8_HANDLER( turbocheck16_1_r )	{ return turbofront_check8(space->machine, 1, 0*8); }
-static READ8_HANDLER( turbocheck16_2_r )	{ return turbofront_check8(space->machine, 1, 1*8); }
-static READ8_HANDLER( turbocheck16_3_r )	{ return turbofront_check8(space->machine, 1, 2*8); }
-static READ8_HANDLER( turbocheck16_4_r )	{ return turbofront_check8(space->machine, 1, 3*8); }
-static READ8_HANDLER( turbocheck16_5_r )	{ return turbofront_check8(space->machine, 1, 4*8); }
-static READ8_HANDLER( turbocheck16_6_r )	{ return turbofront_check8(space->machine, 1, 5*8); }
-static READ8_HANDLER( turbocheck16_7_r )	{ return turbofront_check8(space->machine, 1, 6*8); }
-static READ8_HANDLER( turbocheck16_8_r )	{ return turbofront_check8(space->machine, 1, 7*8); }
-static READ8_HANDLER( turbocheck32_1_r )	{ return turbofront_check8(space->machine, 0, 0*8); }
-static READ8_HANDLER( turbocheck32_2_r )	{ return turbofront_check8(space->machine, 0, 1*8); }
-static READ8_HANDLER( turbocheck32_3_r )	{ return turbofront_check8(space->machine, 0, 2*8); }
-static READ8_HANDLER( turbocheck32_4_r )	{ return turbofront_check8(space->machine, 0, 3*8); }
+static READ8_HANDLER( turbocheck16_1_r )	{ return turbofront_check8(space->machine(), 1, 0*8); }
+static READ8_HANDLER( turbocheck16_2_r )	{ return turbofront_check8(space->machine(), 1, 1*8); }
+static READ8_HANDLER( turbocheck16_3_r )	{ return turbofront_check8(space->machine(), 1, 2*8); }
+static READ8_HANDLER( turbocheck16_4_r )	{ return turbofront_check8(space->machine(), 1, 3*8); }
+static READ8_HANDLER( turbocheck16_5_r )	{ return turbofront_check8(space->machine(), 1, 4*8); }
+static READ8_HANDLER( turbocheck16_6_r )	{ return turbofront_check8(space->machine(), 1, 5*8); }
+static READ8_HANDLER( turbocheck16_7_r )	{ return turbofront_check8(space->machine(), 1, 6*8); }
+static READ8_HANDLER( turbocheck16_8_r )	{ return turbofront_check8(space->machine(), 1, 7*8); }
+static READ8_HANDLER( turbocheck32_1_r )	{ return turbofront_check8(space->machine(), 0, 0*8); }
+static READ8_HANDLER( turbocheck32_2_r )	{ return turbofront_check8(space->machine(), 0, 1*8); }
+static READ8_HANDLER( turbocheck32_3_r )	{ return turbofront_check8(space->machine(), 0, 2*8); }
+static READ8_HANDLER( turbocheck32_4_r )	{ return turbofront_check8(space->machine(), 0, 3*8); }
 
 
 
@@ -752,10 +752,10 @@ hand, always returning 0xf inbetween valid values confuses the game.
 
 static CUSTOM_INPUT( gwar_rotary )
 {
-	snk_state *state = field->port->machine->driver_data<snk_state>();
+	snk_state *state = field->port->machine().driver_data<snk_state>();
 	static const char *const ports[] = { "P1ROT", "P2ROT" };
 	int which = (int)(FPTR)param;
-	int value = input_port_read(field->port->machine, ports[which]);
+	int value = input_port_read(field->port->machine(), ports[which]);
 
 	if ((state->last_value[which] == 0x5 && value == 0x6) || (state->last_value[which] == 0x6 && value == 0x5))
 	{
@@ -770,7 +770,7 @@ static CUSTOM_INPUT( gwar_rotary )
 
 static CUSTOM_INPUT( gwarb_rotary )
 {
-	if (input_port_read(field->port->machine, "JOYSTICK_MODE") == 1)
+	if (input_port_read(field->port->machine(), "JOYSTICK_MODE") == 1)
 	{
 		return gwar_rotary(field, param);
 	}
@@ -785,50 +785,50 @@ static CUSTOM_INPUT( gwarb_rotary )
 
 static WRITE8_HANDLER( athena_coin_counter_w )
 {
-	coin_counter_w(space->machine, 0, ~data & 2);
-	coin_counter_w(space->machine, 1, ~data & 1);
+	coin_counter_w(space->machine(), 0, ~data & 2);
+	coin_counter_w(space->machine(), 1, ~data & 1);
 }
 
 static WRITE8_HANDLER( ikari_coin_counter_w )
 {
 	if (~data & 0x80)
 	{
-		coin_counter_w(space->machine, 0, 1);
-		coin_counter_w(space->machine, 0, 0);
+		coin_counter_w(space->machine(), 0, 1);
+		coin_counter_w(space->machine(), 0, 0);
 	}
 
 	if (~data & 0x40)
 	{
-		coin_counter_w(space->machine, 1, 1);
-		coin_counter_w(space->machine, 1, 0);
+		coin_counter_w(space->machine(), 1, 1);
+		coin_counter_w(space->machine(), 1, 0);
 	}
 }
 
 static WRITE8_HANDLER( tdfever_coin_counter_w )
 {
-	coin_counter_w(space->machine, 0, data & 1);
-	coin_counter_w(space->machine, 1, data & 2);
+	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(space->machine(), 1, data & 2);
 }
 
 static WRITE8_HANDLER( countryc_trackball_w )
 {
-	snk_state *state = space->machine->driver_data<snk_state>();
+	snk_state *state = space->machine().driver_data<snk_state>();
 
 	state->countryc_trackball = data & 1;
 }
 
 static CUSTOM_INPUT( countryc_trackball_x )
 {
-	snk_state *state = field->port->machine->driver_data<snk_state>();
+	snk_state *state = field->port->machine().driver_data<snk_state>();
 
-	return input_port_read(field->port->machine, state->countryc_trackball ? "TRACKBALLX2" : "TRACKBALLX1");
+	return input_port_read(field->port->machine(), state->countryc_trackball ? "TRACKBALLX2" : "TRACKBALLX1");
 }
 
 static CUSTOM_INPUT( countryc_trackball_y )
 {
-	snk_state *state = field->port->machine->driver_data<snk_state>();
+	snk_state *state = field->port->machine().driver_data<snk_state>();
 
-	return input_port_read(field->port->machine, state->countryc_trackball ? "TRACKBALLY2" : "TRACKBALLY1");
+	return input_port_read(field->port->machine(), state->countryc_trackball ? "TRACKBALLY2" : "TRACKBALLY1");
 }
 
 
@@ -841,14 +841,14 @@ static CUSTOM_INPUT( snk_bonus_r )
 	switch (bit_mask)
 	{
 		case 0x01:  /* older games : "Occurence" Dip Switch (DSW2:1) */
-			return ((input_port_read(field->port->machine, "BONUS") & bit_mask) >> 0);
+			return ((input_port_read(field->port->machine(), "BONUS") & bit_mask) >> 0);
 		case 0xc0:  /* older games : "Bonus Life" Dip Switches (DSW1:7,8) */
-			return ((input_port_read(field->port->machine, "BONUS") & bit_mask) >> 6);
+			return ((input_port_read(field->port->machine(), "BONUS") & bit_mask) >> 6);
 
 		case 0x04:  /* later games : "Occurence" Dip Switch (DSW1:3) */
-			return ((input_port_read(field->port->machine, "BONUS") & bit_mask) >> 2);
+			return ((input_port_read(field->port->machine(), "BONUS") & bit_mask) >> 2);
 		case 0x30:  /* later games : "Bonus Life" Dip Switches (DSW2:5,6) */
-			return ((input_port_read(field->port->machine, "BONUS") & bit_mask) >> 4);
+			return ((input_port_read(field->port->machine(), "BONUS") & bit_mask) >> 4);
 
 		default:
 			logerror("snk_bonus_r : invalid %02X bit_mask\n",bit_mask);
@@ -6253,7 +6253,7 @@ ROM_END
 static DRIVER_INIT( countryc )
 {
 	// replace coin counter with trackball select
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc300, 0xc300, FUNC(countryc_trackball_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc300, 0xc300, FUNC(countryc_trackball_w));
 }
 
 

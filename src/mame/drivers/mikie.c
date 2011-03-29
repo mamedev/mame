@@ -59,7 +59,7 @@ Stephh's notes (based on the games M6809 code and some tests) :
 
 static READ8_HANDLER( mikie_sh_timer_r )
 {
-	mikie_state *state = space->machine->driver_data<mikie_state>();
+	mikie_state *state = space->machine().driver_data<mikie_state>();
 	int clock = state->audiocpu->total_cycles() / MIKIE_TIMER_RATE;
 
 	return clock;
@@ -67,7 +67,7 @@ static READ8_HANDLER( mikie_sh_timer_r )
 
 static WRITE8_HANDLER( mikie_sh_irqtrigger_w )
 {
-	mikie_state *state = space->machine->driver_data<mikie_state>();
+	mikie_state *state = space->machine().driver_data<mikie_state>();
 
 	if (state->last_irq == 0 && data == 1)
 	{
@@ -80,7 +80,7 @@ static WRITE8_HANDLER( mikie_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( mikie_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset, data);
+	coin_counter_w(space->machine(), offset, data);
 }
 
 /*************************************
@@ -227,10 +227,10 @@ GFXDECODE_END
 
 static MACHINE_START( mikie )
 {
-	mikie_state *state = machine->driver_data<mikie_state>();
+	mikie_state *state = machine.driver_data<mikie_state>();
 
-	state->maincpu = machine->device<cpu_device>("maincpu");
-	state->audiocpu = machine->device<cpu_device>("audiocpu");
+	state->maincpu = machine.device<cpu_device>("maincpu");
+	state->audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->palettebank));
 	state->save_item(NAME(state->last_irq));
@@ -238,7 +238,7 @@ static MACHINE_START( mikie )
 
 static MACHINE_RESET( mikie )
 {
-	mikie_state *state = machine->driver_data<mikie_state>();
+	mikie_state *state = machine.driver_data<mikie_state>();
 
 	state->palettebank = 0;
 	state->last_irq = 0;

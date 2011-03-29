@@ -12,9 +12,9 @@
 #include "includes/bishi.h"
 
 
-void bishi_tile_callback( running_machine *machine, int layer, int *code, int *color, int *flags )
+void bishi_tile_callback( running_machine &machine, int layer, int *code, int *color, int *flags )
 {
-	bishi_state *state = machine->driver_data<bishi_state>();
+	bishi_state *state = machine.driver_data<bishi_state>();
 
 //  *code -= '0';
 //  *color = state->layer_colorbase[layer] | (*color>>2 & 0x0f);
@@ -26,9 +26,9 @@ void bishi_tile_callback( running_machine *machine, int layer, int *code, int *c
 
 VIDEO_START( bishi )
 {
-	bishi_state *state = machine->driver_data<bishi_state>();
+	bishi_state *state = machine.driver_data<bishi_state>();
 
-	assert(machine->primary_screen->format() == BITMAP_FORMAT_RGB32);
+	assert(machine.primary_screen->format() == BITMAP_FORMAT_RGB32);
 
 	k056832_set_layer_association(state->k056832, 0);
 
@@ -46,7 +46,7 @@ VIDEO_START( bishi )
 
 SCREEN_UPDATE(bishi)
 {
-	bishi_state *state = screen->machine->driver_data<bishi_state>();
+	bishi_state *state = screen->machine().driver_data<bishi_state>();
 	int layers[4], layerpri[4], i;/*, old;*/
 /*  int bg_colorbase, new_colorbase, plane, dirty; */
 	static const int pris[4] = { K55_PRIINP_0, K55_PRIINP_3, K55_PRIINP_6, K55_PRIINP_7 };
@@ -63,7 +63,7 @@ SCREEN_UPDATE(bishi)
 
 	konami_sortlayers4(layers, layerpri);
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	for (i = 0; i < 4; i++)
 	{

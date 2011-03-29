@@ -87,7 +87,7 @@ TODO:
 
 static TIMER_CALLBACK( interrupt_disable )
 {
-	zodiack_state *state = machine->driver_data<zodiack_state>();
+	zodiack_state *state = machine.driver_data<zodiack_state>();
 	//interrupt_enable = 0;
 	cpu_interrupt_enable(state->maincpu, 0);
 }
@@ -99,14 +99,14 @@ static WRITE8_HANDLER( zodiac_master_interrupt_enable_w )
 
 static WRITE8_HANDLER( zodiac_sound_nmi_enable_w )
 {
-	zodiack_state *state = space->machine->driver_data<zodiack_state>();
+	zodiack_state *state = space->machine().driver_data<zodiack_state>();
 	state->sound_nmi_enabled = data & 1;
 }
 
 
 static INTERRUPT_GEN( zodiac_sound_nmi_gen )
 {
-	zodiack_state *state = device->machine->driver_data<zodiack_state>();
+	zodiack_state *state = device->machine().driver_data<zodiack_state>();
 
 	if (state->sound_nmi_enabled)
 		nmi_line_pulse(device);
@@ -122,34 +122,34 @@ static INTERRUPT_GEN( zodiac_master_interrupt )
 
 static WRITE8_HANDLER( zodiac_master_soundlatch_w )
 {
-	zodiack_state *state = space->machine->driver_data<zodiack_state>();
+	zodiack_state *state = space->machine().driver_data<zodiack_state>();
 	soundlatch_w(space, offset, data);
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static MACHINE_START( zodiack )
 {
-	zodiack_state *state = machine->driver_data<zodiack_state>();
+	zodiack_state *state = machine.driver_data<zodiack_state>();
 
 	state->percuss_hardware = 0;
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->sound_nmi_enabled));
 }
 
 static MACHINE_RESET( zodiack )
 {
-	zodiack_state *state = machine->driver_data<zodiack_state>();
+	zodiack_state *state = machine.driver_data<zodiack_state>();
 
 	/* we must start with NMI interrupts disabled */
-	machine->scheduler().synchronize(FUNC(interrupt_disable));
+	machine.scheduler().synchronize(FUNC(interrupt_disable));
 	state->sound_nmi_enabled = FALSE;
 }
 
 static MACHINE_START( percuss )
 {
-	zodiack_state *state = machine->driver_data<zodiack_state>();
+	zodiack_state *state = machine.driver_data<zodiack_state>();
 
 	MACHINE_START_CALL( zodiack );
 
@@ -160,8 +160,8 @@ static MACHINE_START( percuss )
 static WRITE8_HANDLER( zodiack_control_w )
 {
 	/* Bit 0-1 - coin counters */
-	coin_counter_w(space->machine, 0, data & 0x02);
-	coin_counter_w(space->machine, 1, data & 0x01);
+	coin_counter_w(space->machine(), 0, data & 0x02);
+	coin_counter_w(space->machine(), 1, data & 0x01);
 
 	/* Bit 2 - ???? */
 }

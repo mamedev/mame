@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "includes/lemmings.h"
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 *spritedata, int gfxbank, UINT16 pri )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 *spritedata, int gfxbank, UINT16 pri )
 {
 	int offs;
 
@@ -30,7 +30,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 		y = spritedata[offs];
 		flash = y & 0x1000;
-		if (flash && (machine->primary_screen->frame_number() & 1))
+		if (flash && (machine.primary_screen->frame_number() & 1))
 			continue;
 
 		x = spritedata[offs + 2];
@@ -59,7 +59,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 		while (multi >= 0)
 		{
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[gfxbank],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[gfxbank],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
@@ -74,7 +74,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static TILE_GET_INFO( get_tile_info )
 {
-	lemmings_state *state = machine->driver_data<lemmings_state>();
+	lemmings_state *state = machine.driver_data<lemmings_state>();
 	UINT16 tile = state->vram_data[tile_index];
 
 	SET_TILE_INFO(
@@ -86,8 +86,8 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( lemmings )
 {
-	lemmings_state *state = machine->driver_data<lemmings_state>();
-	state->bitmap0 = auto_bitmap_alloc(machine, 2048, 256, machine->primary_screen->format());
+	lemmings_state *state = machine.driver_data<lemmings_state>();
+	state->bitmap0 = auto_bitmap_alloc(machine, 2048, 256, machine.primary_screen->format());
 	state->vram_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols, 8, 8, 64, 32);
 
 	state->vram_buffer = auto_alloc_array(machine, UINT8, 2048 * 64); /* 64 bytes per VRAM character */
@@ -97,7 +97,7 @@ VIDEO_START( lemmings )
 	tilemap_set_transparent_pen(state->vram_tilemap, 0);
 	bitmap_fill(state->bitmap0, 0, 0x100);
 
-	gfx_element_set_source(machine->gfx[2], state->vram_buffer);
+	gfx_element_set_source(machine.gfx[2], state->vram_buffer);
 
 	state->save_item(NAME(*state->bitmap0));
 	state->save_pointer(NAME(state->vram_buffer), 2048 * 64);
@@ -107,17 +107,17 @@ VIDEO_START( lemmings )
 
 SCREEN_EOF( lemmings )
 {
-	lemmings_state *state = machine->driver_data<lemmings_state>();
+	lemmings_state *state = machine.driver_data<lemmings_state>();
 
-	memcpy(state->sprite_triple_buffer_0, machine->generic.buffered_spriteram.u16, 0x800);
-	memcpy(state->sprite_triple_buffer_1, machine->generic.buffered_spriteram2.u16, 0x800);
+	memcpy(state->sprite_triple_buffer_0, machine.generic.buffered_spriteram.u16, 0x800);
+	memcpy(state->sprite_triple_buffer_1, machine.generic.buffered_spriteram2.u16, 0x800);
 }
 
 /******************************************************************************/
 
 WRITE16_HANDLER( lemmings_pixel_0_w )
 {
-	lemmings_state *state = space->machine->driver_data<lemmings_state>();
+	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 	int sx, sy, src, old;
 
 	old = state->pixel_0_data[offset];
@@ -138,7 +138,7 @@ WRITE16_HANDLER( lemmings_pixel_0_w )
 
 WRITE16_HANDLER( lemmings_pixel_1_w )
 {
-	lemmings_state *state = space->machine->driver_data<lemmings_state>();
+	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 	int sx, sy, src, /*old,*/ tile;
 
 //  old = state->pixel_1_data[offset];
@@ -152,7 +152,7 @@ WRITE16_HANDLER( lemmings_pixel_1_w )
 
 	/* Copy pixel to buffer for easier decoding later */
 	tile = ((sx / 8) * 32) + (sy / 8);
-	gfx_element_mark_dirty(space->machine->gfx[2], tile);
+	gfx_element_mark_dirty(space->machine().gfx[2], tile);
 	state->vram_buffer[(tile * 64) + ((sx & 7)) + ((sy & 7) * 8)] = (src >> 8) & 0xf;
 
 	sx += 1; /* Update both pixels in the word */
@@ -161,14 +161,14 @@ WRITE16_HANDLER( lemmings_pixel_1_w )
 
 WRITE16_HANDLER( lemmings_vram_w )
 {
-	lemmings_state *state = space->machine->driver_data<lemmings_state>();
+	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 	COMBINE_DATA(&state->vram_data[offset]);
 	tilemap_mark_tile_dirty(state->vram_tilemap, offset);
 }
 
 SCREEN_UPDATE( lemmings )
 {
-	lemmings_state *state = screen->machine->driver_data<lemmings_state>();
+	lemmings_state *state = screen->machine().driver_data<lemmings_state>();
 	int x1 = -state->control_data[0];
 	int x0 = -state->control_data[2];
 	int y = 0;
@@ -176,8 +176,8 @@ SCREEN_UPDATE( lemmings )
 	rect.max_y = cliprect->max_y;
 	rect.min_y = cliprect->min_y;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
-	draw_sprites(screen->machine, bitmap, cliprect, state->sprite_triple_buffer_1, 1, 0x0000);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	draw_sprites(screen->machine(), bitmap, cliprect, state->sprite_triple_buffer_1, 1, 0x0000);
 
 	/* Pixel layer can be windowed in hardware (two player mode) */
 	if ((state->control_data[6] & 2) == 0)
@@ -191,9 +191,9 @@ SCREEN_UPDATE( lemmings )
 		rect.min_x = 160;
 		copyscrollbitmap_trans(bitmap, state->bitmap0, 1, &x1, 1, &y, &rect, 0x100);
 	}
-	draw_sprites(screen->machine, bitmap, cliprect, state->sprite_triple_buffer_0, 0, 0x0000);
-	draw_sprites(screen->machine, bitmap, cliprect, state->sprite_triple_buffer_1, 1, 0x2000);
+	draw_sprites(screen->machine(), bitmap, cliprect, state->sprite_triple_buffer_0, 0, 0x0000);
+	draw_sprites(screen->machine(), bitmap, cliprect, state->sprite_triple_buffer_1, 1, 0x2000);
 	tilemap_draw(bitmap, cliprect, state->vram_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, state->sprite_triple_buffer_0, 0, 0x2000);
+	draw_sprites(screen->machine(), bitmap, cliprect, state->sprite_triple_buffer_0, 0, 0x2000);
 	return 0;
 }

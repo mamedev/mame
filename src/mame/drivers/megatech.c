@@ -209,7 +209,7 @@ INPUT_PORTS_END
 /* MEGATECH specific */
 static READ8_HANDLER( megatech_cart_select_r )
 {
-	mtech_state *state = space->machine->driver_data<mtech_state>();
+	mtech_state *state = space->machine().driver_data<mtech_state>();
 	return state->mt_cart_select_reg;
 }
 
@@ -217,14 +217,14 @@ static READ8_HANDLER( megatech_cart_select_r )
 
 static TIMER_CALLBACK( megatech_z80_run_state )
 {
-	mtech_state *state = machine->driver_data<mtech_state>();
+	mtech_state *state = machine.driver_data<mtech_state>();
 	char tempname[20];
 	UINT8* game_region;
 
 	sprintf(tempname, "game%d", param);
-	game_region = machine->region(tempname)->base();
+	game_region = machine.region(tempname)->base();
 
-	memcpy(machine->region("maincpu")->base(), game_region, 0x400000);
+	memcpy(machine.region("maincpu")->base(), game_region, 0x400000);
 
 	if (!state->cart_is_genesis[param])
 	{
@@ -252,7 +252,7 @@ static TIMER_CALLBACK( megatech_z80_stop_state )
 	printf("megatech_select_game %d\n", param+1);
 
 	sprintf(tempname, "game%d", param);
-	game_region = machine->region(tempname)->base();
+	game_region = machine.region(tempname)->base();
 
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, ASSERT_LINE);
@@ -268,22 +268,22 @@ static TIMER_CALLBACK( megatech_z80_stop_state )
 	if (game_region)
 	{
 		{
-			machine->scheduler().timer_set(attotime::zero, FUNC(megatech_z80_run_state), param);
+			machine.scheduler().timer_set(attotime::zero, FUNC(megatech_z80_run_state), param);
 		}
 	}
 	else
 	{
 		/* no cart.. */
-		memset(machine->region("mtbios")->base() + 0x8000, 0x00, 0x8000);
-		memset(machine->region("maincpu")->base(), 0x00, 0x400000);
+		memset(machine.region("mtbios")->base() + 0x8000, 0x00, 0x8000);
+		memset(machine.region("maincpu")->base(), 0x00, 0x400000);
 	}
 
 	return;
 }
 
-static void megatech_select_game(running_machine *machine, int gameno)
+static void megatech_select_game(running_machine &machine, int gameno)
 {
-	machine->scheduler().timer_set(attotime::zero, FUNC(megatech_z80_stop_state), gameno);
+	machine.scheduler().timer_set(attotime::zero, FUNC(megatech_z80_stop_state), gameno);
 }
 
 static WRITE8_HANDLER( megatech_cart_select_w )
@@ -292,16 +292,16 @@ static WRITE8_HANDLER( megatech_cart_select_w )
       but it stores something in (banked?) ram
       because it always seems to show the
       same instructions ... */
-	mtech_state *state = space->machine->driver_data<mtech_state>();
+	mtech_state *state = space->machine().driver_data<mtech_state>();
 	state->mt_cart_select_reg = data;
 
-	megatech_select_game(space->machine, state->mt_cart_select_reg);
+	megatech_select_game(space->machine(), state->mt_cart_select_reg);
 }
 
 
 static READ8_HANDLER( bios_ctrl_r )
 {
-	mtech_state *state = space->machine->driver_data<mtech_state>();
+	mtech_state *state = space->machine().driver_data<mtech_state>();
 
 	if (offset == 0)
 		return 0;
@@ -313,7 +313,7 @@ static READ8_HANDLER( bios_ctrl_r )
 
 static WRITE8_HANDLER( bios_ctrl_w )
 {
-	mtech_state *state = space->machine->driver_data<mtech_state>();
+	mtech_state *state = space->machine().driver_data<mtech_state>();
 	if (offset == 1)
 	{
 		state->bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
@@ -326,39 +326,39 @@ static WRITE8_HANDLER( bios_ctrl_w )
 
 static READ8_HANDLER( megatech_z80_read_68k_banked_data )
 {
-	mtech_state *state = space->machine->driver_data<mtech_state>();
-	address_space *space68k = space->machine->device<legacy_cpu_device>("maincpu")->space();
+	mtech_state *state = space->machine().driver_data<mtech_state>();
+	address_space *space68k = space->machine().device<legacy_cpu_device>("maincpu")->space();
 	UINT8 ret = space68k->read_byte(state->mt_bank_addr + offset);
 	return ret;
 }
 
 static WRITE8_HANDLER( megatech_z80_write_68k_banked_data )
 {
-	mtech_state *state = space->machine->driver_data<mtech_state>();
-	address_space *space68k = space->machine->device<legacy_cpu_device>("maincpu")->space();
+	mtech_state *state = space->machine().driver_data<mtech_state>();
+	address_space *space68k = space->machine().device<legacy_cpu_device>("maincpu")->space();
 	space68k->write_byte(state->mt_bank_addr + offset,data);
 }
 
-static void megatech_z80_bank_w(running_machine *machine, UINT16 data)
+static void megatech_z80_bank_w(running_machine &machine, UINT16 data)
 {
-	mtech_state *state = machine->driver_data<mtech_state>();
+	mtech_state *state = machine.driver_data<mtech_state>();
 	state->mt_bank_addr = ((state->mt_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
 
 static WRITE8_HANDLER( mt_z80_bank_w )
 {
-	megatech_z80_bank_w(space->machine, data & 1);
+	megatech_z80_bank_w(space->machine(), data & 1);
 }
 
 static READ8_HANDLER( megatech_banked_ram_r )
 {
-	mtech_state *state = space->machine->driver_data<mtech_state>();
+	mtech_state *state = space->machine().driver_data<mtech_state>();
 	return state->megatech_banked_ram[offset + 0x1000 * (state->mt_cart_select_reg & 0x07)];
 }
 
 static WRITE8_HANDLER( megatech_banked_ram_w )
 {
-	mtech_state *state = space->machine->driver_data<mtech_state>();
+	mtech_state *state = space->machine().driver_data<mtech_state>();
 	state->megatech_banked_ram[offset + 0x1000 * (state->mt_cart_select_reg & 0x07)] = data;
 }
 
@@ -384,14 +384,14 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( megatech_bios_port_ctrl_w )
 {
-	mtech_state *state = space->machine->driver_data<mtech_state>();
+	mtech_state *state = space->machine().driver_data<mtech_state>();
 	state->bios_port_ctrl = data;
 }
 
 static READ8_HANDLER( megatech_bios_joypad_r )
 {
-	mtech_state *state = space->machine->driver_data<mtech_state>();
-	return megatech_bios_port_cc_dc_r(space->machine, offset, state->bios_port_ctrl);
+	mtech_state *state = space->machine().driver_data<mtech_state>();
+	return megatech_bios_port_cc_dc_r(space->machine(), offset, state->bios_port_ctrl);
 }
 
 static WRITE8_HANDLER (megatech_bios_port_7f_w)
@@ -416,7 +416,7 @@ ADDRESS_MAP_END
 
 static DRIVER_INIT(mt_slot)
 {
-	mtech_state *state = machine->driver_data<mtech_state>();
+	mtech_state *state = machine.driver_data<mtech_state>();
 	state->megatech_banked_ram = auto_alloc_array(machine, UINT8, 0x1000*8);
 
 	DRIVER_INIT_CALL(megadriv);
@@ -428,8 +428,8 @@ static DRIVER_INIT(mt_slot)
 
 static DRIVER_INIT(mt_crt)
 {
-	mtech_state *state = machine->driver_data<mtech_state>();
-	UINT8* pin = machine->region("sms_pin")->base();
+	mtech_state *state = machine.driver_data<mtech_state>();
+	UINT8* pin = machine.region("sms_pin")->base();
 	DRIVER_INIT_CALL(mt_slot);
 
 	state->cart_is_genesis[0] = !pin[0] ? 1 : 0;;
@@ -444,9 +444,9 @@ static VIDEO_START(mtnew)
 //attotime::never
 static SCREEN_UPDATE(mtnew)
 {
-	mtech_state *state = screen->machine->driver_data<mtech_state>();
-	device_t *megadriv_screen = screen->machine->device("megadriv");
-	device_t *menu_screen = screen->machine->device("menu");
+	mtech_state *state = screen->machine().driver_data<mtech_state>();
+	device_t *megadriv_screen = screen->machine().device("megadriv");
+	device_t *menu_screen = screen->machine().device("menu");
 
 	if (screen == megadriv_screen)
 	{
@@ -463,7 +463,7 @@ static SCREEN_UPDATE(mtnew)
 
 static SCREEN_EOF(mtnew)
 {
-	mtech_state *state = machine->driver_data<mtech_state>();
+	mtech_state *state = machine.driver_data<mtech_state>();
 	if (!state->current_game_is_sms)
 		SCREEN_EOF_CALL(megadriv);
 	else
@@ -474,7 +474,7 @@ static SCREEN_EOF(mtnew)
 
 static MACHINE_RESET(mtnew)
 {
-	mtech_state *state = machine->driver_data<mtech_state>();
+	mtech_state *state = machine.driver_data<mtech_state>();
 	state->mt_bank_addr = 0;
 
 	MACHINE_RESET_CALL(megadriv);
@@ -539,7 +539,7 @@ static const struct megatech_cart_region megatech_cart_table[] =
 
 static DEVICE_IMAGE_LOAD( megatech_cart )
 {
-	mtech_state *state = image.device().machine->driver_data<mtech_state>();
+	mtech_state *state = image.device().machine().driver_data<mtech_state>();
 	const struct megatech_cart_region *mt_cart = &megatech_cart_table[0], *this_cart;
 	const char	*pcb_name;
 
@@ -558,7 +558,7 @@ static DEVICE_IMAGE_LOAD( megatech_cart )
 		return IMAGE_INIT_FAIL;
 
 	//printf("load list\n");
-	UINT8 *ROM = image.device().machine->region(this_cart->region)->base();
+	UINT8 *ROM = image.device().machine().region(this_cart->region)->base();
 	//printf("load list2\n");
 	UINT32 length = image.get_software_region_length("rom");
 	memcpy(ROM, image.get_software_region("rom"), length);

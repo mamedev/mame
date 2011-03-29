@@ -134,10 +134,10 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( kingpin_video_interrupt )
 {
-	TMS9928A_interrupt(device->machine);
+	TMS9928A_interrupt(device->machine());
 }
 
-static void vdp_interrupt (running_machine *machine, int state)
+static void vdp_interrupt (running_machine &machine, int state)
 {
 	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 }
@@ -184,12 +184,12 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( kingpin )
 {
-	kingpin_state *state = machine->driver_data<kingpin_state>();
+	kingpin_state *state = machine.driver_data<kingpin_state>();
 
 	TMS9928A_configure(&tms9928a_interface);
 
 	/* Hacks to keep the emu a'runnin */
-	state->code_base = machine->region("maincpu")->base();
+	state->code_base = machine.region("maincpu")->base();
 	state->code_base[0x17d4] = 0xc3;	/* Maybe sound related? */
 }
 

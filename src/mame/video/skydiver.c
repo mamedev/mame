@@ -11,7 +11,7 @@
 
 MACHINE_RESET( skydiver )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* reset all latches */
 	skydiver_start_lamp_1_w(space, 0, 0);
@@ -37,7 +37,7 @@ MACHINE_RESET( skydiver )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	skydiver_state *state = machine->driver_data<skydiver_state>();
+	skydiver_state *state = machine.driver_data<skydiver_state>();
 	UINT8 code = state->videoram[tile_index];
 	SET_TILE_INFO(0, code & 0x3f, code >> 6, 0);
 }
@@ -52,7 +52,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( skydiver )
 {
-	skydiver_state *state = machine->driver_data<skydiver_state>();
+	skydiver_state *state = machine.driver_data<skydiver_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
@@ -65,7 +65,7 @@ VIDEO_START( skydiver )
 
 WRITE8_HANDLER( skydiver_videoram_w )
 {
-	skydiver_state *state = space->machine->driver_data<skydiver_state>();
+	skydiver_state *state = space->machine().driver_data<skydiver_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -73,38 +73,38 @@ WRITE8_HANDLER( skydiver_videoram_w )
 
 READ8_HANDLER( skydiver_wram_r )
 {
-	skydiver_state *state = space->machine->driver_data<skydiver_state>();
+	skydiver_state *state = space->machine().driver_data<skydiver_state>();
 	return state->videoram[offset | 0x380];
 }
 
 WRITE8_HANDLER( skydiver_wram_w )
 {
-	skydiver_state *state = space->machine->driver_data<skydiver_state>();
+	skydiver_state *state = space->machine().driver_data<skydiver_state>();
 	state->videoram[offset | 0x0380] = data;
 }
 
 
 WRITE8_HANDLER( skydiver_width_w )
 {
-	skydiver_state *state = space->machine->driver_data<skydiver_state>();
+	skydiver_state *state = space->machine().driver_data<skydiver_state>();
 	state->width = offset;
 }
 
 
 WRITE8_HANDLER( skydiver_coin_lockout_w )
 {
-	coin_lockout_global_w(space->machine, !offset);
+	coin_lockout_global_w(space->machine(), !offset);
 }
 
 
 WRITE8_HANDLER( skydiver_start_lamp_1_w )
 {
-	set_led_status(space->machine, 0, offset);
+	set_led_status(space->machine(), 0, offset);
 }
 
 WRITE8_HANDLER( skydiver_start_lamp_2_w )
 {
-	set_led_status(space->machine, 1, offset);
+	set_led_status(space->machine(), 1, offset);
 }
 
 
@@ -130,7 +130,7 @@ WRITE8_HANDLER( skydiver_lamp_d_w )
 
 WRITE8_HANDLER( skydiver_2000_201F_w )
 {
-	device_t *discrete = space->machine->device("discrete");
+	device_t *discrete = space->machine().device("discrete");
 	int bit = offset & 0x01;
 
 	watchdog_reset_w(space,0,0);
@@ -168,9 +168,9 @@ WRITE8_HANDLER( skydiver_2000_201F_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	skydiver_state *state = machine->driver_data<skydiver_state>();
+	skydiver_state *state = machine.driver_data<skydiver_state>();
 	int pic;
 
 
@@ -198,7 +198,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			sx -= 8;
 		}
 
-		drawgfxzoom_transpen(bitmap,cliprect,machine->gfx[1],
+		drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1],
 			charcode, color,
 			xflip,yflip,sx,sy,
 			wide ? 0x20000 : 0x10000, 0x10000,0);
@@ -208,9 +208,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( skydiver )
 {
-	skydiver_state *state = screen->machine->driver_data<skydiver_state>();
+	skydiver_state *state = screen->machine().driver_data<skydiver_state>();
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

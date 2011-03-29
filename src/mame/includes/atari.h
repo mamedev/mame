@@ -24,14 +24,14 @@ READ8_DEVICE_HANDLER(atari_pia_pb_r);
 WRITE8_DEVICE_HANDLER(a600xl_pia_pb_w);
 
 /* This is needed in MESS as well for Atari 8bit drivers */
-void atari_machine_start(running_machine *machine);
+void atari_machine_start(running_machine &machine);
 
 MACHINE_START( atarixl );
 
 void atari_interrupt_cb(device_t *device, int mask);
 
-void a800_handle_keyboard(running_machine *machine);
-void a5200_handle_keypads(running_machine *machine);
+void a800_handle_keyboard(running_machine &machine);
+void a5200_handle_keypads(running_machine &machine);
 
 /* video */
 
@@ -597,7 +597,7 @@ extern PALETTE_INIT( atari );
 
 /*----------- defined in drivers/maxaflex.c -----------*/
 
-int atari_input_disabled(running_machine *machine);
+int atari_input_disabled(running_machine &machine);
 
 #endif /* ATARI_H */
 

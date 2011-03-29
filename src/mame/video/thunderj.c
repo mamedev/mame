@@ -18,7 +18,7 @@
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	thunderj_state *state = machine->driver_data<thunderj_state>();
+	thunderj_state *state = machine.driver_data<thunderj_state>();
 	UINT16 data = state->alpha[tile_index];
 	int code = ((data & 0x200) ? (state->alpha_tile_bank * 0x200) : 0) + (data & 0x1ff);
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	thunderj_state *state = machine->driver_data<thunderj_state>();
+	thunderj_state *state = machine.driver_data<thunderj_state>();
 	UINT16 data1 = state->playfield[tile_index];
 	UINT16 data2 = state->playfield_upper[tile_index] & 0xff;
 	int code = data1 & 0x7fff;
@@ -41,7 +41,7 @@ static TILE_GET_INFO( get_playfield_tile_info )
 
 static TILE_GET_INFO( get_playfield2_tile_info )
 {
-	thunderj_state *state = machine->driver_data<thunderj_state>();
+	thunderj_state *state = machine.driver_data<thunderj_state>();
 	UINT16 data1 = state->playfield2[tile_index];
 	UINT16 data2 = state->playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x7fff;
@@ -96,7 +96,7 @@ VIDEO_START( thunderj )
 		0,					/* resulting value to indicate "special" */
 		NULL				/* callback routine for special entries */
 	};
-	thunderj_state *state = machine->driver_data<thunderj_state>();
+	thunderj_state *state = machine.driver_data<thunderj_state>();
 
 	/* initialize the playfield */
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
@@ -123,8 +123,8 @@ VIDEO_START( thunderj )
 
 SCREEN_UPDATE( thunderj )
 {
-	thunderj_state *state = screen->machine->driver_data<thunderj_state>();
-	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
+	thunderj_state *state = screen->machine().driver_data<thunderj_state>();
+	bitmap_t *priority_bitmap = screen->machine().priority_bitmap;
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

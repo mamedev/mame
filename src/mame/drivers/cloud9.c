@@ -110,21 +110,21 @@
  *
  *************************************/
 
-INLINE void schedule_next_irq(running_machine *machine, int curscanline)
+INLINE void schedule_next_irq(running_machine &machine, int curscanline)
 {
-	cloud9_state *state = machine->driver_data<cloud9_state>();
+	cloud9_state *state = machine.driver_data<cloud9_state>();
 
 	/* IRQ is clocked by /32V, so every 64 scanlines */
 	curscanline = (curscanline + 64) & 255;
 
 	/* next one at the start of this scanline */
-	state->irq_timer->adjust(machine->primary_screen->time_until_pos(curscanline), curscanline);
+	state->irq_timer->adjust(machine.primary_screen->time_until_pos(curscanline), curscanline);
 }
 
 
 static TIMER_CALLBACK( clock_irq )
 {
-	cloud9_state *state = machine->driver_data<cloud9_state>();
+	cloud9_state *state = machine.driver_data<cloud9_state>();
 	/* assert the IRQ if not already asserted */
 	if (!state->irq_state)
 	{
@@ -133,7 +133,7 @@ static TIMER_CALLBACK( clock_irq )
 	}
 
 	/* force an update now */
-	machine->primary_screen->update_partial(machine->primary_screen->vpos());
+	machine.primary_screen->update_partial(machine.primary_screen->vpos());
 
 	/* find the next edge */
 	schedule_next_irq(machine, param);
@@ -142,8 +142,8 @@ static TIMER_CALLBACK( clock_irq )
 
 static CUSTOM_INPUT( get_vblank )
 {
-	cloud9_state *state = field->port->machine->driver_data<cloud9_state>();
-	int scanline = field->port->machine->primary_screen->vpos();
+	cloud9_state *state = field->port->machine().driver_data<cloud9_state>();
+	int scanline = field->port->machine().primary_screen->vpos();
 	return (~state->syncprom[scanline & 0xff] >> 1) & 1;
 }
 
@@ -157,11 +157,11 @@ static CUSTOM_INPUT( get_vblank )
 
 static MACHINE_START( cloud9 )
 {
-	cloud9_state *state = machine->driver_data<cloud9_state>();
+	cloud9_state *state = machine.driver_data<cloud9_state>();
 	rectangle visarea;
 
 	/* initialize globals */
-	state->syncprom = machine->region("proms")->base() + 0x000;
+	state->syncprom = machine.region("proms")->base() + 0x000;
 
 	/* find the start of VBLANK in the SYNC PROM */
 	for (state->vblank_start = 0; state->vblank_start < 256; state->vblank_start++)
@@ -183,10 +183,10 @@ static MACHINE_START( cloud9 )
 	visarea.max_x = 255;
 	visarea.min_y = state->vblank_end + 1;
 	visarea.max_y = state->vblank_start;
-	machine->primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
+	machine.primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* create a timer for IRQs and set up the first callback */
-	state->irq_timer = machine->scheduler().timer_alloc(FUNC(clock_irq));
+	state->irq_timer = machine.scheduler().timer_alloc(FUNC(clock_irq));
 	state->irq_state = 0;
 	schedule_next_irq(machine, 0-64);
 
@@ -197,7 +197,7 @@ static MACHINE_START( cloud9 )
 
 static MACHINE_RESET( cloud9 )
 {
-	cloud9_state *state = machine->driver_data<cloud9_state>();
+	cloud9_state *state = machine.driver_data<cloud9_state>();
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	state->irq_state = 0;
 }
@@ -212,7 +212,7 @@ static MACHINE_RESET( cloud9 )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cloud9_state *state = space->machine->driver_data<cloud9_state>();
+	cloud9_state *state = space->machine().driver_data<cloud9_state>();
 	if (state->irq_state)
 	{
 		device_set_input_line(state->maincpu, 0, CLEAR_LINE);
@@ -223,19 +223,19 @@ static WRITE8_HANDLER( irq_ack_w )
 
 static WRITE8_HANDLER( cloud9_led_w )
 {
-	set_led_status(space->machine, offset, ~data & 0x80);
+	set_led_status(space->machine(), offset, ~data & 0x80);
 }
 
 
 static WRITE8_HANDLER( cloud9_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset, data & 0x80);
+	coin_counter_w(space->machine(), offset, data & 0x80);
 }
 
 
 static READ8_HANDLER( leta_r )
 {
-	return input_port_read(space->machine, offset ? "TRACKX" : "TRACKY");
+	return input_port_read(space->machine(), offset ? "TRACKX" : "TRACKY");
 }
 
 
@@ -248,7 +248,7 @@ static READ8_HANDLER( leta_r )
 
 static WRITE8_HANDLER( nvram_recall_w )
 {
-	cloud9_state *state = space->machine->driver_data<cloud9_state>();
+	cloud9_state *state = space->machine().driver_data<cloud9_state>();
 	state->nvram->recall(0);
 	state->nvram->recall(1);
 	state->nvram->recall(0);
@@ -257,7 +257,7 @@ static WRITE8_HANDLER( nvram_recall_w )
 
 static WRITE8_HANDLER( nvram_store_w )
 {
-	cloud9_state *state = space->machine->driver_data<cloud9_state>();
+	cloud9_state *state = space->machine().driver_data<cloud9_state>();
 	state->nvram->store(0);
 	state->nvram->store(1);
 	state->nvram->store(0);

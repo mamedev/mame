@@ -158,8 +158,8 @@ Fax                  1982  6502   FXL, FLA
 
 static CUSTOM_INPUT( teetert_input_r )
 {
-	exidy_state *state = field->port->machine->driver_data<exidy_state>();
-	UINT8 dial = input_port_read(field->port->machine, "DIAL");
+	exidy_state *state = field->port->machine().driver_data<exidy_state>();
+	UINT8 dial = input_port_read(field->port->machine(), "DIAL");
 	int result = 0;
 
 	result = (dial != state->last_dial) << 4;
@@ -187,9 +187,9 @@ static CUSTOM_INPUT( teetert_input_r )
 
 static WRITE8_HANDLER( fax_bank_select_w )
 {
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 
-	memory_set_bankptr(space->machine, "bank1", &RAM[0x10000 + (0x2000 * (data & 0x1f))]);
+	memory_set_bankptr(space->machine(), "bank1", &RAM[0x10000 + (0x2000 * (data & 0x1f))]);
 	if ((data & 0x1f) > 0x17)
 		logerror("Banking to unpopulated ROM bank %02X!\n",data & 0x1f);
 }
@@ -795,7 +795,7 @@ GFXDECODE_END
 
 static MACHINE_START( teetert )
 {
-	exidy_state *state = machine->driver_data<exidy_state>();
+	exidy_state *state = machine.driver_data<exidy_state>();
 	state_save_register_global(machine, state->last_dial);
 }
 
@@ -1384,7 +1384,7 @@ ROM_END
 
 static DRIVER_INIT( sidetrac )
 {
-	exidy_state *state = machine->driver_data<exidy_state>();
+	exidy_state *state = machine.driver_data<exidy_state>();
 	exidy_video_config(machine, 0x00, 0x00, FALSE);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
@@ -1396,7 +1396,7 @@ static DRIVER_INIT( sidetrac )
 
 static DRIVER_INIT( targ )
 {
-	exidy_state *state = machine->driver_data<exidy_state>();
+	exidy_state *state = machine.driver_data<exidy_state>();
 	exidy_video_config(machine, 0x00, 0x00, FALSE);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
@@ -1408,7 +1408,7 @@ static DRIVER_INIT( targ )
 
 static DRIVER_INIT( spectar )
 {
-	exidy_state *state = machine->driver_data<exidy_state>();
+	exidy_state *state = machine.driver_data<exidy_state>();
 	exidy_video_config(machine, 0x00, 0x00, FALSE);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
@@ -1419,7 +1419,7 @@ static DRIVER_INIT( spectar )
 
 static DRIVER_INIT( rallys )
 {
-	exidy_state *state = machine->driver_data<exidy_state>();
+	exidy_state *state = machine.driver_data<exidy_state>();
 	exidy_video_config(machine, 0x00, 0x00, FALSE);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
@@ -1430,7 +1430,7 @@ static DRIVER_INIT( rallys )
 
 static DRIVER_INIT( phantoma )
 {
-	exidy_state *state = machine->driver_data<exidy_state>();
+	exidy_state *state = machine.driver_data<exidy_state>();
 	exidy_video_config(machine, 0x00, 0x00, FALSE);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
@@ -1439,8 +1439,8 @@ static DRIVER_INIT( phantoma )
 	state->color_latch[0] = 0x09;
 
 	/* the ROM is actually mapped high */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xf800, 0xffff, "bank1");
-	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0xf800);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xf800, 0xffff, "bank1");
+	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0xf800);
 }
 
 
@@ -1470,7 +1470,7 @@ static DRIVER_INIT( pepper2 )
 
 static DRIVER_INIT( fax )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	exidy_video_config(machine, 0x04, 0x04, TRUE);
 

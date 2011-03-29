@@ -34,7 +34,7 @@ public:
 
 /*----------- defined in video/bishi.c -----------*/
 
-extern void bishi_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
+extern void bishi_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 
 VIDEO_START(bishi);
 SCREEN_UPDATE(bishi);

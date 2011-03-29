@@ -23,7 +23,7 @@
 
 static WRITE16_HANDLER( bigkarnk_sound_command_w )
 {
-	gaelco_state *state = space->machine->driver_data<gaelco_state>();
+	gaelco_state *state = space->machine().driver_data<gaelco_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -40,11 +40,11 @@ static WRITE16_HANDLER( bigkarnk_coin_w )
 		{
 			case 0x00:	/* Coin Lockouts */
 			case 0x01:
-				coin_lockout_w(space->machine, (offset >> 3) & 0x01, ~data & 0x01);
+				coin_lockout_w(space->machine(), (offset >> 3) & 0x01, ~data & 0x01);
 				break;
 			case 0x02:	/* Coin Counters */
 			case 0x03:
-				coin_counter_w(space->machine, (offset >> 3) & 0x01, data & 0x01);
+				coin_counter_w(space->machine(), (offset >> 3) & 0x01, data & 0x01);
 				break;
 		}
 	}
@@ -52,7 +52,7 @@ static WRITE16_HANDLER( bigkarnk_coin_w )
 
 static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 {
-	UINT8 *RAM = space->machine->region("oki")->base();
+	UINT8 *RAM = space->machine().region("oki")->base();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -64,7 +64,7 @@ static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 
 static WRITE16_HANDLER( gaelco_vram_encrypted_w )
 {
-	gaelco_state *state = space->machine->driver_data<gaelco_state>();
+	gaelco_state *state = space->machine().driver_data<gaelco_state>();
 
 	// mame_printf_debug("gaelco_vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
@@ -76,7 +76,7 @@ static WRITE16_HANDLER( gaelco_vram_encrypted_w )
 
 static WRITE16_HANDLER(gaelco_encrypted_w)
 {
-	gaelco_state *state = space->machine->driver_data<gaelco_state>();
+	gaelco_state *state = space->machine().driver_data<gaelco_state>();
 
 	// mame_printf_debug("gaelco_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
@@ -87,7 +87,7 @@ static WRITE16_HANDLER(gaelco_encrypted_w)
 
 static WRITE16_HANDLER( thoop_vram_encrypted_w )
 {
-	gaelco_state *state = space->machine->driver_data<gaelco_state>();
+	gaelco_state *state = space->machine().driver_data<gaelco_state>();
 
 	// mame_printf_debug("gaelco_vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
@@ -98,7 +98,7 @@ static WRITE16_HANDLER( thoop_vram_encrypted_w )
 
 static WRITE16_HANDLER(thoop_encrypted_w)
 {
-	gaelco_state *state = space->machine->driver_data<gaelco_state>();
+	gaelco_state *state = space->machine().driver_data<gaelco_state>();
 
 	// mame_printf_debug("gaelco_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
@@ -492,9 +492,9 @@ GFXDECODEINFO(0x100000,64)
 
 static MACHINE_START( gaelco )
 {
-	gaelco_state *state = machine->driver_data<gaelco_state>();
+	gaelco_state *state = machine.driver_data<gaelco_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 }
 
 static MACHINE_CONFIG_START( bigkarnk, gaelco_state )

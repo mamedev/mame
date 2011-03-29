@@ -115,14 +115,14 @@ GFXDECODE_END
 
 static MACHINE_START( news )
 {
-	news_state *state = machine->driver_data<news_state>();
+	news_state *state = machine.driver_data<news_state>();
 
 	state->save_item(NAME(state->bgpic));
 }
 
 static MACHINE_RESET( news )
 {
-	news_state *state = machine->driver_data<news_state>();
+	news_state *state = machine.driver_data<news_state>();
 
 	state->bgpic = 0;
 }

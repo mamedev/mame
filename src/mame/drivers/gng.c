@@ -31,14 +31,14 @@ Notes:
 static WRITE8_HANDLER( gng_bankswitch_w )
 {
 	if (data == 4)
-		memory_set_bank(space->machine, "bank1", 4);
+		memory_set_bank(space->machine(), "bank1", 4);
 	else
-		memory_set_bank(space->machine, "bank1", (data & 0x03));
+		memory_set_bank(space->machine(), "bank1", (data & 0x03));
 }
 
 static WRITE8_HANDLER( gng_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset, data);
+	coin_counter_w(space->machine(), offset, data);
 }
 
 static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8 )
@@ -303,9 +303,9 @@ GFXDECODE_END
 
 static MACHINE_START( gng )
 {
-	gng_state *state = machine->driver_data<gng_state>();
+	gng_state *state = machine.driver_data<gng_state>();
 
-	UINT8 *rombase = machine->region("maincpu")->base();
+	UINT8 *rombase = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 4, &rombase[0x10000], 0x2000);
 	memory_configure_bank(machine, "bank1", 4, 1, &rombase[0x4000], 0x2000);
 
@@ -315,7 +315,7 @@ static MACHINE_START( gng )
 
 static MACHINE_RESET( gng )
 {
-	gng_state *state = machine->driver_data<gng_state>();
+	gng_state *state = machine.driver_data<gng_state>();
 
 	state->scrollx[0] = 0;
 	state->scrollx[1] = 0;
@@ -721,7 +721,7 @@ static READ8_HANDLER( diamond_hack_r )
 
 static DRIVER_INIT( diamond )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6000, 0x6000, FUNC(diamond_hack_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6000, 0x6000, FUNC(diamond_hack_r));
 }
 
 

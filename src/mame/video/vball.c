@@ -27,7 +27,7 @@ static TILEMAP_MAPPER( background_scan )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	vball_state *state = machine->driver_data<vball_state>();
+	vball_state *state = machine.driver_data<vball_state>();
 	UINT8 code = state->vb_videoram[tile_index];
 	UINT8 attr = state->vb_attribram[tile_index];
 	SET_TILE_INFO(
@@ -40,7 +40,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( vb )
 {
-	vball_state *state = machine->driver_data<vball_state>();
+	vball_state *state = machine.driver_data<vball_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,background_scan, 8, 8,64,64);
 
 	tilemap_set_scroll_rows(state->bg_tilemap,32);
@@ -51,7 +51,7 @@ VIDEO_START( vb )
 
 WRITE8_HANDLER( vb_videoram_w )
 {
-	vball_state *state = space->machine->driver_data<vball_state>();
+	vball_state *state = space->machine().driver_data<vball_state>();
 	state->vb_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
@@ -59,27 +59,27 @@ WRITE8_HANDLER( vb_videoram_w )
 #ifdef UNUSED_FUNCTION
 READ8_HANDLER( vb_attrib_r )
 {
-	vball_state *state = space->machine->driver_data<vball_state>();
+	vball_state *state = space->machine().driver_data<vball_state>();
 	return state->vb_attribram[offset];
 }
 #endif
 
 WRITE8_HANDLER( vb_attrib_w )
 {
-	vball_state *state = space->machine->driver_data<vball_state>();
+	vball_state *state = space->machine().driver_data<vball_state>();
 	state->vb_attribram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
 
-void vb_bgprombank_w( running_machine *machine, int bank )
+void vb_bgprombank_w( running_machine &machine, int bank )
 {
-	vball_state *state = machine->driver_data<vball_state>();
+	vball_state *state = machine.driver_data<vball_state>();
 	int i;
 	UINT8* color_prom;
 
 	if (bank==state->vb_bgprombank) return;
 
-	color_prom = machine->region("proms")->base() + bank*0x80;
+	color_prom = machine.region("proms")->base() + bank*0x80;
 	for (i=0;i<128;i++, color_prom++) {
 		palette_set_color_rgb(machine,i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
 				       pal4bit(color_prom[0x800] >> 0));
@@ -87,16 +87,16 @@ void vb_bgprombank_w( running_machine *machine, int bank )
 	state->vb_bgprombank=bank;
 }
 
-void vb_spprombank_w( running_machine *machine, int bank )
+void vb_spprombank_w( running_machine &machine, int bank )
 {
-	vball_state *state = machine->driver_data<vball_state>();
+	vball_state *state = machine.driver_data<vball_state>();
 
 	int i;
 	UINT8* color_prom;
 
 	if (bank==state->vb_spprombank) return;
 
-	color_prom = machine->region("proms")->base()+0x400 + bank*0x80;
+	color_prom = machine.region("proms")->base()+0x400 + bank*0x80;
 	for (i=128;i<256;i++,color_prom++)	{
 		palette_set_color_rgb(machine,i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
 				       pal4bit(color_prom[0x800] >> 0));
@@ -104,9 +104,9 @@ void vb_spprombank_w( running_machine *machine, int bank )
 	state->vb_spprombank=bank;
 }
 
-void vb_mark_all_dirty( running_machine *machine )
+void vb_mark_all_dirty( running_machine &machine )
 {
-	vball_state *state = machine->driver_data<vball_state>();
+	vball_state *state = machine.driver_data<vball_state>();
 	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 }
 
@@ -114,10 +114,10 @@ void vb_mark_all_dirty( running_machine *machine )
 					cliprect,gfx, \
 					(which+order),color,flipx,flipy,sx,sy,0);
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	vball_state *state = machine->driver_data<vball_state>();
-	const gfx_element *gfx = machine->gfx[1];
+	vball_state *state = machine.driver_data<vball_state>();
+	const gfx_element *gfx = machine.gfx[1];
 	UINT8 *src = state->spriteram;
 	int i;
 
@@ -163,7 +163,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( vb )
 {
-	vball_state *state = screen->machine->driver_data<vball_state>();
+	vball_state *state = screen->machine().driver_data<vball_state>();
 	int i;
 
 	tilemap_set_scrolly(state->bg_tilemap,0,state->vb_scrolly_hi + *state->vb_scrolly_lo);
@@ -174,6 +174,6 @@ SCREEN_UPDATE( vb )
 		//logerror("scrollx[%d] = %d\n",i,state->vb_scrollx[i]);
 	}
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	draw_sprites(screen->machine(),bitmap,cliprect);
 	return 0;
 }

@@ -313,14 +313,14 @@ public:
 
 static WRITE8_HANDLER( megadpkr_videoram_w )
 {
-	blitz_state *state = space->machine->driver_data<blitz_state>();
+	blitz_state *state = space->machine().driver_data<blitz_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( megadpkr_colorram_w )
 {
-	blitz_state *state = space->machine->driver_data<blitz_state>();
+	blitz_state *state = space->machine().driver_data<blitz_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -328,7 +328,7 @@ static WRITE8_HANDLER( megadpkr_colorram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	blitz_state *state = machine->driver_data<blitz_state>();
+	blitz_state *state = machine.driver_data<blitz_state>();
 /*  - bits -
     7654 3210
     --xx xx--   tiles color.
@@ -348,13 +348,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( megadpkr )
 {
-	blitz_state *state = machine->driver_data<blitz_state>();
+	blitz_state *state = machine.driver_data<blitz_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE( megadpkr )
 {
-	blitz_state *state = screen->machine->driver_data<blitz_state>();
+	blitz_state *state = screen->machine().driver_data<blitz_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
@@ -380,7 +380,7 @@ static PALETTE_INIT( megadpkr )
 
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b, bk;
 
@@ -416,13 +416,13 @@ static PALETTE_INIT( megadpkr )
 */
 static READ8_DEVICE_HANDLER( megadpkr_mux_port_r )
 {
-	blitz_state *state = device->machine->driver_data<blitz_state>();
+	blitz_state *state = device->machine().driver_data<blitz_state>();
 	switch( state->mux_data & 0xf0 )		/* bits 4-7 */
 	{
-		case 0x10: return input_port_read(device->machine, "IN0-0");
-		case 0x20: return input_port_read(device->machine, "IN0-1");
-		case 0x40: return input_port_read(device->machine, "IN0-2");
-		case 0x80: return input_port_read(device->machine, "IN0-3");
+		case 0x10: return input_port_read(device->machine(), "IN0-0");
+		case 0x20: return input_port_read(device->machine(), "IN0-1");
+		case 0x40: return input_port_read(device->machine(), "IN0-2");
+		case 0x80: return input_port_read(device->machine(), "IN0-3");
 	}
 	return 0xff;
 }
@@ -430,7 +430,7 @@ static READ8_DEVICE_HANDLER( megadpkr_mux_port_r )
 
 static WRITE8_DEVICE_HANDLER( mux_w )
 {
-	blitz_state *state = device->machine->driver_data<blitz_state>();
+	blitz_state *state = device->machine().driver_data<blitz_state>();
 	state->mux_data = data ^ 0xff;	/* inverted */
 }
 
@@ -449,9 +449,9 @@ static WRITE8_DEVICE_HANDLER( lamps_a_w )
 //  output_set_lamp_value(4, 1 - ((data >> 4) & 1));    /* Lamp 4 */
 
 //  popmessage("written : %02X", data);
-//  coin_counter_w(device->machine, 0, data & 0x40);    /* counter1 */
-//  coin_counter_w(device->machine, 1, data & 0x80);    /* counter2 */
-//  coin_counter_w(device->machine, 2, data & 0x20);    /* counter3 */
+//  coin_counter_w(device->machine(), 0, data & 0x40);    /* counter1 */
+//  coin_counter_w(device->machine(), 1, data & 0x80);    /* counter2 */
+//  coin_counter_w(device->machine(), 2, data & 0x20);    /* counter3 */
 
 /*  Counters:
 

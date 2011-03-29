@@ -376,7 +376,7 @@ static void custom_tilemap_draw(
 	int is_tattoo
 	)
 {
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	tilemap_t *tilemap0 = BIT(control1, 7) ? tilemap0_8x8 : tilemap0_16x16;
 	tilemap_t *tilemap1 = BIT(control1, 7) ? tilemap1_8x8 : tilemap1_16x16;
 	const bitmap_t *src_bitmap0 = tilemap0 ? tilemap_get_pixmap(tilemap0) : NULL;
@@ -430,10 +430,10 @@ static void custom_tilemap_draw(
 
 				if ((flags & TILEMAP_DRAW_OPAQUE) || (p & trans_mask))
 				{
-					*BITMAP_ADDR16(bitmap, y, x) = machine->pens[p];
-					if (machine->priority_bitmap)
+					*BITMAP_ADDR16(bitmap, y, x) = machine.pens[p];
+					if (machine.priority_bitmap)
 					{
-						UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
+						UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
 						pri[x] |= priority;
 					}
 				}
@@ -468,10 +468,10 @@ static void custom_tilemap_draw(
 
 				if ((flags & TILEMAP_DRAW_OPAQUE) || (p & trans_mask))
 				{
-					*BITMAP_ADDR32(bitmap, y, x) = machine->pens[p];
-					if (machine->priority_bitmap)
+					*BITMAP_ADDR32(bitmap, y, x) = machine.pens[p];
+					if (machine.priority_bitmap)
 					{
-						UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
+						UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
 						pri[x] |= priority;
 					}
 				}
@@ -592,7 +592,7 @@ WRITE16_DEVICE_HANDLER( deco16ic_pf_control_w )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	COMBINE_DATA(&deco16ic->pf12_control[offset]);
-	device->machine->primary_screen->update_partial(device->machine->primary_screen->vpos());
+	device->machine().primary_screen->update_partial(device->machine().primary_screen->vpos());
 }
 
 READ16_DEVICE_HANDLER( deco16ic_pf_control_r )
@@ -836,7 +836,7 @@ void deco16ic_print_debug_info(device_t *device, bitmap_t *bitmap)
 	deco16ic_state *deco16ic = get_safe_token(device);
 	char buf[64*5];
 
-	if (input_code_pressed(device->machine, KEYCODE_O))
+	if (input_code_pressed(device->machine(), KEYCODE_O))
 		return;
 
 	if (deco16ic->pf12_control)
@@ -847,7 +847,7 @@ void deco16ic_print_debug_info(device_t *device, bitmap_t *bitmap)
 	else
 		sprintf(buf, "\n\n");
 
-	ui_draw_text(&device->machine->render().ui_container(), buf, 60, 40);
+	ui_draw_text(&device->machine().render().ui_container(), buf, 60, 40);
 }
 
 /*****************************************************************************************/
@@ -951,9 +951,9 @@ static DEVICE_START( deco16ic )
 
 	deco16ic->pf1_8bpp_mode = 0;
 
-	deco16ic->pf1_data = auto_alloc_array_clear(device->machine, UINT16, 0x2000 / 2);
-	deco16ic->pf2_data = auto_alloc_array_clear(device->machine, UINT16, 0x2000 / 2);
-	deco16ic->pf12_control = auto_alloc_array_clear(device->machine, UINT16, 0x10 / 2);
+	deco16ic->pf1_data = auto_alloc_array_clear(device->machine(), UINT16, 0x2000 / 2);
+	deco16ic->pf2_data = auto_alloc_array_clear(device->machine(), UINT16, 0x2000 / 2);
+	deco16ic->pf12_control = auto_alloc_array_clear(device->machine(), UINT16, 0x10 / 2);
 
 
 	device->save_item(NAME(deco16ic->use_custom_pf1));

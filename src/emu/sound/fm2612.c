@@ -1004,7 +1004,7 @@ INLINE UINT8 FM_STATUS_FLAG(FM_ST *ST)
 {
 	if( COMPARE_TIMES(ST->busy_expiry_time, UNDEFINED_TIME) != 0 )
 	{
-		if (COMPARE_TIMES(ST->busy_expiry_time, FM_GET_TIME_NOW(ST->device->machine)) > 0)
+		if (COMPARE_TIMES(ST->busy_expiry_time, FM_GET_TIME_NOW(&ST->device->machine())) > 0)
 			return ST->status | 0x80;	/* with busy */
 		/* expire */
 		FM_BUSY_CLEAR(ST);
@@ -1014,7 +1014,7 @@ INLINE UINT8 FM_STATUS_FLAG(FM_ST *ST)
 INLINE void FM_BUSY_SET(FM_ST *ST,int busyclock )
 {
 	TIME_TYPE expiry_period = MULTIPLY_TIME_BY_INT(attotime::from_hz(ST->clock), busyclock * ST->timer_prescaler);
-	ST->busy_expiry_time = ADD_TIMES(FM_GET_TIME_NOW(ST->device->machine), expiry_period);
+	ST->busy_expiry_time = ADD_TIMES(FM_GET_TIME_NOW(&ST->device->machine()), expiry_period);
 }
 #else
 #define FM_STATUS_FLAG(ST) ((ST)->status)
@@ -2369,7 +2369,7 @@ void * ym2612_init(void *param, device_t *device, int clock, int rate,
 	YM2612 *F2612;
 
 	/* allocate extend state space */
-	F2612 = auto_alloc_clear(device->machine, YM2612);
+	F2612 = auto_alloc_clear(device->machine(), YM2612);
 	/* allocate total level table (128kb space) */
 	init_tables();
 
@@ -2397,7 +2397,7 @@ void ym2612_shutdown(void *chip)
 	YM2612 *F2612 = (YM2612 *)chip;
 
 	FMCloseTable();
-	auto_free(F2612->OPN.ST.device->machine, F2612);
+	auto_free(F2612->OPN.ST.device->machine(), F2612);
 }
 
 /* reset one of chip */

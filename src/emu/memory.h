@@ -353,6 +353,7 @@ public:
 	// getters
 	address_space *next() const { return m_next; }
 	device_t &device() const { return m_device; }
+	running_machine &machine() const { return m_machine; }
 	const char *name() const { return m_name; }
 	address_spacenum spacenum() const { return m_spacenum; }
 	address_map *map() const { return m_map; }
@@ -576,15 +577,14 @@ private:
 
 public:
 	// public state (eventually will go away)
-	running_machine *		machine;			// kept for backwards compatibility
 	device_t *				cpu;				// kept for backwards compatibility
-	running_machine &		m_machine;			// reference to the owning machine
 
 protected:
 	// private state
 	address_space *			m_next;				// next address space in the global list
 	const address_space_config &m_config;		// configuration of this space
 	device_t &				m_device;			// reference to the owning device
+	running_machine &		m_machine;			// reference to the owning machine
 	address_map *			m_map;				// original memory map
 	offs_t					m_addrmask;			// physical address mask
 	offs_t					m_bytemask;			// byte-converted physical address mask
@@ -715,31 +715,31 @@ extern const char *const address_space_names[ADDRESS_SPACES];
 //**************************************************************************
 
 // initialize the memory system
-void memory_init(running_machine *machine);
+void memory_init(running_machine &machine);
 
 // configure the addresses for a bank
-void memory_configure_bank(running_machine *machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(1, 5);
+void memory_configure_bank(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(5);
 
 // configure the decrypted addresses for a bank
-void memory_configure_bank_decrypted(running_machine *machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(1, 5);
+void memory_configure_bank_decrypted(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(5);
 
 // select one pre-configured entry to be the new bank base
-void memory_set_bank(running_machine *machine, const char *tag, int entrynum) ATTR_NONNULL(1);
+void memory_set_bank(running_machine &machine, const char *tag, int entrynum);
 
 // return the currently selected bank
-int memory_get_bank(running_machine *machine, const char *tag) ATTR_NONNULL(1);
+int memory_get_bank(running_machine &machine, const char *tag);
 
 // set the absolute address of a bank base
-void memory_set_bankptr(running_machine *machine, const char *tag, void *base) ATTR_NONNULL(1, 3);
+void memory_set_bankptr(running_machine &machine, const char *tag, void *base) ATTR_NONNULL(3);
 
 // get a pointer to a shared memory region by tag
 void *memory_get_shared(running_machine &machine, const char *tag);
 void *memory_get_shared(running_machine &machine, const char *tag, size_t &length);
 
 // dump the internal memory tables to the given file
-void memory_dump(running_machine *machine, FILE *file);
+void memory_dump(running_machine &machine, FILE *file);
 
-address_space *memory_nonspecific_space(running_machine *machine);
+address_space *memory_nonspecific_space(running_machine &machine);
 
 
 //**************************************************************************

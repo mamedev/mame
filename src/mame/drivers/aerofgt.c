@@ -68,7 +68,7 @@ Verification still needed for the other PCBs.
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
+	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->pending_command = 1;
@@ -79,7 +79,7 @@ static WRITE16_HANDLER( sound_command_w )
 
 static WRITE16_HANDLER( turbofrc_sound_command_w )
 {
-	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
+	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		state->pending_command = 1;
@@ -90,7 +90,7 @@ static WRITE16_HANDLER( turbofrc_sound_command_w )
 
 static WRITE16_HANDLER( aerfboot_soundlatch_w )
 {
-	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
+	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
 	if(ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, 0, (data >> 8) & 0xff);
@@ -100,19 +100,19 @@ static WRITE16_HANDLER( aerfboot_soundlatch_w )
 
 static READ16_HANDLER( pending_command_r )
 {
-	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
+	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
 	return state->pending_command;
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
+	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
 	state->pending_command = 0;
 }
 
 static WRITE8_HANDLER( aerofgt_sh_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x03);
+	memory_set_bank(space->machine(), "bank1", data & 0x03);
 }
 
 
@@ -134,7 +134,7 @@ static WRITE16_DEVICE_HANDLER( aerfboo2_okim6295_banking_w )
 
 static WRITE8_HANDLER( aerfboot_okim6295_banking_w )
 {
-	UINT8 *oki = space->machine->region("oki")->base();
+	UINT8 *oki = space->machine().region("oki")->base();
 	/*bit 2 (0x4) setted too?*/
 	if (data & 0x4)
 		memcpy(&oki[0x20000], &oki[((data & 0x3) * 0x20000) + 0x40000], 0x20000);
@@ -1282,7 +1282,7 @@ GFXDECODE_END
 
 static void irqhandler( device_t *device, int irq )
 {
-	aerofgt_state *state = device->machine->driver_data<aerofgt_state>();
+	aerofgt_state *state = device->machine().driver_data<aerofgt_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -1299,15 +1299,15 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_START( common )
 {
-	aerofgt_state *state = machine->driver_data<aerofgt_state>();
+	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 	state->save_item(NAME(state->pending_command));
 }
 
 static MACHINE_START( aerofgt )
 {
-	UINT8 *rom = machine->region("audiocpu")->base();
+	UINT8 *rom = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &rom[0x10000], 0x8000);
 
@@ -1316,7 +1316,7 @@ static MACHINE_START( aerofgt )
 
 static MACHINE_RESET( common )
 {
-	aerofgt_state *state = machine->driver_data<aerofgt_state>();
+	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	state->pending_command = 0;
 }
 

@@ -27,7 +27,7 @@ t=tile, p=palette
 
 static TILE_GET_INFO( VS920A_get_tile_info )
 {
-	gstriker_state *state = machine->driver_data<gstriker_state>();
+	gstriker_state *state = machine.driver_data<gstriker_state>();
 	int data;
 	int tileno, pal;
 
@@ -41,21 +41,21 @@ static TILE_GET_INFO( VS920A_get_tile_info )
 
 WRITE16_HANDLER( VS920A_0_vram_w )
 {
-	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	COMBINE_DATA(&state->VS920A[0].vram[offset]);
 	tilemap_mark_tile_dirty(state->VS920A[0].tmap, offset);
 }
 
 WRITE16_HANDLER( VS920A_1_vram_w )
 {
-	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	COMBINE_DATA(&state->VS920A[1].vram[offset]);
 	tilemap_mark_tile_dirty(state->VS920A[1].tmap, offset);
 }
 
-static void VS920A_init(running_machine *machine, int numchips)
+static void VS920A_init(running_machine &machine, int numchips)
 {
-	gstriker_state *state = machine->driver_data<gstriker_state>();
+	gstriker_state *state = machine.driver_data<gstriker_state>();
 	int i;
 
 	if (numchips > MAX_VS920A)
@@ -143,7 +143,7 @@ index is in the MSB. gstriker uses 5 bits for banking, but the chips could be ab
 
 static TILE_GET_INFO( MB60553_get_tile_info )
 {
-	gstriker_state *state = machine->driver_data<gstriker_state>();
+	gstriker_state *state = machine.driver_data<gstriker_state>();
 	int data, bankno;
 	int tileno, pal;
 
@@ -211,9 +211,9 @@ static TILEMAP_MAPPER( twc94_scan )
 	return (row*64) + (col&63) + ((col&64)<<6);
 }
 
-static void MB60553_init(running_machine *machine, int numchips)
+static void MB60553_init(running_machine &machine, int numchips)
 {
-	gstriker_state *state = machine->driver_data<gstriker_state>();
+	gstriker_state *state = machine.driver_data<gstriker_state>();
 	int i;
 
 	if (numchips > MAX_MB60553)
@@ -238,15 +238,15 @@ static void MB60553_set_gfx_region(gstriker_state *state, int numchip, int gfx_r
 }
 
 /* THIS IS STILL WRONG! */
-static void MB60553_draw(running_machine *machine, int numchip, bitmap_t* screen, const rectangle* cliprect, int priority)
+static void MB60553_draw(running_machine &machine, int numchip, bitmap_t* screen, const rectangle* cliprect, int priority)
 {
-	gstriker_state *state = machine->driver_data<gstriker_state>();
+	gstriker_state *state = machine.driver_data<gstriker_state>();
 	int line;
 	rectangle clip;
 	state->MB60553_cur_chip = &state->MB60553[numchip];
 
-	clip.min_x = machine->primary_screen->visible_area().min_x;
-	clip.max_x = machine->primary_screen->visible_area().max_x;
+	clip.min_x = machine.primary_screen->visible_area().min_x;
+	clip.max_x = machine.primary_screen->visible_area().max_x;
 
 	for (line = 0; line < 224;line++)
 	{
@@ -288,7 +288,7 @@ static tilemap_t* MB60553_get_tilemap(gstriker_state *state, int numchip)
 
 WRITE16_HANDLER(MB60553_0_regs_w)
 {
-	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	UINT16 oldreg = state->MB60553[0].regs[offset];
 
 	COMBINE_DATA(&state->MB60553[0].regs[offset]);
@@ -299,7 +299,7 @@ WRITE16_HANDLER(MB60553_0_regs_w)
 
 WRITE16_HANDLER(MB60553_1_regs_w)
 {
-	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	UINT16 oldreg = state->MB60553[1].regs[offset];
 
 	COMBINE_DATA(&state->MB60553[1].regs[offset]);
@@ -310,7 +310,7 @@ WRITE16_HANDLER(MB60553_1_regs_w)
 
 WRITE16_HANDLER(MB60553_0_vram_w)
 {
-	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	COMBINE_DATA(&state->MB60553[0].vram[offset]);
 
 	tilemap_mark_tile_dirty(state->MB60553[0].tmap, offset);
@@ -318,7 +318,7 @@ WRITE16_HANDLER(MB60553_0_vram_w)
 
 WRITE16_HANDLER(MB60553_1_vram_w)
 {
-	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	COMBINE_DATA(&state->MB60553[1].vram[offset]);
 
 	tilemap_mark_tile_dirty(state->MB60553[1].tmap, offset);
@@ -383,9 +383,9 @@ Abstracts the VS9210
 */
 
 
-static void CG10103_draw_sprite(running_machine *machine, bitmap_t* screen, const rectangle* cliprect, UINT16* spr, int drawpri)
+static void CG10103_draw_sprite(running_machine &machine, bitmap_t* screen, const rectangle* cliprect, UINT16* spr, int drawpri)
 {
-	gstriker_state *state = machine->driver_data<gstriker_state>();
+	gstriker_state *state = machine.driver_data<gstriker_state>();
 	int ypos = spr[0] & 0x1FF;
 	int xpos = (spr[1] & 0x1FF);
 	UINT32 tile = (spr[3] & 0xFFFF) | ((spr[2] & 1) << 16);
@@ -449,8 +449,8 @@ static void CG10103_draw_sprite(running_machine *machine, bitmap_t* screen, cons
 		for (x=0;x<xnum;x++)
 		{
 			// Hack to handle horizontal wrapping
-			drawgfxzoom_transpen(screen, cliprect, machine->gfx[state->CG10103_cur_chip->gfx_region], tile, color+state->CG10103_cur_chip->pal_base, flipx, flipy, xp>>16, ypos>>16, xfact, yfact, state->CG10103_cur_chip->transpen);
-			drawgfxzoom_transpen(screen, cliprect, machine->gfx[state->CG10103_cur_chip->gfx_region], tile, color+state->CG10103_cur_chip->pal_base, flipx, flipy, (xp>>16) - 0x200, ypos>>16, xfact, yfact, state->CG10103_cur_chip->transpen);
+			drawgfxzoom_transpen(screen, cliprect, machine.gfx[state->CG10103_cur_chip->gfx_region], tile, color+state->CG10103_cur_chip->pal_base, flipx, flipy, xp>>16, ypos>>16, xfact, yfact, state->CG10103_cur_chip->transpen);
+			drawgfxzoom_transpen(screen, cliprect, machine.gfx[state->CG10103_cur_chip->gfx_region], tile, color+state->CG10103_cur_chip->pal_base, flipx, flipy, (xp>>16) - 0x200, ypos>>16, xfact, yfact, state->CG10103_cur_chip->transpen);
 			xp += xstep;
 			tile++;
 		}
@@ -460,9 +460,9 @@ static void CG10103_draw_sprite(running_machine *machine, bitmap_t* screen, cons
 }
 
 
-static void CG10103_draw(running_machine *machine, int numchip, bitmap_t* screen, const rectangle* cliprect, int priority)
+static void CG10103_draw(running_machine &machine, int numchip, bitmap_t* screen, const rectangle* cliprect, int priority)
 {
-	gstriker_state *state = machine->driver_data<gstriker_state>();
+	gstriker_state *state = machine.driver_data<gstriker_state>();
 	UINT16* splist;
 	int i;
 
@@ -535,18 +535,18 @@ WRITE16_HANDLER( gsx_videoram3_w )
 
 SCREEN_UPDATE(gstriker)
 {
-	gstriker_state *state = screen->machine->driver_data<gstriker_state>();
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	gstriker_state *state = screen->machine().driver_data<gstriker_state>();
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
 	// Sandwitched screen/sprite0/score/sprite1. Surely wrong, probably
 	//  needs sprite orthogonality
-	MB60553_draw(screen->machine, 0, bitmap,cliprect, 0);
+	MB60553_draw(screen->machine(), 0, bitmap,cliprect, 0);
 
-	CG10103_draw(screen->machine, 0, bitmap, cliprect, 0);
+	CG10103_draw(screen->machine(), 0, bitmap, cliprect, 0);
 
 	VS920A_draw(state, 0, bitmap, cliprect, 0);
 
-	CG10103_draw(screen->machine, 0, bitmap, cliprect, 1);
+	CG10103_draw(screen->machine(), 0, bitmap, cliprect, 1);
 
 #if 0
 	popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",
@@ -566,7 +566,7 @@ SCREEN_UPDATE(gstriker)
 
 VIDEO_START(gstriker)
 {
-	gstriker_state *state = machine->driver_data<gstriker_state>();
+	gstriker_state *state = machine.driver_data<gstriker_state>();
 
 	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
 
@@ -591,7 +591,7 @@ VIDEO_START(gstriker)
 
 VIDEO_START(twrldc94)
 {
-	gstriker_state *state = machine->driver_data<gstriker_state>();
+	gstriker_state *state = machine.driver_data<gstriker_state>();
 
 	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
 
@@ -616,7 +616,7 @@ VIDEO_START(twrldc94)
 
 VIDEO_START(vgoalsoc)
 {
-	gstriker_state *state = machine->driver_data<gstriker_state>();
+	gstriker_state *state = machine.driver_data<gstriker_state>();
 
 	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
 

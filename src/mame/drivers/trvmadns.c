@@ -80,7 +80,7 @@ public:
 
 static WRITE8_HANDLER( trvmadns_banking_w )
 {
-	trvmadns_state *state = space->machine->driver_data<trvmadns_state>();
+	trvmadns_state *state = space->machine().driver_data<trvmadns_state>();
 
 	UINT8 *rom;
 	int address = 0;
@@ -91,7 +91,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 	}
 	else if((data & 0xf0) == 0x80 || (data & 0xf0) == 0x90)
 	{
-		rom = space->machine->region("user2")->base();
+		rom = space->machine().region("user2")->base();
 
 		switch(data & 0xf)
 		{
@@ -107,8 +107,8 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 
 		address |= (data & 0x10) ? 0x10000 : 0;
 
-		memory_set_bankptr(space->machine, "bank1", &rom[address]);
-		memory_set_bankptr(space->machine, "bank2", &rom[address + 0x1000]);
+		memory_set_bankptr(space->machine(), "bank1", &rom[address]);
+		memory_set_bankptr(space->machine(), "bank2", &rom[address + 0x1000]);
 	}
 	else
 	{
@@ -119,7 +119,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 				//logerror("port80 = %02X\n",data);
 			}
 
-		rom = space->machine->region("user1")->base();
+		rom = space->machine().region("user1")->base();
 
 		/*
         7
@@ -147,29 +147,29 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 
 //      logerror("add = %X\n",address);
 
-		memory_set_bankptr(space->machine, "bank1", &rom[address]);
+		memory_set_bankptr(space->machine(), "bank1", &rom[address]);
 	}
 }
 
 static WRITE8_HANDLER( trvmadns_gfxram_w )
 {
-	trvmadns_state *state = space->machine->driver_data<trvmadns_state>();
+	trvmadns_state *state = space->machine().driver_data<trvmadns_state>();
 	state->gfxram[offset] = data;
-	gfx_element_mark_dirty(space->machine->gfx[0], offset/16);
+	gfx_element_mark_dirty(space->machine().gfx[0], offset/16);
 }
 
 static WRITE8_HANDLER( trvmadns_palette_w )
 {
 	int r,g,b,datax;
-	space->machine->generic.paletteram.u8[offset] = data;
+	space->machine().generic.paletteram.u8[offset] = data;
 	offset>>=1;
-	datax=space->machine->generic.paletteram.u8[offset*2+1]+256*space->machine->generic.paletteram.u8[offset*2];
+	datax=space->machine().generic.paletteram.u8[offset*2+1]+256*space->machine().generic.paletteram.u8[offset*2];
 
 	b = (((datax & 0x0007)>>0) | ((datax & 0x0200)>>6)) ^ 0xf;
 	r = (((datax & 0x0038)>>3) | ((datax & 0x0400)>>7)) ^ 0xf;
 	g = (((datax & 0x01c0)>>6) | ((datax & 0x0800)>>8)) ^ 0xf;
 
-	palette_set_color_rgb(space->machine, offset, pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(space->machine(), offset, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 
@@ -191,12 +191,12 @@ static WRITE8_HANDLER( w3 )
 
 static WRITE8_HANDLER( trvmadns_tileram_w )
 {
-	trvmadns_state *state = space->machine->driver_data<trvmadns_state>();
+	trvmadns_state *state = space->machine().driver_data<trvmadns_state>();
 	if(offset==0)
 	{
 		if(cpu_get_previouspc(space->cpu)==0x29e9)// || cpu_get_previouspc(space->cpu)==0x1b3f) //29f5
 		{
-			cputag_set_input_line(space->machine, "maincpu", 0, HOLD_LINE);
+			cputag_set_input_line(space->machine(), "maincpu", 0, HOLD_LINE);
 		}
 //      else
 //          logerror("%x \n", cpu_get_previouspc(space->cpu));
@@ -256,7 +256,7 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	trvmadns_state *state = machine->driver_data<trvmadns_state>();
+	trvmadns_state *state = machine.driver_data<trvmadns_state>();
 	int tile,attr,color,flag;
 
 	attr = state->tileram[tile_index*2 + 0];
@@ -277,19 +277,19 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( trvmadns )
 {
-	trvmadns_state *state = machine->driver_data<trvmadns_state>();
+	trvmadns_state *state = machine.driver_data<trvmadns_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 //  tilemap_set_transparent_pen(fg_tilemap,1);
 
-	gfx_element_set_source(machine->gfx[0], state->gfxram);
+	gfx_element_set_source(machine.gfx[0], state->gfxram);
 }
 
 static SCREEN_UPDATE( trvmadns )
 {
-	trvmadns_state *state = screen->machine->driver_data<trvmadns_state>();
+	trvmadns_state *state = screen->machine().driver_data<trvmadns_state>();
 	int x,y,count;
-	const gfx_element *gfx = screen->machine->gfx[0];
+	const gfx_element *gfx = screen->machine().gfx[0];
 
 	bitmap_fill(bitmap,cliprect,0xd);
 
@@ -334,7 +334,7 @@ static SCREEN_UPDATE( trvmadns )
 
 static MACHINE_RESET( trvmadns )
 {
-	trvmadns_state *state = machine->driver_data<trvmadns_state>();
+	trvmadns_state *state = machine.driver_data<trvmadns_state>();
 	state->old_data = -1;
 }
 

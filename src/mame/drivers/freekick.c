@@ -46,49 +46,49 @@ static WRITE8_HANDLER( flipscreen_w )
 {
 	/* flip Y/X could be the other way round... */
 	if (offset)
-		flip_screen_y_set(space->machine, ~data & 1);
+		flip_screen_y_set(space->machine(), ~data & 1);
 	else
-		flip_screen_x_set(space->machine, ~data & 1);
+		flip_screen_x_set(space->machine(), ~data & 1);
 }
 
 static WRITE8_HANDLER( coin_w )
 {
-	coin_counter_w(space->machine, offset, ~data & 1);
+	coin_counter_w(space->machine(), offset, ~data & 1);
 }
 
 static WRITE8_HANDLER( spinner_select_w )
 {
-	freekick_state *state = space->machine->driver_data<freekick_state>();
+	freekick_state *state = space->machine().driver_data<freekick_state>();
 	state->spinner = data & 1;
 }
 
 static READ8_HANDLER( spinner_r )
 {
-	freekick_state *state = space->machine->driver_data<freekick_state>();
-	return input_port_read(space->machine, state->spinner ? "IN3" : "IN2");
+	freekick_state *state = space->machine().driver_data<freekick_state>();
+	return input_port_read(space->machine(), state->spinner ? "IN3" : "IN2");
 }
 
 static WRITE8_HANDLER( pbillrd_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 1);
+	memory_set_bank(space->machine(), "bank1", data & 1);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	freekick_state *state = space->machine->driver_data<freekick_state>();
+	freekick_state *state = space->machine().driver_data<freekick_state>();
 	state->nmi_en = data & 1;
 }
 
 static INTERRUPT_GEN( freekick_irqgen )
 {
-	freekick_state *state = device->machine->driver_data<freekick_state>();
+	freekick_state *state = device->machine().driver_data<freekick_state>();
 	if (state->nmi_en)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( oigas_5_w )
 {
-	freekick_state *state = space->machine->driver_data<freekick_state>();
+	freekick_state *state = space->machine().driver_data<freekick_state>();
 	if (data > 0xc0 && data < 0xe0)
 		state->cnt = 1;
 
@@ -101,7 +101,7 @@ static WRITE8_HANDLER( oigas_5_w )
 
 static READ8_HANDLER( oigas_3_r )
 {
-	freekick_state *state = space->machine->driver_data<freekick_state>();
+	freekick_state *state = space->machine().driver_data<freekick_state>();
 	switch (++state->cnt)
 	{
 	case 2: return ~(state->inval >> 8);
@@ -144,13 +144,13 @@ static READ8_HANDLER( oigas_2_r )
 
 static READ8_HANDLER( freekick_ff_r )
 {
-	freekick_state *state = space->machine->driver_data<freekick_state>();
+	freekick_state *state = space->machine().driver_data<freekick_state>();
 	return state->ff_data;
 }
 
 static WRITE8_HANDLER( freekick_ff_w )
 {
-	freekick_state *state = space->machine->driver_data<freekick_state>();
+	freekick_state *state = space->machine().driver_data<freekick_state>();
 	state->ff_data = data;
 }
 
@@ -513,20 +513,20 @@ INPUT_PORTS_END
 
 static WRITE8_DEVICE_HANDLER( snd_rom_addr_l_w )
 {
-	freekick_state *state = device->machine->driver_data<freekick_state>();
+	freekick_state *state = device->machine().driver_data<freekick_state>();
 	state->romaddr = (state->romaddr & 0xff00) | data;
 }
 
 static WRITE8_DEVICE_HANDLER( snd_rom_addr_h_w )
 {
-	freekick_state *state = device->machine->driver_data<freekick_state>();
+	freekick_state *state = device->machine().driver_data<freekick_state>();
 	state->romaddr = (state->romaddr & 0x00ff) | (data << 8);
 }
 
 static READ8_DEVICE_HANDLER( snd_rom_r )
 {
-	freekick_state *state = device->machine->driver_data<freekick_state>();
-	return device->machine->region("user1")->base()[state->romaddr & 0x7fff];
+	freekick_state *state = device->machine().driver_data<freekick_state>();
+	return device->machine().region("user1")->base()[state->romaddr & 0x7fff];
 }
 
 static const ppi8255_interface ppi8255_intf[2] =
@@ -596,7 +596,7 @@ GFXDECODE_END
 
 static MACHINE_START( freekick )
 {
-	freekick_state *state = machine->driver_data<freekick_state>();
+	freekick_state *state = machine.driver_data<freekick_state>();
 
 	state->save_item(NAME(state->romaddr));
 	state->save_item(NAME(state->spinner));
@@ -606,7 +606,7 @@ static MACHINE_START( freekick )
 
 static MACHINE_RESET( freekick )
 {
-	freekick_state *state = machine->driver_data<freekick_state>();
+	freekick_state *state = machine.driver_data<freekick_state>();
 
 	state->romaddr = 0;
 	state->spinner = 0;
@@ -616,14 +616,14 @@ static MACHINE_RESET( freekick )
 
 static MACHINE_START( pbillrd )
 {
-	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	MACHINE_START_CALL(freekick);
 }
 
 static MACHINE_START( oigas )
 {
-	freekick_state *state = machine->driver_data<freekick_state>();
+	freekick_state *state = machine.driver_data<freekick_state>();
 
 	state->save_item(NAME(state->inval));
 	state->save_item(NAME(state->outval));
@@ -634,7 +634,7 @@ static MACHINE_START( oigas )
 
 static MACHINE_RESET( oigas )
 {
-	freekick_state *state = machine->driver_data<freekick_state>();
+	freekick_state *state = machine.driver_data<freekick_state>();
 
 	MACHINE_RESET_CALL(freekick);
 
@@ -1108,8 +1108,8 @@ ROM_END
 
 static DRIVER_INIT(gigasb)
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0xbfff, machine->region("maincpu")->base() + 0x10000);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	space->set_decrypted_region(0x0000, 0xbfff, machine.region("maincpu")->base() + 0x10000);
 }
 
 

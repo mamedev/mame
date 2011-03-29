@@ -81,7 +81,7 @@ static INT16 interpolate16(INT32 value)
     initialization and termination
 *********************************************************************/
 
-static cassette_image *cassette_init(running_machine *machine,const struct CassetteFormat *format, void *file, const struct io_procs *procs, int flags)
+static cassette_image *cassette_init(running_machine &machine,const struct CassetteFormat *format, void *file, const struct io_procs *procs, int flags)
 {
 	cassette_image *cassette;
 
@@ -95,7 +95,7 @@ static cassette_image *cassette_init(running_machine *machine,const struct Casse
 	cassette->io.procs = procs;
 	cassette->flags = flags;
 	cassette->pool = pool_alloc_lib(NULL);
-	cassette->machine = machine;
+	cassette->m_machine = &machine;
 	return cassette;
 }
 
@@ -125,7 +125,7 @@ static int good_format(const struct CassetteFormat *format, const char *extensio
 
 
 
-casserr_t cassette_open_choices(running_machine *machine,void *file, const struct io_procs *procs, const char *extension,
+casserr_t cassette_open_choices(running_machine &machine,void *file, const struct io_procs *procs, const char *extension,
 	const struct CassetteFormat *const *formats, int flags, cassette_image **outcassette)
 {
 	casserr_t err;
@@ -190,7 +190,7 @@ done:
 
 
 
-casserr_t cassette_open(running_machine *machine, void *file, const struct io_procs *procs,
+casserr_t cassette_open(running_machine &machine, void *file, const struct io_procs *procs,
 	const struct CassetteFormat *format, int flags, cassette_image **outcassette)
 {
 	const struct CassetteFormat *formats[2];
@@ -201,7 +201,7 @@ casserr_t cassette_open(running_machine *machine, void *file, const struct io_pr
 
 
 
-casserr_t cassette_create(running_machine *machine, void *file, const struct io_procs *procs, const struct CassetteFormat *format,
+casserr_t cassette_create(running_machine &machine, void *file, const struct io_procs *procs, const struct CassetteFormat *format,
 	const struct CassetteOptions *opts, int flags, cassette_image **outcassette)
 {
 	casserr_t err;

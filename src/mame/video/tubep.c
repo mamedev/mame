@@ -133,7 +133,7 @@
 
 PALETTE_INIT( tubep )
 {
-	tubep_state *state = machine->driver_data<tubep_state>();
+	tubep_state *state = machine.driver_data<tubep_state>();
 	int i,r,g,b;
 
 	/* background/sprites palette variables */
@@ -338,7 +338,7 @@ PALETTE_INIT( tubep )
 
 VIDEO_START( tubep )
 {
-	tubep_state *state = machine->driver_data<tubep_state>();
+	tubep_state *state = machine.driver_data<tubep_state>();
 	state->spritemap = auto_alloc_array(machine, UINT8, 256*256*2);
 
 	/* Set up save state */
@@ -368,7 +368,7 @@ VIDEO_START( tubep )
 
 VIDEO_RESET( tubep )
 {
-	tubep_state *state = machine->driver_data<tubep_state>();
+	tubep_state *state = machine.driver_data<tubep_state>();
 	memset(state->spritemap,0,256*256*2);
 
 	state->romD_addr = 0;
@@ -397,35 +397,35 @@ VIDEO_RESET( tubep )
 
 WRITE8_HANDLER( tubep_textram_w )
 {
-	tubep_state *state = space->machine->driver_data<tubep_state>();
+	tubep_state *state = space->machine().driver_data<tubep_state>();
 	state->textram[offset] = data;
 }
 
 
 WRITE8_HANDLER( tubep_background_romselect_w )
 {
-	tubep_state *state = space->machine->driver_data<tubep_state>();
+	tubep_state *state = space->machine().driver_data<tubep_state>();
 	state->background_romsel = data & 1;
 }
 
 
 WRITE8_HANDLER( tubep_colorproms_A4_line_w )
 {
-	tubep_state *state = space->machine->driver_data<tubep_state>();
+	tubep_state *state = space->machine().driver_data<tubep_state>();
 	state->color_A4 = (data & 1)<<4;
 }
 
 
 WRITE8_HANDLER( tubep_background_a000_w )
 {
-	tubep_state *state = space->machine->driver_data<tubep_state>();
+	tubep_state *state = space->machine().driver_data<tubep_state>();
 	state->ls175_b7 = ((data & 0x0f) ^ 0x0f) | 0xf0;
 }
 
 
 WRITE8_HANDLER( tubep_background_c000_w )
 {
-	tubep_state *state = space->machine->driver_data<tubep_state>();
+	tubep_state *state = space->machine().driver_data<tubep_state>();
 	state->ls175_e8 = ((data & 0x0f) ^ 0x0f);
 }
 
@@ -436,12 +436,12 @@ static TIMER_CALLBACK( sprite_timer_callback )
 }
 
 
-static void draw_sprite(running_machine *machine)
+static void draw_sprite(running_machine &machine)
 {
-	tubep_state *state = machine->driver_data<tubep_state>();
+	tubep_state *state = machine.driver_data<tubep_state>();
 	UINT32	XDOT;
 	UINT32	YDOT;
-	UINT8 * romCxx  = machine->region("user2")->base()+0x00000;
+	UINT8 * romCxx  = machine.region("user2")->base()+0x00000;
 	UINT8 * romD10  = romCxx+0x10000;
 	UINT8 * romEF13 = romCxx+0x12000;
 	UINT8 * romHI2  = romCxx+0x14000;
@@ -508,7 +508,7 @@ static void draw_sprite(running_machine *machine)
 
 WRITE8_HANDLER( tubep_sprite_control_w )
 {
-	tubep_state *state = space->machine->driver_data<tubep_state>();
+	tubep_state *state = space->machine().driver_data<tubep_state>();
 	if (offset < 10)
 	{
 		/*graph_ctrl[offset] = data;*/
@@ -563,21 +563,21 @@ WRITE8_HANDLER( tubep_sprite_control_w )
             /SINT line will be reasserted in state->XSize * state->YSize cycles (RH0 signal cycles)
             */
 			/* 1.clear the /SINT interrupt line */
-			cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
 
 			/* 2.assert /SINT again after this time */
-			space->machine->scheduler().timer_set( attotime::from_hz(19968000/8) * ((state->XSize+1)*(state->YSize+1)), FUNC(sprite_timer_callback));
+			space->machine().scheduler().timer_set( attotime::from_hz(19968000/8) * ((state->XSize+1)*(state->YSize+1)), FUNC(sprite_timer_callback));
 
 			/* 3.clear of /SINT starts sprite drawing circuit */
-			draw_sprite(space->machine);
+			draw_sprite(space->machine());
 			break;
 		}
 	}
 }
 
-void tubep_vblank_end(running_machine *machine)
+void tubep_vblank_end(running_machine &machine)
 {
-	tubep_state *state = machine->driver_data<tubep_state>();
+	tubep_state *state = machine.driver_data<tubep_state>();
 	state->DISP = state->DISP ^ 1;
 	/* logerror("EOF: DISP after this is=%i, and clearing it now.\n", state->DISP); */
 	/* clear the new frame (the one that was (just) displayed)*/
@@ -587,14 +587,14 @@ void tubep_vblank_end(running_machine *machine)
 
 SCREEN_UPDATE( tubep )
 {
-	tubep_state *state = screen->machine->driver_data<tubep_state>();
+	tubep_state *state = screen->machine().driver_data<tubep_state>();
 	int DISP_ = state->DISP^1;
 
 	pen_t pen_base = 32; //change it later
 
 	UINT32 v;
-	UINT8 *text_gfx_base = screen->machine->region("gfx1")->base();
-	UINT8 *romBxx = screen->machine->region("user1")->base() + 0x2000*state->background_romsel;
+	UINT8 *text_gfx_base = screen->machine().region("gfx1")->base();
+	UINT8 *romBxx = screen->machine().region("user1")->base() + 0x2000*state->background_romsel;
 
 	/* logerror(" update: from DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect->min_y, cliprect->max_y+1); */
 
@@ -703,7 +703,7 @@ PALETTE_INIT( rjammer )
 			2,	resistors_b,	weights_b,	470,	0,
 			0,	0,	0,	0,	0	);
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -731,26 +731,26 @@ PALETTE_INIT( rjammer )
 
 WRITE8_HANDLER( rjammer_background_LS377_w )
 {
-	tubep_state *state = space->machine->driver_data<tubep_state>();
+	tubep_state *state = space->machine().driver_data<tubep_state>();
 	state->ls377_data = data & 0xff;
 }
 
 
 WRITE8_HANDLER( rjammer_background_page_w )
 {
-	tubep_state *state = space->machine->driver_data<tubep_state>();
+	tubep_state *state = space->machine().driver_data<tubep_state>();
 	state->page = (data & 1) * 0x200;
 }
 
 
 SCREEN_UPDATE( rjammer )
 {
-	tubep_state *state = screen->machine->driver_data<tubep_state>();
+	tubep_state *state = screen->machine().driver_data<tubep_state>();
 	int DISP_ = state->DISP^1;
 
 	UINT32 v;
-	UINT8 *text_gfx_base = screen->machine->region("gfx1")->base();
-	UINT8 *rom13D  = screen->machine->region("user1")->base();
+	UINT8 *text_gfx_base = screen->machine().region("gfx1")->base();
+	UINT8 *rom13D  = screen->machine().region("user1")->base();
 	UINT8 *rom11BD = rom13D+0x1000;
 	UINT8 *rom19C  = rom13D+0x5000;
 

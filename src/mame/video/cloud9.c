@@ -17,7 +17,7 @@
 
 VIDEO_START( cloud9 )
 {
-	cloud9_state *state = machine->driver_data<cloud9_state>();
+	cloud9_state *state = machine.driver_data<cloud9_state>();
 	static const int resistances[3] = { 22000, 10000, 4700 };
 
 	/* allocate second bank of videoram */
@@ -25,9 +25,9 @@ VIDEO_START( cloud9 )
 	memory_set_bankptr(machine, "bank1", state->videoram);
 
 	/* get pointers to our PROMs */
-	state->syncprom = machine->region("proms")->base() + 0x000;
-	state->wpprom = machine->region("proms")->base() + 0x200;
-	state->priprom = machine->region("proms")->base() + 0x300;
+	state->syncprom = machine.region("proms")->base() + 0x000;
+	state->wpprom = machine.region("proms")->base() + 0x200;
+	state->priprom = machine.region("proms")->base() + 0x300;
 
 	/* compute the color output resistor weights at startup */
 	compute_resistor_weights(0,	255, -1.0,
@@ -36,7 +36,7 @@ VIDEO_START( cloud9 )
 			3,	resistances, state->bweights, 1000, 0);
 
 	/* allocate a bitmap for drawing sprites */
-	state->spritebitmap = machine->primary_screen->alloc_compatible_bitmap();
+	state->spritebitmap = machine.primary_screen->alloc_compatible_bitmap();
 
 	/* register for savestates */
 	state->save_pointer(NAME(state->videoram), 0x8000);
@@ -54,7 +54,7 @@ VIDEO_START( cloud9 )
 
 WRITE8_HANDLER( cloud9_video_control_w )
 {
-	cloud9_state *state = space->machine->driver_data<cloud9_state>();
+	cloud9_state *state = space->machine().driver_data<cloud9_state>();
 
 	/* only D7 matters */
 	state->video_control[offset] = (data >> 7) & 1;
@@ -70,7 +70,7 @@ WRITE8_HANDLER( cloud9_video_control_w )
 
 WRITE8_HANDLER( cloud9_paletteram_w )
 {
-	cloud9_state *state = space->machine->driver_data<cloud9_state>();
+	cloud9_state *state = space->machine().driver_data<cloud9_state>();
 	int bit0, bit1, bit2;
 	int r, g, b;
 
@@ -97,7 +97,7 @@ WRITE8_HANDLER( cloud9_paletteram_w )
 	bit2 = (~b >> 2) & 0x01;
 	b = combine_3_weights(state->bweights, bit0, bit1, bit2);
 
-	palette_set_color(space->machine, offset & 0x3f, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset & 0x3f, MAKE_RGB(r, g, b));
 }
 
 
@@ -109,9 +109,9 @@ WRITE8_HANDLER( cloud9_paletteram_w )
  *
  *************************************/
 
-INLINE void cloud9_write_vram( running_machine *machine, UINT16 addr, UINT8 data, UINT8 bitmd, UINT8 pixba )
+INLINE void cloud9_write_vram( running_machine &machine, UINT16 addr, UINT8 data, UINT8 bitmd, UINT8 pixba )
 {
-	cloud9_state *state = machine->driver_data<cloud9_state>();
+	cloud9_state *state = machine.driver_data<cloud9_state>();
 	UINT8 *dest = &state->videoram[0x0000 | (addr & 0x3fff)];
 	UINT8 *dest2 = &state->videoram[0x4000 | (addr & 0x3fff)];
 	UINT8 promaddr = 0;
@@ -159,9 +159,9 @@ INLINE void cloud9_write_vram( running_machine *machine, UINT16 addr, UINT8 data
  *
  *************************************/
 
-INLINE void bitmode_autoinc( running_machine *machine )
+INLINE void bitmode_autoinc( running_machine &machine )
 {
-	cloud9_state *state = machine->driver_data<cloud9_state>();
+	cloud9_state *state = machine.driver_data<cloud9_state>();
 
 	/* auto increment in the x-direction if it's enabled */
 	if (!state->video_control[0])	/* /AX */
@@ -183,7 +183,7 @@ INLINE void bitmode_autoinc( running_machine *machine )
 WRITE8_HANDLER( cloud9_videoram_w )
 {
 	/* direct writes to VRAM go through the write protect PROM as well */
-	cloud9_write_vram(space->machine, offset, data, 0, 0);
+	cloud9_write_vram(space->machine(), offset, data, 0, 0);
 }
 
 
@@ -196,7 +196,7 @@ WRITE8_HANDLER( cloud9_videoram_w )
 
 READ8_HANDLER( cloud9_bitmode_r )
 {
-	cloud9_state *state = space->machine->driver_data<cloud9_state>();
+	cloud9_state *state = space->machine().driver_data<cloud9_state>();
 
 	/* in bitmode, the address comes from the autoincrement latches */
 	UINT16 addr = (state->bitmode_addr[1] << 6) | (state->bitmode_addr[0] >> 2);
@@ -205,7 +205,7 @@ READ8_HANDLER( cloud9_bitmode_r )
 	UINT8 result = state->videoram[((~state->bitmode_addr[0] & 2) << 13) | addr] << ((state->bitmode_addr[0] & 1) * 4);
 
 	/* autoincrement because /BITMD was selected */
-	bitmode_autoinc(space->machine);
+	bitmode_autoinc(space->machine());
 
 	/* the upper 4 bits of the data lines are not driven so make them all 1's */
 	return (result >> 4) | 0xf0;
@@ -214,7 +214,7 @@ READ8_HANDLER( cloud9_bitmode_r )
 
 WRITE8_HANDLER( cloud9_bitmode_w )
 {
-	cloud9_state *state = space->machine->driver_data<cloud9_state>();
+	cloud9_state *state = space->machine().driver_data<cloud9_state>();
 
 	/* in bitmode, the address comes from the autoincrement latches */
 	UINT16 addr = (state->bitmode_addr[1] << 6) | (state->bitmode_addr[0] >> 2);
@@ -223,19 +223,19 @@ WRITE8_HANDLER( cloud9_bitmode_w )
 	data = (data & 0x0f) | (data << 4);
 
 	/* write through the generic VRAM routine, passing the low 2 X bits as PIXB/PIXA */
-	cloud9_write_vram(space->machine, addr, data, 1, state->bitmode_addr[0] & 3);
+	cloud9_write_vram(space->machine(), addr, data, 1, state->bitmode_addr[0] & 3);
 
 	/* autoincrement because /BITMD was selected */
-	bitmode_autoinc(space->machine);
+	bitmode_autoinc(space->machine());
 }
 
 
 WRITE8_HANDLER( cloud9_bitmode_addr_w )
 {
-	cloud9_state *state = space->machine->driver_data<cloud9_state>();
+	cloud9_state *state = space->machine().driver_data<cloud9_state>();
 
 	/* write through to video RAM and also to the addressing latches */
-	cloud9_write_vram(space->machine, offset, data, 0, 0);
+	cloud9_write_vram(space->machine(), offset, data, 0, 0);
 	state->bitmode_addr[offset] = data;
 }
 
@@ -249,10 +249,10 @@ WRITE8_HANDLER( cloud9_bitmode_addr_w )
 
 SCREEN_UPDATE( cloud9 )
 {
-	cloud9_state *state = screen->machine->driver_data<cloud9_state>();
+	cloud9_state *state = screen->machine().driver_data<cloud9_state>();
 	UINT8 *spriteaddr = state->spriteram;
 	int flip = state->video_control[5] ? 0xff : 0x00;	/* PLAYER2 */
-	pen_t black = get_black_pen(screen->machine);
+	pen_t black = get_black_pen(screen->machine());
 	int x, y, offs;
 
 	/* draw the sprites */
@@ -267,9 +267,9 @@ SCREEN_UPDATE( cloud9 )
 			int which = spriteaddr[offs + 0x20];
 			int color = 0;
 
-			drawgfx_transpen(state->spritebitmap, cliprect, screen->machine->gfx[0], which, color, xflip, yflip, x, y, 0);
+			drawgfx_transpen(state->spritebitmap, cliprect, screen->machine().gfx[0], which, color, xflip, yflip, x, y, 0);
 			if (x >= 256 - 16)
-				drawgfx_transpen(state->spritebitmap, cliprect, screen->machine->gfx[0], which, color, xflip, yflip, x - 256, y, 0);
+				drawgfx_transpen(state->spritebitmap, cliprect, screen->machine().gfx[0], which, color, xflip, yflip, x - 256, y, 0);
 		}
 
 	/* draw the bitmap to the screen, looping over Y */

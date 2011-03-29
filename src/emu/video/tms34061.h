@@ -43,7 +43,7 @@ struct tms34061_interface
 	const char	*screen_tag;	/* the screen we are acting on */
 	UINT8		rowshift;		/* VRAM address is (row << rowshift) | col */
 	UINT32		vramsize;		/* size of video RAM */
-	void		(*interrupt)(running_machine *machine, int state);	/* interrupt gen callback */
+	void		(*interrupt)(running_machine &machine, int state);	/* interrupt gen callback */
 };
 
 
@@ -59,7 +59,7 @@ struct tms34061_display
 
 
 /* starts/stops the emulator */
-void tms34061_start(running_machine *machine, const struct tms34061_interface *interface);
+void tms34061_start(running_machine &machine, const struct tms34061_interface *interface);
 
 /* reads/writes to the 34061 */
 UINT8 tms34061_r(address_space *space, int col, int row, int func);

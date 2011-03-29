@@ -28,7 +28,7 @@ gtia_struct gtia;
 #define VERBOSE			0
 
 static void gtia_reset(running_machine &machine);
-static void gtia_state(running_machine *machine);
+static void gtia_state(running_machine &machine);
 static STATE_POSTLOAD( gtia_state_postload );
 
 /**********************************************
@@ -63,12 +63,12 @@ static STATE_POSTLOAD( gtia_state_postload );
  *
  *************************************/
 
-void gtia_init(running_machine *machine, const gtia_interface *intf)
+void gtia_init(running_machine &machine, const gtia_interface *intf)
 {
 	memset(&gtia, 0, sizeof(gtia));
 	gtia.intf = *intf;
 
-	machine->add_notifier(MACHINE_NOTIFY_RESET, gtia_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, gtia_reset);
 
 	/* state saves */
 	gtia_state(machine);
@@ -76,7 +76,7 @@ void gtia_init(running_machine *machine, const gtia_interface *intf)
 
 
 
-static void gtia_state(running_machine *machine)
+static void gtia_state(running_machine &machine)
 {
 	state_save_register_global(machine, gtia.r.m0pf);
 	state_save_register_global(machine, gtia.r.m1pf);
@@ -139,14 +139,14 @@ static void gtia_state(running_machine *machine)
 	state_save_register_global(machine, gtia.w.gractl);
 	state_save_register_global(machine, gtia.w.hitclr);
 	state_save_register_global(machine, gtia.w.cons);
-	machine->state().register_postload(gtia_state_postload, NULL);
+	machine.state().register_postload(gtia_state_postload, NULL);
 }
 
 
 
-static int is_ntsc(running_machine *machine)
+static int is_ntsc(running_machine &machine)
 {
-	return ATTOSECONDS_TO_HZ(machine->primary_screen->frame_period().attoseconds) > 55;
+	return ATTOSECONDS_TO_HZ(machine.primary_screen->frame_period().attoseconds) > 55;
 }
 
 
@@ -160,7 +160,7 @@ static void gtia_reset(running_machine &machine)
 	for (i = 0; i < 32; i++)
 		atari_gtia_w(space,i,0);
     memset(&gtia.r, 0, sizeof(gtia.r));
-	if (is_ntsc(&machine))
+	if (is_ntsc(machine))
 		gtia.r.pal = 0xff;
 	else
 		gtia.r.pal = 0xf1;

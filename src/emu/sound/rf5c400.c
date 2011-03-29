@@ -264,7 +264,7 @@ static void rf5c400_init_chip(device_t *device, rf5c400_state *info)
 		double r;
 
 		// attack
-		r = 1.0 / (ENV_AR_SPEED * device->machine->sample_rate());
+		r = 1.0 / (ENV_AR_SPEED * device->machine().sample_rate());
 		for (i = 0; i < ENV_MIN_AR; i++)
 		{
 			info->env_ar_table[i] = 1.0;
@@ -280,7 +280,7 @@ static void rf5c400_init_chip(device_t *device, rf5c400_state *info)
 		}
 
 		// decay
-		r = -1.0 / (ENV_DR_SPEED * device->machine->sample_rate());
+		r = -1.0 / (ENV_DR_SPEED * device->machine().sample_rate());
 		for (i = 0; i < ENV_MIN_DR; i++)
 		{
 			info->env_dr_table[i] = r;
@@ -296,7 +296,7 @@ static void rf5c400_init_chip(device_t *device, rf5c400_state *info)
 		}
 
 		// release
-		r = -1.0 / (ENV_RR_SPEED * device->machine->sample_rate());
+		r = -1.0 / (ENV_RR_SPEED * device->machine().sample_rate());
 		for (i = 0; i < ENV_MIN_RR; i++)
 		{
 			info->env_rr_table[i] = r;
@@ -345,7 +345,7 @@ static void rf5c400_init_chip(device_t *device, rf5c400_state *info)
 		device->save_item(NAME(info->channels[i].env_scale), i);
 	}
 
-	info->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock()/384, info, rf5c400_update);
+	info->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock()/384, info, rf5c400_update);
 }
 
 
@@ -448,11 +448,11 @@ WRITE16_DEVICE_HANDLER( rf5c400_w )
 
 			default:
 			{
-				//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", device->machine->describe_context(), data, offset, mem_mask);
+				//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", device->machine().describe_context(), data, offset, mem_mask);
 				break;
 			}
 		}
-		//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X at %08X\n", device->machine->describe_context(), data, offset, mem_mask);
+		//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X at %08X\n", device->machine().describe_context(), data, offset, mem_mask);
 	}
 	else
 	{

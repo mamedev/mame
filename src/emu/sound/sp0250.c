@@ -208,10 +208,10 @@ static DEVICE_START( sp0250 )
 	if (sp->drq != NULL)
 	{
 		sp->drq(sp->device, ASSERT_LINE);
-		device->machine->scheduler().timer_pulse(attotime::from_hz(device->clock()) * CLOCK_DIVIDER, FUNC(sp0250_timer_tick), 0, sp);
+		device->machine().scheduler().timer_pulse(attotime::from_hz(device->clock()) * CLOCK_DIVIDER, FUNC(sp0250_timer_tick), 0, sp);
 	}
 
-	sp->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() / CLOCK_DIVIDER, sp, sp0250_update);
+	sp->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() / CLOCK_DIVIDER, sp, sp0250_update);
 }
 
 
@@ -226,7 +226,7 @@ WRITE8_DEVICE_HANDLER( sp0250_w )
 			sp->drq(sp->device, CLEAR_LINE);
 	}
 	else
-		logerror("%s: overflow SP0250 FIFO\n", device->machine->describe_context());
+		logerror("%s: overflow SP0250 FIFO\n", device->machine().describe_context());
 }
 
 

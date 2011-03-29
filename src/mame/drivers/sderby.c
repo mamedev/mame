@@ -77,7 +77,7 @@ static READ16_HANDLER ( sderby_input_r )
 	switch (offset)
 	{
 		case 0x00 >> 1:
-			return input_port_read(space->machine, "IN0");
+			return input_port_read(space->machine(), "IN0");
 		case 0x02 >> 1:
 			return 0xffff;			// to avoid game to reset (needs more work)
 	}
@@ -92,11 +92,11 @@ static READ16_HANDLER( roulette_input_r )
 	switch (offset)
 	{
 		case 0x00 >> 1:
-			return input_port_read(space->machine, "IN0");
+			return input_port_read(space->machine(), "IN0");
 		case 0x02 >> 1:
-			return input_port_read(space->machine, "IN1");
+			return input_port_read(space->machine(), "IN1");
 		case 0x04 >> 1:
-			return input_port_read(space->machine, "IN2");
+			return input_port_read(space->machine(), "IN2");
 	}
 
 	return 0xffff;
@@ -135,7 +135,7 @@ static READ16_HANDLER( rprot_r )
    If someone more skilled in 68K code can help to trace it,
    searching for an accurated response, I'll appreciate.
 */
-	return space->machine->rand() & 0x1f;
+	return space->machine().rand() & 0x1f;
 }
 
 static WRITE16_HANDLER( rprot_w )
@@ -188,7 +188,7 @@ static WRITE16_HANDLER( sderby_out_w )
 	output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - BET */
 	output_set_lamp_value(3, (data >> 15) & 1);		/* Lamp 3 - END OF RACE */
 
-	coin_counter_w(space->machine, 0, data & 0x2000);
+	coin_counter_w(space->machine(), 0, data & 0x2000);
 }
 
 
@@ -237,7 +237,7 @@ static WRITE16_HANDLER( scmatto_out_w )
 	output_set_lamp_value(6, (data >> 5) & 1);		/* Lamp 6 - START  */
 	output_set_lamp_value(7, (data >> 6) & 1);		/* Lamp 7 - BET    */
 
-	coin_counter_w(space->machine, 0, data & 0x2000);
+	coin_counter_w(space->machine(), 0, data & 0x2000);
 }
 
 

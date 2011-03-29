@@ -328,7 +328,7 @@ static WRITE16_HANDLER( semicom_soundcmd_w );
 
 static WRITE16_HANDLER( tumblepb_oki_w )
 {
-	okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+	okim6295_device *oki = space->machine().device<okim6295_device>("oki");
 	if (mem_mask == 0xffff)
 	{
 		oki->write(*space, 0, data & 0xff);
@@ -350,7 +350,7 @@ static READ16_HANDLER( tumblepb_prot_r )
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( tumblepb_sound_w )
 {
-	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
+	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
@@ -358,7 +358,7 @@ static WRITE16_HANDLER( tumblepb_sound_w )
 
 static WRITE16_HANDLER( jumppop_sound_w )
 {
-	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
+	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	device_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 }
@@ -370,11 +370,11 @@ static READ16_HANDLER( tumblepopb_controls_r )
 	switch (offset << 1)
 	{
 		case 0:
-			return input_port_read(space->machine, "PLAYERS");
+			return input_port_read(space->machine(), "PLAYERS");
 		case 2:
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 		case 8:
-			return input_port_read(space->machine, "SYSTEM");
+			return input_port_read(space->machine(), "SYSTEM");
 		case 10: /* ? */
 		case 12:
         	return 0;
@@ -454,7 +454,7 @@ command 1 - stop?
 
 static void tumbleb2_playmusic( device_t *device )
 {
-	tumbleb_state *state = device->machine->driver_data<tumbleb_state>();
+	tumbleb_state *state = device->machine().driver_data<tumbleb_state>();
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	int status = oki->read_status();
 
@@ -471,7 +471,7 @@ static void tumbleb2_playmusic( device_t *device )
 
 static INTERRUPT_GEN( tumbleb2_interrupt )
 {
-	tumbleb_state *state = device->machine->driver_data<tumbleb_state>();
+	tumbleb_state *state = device->machine().driver_data<tumbleb_state>();
 	device_set_input_line(device, 6, HOLD_LINE);
 	tumbleb2_playmusic(state->oki);
 }
@@ -497,9 +497,9 @@ static const int tumbleb_sound_lookup[256] = {
 };
 
 /* we use channels 1,2,3 for sound effects, and channel 4 for music */
-static void tumbleb2_set_music_bank( running_machine *machine, int bank )
+static void tumbleb2_set_music_bank( running_machine &machine, int bank )
 {
-	UINT8 *oki = machine->region("oki")->base();
+	UINT8 *oki = machine.region("oki")->base();
 	memcpy(&oki[0x38000], &oki[0x80000 + 0x38000 + 0x8000 * bank], 0x8000);
 }
 
@@ -538,7 +538,7 @@ static void tumbleb2_play_sound( okim6295_device *oki, int data )
 
 static void process_tumbleb2_music_command( okim6295_device *oki, int data )
 {
-	tumbleb_state *state = oki->machine->driver_data<tumbleb_state>();
+	tumbleb_state *state = oki->machine().driver_data<tumbleb_state>();
 	int status = oki->read_status();
 
 	if (data == 1) // stop?
@@ -628,7 +628,7 @@ static void process_tumbleb2_music_command( okim6295_device *oki, int data )
 					break;
 			}
 
-			tumbleb2_set_music_bank(oki->machine, state->music_bank);
+			tumbleb2_set_music_bank(oki->machine(), state->music_bank);
 			tumbleb2_playmusic(oki);
 		}
 	}
@@ -704,7 +704,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( semibase_unknown_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static ADDRESS_MAP_START( htchctch_main_map, AS_PROGRAM, 16 )
@@ -743,7 +743,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( jumpkids_sound_w )
 {
-	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
+	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
@@ -785,14 +785,14 @@ static WRITE16_HANDLER( semicom_soundcmd_w )
 		soundlatch_w(space, 0, data & 0xff);
 		// needed for Super Trio which reads the sound with polling
 		// device_spin_until_time(space->cpu, attotime::from_usec(100));
-		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 
 	}
 }
 
 static WRITE8_HANDLER( oki_sound_bank_w )
 {
-	UINT8 *oki = space->machine->region("oki")->base();
+	UINT8 *oki = space->machine().region("oki")->base();
 	memcpy(&oki[0x30000], &oki[(data * 0x10000) + 0x40000], 0x10000);
 }
 
@@ -817,7 +817,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(jumppop_z80_bank_w)
 {
-	memory_set_bankptr(space->machine, "bank1", space->machine->region("audiocpu")->base() + 0x10000 + (0x4000 * data));
+	memory_set_bankptr(space->machine(), "bank1", space->machine().region("audiocpu")->base() + 0x10000 + (0x4000 * data));
 }
 
 static ADDRESS_MAP_START( jumppop_sound_map, AS_PROGRAM, 8 )
@@ -828,7 +828,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(jumppop_z80latch_r)
 {
-	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
+	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 	device_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
@@ -866,8 +866,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( jumpkids_oki_bank_w )
 {
-	UINT8* sound1 = space->machine->region("oki")->base();
-	UINT8* sound2 = space->machine->region("oki2")->base();
+	UINT8* sound1 = space->machine().region("oki")->base();
+	UINT8* sound2 = space->machine().region("oki2")->base();
 	int bank = data & 0x03;
 
 	memcpy(sound1 + 0x20000, sound2 + bank * 0x20000, 0x20000);
@@ -892,7 +892,7 @@ static READ8_HANDLER( prot_io_r )
 // probably not endian safe
 static WRITE8_HANDLER( prot_io_w )
 {
-	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
+	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
 	switch (offset)
 	{
@@ -2045,11 +2045,11 @@ GFXDECODE_END
 
 static MACHINE_START( tumbleb )
 {
-	tumbleb_state *state = machine->driver_data<tumbleb_state>();
+	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->oki = machine->device("oki");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->oki = machine.device("oki");
 
 	state->save_item(NAME(state->music_command));
 	state->save_item(NAME(state->music_bank));
@@ -2062,7 +2062,7 @@ static MACHINE_START( tumbleb )
 
 static MACHINE_RESET( tumbleb )
 {
-	tumbleb_state *state = machine->driver_data<tumbleb_state>();
+	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
 	state->music_command = 0;
 	state->music_bank = 0;
@@ -2210,7 +2210,7 @@ MACHINE_CONFIG_END
 
 static void semicom_irqhandler( device_t *device, int irq )
 {
-	tumbleb_state *state = device->machine->driver_data<tumbleb_state>();
+	tumbleb_state *state = device->machine().driver_data<tumbleb_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -2222,11 +2222,11 @@ static const ym2151_interface semicom_ym2151_interface =
 
 static MACHINE_RESET (htchctch)
 {
-	tumbleb_state *state = machine->driver_data<tumbleb_state>();
+	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
 	/* copy protection data every reset */
-	UINT16 *PROTDATA = (UINT16*)machine->region("user1")->base();
-	int i, len = machine->region("user1")->bytes();
+	UINT16 *PROTDATA = (UINT16*)machine.region("user1")->base();
+	int i, len = machine.region("user1")->bytes();
 
 	for (i = 0; i < len / 2; i++)
 		state->mainram[0x000/2 + i] = PROTDATA[i];
@@ -3345,20 +3345,20 @@ ROM_END
 /******************************************************************************/
 
 #if TUMBLEP_HACK
-void tumblepb_patch_code(running_machine *machine, UINT16 offset)
+void tumblepb_patch_code(running_machine &machine, UINT16 offset)
 {
 	/* A hack which enables all Dip Switches effects */
-	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
 	RAM[(offset + 0)/2] = 0x0240;
 	RAM[(offset + 2)/2] = 0xffff;	// andi.w  #$f3ff, D0
 }
 #endif
 
 
-static void tumblepb_gfx1_rearrange(running_machine *machine)
+static void tumblepb_gfx1_rearrange(running_machine &machine)
 {
-	UINT8 *rom = machine->region("gfx1")->base();
-	int len = machine->region("gfx1")->bytes();
+	UINT8 *rom = machine.region("gfx1")->base();
+	int len = machine.region("gfx1")->bytes();
 	int i;
 
 	/* gfx data is in the wrong order */
@@ -3387,7 +3387,7 @@ static DRIVER_INIT( tumblepb )
 
 static DRIVER_INIT( tumbleb2 )
 {
-	device_t *oki = machine->device("oki");
+	device_t *oki = machine.device("oki");
 
 	tumblepb_gfx1_rearrange(machine);
 
@@ -3395,7 +3395,7 @@ static DRIVER_INIT( tumbleb2 )
 	tumblepb_patch_code(machine, 0x000132);
 	#endif
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki, 0x100000, 0x100001, FUNC(tumbleb2_soundmcu_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki, 0x100000, 0x100001, FUNC(tumbleb2_soundmcu_w) );
 
 }
 
@@ -3415,7 +3415,7 @@ static DRIVER_INIT( fncywld )
 	#if FNCYWLD_HACK
 	/* This is a hack to allow you to use the extra features
        of the 2 first "Unused" Dip Switch (see notes above). */
-	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
 	RAM[0x0005fa/2] = 0x4e71;
 	RAM[0x00060a/2] = 0x4e71;
 	#endif
@@ -3427,23 +3427,23 @@ static READ16_HANDLER( bcstory_1a0_read )
 	//mame_printf_debug("bcstory_io %06x\n",cpu_get_pc(space->cpu));
 
 	if (cpu_get_pc(space->cpu)==0x0560) return 0x1a0;
-	else return input_port_read(space->machine, "SYSTEM");
+	else return input_port_read(space->machine(), "SYSTEM");
 }
 
 static DRIVER_INIT ( bcstory )
 {
 	tumblepb_gfx1_rearrange(machine);
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x180008, 0x180009, FUNC(bcstory_1a0_read) ); // io should be here??
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x180008, 0x180009, FUNC(bcstory_1a0_read) ); // io should be here??
 }
 
 
 static DRIVER_INIT( htchctch )
 {
 
-	tumbleb_state *state = machine->driver_data<tumbleb_state>();
-//  UINT16 *HCROM = (UINT16*)machine->region("maincpu")->base();
-	UINT16 *PROTDATA = (UINT16*)machine->region("user1")->base();
-	int i, len = machine->region("user1")->bytes();
+	tumbleb_state *state = machine.driver_data<tumbleb_state>();
+//  UINT16 *HCROM = (UINT16*)machine.region("maincpu")->base();
+	UINT16 *PROTDATA = (UINT16*)machine.region("user1")->base();
+	int i, len = machine.region("user1")->bytes();
 	/* simulate RAM initialization done by the protection MCU */
 	/* verified on real hardware */
 //  static const UINT16 htchctch_mcu68k[] =
@@ -3675,7 +3675,7 @@ static DRIVER_INIT( htchctch )
 
 	HCROM[0x1e228/2] = 0x4e75;
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x140000, 0x1407ff); // kill palette writes as the interrupt code we don't have controls them
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x140000, 0x1407ff); // kill palette writes as the interrupt code we don't have controls them
 
 
 	{
@@ -3693,9 +3693,9 @@ static DRIVER_INIT( htchctch )
 }
 
 
-static void suprtrio_decrypt_code(running_machine *machine)
+static void suprtrio_decrypt_code(running_machine &machine)
 {
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 	UINT16 *buf = auto_alloc_array(machine, UINT16, 0x80000/2);
 	int i;
 
@@ -3711,9 +3711,9 @@ static void suprtrio_decrypt_code(running_machine *machine)
 	auto_free(machine, buf);
 }
 
-static void suprtrio_decrypt_gfx(running_machine *machine)
+static void suprtrio_decrypt_gfx(running_machine &machine)
 {
-	UINT16 *rom = (UINT16 *)machine->region("gfx1")->base();
+	UINT16 *rom = (UINT16 *)machine.region("gfx1")->base();
 	UINT16 *buf = auto_alloc_array(machine, UINT16, 0x100000/2);
 	int i;
 
@@ -3739,26 +3739,26 @@ static DRIVER_INIT( chokchok )
 	DRIVER_INIT_CALL(htchctch);
 
 	/* different palette format, closer to tumblep -- is this controlled by a register? the palette was right with the hatch catch trojan */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x140000, 0x140fff, FUNC(paletteram16_xxxxBBBBGGGGRRRR_word_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x140000, 0x140fff, FUNC(paletteram16_xxxxBBBBGGGGRRRR_word_w));
 
 	/* slightly different banking */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x100002, 0x100003, FUNC(chokchok_tilebank_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x100002, 0x100003, FUNC(chokchok_tilebank_w));
 }
 
 static DRIVER_INIT( wlstar )
 {
-	tumbleb_state *state = machine->driver_data<tumbleb_state>();
+	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 	tumblepb_gfx1_rearrange(machine);
 
 	/* slightly different banking */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x100002, 0x100003, FUNC(wlstar_tilebank_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x100002, 0x100003, FUNC(wlstar_tilebank_w));
 
 	state->protbase = 0x0000;
 }
 
 static DRIVER_INIT( wondl96 )
 {
-	tumbleb_state *state = machine->driver_data<tumbleb_state>();
+	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 	DRIVER_INIT_CALL( wlstar );
 	state->protbase = 0x0200;
 }

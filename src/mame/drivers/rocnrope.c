@@ -25,7 +25,7 @@
 /* Roc'n'Rope has the IRQ vectors in RAM. The rom contains $FFFF at this address! */
 static WRITE8_HANDLER( rocnrope_interrupt_vector_w )
 {
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 
 	RAM[0xfff2 + offset] = data;
 }

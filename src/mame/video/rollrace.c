@@ -25,7 +25,7 @@ PALETTE_INIT( rollrace )
 	int i;
 
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -35,15 +35,15 @@ PALETTE_INIT( rollrace )
 		bit2 = (color_prom[0] >> 2) & 0x01;
 		bit3 = (color_prom[0] >> 3) & 0x01;
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
-		bit0 = (color_prom[machine->total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[machine->total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[machine->total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[machine->total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[machine.total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[machine.total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[machine.total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[machine.total_colors()] >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
-		bit0 = (color_prom[2*machine->total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine->total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine->total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine->total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[2*machine.total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[2*machine.total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[2*machine.total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[2*machine.total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
@@ -54,7 +54,7 @@ PALETTE_INIT( rollrace )
 
 WRITE8_HANDLER( rollrace_charbank_w)
 {
-	rollrace_state *state = space->machine->driver_data<rollrace_state>();
+	rollrace_state *state = space->machine().driver_data<rollrace_state>();
 
 	state->ra_charbank[offset&1] = data;
 	state->ra_chrbank = state->ra_charbank[0] | (state->ra_charbank[1] << 1) ;
@@ -63,19 +63,19 @@ WRITE8_HANDLER( rollrace_charbank_w)
 
 WRITE8_HANDLER( rollrace_bkgpen_w)
 {
-	rollrace_state *state = space->machine->driver_data<rollrace_state>();
+	rollrace_state *state = space->machine().driver_data<rollrace_state>();
 	state->ra_bkgpen = data;
 }
 
 WRITE8_HANDLER(rollrace_spritebank_w)
 {
-	rollrace_state *state = space->machine->driver_data<rollrace_state>();
+	rollrace_state *state = space->machine().driver_data<rollrace_state>();
 	state->ra_spritebank = data;
 }
 
 WRITE8_HANDLER(rollrace_backgroundpage_w)
 {
-	rollrace_state *state = space->machine->driver_data<rollrace_state>();
+	rollrace_state *state = space->machine().driver_data<rollrace_state>();
 
 	state->ra_bkgpage = data & 0x1f;
 	state->ra_bkgflip = ( data & 0x80 ) >> 7;
@@ -85,31 +85,31 @@ WRITE8_HANDLER(rollrace_backgroundpage_w)
 
 WRITE8_HANDLER( rollrace_backgroundcolor_w )
 {
-	rollrace_state *state = space->machine->driver_data<rollrace_state>();
+	rollrace_state *state = space->machine().driver_data<rollrace_state>();
 	state->ra_bkgcol = data;
 }
 
 WRITE8_HANDLER( rollrace_flipy_w )
 {
-	rollrace_state *state = space->machine->driver_data<rollrace_state>();
+	rollrace_state *state = space->machine().driver_data<rollrace_state>();
 	state->ra_flipy = data & 0x01;
 }
 
 WRITE8_HANDLER( rollrace_flipx_w )
 {
-	rollrace_state *state = space->machine->driver_data<rollrace_state>();
+	rollrace_state *state = space->machine().driver_data<rollrace_state>();
 	state->ra_flipx = data & 0x01;
 }
 
 SCREEN_UPDATE( rollrace )
 {
-	rollrace_state *state = screen->machine->driver_data<rollrace_state>();
+	rollrace_state *state = screen->machine().driver_data<rollrace_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 	int sx, sy;
 	int scroll;
 	int col;
-	const UINT8 *mem = screen->machine->region("user1")->base();
+	const UINT8 *mem = screen->machine().region("user1")->base();
 
 	/* fill in background colour*/
 	bitmap_fill(bitmap,cliprect,state->ra_bkgpen);
@@ -133,7 +133,7 @@ SCREEN_UPDATE( rollrace )
 				sy = 31-sy ;
 
 			drawgfx_transpen(bitmap,
-				cliprect,screen->machine->gfx[RA_BGCHAR_BASE],
+				cliprect,screen->machine().gfx[RA_BGCHAR_BASE],
 				mem[offs + ( state->ra_bkgpage * 1024 )]
 				+ ((( mem[offs + 0x4000 + ( state->ra_bkgpage * 1024 )] & 0xc0 ) >> 6 ) * 256 ) ,
 				state->ra_bkgcol,
@@ -171,7 +171,7 @@ SCREEN_UPDATE( rollrace )
 		if(bank)
 			bank += state->ra_spritebank;
 
-		drawgfx_transpen(bitmap, cliprect,screen->machine->gfx[ RA_SP_BASE + bank ],
+		drawgfx_transpen(bitmap, cliprect,screen->machine().gfx[ RA_SP_BASE + bank ],
 			spriteram[offs+1] & 0x3f ,
 			spriteram[offs+2] & 0x1f,
 			state->ra_flipx,!(s_flipy^state->ra_flipy),
@@ -199,7 +199,7 @@ SCREEN_UPDATE( rollrace )
 
 		if (state->ra_flipx) sx = 31 - sx;
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[RA_FGCHAR_BASE + state->ra_chrbank]  ,
+		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[RA_FGCHAR_BASE + state->ra_chrbank]  ,
 			state->videoram[ offs ]  ,
 			col,
 			state->ra_flipx,state->ra_flipy,

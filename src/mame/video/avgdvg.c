@@ -69,7 +69,9 @@ struct _vgvector
 typedef struct _vgdata vgdata;
 struct _vgdata
 {
-	running_machine *machine;
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
+	running_machine *m_machine;
 
 	UINT16 pc;
 	UINT8 sp;
@@ -170,7 +172,7 @@ static void avg_apply_flipping(int *x, int *y)
  *
  *************************************/
 
-static void vg_flush (running_machine *machine)
+static void vg_flush (running_machine &machine)
 {
 	int i = 0;
 
@@ -482,7 +484,7 @@ static void mhavoc_data(vgdata *vg)
 
 	if (vg->pc & 0x2000)
 	{
-		bank = &vg->machine->region("alpha")->base()[0x18000];
+		bank = &vg->machine().region("alpha")->base()[0x18000];
 		vg->data = bank[(vg->map << 13) | ((vg->pc ^ 1) & 0x1fff)];
 	}
 	else
@@ -758,7 +760,7 @@ static int avg_common_strobe2(vgdata *vg)
                  */
 
 				vector_clear_list();
-				vg_flush(vg->machine);
+				vg_flush(vg->machine());
 			}
 		}
 		else
@@ -811,7 +813,7 @@ static int mhavoc_strobe2(vgdata *vg)
 					| ((vg->dvy >> 1) & 2)
 					| ((vg->dvy << 1) & 4)
 					| ((vg->dvy << 2) & 8)
-					| ((vg->machine->rand() & 0x7) << 4);
+					| ((vg->machine().rand() & 0x7) << 4);
 			}
 			else
 			{
@@ -1204,7 +1206,7 @@ static TIMER_CALLBACK( vg_set_halt_callback )
 static TIMER_CALLBACK( run_state_machine )
 {
 	int cycles = 0;
-	UINT8 *state_prom = machine->region("user1")->base();
+	UINT8 *state_prom = machine.region("user1")->base();
 
 	while (cycles < VGSLICE)
 	{
@@ -1257,7 +1259,7 @@ WRITE8_HANDLER( avgdvg_go_w )
          */
 		vector_clear_list();
 	}
-	vg_flush(space->machine);
+	vg_flush(space->machine());
 
 	vg_set_halt(0);
 	vg_run_timer->adjust(attotime::zero);
@@ -1288,7 +1290,7 @@ WRITE16_HANDLER( avgdvg_reset_word_w )
 
 MACHINE_RESET( avgdvg )
 {
-	avgdvg_reset_w (machine->device("maincpu")->memory().space(AS_PROGRAM),0,0);
+	avgdvg_reset_w (machine.device("maincpu")->memory().space(AS_PROGRAM),0,0);
 }
 
 
@@ -1448,7 +1450,7 @@ static const vgconf avg_tomcat =
  *
  ************************************/
 
-static void register_state (running_machine *machine)
+static void register_state (running_machine &machine)
 {
 	state_save_register_item(machine, "AVG", NULL, 0, vg->pc);
 	state_save_register_item(machine, "AVG", NULL, 0, vg->sp);
@@ -1489,10 +1491,10 @@ static void register_state (running_machine *machine)
 
 static VIDEO_START( avg_common )
 {
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	vg = &vgd;
-	vg->machine = machine;
+	vg->m_machine = &machine;
 
 	xmin = visarea.min_x;
 	ymin = visarea.min_y;
@@ -1504,8 +1506,8 @@ static VIDEO_START( avg_common )
 
 	flip_x = flip_y = 0;
 
-	vg_halt_timer = machine->scheduler().timer_alloc(FUNC(vg_set_halt_callback));
-	vg_run_timer = machine->scheduler().timer_alloc(FUNC(run_state_machine));
+	vg_halt_timer = machine.scheduler().timer_alloc(FUNC(vg_set_halt_callback));
+	vg_run_timer = machine.scheduler().timer_alloc(FUNC(run_state_machine));
 
 	/*
      * The x and y DACs use 10 bit of the counter values which are in
@@ -1521,17 +1523,17 @@ static VIDEO_START( avg_common )
 
 VIDEO_START( dvg )
 {
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	vgc = &dvg_default;
 	vg = &vgd;
-	vg->machine = machine;
+	vg->m_machine = &machine;
 
 	xmin = visarea.min_x;
 	ymin = visarea.min_y;
 
-	vg_halt_timer = machine->scheduler().timer_alloc(FUNC(vg_set_halt_callback));
-	vg_run_timer = machine->scheduler().timer_alloc(FUNC(run_state_machine));
+	vg_halt_timer = machine.scheduler().timer_alloc(FUNC(vg_set_halt_callback));
+	vg_run_timer = machine.scheduler().timer_alloc(FUNC(run_state_machine));
 
 	register_state (machine);
 

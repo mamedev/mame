@@ -17,9 +17,9 @@
 
 ***************************************************************************/
 
-void ajax_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+void ajax_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	ajax_state *state = machine->driver_data<ajax_state>();
+	ajax_state *state = machine.driver_data<ajax_state>();
 	*code |= ((*color & 0x0f) << 8) | (bank << 12);
 	*color = state->layer_colorbase[layer] + ((*color & 0xf0) >> 4);
 }
@@ -31,7 +31,7 @@ void ajax_tile_callback( running_machine *machine, int layer, int bank, int *cod
 
 ***************************************************************************/
 
-void ajax_sprite_callback( running_machine *machine, int *code, int *color, int *priority, int *shadow )
+void ajax_sprite_callback( running_machine &machine, int *code, int *color, int *priority, int *shadow )
 {
 	/* priority bits:
        4 over zoom (0 = have priority)
@@ -39,7 +39,7 @@ void ajax_sprite_callback( running_machine *machine, int *code, int *color, int 
        6 over A    (1 = have priority)
        never over F
     */
-	ajax_state *state = machine->driver_data<ajax_state>();
+	ajax_state *state = machine.driver_data<ajax_state>();
 	*priority = 0xff00;							/* F = 8 */
 	if ( *color & 0x10) *priority |= 0xf0f0;	/* Z = 4 */
 	if (~*color & 0x40) *priority |= 0xcccc;	/* A = 2 */
@@ -54,9 +54,9 @@ void ajax_sprite_callback( running_machine *machine, int *code, int *color, int 
 
 ***************************************************************************/
 
-void ajax_zoom_callback( running_machine *machine, int *code, int *color, int *flags )
+void ajax_zoom_callback( running_machine &machine, int *code, int *color, int *flags )
 {
-	ajax_state *state = machine->driver_data<ajax_state>();
+	ajax_state *state = machine.driver_data<ajax_state>();
 	*code |= ((*color & 0x07) << 8);
 	*color = state->zoom_colorbase + ((*color & 0x08) >> 3);
 }
@@ -70,7 +70,7 @@ void ajax_zoom_callback( running_machine *machine, int *code, int *color, int *f
 
 VIDEO_START( ajax )
 {
-	ajax_state *state = machine->driver_data<ajax_state>();
+	ajax_state *state = machine.driver_data<ajax_state>();
 
 	state->layer_colorbase[0] = 64;
 	state->layer_colorbase[1] = 0;
@@ -89,13 +89,13 @@ VIDEO_START( ajax )
 
 SCREEN_UPDATE( ajax )
 {
-	ajax_state *state = screen->machine->driver_data<ajax_state>();
+	ajax_state *state = screen->machine().driver_data<ajax_state>();
 
 	k052109_tilemap_update(state->k052109);
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 	k052109_tilemap_draw(state->k052109, bitmap, cliprect, 2, 0, 1);
 	if (state->priority)
 	{

@@ -68,7 +68,7 @@ device_config *f3853_device_config::static_alloc_device_config(const machine_con
 
 device_t *f3853_device_config::alloc_device(running_machine &machine) const
 {
-    return auto_alloc(&machine, f3853_device(machine, *this));
+    return auto_alloc(machine, f3853_device(machine, *this));
 }
 
 

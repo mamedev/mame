@@ -56,27 +56,27 @@ Notes:
 
 static READ8_HANDLER( from_snd_r )
 {
-	ladyfrog_state *state = space->machine->driver_data<ladyfrog_state>();
+	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 	state->snd_flag = 0;
 	return state->snd_data;
 }
 
 static WRITE8_HANDLER( to_main_w )
 {
-	ladyfrog_state *state = space->machine->driver_data<ladyfrog_state>();
+	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 	state->snd_data = data;
 	state->snd_flag = 2;
 }
 
 static WRITE8_HANDLER( sound_cpu_reset_w )
 {
-	ladyfrog_state *state = space->machine->driver_data<ladyfrog_state>();
+	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 	device_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	ladyfrog_state *state = machine->driver_data<ladyfrog_state>();
+	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 
 	if (state->sound_nmi_enable)
 		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -87,18 +87,18 @@ static TIMER_CALLBACK( nmi_callback )
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(space, 0, data);
-	space->machine->scheduler().synchronize(FUNC(nmi_callback), data);
+	space->machine().scheduler().synchronize(FUNC(nmi_callback), data);
 }
 
 static WRITE8_HANDLER( nmi_disable_w )
 {
-	ladyfrog_state *state = space->machine->driver_data<ladyfrog_state>();
+	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	ladyfrog_state *state = space->machine->driver_data<ladyfrog_state>();
+	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
@@ -130,7 +130,7 @@ static const msm5232_interface msm5232_config =
 
 static READ8_HANDLER( snd_flag_r )
 {
-	ladyfrog_state *state = space->machine->driver_data<ladyfrog_state>();
+	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 	return state->snd_flag | 0xfd;
 }
 
@@ -285,9 +285,9 @@ GFXDECODE_END
 
 static MACHINE_START( ladyfrog )
 {
-	ladyfrog_state *state = machine->driver_data<ladyfrog_state>();
+	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->tilebank));
 	state->save_item(NAME(state->palette_bank));
@@ -299,7 +299,7 @@ static MACHINE_START( ladyfrog )
 
 static MACHINE_RESET( ladyfrog )
 {
-	ladyfrog_state *state = machine->driver_data<ladyfrog_state>();
+	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 
 	state->tilebank = 0;
 	state->palette_bank = 0;

@@ -162,7 +162,7 @@ void state_manager::register_presave(prepost_func func, void *param)
 			fatalerror("Duplicate save state function (%p, %p)", param, func);
 
 	// allocate a new entry
-	m_presave_list.append(*auto_alloc(&m_machine, state_callback(func, param)));
+	m_presave_list.append(*auto_alloc(m_machine, state_callback(func, param)));
 }
 
 
@@ -183,7 +183,7 @@ void state_manager::register_postload(prepost_func func, void *param)
 			fatalerror("Duplicate save state function (%p, %p)", param, func);
 
 	// allocate a new entry
-	m_postload_list.append(*auto_alloc(&m_machine, state_callback(func, param)));
+	m_postload_list.append(*auto_alloc(m_machine, state_callback(func, param)));
 }
 
 
@@ -228,7 +228,7 @@ void state_manager::save_memory(const char *module, const char *tag, UINT32 inde
 	}
 
 	// insert us into the list
-	m_entry_list.insert_after(*auto_alloc(&m_machine, state_entry(val, totalname, valsize, valcount)), insert_after);
+	m_entry_list.insert_after(*auto_alloc(m_machine, state_entry(val, totalname, valsize, valcount)), insert_after);
 }
 
 
@@ -237,12 +237,11 @@ void state_manager::save_memory(const char *module, const char *tag, UINT32 inde
 //  state
 //-------------------------------------------------
 
-state_save_error state_manager::check_file(running_machine *machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
+state_save_error state_manager::check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
 {
 	// if we want to validate the signature, compute it
 	UINT32 sig = 0;
-	if (machine != NULL)
-		sig = machine->state().signature();
+	sig = machine.state().signature();
 
 	// seek to the beginning and read the header
 	file.compress(FCOMPRESS_NONE);
@@ -300,7 +299,7 @@ state_save_error state_manager::read_file(emu_file &file)
 
 	// call the post-load functions
 	for (state_callback *func = m_postload_list.first(); func != NULL; func = func->next())
-		(*func->m_func)(&m_machine, func->m_param);
+		(*func->m_func)(m_machine, func->m_param);
 
 	return STATERR_NONE;
 }
@@ -334,7 +333,7 @@ state_save_error state_manager::write_file(emu_file &file)
 
 	// call the pre-save functions
 	for (state_callback *func = m_presave_list.first(); func != NULL; func = func->next())
-		(*func->m_func)(&m_machine, func->m_param);
+		(*func->m_func)(m_machine, func->m_param);
 
 	// then write all the data
 	for (state_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())

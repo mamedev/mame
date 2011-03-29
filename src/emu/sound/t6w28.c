@@ -309,7 +309,7 @@ static int t6w28_init(device_t *device, t6w28_state *R)
 	int sample_rate = device->clock()/16;
 	int i;
 
-	R->Channel = device->machine->sound().stream_alloc(*device,0,2,sample_rate,R,t6w28_update);
+	R->Channel = device->machine().sound().stream_alloc(*device,0,2,sample_rate,R,t6w28_update);
 
 	R->SampleRate = sample_rate;
 

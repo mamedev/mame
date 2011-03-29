@@ -1186,7 +1186,7 @@ static DEVICE_START( sp0256 )
 	devcb_call_write_line(&sp->drq, 1);
 	devcb_call_write_line(&sp->sby, 1);
 
-	sp->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() / CLOCK_DIVIDER, sp, sp0256_update);
+	sp->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() / CLOCK_DIVIDER, sp, sp0256_update);
 
     /* -------------------------------------------------------------------- */
     /*  Configure our internal variables.                                   */
@@ -1196,7 +1196,7 @@ static DEVICE_START( sp0256 )
     /* -------------------------------------------------------------------- */
     /*  Allocate a scratch buffer for generating ~10kHz samples.             */
     /* -------------------------------------------------------------------- */
-    sp->scratch = auto_alloc_array(device->machine, INT16, SCBUF_SIZE);
+    sp->scratch = auto_alloc_array(device->machine(), INT16, SCBUF_SIZE);
     sp->sc_head = sp->sc_tail = 0;
 
     /* -------------------------------------------------------------------- */

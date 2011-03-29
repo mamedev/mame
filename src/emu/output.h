@@ -32,7 +32,7 @@ typedef void (*output_notifier_func)(const char *outname, INT32 value, void *par
 ***************************************************************************/
 
 /* core initialization */
-void output_init(running_machine *machine);
+void output_init(running_machine &machine);
 
 /* set the value for a given output */
 void output_set_value(const char *outname, INT32 value);

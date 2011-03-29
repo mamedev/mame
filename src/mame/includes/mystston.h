@@ -35,7 +35,7 @@ public:
 
 /*----------- defined in drivers/mystston.c -----------*/
 
-void mystston_on_scanline_interrupt(running_machine *machine);
+void mystston_on_scanline_interrupt(running_machine &machine);
 
 
 /*----------- defined in video/mystston.c -----------*/

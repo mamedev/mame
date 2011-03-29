@@ -36,7 +36,7 @@ static WRITE16_DEVICE_HANDLER( magicstk_coin_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(device->machine, 0, data & 0x20);
+		coin_counter_w(device->machine(), 0, data & 0x20);
 
 		eeprom_set_cs_line(device, (data & 8) ? CLEAR_LINE : ASSERT_LINE);
 		eeprom_write_bit(device, data & 2);
@@ -46,7 +46,7 @@ static WRITE16_DEVICE_HANDLER( magicstk_coin_eeprom_w )
 
 static WRITE16_HANDLER( magicstk_bgvideoram_w )
 {
-	playmark_state *state = space->machine->driver_data<playmark_state>();
+	playmark_state *state = space->machine().driver_data<playmark_state>();
 
 	COMBINE_DATA(&state->videoram1[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -54,7 +54,7 @@ static WRITE16_HANDLER( magicstk_bgvideoram_w )
 
 static WRITE16_HANDLER( tile_banking_w )
 {
-	playmark_state *state = space->machine->driver_data<playmark_state>();
+	playmark_state *state = space->machine().driver_data<playmark_state>();
 
 	if (((data >> 12) & 0x0f) != state->tilebank)
 	{
@@ -69,7 +69,7 @@ static WRITE16_DEVICE_HANDLER( oki_banking )
 	{
 		int addr = 0x40000 * ((data & 3) - 1);
 
-		if (addr < device->machine->region("oki")->bytes())
+		if (addr < device->machine().region("oki")->bytes())
 			downcast<okim6295_device *>(device)->set_bank_base(addr);
 	}
 }
@@ -377,7 +377,7 @@ INPUT_PORTS_END
 
 static TILE_GET_INFO( powerbal_get_bg_tile_info )
 {
-	playmark_state *state = machine->driver_data<playmark_state>();
+	playmark_state *state = machine.driver_data<playmark_state>();
 	int code = (state->videoram1[tile_index] & 0x07ff) + state->tilebank * 0x800;
 	int colr = state->videoram1[tile_index] & 0xf000;
 
@@ -387,12 +387,12 @@ static TILE_GET_INFO( powerbal_get_bg_tile_info )
 	SET_TILE_INFO(1, code, colr >> 12, 0);
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	playmark_state *state = machine->driver_data<playmark_state>();
+	playmark_state *state = machine.driver_data<playmark_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
-	int height = machine->gfx[0]->height;
+	int height = machine.gfx[0]->height;
 
 	for (offs = 4; offs < state->spriteram_size / 2; offs += 4)
 	{
@@ -408,7 +408,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		code = spriteram[offs + 2];
 		color = (spriteram[offs + 1] & 0xf000) >> 12;
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				code,
 				color,
 				flipx,0,
@@ -418,7 +418,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static VIDEO_START( powerbal )
 {
-	playmark_state *state = machine->driver_data<playmark_state>();
+	playmark_state *state = machine.driver_data<playmark_state>();
 
 	state->bg_tilemap = tilemap_create(machine, powerbal_get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
@@ -429,10 +429,10 @@ static VIDEO_START( powerbal )
 
 static SCREEN_UPDATE( powerbal )
 {
-	playmark_state *state = screen->machine->driver_data<playmark_state>();
+	playmark_state *state = screen->machine().driver_data<playmark_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -471,14 +471,14 @@ GFXDECODE_END
 
 static MACHINE_START( powerbal )
 {
-	playmark_state *state = machine->driver_data<playmark_state>();
+	playmark_state *state = machine.driver_data<playmark_state>();
 
 	state->save_item(NAME(state->tilebank));
 }
 
 static MACHINE_RESET( powerbal )
 {
-	playmark_state *state = machine->driver_data<playmark_state>();
+	playmark_state *state = machine.driver_data<playmark_state>();
 
 	state->tilebank = 0;
 }
@@ -682,7 +682,7 @@ ROM_END
 
 static DRIVER_INIT( powerbal )
 {
-	playmark_state *state = machine->driver_data<playmark_state>();
+	playmark_state *state = machine.driver_data<playmark_state>();
 
 	state->bg_yoffset = 16;
 	state->yoffset = -8;
@@ -690,7 +690,7 @@ static DRIVER_INIT( powerbal )
 
 static DRIVER_INIT( magicstk )
 {
-	playmark_state *state = machine->driver_data<playmark_state>();
+	playmark_state *state = machine.driver_data<playmark_state>();
 
 	state->bg_yoffset = 0;
 	state->yoffset = -5;

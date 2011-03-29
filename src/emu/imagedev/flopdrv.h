@@ -137,11 +137,11 @@ void floppy_install_unload_proc(device_t *image, void (*proc)(device_image_inter
 
 void floppy_install_load_proc(device_t *image, void (*proc)(device_image_interface &image));
 
-device_t *floppy_get_device(running_machine *machine,int drive);
-device_t *floppy_get_device_by_type(running_machine *machine,int ftype,int drive);
+device_t *floppy_get_device(running_machine &machine,int drive);
+device_t *floppy_get_device_by_type(running_machine &machine,int ftype,int drive);
 int floppy_get_drive_type(device_t *image);
 void floppy_set_type(device_t *image,int ftype);
-int floppy_get_count(running_machine *machine);
+int floppy_get_count(running_machine &machine);
 
 int floppy_get_drive(device_t *image);
 int floppy_get_drive_by_type(device_t *image,int ftype);

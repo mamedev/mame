@@ -8,9 +8,9 @@
 
 ***************************************************************************/
 
-void overdriv_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
+void overdriv_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
 {
-	overdriv_state *state = machine->driver_data<overdriv_state>();
+	overdriv_state *state = machine.driver_data<overdriv_state>();
 	int pri = (*color & 0xffe0) >> 5;	/* ??????? */
 	if (pri)
 		*priority_mask = 0x02;
@@ -27,17 +27,17 @@ void overdriv_sprite_callback( running_machine *machine, int *code, int *color, 
 
 ***************************************************************************/
 
-void overdriv_zoom_callback_0( running_machine *machine, int *code, int *color, int *flags )
+void overdriv_zoom_callback_0( running_machine &machine, int *code, int *color, int *flags )
 {
-	overdriv_state *state = machine->driver_data<overdriv_state>();
+	overdriv_state *state = machine.driver_data<overdriv_state>();
 	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8);
 	*color = state->zoom_colorbase[0] + ((*color & 0x3c) >> 2);
 }
 
-void overdriv_zoom_callback_1( running_machine *machine, int *code, int *color, int *flags )
+void overdriv_zoom_callback_1( running_machine &machine, int *code, int *color, int *flags )
 {
-	overdriv_state *state = machine->driver_data<overdriv_state>();
+	overdriv_state *state = machine.driver_data<overdriv_state>();
 	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8);
 	*color = state->zoom_colorbase[1] + ((*color & 0x3c) >> 2);
@@ -52,7 +52,7 @@ void overdriv_zoom_callback_1( running_machine *machine, int *code, int *color, 
 
 SCREEN_UPDATE( overdriv )
 {
-	overdriv_state *state = screen->machine->driver_data<overdriv_state>();
+	overdriv_state *state = screen->machine().driver_data<overdriv_state>();
 
 	state->sprite_colorbase  = k053251_get_palette_index(state->k053251, K053251_CI0);
 	state->road_colorbase[1] = k053251_get_palette_index(state->k053251, K053251_CI1);
@@ -60,7 +60,7 @@ SCREEN_UPDATE( overdriv )
 	state->zoom_colorbase[1] = k053251_get_palette_index(state->k053251, K053251_CI3);
 	state->zoom_colorbase[0] = k053251_get_palette_index(state->k053251, K053251_CI4);
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	k051316_zoom_draw(state->k051316_1, bitmap, cliprect, 0, 0);
 	k051316_zoom_draw(state->k051316_2, bitmap, cliprect, 0, 1);

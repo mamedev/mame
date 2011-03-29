@@ -100,19 +100,19 @@ static WRITE16_HANDLER( arcadia_multibios_change_game )
 static WRITE8_DEVICE_HANDLER( arcadia_cia_0_porta_w )
 {
 	/* switch banks as appropriate */
-	memory_set_bank(device->machine, "bank1", data & 1);
+	memory_set_bank(device->machine(), "bank1", data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		device->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x000000, 0x07ffff, "bank1");
+		device->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x000000, 0x07ffff, "bank1");
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		device->machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x000000, 0x07ffff);
+		device->machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x000000, 0x07ffff);
 
 	/* bit 2 = Power Led on Amiga */
-	set_led_status(device->machine, 0, (data & 2) ? 0 : 1);
+	set_led_status(device->machine(), 0, (data & 2) ? 0 : 1);
 }
 
 
@@ -137,7 +137,7 @@ static WRITE8_DEVICE_HANDLER( arcadia_cia_0_portb_w )
 	/* writing a 0 in the low bit clears one of the coins */
 	if ((data & 1) == 0)
 	{
-		UINT8 *coin_counter = device->machine->driver_data<arcadia_state>()->coin_counter;
+		UINT8 *coin_counter = device->machine().driver_data<arcadia_state>()->coin_counter;
 
 		if (coin_counter[0] > 0)
 			coin_counter[0]--;
@@ -157,7 +157,7 @@ static WRITE8_DEVICE_HANDLER( arcadia_cia_0_portb_w )
 static CUSTOM_INPUT( coin_counter_r )
 {
 	int coin = (FPTR)param;
-	UINT8 *coin_counter = field->port->machine->driver_data<arcadia_state>()->coin_counter;
+	UINT8 *coin_counter = field->port->machine().driver_data<arcadia_state>()->coin_counter;
 
 	/* return coin counter values */
 	return coin_counter[coin] & 3;
@@ -167,7 +167,7 @@ static CUSTOM_INPUT( coin_counter_r )
 static INPUT_CHANGED( coin_changed_callback )
 {
 	int coin = (FPTR)param;
-	UINT8 *coin_counter = field->port->machine->driver_data<arcadia_state>()->coin_counter;
+	UINT8 *coin_counter = field->port->machine().driver_data<arcadia_state>()->coin_counter;
 
 	/* check for a 0 -> 1 transition */
 	if (!oldval && newval && coin_counter[coin] < 3)
@@ -175,9 +175,9 @@ static INPUT_CHANGED( coin_changed_callback )
 }
 
 
-static void arcadia_reset_coins(running_machine *machine)
+static void arcadia_reset_coins(running_machine &machine)
 {
-	UINT8 *coin_counter = machine->driver_data<arcadia_state>()->coin_counter;
+	UINT8 *coin_counter = machine.driver_data<arcadia_state>()->coin_counter;
 
 	/* reset coin counters */
 	coin_counter[0] = coin_counter[1] = 0;
@@ -726,9 +726,9 @@ ROM_END
  *
  *************************************/
 
-INLINE void generic_decode(running_machine *machine, const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0)
+INLINE void generic_decode(running_machine &machine, const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0)
 {
-	UINT16 *rom = (UINT16 *)machine->region(tag)->base();
+	UINT16 *rom = (UINT16 *)machine.region(tag)->base();
 	int i;
 
 	/* only the low byte of ROMs are encrypted in these games */
@@ -737,12 +737,12 @@ INLINE void generic_decode(running_machine *machine, const char *tag, int bit7, 
 
 	#if 0
 	{
-		UINT8 *ROM = machine->region(tag)->base();
-		int size = machine->region(tag)->bytes();
+		UINT8 *ROM = machine.region(tag)->base();
+		int size = machine.region(tag)->bytes();
 
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"decrypted_%s", machine->system().name);
+		sprintf(filename,"decrypted_%s", machine.system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
@@ -761,9 +761,9 @@ INLINE void generic_decode(running_machine *machine, const char *tag, int bit7, 
  *
  *************************************/
 
-static void arcadia_init(running_machine *machine)
+static void arcadia_init(running_machine &machine)
 {
-	arcadia_state *state = machine->driver_data<arcadia_state>();
+	arcadia_state *state = machine.driver_data<arcadia_state>();
 	static const amiga_machine_interface arcadia_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
@@ -780,10 +780,10 @@ static void arcadia_init(running_machine *machine)
 
 	/* set up memory */
 	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user1")->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
 
 	/* OnePlay bios is encrypted, TenPlay is not */
-	biosrom = (UINT16 *)machine->region("user2")->base();
+	biosrom = (UINT16 *)machine.region("user2")->base();
 	if (biosrom[0] != 0x4afc)
 		generic_decode(machine, "user2", 6, 1, 0, 2, 3, 4, 5, 7);
 }

@@ -537,7 +537,7 @@ static int drawd3d_window_init(win_window_info *window)
 
 	// experimental: load a PNG to use for vector rendering; it is treated
 	// as a brightness map
-	emu_file file(window->machine->options().art_path(), OPEN_FLAG_READ);
+	emu_file file(window->machine().options().art_path(), OPEN_FLAG_READ);
 	d3d->vector_bitmap = render_load_png(file, NULL, "vector.png", NULL, NULL);
 	if (d3d->vector_bitmap != NULL)
 	{
@@ -807,7 +807,7 @@ try_again:
 	if (window->fullscreen)
 	{
 		// only set the gamma if it's not 1.0f
-		windows_options &options = downcast<windows_options &>(window->machine->options());
+		windows_options &options = downcast<windows_options &>(window->machine().options());
 		float brightness = options.full_screen_brightness();
 		float contrast = options.full_screen_contrast();
 		float gamma = options.full_screen_gamma();
@@ -1285,7 +1285,7 @@ static void pick_best_mode(win_window_info *window)
 	int modenum;
 
 	// determine the refresh rate of the primary screen
-	const screen_device_config *primary_screen = window->machine->config().first_screen();
+	const screen_device_config *primary_screen = window->machine().config().first_screen();
 	if (primary_screen != NULL)
 		target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh());
 

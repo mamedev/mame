@@ -57,8 +57,8 @@ typedef struct _ui_menu ui_menu;
 
 
 /* menu-related callback functions */
-typedef void (*ui_menu_handler_func)(running_machine *machine, ui_menu *menu, void *parameter, void *state);
-typedef void (*ui_menu_custom_func)(running_machine *machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
+typedef void (*ui_menu_handler_func)(running_machine &machine, ui_menu *menu, void *parameter, void *state);
+typedef void (*ui_menu_custom_func)(running_machine &machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 typedef void (*ui_menu_destroy_state_func)(ui_menu *menu, void *state);
 
 
@@ -81,14 +81,14 @@ struct _ui_menu_event
 /* ----- core system management ----- */
 
 /* initialization */
-void ui_menu_init(running_machine *machine);
+void ui_menu_init(running_machine &machine);
 
 
 
 /* ----- core menu management ----- */
 
 /* allocate a new menu */
-ui_menu *ui_menu_alloc(running_machine *machine, render_container *container, ui_menu_handler_func handler, void *parameter);
+ui_menu *ui_menu_alloc(running_machine &machine, render_container *container, ui_menu_handler_func handler, void *parameter);
 
 /* free a menu */
 void ui_menu_free(ui_menu *menu);
@@ -103,7 +103,7 @@ int ui_menu_populated(ui_menu *menu);
 void ui_menu_item_append(ui_menu *menu, const char *text, const char *subtext, UINT32 flags, void *ref);
 
 /* process a menu, drawing it and returning any interesting events */
-const ui_menu_event *ui_menu_process(running_machine *machine, ui_menu *menu, UINT32 flags);
+const ui_menu_event *ui_menu_process(running_machine &machine, ui_menu *menu, UINT32 flags);
 
 /* configure the menu for custom rendering */
 void ui_menu_set_custom_render(ui_menu *menu, ui_menu_custom_func custom, float top, float bottom);
@@ -128,26 +128,26 @@ void ui_menu_set_selection(ui_menu *menu, void *selected_itemref);
 /* ----- menu stack management ----- */
 
 /* reset the menus, clearing everything */
-void ui_menu_stack_reset(running_machine *machine);
+void ui_menu_stack_reset(running_machine &machine);
 
 /* push a new menu onto the stack */
 void ui_menu_stack_push(ui_menu *menu);
 
 /* pop a menu from the stack */
-void ui_menu_stack_pop(running_machine *machine);
+void ui_menu_stack_pop(running_machine &machine);
 
 
 
 /* ----- UI system interaction ----- */
 
 /* master handler */
-UINT32 ui_menu_ui_handler(running_machine *machine, render_container *container, UINT32 state);
+UINT32 ui_menu_ui_handler(running_machine &machine, render_container *container, UINT32 state);
 
 /* slider handler */
-UINT32 ui_slider_ui_handler(running_machine *machine, render_container *container, UINT32 state);
+UINT32 ui_slider_ui_handler(running_machine &machine, render_container *container, UINT32 state);
 
 /* force game select menu */
-void ui_menu_force_game_select(running_machine *machine, render_container *container);
+void ui_menu_force_game_select(running_machine &machine, render_container *container);
 int ui_menu_is_force_game_select(void);
 
 

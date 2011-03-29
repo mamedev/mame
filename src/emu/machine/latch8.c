@@ -44,7 +44,7 @@ static void update(device_t *device, UINT8 new_val, UINT8 mask)
 		UINT8 changed = old_val ^ latch8->value;
 		for (i=0; i<8; i++)
 			if (((changed & (1<<i)) != 0) && latch8->intf->node_map[i] != 0)
-				discrete_sound_w(device->machine->device(latch8->intf->node_device[i]), latch8->intf->node_map[i] , (latch8->value >> i) & 1);
+				discrete_sound_w(device->machine().device(latch8->intf->node_device[i]), latch8->intf->node_map[i] , (latch8->value >> i) & 1);
 	}
 }
 
@@ -83,7 +83,7 @@ READ8_DEVICE_HANDLER( latch8_r )
 	if (latch8->has_read)
 	{
 		/*  temporary hack until all relevant systems are devices */
-		address_space *space = device->machine->firstcpu->memory().space(AS_PROGRAM);
+		address_space *space = device->machine().firstcpu->memory().space(AS_PROGRAM);
 		int i;
 		for (i=0; i<8; i++)
 		{
@@ -105,7 +105,7 @@ WRITE8_DEVICE_HANDLER( latch8_w )
 	assert(offset == 0);
 
 	if (latch8->intf->nosync != 0xff)
-		device->machine->scheduler().synchronize(FUNC(latch8_timerproc), (0xFF << 8) | data, (void *)device);
+		device->machine().scheduler().synchronize(FUNC(latch8_timerproc), (0xFF << 8) | data, (void *)device);
 	else
 		update(device, data, 0xFF);
 }
@@ -165,7 +165,7 @@ INLINE void latch8_bitx_w(device_t *device, int bit, offs_t offset, UINT8 data)
 	if (latch8->intf->nosync & mask)
 		update(device, masked_data, mask);
 	else
-		device->machine->scheduler().synchronize(FUNC(latch8_timerproc), (mask << 8) | masked_data, (void *) device);
+		device->machine().scheduler().synchronize(FUNC(latch8_timerproc), (mask << 8) | masked_data, (void *) device);
 }
 
 WRITE8_DEVICE_HANDLER( latch8_bit0_w ) { latch8_bitx_w(device, 0, offset, data); }
@@ -206,7 +206,7 @@ static DEVICE_START( latch8 )
 		{
 			if (latch8->devices[i] != NULL)
 				fatalerror("Device %s: Bit %d already has a handler.\n", device->tag(), i);
-			latch8->devices[i] = device->machine->device(latch8->intf->devread[i].tag);
+			latch8->devices[i] = device->machine().device(latch8->intf->devread[i].tag);
 			if (latch8->devices[i] == NULL)
 				fatalerror("Device %s: Unable to find device %s\n", device->tag(), latch8->intf->devread[i].tag);
 			latch8->has_devread = 1;

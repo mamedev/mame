@@ -99,7 +99,7 @@ static PALETTE_INIT( m14 )
 
 static TILE_GET_INFO( m14_get_tile_info )
 {
-	m14_state *state = machine->driver_data<m14_state>();
+	m14_state *state = machine.driver_data<m14_state>();
 
 	int code = state->video_ram[tile_index];
 	int color = state->color_ram[tile_index] & 0x0f;
@@ -115,14 +115,14 @@ static TILE_GET_INFO( m14_get_tile_info )
 
 static VIDEO_START( m14 )
 {
-	m14_state *state = machine->driver_data<m14_state>();
+	m14_state *state = machine.driver_data<m14_state>();
 
 	state->m14_tilemap = tilemap_create(machine, m14_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE( m14 )
 {
-	m14_state *state = screen->machine->driver_data<m14_state>();
+	m14_state *state = screen->machine().driver_data<m14_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m14_tilemap, 0, 0);
 	return 0;
@@ -131,7 +131,7 @@ static SCREEN_UPDATE( m14 )
 
 static WRITE8_HANDLER( m14_vram_w )
 {
-	m14_state *state = space->machine->driver_data<m14_state>();
+	m14_state *state = space->machine().driver_data<m14_state>();
 
 	state->video_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->m14_tilemap, offset);
@@ -139,7 +139,7 @@ static WRITE8_HANDLER( m14_vram_w )
 
 static WRITE8_HANDLER( m14_cram_w )
 {
-	m14_state *state = space->machine->driver_data<m14_state>();
+	m14_state *state = space->machine().driver_data<m14_state>();
 
 	state->color_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->m14_tilemap, offset);
@@ -154,13 +154,13 @@ static WRITE8_HANDLER( m14_cram_w )
 static READ8_HANDLER( m14_rng_r )
 {
 	/* graphic artifacts happens if this doesn't return random values. */
-	return (space->machine->rand() & 0x0f) | 0xf0; /* | (input_port_read(space->machine, "IN1") & 0x80)*/;
+	return (space->machine().rand() & 0x0f) | 0xf0; /* | (input_port_read(space->machine(), "IN1") & 0x80)*/;
 }
 
 /* Here routes the hopper & the inputs */
 static READ8_HANDLER( input_buttons_r )
 {
-	m14_state *state = space->machine->driver_data<m14_state>();
+	m14_state *state = space->machine().driver_data<m14_state>();
 
 	if (state->hop_mux)
 	{
@@ -168,7 +168,7 @@ static READ8_HANDLER( input_buttons_r )
 		return 0; //0x43 status bits
 	}
 	else
-		return input_port_read(space->machine, "IN0");
+		return input_port_read(space->machine(), "IN0");
 }
 
 #if 0
@@ -184,7 +184,7 @@ static WRITE8_HANDLER( test_w )
 
 static WRITE8_HANDLER( hopper_w )
 {
-	m14_state *state = space->machine->driver_data<m14_state>();
+	m14_state *state = space->machine().driver_data<m14_state>();
 
 	/* ---- x--- coin out */
 	/* ---- --x- hopper/input mux? */
@@ -222,7 +222,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( left_coin_inserted )
 {
-	m14_state *state = field->port->machine->driver_data<m14_state>();
+	m14_state *state = field->port->machine().driver_data<m14_state>();
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
 	if (newval)
 		device_set_input_line(state->maincpu, I8085_RST65_LINE, HOLD_LINE);
@@ -230,7 +230,7 @@ static INPUT_CHANGED( left_coin_inserted )
 
 static INPUT_CHANGED( right_coin_inserted )
 {
-	m14_state *state = field->port->machine->driver_data<m14_state>();
+	m14_state *state = field->port->machine().driver_data<m14_state>();
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
 	if (newval)
 		device_set_input_line(state->maincpu, I8085_RST55_LINE, HOLD_LINE);
@@ -314,16 +314,16 @@ static INTERRUPT_GEN( m14_irq )
 
 static MACHINE_START( m14 )
 {
-	m14_state *state = machine->driver_data<m14_state>();
+	m14_state *state = machine.driver_data<m14_state>();
 
-	state->maincpu = machine->device("maincpu");
+	state->maincpu = machine.device("maincpu");
 
 	state->save_item(NAME(state->hop_mux));
 }
 
 static MACHINE_RESET( m14 )
 {
-	m14_state *state = machine->driver_data<m14_state>();
+	m14_state *state = machine.driver_data<m14_state>();
 
 	state->hop_mux = 0;
 }

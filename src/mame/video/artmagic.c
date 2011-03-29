@@ -41,9 +41,9 @@ INLINE UINT16 *address_to_vram(artmagic_state *state, offs_t *address)
 
 VIDEO_START( artmagic )
 {
-	artmagic_state *state = machine->driver_data<artmagic_state>();
-	state->blitter_base = (UINT16 *)machine->region("gfx1")->base();
-	state->blitter_mask = machine->region("gfx1")->bytes()/2 - 1;
+	artmagic_state *state = machine.driver_data<artmagic_state>();
+	state->blitter_base = (UINT16 *)machine.region("gfx1")->base();
+	state->blitter_mask = machine.region("gfx1")->bytes()/2 - 1;
 
 	state_save_register_global_array(machine, state->_xor);
 	state_save_register_global(machine, state->is_stoneball);
@@ -61,7 +61,7 @@ VIDEO_START( artmagic )
 
 void artmagic_to_shiftreg(address_space *space, offs_t address, UINT16 *data)
 {
-	artmagic_state *state = space->machine->driver_data<artmagic_state>();
+	artmagic_state *state = space->machine().driver_data<artmagic_state>();
 	UINT16 *vram = address_to_vram(state, &address);
 	if (vram)
 		memcpy(data, &vram[address], TOBYTE(0x2000));
@@ -70,7 +70,7 @@ void artmagic_to_shiftreg(address_space *space, offs_t address, UINT16 *data)
 
 void artmagic_from_shiftreg(address_space *space, offs_t address, UINT16 *data)
 {
-	artmagic_state *state = space->machine->driver_data<artmagic_state>();
+	artmagic_state *state = space->machine().driver_data<artmagic_state>();
 	UINT16 *vram = address_to_vram(state, &address);
 	if (vram)
 		memcpy(&vram[address], data, TOBYTE(0x2000));
@@ -84,9 +84,9 @@ void artmagic_from_shiftreg(address_space *space, offs_t address, UINT16 *data)
  *
  *************************************/
 
-static void execute_blit(running_machine *machine)
+static void execute_blit(running_machine &machine)
 {
-	artmagic_state *state = machine->driver_data<artmagic_state>();
+	artmagic_state *state = machine.driver_data<artmagic_state>();
 	UINT16 *dest = state->blitter_page ? state->vram0 : state->vram1;
 	int offset = ((state->blitter_data[1] & 0xff) << 16) | state->blitter_data[0];
 	int color = (state->blitter_data[1] >> 4) & 0xf0;
@@ -105,7 +105,7 @@ static void execute_blit(running_machine *machine)
 	static FILE *f;
 
 	logerror("%s:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
-				machine->describe_context(), offset, x, y, w, h,
+				machine.describe_context(), offset, x, y, w, h,
 				state->blitter_data[0], state->blitter_data[1],
 				state->blitter_data[2], state->blitter_data[3],
 				state->blitter_data[4], state->blitter_data[5],
@@ -123,7 +123,7 @@ static void execute_blit(running_machine *machine)
 
 		fprintf(f, "----------------------\n"
 				   "%s:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
-					machine->describe_context(), offset, x, y, w, h,
+					machine.describe_context(), offset, x, y, w, h,
 					state->blitter_data[0], state->blitter_data[1],
 					state->blitter_data[2], state->blitter_data[3],
 					state->blitter_data[4], state->blitter_data[5],
@@ -295,14 +295,14 @@ static void execute_blit(running_machine *machine)
 	g_profiler.stop();
 
 #if (!INSTANT_BLIT)
-	state->blitter_busy_until = machine->time() + attotime::from_nsec(w*h*20);
+	state->blitter_busy_until = machine.time() + attotime::from_nsec(w*h*20);
 #endif
 }
 
 
 READ16_HANDLER( artmagic_blitter_r )
 {
-	artmagic_state *state = space->machine->driver_data<artmagic_state>();
+	artmagic_state *state = space->machine().driver_data<artmagic_state>();
 	/*
         bit 1 is a busy flag; loops tightly if clear
         bit 2 is tested in a similar fashion
@@ -310,7 +310,7 @@ READ16_HANDLER( artmagic_blitter_r )
     */
 	UINT16 result = 0xffef | (state->blitter_page << 4);
 #if (!INSTANT_BLIT)
-	if (attotime_compare(space->machine->time(), state->blitter_busy_until) < 0)
+	if (attotime_compare(space->machine().time(), state->blitter_busy_until) < 0)
 		result ^= 6;
 #endif
 	return result;
@@ -319,12 +319,12 @@ READ16_HANDLER( artmagic_blitter_r )
 
 WRITE16_HANDLER( artmagic_blitter_w )
 {
-	artmagic_state *state = space->machine->driver_data<artmagic_state>();
+	artmagic_state *state = space->machine().driver_data<artmagic_state>();
 	COMBINE_DATA(&state->blitter_data[offset]);
 
 	/* offset 3 triggers the blit */
 	if (offset == 3)
-		execute_blit(space->machine);
+		execute_blit(space->machine());
 
 	/* offset 4 contains the target page */
 	else if (offset == 4)
@@ -341,11 +341,11 @@ WRITE16_HANDLER( artmagic_blitter_w )
 
 void artmagic_scanline(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	artmagic_state *state = screen.machine->driver_data<artmagic_state>();
+	artmagic_state *state = screen.machine().driver_data<artmagic_state>();
 	offs_t offset = (params->rowaddr << 12) & 0x7ff000;
 	UINT16 *vram = address_to_vram(state, &offset);
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
-	const rgb_t *pens = tlc34076_get_pens(screen.machine->device("tlc34076"));
+	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = params->coladdr << 1;
 	int x;
 

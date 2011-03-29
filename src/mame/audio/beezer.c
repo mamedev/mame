@@ -135,7 +135,7 @@ INLINE beezer_sound_state *get_safe_token(device_t *device)
 /*static WRITE_LINE_DEVICE_HANDLER( update_irq_state )
 {
     beezer_sound_state *sndstate = get_safe_token(device);
-    cputag_set_input_line(device->machine, "audiocpu", M6809_IRQ_LINE, (sndstate->ptm_irq_state) ? ASSERT_LINE : CLEAR_LINE);
+    cputag_set_input_line(device->machine(), "audiocpu", M6809_IRQ_LINE, (sndstate->ptm_irq_state) ? ASSERT_LINE : CLEAR_LINE);
 }*/
 
 
@@ -380,8 +380,8 @@ static DEVICE_START( common_sh_start )
 	state->sh6840_clocks_per_sample = (int)(((double)SH6840_CLOCK / (double)sample_rate) * (double)(1 << 24));
 
 	/* allocate the stream */
-	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, sample_rate, NULL, beezer_stream_update);
-	state->maincpu = device->machine->device("maincpu");
+	state->stream = device->machine().sound().stream_alloc(*device, 0, 1, sample_rate, NULL, beezer_stream_update);
+	state->maincpu = device->machine().device("maincpu");
 
 	sh6840_register_state_globals(device);
 }

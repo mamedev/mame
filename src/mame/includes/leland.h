@@ -50,7 +50,7 @@ public:
 	UINT8 sound_port_bank;
 	UINT8 alternate_bank;
 	UINT8 master_bank;
-	void (*update_master_bank)(running_machine *machine);
+	void (*update_master_bank)(running_machine &machine);
 	UINT32 xrom1_addr;
 	UINT32 xrom2_addr;
 	UINT8 battery_ram_enable;
@@ -106,17 +106,17 @@ MACHINE_RESET( ataxx );
 INTERRUPT_GEN( leland_master_interrupt );
 
 WRITE8_HANDLER( leland_master_alt_bankswitch_w );
-void cerberus_bankswitch(running_machine *machine);
-void mayhem_bankswitch(running_machine *machine);
-void dangerz_bankswitch(running_machine *machine);
-void basebal2_bankswitch(running_machine *machine);
-void redline_bankswitch(running_machine *machine);
-void viper_bankswitch(running_machine *machine);
-void offroad_bankswitch(running_machine *machine);
-void ataxx_bankswitch(running_machine *machine);
+void cerberus_bankswitch(running_machine &machine);
+void mayhem_bankswitch(running_machine &machine);
+void dangerz_bankswitch(running_machine &machine);
+void basebal2_bankswitch(running_machine &machine);
+void redline_bankswitch(running_machine &machine);
+void viper_bankswitch(running_machine &machine);
+void offroad_bankswitch(running_machine &machine);
+void ataxx_bankswitch(running_machine &machine);
 
-void leland_init_eeprom(running_machine *machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type);
-void ataxx_init_eeprom(running_machine *machine, const UINT16 *data);
+void leland_init_eeprom(running_machine &machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type);
+void ataxx_init_eeprom(running_machine &machine, const UINT16 *data);
 
 READ8_DEVICE_HANDLER( ataxx_eeprom_r );
 WRITE8_DEVICE_HANDLER( ataxx_eeprom_w );
@@ -146,7 +146,7 @@ WRITE8_HANDLER( ataxx_slave_banksw_w );
 
 READ8_HANDLER( leland_raster_r );
 
-void leland_rotate_memory(running_machine *machine, const char *cpuname);
+void leland_rotate_memory(running_machine &machine, const char *cpuname);
 
 
 /*----------- defined in audio/leland.c -----------*/

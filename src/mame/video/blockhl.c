@@ -9,9 +9,9 @@
 
 ***************************************************************************/
 
-void blockhl_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+void blockhl_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	blockhl_state *state = machine->driver_data<blockhl_state>();
+	blockhl_state *state = machine.driver_data<blockhl_state>();
 	*code |= ((*color & 0x0f) << 8);
 	*color = state->layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
@@ -22,9 +22,9 @@ void blockhl_tile_callback( running_machine *machine, int layer, int bank, int *
 
 ***************************************************************************/
 
-void blockhl_sprite_callback( running_machine *machine, int *code, int *color, int *priority, int *shadow )
+void blockhl_sprite_callback( running_machine &machine, int *code, int *color, int *priority, int *shadow )
 {
-	blockhl_state *state = machine->driver_data<blockhl_state>();
+	blockhl_state *state = machine.driver_data<blockhl_state>();
 
 	if(*color & 0x10)
 		*priority = 0xfe; // under K052109_tilemap[0]
@@ -43,23 +43,23 @@ void blockhl_sprite_callback( running_machine *machine, int *code, int *color, i
 
 VIDEO_START( blockhl )
 {
-	blockhl_state *state = machine->driver_data<blockhl_state>();
+	blockhl_state *state = machine.driver_data<blockhl_state>();
 
-	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x800);
+	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x800);
 
 	state->layer_colorbase[0] = 0;
 	state->layer_colorbase[1] = 16;
 	state->layer_colorbase[2] = 32;
 	state->sprite_colorbase = 48;
 
-	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x800);
+	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x800);
 }
 
 SCREEN_UPDATE( blockhl )
 {
-	blockhl_state *state = screen->machine->driver_data<blockhl_state>();
+	blockhl_state *state = screen->machine().driver_data<blockhl_state>();
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	k052109_tilemap_update(state->k052109);
 

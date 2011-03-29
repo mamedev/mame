@@ -184,7 +184,7 @@ struct shaded_point
 
 
 
-static void stv_vdp1_process_list(running_machine *machine);
+static void stv_vdp1_process_list(running_machine &machine);
 
 READ32_HANDLER( stv_vdp1_regs_r )
 {
@@ -293,13 +293,13 @@ WRITE32_HANDLER( stv_vdp1_regs_w )
 		else
 		{
 			if ( vdp1_sprite_log ) logerror( "VDP1: Access to register TVMR = %1X\n", STV_VDP1_TVMR );
-			if ( STV_VDP1_VBE && stv_get_vblank(space->machine) )
+			if ( STV_VDP1_VBE && stv_get_vblank(space->machine()) )
 			{
 				stv_vdp1_clear_framebuffer_on_next_frame = 1;
 			}
 
 			/* needed by pblbeach, it doesn't clear local coordinates in its sprite list...*/
-			//if ( !strcmp(space->machine->system().name, "pblbeach") )
+			//if ( !strcmp(space->machine().system().name, "pblbeach") )
 			//{
 			//  stvvdp1_local_x = stvvdp1_local_y = 0;
 			//}
@@ -312,7 +312,7 @@ WRITE32_HANDLER( stv_vdp1_regs_w )
 			if ( STV_VDP1_PTMR == 1 )
 			{
 				if ( vdp1_sprite_log ) logerror( "VDP1: Access to register PTMR = %1X\n", STV_VDP1_PTMR );
-				stv_vdp1_process_list( space->machine );
+				stv_vdp1_process_list( space->machine() );
 			}
 		}
 		else if ( ACCESSING_BITS_0_15 )
@@ -854,14 +854,14 @@ static UINT8* gfxdata;
 static UINT16 sprite_colorbank;
 
 
-static void (*drawpixel)(running_machine *machine, int x, int y, int patterndata, int offsetcnt);
+static void (*drawpixel)(running_machine &machine, int x, int y, int patterndata, int offsetcnt);
 
-static void drawpixel_poly(running_machine *machine, int x, int y, int patterndata, int offsetcnt)
+static void drawpixel_poly(running_machine &machine, int x, int y, int patterndata, int offsetcnt)
 {
 	stv_framebuffer_draw_lines[y][x] = stv2_current_sprite.CMDCOLR;
 }
 
-static void drawpixel_8bpp_trans(running_machine *machine, int x, int y, int patterndata, int offsetcnt)
+static void drawpixel_8bpp_trans(running_machine &machine, int x, int y, int patterndata, int offsetcnt)
 {
 	UINT16 pix;
 
@@ -872,7 +872,7 @@ static void drawpixel_8bpp_trans(running_machine *machine, int x, int y, int pat
 	}
 }
 
-static void drawpixel_4bpp_notrans(running_machine *machine, int x, int y, int patterndata, int offsetcnt)
+static void drawpixel_4bpp_notrans(running_machine &machine, int x, int y, int patterndata, int offsetcnt)
 {
 	UINT16 pix;
 
@@ -881,7 +881,7 @@ static void drawpixel_4bpp_notrans(running_machine *machine, int x, int y, int p
 	stv_framebuffer_draw_lines[y][x] = pix | sprite_colorbank;
 }
 
-static void drawpixel_4bpp_trans(running_machine *machine, int x, int y, int patterndata, int offsetcnt)
+static void drawpixel_4bpp_trans(running_machine &machine, int x, int y, int patterndata, int offsetcnt)
 {
 	UINT16 pix;
 
@@ -891,7 +891,7 @@ static void drawpixel_4bpp_trans(running_machine *machine, int x, int y, int pat
 		stv_framebuffer_draw_lines[y][x] = pix | sprite_colorbank;
 }
 
-static void drawpixel_generic(running_machine *machine, int x, int y, int patterndata, int offsetcnt)
+static void drawpixel_generic(running_machine &machine, int x, int y, int patterndata, int offsetcnt)
 {
 	int pix,mode,transmask, spd = stv2_current_sprite.CMDPMOD & 0x40;
 	int mesh = stv2_current_sprite.CMDPMOD & 0x100;
@@ -962,7 +962,7 @@ static void drawpixel_generic(running_machine *machine, int x, int y, int patter
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xff80);
 				transmask = 0x7f;
 				mode = 3;
-			//  pix = machine->rand();
+			//  pix = machine.rand();
 				break;
 			case 0x0020: // mode 4 256 colour bank mode (8bits) (hanagumi title)
 				pix = gfxdata[patterndata+offsetcnt];
@@ -976,7 +976,7 @@ static void drawpixel_generic(running_machine *machine, int x, int y, int patter
 				transmask = 0xffff;
 				break;
 			default: // other settings illegal
-				pix = machine->rand();
+				pix = machine.rand();
 				mode = 0;
 				transmask = 0xff;
 		}
@@ -1081,7 +1081,7 @@ static void stv_vdp1_set_drawpixel(void)
 }
 
 
-static void vdp1_fill_slope(running_machine *machine, const rectangle *cliprect, int patterndata, int xsize,
+static void vdp1_fill_slope(running_machine &machine, const rectangle *cliprect, int patterndata, int xsize,
 							INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 *nx1, INT32 *nx2,
 							INT32 u1, INT32 u2, INT32 slu1, INT32 slu2, INT32 *nu1, INT32 *nu2,
 							INT32 v1, INT32 v2, INT32 slv1, INT32 slv2, INT32 *nv1, INT32 *nv2,
@@ -1197,7 +1197,7 @@ static void vdp1_fill_slope(running_machine *machine, const rectangle *cliprect,
 	*nv2 = v2;
 }
 
-static void vdp1_fill_line(running_machine *machine, const rectangle *cliprect, int patterndata, int xsize, INT32 y,
+static void vdp1_fill_line(running_machine &machine, const rectangle *cliprect, int patterndata, int xsize, INT32 y,
 						   INT32 x1, INT32 x2, INT32 u1, INT32 u2, INT32 v1, INT32 v2)
 {
 	int xx1 = x1>>FRAC_SHIFT;
@@ -1235,7 +1235,7 @@ static void vdp1_fill_line(running_machine *machine, const rectangle *cliprect, 
 	}
 }
 
-static void vdp1_fill_quad(running_machine *machine, const rectangle *cliprect, int patterndata, int xsize, const struct spoint *q)
+static void vdp1_fill_quad(running_machine &machine, const rectangle *cliprect, int patterndata, int xsize, const struct spoint *q)
 {
 	INT32 sl1, sl2, slu1, slu2, slv1, slv2, cury, limy, x1, x2, u1, u2, v1, v2, delta;
 	int pmin, pmax, i, ps1, ps2;
@@ -1382,7 +1382,7 @@ static int y2s(int v)
 	return (INT32)(INT16)v + stvvdp1_local_y;
 }
 
-static void stv_vdp1_draw_line(running_machine *machine, const rectangle *cliprect)
+static void stv_vdp1_draw_line(running_machine &machine, const rectangle *cliprect)
 {
 	struct spoint q[4];
 
@@ -1401,7 +1401,7 @@ static void stv_vdp1_draw_line(running_machine *machine, const rectangle *clipre
 	vdp1_fill_quad(machine, cliprect, 0, 1, q);
 }
 
-static void stv_vdp1_draw_poly_line(running_machine *machine, const rectangle *cliprect)
+static void stv_vdp1_draw_poly_line(running_machine &machine, const rectangle *cliprect)
 {
 	struct spoint q[4];
 
@@ -1464,7 +1464,7 @@ static void stv_vdp1_draw_poly_line(running_machine *machine, const rectangle *c
 
 }
 
-static void stv_vpd1_draw_distorted_sprite(running_machine *machine, const rectangle *cliprect)
+static void stv_vpd1_draw_distorted_sprite(running_machine &machine, const rectangle *cliprect)
 {
 	struct spoint q[4];
 
@@ -1522,7 +1522,7 @@ static void stv_vpd1_draw_distorted_sprite(running_machine *machine, const recta
 	vdp1_fill_quad(machine, cliprect, patterndata, xsize, q);
 }
 
-static void stv_vpd1_draw_scaled_sprite(running_machine *machine, const rectangle *cliprect)
+static void stv_vpd1_draw_scaled_sprite(running_machine &machine, const rectangle *cliprect)
 {
 	struct spoint q[4];
 
@@ -1670,7 +1670,7 @@ static void stv_vpd1_draw_scaled_sprite(running_machine *machine, const rectangl
 }
 
 
-static void stv_vpd1_draw_normal_sprite(running_machine *machine, const rectangle *cliprect, int sprite_type)
+static void stv_vpd1_draw_normal_sprite(running_machine &machine, const rectangle *cliprect, int sprite_type)
 {
 	//UINT16 *destline;
 
@@ -1756,7 +1756,7 @@ static void stv_vpd1_draw_normal_sprite(running_machine *machine, const rectangl
 	}
 }
 
-static void stv_vdp1_process_list(running_machine *machine)
+static void stv_vdp1_process_list(running_machine &machine)
 {
 	int position;
 	int spritecount;
@@ -1992,7 +1992,7 @@ static void stv_vdp1_process_list(running_machine *machine)
 	if (vdp1_sprite_log) logerror ("End of list processing!\n");
 }
 
-void video_update_vdp1(running_machine *machine)
+void video_update_vdp1(running_machine &machine)
 {
 	int framebufer_changed = 0;
 
@@ -2093,7 +2093,7 @@ static STATE_POSTLOAD( stv_vdp1_state_save_postload )
 	}
 }
 
-int stv_vdp1_start ( running_machine *machine )
+int stv_vdp1_start ( running_machine &machine )
 {
 	stv_vdp1_regs = auto_alloc_array_clear(machine, UINT32, 0x040000/4 );
 	stv_vdp1_vram = auto_alloc_array_clear(machine, UINT32, 0x100000/4 );
@@ -2130,6 +2130,6 @@ int stv_vdp1_start ( running_machine *machine )
 	state_save_register_global(machine, stv_vdp1_clear_framebuffer_on_next_frame);
 	state_save_register_global(machine, stvvdp1_local_x);
 	state_save_register_global(machine, stvvdp1_local_y);
-	machine->state().register_postload(stv_vdp1_state_save_postload, NULL);
+	machine.state().register_postload(stv_vdp1_state_save_postload, NULL);
 	return 0;
 }

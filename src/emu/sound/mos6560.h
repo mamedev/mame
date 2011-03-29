@@ -15,13 +15,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef UINT8 (*mos6560_lightpen_x_callback)(running_machine *machine);
-typedef UINT8 (*mos6560_lightpen_y_callback)(running_machine *machine);
-typedef UINT8 (*mos6560_lightpen_button_callback)(running_machine *machine);
-typedef UINT8 (*mos6560_paddle_callback)(running_machine *machine);
+typedef UINT8 (*mos6560_lightpen_x_callback)(running_machine &machine);
+typedef UINT8 (*mos6560_lightpen_y_callback)(running_machine &machine);
+typedef UINT8 (*mos6560_lightpen_button_callback)(running_machine &machine);
+typedef UINT8 (*mos6560_paddle_callback)(running_machine &machine);
 
-typedef int (*mos6560_dma_read)(running_machine *machine, int);
-typedef int (*mos6560_dma_read_color)(running_machine *machine, int);
+typedef int (*mos6560_dma_read)(running_machine &machine, int);
+typedef int (*mos6560_dma_read_color)(running_machine &machine, int);
 
 
 typedef enum

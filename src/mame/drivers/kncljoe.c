@@ -35,7 +35,7 @@ Updates:
 
 static WRITE8_HANDLER( sound_cmd_w )
 {
-	kncljoe_state *state = space->machine->driver_data<kncljoe_state>();
+	kncljoe_state *state = space->machine().driver_data<kncljoe_state>();
 
 	if ((data & 0x80) == 0)
 		soundlatch_w(space, 0, data & 0x7f);
@@ -65,13 +65,13 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( m6803_port1_w )
 {
-	kncljoe_state *state = device->machine->driver_data<kncljoe_state>();
+	kncljoe_state *state = device->machine().driver_data<kncljoe_state>();
 	state->port1 = data;
 }
 
 static WRITE8_DEVICE_HANDLER( m6803_port2_w )
 {
-	kncljoe_state *state = device->machine->driver_data<kncljoe_state>();
+	kncljoe_state *state = device->machine().driver_data<kncljoe_state>();
 
 	/* write latch */
 	if ((state->port2 & 0x01) && !(data & 0x01))
@@ -85,7 +85,7 @@ static WRITE8_DEVICE_HANDLER( m6803_port2_w )
 
 static READ8_DEVICE_HANDLER( m6803_port1_r )
 {
-	kncljoe_state *state = device->machine->driver_data<kncljoe_state>();
+	kncljoe_state *state = device->machine().driver_data<kncljoe_state>();
 
 	if (state->port2 & 0x08)
 		return ay8910_r(device, 0);
@@ -99,7 +99,7 @@ static READ8_DEVICE_HANDLER( m6803_port2_r )
 
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
-	kncljoe_state *state = space->machine->driver_data<kncljoe_state>();
+	kncljoe_state *state = space->machine().driver_data<kncljoe_state>();
 	device_set_input_line(state->soundcpu, 0, CLEAR_LINE);
 }
 
@@ -250,9 +250,9 @@ static INTERRUPT_GEN (sound_nmi)
 
 static MACHINE_START( kncljoe )
 {
-	kncljoe_state *state = machine->driver_data<kncljoe_state>();
+	kncljoe_state *state = machine.driver_data<kncljoe_state>();
 
-	state->soundcpu = machine->device("soundcpu");
+	state->soundcpu = machine.device("soundcpu");
 
 	state->save_item(NAME(state->port1));
 	state->save_item(NAME(state->port2));
@@ -263,7 +263,7 @@ static MACHINE_START( kncljoe )
 
 static MACHINE_RESET( kncljoe )
 {
-	kncljoe_state *state = machine->driver_data<kncljoe_state>();
+	kncljoe_state *state = machine.driver_data<kncljoe_state>();
 
 	state->port1 = 0;
 	state->port2 = 0;

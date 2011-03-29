@@ -170,7 +170,7 @@ READ8_HANDLER( i8041_p1_r );
 WRITE8_HANDLER( i8041_p2_w );
 READ8_HANDLER( i8041_p2_r );
 
-void decocass_machine_state_save_init(running_machine *machine);
+void decocass_machine_state_save_init(running_machine &machine);
 
 
 /*----------- defined in video/decocass.c -----------*/
@@ -199,4 +199,4 @@ WRITE8_HANDLER( decocass_center_v_shift_w );
 VIDEO_START( decocass );
 SCREEN_UPDATE( decocass );
 
-void decocass_video_state_save_init(running_machine *machine);
+void decocass_video_state_save_init(running_machine &machine);

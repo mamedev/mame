@@ -78,12 +78,12 @@
 #if TILEMAPS
 static TILE_GET_INFO( get_tile_info )
 {
-	suna8_state *state = machine->driver_data<suna8_state>();
+	suna8_state *state = machine.driver_data<suna8_state>();
 	UINT8 code, attr;
 
 	if (input_code_pressed(machine, KEYCODE_X))
 	{
-		UINT8 *rom = machine->region("maincpu")->base() + 0x10000 + 0x4000 * state->trombank;
+		UINT8 *rom = machine.region("maincpu")->base() + 0x10000 + 0x4000 * state->trombank;
 		code = rom[ 2 * tile_index + 0 ];
 		attr = rom[ 2 * tile_index + 1 ];
 	}
@@ -103,15 +103,15 @@ static TILE_GET_INFO( get_tile_info )
 
 READ8_HANDLER( suna8_banked_paletteram_r )
 {
-	suna8_state *state = space->machine->driver_data<suna8_state>();
+	suna8_state *state = space->machine().driver_data<suna8_state>();
 
 	offset += state->palettebank * 0x200;
-	return space->machine->generic.paletteram.u8[offset];
+	return space->machine().generic.paletteram.u8[offset];
 }
 
 READ8_HANDLER( suna8_banked_spriteram_r )
 {
-	suna8_state *state = space->machine->driver_data<suna8_state>();
+	suna8_state *state = space->machine().driver_data<suna8_state>();
 
 	offset += state->spritebank * 0x2000;
 	return state->spriteram[offset];
@@ -119,7 +119,7 @@ READ8_HANDLER( suna8_banked_spriteram_r )
 
 WRITE8_HANDLER( suna8_spriteram_w )
 {
-	suna8_state *state = space->machine->driver_data<suna8_state>();
+	suna8_state *state = space->machine().driver_data<suna8_state>();
 
 	state->spriteram[offset] = data;
 #if TILEMAPS
@@ -129,7 +129,7 @@ WRITE8_HANDLER( suna8_spriteram_w )
 
 WRITE8_HANDLER( suna8_banked_spriteram_w )
 {
-	suna8_state *state = space->machine->driver_data<suna8_state>();
+	suna8_state *state = space->machine().driver_data<suna8_state>();
 
 	offset += state->spritebank * 0x2000;
 	state->spriteram[offset] = data;
@@ -143,13 +143,13 @@ WRITE8_HANDLER( suna8_banked_spriteram_w )
 */
 WRITE8_HANDLER( brickzn_banked_paletteram_w )
 {
-	suna8_state *state = space->machine->driver_data<suna8_state>();
+	suna8_state *state = space->machine().driver_data<suna8_state>();
 	int r,g,b;
 	UINT16 rgb;
 
 	offset += state->palettebank * 0x200;
-	space->machine->generic.paletteram.u8[offset] = data;
-	rgb = (space->machine->generic.paletteram.u8[offset&~1] << 8) + space->machine->generic.paletteram.u8[offset|1];
+	space->machine().generic.paletteram.u8[offset] = data;
+	rgb = (space->machine().generic.paletteram.u8[offset&~1] << 8) + space->machine().generic.paletteram.u8[offset|1];
 	r	=	(((rgb & (1<<0xc))?1:0)<<0) |
 			(((rgb & (1<<0xb))?1:0)<<1) |
 			(((rgb & (1<<0xe))?1:0)<<2) |
@@ -163,19 +163,19 @@ WRITE8_HANDLER( brickzn_banked_paletteram_w )
 			(((rgb & (1<<0x6))?1:0)<<2) |
 			(((rgb & (1<<0x7))?1:0)<<3);
 
-	palette_set_color_rgb(space->machine,offset/2,pal4bit(r),pal4bit(g),pal4bit(b));
+	palette_set_color_rgb(space->machine(),offset/2,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
 
 
-static void suna8_vh_start_common(running_machine *machine, int dim)
+static void suna8_vh_start_common(running_machine &machine, int dim)
 {
-	suna8_state *state = machine->driver_data<suna8_state>();
+	suna8_state *state = machine.driver_data<suna8_state>();
 
 	state->text_dim = dim;
 	if (!(state->text_dim > 0))
 	{
-		machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200 * 2);
+		machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200 * 2);
 		state->spriteram = auto_alloc_array(machine, UINT8, 0x2000 * 2);
 		state->spritebank  = 0;
 		state->palettebank = 0;
@@ -202,15 +202,15 @@ VIDEO_START( suna8_textdim12 )	{ suna8_vh_start_common(machine, 12); }
 
 ***************************************************************************/
 
-static void draw_normal_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_normal_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	suna8_state *state = machine->driver_data<suna8_state>();
+	suna8_state *state = machine.driver_data<suna8_state>();
 	UINT8 *spriteram = state->spriteram;
 	int i;
 	int mx = 0;	// multisprite x counter
 
-	int max_x = machine->primary_screen->width() - 8;
-	int max_y = machine->primary_screen->height() - 8;
+	int max_x = machine.primary_screen->width() - 8;
+	int max_y = machine.primary_screen->height() - 8;
 
 	for (i = 0x1d00; i < 0x2000; i += 4)
 	{
@@ -325,7 +325,7 @@ static void draw_normal_sprites(running_machine *machine, bitmap_t *bitmap,const
 					sy = max_y - sy;	tile_flipy = !tile_flipy;
 				}
 
-				drawgfx_transpen(	bitmap,cliprect,machine->gfx[0],
+				drawgfx_transpen(	bitmap,cliprect,machine.gfx[0],
 							tile + (attr & 0x3)*0x100 + gfxbank,
 							((attr >> 2) & 0xf) | colorbank,	// hardhea2 player2
 							tile_flipx, tile_flipy,
@@ -336,14 +336,14 @@ static void draw_normal_sprites(running_machine *machine, bitmap_t *bitmap,const
 	}
 }
 
-static void draw_text_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_text_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	suna8_state *state = machine->driver_data<suna8_state>();
+	suna8_state *state = machine.driver_data<suna8_state>();
 	UINT8 *spriteram = state->spriteram;
 	int i;
 
-	int max_x = machine->primary_screen->width() - 8;
-	int max_y = machine->primary_screen->height() - 8;
+	int max_x = machine.primary_screen->width() - 8;
+	int max_y = machine.primary_screen->height() - 8;
 
 	/* Earlier games only */
 	if (!(state->text_dim > 0))	return;
@@ -393,7 +393,7 @@ static void draw_text_sprites(running_machine *machine, bitmap_t *bitmap,const r
 					sy = max_y - sy;	flipy = !flipy;
 				}
 
-				drawgfx_transpen(	bitmap,cliprect,machine->gfx[0],
+				drawgfx_transpen(	bitmap,cliprect,machine.gfx[0],
 							tile + (attr & 0x3)*0x100 + bank,
 							(attr >> 2) & 0xf,
 							flipx, flipy,
@@ -419,17 +419,17 @@ SCREEN_UPDATE( suna8 )
 
 #ifdef MAME_DEBUG
 #if TILEMAPS
-	if (input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen->machine, KEYCODE_X))
+	if (input_code_pressed(screen->machine(), KEYCODE_Z) || input_code_pressed(screen->machine(), KEYCODE_X))
 	{
-		suna8_state *state = screen->machine->driver_data<suna8_state>();
-		int max_tiles = screen->machine->region("gfx1")->bytes() / (0x400 * 0x20);
+		suna8_state *state = screen->machine().driver_data<suna8_state>();
+		int max_tiles = screen->machine().region("gfx1")->bytes() / (0x400 * 0x20);
 
-		if (input_code_pressed_once(screen->machine, KEYCODE_Q))	{ state->page--;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
-		if (input_code_pressed_once(screen->machine, KEYCODE_W))	{ state->page++;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
-		if (input_code_pressed_once(screen->machine, KEYCODE_E))	{ state->tiles--;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
-		if (input_code_pressed_once(screen->machine, KEYCODE_R))	{ state->tiles++;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
-		if (input_code_pressed_once(screen->machine, KEYCODE_A))	{ state->trombank--;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
-		if (input_code_pressed_once(screen->machine, KEYCODE_S))	{ state->trombank++;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
+		if (input_code_pressed_once(screen->machine(), KEYCODE_Q))	{ state->page--;	tilemap_mark_all_tiles_dirty_all(screen->machine());	}
+		if (input_code_pressed_once(screen->machine(), KEYCODE_W))	{ state->page++;	tilemap_mark_all_tiles_dirty_all(screen->machine());	}
+		if (input_code_pressed_once(screen->machine(), KEYCODE_E))	{ state->tiles--;	tilemap_mark_all_tiles_dirty_all(screen->machine());	}
+		if (input_code_pressed_once(screen->machine(), KEYCODE_R))	{ state->tiles++;	tilemap_mark_all_tiles_dirty_all(screen->machine());	}
+		if (input_code_pressed_once(screen->machine(), KEYCODE_A))	{ state->trombank--;	tilemap_mark_all_tiles_dirty_all(screen->machine());	}
+		if (input_code_pressed_once(screen->machine(), KEYCODE_S))	{ state->trombank++;	tilemap_mark_all_tiles_dirty_all(screen->machine());	}
 
 		state->rombank  &= 0xf;
 		state->page  &= (state->text_dim > 0)?3:7;
@@ -449,8 +449,8 @@ SCREEN_UPDATE( suna8 )
 #endif
 #endif
 	{
-		draw_normal_sprites(screen->machine ,bitmap,cliprect);
-		draw_text_sprites(screen->machine, bitmap,cliprect);
+		draw_normal_sprites(screen->machine() ,bitmap,cliprect);
+		draw_text_sprites(screen->machine(), bitmap,cliprect);
 	}
 	return 0;
 }

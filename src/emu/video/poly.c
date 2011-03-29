@@ -200,7 +200,7 @@ struct _poly_manager
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void **allocate_array(running_machine *machine, size_t *itemsize, UINT32 itemcount);
+static void **allocate_array(running_machine &machine, size_t *itemsize, UINT32 itemcount);
 static void *poly_item_callback(void *param, int threadid);
 static STATE_PRESAVE( poly_state_presave );
 
@@ -316,7 +316,7 @@ INLINE polygon_info *allocate_polygon(poly_manager *poly, int miny, int maxy)
     manager
 -------------------------------------------------*/
 
-poly_manager *poly_alloc(running_machine *machine, int max_polys, size_t extra_data_size, UINT8 flags)
+poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t extra_data_size, UINT8 flags)
 {
 	poly_manager *poly;
 
@@ -347,7 +347,7 @@ poly_manager *poly_alloc(running_machine *machine, int max_polys, size_t extra_d
 		poly->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
 
 	/* request a pre-save callback for synchronization */
-	machine->state().register_presave(poly_state_presave, poly);
+	machine.state().register_presave(poly_state_presave, poly);
 	return poly;
 }
 
@@ -1286,7 +1286,7 @@ int poly_zclip_if_less(int numverts, const poly_vertex *v, poly_vertex *outv, in
     allocate_array - allocate an array of pointers
 -------------------------------------------------*/
 
-static void **allocate_array(running_machine *machine, size_t *itemsize, UINT32 itemcount)
+static void **allocate_array(running_machine &machine, size_t *itemsize, UINT32 itemcount)
 {
 	void **ptrarray;
 	int itemnum;

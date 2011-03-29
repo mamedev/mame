@@ -62,7 +62,7 @@
 #define PERIOD_OF_555_MONOSTABLE(r,c)		attotime::from_nsec(PERIOD_OF_555_MONOSTABLE_NSEC(r,c))
 #define PERIOD_OF_555_ASTABLE(r1,r2,c)		attotime::from_nsec(PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c))
 
-#define TIMER_CALLBACK(name)			void name(running_machine *machine, void *ptr, int param)
+#define TIMER_CALLBACK(name)			void name(running_machine &machine, void *ptr, int param)
 
 
 
@@ -71,14 +71,14 @@
 //**************************************************************************
 
 // timer callbacks look like this
-typedef void (*timer_expired_func)(running_machine *machine, void *ptr, INT32 param);
+typedef void (*timer_expired_func)(running_machine &machine, void *ptr, INT32 param);
 
 // stub for when the ptr parameter points to a class
 template<class T, void (T::*func)(running_machine &machine, INT32 param)>
-void timer_expired_stub(running_machine *machine, void *ptr, INT32 param)
+void timer_expired_stub(running_machine &machine, void *ptr, INT32 param)
 {
 	T *target = reinterpret_cast<T *>(ptr);
-	(target->*func)(*machine, param);
+	(target->*func)(machine, param);
 }
 
 

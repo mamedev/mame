@@ -44,19 +44,19 @@
 
 static WRITE8_HANDLER( rom_bank_select_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 15);
+	memory_set_bank(space->machine(), "bank1", data & 15);
 }
 
 
 static MACHINE_START( crgolf )
 {
-	crgolf_state *state = machine->driver_data<crgolf_state>();
+	crgolf_state *state = machine.driver_data<crgolf_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	/* configure the banking */
-	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for save states */
@@ -70,7 +70,7 @@ static MACHINE_START( crgolf )
 
 static MACHINE_RESET( crgolf )
 {
-	crgolf_state *state = machine->driver_data<crgolf_state>();
+	crgolf_state *state = machine.driver_data<crgolf_state>();
 
 	state->port_select = 0;
 	state->main_to_sound_data = 0;
@@ -89,21 +89,21 @@ static MACHINE_RESET( crgolf )
 static READ8_HANDLER( switch_input_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "P1", "P2", "DSW", "UNUSED0", "UNUSED1" };
-	crgolf_state *state = space->machine->driver_data<crgolf_state>();
+	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 
-	return input_port_read(space->machine, portnames[state->port_select]);
+	return input_port_read(space->machine(), portnames[state->port_select]);
 }
 
 
 static READ8_HANDLER( analog_input_r )
 {
-	return ((input_port_read(space->machine, "STICK0") >> 4) | (input_port_read(space->machine, "STICK1") & 0xf0)) ^ 0x88;
+	return ((input_port_read(space->machine(), "STICK0") >> 4) | (input_port_read(space->machine(), "STICK1") & 0xf0)) ^ 0x88;
 }
 
 
 static WRITE8_HANDLER( switch_input_select_w )
 {
-	crgolf_state *state = space->machine->driver_data<crgolf_state>();
+	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 
 	if (!(data & 0x40)) state->port_select = 6;
 	if (!(data & 0x20)) state->port_select = 5;
@@ -130,7 +130,7 @@ static WRITE8_HANDLER( unknown_w )
 
 static TIMER_CALLBACK( main_to_sound_callback )
 {
-	crgolf_state *state = machine->driver_data<crgolf_state>();
+	crgolf_state *state = machine.driver_data<crgolf_state>();
 
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 	state->main_to_sound_data = param;
@@ -139,13 +139,13 @@ static TIMER_CALLBACK( main_to_sound_callback )
 
 static WRITE8_HANDLER( main_to_sound_w )
 {
-	space->machine->scheduler().synchronize(FUNC(main_to_sound_callback), data);
+	space->machine().scheduler().synchronize(FUNC(main_to_sound_callback), data);
 }
 
 
 static READ8_HANDLER( main_to_sound_r )
 {
-	crgolf_state *state = space->machine->driver_data<crgolf_state>();
+	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return state->main_to_sound_data;
@@ -161,7 +161,7 @@ static READ8_HANDLER( main_to_sound_r )
 
 static TIMER_CALLBACK( sound_to_main_callback )
 {
-	crgolf_state *state = machine->driver_data<crgolf_state>();
+	crgolf_state *state = machine.driver_data<crgolf_state>();
 
 	device_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 	state->sound_to_main_data = param;
@@ -170,13 +170,13 @@ static TIMER_CALLBACK( sound_to_main_callback )
 
 static WRITE8_HANDLER( sound_to_main_w )
 {
-	space->machine->scheduler().synchronize(FUNC(sound_to_main_callback), data);
+	space->machine().scheduler().synchronize(FUNC(sound_to_main_callback), data);
 }
 
 
 static READ8_HANDLER( sound_to_main_r )
 {
-	crgolf_state *state = space->machine->driver_data<crgolf_state>();
+	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 
 	device_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return state->sound_to_main_data;
@@ -192,12 +192,12 @@ static READ8_HANDLER( sound_to_main_r )
 
 static void vck_callback( device_t *device )
 {
-	crgolf_state *state = device->machine->driver_data<crgolf_state>();
+	crgolf_state *state = device->machine().driver_data<crgolf_state>();
 
 	/* only play back if we have data remaining */
 	if (state->sample_count != 0xff)
 	{
-		UINT8 data = device->machine->region("adpcm")->base()[state->sample_offset >> 1];
+		UINT8 data = device->machine().region("adpcm")->base()[state->sample_offset >> 1];
 
 		/* write the next nibble and advance */
 		msm5205_data_w(device, (data >> (4 * (~state->sample_offset & 1))) & 0x0f);
@@ -218,7 +218,7 @@ static void vck_callback( device_t *device )
 
 static WRITE8_DEVICE_HANDLER( crgolfhi_sample_w )
 {
-	crgolf_state *state = device->machine->driver_data<crgolf_state>();
+	crgolf_state *state = device->machine().driver_data<crgolf_state>();
 
 	switch (offset)
 	{
@@ -599,8 +599,8 @@ ROM_END
 
 static DRIVER_INIT( crgolfhi )
 {
-	device_t *msm = machine->device("msm");
-	machine->device("audiocpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*msm, 0xa000, 0xa003, FUNC(crgolfhi_sample_w));
+	device_t *msm = machine.device("msm");
+	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*msm, 0xa000, 0xa003, FUNC(crgolfhi_sample_w));
 }
 
 

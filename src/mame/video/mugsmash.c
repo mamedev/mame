@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/mugsmash.h"
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 
 	/* Each Sprite takes 16 bytes, 5 used? */
@@ -25,10 +25,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
     */
 
-	mugsmash_state *state = machine->driver_data<mugsmash_state>();
+	mugsmash_state *state = machine.driver_data<mugsmash_state>();
 	const UINT16 *source = state->spriteram;
 	const UINT16 *finish = source + 0x2000;
-	const gfx_element *gfx = machine->gfx[0];
+	const gfx_element *gfx = machine.gfx[0];
 
 	while (source < finish)
 	{
@@ -70,7 +70,7 @@ static TILE_GET_INFO( get_mugsmash_tile_info1 )
        f = flip-Y
     */
 
-	mugsmash_state *state = machine->driver_data<mugsmash_state>();
+	mugsmash_state *state = machine.driver_data<mugsmash_state>();
 	int tileno, colour, fx;
 
 	tileno = state->videoram1[tile_index * 2 + 1];
@@ -82,7 +82,7 @@ static TILE_GET_INFO( get_mugsmash_tile_info1 )
 
 WRITE16_HANDLER( mugsmash_videoram1_w )
 {
-	mugsmash_state *state = space->machine->driver_data<mugsmash_state>();
+	mugsmash_state *state = space->machine().driver_data<mugsmash_state>();
 
 	state->videoram1[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap1, offset / 2);
@@ -99,7 +99,7 @@ static TILE_GET_INFO( get_mugsmash_tile_info2 )
        f = flip-Y
     */
 
-	mugsmash_state *state = machine->driver_data<mugsmash_state>();
+	mugsmash_state *state = machine.driver_data<mugsmash_state>();
 	int tileno, colour, fx;
 
 	tileno = state->videoram2[tile_index * 2 + 1];
@@ -111,7 +111,7 @@ static TILE_GET_INFO( get_mugsmash_tile_info2 )
 
 WRITE16_HANDLER( mugsmash_videoram2_w )
 {
-	mugsmash_state *state = space->machine->driver_data<mugsmash_state>();
+	mugsmash_state *state = space->machine().driver_data<mugsmash_state>();
 
 	state->videoram2[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap2, offset / 2);
@@ -119,7 +119,7 @@ WRITE16_HANDLER( mugsmash_videoram2_w )
 
 WRITE16_HANDLER (mugsmash_reg_w)
 {
-	mugsmash_state *state = space->machine->driver_data<mugsmash_state>();
+	mugsmash_state *state = space->machine().driver_data<mugsmash_state>();
 
 	state->regs1[offset] = data;
 //  popmessage ("Regs %04x, %04x, %04x, %04x", mugsmash_regs1[0], mugsmash_regs1[1],mugsmash_regs1[2], mugsmash_regs1[3]);
@@ -143,7 +143,7 @@ WRITE16_HANDLER (mugsmash_reg_w)
 
 VIDEO_START( mugsmash )
 {
-	mugsmash_state *state = machine->driver_data<mugsmash_state>();
+	mugsmash_state *state = machine.driver_data<mugsmash_state>();
 
 	state->tilemap1 = tilemap_create(machine, get_mugsmash_tile_info1, tilemap_scan_rows, 16, 16, 32, 32);
 	tilemap_set_transparent_pen(state->tilemap1, 0);
@@ -153,10 +153,10 @@ VIDEO_START( mugsmash )
 
 SCREEN_UPDATE( mugsmash )
 {
-	mugsmash_state *state = screen->machine->driver_data<mugsmash_state>();
+	mugsmash_state *state = screen->machine().driver_data<mugsmash_state>();
 
 	tilemap_draw(bitmap, cliprect, state->tilemap2, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->tilemap1, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

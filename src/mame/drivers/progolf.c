@@ -78,7 +78,7 @@ public:
 
 static VIDEO_START( progolf )
 {
-	progolf_state *state = machine->driver_data<progolf_state>();
+	progolf_state *state = machine.driver_data<progolf_state>();
 	state->scrollx_hi = 0;
 	state->scrollx_lo = 0;
 
@@ -89,7 +89,7 @@ static VIDEO_START( progolf )
 
 static SCREEN_UPDATE( progolf )
 {
-	progolf_state *state = screen->machine->driver_data<progolf_state>();
+	progolf_state *state = screen->machine().driver_data<progolf_state>();
 	UINT8 *videoram = state->videoram;
 	int count,color,x,y,xi,yi;
 
@@ -104,9 +104,9 @@ static SCREEN_UPDATE( progolf )
 			{
 				int tile = videoram[count];
 
-				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,1,0,0,(256-x*8)+scroll,y*8);
+				drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tile,1,0,0,(256-x*8)+scroll,y*8);
 				/* wrap-around */
-				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,1,0,0,(256-x*8)+scroll-1024,y*8);
+				drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tile,1,0,0,(256-x*8)+scroll-1024,y*8);
 
 				count++;
 			}
@@ -128,7 +128,7 @@ static SCREEN_UPDATE( progolf )
 						color = state->fg_fb[(xi+yi*8)+count*0x40];
 
 						if((x+yi) <= cliprect->max_x && (256-y+xi) <= cliprect->max_y && color != 0)
-							*BITMAP_ADDR16(bitmap, x+yi, 256-y+xi) = screen->machine->pens[(color & 0x7)];
+							*BITMAP_ADDR16(bitmap, x+yi, 256-y+xi) = screen->machine().pens[(color & 0x7)];
 					}
 				}
 
@@ -142,7 +142,7 @@ static SCREEN_UPDATE( progolf )
 
 static WRITE8_HANDLER( progolf_charram_w )
 {
-	progolf_state *state = space->machine->driver_data<progolf_state>();
+	progolf_state *state = space->machine().driver_data<progolf_state>();
 	int i;
 	state->fbram[offset] = data;
 
@@ -165,7 +165,7 @@ static WRITE8_HANDLER( progolf_charram_w )
 
 static WRITE8_HANDLER( progolf_char_vregs_w )
 {
-	progolf_state *state = space->machine->driver_data<progolf_state>();
+	progolf_state *state = space->machine().driver_data<progolf_state>();
 	state->char_pen = data & 0x07;
 	state->gfx_switch = data & 0xf0;
 	state->char_pen_vreg = data & 0x30;
@@ -173,42 +173,42 @@ static WRITE8_HANDLER( progolf_char_vregs_w )
 
 static WRITE8_HANDLER( progolf_scrollx_lo_w )
 {
-	progolf_state *state = space->machine->driver_data<progolf_state>();
+	progolf_state *state = space->machine().driver_data<progolf_state>();
 	state->scrollx_lo = data;
 }
 
 static WRITE8_HANDLER( progolf_scrollx_hi_w )
 {
-	progolf_state *state = space->machine->driver_data<progolf_state>();
+	progolf_state *state = space->machine().driver_data<progolf_state>();
 	state->scrollx_hi = data;
 }
 
 static WRITE8_HANDLER( progolf_flip_screen_w )
 {
-	flip_screen_set(space->machine, data & 1);
+	flip_screen_set(space->machine(), data & 1);
 	if(data & 0xfe)
 		printf("$9600 with data = %02x used\n",data);
 }
 
 static WRITE8_HANDLER( audio_command_w )
 {
-	progolf_state *state = space->machine->driver_data<progolf_state>();
+	progolf_state *state = space->machine().driver_data<progolf_state>();
 	state->sound_cmd = data;
-	cputag_set_input_line(space->machine, "audiocpu", 0, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, ASSERT_LINE);
 }
 
 static READ8_HANDLER( audio_command_r )
 {
-	progolf_state *state = space->machine->driver_data<progolf_state>();
-	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
+	progolf_state *state = space->machine().driver_data<progolf_state>();
+	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
 	return state->sound_cmd;
 }
 
 static READ8_HANDLER( progolf_videoram_r )
 {
-	progolf_state *state = space->machine->driver_data<progolf_state>();
+	progolf_state *state = space->machine().driver_data<progolf_state>();
 	UINT8 *videoram = state->videoram;
-	UINT8 *gfx_rom = space->machine->region("gfx1")->base();
+	UINT8 *gfx_rom = space->machine().region("gfx1")->base();
 
 	if (offset >= 0x0800)
 	{
@@ -234,7 +234,7 @@ static READ8_HANDLER( progolf_videoram_r )
 
 static WRITE8_HANDLER( progolf_videoram_w )
 {
-	progolf_state *state = space->machine->driver_data<progolf_state>();
+	progolf_state *state = space->machine().driver_data<progolf_state>();
 	UINT8 *videoram = state->videoram;
 	//if(state->gfx_switch & 0x40)
 	videoram[offset] = data;
@@ -268,7 +268,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( progolf )
@@ -426,7 +426,7 @@ static PALETTE_INIT( progolf )
 {
 	int i;
 
-	for (i = 0;i < machine->total_colors();i++)
+	for (i = 0;i < machine.total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -536,8 +536,8 @@ ROM_END
 static DRIVER_INIT( progolf )
 {
 	int A;
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine->region("maincpu")->base();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine.region("maincpu")->base();
 	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 
 	space->set_decrypted_region(0x0000,0xffff, decrypted);
@@ -550,8 +550,8 @@ static DRIVER_INIT( progolf )
 static DRIVER_INIT( progolfa )
 {
 	int A;
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine->region("maincpu")->base();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine.region("maincpu")->base();
 	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 
 	space->set_decrypted_region(0x0000,0xffff, decrypted);

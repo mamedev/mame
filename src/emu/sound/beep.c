@@ -92,7 +92,7 @@ static DEVICE_START( beep )
 {
 	beep_state *pBeep = get_safe_token(device);
 
-	pBeep->stream = device->machine->sound().stream_alloc(*device, 0, 1, BEEP_RATE, pBeep, beep_sound_update );
+	pBeep->stream = device->machine().sound().stream_alloc(*device, 0, 1, BEEP_RATE, pBeep, beep_sound_update );
 	pBeep->enable = 0;
 	pBeep->frequency = 3250;
 	pBeep->incr = 0;

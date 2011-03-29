@@ -11,8 +11,8 @@
 #include "includes/nbmj9195.h"
 
 
-static void nbmj9195_vramflip(running_machine *machine, int vram);
-static void nbmj9195_gfxdraw(running_machine *machine, int vram);
+static void nbmj9195_vramflip(running_machine &machine, int vram);
+static void nbmj9195_gfxdraw(running_machine &machine, int vram);
 
 
 /******************************************************************************
@@ -21,13 +21,13 @@ static void nbmj9195_gfxdraw(running_machine *machine, int vram);
 ******************************************************************************/
 READ8_HANDLER( nbmj9195_palette_r )
 {
-	nbmj9195_state *state = space->machine->driver_data<nbmj9195_state>();
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
 	return state->palette[offset];
 }
 
 WRITE8_HANDLER( nbmj9195_palette_w )
 {
-	nbmj9195_state *state = space->machine->driver_data<nbmj9195_state>();
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
 	int r, g, b;
 
 	state->palette[offset] = data;
@@ -40,19 +40,19 @@ WRITE8_HANDLER( nbmj9195_palette_w )
 		g = ((state->palette[offset + 0] & 0xf0) >> 4);
 		b = ((state->palette[offset + 1] & 0x0f) >> 0);
 
-		palette_set_color_rgb(space->machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+		palette_set_color_rgb(space->machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
 READ8_HANDLER( nbmj9195_nb22090_palette_r )
 {
-	nbmj9195_state *state = space->machine->driver_data<nbmj9195_state>();
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
 	return state->nb22090_palette[offset];
 }
 
 WRITE8_HANDLER( nbmj9195_nb22090_palette_w )
 {
-	nbmj9195_state *state = space->machine->driver_data<nbmj9195_state>();
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
 	int r, g, b;
 	int offs_h, offs_l;
 
@@ -65,7 +65,7 @@ WRITE8_HANDLER( nbmj9195_nb22090_palette_w )
 	g = state->nb22090_palette[(0x100 + (offs_h * 0x300) + offs_l)];
 	b = state->nb22090_palette[(0x200 + (offs_h * 0x300) + offs_l)];
 
-	palette_set_color(space->machine, ((offs_h * 0x100) + offs_l), MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), ((offs_h * 0x100) + offs_l), MAKE_RGB(r, g, b));
 }
 
 /******************************************************************************
@@ -74,9 +74,9 @@ WRITE8_HANDLER( nbmj9195_nb22090_palette_w )
 ******************************************************************************/
 static int nbmj9195_blitter_r(address_space *space, int offset, int vram)
 {
-	nbmj9195_state *state = space->machine->driver_data<nbmj9195_state>();
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
 	int ret;
-	UINT8 *GFXROM = space->machine->region("gfx1")->base();
+	UINT8 *GFXROM = space->machine().region("gfx1")->base();
 
 	switch (offset)
 	{
@@ -90,7 +90,7 @@ static int nbmj9195_blitter_r(address_space *space, int offset, int vram)
 
 static void nbmj9195_blitter_w(address_space *space, int offset, int data, int vram)
 {
-	nbmj9195_state *state = space->machine->driver_data<nbmj9195_state>();
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
 	int new_line;
 
 	switch (offset)
@@ -103,11 +103,11 @@ static void nbmj9195_blitter_w(address_space *space, int offset, int data, int v
 				//  if (data & 0x20) popmessage("Unknown GFX Flag!! (0x20)");
 					state->flipscreen[vram] = (data & 0x40) ? 0 : 1;
 					state->dispflag[vram] = (data & 0x80) ? 1 : 0;
-					nbmj9195_vramflip(space->machine, vram);
+					nbmj9195_vramflip(space->machine(), vram);
 					break;
 		case 0x01:	state->scrollx[vram] = (state->scrollx[vram] & 0x0100) | data; break;
 		case 0x02:	state->scrollx[vram] = (state->scrollx[vram] & 0x00ff) | ((data << 8) & 0x0100);
-					new_line = space->machine->primary_screen->vpos();
+					new_line = space->machine().primary_screen->vpos();
 					if (state->flipscreen[vram])
 					{
 						for ( ; state->scanline[vram] < new_line; state->scanline[vram]++)
@@ -130,7 +130,7 @@ static void nbmj9195_blitter_w(address_space *space, int offset, int data, int v
 		case 0x0b:	state->blitter_destx[vram] = (state->blitter_destx[vram]  & 0x00ff) | (data << 8); break;
 		case 0x0c:	state->blitter_desty[vram] = (state->blitter_desty[vram]  & 0xff00) | data; break;
 		case 0x0d:	state->blitter_desty[vram] = (state->blitter_desty[vram]  & 0x00ff) | (data << 8);
-					nbmj9195_gfxdraw(space->machine, vram);
+					nbmj9195_gfxdraw(space->machine(), vram);
 					break;
 		default:	break;
 	}
@@ -138,19 +138,19 @@ static void nbmj9195_blitter_w(address_space *space, int offset, int data, int v
 
 void nbmj9195_clutsel_w(address_space *space, int data)
 {
-	nbmj9195_state *state = space->machine->driver_data<nbmj9195_state>();
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
 	state->clutsel = data;
 }
 
 static void nbmj9195_clut_w(address_space *space, int offset, int data, int vram)
 {
-	nbmj9195_state *state = space->machine->driver_data<nbmj9195_state>();
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
 	state->clut[vram][((state->clutsel & 0xff) * 0x10) + (offset & 0x0f)] = data;
 }
 
 void nbmj9195_gfxflag2_w(address_space *space, int data)
 {
-	nbmj9195_state *state = space->machine->driver_data<nbmj9195_state>();
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
 	state->gfxflag2 = data;
 }
 
@@ -158,13 +158,13 @@ void nbmj9195_gfxflag2_w(address_space *space, int data)
 
 
 ******************************************************************************/
-static void nbmj9195_vramflip(running_machine *machine, int vram)
+static void nbmj9195_vramflip(running_machine &machine, int vram)
 {
-	nbmj9195_state *state = machine->driver_data<nbmj9195_state>();
+	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
 	int x, y;
 	UINT16 color1, color2;
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	if (state->flipscreen[vram] == state->flipscreen_old[vram]) return;
 
@@ -197,24 +197,24 @@ static void nbmj9195_vramflip(running_machine *machine, int vram)
 	state->screen_refresh = 1;
 }
 
-static void update_pixel(running_machine *machine, int vram, int x, int y)
+static void update_pixel(running_machine &machine, int vram, int x, int y)
 {
-	nbmj9195_state *state = machine->driver_data<nbmj9195_state>();
-	UINT16 color = state->videoram[vram][(y * machine->primary_screen->width()) + x];
+	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
+	UINT16 color = state->videoram[vram][(y * machine.primary_screen->width()) + x];
 	*BITMAP_ADDR16(state->tmpbitmap[vram], y, x) = color;
 }
 
 static TIMER_CALLBACK( blitter_timer_callback )
 {
-	nbmj9195_state *state = machine->driver_data<nbmj9195_state>();
+	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
 	state->nb19010_busyflag = 1;
 }
 
-static void nbmj9195_gfxdraw(running_machine *machine, int vram)
+static void nbmj9195_gfxdraw(running_machine &machine, int vram)
 {
-	nbmj9195_state *state = machine->driver_data<nbmj9195_state>();
-	UINT8 *GFX = machine->region("gfx1")->base();
-	int width = machine->primary_screen->width();
+	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
+	UINT8 *GFX = machine.region("gfx1")->base();
+	int width = machine.primary_screen->width();
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -260,7 +260,7 @@ static void nbmj9195_gfxdraw(running_machine *machine, int vram)
 		skipy = -1;
 	}
 
-	gfxlen = machine->region("gfx1")->bytes();
+	gfxlen = machine.region("gfx1")->bytes();
 	gfxaddr = ((state->blitter_src_addr[vram] + 2) & 0x00ffffff);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
@@ -368,7 +368,7 @@ static void nbmj9195_gfxdraw(running_machine *machine, int vram)
 	state->nb19010_busyflag = 0;
 
 	/* 1650ns per count */
-	machine->scheduler().timer_set(attotime::from_nsec(state->nb19010_busyctr * 1650), FUNC(blitter_timer_callback));
+	machine.scheduler().timer_set(attotime::from_nsec(state->nb19010_busyctr * 1650), FUNC(blitter_timer_callback));
 }
 
 /******************************************************************************
@@ -390,11 +390,11 @@ WRITE8_HANDLER( nbmj9195_clut_1_w )		{ nbmj9195_clut_w(space, offset, data, 1); 
 ******************************************************************************/
 VIDEO_START( nbmj9195_1layer )
 {
-	nbmj9195_state *state = machine->driver_data<nbmj9195_state>();
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
-	state->tmpbitmap[0] = machine->primary_screen->alloc_compatible_bitmap();
+	state->tmpbitmap[0] = machine.primary_screen->alloc_compatible_bitmap();
 	state->videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
 	state->palette = auto_alloc_array(machine, UINT8, 0x200);
 	state->clut[0] = auto_alloc_array(machine, UINT8, 0x1000);
@@ -405,12 +405,12 @@ VIDEO_START( nbmj9195_1layer )
 
 VIDEO_START( nbmj9195_2layer )
 {
-	nbmj9195_state *state = machine->driver_data<nbmj9195_state>();
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
-	state->tmpbitmap[0] = machine->primary_screen->alloc_compatible_bitmap();
-	state->tmpbitmap[1] = machine->primary_screen->alloc_compatible_bitmap();
+	state->tmpbitmap[0] = machine.primary_screen->alloc_compatible_bitmap();
+	state->tmpbitmap[1] = machine.primary_screen->alloc_compatible_bitmap();
 	state->videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
 	state->videoram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
 	state->palette = auto_alloc_array(machine, UINT8, 0x200);
@@ -423,12 +423,12 @@ VIDEO_START( nbmj9195_2layer )
 
 VIDEO_START( nbmj9195_nb22090 )
 {
-	nbmj9195_state *state = machine->driver_data<nbmj9195_state>();
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
-	state->tmpbitmap[0] = machine->primary_screen->alloc_compatible_bitmap();
-	state->tmpbitmap[1] = machine->primary_screen->alloc_compatible_bitmap();
+	state->tmpbitmap[0] = machine.primary_screen->alloc_compatible_bitmap();
+	state->tmpbitmap[1] = machine.primary_screen->alloc_compatible_bitmap();
 	state->videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
 	state->videoram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
 	state->videoworkram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
@@ -447,7 +447,7 @@ VIDEO_START( nbmj9195_nb22090 )
 ******************************************************************************/
 SCREEN_UPDATE( nbmj9195 )
 {
-	nbmj9195_state *state = screen->machine->driver_data<nbmj9195_state>();
+	nbmj9195_state *state = screen->machine().driver_data<nbmj9195_state>();
 	int i;
 	int x, y;
 	int scrolly[2];
@@ -462,10 +462,10 @@ SCREEN_UPDATE( nbmj9195 )
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
 			{
-				update_pixel(screen->machine, 0, x, y);
+				update_pixel(screen->machine(), 0, x, y);
 
 				if (state->gfxdraw_mode)
-					update_pixel(screen->machine, 1, x, y);
+					update_pixel(screen->machine(), 1, x, y);
 			}
 	}
 

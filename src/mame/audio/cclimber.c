@@ -15,19 +15,19 @@ static INT16 *samplebuf;	/* buffer to decode samples at run time */
 
 static SAMPLES_START( cclimber_sh_start )
 {
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	samplebuf = 0;
-	if (machine->region("samples")->base())
-		samplebuf = auto_alloc_array(machine, INT16, 2 * machine->region("samples")->bytes());
+	if (machine.region("samples")->base())
+		samplebuf = auto_alloc_array(machine, INT16, 2 * machine.region("samples")->bytes());
 }
 
 
-static void cclimber_play_sample(running_machine *machine, int start,int freq,int volume)
+static void cclimber_play_sample(running_machine &machine, int start,int freq,int volume)
 {
 	int len;
-	int romlen = machine->region("samples")->bytes();
-	const UINT8 *rom = machine->region("samples")->base();
-	device_t *samples = machine->device("samples");
+	int romlen = machine.region("samples")->bytes();
+	const UINT8 *rom = machine.region("samples")->base();
+	device_t *samples = machine.device("samples");
 
 
 	if (!rom) return;
@@ -74,7 +74,7 @@ WRITE8_HANDLER( cclimber_sample_trigger_w )
 	if (data == 0)
 		return;
 
-	cclimber_play_sample(space->machine, 32 * sample_num,sample_freq,sample_volume);
+	cclimber_play_sample(space->machine(), 32 * sample_num,sample_freq,sample_volume);
 }
 
 

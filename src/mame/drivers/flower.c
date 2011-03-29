@@ -78,30 +78,30 @@ CHIP #  POSITION   TYPE
 
 static WRITE8_HANDLER( flower_irq_ack )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( sn_irq_enable_w )
 {
-	flower_state *state = space->machine->driver_data<flower_state>();
+	flower_state *state = space->machine().driver_data<flower_state>();
 	*state->sn_irq_enable = data;
 
-	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( sn_irq )
 {
-	flower_state *state = device->machine->driver_data<flower_state>();
+	flower_state *state = device->machine().driver_data<flower_state>();
 	if ((*state->sn_irq_enable & 1) == 1)
 		device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	flower_state *state = space->machine->driver_data<flower_state>();
+	flower_state *state = space->machine().driver_data<flower_state>();
 	soundlatch_w(space, 0, data);
 	if ((*state->sn_nmi_enable & 1) == 1)
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( flower_cpu1_2, AS_PROGRAM, 8 )

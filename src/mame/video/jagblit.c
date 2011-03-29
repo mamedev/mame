@@ -130,7 +130,7 @@
 	} while (0)
 #endif
 
-static void FUNCNAME(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags)
+static void FUNCNAME(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags)
 {
 	UINT32 a1_base = blitter_regs[A1_BASE];
 	INT32 a1_pitch = (A1FIXED & 3) ^ ((A1FIXED & 2) >> 1);
@@ -195,7 +195,7 @@ static void FUNCNAME(running_machine *machine, UINT32 command, UINT32 a1flags, U
 	{
 		if (LOG_BAD_BLITS)
 		{
-		logerror("%s:Blit!\n", machine->describe_context());
+		logerror("%s:Blit!\n", machine.describe_context());
 		logerror("  a1_base  = %08X\n", a1_base);
 		logerror("  a2_base  = %08X\n", a2_base);
 		}
@@ -275,7 +275,7 @@ static void FUNCNAME(running_machine *machine, UINT32 command, UINT32 a1flags, U
 
 	if (LOG_BLITS)
 	{
-	logerror("%s:Blit!\n", machine->describe_context());
+	logerror("%s:Blit!\n", machine.describe_context());
 	logerror("  a1_base  = %08X\n", a1_base);
 	logerror("  a1_pitch = %d\n", a1_pitch);
 	logerror("  a1_psize = %d\n", 1 << ((A1FIXED >> 3) & 7));

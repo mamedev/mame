@@ -12,7 +12,7 @@
 
 
 static void mjsikaku_vramflip(nbmj8688_state *state);
-static void mbmj8688_gfxdraw(running_machine *machine, int gfxtype);
+static void mbmj8688_gfxdraw(running_machine &machine, int gfxtype);
 
 
 /* the blitter can copy data both in "direct" mode, where every byte of the source
@@ -105,7 +105,7 @@ PALETTE_INIT( mbmj8688_16bit )
 
 WRITE8_HANDLER( nbmj8688_clut_w )
 {
-	nbmj8688_state *state = space->machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
 	state->clut[offset] = (data ^ 0xff);
 }
 
@@ -116,7 +116,7 @@ WRITE8_HANDLER( nbmj8688_clut_w )
 
 WRITE8_HANDLER( nbmj8688_blitter_w )
 {
-	nbmj8688_state *state = space->machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
 	switch (offset)
 	{
 		case 0x00:	state->blitter_src_addr = (state->blitter_src_addr & 0xff00) | data; break;
@@ -126,7 +126,7 @@ WRITE8_HANDLER( nbmj8688_blitter_w )
 		case 0x04:	state->blitter_sizex = data; break;
 		case 0x05:	state->blitter_sizey = data;
 					/* writing here also starts the blit */
-					mbmj8688_gfxdraw(space->machine, state->mjsikaku_gfxmode);
+					mbmj8688_gfxdraw(space->machine(), state->mjsikaku_gfxmode);
 					break;
 		case 0x06:	state->blitter_direction_x = (data & 0x01) ? 1 : 0;
 					state->blitter_direction_y = (data & 0x02) ? 1 : 0;
@@ -140,7 +140,7 @@ WRITE8_HANDLER( nbmj8688_blitter_w )
 
 WRITE8_HANDLER( mjsikaku_gfxflag2_w )
 {
-	nbmj8688_state *state = space->machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
 	state->mjsikaku_gfxflag2 = data;
 
 	if (nb1413m3_type == NB1413M3_SEIHAM
@@ -156,20 +156,20 @@ WRITE8_HANDLER( mjsikaku_gfxflag2_w )
 
 static WRITE8_HANDLER( mjsikaku_gfxflag3_w )
 {
-	nbmj8688_state *state = space->machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
 	state->mjsikaku_gfxflag3 = (data & 0xe0);
 }
 
 WRITE8_HANDLER( mjsikaku_scrolly_w )
 {
-	nbmj8688_state *state = space->machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
 	state->mjsikaku_scrolly = data;
 }
 
 WRITE8_HANDLER( mjsikaku_romsel_w )
 {
-	nbmj8688_state *state = space->machine->driver_data<nbmj8688_state>();
-	int gfxlen = space->machine->region("gfx1")->bytes();
+	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
+	int gfxlen = space->machine().region("gfx1")->bytes();
 	state->mjsikaku_gfxrom = (data & 0x0f);
 
 	if ((state->mjsikaku_gfxrom << 17) > (gfxlen - 1))
@@ -183,8 +183,8 @@ WRITE8_HANDLER( mjsikaku_romsel_w )
 
 WRITE8_HANDLER( secolove_romsel_w )
 {
-	nbmj8688_state *state = space->machine->driver_data<nbmj8688_state>();
-	int gfxlen = space->machine->region("gfx1")->bytes();
+	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
+	int gfxlen = space->machine().region("gfx1")->bytes();
 	state->mjsikaku_gfxrom = ((data & 0xc0) >> 4) + (data & 0x03);
 	mjsikaku_gfxflag2_w(space, 0, data);
 
@@ -199,8 +199,8 @@ WRITE8_HANDLER( secolove_romsel_w )
 
 WRITE8_HANDLER( crystalg_romsel_w )
 {
-	nbmj8688_state *state = space->machine->driver_data<nbmj8688_state>();
-	int gfxlen = space->machine->region("gfx1")->bytes();
+	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
+	int gfxlen = space->machine().region("gfx1")->bytes();
 	state->mjsikaku_gfxrom = (data & 0x03);
 	mjsikaku_gfxflag2_w(space, 0, data);
 
@@ -215,8 +215,8 @@ WRITE8_HANDLER( crystalg_romsel_w )
 
 WRITE8_HANDLER( seiha_romsel_w )
 {
-	nbmj8688_state *state = space->machine->driver_data<nbmj8688_state>();
-	int gfxlen = space->machine->region("gfx1")->bytes();
+	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
+	int gfxlen = space->machine().region("gfx1")->bytes();
 	state->mjsikaku_gfxrom = (data & 0x1f);
 	mjsikaku_gfxflag3_w(space, 0, data);
 
@@ -281,10 +281,10 @@ static TIMER_CALLBACK( blitter_timer_callback )
 	nb1413m3_busyflag = 1;
 }
 
-static void mbmj8688_gfxdraw(running_machine *machine, int gfxtype)
+static void mbmj8688_gfxdraw(running_machine &machine, int gfxtype)
 {
-	nbmj8688_state *state = machine->driver_data<nbmj8688_state>();
-	UINT8 *GFX = machine->region("gfx1")->base();
+	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
+	UINT8 *GFX = machine.region("gfx1")->base();
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -327,7 +327,7 @@ static void mbmj8688_gfxdraw(running_machine *machine, int gfxtype)
 		skipy = -1;
 	}
 
-	gfxlen = machine->region("gfx1")->bytes();
+	gfxlen = machine.region("gfx1")->bytes();
 	gfxaddr = (state->mjsikaku_gfxrom << 17) + (state->blitter_src_addr << 1);
 //popmessage("ADDR:%08X DX:%03d DY:%03d SX:%03d SY:%03d", gfxaddr, startx, starty, sizex, sizey);
 //if (state->blitter_direction_x|state->blitter_direction_y) popmessage("ADDR:%08X FX:%01d FY:%01d", gfxaddr, state->blitter_direction_x, state->blitter_direction_y);
@@ -535,9 +535,9 @@ static void mbmj8688_gfxdraw(running_machine *machine, int gfxtype)
 	nb1413m3_busyflag = 0;
 
 	if (gfxtype == GFXTYPE_8BIT)
-		machine->scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, FUNC(blitter_timer_callback));
+		machine.scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, FUNC(blitter_timer_callback));
 	else
-		machine->scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, FUNC(blitter_timer_callback));
+		machine.scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, FUNC(blitter_timer_callback));
 }
 
 
@@ -546,10 +546,10 @@ static void mbmj8688_gfxdraw(running_machine *machine, int gfxtype)
 
 ******************************************************************************/
 
-static void common_video_start(running_machine *machine)
+static void common_video_start(running_machine &machine)
 {
-	nbmj8688_state *state = machine->driver_data<nbmj8688_state>();
-	state->mjsikaku_tmpbitmap = auto_bitmap_alloc(machine, 512, 256, machine->primary_screen->format());
+	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
+	state->mjsikaku_tmpbitmap = auto_bitmap_alloc(machine, 512, 256, machine.primary_screen->format());
 	state->mjsikaku_videoram = auto_alloc_array_clear(machine, UINT16, 512 * 256);
 	state->clut = auto_alloc_array(machine, UINT8, 0x20);
 
@@ -558,42 +558,42 @@ static void common_video_start(running_machine *machine)
 
 VIDEO_START( mbmj8688_8bit )
 {
-	nbmj8688_state *state = machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
 	state->mjsikaku_gfxmode = GFXTYPE_8BIT;
 	common_video_start(machine);
 }
 
 VIDEO_START( mbmj8688_hybrid_12bit )
 {
-	nbmj8688_state *state = machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
 	state->mjsikaku_gfxmode = GFXTYPE_HYBRID_12BIT;
 	common_video_start(machine);
 }
 
 VIDEO_START( mbmj8688_pure_12bit )
 {
-	nbmj8688_state *state = machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
 	state->mjsikaku_gfxmode = GFXTYPE_PURE_12BIT;
 	common_video_start(machine);
 }
 
 VIDEO_START( mbmj8688_hybrid_16bit )
 {
-	nbmj8688_state *state = machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
 	state->mjsikaku_gfxmode = GFXTYPE_HYBRID_16BIT;
 	common_video_start(machine);
 }
 
 VIDEO_START( mbmj8688_pure_16bit )
 {
-	nbmj8688_state *state = machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
 	state->mjsikaku_gfxmode = GFXTYPE_PURE_16BIT;
 	common_video_start(machine);
 }
 
 VIDEO_START( mbmj8688_pure_16bit_LCD )
 {
-	nbmj8688_state *state = machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
 	state->mjsikaku_gfxmode = GFXTYPE_PURE_16BIT;
 
 	state->HD61830B_ram[0] = auto_alloc_array(machine, UINT8, 0x10000);
@@ -612,13 +612,13 @@ Hitachi HD61830B LCD controller.
 
 static void nbmj8688_HD61830B_instr_w(address_space *space,int offset,int data,int chip)
 {
-	nbmj8688_state *state = space->machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
 	state->HD61830B_instr[chip] = data;
 }
 
 static void nbmj8688_HD61830B_data_w(address_space *space,int offset,int data,int chip)
 {
-	nbmj8688_state *state = space->machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
 	switch (state->HD61830B_instr[chip])
 	{
 		case 0x0a:	// set cursor address (low order)
@@ -678,7 +678,7 @@ WRITE8_HANDLER( nbmj8688_HD61830B_both_data_w )
 
 SCREEN_UPDATE( mbmj8688 )
 {
-	nbmj8688_state *state = screen->machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = screen->machine().driver_data<nbmj8688_state>();
 	int x, y;
 
 	if (state->mjsikaku_screen_refresh)
@@ -712,7 +712,7 @@ SCREEN_UPDATE( mbmj8688 )
 
 SCREEN_UPDATE( mbmj8688_lcd0 )
 {
-	nbmj8688_state *state = screen->machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = screen->machine().driver_data<nbmj8688_state>();
 	int x, y, b;
 
 	for (y = 0;y < 64;y++)
@@ -728,7 +728,7 @@ SCREEN_UPDATE( mbmj8688_lcd0 )
 
 SCREEN_UPDATE( mbmj8688_lcd1 )
 {
-	nbmj8688_state *state = screen->machine->driver_data<nbmj8688_state>();
+	nbmj8688_state *state = screen->machine().driver_data<nbmj8688_state>();
 	int x, y, b;
 
 	for (y = 0;y < 64;y++)

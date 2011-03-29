@@ -54,7 +54,7 @@ public:
 /* CGLayer */
 static WRITE32_HANDLER( igs_cg_videoram_w )
 {
-	igs_m027_state *state = space->machine->driver_data<igs_m027_state>();
+	igs_m027_state *state = space->machine().driver_data<igs_m027_state>();
 	COMBINE_DATA(&state->igs_cg_videoram[offset]);
 	//if(data!=0)
 	logerror("PC(%08X) CG @%x = %x!\n",cpu_get_pc(space->cpu),offset ,state->igs_cg_videoram[offset]);
@@ -98,7 +98,7 @@ static WRITE32_HANDLER( igs_cg_videoram_w )
 /* TX Layer */
 static WRITE32_HANDLER( igs_tx_videoram_w )
 {
-	igs_m027_state *state = space->machine->driver_data<igs_m027_state>();
+	igs_m027_state *state = space->machine().driver_data<igs_m027_state>();
 	COMBINE_DATA(&state->igs_tx_videoram[offset]);
 	tilemap_mark_tile_dirty(state->igs_tx_tilemap,offset);
 	//if(data!=0)
@@ -107,7 +107,7 @@ static WRITE32_HANDLER( igs_tx_videoram_w )
 
 static TILE_GET_INFO( get_tx_tilemap_tile_info )
 {
-	igs_m027_state *state = machine->driver_data<igs_m027_state>();
+	igs_m027_state *state = machine.driver_data<igs_m027_state>();
 	//ppppppppNNNNNNNN
 	int tileno,colour;
 	tileno = state->igs_tx_videoram[tile_index] & 0xffff;
@@ -119,7 +119,7 @@ static TILE_GET_INFO( get_tx_tilemap_tile_info )
 /* BG Layer */
 static WRITE32_HANDLER( igs_bg_videoram_w )
 {
-	igs_m027_state *state = space->machine->driver_data<igs_m027_state>();
+	igs_m027_state *state = space->machine().driver_data<igs_m027_state>();
 	COMBINE_DATA(&state->igs_bg_videoram[offset]);
 	tilemap_mark_tile_dirty(state->igs_bg_tilemap,offset);
 	//if(data!=0)
@@ -128,7 +128,7 @@ static WRITE32_HANDLER( igs_bg_videoram_w )
 
 static TILE_GET_INFO( get_bg_tilemap_tile_info )
 {
-	igs_m027_state *state = machine->driver_data<igs_m027_state>();
+	igs_m027_state *state = machine.driver_data<igs_m027_state>();
 	//ppppppppNNNNNNNN
 	int tileno,colour;
 	tileno = state->igs_bg_videoram[tile_index] & 0xffff;
@@ -141,11 +141,11 @@ static TILE_GET_INFO( get_bg_tilemap_tile_info )
 /* Pallete Layer */
 static WRITE32_HANDLER( igs_pallete32_w )
 {
-	igs_m027_state *state = space->machine->driver_data<igs_m027_state>();
-	space->machine->generic.paletteram.u16=(UINT16 *)state->igs_pallete32;
+	igs_m027_state *state = space->machine().driver_data<igs_m027_state>();
+	space->machine().generic.paletteram.u16=(UINT16 *)state->igs_pallete32;
 	COMBINE_DATA(&state->igs_pallete32[offset]);
-	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2,space->machine->generic.paletteram.u16[offset*2],0);
-	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2+1,space->machine->generic.paletteram.u16[offset*2+1],0);
+	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2,space->machine().generic.paletteram.u16[offset*2],0);
+	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2+1,space->machine().generic.paletteram.u16[offset*2+1],0);
 	//if(data!=0)
 	//fprintf(stdout,"PALLETE RAM OFFSET %x ,data %x!\n",offset ,state->igs_pallete32[offset]);
 }
@@ -154,7 +154,7 @@ static WRITE32_HANDLER( igs_pallete32_w )
 
 static VIDEO_START(igs_majhong)
 {
-	igs_m027_state *state = machine->driver_data<igs_m027_state>();
+	igs_m027_state *state = machine.driver_data<igs_m027_state>();
 	state->igs_tx_tilemap= tilemap_create(machine, get_tx_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
 	tilemap_set_transparent_pen(state->igs_tx_tilemap,15);
 	state->igs_bg_tilemap= tilemap_create(machine, get_bg_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
@@ -165,9 +165,9 @@ static VIDEO_START(igs_majhong)
 
 static SCREEN_UPDATE(igs_majhong)
 {
-	igs_m027_state *state = screen->machine->driver_data<igs_m027_state>();
+	igs_m027_state *state = screen->machine().driver_data<igs_m027_state>();
 	//??????????
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
 	//??????
 	tilemap_draw(bitmap,cliprect,state->igs_bg_tilemap,0,0);
@@ -242,11 +242,11 @@ static const UINT8 sdwx_tab[] =
 	0x12,0x56,0x97,0x26,0x1D,0x5F,0xA7,0xF8,0x89,0x3F,0x14,0x36,0x72,0x3B,0x48,0x7B,
 	0xF1,0xED,0x72,0xB7,0x7A,0x56,0x05,0xDE,0x7B,0x27,0x6D,0xCF,0x33,0x4C,0x14,0x86,
 };
-static void sdwx_decrypt(running_machine *machine)
+static void sdwx_decrypt(running_machine &machine)
 {
 
 	int i;
-	UINT16 *src = (UINT16 *) machine->region("user1")->base();
+	UINT16 *src = (UINT16 *) machine.region("user1")->base();
 
 	int rom_size = 0x80000;
 
@@ -287,11 +287,11 @@ static void sdwx_decrypt(running_machine *machine)
 
 
 
-static void sdwx_gfx_decrypt(running_machine *machine)
+static void sdwx_gfx_decrypt(running_machine &machine)
 {
 	int i;
 	unsigned rom_size = 0x80000;
-	UINT8 *src = (UINT8 *) (machine->region("gfx1")->base());
+	UINT8 *src = (UINT8 *) (machine.region("gfx1")->base());
 	UINT8 *result_data = auto_alloc_array(machine, UINT8, rom_size);
 
 	for (i=0; i<rom_size; i++)

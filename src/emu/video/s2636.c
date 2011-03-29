@@ -324,7 +324,7 @@ WRITE8_DEVICE_HANDLER( s2636_work_ram_w )
 		const s2636_interface *intf = get_interface(device);
 		if ( intf->sound && *intf->sound )
 		{
-			s2636_soundport_w(device->machine->device(intf->sound), 0, data);
+			s2636_soundport_w(device->machine().device(intf->sound), 0, data);
 		}
 	}
 
@@ -351,7 +351,7 @@ static DEVICE_START( s2636 )
 {
 	s2636_state *s2636 = get_safe_token(device);
 	const s2636_interface *intf = get_interface(device);
-	screen_device *screen = downcast<screen_device *>(device->machine->device(intf->screen));
+	screen_device *screen = downcast<screen_device *>(device->machine().device(intf->screen));
 	int width = screen->width();
 	int height = screen->height();
 
@@ -359,9 +359,9 @@ static DEVICE_START( s2636 )
 	s2636->x_offset = intf->x_offset;
 	s2636->y_offset = intf->y_offset;
 
-	s2636->work_ram = auto_alloc_array_clear(device->machine, UINT8, intf->work_ram_size);
-	s2636->bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
-	s2636->collision_bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
+	s2636->work_ram = auto_alloc_array_clear(device->machine(), UINT8, intf->work_ram_size);
+	s2636->bitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED16);
+	s2636->collision_bitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED16);
 
 	device->save_item(NAME(s2636->x_offset));
 	device->save_item(NAME(s2636->y_offset));

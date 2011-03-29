@@ -46,16 +46,16 @@ To Do:
 /* BBBBBGGGGGRRRRRx xxxxxxxxxxxxxxxx */
 WRITE16_HANDLER( tetrisp2_palette_w )
 {
-	data = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	data = COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 	if ((offset & 1) == 0)
-		palette_set_color_rgb(space->machine,offset/2,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
+		palette_set_color_rgb(space->machine(),offset/2,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
 
 WRITE16_HANDLER( rocknms_sub_palette_w )
 {
-	data = COMBINE_DATA(&space->machine->generic.paletteram2.u16[offset]);
+	data = COMBINE_DATA(&space->machine().generic.paletteram2.u16[offset]);
 	if ((offset & 1) == 0)
-		palette_set_color_rgb(space->machine,(0x8000 + (offset/2)),pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
+		palette_set_color_rgb(space->machine(),(0x8000 + (offset/2)),pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
 
 
@@ -70,7 +70,7 @@ WRITE16_HANDLER( rocknms_sub_palette_w )
 
 WRITE8_HANDLER( tetrisp2_priority_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	//if (ACCESSING_BITS_8_15)
 	{
 		data |= ((data & 0xff00) >> 8);
@@ -81,7 +81,7 @@ WRITE8_HANDLER( tetrisp2_priority_w )
 
 WRITE8_HANDLER( rockn_priority_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	//if (ACCESSING_BITS_8_15)
 	{
 		state->priority[offset] = data;
@@ -90,7 +90,7 @@ WRITE8_HANDLER( rockn_priority_w )
 
 WRITE16_HANDLER( rocknms_sub_priority_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		state->rocknms_sub_priority[offset] = data;
@@ -99,13 +99,13 @@ WRITE16_HANDLER( rocknms_sub_priority_w )
 
 READ16_HANDLER( nndmseal_priority_r )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	return state->priority[offset] | 0xff00;
 }
 
 READ8_HANDLER( tetrisp2_priority_r )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	return state->priority[offset];
 }
 
@@ -130,7 +130,7 @@ READ8_HANDLER( tetrisp2_priority_r )
 
 static TILE_GET_INFO( get_tile_info_bg )
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	UINT16 code_hi = state->vram_bg[ 2 * tile_index + 0];
 	UINT16 code_lo = state->vram_bg[ 2 * tile_index + 1];
 	SET_TILE_INFO(
@@ -142,7 +142,7 @@ static TILE_GET_INFO( get_tile_info_bg )
 
 WRITE16_HANDLER( tetrisp2_vram_bg_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	COMBINE_DATA(&state->vram_bg[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_bg,offset/2);
 }
@@ -154,7 +154,7 @@ WRITE16_HANDLER( tetrisp2_vram_bg_w )
 
 static TILE_GET_INFO( get_tile_info_fg )
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	UINT16 code_hi = state->vram_fg[ 2 * tile_index + 0];
 	UINT16 code_lo = state->vram_fg[ 2 * tile_index + 1];
 	SET_TILE_INFO(
@@ -166,7 +166,7 @@ static TILE_GET_INFO( get_tile_info_fg )
 
 WRITE16_HANDLER( tetrisp2_vram_fg_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	COMBINE_DATA(&state->vram_fg[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_fg,offset/2);
 }
@@ -174,7 +174,7 @@ WRITE16_HANDLER( tetrisp2_vram_fg_w )
 
 static TILE_GET_INFO( get_tile_info_rot )
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	UINT16 code_hi = state->vram_rot[ 2 * tile_index + 0];
 	UINT16 code_lo = state->vram_rot[ 2 * tile_index + 1];
 	SET_TILE_INFO(
@@ -186,14 +186,14 @@ static TILE_GET_INFO( get_tile_info_rot )
 
 WRITE16_HANDLER( tetrisp2_vram_rot_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	COMBINE_DATA(&state->vram_rot[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_rot,offset/2);
 }
 
 static TILE_GET_INFO( get_tile_info_rocknms_sub_bg )
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	UINT16 code_hi = state->rocknms_sub_vram_bg[ 2 * tile_index + 0];
 	UINT16 code_lo = state->rocknms_sub_vram_bg[ 2 * tile_index + 1];
 	SET_TILE_INFO(
@@ -205,7 +205,7 @@ static TILE_GET_INFO( get_tile_info_rocknms_sub_bg )
 
 WRITE16_HANDLER( rocknms_sub_vram_bg_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	COMBINE_DATA(&state->rocknms_sub_vram_bg[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_sub_bg,offset/2);
 }
@@ -213,7 +213,7 @@ WRITE16_HANDLER( rocknms_sub_vram_bg_w )
 
 static TILE_GET_INFO( get_tile_info_rocknms_sub_fg )
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	UINT16 code_hi = state->rocknms_sub_vram_fg[ 2 * tile_index + 0];
 	UINT16 code_lo = state->rocknms_sub_vram_fg[ 2 * tile_index + 1];
 	SET_TILE_INFO(
@@ -225,7 +225,7 @@ static TILE_GET_INFO( get_tile_info_rocknms_sub_fg )
 
 WRITE16_HANDLER( rocknms_sub_vram_fg_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	COMBINE_DATA(&state->rocknms_sub_vram_fg[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_sub_fg,offset/2);
 }
@@ -233,7 +233,7 @@ WRITE16_HANDLER( rocknms_sub_vram_fg_w )
 
 static TILE_GET_INFO( get_tile_info_rocknms_sub_rot )
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	UINT16 code_hi = state->rocknms_sub_vram_rot[ 2 * tile_index + 0];
 	UINT16 code_lo = state->rocknms_sub_vram_rot[ 2 * tile_index + 1];
 	SET_TILE_INFO(
@@ -245,7 +245,7 @@ static TILE_GET_INFO( get_tile_info_rocknms_sub_rot )
 
 WRITE16_HANDLER( rocknms_sub_vram_rot_w )
 {
-	tetrisp2_state *state = space->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	COMBINE_DATA(&state->rocknms_sub_vram_rot[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_sub_rot,offset/2);
 }
@@ -254,7 +254,7 @@ WRITE16_HANDLER( rocknms_sub_vram_rot_w )
 
 VIDEO_START( tetrisp2 )
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	state->flipscreen_old = -1;
 
 	state->tilemap_bg = tilemap_create(	machine, get_tile_info_bg,tilemap_scan_rows,
@@ -280,14 +280,14 @@ VIDEO_START( tetrisp2 )
 
 VIDEO_START( nndmseal )
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	VIDEO_START_CALL( tetrisp2 );
 	tilemap_set_scrolldx(state->tilemap_bg, -4,-4);
 }
 
 VIDEO_START( rockntread )
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	state->flipscreen_old = -1;
 
 	state->tilemap_bg = tilemap_create(	machine, get_tile_info_bg,tilemap_scan_rows,
@@ -314,7 +314,7 @@ VIDEO_START( rockntread )
 
 VIDEO_START( rocknms )
 {
-	tetrisp2_state *state = machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	VIDEO_START_CALL( rockntread );
 
 	state->tilemap_sub_bg = tilemap_create(machine, get_tile_info_rocknms_sub_bg,tilemap_scan_rows,
@@ -380,7 +380,7 @@ VIDEO_START( rocknms )
 /* sprites should be able to create shadows too, how?
   -- it appears that sprites which should be shadows are often rendered *UNDER* the tilemaps, maybe related?
 */
-static void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle *cliprect, UINT8* priority_ram, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int flip)
+static void tetrisp2_draw_sprites(running_machine &machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle *cliprect, UINT8* priority_ram, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int flip)
 {
 	int tx, ty, sx, sy, flipx, flipy;
 	int xsize, ysize;
@@ -388,7 +388,7 @@ static void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bi
 	int pri;
 	int xzoom, yzoom;
 	UINT32 primask;
-	gfx_element *gfx = machine->gfx[gfxnum];
+	gfx_element *gfx = machine.gfx[gfxnum];
 
 	UINT16		*source	=	sprram_top;
 	UINT16	*finish	=	sprram_top + (sprram_size - 0x10) / 2;
@@ -461,7 +461,7 @@ static void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bi
 
 SCREEN_UPDATE( tetrisp2 )
 {
-	tetrisp2_state *state = screen->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = screen->machine().driver_data<tetrisp2_state>();
 	int flipscreen;
 	int asc_pri;
 	int scr_pri;
@@ -472,13 +472,13 @@ SCREEN_UPDATE( tetrisp2 )
 
 	/* Black background color */
 	bitmap_fill(bitmap, cliprect, 0);
-	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
+	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
 
 	/* Flip Screen */
 	if (flipscreen != state->flipscreen_old)
 	{
 		state->flipscreen_old = flipscreen;
-		tilemap_set_flip_all(screen->machine, flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(screen->machine(), flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
 	/* Flip Screen */
@@ -540,13 +540,13 @@ SCREEN_UPDATE( tetrisp2 )
 	else if (asc_pri == 2)
 		tilemap_draw(bitmap,cliprect, state->tilemap_fg,  0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen->machine, bitmap, screen->machine->priority_bitmap, cliprect, state->priority, screen->machine->generic.spriteram.u16, screen->machine->generic.spriteram_size, 0, (state->systemregs[0x00] & 0x02));
+	tetrisp2_draw_sprites(screen->machine(), bitmap, screen->machine().priority_bitmap, cliprect, state->priority, screen->machine().generic.spriteram.u16, screen->machine().generic.spriteram_size, 0, (state->systemregs[0x00] & 0x02));
 	return 0;
 }
 
 SCREEN_UPDATE( rockntread )
 {
-	tetrisp2_state *state = screen->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = screen->machine().driver_data<tetrisp2_state>();
 	int flipscreen;
 	int asc_pri;
 	int scr_pri;
@@ -557,13 +557,13 @@ SCREEN_UPDATE( rockntread )
 
 	/* Black background color */
 	bitmap_fill(bitmap, cliprect, 0);
-	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
+	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
 
 	/* Flip Screen */
 	if (flipscreen != state->flipscreen_old)
 	{
 		state->flipscreen_old = flipscreen;
-		tilemap_set_flip_all(screen->machine, flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(screen->machine(), flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
 	/* Flip Screen */
@@ -625,7 +625,7 @@ SCREEN_UPDATE( rockntread )
 	else if (asc_pri == 2)
 		tilemap_draw(bitmap,cliprect, state->tilemap_fg,  0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen->machine, bitmap, screen->machine->priority_bitmap,cliprect, state->priority, screen->machine->generic.spriteram.u16, screen->machine->generic.spriteram_size, 0, (state->systemregs[0x00] & 0x02));
+	tetrisp2_draw_sprites(screen->machine(), bitmap, screen->machine().priority_bitmap,cliprect, state->priority, screen->machine().generic.spriteram.u16, screen->machine().generic.spriteram_size, 0, (state->systemregs[0x00] & 0x02));
 	return 0;
 }
 
@@ -634,13 +634,13 @@ SCREEN_UPDATE( rockntread )
 
 SCREEN_UPDATE( rocknms )
 {
-	tetrisp2_state *state = screen->machine->driver_data<tetrisp2_state>();
+	tetrisp2_state *state = screen->machine().driver_data<tetrisp2_state>();
 	int asc_pri;
 	int scr_pri;
 	int rot_pri;
 
-	device_t *left_screen  = screen->machine->device("lscreen");
-	device_t *right_screen = screen->machine->device("rscreen");
+	device_t *left_screen  = screen->machine().device("lscreen");
+	device_t *right_screen = screen->machine().device("rscreen");
 
 	/* Black background color */
 	if (screen == left_screen)
@@ -652,8 +652,8 @@ SCREEN_UPDATE( rocknms )
 		tilemap_set_scrollx(state->tilemap_sub_rot, 0, state->rocknms_sub_rotregs[ 0 ] + 0x400);
 		tilemap_set_scrolly(state->tilemap_sub_rot, 0, state->rocknms_sub_rotregs[ 2 ] + 0x400);
 
-		bitmap_fill(bitmap, cliprect, screen->machine->pens[0x0000]);
-		bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+		bitmap_fill(bitmap, cliprect, screen->machine().pens[0x0000]);
+		bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 		asc_pri = scr_pri = rot_pri = 0;
 
@@ -693,7 +693,7 @@ SCREEN_UPDATE( rocknms )
 		else if (asc_pri == 2)
 			tilemap_draw(bitmap,cliprect, state->tilemap_sub_fg,  0, 1 << 2);
 
-		tetrisp2_draw_sprites(screen->machine, bitmap, screen->machine->priority_bitmap,cliprect, state->priority, screen->machine->generic.spriteram2.u16, screen->machine->generic.spriteram2_size, 4, (state->systemregs[0x00] & 0x02));
+		tetrisp2_draw_sprites(screen->machine(), bitmap, screen->machine().priority_bitmap,cliprect, state->priority, screen->machine().generic.spriteram2.u16, screen->machine().generic.spriteram2_size, 4, (state->systemregs[0x00] & 0x02));
 	}
 	else if (screen == right_screen) /* game screen */
 	{
@@ -705,8 +705,8 @@ SCREEN_UPDATE( rocknms )
 		tilemap_set_scrolly(state->tilemap_rot, 0, state->rotregs[ 2 ] + 0x400);
 
 		/* Black background color */
-		bitmap_fill(bitmap, cliprect, screen->machine->pens[0x0000]);
-		bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+		bitmap_fill(bitmap, cliprect, screen->machine().pens[0x0000]);
+		bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 		asc_pri = scr_pri = rot_pri = 0;
 
@@ -746,7 +746,7 @@ SCREEN_UPDATE( rocknms )
 		else if (asc_pri == 2)
 			tilemap_draw(bitmap,cliprect, state->tilemap_fg,  0, 1 << 2);
 
-		tetrisp2_draw_sprites(screen->machine, bitmap, screen->machine->priority_bitmap,cliprect, state->priority, screen->machine->generic.spriteram.u16, screen->machine->generic.spriteram_size, 0, (state->systemregs[0x00] & 0x02));
+		tetrisp2_draw_sprites(screen->machine(), bitmap, screen->machine().priority_bitmap,cliprect, state->priority, screen->machine().generic.spriteram.u16, screen->machine().generic.spriteram_size, 0, (state->systemregs[0x00] & 0x02));
 	}
 
 	return 0;

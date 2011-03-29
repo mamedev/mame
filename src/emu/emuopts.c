@@ -401,7 +401,7 @@ void emu_options::set_system_name(const char *name)
 
 const char *emu_options::device_option(device_image_interface &image)
 {
-	return image.device().machine->options().value(image.image_config().instance_name());
+	return image.device().machine().options().value(image.image_config().instance_name());
 }
 
 

@@ -1114,9 +1114,9 @@ DISCRETE_SOUND_END
 
 static SOUND_START( dkong)
 {
-	dkong_state *state = machine->driver_data<dkong_state>();
+	dkong_state *state = machine.driver_data<dkong_state>();
 
-	state->snd_rom = machine->region("soundcpu")->base();
+	state->snd_rom = machine.region("soundcpu")->base();
 }
 
 
@@ -1244,7 +1244,7 @@ static READ8_DEVICE_HANDLER( dkong_voice_status_r )
 
 static READ8_DEVICE_HANDLER( dkong_tune_r )
 {
-	dkong_state *state = device->machine->driver_data<dkong_state>();
+	dkong_state *state = device->machine().driver_data<dkong_state>();
 	UINT8 page = latch8_r(state->dev_vp2, 0) & 0x47;
 
 	if ( page & 0x40 )
@@ -1253,7 +1253,7 @@ static READ8_DEVICE_HANDLER( dkong_tune_r )
 	}
 	else
 	{
-		/* printf("%s:rom access\n",device->machine->describe_context()); */
+		/* printf("%s:rom access\n",device->machine().describe_context()); */
 		return (state->snd_rom[0x1000 + (page & 7) * 256 + offset]);
 	}
 }
@@ -1273,9 +1273,9 @@ static WRITE8_DEVICE_HANDLER( dkong_p1_w )
 WRITE8_HANDLER( dkong_audio_irq_w )
 {
 	if (data)
-		cputag_set_input_line(space->machine, "soundcpu", 0, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "soundcpu", 0, ASSERT_LINE);
 	else
-		cputag_set_input_line(space->machine, "soundcpu", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "soundcpu", 0, CLEAR_LINE);
 }
 
 

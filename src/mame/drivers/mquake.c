@@ -34,16 +34,16 @@
 static WRITE8_DEVICE_HANDLER( mquake_cia_0_porta_w )
 {
 	/* switch banks as appropriate */
-	memory_set_bank(device->machine, "bank1", data & 1);
+	memory_set_bank(device->machine(), "bank1", data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		device->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x000000, 0x07ffff, "bank1");
+		device->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x000000, 0x07ffff, "bank1");
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		device->machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x000000, 0x07ffff);
+		device->machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x000000, 0x07ffff);
 }
 
 
@@ -66,14 +66,14 @@ static WRITE8_DEVICE_HANDLER( mquake_cia_0_porta_w )
 static READ8_DEVICE_HANDLER( mquake_cia_0_portb_r )
 {
 	/* parallel port */
-	logerror("%s:CIA0_portb_r\n", device->machine->describe_context());
+	logerror("%s:CIA0_portb_r\n", device->machine().describe_context());
 	return 0xff;
 }
 
 static WRITE8_DEVICE_HANDLER( mquake_cia_0_portb_w )
 {
 	/* parallel port */
-	logerror("%s:CIA0_portb_w(%02x)\n", device->machine->describe_context(), data);
+	logerror("%s:CIA0_portb_w(%02x)\n", device->machine().describe_context(), data);
 }
 
 
@@ -95,7 +95,7 @@ static WRITE8_DEVICE_HANDLER( mquake_es5503_w )
 			// if not writing a "halt", set the bank
 			if (!(data & 1))
 			{
-				es5503_set_base(device, device->machine->region("ensoniq")->base() + ((data>>4)*0x10000));
+				es5503_set_base(device, device->machine().region("ensoniq")->base() + ((data>>4)*0x10000));
 			}
 		}
 	}
@@ -114,7 +114,7 @@ static WRITE16_HANDLER( output_w )
 static READ16_HANDLER( coin_chip_r )
 {
 	if (offset == 1)
-		return input_port_read(space->machine, "COINCHIP");
+		return input_port_read(space->machine(), "COINCHIP");
 	logerror("%06x:coin_chip_r(%02x) & %04x\n", cpu_get_pc(space->cpu), offset, mem_mask);
 	return 0xffff;
 }
@@ -320,7 +320,7 @@ static const es5503_interface es5503_intf =
 static MACHINE_RESET(mquake)
 {
 	/* set ES5503 wave memory (this is banked in 64k increments) */
-	es5503_set_base(machine->device("ensoniq"), machine->region("ensoniq")->base());
+	es5503_set_base(machine.device("ensoniq"), machine.region("ensoniq")->base());
 
 	MACHINE_RESET_CALL(amiga);
 }
@@ -447,7 +447,7 @@ ROM_END
 
 static DRIVER_INIT(mquake)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	static const amiga_machine_interface mquake_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
@@ -461,7 +461,7 @@ static DRIVER_INIT(mquake)
 
 	/* set up memory */
 	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user1")->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
 }
 
 

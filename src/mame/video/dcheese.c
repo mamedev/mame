@@ -27,7 +27,7 @@
 
 PALETTE_INIT( dcheese )
 {
-	const UINT16 *src = (UINT16 *)machine->region("user1")->base();
+	const UINT16 *src = (UINT16 *)machine.region("user1")->base();
 	int i;
 
 	/* really 65536 colors, but they don't use the later ones so we can stay */
@@ -47,9 +47,9 @@ PALETTE_INIT( dcheese )
  *
  *************************************/
 
-static void update_scanline_irq( running_machine *machine )
+static void update_scanline_irq( running_machine &machine )
 {
-	dcheese_state *state = machine->driver_data<dcheese_state>();
+	dcheese_state *state = machine.driver_data<dcheese_state>();
 
 	/* if not in range, don't bother */
 	if (state->blitter_vidparam[0x22/2] <= state->blitter_vidparam[0x1e/2])
@@ -63,9 +63,9 @@ static void update_scanline_irq( running_machine *machine )
 			effscan += state->blitter_vidparam[0x1e/2];
 
 		/* determine the time; if it's in this scanline, bump to the next frame */
-		time = machine->primary_screen->time_until_pos(effscan);
-		if (time < machine->primary_screen->scan_period())
-			time += machine->primary_screen->frame_period();
+		time = machine.primary_screen->time_until_pos(effscan);
+		if (time < machine.primary_screen->scan_period())
+			time += machine.primary_screen->frame_period();
 		state->blitter_timer->adjust(time);
 	}
 }
@@ -92,13 +92,13 @@ static TIMER_CALLBACK( dcheese_signal_irq_callback )
 
 VIDEO_START( dcheese )
 {
-	dcheese_state *state = machine->driver_data<dcheese_state>();
+	dcheese_state *state = machine.driver_data<dcheese_state>();
 
 	/* the destination bitmap is not directly accessible to the CPU */
-	state->dstbitmap = auto_bitmap_alloc(machine, DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT, machine->primary_screen->format());
+	state->dstbitmap = auto_bitmap_alloc(machine, DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT, machine.primary_screen->format());
 
 	/* create a timer */
-	state->blitter_timer = machine->scheduler().timer_alloc(FUNC(blitter_scanline_callback));
+	state->blitter_timer = machine.scheduler().timer_alloc(FUNC(blitter_scanline_callback));
 
 	/* register for saving */
 	state->save_item(NAME(state->blitter_color));
@@ -118,7 +118,7 @@ VIDEO_START( dcheese )
 
 SCREEN_UPDATE( dcheese )
 {
-	dcheese_state *state = screen->machine->driver_data<dcheese_state>();
+	dcheese_state *state = screen->machine().driver_data<dcheese_state>();
 	int x, y;
 
 	/* update the pixels */
@@ -141,9 +141,9 @@ SCREEN_UPDATE( dcheese )
  *
  *************************************/
 
-static void do_clear( running_machine *machine )
+static void do_clear( running_machine &machine )
 {
-	dcheese_state *state = machine->driver_data<dcheese_state>();
+	dcheese_state *state = machine.driver_data<dcheese_state>();
 	int y;
 
 	/* clear the requested scanlines */
@@ -151,13 +151,13 @@ static void do_clear( running_machine *machine )
 		memset(BITMAP_ADDR16(state->dstbitmap, y % DSTBITMAP_HEIGHT, 0), 0, DSTBITMAP_WIDTH * 2);
 
 	/* signal an IRQ when done (timing is just a guess) */
-	machine->scheduler().timer_set(machine->primary_screen->scan_period(), FUNC(dcheese_signal_irq_callback), 1);
+	machine.scheduler().timer_set(machine.primary_screen->scan_period(), FUNC(dcheese_signal_irq_callback), 1);
 }
 
 
-static void do_blit( running_machine *machine )
+static void do_blit( running_machine &machine )
 {
-	dcheese_state *state = machine->driver_data<dcheese_state>();
+	dcheese_state *state = machine.driver_data<dcheese_state>();
 	INT32 srcminx = state->blitter_xparam[0] << 12;
 	INT32 srcmaxx = state->blitter_xparam[1] << 12;
 	INT32 srcminy = state->blitter_yparam[0] << 12;
@@ -168,8 +168,8 @@ static void do_blit( running_machine *machine )
 	INT32 dxdy = (INT32)(((state->blitter_xparam[6] & 0x0fff) | ((state->blitter_xparam[7] & 0x0fff) << 12)) << 12) >> 12;
 	INT32 dydx = (INT32)(((state->blitter_yparam[4] & 0x0fff) | ((state->blitter_yparam[5] & 0x0fff) << 12)) << 12) >> 12;
 	INT32 dydy = (INT32)(((state->blitter_yparam[6] & 0x0fff) | ((state->blitter_yparam[7] & 0x0fff) << 12)) << 12) >> 12;
-	UINT8 *src = machine->region("gfx1")->base();
-	UINT32 pagemask = (machine->region("gfx1")->bytes() - 1) / 0x40000;
+	UINT8 *src = machine.region("gfx1")->base();
+	UINT32 pagemask = (machine.region("gfx1")->bytes() - 1) / 0x40000;
 	int xstart = state->blitter_xparam[14];
 	int xend = state->blitter_xparam[15] + 1;
 	int ystart = state->blitter_yparam[14];
@@ -206,13 +206,13 @@ static void do_blit( running_machine *machine )
 	}
 
 	/* signal an IRQ when done (timing is just a guess) */
-	machine->scheduler().timer_set(machine->primary_screen->scan_period() / 2, FUNC(dcheese_signal_irq_callback), 2);
+	machine.scheduler().timer_set(machine.primary_screen->scan_period() / 2, FUNC(dcheese_signal_irq_callback), 2);
 
 	/* these extra parameters are written but they are always zero, so I don't know what they do */
 	if (state->blitter_xparam[8] != 0 || state->blitter_xparam[9] != 0 || state->blitter_xparam[10] != 0 || state->blitter_xparam[11] != 0 ||
 		state->blitter_yparam[8] != 0 || state->blitter_yparam[9] != 0 || state->blitter_yparam[10] != 0 || state->blitter_yparam[11] != 0)
 	{
-		logerror("%s:blit! (%04X)\n", machine->describe_context(), state->blitter_color[0]);
+		logerror("%s:blit! (%04X)\n", machine.describe_context(), state->blitter_color[0]);
 		logerror("   %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X\n",
 				state->blitter_xparam[0], state->blitter_xparam[1], state->blitter_xparam[2], state->blitter_xparam[3],
 				state->blitter_xparam[4], state->blitter_xparam[5], state->blitter_xparam[6], state->blitter_xparam[7],
@@ -236,28 +236,28 @@ static void do_blit( running_machine *machine )
 
 WRITE16_HANDLER( madmax_blitter_color_w )
 {
-	dcheese_state *state = space->machine->driver_data<dcheese_state>();
+	dcheese_state *state = space->machine().driver_data<dcheese_state>();
 	COMBINE_DATA(&state->blitter_color[offset]);
 }
 
 
 WRITE16_HANDLER( madmax_blitter_xparam_w )
 {
-	dcheese_state *state = space->machine->driver_data<dcheese_state>();
+	dcheese_state *state = space->machine().driver_data<dcheese_state>();
 	COMBINE_DATA(&state->blitter_xparam[offset]);
 }
 
 
 WRITE16_HANDLER( madmax_blitter_yparam_w )
 {
-	dcheese_state *state = space->machine->driver_data<dcheese_state>();
+	dcheese_state *state = space->machine().driver_data<dcheese_state>();
 	COMBINE_DATA(&state->blitter_yparam[offset]);
 }
 
 
 WRITE16_HANDLER( madmax_blitter_vidparam_w )
 {
-	dcheese_state *state = space->machine->driver_data<dcheese_state>();
+	dcheese_state *state = space->machine().driver_data<dcheese_state>();
 	COMBINE_DATA(&state->blitter_vidparam[offset]);
 
 	switch (offset)
@@ -274,7 +274,7 @@ WRITE16_HANDLER( madmax_blitter_vidparam_w )
 			break;
 
 		case 0x22/2:		/* scanline interrupt */
-			update_scanline_irq(space->machine);
+			update_scanline_irq(space->machine());
 			break;
 
 		case 0x24/2:		/* writes here after writing to 0x28 */
@@ -286,11 +286,11 @@ WRITE16_HANDLER( madmax_blitter_vidparam_w )
 			break;
 
 		case 0x38/2:		/* blit */
-			do_blit(space->machine);
+			do_blit(space->machine());
 			break;
 
 		case 0x3e/2:		/* clear */
-			do_clear(space->machine);
+			do_clear(space->machine());
 			break;
 
 		default:
@@ -311,9 +311,9 @@ READ16_HANDLER( madmax_blitter_vidparam_r )
 {
 	/* analog inputs seem to be hooked up here -- might not actually map to blitter */
 	if (offset == 0x02/2)
-		return input_port_read(space->machine, "2a0002");
+		return input_port_read(space->machine(), "2a0002");
 	if (offset == 0x0e/2)
-		return input_port_read(space->machine, "2a000e");
+		return input_port_read(space->machine(), "2a000e");
 
 	/* early code polls on this bit, wants it to be 0 */
 	if (offset == 0x36/2)

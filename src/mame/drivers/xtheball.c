@@ -36,10 +36,10 @@ public:
 
 static void xtheball_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	xtheball_state *state = screen.machine->driver_data<xtheball_state>();
+	xtheball_state *state = screen.machine().driver_data<xtheball_state>();
 	UINT16 *srcbg = &state->vram_bg[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
-	const rgb_t *pens = tlc34076_get_pens(screen.machine->device("tlc34076"));
+	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = params->coladdr;
 	int x;
 
@@ -86,25 +86,25 @@ static void xtheball_scanline_update(screen_device &screen, bitmap_t *bitmap, in
 
 static void xtheball_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	xtheball_state *state = space->machine->driver_data<xtheball_state>();
+	xtheball_state *state = space->machine().driver_data<xtheball_state>();
 	if (address >= 0x01000000 && address <= 0x010fffff)
 		memcpy(shiftreg, &state->vram_bg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
 	else if (address >= 0x02000000 && address <= 0x020fffff)
 		memcpy(shiftreg, &state->vram_fg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
 	else
-		logerror("%s:xtheball_to_shiftreg(%08X)\n", space->machine->describe_context(), address);
+		logerror("%s:xtheball_to_shiftreg(%08X)\n", space->machine().describe_context(), address);
 }
 
 
 static void xtheball_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	xtheball_state *state = space->machine->driver_data<xtheball_state>();
+	xtheball_state *state = space->machine().driver_data<xtheball_state>();
 	if (address >= 0x01000000 && address <= 0x010fffff)
 		memcpy(&state->vram_bg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
 	else if (address >= 0x02000000 && address <= 0x020fffff)
 		memcpy(&state->vram_fg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
 	else
-		logerror("%s:xtheball_from_shiftreg(%08X)\n", space->machine->describe_context(), address);
+		logerror("%s:xtheball_from_shiftreg(%08X)\n", space->machine().describe_context(), address);
 }
 
 
@@ -117,7 +117,7 @@ static void xtheball_from_shiftreg(address_space *space, UINT32 address, UINT16 
 
 static WRITE16_HANDLER( bit_controls_w )
 {
-	xtheball_state *state = space->machine->driver_data<xtheball_state>();
+	xtheball_state *state = space->machine().driver_data<xtheball_state>();
 	UINT8 *bitvals = state->bitvals;
 	if (ACCESSING_BITS_0_7)
 	{
@@ -128,11 +128,11 @@ static WRITE16_HANDLER( bit_controls_w )
 			switch (offset)
 			{
 				case 7:
-					ticket_dispenser_w(space->machine->device("ticket"), 0, data << 7);
+					ticket_dispenser_w(space->machine().device("ticket"), 0, data << 7);
 					break;
 
 				case 8:
-					set_led_status(space->machine, 0, data & 1);
+					set_led_status(space->machine(), 0, data & 1);
 					break;
 			}
 		}
@@ -187,7 +187,7 @@ static WRITE16_HANDLER( bit_controls_w )
 
 static READ16_HANDLER( analogx_r )
 {
-	return (input_port_read(space->machine, "ANALOGX") << 8) | 0x00ff;
+	return (input_port_read(space->machine(), "ANALOGX") << 8) | 0x00ff;
 }
 
 
@@ -195,7 +195,7 @@ static READ16_HANDLER( analogy_watchdog_r )
 {
 	/* doubles as a watchdog address */
 	watchdog_reset_w(space,0,0);
-	return (input_port_read(space->machine, "ANALOGY") << 8) | 0x00ff;
+	return (input_port_read(space->machine(), "ANALOGY") << 8) | 0x00ff;
 }
 
 

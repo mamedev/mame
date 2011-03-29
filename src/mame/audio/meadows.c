@@ -30,7 +30,7 @@ static const INT16 waveform[2] = { -120*256, 120*256 };
 /************************************/
 SAMPLES_START( meadows_sh_start )
 {
-	meadows_state *state = device->machine->driver_data<meadows_state>();
+	meadows_state *state = device->machine().driver_data<meadows_state>();
 	state->_0c00 = state->_0c01 = state->_0c02 = state->_0c03 = 0;
 	state->dac = 0;
 	state->dac_enable = 0;
@@ -47,10 +47,10 @@ SAMPLES_START( meadows_sh_start )
 /************************************/
 /* Sound handler update             */
 /************************************/
-void meadows_sh_update(running_machine *machine)
+void meadows_sh_update(running_machine &machine)
 {
-	meadows_state *state = machine->driver_data<meadows_state>();
-	device_t *samples = machine->device("samples");
+	meadows_state *state = machine.driver_data<meadows_state>();
+	device_t *samples = machine.device("samples");
 	int preset, amp;
 
 	if (state->latched_0c01 != state->_0c01 || state->latched_0c03 != state->_0c03)
@@ -58,7 +58,7 @@ void meadows_sh_update(running_machine *machine)
 		/* amplitude is a combination of the upper 4 bits of 0c01 */
 		/* and bit 4 merged from S2650's flag output */
 		amp = ((state->_0c03 & ENABLE_CTR1) == 0) ? 0 : (state->_0c01 & 0xf0) >> 1;
-		if( cpu_get_reg(machine->device("maincpu"), S2650_FO) )
+		if( cpu_get_reg(machine.device("maincpu"), S2650_FO) )
 			amp += 0x80;
 		/* calculate frequency for counter #1 */
 		/* bit 0..3 of 0c01 are ctr preset */
@@ -94,9 +94,9 @@ void meadows_sh_update(running_machine *machine)
 		state->dac_enable = state->_0c03 & ENABLE_DAC;
 
 		if (state->dac_enable)
-			dac_data_w(machine->device("dac"), state->dac);
+			dac_data_w(machine.device("dac"), state->dac);
 		else
-			dac_data_w(machine->device("dac"), 0);
+			dac_data_w(machine.device("dac"), 0);
 	}
 
 	state->latched_0c01 = state->_0c01;
@@ -107,14 +107,14 @@ void meadows_sh_update(running_machine *machine)
 /************************************/
 /* Write DAC value                  */
 /************************************/
-void meadows_sh_dac_w(running_machine *machine, int data)
+void meadows_sh_dac_w(running_machine &machine, int data)
 {
-	meadows_state *state = machine->driver_data<meadows_state>();
+	meadows_state *state = machine.driver_data<meadows_state>();
 	state->dac = data;
 	if (state->dac_enable)
-		dac_data_w(machine->device("dac"), state->dac);
+		dac_data_w(machine.device("dac"), state->dac);
 	else
-		dac_data_w(machine->device("dac"), 0);
+		dac_data_w(machine.device("dac"), 0);
 }
 
 

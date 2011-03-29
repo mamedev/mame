@@ -38,9 +38,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	rampart_state *state = machine->driver_data<rampart_state>();
+	rampart_state *state = machine.driver_data<rampart_state>();
 	cputag_set_input_line(machine, "maincpu", 4, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -49,7 +49,7 @@ static void scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
-		atarigen_scanline_int_gen(screen.machine->device("maincpu"));
+		atarigen_scanline_int_gen(screen.machine().device("maincpu"));
 }
 
 
@@ -68,12 +68,12 @@ static MACHINE_START( rampart )
 
 static MACHINE_RESET( rampart )
 {
-	rampart_state *state = machine->driver_data<rampart_state>();
+	rampart_state *state = machine.driver_data<rampart_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_slapstic_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine->primary_screen, scanline_update, 32);
+	atarigen_scanline_timer_reset(*machine.primary_screen, scanline_update, 32);
 }
 
 
@@ -107,19 +107,19 @@ static WRITE16_HANDLER( latch_w )
 	{
 		if (data & 0x1000)
 			logerror("Color bank set to 1!\n");
-		coin_counter_w(space->machine, 0, (data >> 9) & 1);
-		coin_counter_w(space->machine, 1, (data >> 8) & 1);
+		coin_counter_w(space->machine(), 0, (data >> 9) & 1);
+		coin_counter_w(space->machine(), 1, (data >> 8) & 1);
 	}
 
 	/* lower byte being modified? */
 	if (ACCESSING_BITS_0_7)
 	{
-		atarigen_set_oki6295_vol(space->machine, (data & 0x0020) ? 100 : 0);
+		atarigen_set_oki6295_vol(space->machine(), (data & 0x0020) ? 100 : 0);
 		if (!(data & 0x0010))
-			devtag_reset(space->machine, "oki");
-		atarigen_set_ym2413_vol(space->machine, ((data >> 1) & 7) * 100 / 7);
+			devtag_reset(space->machine(), "oki");
+		atarigen_set_ym2413_vol(space->machine(), ((data >> 1) & 7) * 100 / 7);
 		if (!(data & 0x0001))
-			devtag_reset(space->machine, "ymsnd");
+			devtag_reset(space->machine(), "ymsnd");
 	}
 }
 
@@ -479,10 +479,10 @@ ROM_END
 
 static DRIVER_INIT( rampart )
 {
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	memcpy(&rom[0x140000], &rom[0x40000], 0x8000);
-	atarigen_slapstic_init(machine->device("maincpu"), 0x140000, 0x438000, 118);
+	atarigen_slapstic_init(machine.device("maincpu"), 0x140000, 0x438000, 118);
 }
 
 

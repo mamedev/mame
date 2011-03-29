@@ -36,7 +36,7 @@
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 	int color, tile_number, attrib;
 
 	attrib = state->txvideoram16[tile_index];
@@ -56,9 +56,9 @@ static TILE_GET_INFO( get_text_tile_info )
 ***************************************************************************/
 
 
-static void truxton2_create_tx_tilemap(running_machine *machine)
+static void truxton2_create_tx_tilemap(running_machine &machine)
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
 	state->tx_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	tilemap_set_scroll_rows(state->tx_tilemap, 8*32);	/* line scrolling */
@@ -66,9 +66,9 @@ static void truxton2_create_tx_tilemap(running_machine *machine)
 	tilemap_set_transparent_pen(state->tx_tilemap, 0);
 }
 
-static void register_state_save(running_machine *machine)
+static void register_state_save(running_machine &machine)
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
 	state->save_item(NAME(state->tx_flip));
 }
@@ -76,18 +76,18 @@ static void register_state_save(running_machine *machine)
 static STATE_POSTLOAD( truxton2_postload )
 {
 	for (int i = 0; i < 1024; i++)
-		gfx_element_mark_dirty(machine->gfx[2], i);
+		gfx_element_mark_dirty(machine.gfx[2], i);
 }
 
 VIDEO_START( toaplan2 )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	/* cache the VDP device */
-	state->vdp0 = machine->device<gp9001vdp_device>("gp9001vdp0");
-	state->vdp1 = machine->device<gp9001vdp_device>("gp9001vdp1");
+	state->vdp0 = machine.device<gp9001vdp_device>("gp9001vdp0");
+	state->vdp1 = machine.device<gp9001vdp_device>("gp9001vdp1");
 
 	/* our current VDP implementation needs this bitmap to work with */
 	state->custom_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8);
@@ -109,13 +109,13 @@ VIDEO_START( toaplan2 )
 
 VIDEO_START( truxton2 )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
 	VIDEO_START_CALL( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	gfx_element_set_source(machine->gfx[2], (UINT8 *)state->tx_gfxram16);
-	machine->state().register_postload(truxton2_postload, NULL);
+	gfx_element_set_source(machine.gfx[2], (UINT8 *)state->tx_gfxram16);
+	machine.state().register_postload(truxton2_postload, NULL);
 
 	truxton2_create_tx_tilemap(machine);
 	tilemap_set_scrolldx(state->tx_tilemap, 0x1d4 +1, 0x2a);
@@ -123,7 +123,7 @@ VIDEO_START( truxton2 )
 
 VIDEO_START( fixeightbl )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
 	VIDEO_START_CALL( toaplan2 );
 
@@ -150,7 +150,7 @@ VIDEO_START( fixeightbl )
 
 VIDEO_START( bgaregga )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
 	VIDEO_START_CALL( toaplan2 );
 
@@ -161,7 +161,7 @@ VIDEO_START( bgaregga )
 
 VIDEO_START( batrider )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 	VIDEO_START_CALL( toaplan2 );
 
 	state->vdp0->sp.use_sprite_buffer = 0; // disable buffering on this game
@@ -169,8 +169,8 @@ VIDEO_START( batrider )
 	/* Create the Text tilemap for this game */
 	state->tx_gfxram16 = auto_alloc_array_clear(machine, UINT16, RAIZING_TX_GFXRAM_SIZE/2);
 	state->save_pointer(NAME(state->tx_gfxram16), RAIZING_TX_GFXRAM_SIZE/2);
-	gfx_element_set_source(machine->gfx[2], (UINT8 *)state->tx_gfxram16);
-	machine->state().register_postload(truxton2_postload, NULL);
+	gfx_element_set_source(machine.gfx[2], (UINT8 *)state->tx_gfxram16);
+	machine.state().register_postload(truxton2_postload, NULL);
 
 	truxton2_create_tx_tilemap(machine);
 	tilemap_set_scrolldx(state->tx_tilemap, 0x1d4, 0x2a);
@@ -181,7 +181,7 @@ VIDEO_START( batrider )
 
 WRITE16_HANDLER( toaplan2_txvideoram16_w )
 {
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 	COMBINE_DATA(&state->txvideoram16[offset]);
 	if (offset < (state->tx_vram_size/4))
@@ -193,7 +193,7 @@ WRITE16_HANDLER( toaplan2_txvideoram16_offs_w )
 	// FIXME: implement line select and per-line flipping for all games
 	// see SCREEN_UPDATE( batrider )
 
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 	UINT16 oldword = state->txvideoram16_offs[offset];
 
 	if (oldword != data)
@@ -222,7 +222,7 @@ WRITE16_HANDLER( toaplan2_txscrollram16_w )
 {
 	/*** Line-Scroll RAM for Text Layer ***/
 
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 	int data_tx = data;
 
 	tilemap_set_scrollx(state->tx_tilemap, offset, data_tx);
@@ -235,14 +235,14 @@ WRITE16_HANDLER( toaplan2_tx_gfxram16_w )
 {
 	/*** Dynamic GFX decoding for Truxton 2 / FixEight ***/
 
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 	UINT16 oldword = state->tx_gfxram16[offset];
 
 	if (oldword != data)
 	{
 		int code = offset/32;
 		COMBINE_DATA(&state->tx_gfxram16[offset]);
-		gfx_element_mark_dirty(space->machine->gfx[2], code);
+		gfx_element_mark_dirty(space->machine().gfx[2], code);
 	}
 }
 
@@ -251,12 +251,12 @@ WRITE16_HANDLER( batrider_textdata_dma_w )
 	/*** Dynamic Text GFX decoding for Batrider ***/
 	/*** Only done once during start-up ***/
 
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 	UINT16 *dest = state->tx_gfxram16;
 
 	memcpy(dest, state->txvideoram16, state->tx_vram_size);
 	dest += (state->tx_vram_size/2);
-	memcpy(dest, space->machine->generic.paletteram.u16, state->paletteram_size);
+	memcpy(dest, space->machine().generic.paletteram.u16, state->paletteram_size);
 	dest += (state->paletteram_size/2);
 	memcpy(dest, state->txvideoram16_offs, state->tx_offs_vram_size);
 	dest += (state->tx_offs_vram_size/2);
@@ -265,7 +265,7 @@ WRITE16_HANDLER( batrider_textdata_dma_w )
 	memcpy(dest, state->mainram16, state->mainram_overlap_size);
 
 	for (int i = 0; i < 1024; i++)
-		gfx_element_mark_dirty(space->machine->gfx[2], i);
+		gfx_element_mark_dirty(space->machine().gfx[2], i);
 }
 
 WRITE16_HANDLER( batrider_unknown_dma_w )
@@ -277,7 +277,7 @@ WRITE16_HANDLER( batrider_unknown_dma_w )
 
 WRITE16_HANDLER( batrider_objectbank_w )
 {
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -293,19 +293,19 @@ WRITE16_HANDLER( batrider_objectbank_w )
 // Dogyuun doesn't appear to require fancy mixing?
 SCREEN_UPDATE( toaplan2_dual )
 {
-	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = screen->machine().driver_data<toaplan2_state>();
 
 	if (state->vdp1)
 	{
 		bitmap_fill(bitmap,cliprect,0);
 		bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
-		state->vdp1->gp9001_render_vdp(screen->machine, bitmap, cliprect);
+		state->vdp1->gp9001_render_vdp(screen->machine(), bitmap, cliprect);
 	}
 	if (state->vdp0)
 	{
 	//  bitmap_fill(bitmap,cliprect,0);
 		bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
-		state->vdp0->gp9001_render_vdp(screen->machine, bitmap, cliprect);
+		state->vdp0->gp9001_render_vdp(screen->machine(), bitmap, cliprect);
 	}
 
 
@@ -316,7 +316,7 @@ SCREEN_UPDATE( toaplan2_dual )
 // renders to 2 bitmaps, and mixes output
 SCREEN_UPDATE( toaplan2_mixed )
 {
-	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = screen->machine().driver_data<toaplan2_state>();
 
 //  bitmap_fill(bitmap,cliprect,0);
 //  bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
@@ -325,13 +325,13 @@ SCREEN_UPDATE( toaplan2_mixed )
 	{
 		bitmap_fill(bitmap,cliprect,0);
 		bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
-		state->vdp0->gp9001_render_vdp(screen->machine, bitmap, cliprect);
+		state->vdp0->gp9001_render_vdp(screen->machine(), bitmap, cliprect);
 	}
 	if (state->vdp1)
 	{
 		bitmap_fill(state->secondary_render_bitmap,cliprect,0);
 		bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
-		state->vdp1->gp9001_render_vdp(screen->machine, state->secondary_render_bitmap, cliprect);
+		state->vdp1->gp9001_render_vdp(screen->machine(), state->secondary_render_bitmap, cliprect);
 	}
 
 
@@ -416,17 +416,17 @@ SCREEN_UPDATE( toaplan2_mixed )
 
 SCREEN_UPDATE( toaplan2 )
 {
-	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = screen->machine().driver_data<toaplan2_state>();
 
 	if (state->vdp0)
 	{
-		device_t *screen1  = screen->machine->device("screen");
+		device_t *screen1  = screen->machine().device("screen");
 
 		if (screen == screen1)
 		{
 			bitmap_fill(bitmap,cliprect,0);
 			bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
-			state->vdp0->gp9001_render_vdp(screen->machine, bitmap, cliprect);
+			state->vdp0->gp9001_render_vdp(screen->machine(), bitmap, cliprect);
 		}
 	}
 
@@ -435,7 +435,7 @@ SCREEN_UPDATE( toaplan2 )
 
 SCREEN_UPDATE( truxton2 )
 {
-	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = screen->machine().driver_data<toaplan2_state>();
 
 	SCREEN_UPDATE_CALL(toaplan2);
 	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
@@ -445,7 +445,7 @@ SCREEN_UPDATE( truxton2 )
 
 SCREEN_UPDATE( batrider )
 {
-	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = screen->machine().driver_data<toaplan2_state>();
 
 	SCREEN_UPDATE_CALL( toaplan2 );
 
@@ -492,7 +492,7 @@ SCREEN_UPDATE( batsugun )
 
 SCREEN_EOF( toaplan2 )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 	if (state->vdp0) state->vdp0->gp9001_screen_eof();
 	if (state->vdp1) state->vdp1->gp9001_screen_eof();
 }

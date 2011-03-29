@@ -30,5 +30,5 @@ extern struct pce_struct pce;
 DRIVER_INIT( pce );
 MACHINE_RESET( pce );
 
-void pce_set_joystick_readinputport_callback( UINT8 (*joy_read)(running_machine *));
+void pce_set_joystick_readinputport_callback( UINT8 (*joy_read)(running_machine &));
 #endif

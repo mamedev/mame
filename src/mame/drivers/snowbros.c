@@ -92,13 +92,13 @@ public:
 static WRITE16_HANDLER( snowbros_flipscreen_w )
 {
 	if (ACCESSING_BITS_8_15)
-		flip_screen_set(space->machine, ~data & 0x8000);
+		flip_screen_set(space->machine(), ~data & 0x8000);
 }
 
 
 static SCREEN_UPDATE( snowbros )
 {
-	device_t *pandora = screen->machine->device("pandora");
+	device_t *pandora = screen->machine().device("pandora");
 
 	/* This clears & redraws the entire screen each pass */
 	bitmap_fill(bitmap,cliprect,0xf0);
@@ -109,7 +109,7 @@ static SCREEN_UPDATE( snowbros )
 
 static SCREEN_EOF( snowbros )
 {
-	device_t *pandora = machine->device("pandora");
+	device_t *pandora = machine.device("pandora");
 	pandora_eof(pandora);
 }
 
@@ -117,17 +117,17 @@ static SCREEN_EOF( snowbros )
 
 static WRITE16_HANDLER( snowbros_irq4_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 4, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 4, CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( snowbros_irq3_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 3, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 3, CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( snowbros_irq2_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 2, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 2, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( snowbros_interrupt )
@@ -137,8 +137,8 @@ static INTERRUPT_GEN( snowbros_interrupt )
 
 static INTERRUPT_GEN( snowbro3_interrupt )
 {
-	snowbros_state *state = device->machine->driver_data<snowbros_state>();
-	okim6295_device *adpcm = device->machine->device<okim6295_device>("oki");
+	snowbros_state *state = device->machine().driver_data<snowbros_state>();
+	okim6295_device *adpcm = device->machine().device<okim6295_device>("oki");
 	int status = adpcm->read_status();
 
 	device_set_input_line(device, cpu_getiloops(device) + 2, ASSERT_LINE);	/* IRQs 4, 3, and 2 */
@@ -176,7 +176,7 @@ static WRITE16_HANDLER( snowbros_68000_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, offset, data & 0xff);
-		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -226,7 +226,7 @@ static READ8_HANDLER( prot_io_r )
 // probably not endian safe
 static WRITE8_HANDLER( prot_io_w )
 {
-	snowbros_state *state = space->machine->driver_data<snowbros_state>();
+	snowbros_state *state = space->machine().driver_data<snowbros_state>();
 	switch (offset)
 	{
 		case 0x00:
@@ -323,7 +323,7 @@ static WRITE16_HANDLER( twinadv_68000_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, offset, data & 0xff);
-		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -399,9 +399,9 @@ static READ16_HANDLER( sb3_sound_r )
 	return 0x0003;
 }
 
-static void sb3_play_music(running_machine *machine, int data)
+static void sb3_play_music(running_machine &machine, int data)
 {
-	snowbros_state *state = machine->driver_data<snowbros_state>();
+	snowbros_state *state = machine.driver_data<snowbros_state>();
 	UINT8 *snd;
 
 	/* sample is actually played in interrupt function so it loops */
@@ -411,13 +411,13 @@ static void sb3_play_music(running_machine *machine, int data)
 	{
 		case 0x23:
 		case 0x26:
-		snd = machine->region("oki")->base();
+		snd = machine.region("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x00000, 0x20000);
 		state->sb3_music_is_playing = 1;
 		break;
 
 		case 0x24:
-		snd = machine->region("oki")->base();
+		snd = machine.region("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x20000, 0x20000);
 		state->sb3_music_is_playing = 1;
 		break;
@@ -430,7 +430,7 @@ static void sb3_play_music(running_machine *machine, int data)
 		case 0x2b:
 		case 0x2c:
 		case 0x2d:
-		snd = machine->region("oki")->base();
+		snd = machine.region("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x40000, 0x20000);
 		state->sb3_music_is_playing = 1;
 		break;
@@ -466,7 +466,7 @@ static void sb3_play_sound (okim6295_device *oki, int data)
 
 static WRITE16_DEVICE_HANDLER( sb3_sound_w )
 {
-	snowbros_state *state = device->machine->driver_data<snowbros_state>();
+	snowbros_state *state = device->machine().driver_data<snowbros_state>();
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	if (data == 0x00fe)
 	{
@@ -484,7 +484,7 @@ static WRITE16_DEVICE_HANDLER( sb3_sound_w )
 
 		if (data>=0x22 && data<=0x31)
 		{
-			sb3_play_music(device->machine, data);
+			sb3_play_music(device->machine(), data);
 		}
 
 		if ((data>=0x30) && (data<=0x51))
@@ -494,7 +494,7 @@ static WRITE16_DEVICE_HANDLER( sb3_sound_w )
 
 		if (data>=0x52 && data<=0x5f)
 		{
-			sb3_play_music(device->machine, data-0x30);
+			sb3_play_music(device->machine(), data-0x30);
 		}
 
 	}
@@ -1419,7 +1419,7 @@ GFXDECODE_END
 /* handler called by the 3812/2151 emulator when the internal timers cause an IRQ */
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* SnowBros Sound */
@@ -1439,8 +1439,8 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_RESET (semiprot)
 {
-	snowbros_state *state = machine->driver_data<snowbros_state>();
-	UINT16 *PROTDATA = (UINT16*)machine->region("user1")->base();
+	snowbros_state *state = machine.driver_data<snowbros_state>();
+	UINT16 *PROTDATA = (UINT16*)machine.region("user1")->base();
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
@@ -1449,8 +1449,8 @@ static MACHINE_RESET (semiprot)
 
 static MACHINE_RESET (finalttr)
 {
-	snowbros_state *state = machine->driver_data<snowbros_state>();
-	UINT16 *PROTDATA = (UINT16*)machine->region("user1")->base();
+	snowbros_state *state = machine.driver_data<snowbros_state>();
+	UINT16 *PROTDATA = (UINT16*)machine.region("user1")->base();
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
@@ -2264,23 +2264,23 @@ static READ16_HANDLER ( moremorp_0a_read )
 
 static DRIVER_INIT( moremorp )
 {
-	//snowbros_state *state = machine->driver_data<snowbros_state>();
-//  UINT16 *PROTDATA = (UINT16*)machine->region("user1")->base();
+	//snowbros_state *state = machine.driver_data<snowbros_state>();
+//  UINT16 *PROTDATA = (UINT16*)machine.region("user1")->base();
 //  int i;
 
 //  for (i = 0;i < 0x200/2;i++)
 //      state->hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 
 	/* explicit check in the code */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200000, 0x200001, FUNC(moremorp_0a_read) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200000, 0x200001, FUNC(moremorp_0a_read) );
 }
 
 
 static DRIVER_INIT( cookbib2 )
 {
-	//snowbros_state *state = machine->driver_data<snowbros_state>();
-//  UINT16 *HCROM = (UINT16*)machine->region("maincpu")->base();
-//  UINT16 *PROTDATA = (UINT16*)machine->region("user1")->base();
+	//snowbros_state *state = machine.driver_data<snowbros_state>();
+//  UINT16 *HCROM = (UINT16*)machine.region("maincpu")->base();
+//  UINT16 *PROTDATA = (UINT16*)machine.region("user1")->base();
 //  int i;
 //  state->hyperpac_ram[0xf000/2] = 0x46fc;
 //  state->hyperpac_ram[0xf002/2] = 0x2700;
@@ -2623,7 +2623,7 @@ static DRIVER_INIT( cookbib2 )
 #if 0
 static DRIVER_INIT( hyperpac )
 {
-	snowbros_state *state = machine->driver_data<snowbros_state>();
+	snowbros_state *state = machine.driver_data<snowbros_state>();
 	UINT16 *hyperpac_ram = state->hyperpac_ram;
 	/* simulate RAM initialization done by the protection MCU */
 	/* not verified on real hardware */
@@ -2646,8 +2646,8 @@ static READ16_HANDLER ( _4in1_02_read )
 static DRIVER_INIT(4in1boot)
 {
 	UINT8 *buffer;
-	UINT8 *src = machine->region("maincpu")->base();
-	int len = machine->region("maincpu")->bytes();
+	UINT8 *src = machine.region("maincpu")->base();
+	int len = machine.region("maincpu")->bytes();
 
 	/* strange order */
 	buffer = auto_alloc_array(machine, UINT8, len);
@@ -2661,8 +2661,8 @@ static DRIVER_INIT(4in1boot)
 		auto_free(machine, buffer);
 	}
 
-	src = machine->region("soundcpu")->base();
-	len = machine->region("soundcpu")->bytes();
+	src = machine.region("soundcpu")->base();
+	len = machine.region("soundcpu")->bytes();
 
 	/* strange order */
 	buffer = auto_alloc_array(machine, UINT8, len);
@@ -2673,14 +2673,14 @@ static DRIVER_INIT(4in1boot)
 		memcpy(src,buffer,len);
 		auto_free(machine, buffer);
 	}
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200000, 0x200001, FUNC(_4in1_02_read) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200000, 0x200001, FUNC(_4in1_02_read) );
 }
 
 static DRIVER_INIT(snowbro3)
 {
 	UINT8 *buffer;
-	UINT8 *src = machine->region("maincpu")->base();
-	int len = machine->region("maincpu")->bytes();
+	UINT8 *src = machine.region("maincpu")->base();
+	int len = machine.region("maincpu")->bytes();
 
 	/* strange order */
 	buffer = auto_alloc_array(machine, UINT8, len);
@@ -2700,7 +2700,7 @@ static READ16_HANDLER( _3in1_read )
 
 static DRIVER_INIT( 3in1semi )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200000, 0x200001, FUNC(_3in1_read) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200000, 0x200001, FUNC(_3in1_read) );
 }
 
 static READ16_HANDLER( cookbib3_read )
@@ -2710,12 +2710,12 @@ static READ16_HANDLER( cookbib3_read )
 
 static DRIVER_INIT( cookbib3 )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200000, 0x200001, FUNC(cookbib3_read) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200000, 0x200001, FUNC(cookbib3_read) );
 }
 
 static DRIVER_INIT( pzlbreak )
 {
-	pandora_set_bg_pen(machine->device("pandora"), 0xc0);
+	pandora_set_bg_pen(machine.device("pandora"), 0xc0);
 }
 
 GAME( 1990, snowbros,  0,        snowbros, snowbros, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 1)", 0 )

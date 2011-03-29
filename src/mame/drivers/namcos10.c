@@ -270,7 +270,7 @@ Utyuu Daisakusen Chocovader Contactee CVC1  Ver.A   KC022A
 
 WRITE32_HANDLER( namcos10_bank_w )
 {
-	memory_set_bank( space->machine, "bank1", data & 0xf );
+	memory_set_bank( space->machine(), "bank1", data & 0xf );
 }
 
 class namcos10_state : public psx_state
@@ -306,12 +306,12 @@ static ADDRESS_MAP_START( namcos10_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
-static void memm_driver_init( running_machine *machine )
+static void memm_driver_init( running_machine &machine )
 {
 	psx_driver_init(machine);
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1f300000, 0x1f300003, FUNC(namcos10_bank_w) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank( 0x1f400000, 0x1f7fffff, "bank1" );
-	memory_configure_bank( machine, "bank1", 0, 16, machine->region( "user2" )->base(), 4 * 1024 * 1024 );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1f300000, 0x1f300003, FUNC(namcos10_bank_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank( 0x1f400000, 0x1f7fffff, "bank1" );
+	memory_configure_bank( machine, "bank1", 0, 16, machine.region( "user2" )->base(), 4 * 1024 * 1024 );
 }
 
 UINT8 *nand_base;
@@ -391,32 +391,32 @@ WRITE32_HANDLER( watchdog_w )
 {
 }
 
-static void memn_driver_init( running_machine *machine )
+static void memn_driver_init( running_machine &machine )
 {
-	UINT8 *BIOS = (UINT8 *)machine->region( "user1" )->base();
-	nand_base = (UINT8 *)machine->region( "user2" )->base();
+	UINT8 *BIOS = (UINT8 *)machine.region( "user1" )->base();
+	nand_base = (UINT8 *)machine.region( "user2" )->base();
 
 	nand_copy( (UINT32 *)( BIOS + 0x0000000 ), 0x08000, 0x001c000 );
 	nand_copy( (UINT32 *)( BIOS + 0x0020000 ), 0x24000, 0x03e0000 );
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1f400000, 0x1f400003, FUNC(nand_status_r) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1f410000, 0x1f410003, FUNC(nand_address1_w) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1f420000, 0x1f420003, FUNC(nand_address2_w) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1f430000, 0x1f430003, FUNC(nand_address3_w) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1f440000, 0x1f440003, FUNC(nand_address4_w) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1f450000, 0x1f450003, FUNC(nand_data_r) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1fb60000, 0x1fb60003, FUNC(watchdog_w) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0xbf500000, 0xbf5007d7, FUNC(nand_block_w) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0xbf500000, 0xbf5007d7, FUNC(nand_block_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1f400000, 0x1f400003, FUNC(nand_status_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1f410000, 0x1f410003, FUNC(nand_address1_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1f420000, 0x1f420003, FUNC(nand_address2_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1f430000, 0x1f430003, FUNC(nand_address3_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1f440000, 0x1f440003, FUNC(nand_address4_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1f450000, 0x1f450003, FUNC(nand_data_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1fb60000, 0x1fb60003, FUNC(watchdog_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0xbf500000, 0xbf5007d7, FUNC(nand_block_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0xbf500000, 0xbf5007d7, FUNC(nand_block_r) );
 
 	psx_driver_init(machine);
 }
 
-static void decrypt_bios( running_machine *machine, int b15, int b14, int b13, int b12, int b11, int b10, int b9, int b8,
+static void decrypt_bios( running_machine &machine, int b15, int b14, int b13, int b12, int b11, int b10, int b9, int b8,
 	int b7, int b6, int b5, int b4, int b3, int b2, int b1, int b0 )
 {
-	UINT16 *BIOS = (UINT16 *)machine->region( "user1" )->base();
-	int len = machine->region( "user1" )->bytes() / 2;
+	UINT16 *BIOS = (UINT16 *)machine.region( "user1" )->base();
+	int len = machine.region( "user1" )->bytes() / 2;
 	int i;
 
 	for( i = 0; i < len; i++ )

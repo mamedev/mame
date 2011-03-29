@@ -91,9 +91,9 @@ const stepper_interface starpoint_interface_48step =
 };
 
 ///////////////////////////////////////////////////////////////////////////
-void stepper_config(running_machine *machine, int which, const stepper_interface *intf)
+void stepper_config(running_machine &machine, int which, const stepper_interface *intf)
 {
-	assert_always(machine->phase() == MACHINE_PHASE_INIT, "Can only call stepper_config at init time!");
+	assert_always(machine.phase() == MACHINE_PHASE_INIT, "Can only call stepper_config at init time!");
 	assert_always((which >= 0) && (which < MAX_STEPPERS), "stepper_config called on an invalid stepper motor!");
 	assert_always(intf, "stepper_config called with an invalid interface!");
 

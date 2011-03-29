@@ -109,7 +109,7 @@ static WRITE16_HANDLER( pirates_out_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_device *eeprom = space->machine->device<eeprom_device>("eeprom");
+		eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
 
 		/* bits 0-2 control EEPROM */
 		eeprom_write_bit(eeprom, data & 0x04);
@@ -117,7 +117,7 @@ static WRITE16_HANDLER( pirates_out_w )
 		eeprom_set_clock_line(eeprom, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 6 selects oki bank */
-		okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+		okim6295_device *oki = space->machine().device<okim6295_device>("oki");
 		oki->set_bank_base((data & 0x40) ? 0x40000 : 0x00000);
 
 		/* bit 7 used (function unknown) */
@@ -132,14 +132,14 @@ static CUSTOM_INPUT( prot_r )
 //  offs_t pc;
 	int bit;
 
-//  logerror("%s: IN1_r\n",field->port->machine->describe_context());
+//  logerror("%s: IN1_r\n",field->port->machine().describe_context());
 
 #if 0
 	/* Pirates protection workaround. It more complicated than this... see code at
        602e and 62a6 */
 	/* For Genix, see 6576 for setting values and 67c2,d3b4 and dbc2 for tests. */
 
-	pc = cpu_get_pc(field->port->machine->device("main"));
+	pc = cpu_get_pc(field->port->machine().device("main"));
 	if (pc == 0x6134)
 	{
 		bit = prot & 1;
@@ -337,17 +337,17 @@ ROM_END
 
 /* Init */
 
-static void pirates_decrypt_68k(running_machine *machine)
+static void pirates_decrypt_68k(running_machine &machine)
 {
     int rom_size;
     UINT16 *buf, *rom;
     int i;
 
-    rom_size = machine->region("maincpu")->bytes();
+    rom_size = machine.region("maincpu")->bytes();
 
     buf = auto_alloc_array(machine, UINT16, rom_size/2);
 
-    rom = (UINT16 *)machine->region("maincpu")->base();
+    rom = (UINT16 *)machine.region("maincpu")->base();
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size/2; i++)
@@ -366,17 +366,17 @@ static void pirates_decrypt_68k(running_machine *machine)
     auto_free (machine, buf);
 }
 
-static void pirates_decrypt_p(running_machine *machine)
+static void pirates_decrypt_p(running_machine &machine)
 {
     int rom_size;
     UINT8 *buf, *rom;
     int i;
 
-    rom_size = machine->region("gfx1")->bytes();
+    rom_size = machine.region("gfx1")->bytes();
 
     buf = auto_alloc_array(machine, UINT8, rom_size);
 
-    rom = machine->region("gfx1")->base();
+    rom = machine.region("gfx1")->base();
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size/4; i++)
@@ -390,17 +390,17 @@ static void pirates_decrypt_p(running_machine *machine)
     auto_free (machine, buf);
 }
 
-static void pirates_decrypt_s(running_machine *machine)
+static void pirates_decrypt_s(running_machine &machine)
 {
     int rom_size;
     UINT8 *buf, *rom;
     int i;
 
-    rom_size = machine->region("gfx2")->bytes();
+    rom_size = machine.region("gfx2")->bytes();
 
     buf = auto_alloc_array(machine, UINT8, rom_size);
 
-    rom = machine->region("gfx2")->base();
+    rom = machine.region("gfx2")->base();
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size/4; i++)
@@ -415,17 +415,17 @@ static void pirates_decrypt_s(running_machine *machine)
 }
 
 
-static void pirates_decrypt_oki(running_machine *machine)
+static void pirates_decrypt_oki(running_machine &machine)
 {
     int rom_size;
     UINT8 *buf, *rom;
     int i;
 
-    rom_size = machine->region("oki")->bytes();
+    rom_size = machine.region("oki")->bytes();
 
     buf = auto_alloc_array(machine, UINT8, rom_size);
 
-    rom = machine->region("oki")->base();
+    rom = machine.region("oki")->base();
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size; i++)
@@ -439,7 +439,7 @@ static void pirates_decrypt_oki(running_machine *machine)
 
 static DRIVER_INIT( pirates )
 {
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 
 	pirates_decrypt_68k(machine);
 	pirates_decrypt_p(machine);
@@ -461,7 +461,7 @@ static DRIVER_INIT( genix )
 
 	/* If this value is increased then something has gone wrong and the protection failed */
 	/* Write-protect it for now */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x109e98, 0x109e9b, FUNC(genix_prot_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x109e98, 0x109e9b, FUNC(genix_prot_r) );
 }
 
 

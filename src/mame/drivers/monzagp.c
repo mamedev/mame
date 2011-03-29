@@ -57,35 +57,35 @@ static PALETTE_INIT(monzagp)
 
 static VIDEO_START(monzagp)
 {
-	monzagp_state *state = machine->driver_data<monzagp_state>();
+	monzagp_state *state = machine.driver_data<monzagp_state>();
 	state->screenw = 80;
 	state->vram = auto_alloc_array(machine, UINT8, 0x10000);
 }
 
 static SCREEN_UPDATE(monzagp)
 {
-	monzagp_state *state = screen->machine->driver_data<monzagp_state>();
+	monzagp_state *state = screen->machine().driver_data<monzagp_state>();
 	int x,y;
 
-	if(input_code_pressed_once(screen->machine,KEYCODE_Z))
+	if(input_code_pressed_once(screen->machine(),KEYCODE_Z))
 		state->bank--;
 
-	if(input_code_pressed_once(screen->machine,KEYCODE_X))
+	if(input_code_pressed_once(screen->machine(),KEYCODE_X))
 		state->bank++;
 
-	if(input_code_pressed_once(screen->machine,KEYCODE_Q))
+	if(input_code_pressed_once(screen->machine(),KEYCODE_Q))
 	{
 		state->screenw--;
 		printf("%x\n",state->screenw);
 	}
 
-	if(input_code_pressed_once(screen->machine,KEYCODE_W))
+	if(input_code_pressed_once(screen->machine(),KEYCODE_W))
 	{
 		state->screenw++;
 		printf("%x\n",state->screenw);
 	}
 
-	if(input_code_pressed_once(screen->machine,KEYCODE_A))
+	if(input_code_pressed_once(screen->machine(),KEYCODE_A))
 	{
 		FILE * p=fopen("vram.bin","wb");
 		fwrite(&state->vram[0],1,0x10000,p);
@@ -97,7 +97,7 @@ static SCREEN_UPDATE(monzagp)
 	{
 		for(x=0;x<256;x++)
 		{
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[state->bank&1],
+			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[state->bank&1],
 				state->vram[y*state->screenw+x],
 				//(state->vram[y*state->screenw+x]&0x3f)+(state->bank>>1)*64,
 				0,
@@ -117,12 +117,12 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(rng_r)
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static WRITE8_HANDLER(port_w)
 {
-	monzagp_state *state = space->machine->driver_data<monzagp_state>();
+	monzagp_state *state = space->machine().driver_data<monzagp_state>();
 	state->coordx=offset;//-0xc0;
 	//state->vram[state->coordy*state->screenw+state->coordx]=data;
 	//if(output==0xfe)
@@ -184,7 +184,7 @@ static WRITE8_HANDLER(port1_w)
 
 static WRITE8_HANDLER(port2_w)
 {
-	monzagp_state *state = space->machine->driver_data<monzagp_state>();
+	monzagp_state *state = space->machine().driver_data<monzagp_state>();
 //  printf("P2 %x = %x\n",cpu_get_pc(space->cpu),data);
 	state->coordy=data;
 }

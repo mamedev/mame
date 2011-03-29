@@ -11,7 +11,7 @@ todo - convert to tilemap
 
 WRITE8_HANDLER ( funybubl_paldatawrite )
 {
-	funybubl_state *state = space->machine->driver_data<funybubl_state>();
+	funybubl_state *state = space->machine().driver_data<funybubl_state>();
 	int colchanged ;
 	UINT32 coldat;
 
@@ -20,7 +20,7 @@ WRITE8_HANDLER ( funybubl_paldatawrite )
 	coldat = state->paletteram[colchanged * 4] | (state->paletteram[colchanged * 4 + 1] << 8) |
 			(state->paletteram[colchanged * 4 + 2] << 16) | (state->paletteram[colchanged * 4 + 3] << 24);
 
-	palette_set_color_rgb(space->machine, colchanged, pal6bit(coldat >> 12), pal6bit(coldat >> 0), pal6bit(coldat >> 6));
+	palette_set_color_rgb(space->machine(), colchanged, pal6bit(coldat >> 12), pal6bit(coldat >> 0), pal6bit(coldat >> 6));
 }
 
 
@@ -28,9 +28,9 @@ VIDEO_START(funybubl)
 {
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	funybubl_state *state = machine->driver_data<funybubl_state>();
+	funybubl_state *state = machine.driver_data<funybubl_state>();
 	UINT8 *source = &state->banked_vram[0x2000 - 0x20];
 	UINT8 *finish = source - 0x1000;
 
@@ -67,7 +67,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 		// bits 0x40 and 0x10 not used?...
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[1], tile, 0, 0, 0, xpos, ypos, 255);
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[1], tile, 0, 0, 0, xpos, ypos, 255);
 		source -= 0x20;
 	}
 }
@@ -75,11 +75,11 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE(funybubl)
 {
-	funybubl_state *state = screen->machine->driver_data<funybubl_state>();
+	funybubl_state *state = screen->machine().driver_data<funybubl_state>();
 	int x, y, offs;
 	offs = 0;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	/* tilemap .. convert it .. banking makes it slightly more annoying but still easy */
 	for (y = 0; y < 32; y++)
@@ -89,15 +89,15 @@ SCREEN_UPDATE(funybubl)
 			int data;
 
 			data = state->banked_vram[offs] | (state->banked_vram[offs + 1] << 8);
-			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], data & 0x7fff, (data & 0x8000) ? 2 : 1, 0, 0, x*8, y*8, 0);
+			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], data & 0x7fff, (data & 0x8000) ? 2 : 1, 0, 0, x*8, y*8, 0);
 			offs += 2;
 		}
 	}
 
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 
 #if 0
-	if ( input_code_pressed_once(screen->machine, KEYCODE_W) )
+	if ( input_code_pressed_once(screen->machine(), KEYCODE_W) )
 	{
 		FILE *fp;
 

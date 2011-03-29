@@ -90,10 +90,10 @@ static void video_exit(running_machine &machine);
 static void init_monitors(void);
 static sdl_monitor_info *pick_monitor(sdl_options &options, int index);
 
-static void check_osd_inputs(running_machine *machine);
+static void check_osd_inputs(running_machine &machine);
 
-static void extract_video_config(running_machine *machine);
-static void extract_window_config(running_machine *machine, int index, sdl_window_config *conf);
+static void extract_video_config(running_machine &machine);
+static void extract_window_config(running_machine &machine, int index, sdl_window_config *conf);
 static float get_aspect(const char *defdata, const char *data, int report_error);
 static void get_resolution(const char *defdata, const char *data, sdl_window_config *config, int report_error);
 
@@ -102,7 +102,7 @@ static void get_resolution(const char *defdata, const char *data, sdl_window_con
 //  sdlvideo_init
 //============================================================
 
-int sdlvideo_init(running_machine *machine)
+int sdlvideo_init(running_machine &machine)
 {
 	int index, tc;
 
@@ -110,22 +110,22 @@ int sdlvideo_init(running_machine *machine)
 	extract_video_config(machine);
 
 	// ensure we get called on the way out
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, video_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, video_exit);
 
 	// set up monitors first
 	init_monitors();
 
 	// we need the beam width in a float, contrary to what the core does.
-	video_config.beamwidth = machine->options().beam();
+	video_config.beamwidth = machine.options().beam();
 
 	// initialize the window system so we can make windows
 	if (sdlwindow_init(machine))
 		return 1;
 
-	tc = machine->total_colors();
+	tc = machine.total_colors();
 
 	// create the windows
-	sdl_options &options = downcast<sdl_options &>(machine->options());
+	sdl_options &options = downcast<sdl_options &>(machine.options());
 	for (index = 0; index < video_config.numscreens; index++)
 	{
 		sdl_window_config conf;
@@ -337,16 +337,16 @@ void sdl_osd_interface::update(bool skip_redraw)
 	{
 //      profiler_mark(PROFILER_BLIT);
 		for (window = sdl_window_list; window != NULL; window = window->next)
-			sdlwindow_video_window_update(&machine(), window);
+			sdlwindow_video_window_update(machine(), window);
 //      profiler_mark(PROFILER_END);
 	}
 
 	// poll the joystick values here
-	sdlinput_poll(&machine());
-	check_osd_inputs(&machine());
+	sdlinput_poll(machine());
+	check_osd_inputs(machine());
 
 	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
-		debugwin_update_during_game(&machine());
+		debugwin_update_during_game(machine());
 }
 
 
@@ -557,7 +557,7 @@ static sdl_monitor_info *pick_monitor(sdl_options &options, int index)
 //  check_osd_inputs
 //============================================================
 
-static void check_osd_inputs(running_machine *machine)
+static void check_osd_inputs(running_machine &machine)
 {
 	sdl_window_info *window = sdlinput_get_focus_window(machine);
 
@@ -600,9 +600,9 @@ static void check_osd_inputs(running_machine *machine)
 //  extract_window_config
 //============================================================
 
-static void extract_window_config(running_machine *machine, int index, sdl_window_config *conf)
+static void extract_window_config(running_machine &machine, int index, sdl_window_config *conf)
 {
-	sdl_options &options = downcast<sdl_options &>(machine->options());
+	sdl_options &options = downcast<sdl_options &>(machine.options());
 	// per-window options: extract the data
 	get_resolution(options.resolution(), options.resolution(index), conf, TRUE);
 }
@@ -611,10 +611,10 @@ static void extract_window_config(running_machine *machine, int index, sdl_windo
 //  extract_video_config
 //============================================================
 
-static void extract_video_config(running_machine *machine)
+static void extract_video_config(running_machine &machine)
 {
 	const char *stemp;
-	sdl_options &options = downcast<sdl_options &>(machine->options());
+	sdl_options &options = downcast<sdl_options &>(machine.options());
 
 	video_config.perftest    = options.video_fps();
 
@@ -628,7 +628,7 @@ static void extract_video_config(running_machine *machine)
 	#endif
 
 
-	if (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
+	if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		video_config.windowed = TRUE;
 
 	// default to working video please

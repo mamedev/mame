@@ -738,7 +738,7 @@ void *ay8910_start_ym(void *infoptr, device_type chip_type, device_t *device, in
 	ay8910_context *info = (ay8910_context *)infoptr;
 
 	if (info == NULL)
-		info = auto_alloc_clear(device->machine, ay8910_context);
+		info = auto_alloc_clear(device->machine(), ay8910_context);
 
 	info->device = device;
 	info->intf = intf;
@@ -775,7 +775,7 @@ void *ay8910_start_ym(void *infoptr, device_type chip_type, device_t *device, in
 
 	/* The envelope is pacing twice as fast for the YM2149 as for the AY-3-8910,    */
 	/* This handled by the step parameter. Consequently we use a divider of 8 here. */
-	info->channel = device->machine->sound().stream_alloc(*device, 0, info->streams, device->clock() / 8, info, ay8910_update);
+	info->channel = device->machine().sound().stream_alloc(*device, 0, info->streams, device->clock() / 8, info, ay8910_update);
 
 	ay8910_set_clock_ym(info,device->clock());
 	ay8910_statesave(info, device);
@@ -887,7 +887,7 @@ int ay8910_read_ym(void *chip)
 		if (psg->portAread.read)
 			psg->regs[AY_PORTA] = devcb_call_read8(&psg->portAread, 0);
 		else
-			logerror("%s: warning - read 8910 '%s' Port A\n",psg->device->machine->describe_context(),psg->device->tag());
+			logerror("%s: warning - read 8910 '%s' Port A\n",psg->device->machine().describe_context(),psg->device->tag());
 		break;
 	case AY_PORTB:
 		if ((psg->regs[AY_ENABLE] & 0x80) != 0)
@@ -895,7 +895,7 @@ int ay8910_read_ym(void *chip)
 		if (psg->portBread.read)
 			psg->regs[AY_PORTB] = devcb_call_read8(&psg->portBread, 0);
 		else
-			logerror("%s: warning - read 8910 '%s' Port B\n",psg->device->machine->describe_context(),psg->device->tag());
+			logerror("%s: warning - read 8910 '%s' Port B\n",psg->device->machine().describe_context(),psg->device->tag());
 		break;
 	}
 

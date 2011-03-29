@@ -94,7 +94,7 @@
 
 static WRITE8_HANDLER( irobot_nvram_w )
 {
-	irobot_state *state = space->machine->driver_data<irobot_state>();
+	irobot_state *state = space->machine().driver_data<irobot_state>();
 	state->m_nvram[offset] = data & 0x0f;
 }
 
@@ -108,13 +108,13 @@ static WRITE8_HANDLER( irobot_nvram_w )
 
 static WRITE8_HANDLER( irobot_clearirq_w )
 {
-    cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE ,CLEAR_LINE);
+    cputag_set_input_line(space->machine(), "maincpu", M6809_IRQ_LINE ,CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( irobot_clearfirq_w )
 {
-    cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE ,CLEAR_LINE);
+    cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE ,CLEAR_LINE);
 }
 
 

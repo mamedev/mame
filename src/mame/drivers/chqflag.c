@@ -28,7 +28,7 @@ static WRITE8_DEVICE_HANDLER( k007232_extvolume_w );
 
 static INTERRUPT_GEN( chqflag_interrupt )
 {
-	chqflag_state *state = device->machine->driver_data<chqflag_state>();
+	chqflag_state *state = device->machine().driver_data<chqflag_state>();
 
 	if (cpu_getiloops(device) == 0)
 	{
@@ -44,20 +44,20 @@ static INTERRUPT_GEN( chqflag_interrupt )
 
 static WRITE8_HANDLER( chqflag_bankswitch_w )
 {
-	chqflag_state *state = space->machine->driver_data<chqflag_state>();
+	chqflag_state *state = space->machine().driver_data<chqflag_state>();
 	int bankaddress;
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 
 	/* bits 0-4 = ROM bank # (0x00-0x11) */
 	bankaddress = 0x10000 + (data & 0x1f) * 0x4000;
-	memory_set_bankptr(space->machine, "bank4", &RAM[bankaddress]);
+	memory_set_bankptr(space->machine(), "bank4", &RAM[bankaddress]);
 
 	/* bit 5 = memory bank select */
 	if (data & 0x20)
 	{
 		space->install_read_bank(0x1800, 0x1fff, "bank5");
 		space->install_legacy_write_handler(0x1800, 0x1fff, FUNC(paletteram_xBBBBBGGGGGRRRRR_be_w));
-		memory_set_bankptr(space->machine, "bank5", space->machine->generic.paletteram.v);
+		memory_set_bankptr(space->machine(), "bank5", space->machine().generic.paletteram.v);
 
 		if (state->k051316_readroms)
 			space->install_legacy_readwrite_handler(*state->k051316_1, 0x1000, 0x17ff, FUNC(k051316_rom_r), FUNC(k051316_w));	/* 051316 #1 (ROM test) */
@@ -75,11 +75,11 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 
 static WRITE8_HANDLER( chqflag_vreg_w )
 {
-	chqflag_state *state = space->machine->driver_data<chqflag_state>();
+	chqflag_state *state = space->machine().driver_data<chqflag_state>();
 
 	/* bits 0 & 1 = coin counters */
-	coin_counter_w(space->machine, 1, data & 0x01);
-	coin_counter_w(space->machine, 0, data & 0x02);
+	coin_counter_w(space->machine(), 1, data & 0x01);
+	coin_counter_w(space->machine(), 0, data & 0x02);
 
 	/* bit 4 = enable rom reading thru K051316 #1 & #2 */
 	state->k051316_readroms = (data & 0x10);
@@ -95,9 +95,9 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 	/* the headlight (which have the shadow bit set) become highlights */
 	/* Maybe one of the bits inverts the SHAD line while the other darkens the background. */
 	if (data & 0x08)
-		palette_set_shadow_factor(space->machine, 1 / PALETTE_DEFAULT_SHADOW_FACTOR);
+		palette_set_shadow_factor(space->machine(), 1 / PALETTE_DEFAULT_SHADOW_FACTOR);
 	else
-		palette_set_shadow_factor(space->machine, PALETTE_DEFAULT_SHADOW_FACTOR);
+		palette_set_shadow_factor(space->machine(), PALETTE_DEFAULT_SHADOW_FACTOR);
 
 	if ((data & 0x80) != state->last_vreg)
 	{
@@ -108,7 +108,7 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 
 		/* only affect the background */
 		for (i = 512; i < 1024; i++)
-			palette_set_pen_contrast(space->machine, i, brt);
+			palette_set_pen_contrast(space->machine(), i, brt);
 	}
 
 //if ((data & 0xf8) && (data & 0xf8) != 0x88)
@@ -120,17 +120,17 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 
 static WRITE8_HANDLER( select_analog_ctrl_w )
 {
-	chqflag_state *state = space->machine->driver_data<chqflag_state>();
+	chqflag_state *state = space->machine().driver_data<chqflag_state>();
 	state->analog_ctrl = data;
 }
 
 static READ8_HANDLER( analog_read_r )
 {
-	chqflag_state *state = space->machine->driver_data<chqflag_state>();
+	chqflag_state *state = space->machine().driver_data<chqflag_state>();
 	switch (state->analog_ctrl & 0x03)
 	{
-		case 0x00: return (state->accel = input_port_read(space->machine, "IN3"));	/* accelerator */
-		case 0x01: return (state->wheel = input_port_read(space->machine, "IN4"));	/* steering */
+		case 0x00: return (state->accel = input_port_read(space->machine(), "IN3"));	/* accelerator */
+		case 0x01: return (state->wheel = input_port_read(space->machine(), "IN4"));	/* steering */
 		case 0x02: return state->accel;						/* accelerator (previous?) */
 		case 0x03: return state->wheel;						/* steering (previous?) */
 	}
@@ -140,7 +140,7 @@ static READ8_HANDLER( analog_read_r )
 
 static WRITE8_HANDLER( chqflag_sh_irqtrigger_w )
 {
-	chqflag_state *state = space->machine->driver_data<chqflag_state>();
+	chqflag_state *state = space->machine().driver_data<chqflag_state>();
 	soundlatch2_w(space, 0, data);
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
@@ -176,7 +176,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( k007232_bankswitch_w )
 {
-	chqflag_state *state = space->machine->driver_data<chqflag_state>();
+	chqflag_state *state = space->machine().driver_data<chqflag_state>();
 	int bank_A, bank_B;
 
 	/* banks # for the 007232 (chip 1) */
@@ -292,7 +292,7 @@ INPUT_PORTS_END
 
 static void chqflag_ym2151_irq_w( device_t *device, int data )
 {
-	chqflag_state *state = device->machine->driver_data<chqflag_state>();
+	chqflag_state *state = device->machine().driver_data<chqflag_state>();
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -354,18 +354,18 @@ static const k051316_interface chqflag_k051316_intf_2 =
 
 static MACHINE_START( chqflag )
 {
-	chqflag_state *state = machine->driver_data<chqflag_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	chqflag_state *state = machine.driver_data<chqflag_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->k051316_1 = machine->device("k051316_1");
-	state->k051316_2 = machine->device("k051316_2");
-	state->k051960 = machine->device("k051960");
-	state->k007232_1 = machine->device("k007232_1");
-	state->k007232_2 = machine->device("k007232_2");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->k051316_1 = machine.device("k051316_1");
+	state->k051316_2 = machine.device("k051316_2");
+	state->k051960 = machine.device("k051960");
+	state->k007232_1 = machine.device("k007232_1");
+	state->k007232_2 = machine.device("k007232_2");
 
 	state->save_item(NAME(state->k051316_readroms));
 	state->save_item(NAME(state->last_vreg));
@@ -376,7 +376,7 @@ static MACHINE_START( chqflag )
 
 static MACHINE_RESET( chqflag )
 {
-	chqflag_state *state = machine->driver_data<chqflag_state>();
+	chqflag_state *state = machine.driver_data<chqflag_state>();
 
 	state->k051316_readroms = 0;
 	state->last_vreg = 0;

@@ -98,7 +98,7 @@ public:
 
 static MACHINE_RESET( igs )
 {
-	igspoker_state *state = machine->driver_data<igspoker_state>();
+	igspoker_state *state = machine.driver_data<igspoker_state>();
 	state->nmi_enable	=	0;
 	state->hopper		=	0;
 	state->bg_enable	=	1;
@@ -106,7 +106,7 @@ static MACHINE_RESET( igs )
 
 static INTERRUPT_GEN( igs_interrupt )
 {
-	igspoker_state *state = device->machine->driver_data<igspoker_state>();
+	igspoker_state *state = device->machine().driver_data<igspoker_state>();
 	if (cpu_getiloops(device) % 2) {
 		device_set_input_line(device, 0, HOLD_LINE);
 	} else {
@@ -122,7 +122,7 @@ static READ8_HANDLER( igs_irqack_r )
 
 static WRITE8_HANDLER( igs_irqack_w )
 {
-//  cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+//  cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -130,14 +130,14 @@ static WRITE8_HANDLER( igs_irqack_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	igspoker_state *state = machine->driver_data<igspoker_state>();
+	igspoker_state *state = machine.driver_data<igspoker_state>();
 	int code = state->bg_tile_ram[tile_index];
 	SET_TILE_INFO(1 + (tile_index & 3), code, 0, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	igspoker_state *state = machine->driver_data<igspoker_state>();
+	igspoker_state *state = machine.driver_data<igspoker_state>();
 	int code = state->fg_tile_ram[tile_index] | (state->fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;
 	SET_TILE_INFO(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
@@ -145,28 +145,28 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static WRITE8_HANDLER( bg_tile_w )
 {
-	igspoker_state *state = space->machine->driver_data<igspoker_state>();
+	igspoker_state *state = space->machine().driver_data<igspoker_state>();
 	state->bg_tile_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
 
 static WRITE8_HANDLER( fg_tile_w )
 {
-	igspoker_state *state = space->machine->driver_data<igspoker_state>();
+	igspoker_state *state = space->machine().driver_data<igspoker_state>();
 	state->fg_tile_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
 }
 
 static WRITE8_HANDLER( fg_color_w )
 {
-	igspoker_state *state = space->machine->driver_data<igspoker_state>();
+	igspoker_state *state = space->machine().driver_data<igspoker_state>();
 	state->fg_color_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
 }
 
 static VIDEO_START(igs_video)
 {
-	igspoker_state *state = machine->driver_data<igspoker_state>();
+	igspoker_state *state = machine.driver_data<igspoker_state>();
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	64, 32);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,	8,  32,	64, 8);
 
@@ -175,8 +175,8 @@ static VIDEO_START(igs_video)
 
 static SCREEN_UPDATE(igs_video)
 {
-	igspoker_state *state = screen->machine->driver_data<igspoker_state>();
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	igspoker_state *state = screen->machine().driver_data<igspoker_state>();
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	// FIX: CSK227IT must have some way to disable background, or wrong gfx?
 	if (state->bg_enable) tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -188,13 +188,13 @@ static SCREEN_UPDATE(igs_video)
 
 static VIDEO_START(cpokerpk)
 {
-	igspoker_state *state = machine->driver_data<igspoker_state>();
+	igspoker_state *state = machine.driver_data<igspoker_state>();
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	64, 32);
 }
 
 static SCREEN_UPDATE(cpokerpk)
 {
-	igspoker_state *state = screen->machine->driver_data<igspoker_state>();
+	igspoker_state *state = screen->machine().driver_data<igspoker_state>();
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 
 	return 0;
@@ -210,13 +210,13 @@ static void show_out(igspoker_state *state)
 
 static WRITE8_HANDLER( igs_nmi_and_coins_w )
 {
-	igspoker_state *state = space->machine->driver_data<igspoker_state>();
-	coin_counter_w(space->machine, 0,		data & 0x01);	// coin_a
-	coin_counter_w(space->machine, 1,		data & 0x04);	// coin_c
-	coin_counter_w(space->machine, 2,		data & 0x08);	// key in
-	coin_counter_w(space->machine, 3,		data & 0x10);	// coin state->out mech
+	igspoker_state *state = space->machine().driver_data<igspoker_state>();
+	coin_counter_w(space->machine(), 0,		data & 0x01);	// coin_a
+	coin_counter_w(space->machine(), 1,		data & 0x04);	// coin_c
+	coin_counter_w(space->machine(), 2,		data & 0x08);	// key in
+	coin_counter_w(space->machine(), 3,		data & 0x10);	// coin state->out mech
 
-	set_led_status(space->machine, 6,		data & 0x20);	// led for coin state->out / state->hopper active
+	set_led_status(space->machine(), 6,		data & 0x20);	// led for coin state->out / state->hopper active
 
 	state->nmi_enable = data & 0x80;     // nmi enable?
 #ifdef VERBOSE
@@ -229,7 +229,7 @@ static WRITE8_HANDLER( igs_nmi_and_coins_w )
 
 static WRITE8_HANDLER( igs_lamps_w )
 {
-	igspoker_state *state = space->machine->driver_data<igspoker_state>();
+	igspoker_state *state = space->machine().driver_data<igspoker_state>();
 /*
     - Lbits -
     7654 3210
@@ -258,7 +258,7 @@ static WRITE8_HANDLER( igs_lamps_w )
 
 static READ8_HANDLER( custom_io_r )
 {
-	igspoker_state *state = space->machine->driver_data<igspoker_state>();
+	igspoker_state *state = space->machine().driver_data<igspoker_state>();
 #ifdef VERBOSE
 	logerror("PC %06X: Protection read %02x\n",cpu_get_pc(space->cpu), (int) state->protection_res);
 #endif
@@ -267,14 +267,14 @@ static READ8_HANDLER( custom_io_r )
 
 static WRITE8_HANDLER( custom_io_w )
 {
-	igspoker_state *state = space->machine->driver_data<igspoker_state>();
+	igspoker_state *state = space->machine().driver_data<igspoker_state>();
 #ifdef VERBOSE
 	logerror("PC %06X: Protection write %02x\n",cpu_get_pc(space->cpu),data);
 #endif
 
 	switch (data)
 	{
-		case 0x00: state->protection_res = input_port_read(space->machine, "BUTTONS1"); break;
+		case 0x00: state->protection_res = input_port_read(space->machine(), "BUTTONS1"); break;
 		// CSK227
 		case 0x20: state->protection_res = 0x49; break;
 		case 0x21: state->protection_res = 0x47; break;
@@ -313,14 +313,14 @@ static WRITE8_HANDLER( custom_io_w )
 
 static CUSTOM_INPUT( hopper_r )
 {
-	igspoker_state *state = field->port->machine->driver_data<igspoker_state>();
-	if (state->hopper) return !(field->port->machine->primary_screen->frame_number()%10);
-	return input_code_pressed(field->port->machine, KEYCODE_H);
+	igspoker_state *state = field->port->machine().driver_data<igspoker_state>();
+	if (state->hopper) return !(field->port->machine().primary_screen->frame_number()%10);
+	return input_code_pressed(field->port->machine(), KEYCODE_H);
 }
 
 static READ8_HANDLER( exp_rom_r )
 {
-	UINT8 *rom = space->machine->region("maincpu")->base();
+	UINT8 *rom = space->machine().region("maincpu")->base();
 	return rom[offset+0x10000];
 }
 
@@ -1751,7 +1751,7 @@ ROM_END
 static DRIVER_INIT( cpoker )
 {
 	int A;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -1765,7 +1765,7 @@ static DRIVER_INIT( cpoker )
 
 static DRIVER_INIT( cpokert )
 {
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */
@@ -1795,7 +1795,7 @@ static DRIVER_INIT( cpokert )
 static DRIVER_INIT( cska )
 {
 	int A;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -1812,7 +1812,7 @@ static DRIVER_INIT( cska )
 static DRIVER_INIT( igs_ncs )
 {
 	int A;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -1929,7 +1929,7 @@ Clocks
 
 static DRIVER_INIT( igs_ncs2 )
 {
-	UINT8 *src = (UINT8 *) (machine->region("maincpu")->base());
+	UINT8 *src = (UINT8 *) (machine.region("maincpu")->base());
 	int i;
 
 	for(i = 0; i < 0x10000; i++)
@@ -2006,8 +2006,8 @@ static DRIVER_INIT( chleague )
 	int length;
 	UINT8 *rom;
 
-	rom = machine->region("maincpu")->base();
-	length = machine->region("maincpu")->bytes();
+	rom = machine.region("maincpu")->base();
+	length = machine.region("maincpu")->bytes();
 	for (A = 0;A < length;A++)
 	{
 		if ((A & 0x09C0) == 0x0880) rom[A] ^= 0x20;
@@ -2070,8 +2070,8 @@ static DRIVER_INIT( number10 )
 	UINT8 *tmp;
 	UINT8 *rom;
 
-	rom = machine->region("maincpu")->base();
-	length = machine->region("maincpu")->bytes();
+	rom = machine.region("maincpu")->base();
+	length = machine.region("maincpu")->bytes();
 	for (A = 0;A < length;A++)
 	{
 		if ((A & 0x09C0) == 0x0880) rom[A] ^= 0x20;
@@ -2100,8 +2100,8 @@ static DRIVER_INIT( number10 )
 	rom[0xeed] = 0xc3;
 
 	/* Descramble graphic */
-	rom = machine->region("gfx1")->base();
-	length = machine->region("gfx1")->bytes();
+	rom = machine.region("gfx1")->base();
+	length = machine.region("gfx1")->bytes();
 	tmp = auto_alloc_array(machine, UINT8, length);
 	memcpy(tmp,rom,length);
 	for (A = 0;A < length;A++)
@@ -2149,7 +2149,7 @@ ROM_END
 static DRIVER_INIT( cpokerpk )
 {
 	int A;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	for (A=0x0714; A < 0xF000; A+=0x1000)
 		rom[A] ^= 0x20;
@@ -2203,7 +2203,7 @@ ROM_END
 static DRIVER_INIT( pktet346 )
 {
 	int A;
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)

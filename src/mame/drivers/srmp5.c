@@ -87,7 +87,7 @@ public:
 
 static SCREEN_UPDATE( srmp5 )
 {
-	srmp5_state *state = screen->machine->driver_data<srmp5_state>();
+	srmp5_state *state = screen->machine().driver_data<srmp5_state>();
 	int x,y,address,xs,xs2,ys,ys2,height,width,xw,yw,xb,yb,sizex,sizey;
 	UINT16 *sprite_list=state->sprram;
 	UINT16 *sprite_list_end=&state->sprram[0x4000]; //guess
@@ -193,7 +193,7 @@ static SCREEN_UPDATE( srmp5 )
 		{
 			if (state->tileduty[i] == 1)
 			{
-				gfx_element_decode(screen->machine->gfx[0], i);
+				gfx_element_decode(screen->machine().gfx[0], i);
 				state->tileduty[i] = 0;
 			}
 		}
@@ -204,35 +204,35 @@ static SCREEN_UPDATE( srmp5 )
 
 static READ32_HANDLER(srmp5_palette_r)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	return state->palram[offset];
 }
 
 static WRITE32_HANDLER(srmp5_palette_w)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	COMBINE_DATA(&state->palram[offset]);
-	palette_set_color(space->machine, offset, MAKE_RGB(data << 3 & 0xFF, data >> 2 & 0xFF, data >> 7 & 0xFF));
+	palette_set_color(space->machine(), offset, MAKE_RGB(data << 3 & 0xFF, data >> 2 & 0xFF, data >> 7 & 0xFF));
 }
 static WRITE32_HANDLER(bank_w)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	COMBINE_DATA(&state->databank);
 }
 
 static READ32_HANDLER(tileram_r)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	return state->tileram[offset];
 }
 
 static WRITE32_HANDLER(tileram_w)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	state->tileram[offset] = data & 0xFFFF; //lower 16bit only
 #ifdef DEBUG_CHAR
@@ -242,23 +242,23 @@ static WRITE32_HANDLER(tileram_w)
 
 static READ32_HANDLER(spr_r)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	return state->sprram[offset];
 }
 
 static WRITE32_HANDLER(spr_w)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	state->sprram[offset] = data & 0xFFFF; //lower 16bit only
 }
 
 static READ32_HANDLER(data_r)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 	UINT32 data;
-	const UINT8 *usr = space->machine->region("user2")->base();
+	const UINT8 *usr = space->machine().region("user2")->base();
 
 	data=((state->databank>>4)&0xf)*0x100000; //guess
 	data=usr[data+offset*2]+usr[data+offset*2+1]*256;
@@ -267,30 +267,30 @@ static READ32_HANDLER(data_r)
 
 static WRITE32_HANDLER(input_select_w)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	state->input_select = data & 0x0F;
 }
 
 static READ32_HANDLER(srmp5_inputs_r)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 	UINT32 ret = 0;
 
 	switch (state->input_select)
 	{
 	case 0x01:
-		ret = input_port_read(space->machine, "IN0");
+		ret = input_port_read(space->machine(), "IN0");
 		break;
 	case 0x02:
-		ret = input_port_read(space->machine, "IN1");
+		ret = input_port_read(space->machine(), "IN1");
 		break;
 	case 0x04:
-		ret = input_port_read(space->machine, "IN2");
+		ret = input_port_read(space->machine(), "IN2");
 		break;
 	case 0x00:
 	case 0x08:
-		ret = input_port_read(space->machine, "IN3");
+		ret = input_port_read(space->machine(), "IN3");
 		break;
 	}
 	return ret;
@@ -299,7 +299,7 @@ static READ32_HANDLER(srmp5_inputs_r)
 //almost all cmds are sound related
 static WRITE32_HANDLER(cmd1_w)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	state->cmd1 = data & 0xFF;
 	logerror("cmd1_w %08X\n", data);
@@ -307,7 +307,7 @@ static WRITE32_HANDLER(cmd1_w)
 
 static WRITE32_HANDLER(cmd2_w)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	state->cmd2 = data & 0xFF;
 	state->cmd_stat = 5;
@@ -316,14 +316,14 @@ static WRITE32_HANDLER(cmd2_w)
 
 static READ32_HANDLER(cmd_stat32_r)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	return state->cmd_stat;
 }
 
 static READ32_HANDLER(srmp5_vidregs_r)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	logerror("vidregs read  %08X %08X\n", offset << 2, state->vidregs[offset]);
 	return state->vidregs[offset];
@@ -331,7 +331,7 @@ static READ32_HANDLER(srmp5_vidregs_r)
 
 static WRITE32_HANDLER(srmp5_vidregs_w)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	COMBINE_DATA(&state->vidregs[offset]);
 	if(offset != 0x10C / 4)
@@ -340,7 +340,7 @@ static WRITE32_HANDLER(srmp5_vidregs_w)
 
 static READ32_HANDLER(irq_ack_clear)
 {
-	cputag_set_input_line(space->machine, "sub", R3000_IRQ4, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "sub", R3000_IRQ4, CLEAR_LINE);
 	return 0;
 }
 
@@ -385,7 +385,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(cmd1_r)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	state->cmd_stat = 0;
 	return state->cmd1;
@@ -393,14 +393,14 @@ static READ8_HANDLER(cmd1_r)
 
 static READ8_HANDLER(cmd2_r)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	return state->cmd2;
 }
 
 static READ8_HANDLER(cmd_stat8_r)
 {
-	srmp5_state *state = space->machine->driver_data<srmp5_state>();
+	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
 	return state->cmd_stat;
 }
@@ -617,7 +617,7 @@ ROM_END
 
 static DRIVER_INIT(srmp5)
 {
-	srmp5_state *state = machine->driver_data<srmp5_state>();
+	srmp5_state *state = machine.driver_data<srmp5_state>();
 	st0016_game = 9;
 
 	state->tileram = auto_alloc_array(machine, UINT16, 0x100000/2);

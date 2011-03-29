@@ -58,59 +58,59 @@ Games by Nihon Game/Culture Brain:
 
 static WRITE8_HANDLER( shangkid_maincpu_bank_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 1);
+	memory_set_bank(space->machine(), "bank1", data & 1);
 }
 
 static WRITE8_HANDLER( shangkid_bbx_enable_w )
 {
-	cputag_set_input_line(space->machine, "bbx", INPUT_LINE_HALT, data?0:1 );
+	cputag_set_input_line(space->machine(), "bbx", INPUT_LINE_HALT, data?0:1 );
 }
 
 static WRITE8_HANDLER( shangkid_cpu_reset_w )
 {
 	if( data == 0 )
 	{
-		cputag_set_input_line(space->machine, "bbx", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "bbx", INPUT_LINE_RESET, PULSE_LINE);
 	}
 	else if( data == 1 )
 	{
-		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 
 static WRITE8_HANDLER( shangkid_sound_enable_w )
 {
-	shangkid_state *state = space->machine->driver_data<shangkid_state>();
+	shangkid_state *state = space->machine().driver_data<shangkid_state>();
 	state->bbx_sound_enable = data;
 }
 
 static WRITE8_DEVICE_HANDLER( chinhero_ay8910_porta_w )
 {
-	shangkid_state *state = device->machine->driver_data<shangkid_state>();
+	shangkid_state *state = device->machine().driver_data<shangkid_state>();
 	if( state->bbx_sound_enable )
 	{
 		if( data == 0x01 )
 			/* 0->1 transition triggers interrupt on Sound CPU */
-			cputag_set_input_line(device->machine, "audiocpu", 0, HOLD_LINE );
+			cputag_set_input_line(device->machine(), "audiocpu", 0, HOLD_LINE );
 	}
 }
 
 static WRITE8_DEVICE_HANDLER( shangkid_ay8910_porta_w )
 {
-	shangkid_state *state = device->machine->driver_data<shangkid_state>();
+	shangkid_state *state = device->machine().driver_data<shangkid_state>();
 	if( state->bbx_sound_enable )
 	{
 		if( data == 0x01 )
 			/* 0->1 transition triggers interrupt on Sound CPU */
-			cputag_set_input_line(device->machine, "audiocpu", 0, HOLD_LINE );
+			cputag_set_input_line(device->machine(), "audiocpu", 0, HOLD_LINE );
 	}
 	else
-		memory_set_bank(device->machine, "bank2", data ? 0 : 1);
+		memory_set_bank(device->machine(), "bank2", data ? 0 : 1);
 }
 
 static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
 {
-	shangkid_state *state = device->machine->driver_data<shangkid_state>();
+	shangkid_state *state = device->machine().driver_data<shangkid_state>();
 	state->sound_latch = data;
 }
 
@@ -118,7 +118,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
 
 static READ8_HANDLER( shangkid_soundlatch_r )
 {
-	shangkid_state *state = space->machine->driver_data<shangkid_state>();
+	shangkid_state *state = space->machine().driver_data<shangkid_state>();
 	return state->sound_latch;
 }
 
@@ -126,18 +126,18 @@ static READ8_HANDLER( shangkid_soundlatch_r )
 
 static DRIVER_INIT( chinhero )
 {
-	shangkid_state *state = machine->driver_data<shangkid_state>();
+	shangkid_state *state = machine.driver_data<shangkid_state>();
 	state->gfx_type = 0;
 }
 
 static DRIVER_INIT( shangkid )
 {
-	shangkid_state *state = machine->driver_data<shangkid_state>();
+	shangkid_state *state = machine.driver_data<shangkid_state>();
 	state->gfx_type = 1;
 
 	/* set up banking */
-	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x8000, 0x8000);
-	memory_configure_bank(machine, "bank2", 0, 2, machine->region("audiocpu")->base() + 0x0000, 0x10000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0x8000, 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 2, machine.region("audiocpu")->base() + 0x0000, 0x10000);
 }
 
 /***************************************************************************************/

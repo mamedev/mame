@@ -35,8 +35,8 @@ static void sid_start(device_t *device, SIDTYPE sidtype)
 	const sid6581_interface *iface = (const sid6581_interface*) device->baseconfig().static_config();
 
 	sid->device = device;
-	sid->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 1,  device->machine->sample_rate(), (void *) sid, sid_update);
-	sid->PCMfreq = device->machine->sample_rate();
+	sid->mixer_channel = device->machine().sound().stream_alloc(*device, 0, 1,  device->machine().sample_rate(), (void *) sid, sid_update);
+	sid->PCMfreq = device->machine().sample_rate();
 	sid->clock = device->clock();
 	sid->ad_read = iface ? iface->ad_read : NULL;
 	sid->type = sidtype;
@@ -71,7 +71,7 @@ static DEVICE_START( sid8580 )
 
 READ8_DEVICE_HANDLER  ( sid6581_r )
 {
-	return sid6581_port_r(device->machine, get_sid(device), offset);
+	return sid6581_port_r(device->machine(), get_sid(device), offset);
 }
 
 

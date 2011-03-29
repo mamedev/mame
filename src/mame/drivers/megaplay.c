@@ -377,7 +377,7 @@ INPUT_PORTS_END
 
 static READ8_HANDLER( megaplay_bios_banksel_r )
 {
-	mplay_state *state = space->machine->driver_data<mplay_state>();
+	mplay_state *state = space->machine().driver_data<mplay_state>();
 	return state->bios_bank;
 }
 
@@ -388,7 +388,7 @@ static WRITE8_HANDLER( megaplay_bios_banksel_w )
     It should be possible to multiplex different game ROMs at
     0x000000-0x3fffff based on these bits.
 */
-	mplay_state *state = space->machine->driver_data<mplay_state>();
+	mplay_state *state = space->machine().driver_data<mplay_state>();
 	state->bios_bank = data;
 	state->bios_mode = MP_ROM;
 //  logerror("BIOS: ROM bank %i selected [0x%02x]\n",bios_bank >> 6, data);
@@ -396,13 +396,13 @@ static WRITE8_HANDLER( megaplay_bios_banksel_w )
 
 static READ8_HANDLER( megaplay_bios_gamesel_r )
 {
-	mplay_state *state = space->machine->driver_data<mplay_state>();
+	mplay_state *state = space->machine().driver_data<mplay_state>();
 	return state->bios_6403;
 }
 
 static WRITE8_HANDLER( megaplay_bios_gamesel_w )
 {
-	mplay_state *state = space->machine->driver_data<mplay_state>();
+	mplay_state *state = space->machine().driver_data<mplay_state>();
 	state->bios_6403 = data;
 
 //  logerror("BIOS: 0x6403 write: 0x%02x\n",data);
@@ -427,8 +427,8 @@ static READ16_HANDLER( megaplay_io_read )
 
 static READ8_HANDLER( bank_r )
 {
-	mplay_state *state = space->machine->driver_data<mplay_state>();
-	UINT8* bank = space->machine->region("mtbios")->base();
+	mplay_state *state = space->machine().driver_data<mplay_state>();
+	UINT8* bank = space->machine().region("mtbios")->base();
 	UINT32 fulladdress = state->mp_bios_bank_addr + offset;
 
 	if ((fulladdress >= 0x000000) && (fulladdress <= 0x3fffff)) // ROM Addresses
@@ -451,7 +451,7 @@ static READ8_HANDLER( bank_r )
 		}
 		else
 		{
-			return space->machine->region("maincpu")->base()[fulladdress ^ 1];
+			return space->machine().region("maincpu")->base()[fulladdress ^ 1];
 		}
 	}
 	else if (fulladdress >= 0xa10000 && fulladdress <= 0xa1001f) // IO Acess
@@ -468,7 +468,7 @@ static READ8_HANDLER( bank_r )
 
 static WRITE8_HANDLER( bank_w )
 {
-	mplay_state *state = space->machine->driver_data<mplay_state>();
+	mplay_state *state = space->machine().driver_data<mplay_state>();
 	UINT32 fulladdress = state->mp_bios_bank_addr + offset;
 
 	if ((fulladdress >= 0x000000) && (fulladdress <= 0x3fffff)) // ROM / Megaplay Custom Addresses
@@ -517,7 +517,7 @@ static READ8_HANDLER( megaplay_bios_6204_r )
 
 static WRITE8_HANDLER( megaplay_bios_width_w )
 {
-	mplay_state *state = space->machine->driver_data<mplay_state>();
+	mplay_state *state = space->machine().driver_data<mplay_state>();
 	state->bios_width = data;
 	megadrive_io_data_regs[2] = (megadrive_io_data_regs[2] & 0x07) | ((data & 0xf8));
 //  logerror("BIOS: 0x6204 - Width write: %02x\n", data);
@@ -525,7 +525,7 @@ static WRITE8_HANDLER( megaplay_bios_width_w )
 
 static READ8_HANDLER( megaplay_bios_6404_r )
 {
-	mplay_state *state = space->machine->driver_data<mplay_state>();
+	mplay_state *state = space->machine().driver_data<mplay_state>();
 //  logerror("BIOS: 0x6404 read: returned 0x%02x\n",bios_6404 | (bios_6403 & 0x10) >> 4);
 	return (state->bios_6404 & 0xfe) | ((state->bios_6403 & 0x10) >> 4);
 //  return state->bios_6404 | (state->bios_6403 & 0x10) >> 4;
@@ -533,9 +533,9 @@ static READ8_HANDLER( megaplay_bios_6404_r )
 
 static WRITE8_HANDLER( megaplay_bios_6404_w )
 {
-	mplay_state *state = space->machine->driver_data<mplay_state>();
+	mplay_state *state = space->machine().driver_data<mplay_state>();
 	if(((state->bios_6404 & 0x0c) == 0x00) && ((data & 0x0c) == 0x0c))
-		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	state->bios_6404 = data;
 
 //  logerror("BIOS: 0x6404 write: 0x%02x\n", data);
@@ -549,20 +549,20 @@ static READ8_HANDLER( megaplay_bios_6600_r )
     function to make the BIOS check all 4 slots (3 and 4 will be "not used")
         return (state->bios_6600 & 0xfe) | (state->bios_bank & 0x01);
 */
-	mplay_state *state = space->machine->driver_data<mplay_state>();
+	mplay_state *state = space->machine().driver_data<mplay_state>();
 	return state->bios_6600;// & 0xfe;
 }
 
 static WRITE8_HANDLER( megaplay_bios_6600_w )
 {
-	mplay_state *state = space->machine->driver_data<mplay_state>();
+	mplay_state *state = space->machine().driver_data<mplay_state>();
 	state->bios_6600 = data;
 //  logerror("BIOS: 0x6600 write: 0x%02x\n",data);
 }
 
 static WRITE8_HANDLER( megaplay_game_w )
 {
-	mplay_state *state = space->machine->driver_data<mplay_state>();
+	mplay_state *state = space->machine().driver_data<mplay_state>();
 	if (state->readpos == 1)
 		state->game_banksel = 0;
 	state->game_banksel |= (1 << (state->readpos - 1)) * (data & 0x01);
@@ -631,7 +631,7 @@ static SCREEN_UPDATE(megplay)
 //extern SCREEN_EOF(megadriv);
 static MACHINE_RESET( megaplay )
 {
-	mplay_state *state = machine->driver_data<mplay_state>();
+	mplay_state *state = machine.driver_data<mplay_state>();
 	state->bios_mode = MP_ROM;
 	state->mp_bios_bank_addr = 0;
 	state->readpos = 1;
@@ -828,11 +828,11 @@ ROM_START( mp_shnb3 ) /* Shinobi 3 */
 ROM_END
 
 
-static void mplay_start(running_machine *machine)
+static void mplay_start(running_machine &machine)
 {
-	UINT8 *src = machine->region("mtbios")->base();
-	UINT8 *instruction_rom = machine->region("user1")->base();
-	UINT8 *game_rom = machine->region("maincpu")->base();
+	UINT8 *src = machine.region("mtbios")->base();
+	UINT8 *instruction_rom = machine.region("user1")->base();
+	UINT8 *game_rom = machine.region("maincpu")->base();
 	int offs;
 
 	memmove(src + 0x10000, src + 0x8000, 0x18000); // move bios..
@@ -850,13 +850,13 @@ static void mplay_start(running_machine *machine)
 
 static READ16_HANDLER( megadriv_68k_read_z80_extra_ram )
 {
-	mplay_state *state = space->machine->driver_data<mplay_state>();
+	mplay_state *state = space->machine().driver_data<mplay_state>();
 	return state->ic36_ram[(offset << 1) ^ 1] | (state->ic36_ram[(offset << 1)] << 8);
 }
 
 static WRITE16_HANDLER( megadriv_68k_write_z80_extra_ram )
 {
-	mplay_state *state = space->machine->driver_data<mplay_state>();
+	mplay_state *state = space->machine().driver_data<mplay_state>();
 	if (!ACCESSING_BITS_0_7) // byte (MSB) access
 	{
 		state->ic36_ram[(offset << 1)] = (data & 0xff00) >> 8;
@@ -874,7 +874,7 @@ static WRITE16_HANDLER( megadriv_68k_write_z80_extra_ram )
 
 static DRIVER_INIT(megaplay)
 {
-	mplay_state *state = machine->driver_data<mplay_state>();
+	mplay_state *state = machine.driver_data<mplay_state>();
 	/* to support the old code.. */
 	state->ic36_ram = auto_alloc_array(machine, UINT16, 0x10000 / 2);
 	state->ic37_ram = auto_alloc_array(machine, UINT8, 0x10000);
@@ -885,13 +885,13 @@ static DRIVER_INIT(megaplay)
 	mplay_start(machine);
 
 	/* for now ... */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa10000, 0xa1001f, FUNC(megaplay_io_read), FUNC(megaplay_io_write));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa10000, 0xa1001f, FUNC(megaplay_io_read), FUNC(megaplay_io_write));
 
 	/* megaplay has ram shared with the bios cpu here */
-	machine->device("genesis_snd_z80")->memory().space(AS_PROGRAM)->install_ram(0x2000, 0x3fff, &state->ic36_ram[0]);
+	machine.device("genesis_snd_z80")->memory().space(AS_PROGRAM)->install_ram(0x2000, 0x3fff, &state->ic36_ram[0]);
 
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa02000, 0xa03fff, FUNC(megadriv_68k_read_z80_extra_ram), FUNC(megadriv_68k_write_z80_extra_ram));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa02000, 0xa03fff, FUNC(megadriv_68k_read_z80_extra_ram), FUNC(megadriv_68k_write_z80_extra_ram));
 
 	DRIVER_INIT_CALL(megatech_bios); // create the SMS vdp etc.
 

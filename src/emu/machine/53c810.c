@@ -42,15 +42,15 @@ static struct {
 	int halted;
 	int carry;
 	UINT32 (* fetch)(UINT32 dsp);
-	void (* irq_callback)(running_machine *machine);
+	void (* irq_callback)(running_machine &machine);
 	void (* dma_callback)(UINT32, UINT32, int, int);
 } lsi810;
 
-typedef void (*opcode_handler)(running_machine *machine);
-#define OPCODE_HANDLER(name) void name(running_machine *machine)
+typedef void (*opcode_handler)(running_machine &machine);
+#define OPCODE_HANDLER(name) void name(running_machine &machine)
 static opcode_handler dma_opcode[256];
 
-INLINE UINT32 FETCH(running_machine *machine)
+INLINE UINT32 FETCH(running_machine &machine)
 {
 	UINT32 r = intf->fetch(machine, lsi810.dsp);
 	lsi810.dsp += 4;
@@ -340,7 +340,7 @@ static int scripts_compute_branch(void)
 	return passed;
 }
 
-static UINT32 scripts_get_jump_dest(running_machine *machine)
+static UINT32 scripts_get_jump_dest(running_machine &machine)
 {
 	INT32 dsps;
 	UINT32 dest;
@@ -421,7 +421,7 @@ static OPCODE_HANDLER( dmaop_load )
 
 
 
-static void dma_exec(running_machine *machine)
+static void dma_exec(running_machine &machine)
 {
 	lsi810.dma_icount = DMA_MAX_ICOUNT;
 
@@ -484,7 +484,7 @@ READ8_HANDLER( lsi53c810_reg_r )
 			// clear the interrupt on service
 			if(intf->irq_callback != NULL)
 			{
-				intf->irq_callback(space->machine, 0);
+				intf->irq_callback(space->machine(), 0);
 			}
 
 			return lsi810.istat;
@@ -599,7 +599,7 @@ WRITE8_HANDLER( lsi53c810_reg_w )
 			lsi810.dsp |= data << 24;
 			lsi810.halted = 0;
 			if((lsi810.dmode & 0x1) == 0 && !lsi810.halted) {
-				dma_exec(space->machine);
+				dma_exec(space->machine());
 			}
 			break;
 		case 0x34:		/* SCRATCH A */
@@ -620,19 +620,19 @@ WRITE8_HANDLER( lsi53c810_reg_w )
 			if(lsi810.dcntl & 0x14 && !lsi810.halted)		/* single-step & start DMA */
 			{
 				int op;
-				lsi810.dcmd = FETCH(space->machine);
+				lsi810.dcmd = FETCH(space->machine());
 				op = (lsi810.dcmd >> 24) & 0xff;
-				dma_opcode[op](space->machine);
+				dma_opcode[op](space->machine());
 
 				lsi810.istat |= 0x3;	/* DMA interrupt pending */
 				lsi810.dstat |= 0x8;	/* SSI (Single Step Interrupt) */
 				if(intf->irq_callback != NULL) {
-					intf->irq_callback(space->machine, 1);
+					intf->irq_callback(space->machine(), 1);
 				}
 			}
 			else if(lsi810.dcntl & 0x04 && !lsi810.halted)	/* manual start DMA */
 			{
-				dma_exec(space->machine);
+				dma_exec(space->machine());
 			}
 			break;
 		case 0x40:		/* SIEN0 */
@@ -672,7 +672,7 @@ static void add_opcode(UINT8 op, UINT8 mask, opcode_handler handler)
 	}
 }
 
-void lsi53c810_init(running_machine *machine, const struct LSI53C810interface *interface)
+void lsi53c810_init(running_machine &machine, const struct LSI53C810interface *interface)
 {
 	int i;
 
@@ -766,12 +766,12 @@ void *lsi53c810_get_device(int id)
  *
  *************************************/
 
-static UINT32 lsi53c810_dasm_fetch(running_machine *machine, UINT32 pc)
+static UINT32 lsi53c810_dasm_fetch(running_machine &machine, UINT32 pc)
 {
 	return intf->fetch(machine, pc);
 }
 
-unsigned lsi53c810_dasm(running_machine *machine, char *buf, UINT32 pc)
+unsigned lsi53c810_dasm(running_machine &machine, char *buf, UINT32 pc)
 {
 	unsigned result = 0;
 	const char *op_mnemonic = NULL;

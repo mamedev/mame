@@ -50,7 +50,7 @@ Notes:
 
 static WRITE8_DEVICE_HANDLER( zaccaria_dsw_sel_w )
 {
-	zaccaria_state *state = device->machine->driver_data<zaccaria_state>();
+	zaccaria_state *state = device->machine().driver_data<zaccaria_state>();
 	switch (data & 0xf0)
 	{
 		case 0xe0:
@@ -66,17 +66,17 @@ static WRITE8_DEVICE_HANDLER( zaccaria_dsw_sel_w )
 			break;
 
 		default:
-			logerror("%s: portsel = %02x\n", device->machine->describe_context(), data);
+			logerror("%s: portsel = %02x\n", device->machine().describe_context(), data);
 			break;
 	}
 }
 
 static READ8_HANDLER( zaccaria_dsw_r )
 {
-	zaccaria_state *state = space->machine->driver_data<zaccaria_state>();
+	zaccaria_state *state = space->machine().driver_data<zaccaria_state>();
 	static const char *const dswnames[] = { "IN0", "DSW0", "DSW1" };
 
-	return input_port_read(space->machine, dswnames[state->dsw]);
+	return input_port_read(space->machine(), dswnames[state->dsw]);
 }
 
 
@@ -98,41 +98,41 @@ static WRITE8_DEVICE_HANDLER( ay8910_port0a_w )
 	/* 150 below to scale to volume 100 */
 	v = (150 * table[ba]) / (4700 + table[ba]);
 	//printf("dac1w %02d %04d\n", ba, v);
-	ay8910_set_volume(device->machine->device("ay2"), 1, v);
+	ay8910_set_volume(device->machine().device("ay2"), 1, v);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0a )
 {
-	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( zaccaria_port0a_r )
 {
-	zaccaria_state *state = device->machine->driver_data<zaccaria_state>();
-	return ay8910_r(device->machine->device((state->active_8910 == 0) ? "ay1" : "ay2"), 0);
+	zaccaria_state *state = device->machine().driver_data<zaccaria_state>();
+	return ay8910_r(device->machine().device((state->active_8910 == 0) ? "ay1" : "ay2"), 0);
 }
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port0a_w )
 {
-	zaccaria_state *state = device->machine->driver_data<zaccaria_state>();
+	zaccaria_state *state = device->machine().driver_data<zaccaria_state>();
 	state->port0a = data;
 }
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 {
-	zaccaria_state *state = device->machine->driver_data<zaccaria_state>();
+	zaccaria_state *state = device->machine().driver_data<zaccaria_state>();
 
 	/* bit 1 goes to 8910 #0 BDIR pin  */
 	if ((state->last_port0b & 0x02) == 0x02 && (data & 0x02) == 0x00)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		ay8910_data_address_w(device->machine->device("ay1"), state->last_port0b, state->port0a);
+		ay8910_data_address_w(device->machine().device("ay1"), state->last_port0b, state->port0a);
 	}
 	else if ((state->last_port0b & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -144,7 +144,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 	if ((state->last_port0b & 0x08) == 0x08 && (data & 0x08) == 0x00)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		ay8910_data_address_w(device->machine->device("ay2"), state->last_port0b >> 2, state->port0a);
+		ay8910_data_address_w(device->machine().device("ay2"), state->last_port0b >> 2, state->port0a);
 	}
 	else if ((state->last_port0b & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -158,8 +158,8 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
-	zaccaria_state *state = device->machine->driver_data<zaccaria_state>();
-	device_t *pia0 = device->machine->device("pia0");
+	zaccaria_state *state = device->machine().driver_data<zaccaria_state>();
+	device_t *pia0 = device->machine().device("pia0");
 
 	pia6821_cb1_w(pia0, state->toggle & 1);
 	state->toggle ^= 1;
@@ -167,8 +167,8 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 {
-	zaccaria_state *state = device->machine->driver_data<zaccaria_state>();
-	device_t *tms = device->machine->device("tms");
+	zaccaria_state *state = device->machine().driver_data<zaccaria_state>();
+	device_t *tms = device->machine().device("tms");
 
 	// bit 0 = /RS
 	tms5220_rsq_w(tms, (data >> 0) & 0x01);
@@ -179,19 +179,19 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 	state->acs = ~data & 0x08;
 
 	// bit 4 = led (for testing?)
-	set_led_status(device->machine, 0,~data & 0x10);
+	set_led_status(device->machine(), 0,~data & 0x10);
 }
 
 
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audio2", 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "audio2", 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound1_command_w )
 {
-	device_t *pia0 = space->machine->device("pia0");
+	device_t *pia0 = space->machine().device("pia0");
 	pia6821_ca1_w(pia0, data & 0x80);
 	soundlatch2_w(space, 0, data);
 }
@@ -215,7 +215,7 @@ static READ8_HANDLER( zaccaria_prot1_r )
 			return 0x40;    /* Jack Rabbit */
 
 		case 6:
-			if (&space->machine->system() == &GAME_NAME(monymony))
+			if (&space->machine().system() == &GAME_NAME(monymony))
 				return 0x70;    /* Money Money */
 			return 0xa0;    /* Jack Rabbit */
 
@@ -229,7 +229,7 @@ static READ8_HANDLER( zaccaria_prot2_r )
 	switch (offset)
 	{
 		case 0:
-			return input_port_read(space->machine, "COINS");   /* bits 4 and 5 must be 0 in Jack Rabbit */
+			return input_port_read(space->machine(), "COINS");   /* bits 4 and 5 must be 0 in Jack Rabbit */
 
 		case 2:
 			return 0x10;    /* Jack Rabbit */
@@ -248,7 +248,7 @@ static READ8_HANDLER( zaccaria_prot2_r )
 
 static WRITE8_HANDLER( coin_w )
 {
-	coin_counter_w(space->machine, 0,data & 1);
+	coin_counter_w(space->machine(), 0,data & 1);
 }
 
 static WRITE8_HANDLER( nmienable_w )
@@ -342,7 +342,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( acs_r )
 {
-	zaccaria_state *state = field->port->machine->driver_data<zaccaria_state>();
+	zaccaria_state *state = field->port->machine().driver_data<zaccaria_state>();
 	return (state->acs & 0x08) ? 1 : 0;
 }
 

@@ -152,19 +152,19 @@ Changes:
 static WRITE8_HANDLER( sprite_dma_0_w )
 {
 	int source = ( data & 7 );
-	ppu2c0x_spriteram_dma( space, space->machine->device("ppu1"), source );
+	ppu2c0x_spriteram_dma( space, space->machine().device("ppu1"), source );
 }
 
 static WRITE8_HANDLER( sprite_dma_1_w )
 {
 	int source = ( data & 7 );
-	ppu2c0x_spriteram_dma( space, space->machine->device("ppu2"), source );
+	ppu2c0x_spriteram_dma( space, space->machine().device("ppu2"), source );
 }
 
 static WRITE8_HANDLER( vsnes_coin_counter_w )
 {
-	vsnes_state *state = space->machine->driver_data<vsnes_state>();
-	coin_counter_w( space->machine, 0, data & 0x01 );
+	vsnes_state *state = space->machine().driver_data<vsnes_state>();
+	coin_counter_w( space->machine(), 0, data & 0x01 );
 	state->coin = data;
 
 	 //"bnglngby" and "cluclu"
@@ -176,14 +176,14 @@ static WRITE8_HANDLER( vsnes_coin_counter_w )
 
 static READ8_HANDLER( vsnes_coin_counter_r )
 {
-	vsnes_state *state = space->machine->driver_data<vsnes_state>();
+	vsnes_state *state = space->machine().driver_data<vsnes_state>();
 	//only for platoon
 	return state->coin;
 }
 
 static WRITE8_HANDLER( vsnes_coin_counter_1_w )
 {
-	coin_counter_w( space->machine, 1, data & 0x01 );
+	coin_counter_w( space->machine(), 1, data & 0x01 );
 	if( data & 0xfe ) //vsbball service mode
 	{
 	//do something?

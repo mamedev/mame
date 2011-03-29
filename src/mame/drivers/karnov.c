@@ -90,9 +90,9 @@ Stephh's notes (based on the games M68000 code and some tests) :
  *************************************/
 
 /* Emulation of the protected microcontroller - for coins & general protection */
-static void karnov_i8751_w( running_machine *machine, int data )
+static void karnov_i8751_w( running_machine &machine, int data )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
+	karnov_state *state = machine.driver_data<karnov_state>();
 
 	/* Pending coin operations may cause protection commands to be queued */
 	if (state->i8751_needs_ack)
@@ -123,15 +123,15 @@ static void karnov_i8751_w( running_machine *machine, int data )
 	if (data == 0x401) state->i8751_return = 0x4138; /* ^Whistling wind */
 	if (data == 0x408) state->i8751_return = 0x4276; /* ^Heavy Gates */
 
-//  if (!state->i8751_return && data != 0x300) logerror("%s - Unknown Write %02x intel\n", machine->describe_context(), data);
+//  if (!state->i8751_return && data != 0x300) logerror("%s - Unknown Write %02x intel\n", machine.describe_context(), data);
 
 	device_set_input_line(state->maincpu, 6, HOLD_LINE); /* Signal main cpu task is complete */
 	state->i8751_needs_ack = 1;
 }
 
-static void wndrplnt_i8751_w( running_machine *machine, int data )
+static void wndrplnt_i8751_w( running_machine &machine, int data )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
+	karnov_state *state = machine.driver_data<karnov_state>();
 
 	/* The last command hasn't been ACK'd (probably a conflict with coin command) */
 	if (state->i8751_needs_ack)
@@ -159,7 +159,7 @@ static void wndrplnt_i8751_w( running_machine *machine, int data )
 			case 0x18:	state->i8751_return = 0x5341; break;
 		}
 	}
-//  else logerror("%s - Unknown Write %02x intel\n", machine->describe_context(), data);
+//  else logerror("%s - Unknown Write %02x intel\n", machine.describe_context(), data);
 
 	/* These are 68k function call addresses - different address for each power-up */
 	if (data == 0x400) state->i8751_return = 0x594;
@@ -189,9 +189,9 @@ static void wndrplnt_i8751_w( running_machine *machine, int data )
 	state->i8751_needs_ack = 1;
 }
 
-static void chelnov_i8751_w( running_machine *machine, int data )
+static void chelnov_i8751_w( running_machine &machine, int data )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
+	karnov_state *state = machine.driver_data<karnov_state>();
 
 	/* Pending coin operations may cause protection commands to be queued */
 	if (state->i8751_needs_ack)
@@ -315,7 +315,7 @@ static void chelnov_i8751_w( running_machine *machine, int data )
 		}
 	}
 
-	//  logerror("%s - Unknown Write %02x intel\n", machine->describe_context(), data);
+	//  logerror("%s - Unknown Write %02x intel\n", machine.describe_context(), data);
 
 	device_set_input_line(state->maincpu, 6, HOLD_LINE); /* Signal main cpu task is complete */
 	state->i8751_needs_ack = 1;
@@ -329,7 +329,7 @@ static void chelnov_i8751_w( running_machine *machine, int data )
 
 static WRITE16_HANDLER( karnov_control_w )
 {
-	karnov_state *state = space->machine->driver_data<karnov_state>();
+	karnov_state *state = space->machine().driver_data<karnov_state>();
 
 	/* Mnemonics filled in from the schematics, brackets are my comments */
 	switch (offset << 1)
@@ -371,16 +371,16 @@ static WRITE16_HANDLER( karnov_control_w )
 
 		case 6: /* SECREQ (Interrupt & Data to i8751) */
 			if (state->microcontroller_id == KARNOV || state->microcontroller_id == KARNOVJ)
-				karnov_i8751_w(space->machine, data);
+				karnov_i8751_w(space->machine(), data);
 			if (state->microcontroller_id == CHELNOV || state->microcontroller_id == CHELNOVU || state->microcontroller_id == CHELNOVJ)
-				chelnov_i8751_w(space->machine, data);
+				chelnov_i8751_w(space->machine(), data);
 			if (state->microcontroller_id == WNDRPLNT)
-				wndrplnt_i8751_w(space->machine, data);
+				wndrplnt_i8751_w(space->machine(), data);
 			break;
 
 		case 8: /* HSHIFT (9 bits) - Top bit indicates video flip */
 			COMBINE_DATA(&state->scroll[0]);
-			karnov_flipscreen_w(space->machine, data >> 15);
+			karnov_flipscreen_w(space->machine(), data >> 15);
 			break;
 
 		case 0xa: /* VSHIFT */
@@ -403,16 +403,16 @@ static WRITE16_HANDLER( karnov_control_w )
 
 static READ16_HANDLER( karnov_control_r )
 {
-	karnov_state *state = space->machine->driver_data<karnov_state>();
+	karnov_state *state = space->machine().driver_data<karnov_state>();
 
 	switch (offset << 1)
 	{
 		case 0:
-			return input_port_read(space->machine, "P1_P2");
+			return input_port_read(space->machine(), "P1_P2");
 		case 2: /* Start buttons & VBL */
-			return input_port_read(space->machine, "SYSTEM");
+			return input_port_read(space->machine(), "SYSTEM");
 		case 4:
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 		case 6: /* i8751 return values */
 			return state->i8751_return;
 	}
@@ -728,8 +728,8 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( karnov_interrupt )
 {
-	karnov_state *state = device->machine->driver_data<karnov_state>();
-	UINT8 port = input_port_read(device->machine, "FAKE");
+	karnov_state *state = device->machine().driver_data<karnov_state>();
+	UINT8 port = input_port_read(device->machine(), "FAKE");
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
 	if (port == state->coin_mask)
@@ -757,7 +757,7 @@ static INTERRUPT_GEN( karnov_interrupt )
 
 static void sound_irq( device_t *device, int linestate )
 {
-	karnov_state *state = device->machine->driver_data<karnov_state>();
+	karnov_state *state = device->machine().driver_data<karnov_state>();
 	device_set_input_line(state->audiocpu, 0, linestate); /* IRQ */
 }
 
@@ -774,10 +774,10 @@ static const ym3526_interface ym3526_config =
 
 static MACHINE_START( karnov )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
+	karnov_state *state = machine.driver_data<karnov_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->flipscreen));
 	state->save_item(NAME(state->scroll));
@@ -793,7 +793,7 @@ static MACHINE_START( karnov )
 
 static MACHINE_RESET( karnov )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
+	karnov_state *state = machine.driver_data<karnov_state>();
 
 	memset(state->ram, 0, 0x4000 / 2); /* Chelnov likes ram clear on reset.. */
 
@@ -1116,29 +1116,29 @@ ROM_END
 
 static DRIVER_INIT( karnov )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
+	karnov_state *state = machine.driver_data<karnov_state>();
 	state->microcontroller_id = KARNOV;
 	state->coin_mask = 0x07;
 }
 
 static DRIVER_INIT( karnovj )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
+	karnov_state *state = machine.driver_data<karnov_state>();
 	state->microcontroller_id = KARNOVJ;
 	state->coin_mask = 0x07;
 }
 
 static DRIVER_INIT( wndrplnt )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
+	karnov_state *state = machine.driver_data<karnov_state>();
 	state->microcontroller_id = WNDRPLNT;
 	state->coin_mask = 0x00;
 }
 
 static DRIVER_INIT( chelnov )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
-	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
+	karnov_state *state = machine.driver_data<karnov_state>();
+	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
 
 	state->microcontroller_id = CHELNOV;
 	state->coin_mask = 0xe0;
@@ -1148,8 +1148,8 @@ static DRIVER_INIT( chelnov )
 
 static DRIVER_INIT( chelnovu )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
-	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
+	karnov_state *state = machine.driver_data<karnov_state>();
+	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
 
 	state->microcontroller_id = CHELNOVU;
 	state->coin_mask = 0xe0;
@@ -1159,8 +1159,8 @@ static DRIVER_INIT( chelnovu )
 
 static DRIVER_INIT( chelnovj )
 {
-	karnov_state *state = machine->driver_data<karnov_state>();
-	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
+	karnov_state *state = machine.driver_data<karnov_state>();
+	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
 
 	state->microcontroller_id = CHELNOVJ;
 	state->coin_mask = 0xe0;

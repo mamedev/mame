@@ -168,7 +168,7 @@ INLINE void enable_clipping(itech32_state *state)
 
 VIDEO_START( itech32 )
 {
-	itech32_state *state = machine->driver_data<itech32_state>();
+	itech32_state *state = machine.driver_data<itech32_state>();
 	int i;
 
 	/* allocate memory */
@@ -189,8 +189,8 @@ VIDEO_START( itech32 )
 		state->videoplane[0][i] = state->videoplane[1][i] = 0xff;
 
 	/* fetch the GROM base */
-	state->grom_base = machine->region("gfx1")->base();
-	state->grom_size = machine->region("gfx1")->bytes();
+	state->grom_base = machine.region("gfx1")->base();
+	state->grom_size = machine.region("gfx1")->bytes();
 	state->grom_bank = 0;
 	state->grom_bank_mask = state->grom_size >> 24;
 	if (state->grom_bank_mask == 2)
@@ -199,7 +199,7 @@ VIDEO_START( itech32 )
 	/* reset statics */
 	memset(state->video, 0, 0x80);
 
-	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(scanline_interrupt));
+	state->scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_interrupt));
 	state->enable_latch[0] = 1;
 	state->enable_latch[1] = (state->planes > 1) ? 1 : 0;
 }
@@ -214,7 +214,7 @@ VIDEO_START( itech32 )
 
 WRITE16_HANDLER( timekill_colora_w )
 {
-	itech32_state *state = space->machine->driver_data<itech32_state>();
+	itech32_state *state = space->machine().driver_data<itech32_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->enable_latch[0] = (~data >> 5) & 1;
@@ -226,7 +226,7 @@ WRITE16_HANDLER( timekill_colora_w )
 
 WRITE16_HANDLER( timekill_colorbc_w )
 {
-	itech32_state *state = space->machine->driver_data<itech32_state>();
+	itech32_state *state = space->machine().driver_data<itech32_state>();
 	if (ACCESSING_BITS_0_7)
 		state->color_latch[1] = ((data & 0xf0) << 4) | 0x1000;
 }
@@ -239,14 +239,14 @@ WRITE16_HANDLER( timekill_intensity_w )
 		double intensity = (double)(data & 0xff) / (double)0x60;
 		int i;
 		for (i = 0; i < 8192; i++)
-			palette_set_pen_contrast(space->machine, i, intensity);
+			palette_set_pen_contrast(space->machine(), i, intensity);
 	}
 }
 
 
 WRITE16_HANDLER( bloodstm_color1_w )
 {
-	itech32_state *state = space->machine->driver_data<itech32_state>();
+	itech32_state *state = space->machine().driver_data<itech32_state>();
 	if (ACCESSING_BITS_0_7)
 		state->color_latch[0] = (data & 0x7f) << 8;
 }
@@ -254,7 +254,7 @@ WRITE16_HANDLER( bloodstm_color1_w )
 
 WRITE16_HANDLER( bloodstm_color2_w )
 {
-	itech32_state *state = space->machine->driver_data<itech32_state>();
+	itech32_state *state = space->machine().driver_data<itech32_state>();
 	if (ACCESSING_BITS_0_7)
 		state->color_latch[1] = (data & 0x7f) << 8;
 }
@@ -262,7 +262,7 @@ WRITE16_HANDLER( bloodstm_color2_w )
 
 WRITE16_HANDLER( bloodstm_plane_w )
 {
-	itech32_state *state = space->machine->driver_data<itech32_state>();
+	itech32_state *state = space->machine().driver_data<itech32_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->enable_latch[0] = (~data >> 1) & 1;
@@ -273,7 +273,7 @@ WRITE16_HANDLER( bloodstm_plane_w )
 
 WRITE32_HANDLER( drivedge_color0_w )
 {
-	itech32_state *state = space->machine->driver_data<itech32_state>();
+	itech32_state *state = space->machine().driver_data<itech32_state>();
 	if (ACCESSING_BITS_16_23)
 		state->color_latch[0] = ((data >> 16) & 0x7f) << 8;
 }
@@ -281,7 +281,7 @@ WRITE32_HANDLER( drivedge_color0_w )
 
 WRITE32_HANDLER( itech020_color1_w )
 {
-	itech32_state *state = space->machine->driver_data<itech32_state>();
+	itech32_state *state = space->machine().driver_data<itech32_state>();
 	if (ACCESSING_BITS_0_7)
 		state->color_latch[1] = (data & 0x7f) << 8;
 }
@@ -289,7 +289,7 @@ WRITE32_HANDLER( itech020_color1_w )
 
 WRITE32_HANDLER( itech020_color2_w )
 {
-	itech32_state *state = space->machine->driver_data<itech32_state>();
+	itech32_state *state = space->machine().driver_data<itech32_state>();
 	if (ACCESSING_BITS_0_7)
 		state->color_latch[0] = (data & 0x7f) << 8;
 }
@@ -297,7 +297,7 @@ WRITE32_HANDLER( itech020_color2_w )
 
 WRITE32_HANDLER( itech020_plane_w )
 {
-	itech32_state *state = space->machine->driver_data<itech32_state>();
+	itech32_state *state = space->machine().driver_data<itech32_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		state->enable_latch[0] = (~data >> 9) & 1;
@@ -318,13 +318,13 @@ WRITE16_HANDLER( timekill_paletteram_w )
 {
 	int r, g, b;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 
-	r = space->machine->generic.paletteram.u16[offset & ~1] & 0xff;
-	g = space->machine->generic.paletteram.u16[offset & ~1] >> 8;
-	b = space->machine->generic.paletteram.u16[offset |  1] >> 8;
+	r = space->machine().generic.paletteram.u16[offset & ~1] & 0xff;
+	g = space->machine().generic.paletteram.u16[offset & ~1] >> 8;
+	b = space->machine().generic.paletteram.u16[offset |  1] >> 8;
 
-	palette_set_color(space->machine, offset / 2, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset / 2, MAKE_RGB(r, g, b));
 }
 
 
@@ -335,13 +335,13 @@ WRITE16_HANDLER( bloodstm_paletteram_w )
 	/* in test mode, the LSB is used; in game mode, the MSB is used */
 	if (!ACCESSING_BITS_0_7 && (offset & 1))
 		data >>= 8, mem_mask >>= 8;
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 
-	r = space->machine->generic.paletteram.u16[offset & ~1] & 0xff;
-	g = space->machine->generic.paletteram.u16[offset & ~1] >> 8;
-	b = space->machine->generic.paletteram.u16[offset |  1] & 0xff;
+	r = space->machine().generic.paletteram.u16[offset & ~1] & 0xff;
+	g = space->machine().generic.paletteram.u16[offset & ~1] >> 8;
+	b = space->machine().generic.paletteram.u16[offset |  1] & 0xff;
 
-	palette_set_color(space->machine, offset / 2, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset / 2, MAKE_RGB(r, g, b));
 }
 
 
@@ -349,13 +349,13 @@ WRITE32_HANDLER( drivedge_paletteram_w )
 {
 	int r, g, b;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
 
-	r = space->machine->generic.paletteram.u32[offset] & 0xff;
-	g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
-	b = (space->machine->generic.paletteram.u32[offset] >> 16) & 0xff;
+	r = space->machine().generic.paletteram.u32[offset] & 0xff;
+	g = (space->machine().generic.paletteram.u32[offset] >> 8) & 0xff;
+	b = (space->machine().generic.paletteram.u32[offset] >> 16) & 0xff;
 
-	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
 }
 
 
@@ -363,13 +363,13 @@ WRITE32_HANDLER( itech020_paletteram_w )
 {
 	int r, g, b;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
 
-	r = (space->machine->generic.paletteram.u32[offset] >> 16) & 0xff;
-	g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
-	b = space->machine->generic.paletteram.u32[offset] & 0xff;
+	r = (space->machine().generic.paletteram.u32[offset] >> 16) & 0xff;
+	g = (space->machine().generic.paletteram.u32[offset] >> 8) & 0xff;
+	b = space->machine().generic.paletteram.u32[offset] & 0xff;
 
-	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
 }
 
 
@@ -380,9 +380,9 @@ WRITE32_HANDLER( itech020_paletteram_w )
  *
  *************************************/
 
-static void logblit(running_machine *machine, const char *tag)
+static void logblit(running_machine &machine, const char *tag)
 {
-	itech32_state *state = machine->driver_data<itech32_state>();
+	itech32_state *state = machine.driver_data<itech32_state>();
 	if (!input_code_pressed(machine, KEYCODE_L))
 		return;
 	if (state->is_drivedge && VIDEO_TRANSFER_FLAGS == 0x5490)
@@ -438,9 +438,9 @@ static void logblit(running_machine *machine, const char *tag)
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine, int fast)
+static void update_interrupts(running_machine &machine, int fast)
 {
-	itech32_state *state = machine->driver_data<itech32_state>();
+	itech32_state *state = machine.driver_data<itech32_state>();
 	int scanline_state = 0, blitter_state = 0;
 
 	if (VIDEO_INTSTATE & VIDEO_INTENABLE & VIDEOINT_SCANLINE)
@@ -454,12 +454,12 @@ static void update_interrupts(running_machine *machine, int fast)
 
 static TIMER_CALLBACK( scanline_interrupt )
 {
-	itech32_state *state = machine->driver_data<itech32_state>();
+	itech32_state *state = machine.driver_data<itech32_state>();
 	/* set timer for next frame */
-	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(VIDEO_INTSCANLINE));
+	state->scanline_timer->adjust(machine.primary_screen->time_until_pos(VIDEO_INTSCANLINE));
 
 	/* set the interrupt bit in the status reg */
-	logerror("-------------- (DISPLAY INT @ %d) ----------------\n", machine->primary_screen->vpos());
+	logerror("-------------- (DISPLAY INT @ %d) ----------------\n", machine.primary_screen->vpos());
 	VIDEO_INTSTATE |= VIDEOINT_SCANLINE;
 
 	/* update the interrupt state */
@@ -1173,9 +1173,9 @@ static void shiftreg_clear(itech32_state *state, UINT16 *base, UINT16 *zbase)
  *
  *************************************/
 
-static void handle_video_command(running_machine *machine)
+static void handle_video_command(running_machine &machine)
 {
-	itech32_state *state = machine->driver_data<itech32_state>();
+	itech32_state *state = machine.driver_data<itech32_state>();
 	/* only 6 known commands */
 	switch (VIDEO_COMMAND)
 	{
@@ -1263,7 +1263,7 @@ static void handle_video_command(running_machine *machine)
 
 WRITE16_HANDLER( itech32_video_w )
 {
-	itech32_state *state = space->machine->driver_data<itech32_state>();
+	itech32_state *state = space->machine().driver_data<itech32_state>();
 	rectangle visarea;
 
 	int old = state->video[offset];
@@ -1273,7 +1273,7 @@ WRITE16_HANDLER( itech32_video_w )
 	{
 		case 0x02/2:	/* VIDEO_INTACK */
 			VIDEO_INTSTATE = old & ~data;
-			update_interrupts(space->machine, 1);
+			update_interrupts(space->machine(), 1);
 			break;
 
 		case 0x04/2:	/* VIDEO_TRANSFER */
@@ -1298,11 +1298,11 @@ WRITE16_HANDLER( itech32_video_w )
 			break;
 
 		case 0x08/2:	/* VIDEO_COMMAND */
-			handle_video_command(space->machine);
+			handle_video_command(space->machine());
 			break;
 
 		case 0x0a/2:	/* VIDEO_INTENABLE */
-			update_interrupts(space->machine, 1);
+			update_interrupts(space->machine(), 1);
 			break;
 
 		case 0x24/2:	/* VIDEO_LEFTCLIP */
@@ -1326,7 +1326,7 @@ WRITE16_HANDLER( itech32_video_w )
 			break;
 
 		case 0x2c/2:	/* VIDEO_INTSCANLINE */
-			state->scanline_timer->adjust(space->machine->primary_screen->time_until_pos(VIDEO_INTSCANLINE));
+			state->scanline_timer->adjust(space->machine().primary_screen->time_until_pos(VIDEO_INTSCANLINE));
 			break;
 
 		case 0x32/2:	/* VIDEO_VTOTAL */
@@ -1358,7 +1358,7 @@ WRITE16_HANDLER( itech32_video_w )
 
 				logerror("Configure Screen: HTOTAL: %x  HBSTART: %x  HBEND: %x  VTOTAL: %x  VBSTART: %x  VBEND: %x\n",
 					VIDEO_HTOTAL, VIDEO_HBLANK_START, VIDEO_HBLANK_END, VIDEO_VTOTAL, VIDEO_VBLANK_START, VIDEO_VBLANK_END);
-				space->machine->primary_screen->configure(VIDEO_HTOTAL, VIDEO_VTOTAL, visarea, HZ_TO_ATTOSECONDS(VIDEO_CLOCK) * VIDEO_HTOTAL * VIDEO_VTOTAL);
+				space->machine().primary_screen->configure(VIDEO_HTOTAL, VIDEO_VTOTAL, visarea, HZ_TO_ATTOSECONDS(VIDEO_CLOCK) * VIDEO_HTOTAL * VIDEO_VTOTAL);
 			}
 			break;
 	}
@@ -1367,14 +1367,14 @@ WRITE16_HANDLER( itech32_video_w )
 
 READ16_HANDLER( itech32_video_r )
 {
-	itech32_state *state = space->machine->driver_data<itech32_state>();
+	itech32_state *state = space->machine().driver_data<itech32_state>();
 	if (offset == 0)
 	{
 		return (state->video[offset] & ~0x08) | 0x04 | 0x01;
 	}
 	else if (offset == 3)
 	{
-		return 0xef;/*space->machine->primary_screen->vpos() - 1;*/
+		return 0xef;/*space->machine().primary_screen->vpos() - 1;*/
 	}
 
 	return state->video[offset];
@@ -1411,7 +1411,7 @@ WRITE32_HANDLER( itech020_video_w )
 
 WRITE32_HANDLER( drivedge_zbuf_control_w )
 {
-	itech32_state *state = space->machine->driver_data<itech32_state>();
+	itech32_state *state = space->machine().driver_data<itech32_state>();
 	COMBINE_DATA(&state->drivedge_zbuf_control[offset]);
 }
 
@@ -1432,7 +1432,7 @@ READ32_HANDLER( itech020_video_r )
 
 SCREEN_UPDATE( itech32 )
 {
-	itech32_state *state = screen->machine->driver_data<itech32_state>();
+	itech32_state *state = screen->machine().driver_data<itech32_state>();
 	int y;
 
 	/* loop over height */

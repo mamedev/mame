@@ -86,7 +86,7 @@ public:
 
 static WRITE8_HANDLER( video_disable_w )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	state->video_disable = data & 1;
 	if (data & (~1))
 		logerror("PC %06X: unknown bits of video_disable written = %02x\n",cpu_get_pc(space->cpu),data);
@@ -100,7 +100,7 @@ static WRITE16_HANDLER( video_disable_lsb_w )
 
 static VIDEO_RESET( igs017 )
 {
-	igs017_state *state = machine->driver_data<igs017_state>();
+	igs017_state *state = machine.driver_data<igs017_state>();
 	state->video_disable = 0;
 }
 
@@ -109,14 +109,14 @@ static VIDEO_RESET( igs017 )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	igs017_state *state = machine->driver_data<igs017_state>();
+	igs017_state *state = machine.driver_data<igs017_state>();
 	int code = state->fg_videoram[tile_index*4+0] + (state->fg_videoram[tile_index*4+1] << 8);
 	int attr = state->fg_videoram[tile_index*4+2] + (state->fg_videoram[tile_index*4+3] << 8);
 	SET_TILE_INFO(0, code, COLOR(attr), TILE_FLIPXY( attr >> 5 ));
 }
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	igs017_state *state = machine->driver_data<igs017_state>();
+	igs017_state *state = machine.driver_data<igs017_state>();
 	int code = state->bg_videoram[tile_index*4+0] + (state->bg_videoram[tile_index*4+1] << 8);
 	int attr = state->bg_videoram[tile_index*4+2] + (state->bg_videoram[tile_index*4+3] << 8);
 	SET_TILE_INFO(0, code, COLOR(attr)+8, TILE_FLIPXY( attr >> 5 ));
@@ -124,14 +124,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static WRITE8_HANDLER( fg_w )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	state->fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset/4);
 }
 
 static WRITE8_HANDLER( bg_w )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	state->bg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset/4);
 }
@@ -140,7 +140,7 @@ static WRITE8_HANDLER( bg_w )
 
 static READ16_HANDLER( fg_lsb_r )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	return state->fg_videoram[offset];
 }
 static WRITE16_HANDLER( fg_lsb_w )
@@ -151,7 +151,7 @@ static WRITE16_HANDLER( fg_lsb_w )
 
 static READ16_HANDLER( bg_lsb_r )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	return state->bg_videoram[offset];
 }
 static WRITE16_HANDLER( bg_lsb_w )
@@ -162,12 +162,12 @@ static WRITE16_HANDLER( bg_lsb_w )
 
 static READ16_HANDLER( spriteram_lsb_r )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	return state->spriteram[offset];
 }
 static WRITE16_HANDLER( spriteram_lsb_w )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	if (ACCESSING_BITS_0_7)
 		state->spriteram[offset] = data;
 }
@@ -176,11 +176,11 @@ static WRITE16_HANDLER( spriteram_lsb_w )
 
 // Eeach 16 bit word in the sprites gfx roms contains three 5 bit pens: x-22222-11111-00000.
 // This routine expands each word into three bytes.
-static void expand_sprites(running_machine *machine)
+static void expand_sprites(running_machine &machine)
 {
-	igs017_state *state = machine->driver_data<igs017_state>();
-	UINT8 *rom	=	machine->region("sprites")->base();
-	int size	=	machine->region("sprites")->bytes();
+	igs017_state *state = machine.driver_data<igs017_state>();
+	UINT8 *rom	=	machine.region("sprites")->base();
+	int size	=	machine.region("sprites")->bytes();
 	int i;
 
 	state->sprites_gfx_size	=	size / 2 * 3;
@@ -198,7 +198,7 @@ static void expand_sprites(running_machine *machine)
 
 static VIDEO_START( igs017 )
 {
-	igs017_state *state = machine->driver_data<igs017_state>();
+	igs017_state *state = machine.driver_data<igs017_state>();
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32);
 
@@ -245,9 +245,9 @@ static VIDEO_START( igs017 )
 
 ***************************************************************************/
 
-static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, int color, int addr)
+static void draw_sprite(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, int color, int addr)
 {
-	igs017_state *state = machine->driver_data<igs017_state>();
+	igs017_state *state = machine.driver_data<igs017_state>();
 	// prepare GfxElement on the fly
 	gfx_element gfx;
 
@@ -263,9 +263,9 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectang
 				sx, sy, 0x1f	);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	igs017_state *state = machine->driver_data<igs017_state>();
+	igs017_state *state = machine.driver_data<igs017_state>();
 	UINT8 *s	=	state->spriteram;
 	UINT8 *end	=	state->spriteram + 0x800;
 
@@ -299,10 +299,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 }
 
 // A simple gfx viewer (toggle with T)
-static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static int debug_viewer(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 #ifdef MAME_DEBUG
-	igs017_state *state = machine->driver_data<igs017_state>();
+	igs017_state *state = machine.driver_data<igs017_state>();
 	if (input_code_pressed_once(machine, KEYCODE_T))	state->toggle = 1-state->toggle;
 	if (state->toggle)	{
 		int h = 256, w = state->debug_width, a = state->debug_addr;
@@ -344,31 +344,31 @@ static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectang
 
 static SCREEN_UPDATE( igs017 )
 {
-	igs017_state *state = screen->machine->driver_data<igs017_state>();
+	igs017_state *state = screen->machine().driver_data<igs017_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed(screen->machine, KEYCODE_Z))
+	if (input_code_pressed(screen->machine(), KEYCODE_Z))
 	{
 		int mask = 0;
-		if (input_code_pressed(screen->machine, KEYCODE_Q))	mask |= 1;
-		if (input_code_pressed(screen->machine, KEYCODE_W))	mask |= 2;
-		if (input_code_pressed(screen->machine, KEYCODE_A))	mask |= 4;
+		if (input_code_pressed(screen->machine(), KEYCODE_Q))	mask |= 1;
+		if (input_code_pressed(screen->machine(), KEYCODE_W))	mask |= 2;
+		if (input_code_pressed(screen->machine(), KEYCODE_A))	mask |= 4;
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif
 
-	if (debug_viewer(screen->machine, bitmap,cliprect))
+	if (debug_viewer(screen->machine(), bitmap,cliprect))
 		return 0;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	if (state->video_disable)
 		return 0;
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 
-	if (layers_ctrl & 4)	draw_sprites(screen->machine, bitmap, cliprect);
+	if (layers_ctrl & 4)	draw_sprites(screen->machine(), bitmap, cliprect);
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 
@@ -379,10 +379,10 @@ static SCREEN_UPDATE( igs017 )
                                 Decryption
 ***************************************************************************/
 
-static void decrypt_program_rom(running_machine *machine, int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0)
+static void decrypt_program_rom(running_machine &machine, int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0)
 {
-	int length = machine->region("maincpu")->bytes();
-	UINT8 *rom = machine->region("maincpu")->base();
+	int length = machine.region("maincpu")->bytes();
+	UINT8 *rom = machine.region("maincpu")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
@@ -432,9 +432,9 @@ static void decrypt_program_rom(running_machine *machine, int mask, int a7, int 
 
 // iqblocka
 
-static void iqblocka_patch_rom(running_machine *machine)
+static void iqblocka_patch_rom(running_machine &machine)
 {
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 //  rom[0x7b64] = 0xc9;
 
@@ -473,10 +473,10 @@ static DRIVER_INIT( iqblockf )
 
 // tjsb
 
-static void tjsb_decrypt_sprites(running_machine *machine)
+static void tjsb_decrypt_sprites(running_machine &machine)
 {
-	int length = machine->region("sprites")->bytes();
-	UINT8 *rom = machine->region("sprites")->base();
+	int length = machine.region("sprites")->bytes();
+	UINT8 *rom = machine.region("sprites")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
@@ -503,9 +503,9 @@ static void tjsb_decrypt_sprites(running_machine *machine)
 	}
 }
 
-static void tjsb_patch_rom(running_machine *machine)
+static void tjsb_patch_rom(running_machine &machine)
 {
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 	rom[0x011df] = 0x18;
 }
 
@@ -520,10 +520,10 @@ static DRIVER_INIT( tjsb )
 
 // mgcs
 
-static void mgcs_decrypt_program_rom(running_machine *machine)
+static void mgcs_decrypt_program_rom(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *src = (UINT16 *)machine.region("maincpu")->base();
 
 	int rom_size = 0x80000;
 
@@ -570,10 +570,10 @@ static void mgcs_decrypt_program_rom(running_machine *machine)
 	}
 }
 
-static void mgcs_decrypt_tiles(running_machine *machine)
+static void mgcs_decrypt_tiles(running_machine &machine)
 {
-	int length = machine->region("tilemaps")->bytes();
-	UINT8 *rom = machine->region("tilemaps")->base();
+	int length = machine.region("tilemaps")->bytes();
+	UINT8 *rom = machine.region("tilemaps")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
@@ -587,10 +587,10 @@ static void mgcs_decrypt_tiles(running_machine *machine)
 	auto_free(machine, tmp);
 }
 
-static void mgcs_flip_sprites(running_machine *machine)
+static void mgcs_flip_sprites(running_machine &machine)
 {
-	int length = machine->region("sprites")->bytes();
-	UINT8 *rom = machine->region("sprites")->base();
+	int length = machine.region("sprites")->bytes();
+	UINT8 *rom = machine.region("sprites")->base();
 	int i;
 
 	for (i = 0;i < length;i+=2)
@@ -608,9 +608,9 @@ static void mgcs_flip_sprites(running_machine *machine)
 	}
 }
 
-static void mgcs_patch_rom(running_machine *machine)
+static void mgcs_patch_rom(running_machine &machine)
 {
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 
 	rom[0x4e036/2] = 0x6006;
 
@@ -636,7 +636,7 @@ static DRIVER_INIT( mgcs )
 // decryption is incomplete, the first part of code doesn't seem right.
 static DRIVER_INIT( tarzan )
 {
-	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
 	int i;
 	int size = 0x40000;
 
@@ -662,7 +662,7 @@ static DRIVER_INIT( tarzan )
 // by iq_132
 static DRIVER_INIT( tarzana )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	int i;
 	int size = 0x80000;
 
@@ -684,7 +684,7 @@ static DRIVER_INIT( tarzana )
 // decryption is incomplete, the first part of code doesn't seem right.
 static DRIVER_INIT( starzan )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	int i;
 	int size = 0x040000;
 
@@ -739,7 +739,7 @@ static DRIVER_INIT( starzan )
 static DRIVER_INIT( sdmg2 )
 {
 	int i;
-	UINT16 *src = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *src = (UINT16 *)machine.region("maincpu")->base();
 
 	int rom_size = 0x80000;
 
@@ -796,7 +796,7 @@ static DRIVER_INIT( sdmg2 )
 static DRIVER_INIT( mgdha )
 {
 	int i;
-	UINT16 *src = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *src = (UINT16 *)machine.region("maincpu")->base();
 
 	int rom_size = 0x80000;
 
@@ -831,7 +831,7 @@ static DRIVER_INIT( mgdh )
 {
 	DRIVER_INIT_CALL( mgdha );
 
-	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 
 	// additional protection
 	rom[0x4ad50/2] = 0x4e71;
@@ -843,7 +843,7 @@ static DRIVER_INIT( mgdh )
 static DRIVER_INIT( lhzb2 )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
+	UINT16 *src = (UINT16 *) (machine.region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -933,7 +933,7 @@ static DRIVER_INIT( lhzb2 )
 static DRIVER_INIT( lhzb2a )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
+	UINT16 *src = (UINT16 *) (machine.region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -995,7 +995,7 @@ static DRIVER_INIT( lhzb2a )
 static DRIVER_INIT( slqz2 )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
+	UINT16 *src = (UINT16 *) (machine.region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -1082,7 +1082,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	state->nmi_enable = data & 1;
 	if (data & (~1))
 		logerror("PC %06X: nmi_enable = %02x\n",cpu_get_pc(space->cpu),data);
@@ -1090,7 +1090,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 static WRITE8_HANDLER( irq_enable_w )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	state->irq_enable = data & 1;
 	if (data & (~1))
 		logerror("PC %06X: irq_enable = %02x\n",cpu_get_pc(space->cpu),data);
@@ -1098,18 +1098,18 @@ static WRITE8_HANDLER( irq_enable_w )
 
 static WRITE8_HANDLER( input_select_w )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	state->input_select = data;
 }
 
 static READ8_HANDLER( input_r )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	switch (state->input_select)
 	{
-		case 0x00:	return input_port_read(space->machine, "PLAYER1");
-		case 0x01:	return input_port_read(space->machine, "PLAYER2");
-		case 0x02:	return input_port_read(space->machine, "COINS");
+		case 0x00:	return input_port_read(space->machine(), "PLAYER1");
+		case 0x01:	return input_port_read(space->machine(), "PLAYER2");
+		case 0x02:	return input_port_read(space->machine(), "COINS");
 
 		case 0x03:	return 01;
 
@@ -1175,7 +1175,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( mgcs_magic_w )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	COMBINE_DATA(&state->igs_magic[offset]);
 
 	if (offset == 0)
@@ -1210,7 +1210,7 @@ static WRITE16_HANDLER( mgcs_magic_w )
 
 static READ16_HANDLER( mgcs_magic_r )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	switch(state->igs_magic[0])
 	{
 		case 0x01:
@@ -1226,20 +1226,20 @@ static READ16_HANDLER( mgcs_magic_r )
 
 static READ8_DEVICE_HANDLER( mgcs_keys_r )
 {
-	igs017_state *state = device->machine->driver_data<igs017_state>();
-	if (~state->input_select & 0x08)	return input_port_read(device->machine, "KEY0");
-	if (~state->input_select & 0x10)	return input_port_read(device->machine, "KEY1");
-	if (~state->input_select & 0x20)	return input_port_read(device->machine, "KEY2");
-	if (~state->input_select & 0x40)	return input_port_read(device->machine, "KEY3");
-	if (~state->input_select & 0x80)	return input_port_read(device->machine, "KEY4");
+	igs017_state *state = device->machine().driver_data<igs017_state>();
+	if (~state->input_select & 0x08)	return input_port_read(device->machine(), "KEY0");
+	if (~state->input_select & 0x10)	return input_port_read(device->machine(), "KEY1");
+	if (~state->input_select & 0x20)	return input_port_read(device->machine(), "KEY2");
+	if (~state->input_select & 0x40)	return input_port_read(device->machine(), "KEY3");
+	if (~state->input_select & 0x80)	return input_port_read(device->machine(), "KEY4");
 
-	logerror("%s: warning, reading key with input_select = %02x\n", device->machine->describe_context(), state->input_select);
+	logerror("%s: warning, reading key with input_select = %02x\n", device->machine().describe_context(), state->input_select);
 	return 0xff;
 }
 
 static WRITE16_HANDLER( irq1_enable_w )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	if (ACCESSING_BITS_0_7)
 		state->irq1_enable = data & 1;
 
@@ -1249,7 +1249,7 @@ static WRITE16_HANDLER( irq1_enable_w )
 
 static WRITE16_HANDLER( irq2_enable_w )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	if (ACCESSING_BITS_0_7)
 		state->irq2_enable = data & 1;
 
@@ -1261,14 +1261,14 @@ static WRITE16_HANDLER( mgcs_paletteram_xRRRRRGGGGGBBBBB_w )
 {
 	int rgb;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 
-	rgb = ((space->machine->generic.paletteram.u16[offset/2*2+0] & 0xff) << 8) | (space->machine->generic.paletteram.u16[offset/2*2+1] & 0xff);
+	rgb = ((space->machine().generic.paletteram.u16[offset/2*2+0] & 0xff) << 8) | (space->machine().generic.paletteram.u16[offset/2*2+1] & 0xff);
 
 	// bitswap
 	rgb = BITSWAP16(rgb,7,8,9,2,14,3,13,15,12,11,10,0,1,4,5,6);
 
-	palette_set_color_rgb(space->machine, offset/2, pal5bit(rgb >> 0), pal5bit(rgb >> 5), pal5bit(rgb >> 10));
+	palette_set_color_rgb(space->machine(), offset/2, pal5bit(rgb >> 0), pal5bit(rgb >> 5), pal5bit(rgb >> 10));
 }
 
 static ADDRESS_MAP_START( mgcs, AS_PROGRAM, 16 )
@@ -1295,31 +1295,31 @@ static WRITE16_HANDLER( sdmg2_paletteram_xRRRRRGGGGGBBBBB_w )
 {
 	int rgb;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 
-	rgb = ((space->machine->generic.paletteram.u16[offset/2*2+1] & 0xff) << 8) | (space->machine->generic.paletteram.u16[offset/2*2+0] & 0xff);
+	rgb = ((space->machine().generic.paletteram.u16[offset/2*2+1] & 0xff) << 8) | (space->machine().generic.paletteram.u16[offset/2*2+0] & 0xff);
 
-	palette_set_color_rgb(space->machine, offset/2, pal5bit(rgb >> 0), pal5bit(rgb >> 5), pal5bit(rgb >> 10));
+	palette_set_color_rgb(space->machine(), offset/2, pal5bit(rgb >> 0), pal5bit(rgb >> 5), pal5bit(rgb >> 10));
 }
 
 static READ8_HANDLER( sdmg2_keys_r )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
-	if (~state->input_select & 0x01)	return input_port_read(space->machine, "KEY0");
-	if (~state->input_select & 0x02)	return input_port_read(space->machine, "KEY1");
-	if (~state->input_select & 0x04)	return input_port_read(space->machine, "KEY2");
-	if (~state->input_select & 0x08)	return input_port_read(space->machine, "KEY3");
-	if (~state->input_select & 0x10)	return input_port_read(space->machine, "KEY4");
+	igs017_state *state = space->machine().driver_data<igs017_state>();
+	if (~state->input_select & 0x01)	return input_port_read(space->machine(), "KEY0");
+	if (~state->input_select & 0x02)	return input_port_read(space->machine(), "KEY1");
+	if (~state->input_select & 0x04)	return input_port_read(space->machine(), "KEY2");
+	if (~state->input_select & 0x08)	return input_port_read(space->machine(), "KEY3");
+	if (~state->input_select & 0x10)	return input_port_read(space->machine(), "KEY4");
 
-	if (state->input_select == 0x1f)	return input_port_read(space->machine, "KEY0");	// in joystick mode
+	if (state->input_select == 0x1f)	return input_port_read(space->machine(), "KEY0");	// in joystick mode
 
-	logerror("%s: warning, reading key with input_select = %02x\n", space->machine->describe_context(), state->input_select);
+	logerror("%s: warning, reading key with input_select = %02x\n", space->machine().describe_context(), state->input_select);
 	return 0xff;
 }
 
 static WRITE16_HANDLER( sdmg2_magic_w )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	COMBINE_DATA(&state->igs_magic[offset]);
 
 	if (offset == 0)
@@ -1333,7 +1333,7 @@ static WRITE16_HANDLER( sdmg2_magic_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				state->input_select	=	data & 0x1f;
-				coin_counter_w(space->machine, 0,	data & 0x20);
+				coin_counter_w(space->machine(), 0,	data & 0x20);
 				//  coin out        data & 0x40
 				state->hopper			=	data & 0x80;
 			}
@@ -1342,7 +1342,7 @@ static WRITE16_HANDLER( sdmg2_magic_w )
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+				okim6295_device *oki = space->machine().device<okim6295_device>("oki");
 				oki->set_bank_base((data & 0x80) ? 0x40000 : 0);
 			}
 			break;
@@ -1354,13 +1354,13 @@ static WRITE16_HANDLER( sdmg2_magic_w )
 
 static READ16_HANDLER( sdmg2_magic_r )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	switch(state->igs_magic[0])
 	{
 		case 0x00:
 		{
-			UINT16 hopper_bit = (state->hopper && ((space->machine->primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
-			return input_port_read(space->machine, "COINS") | hopper_bit;
+			UINT16 hopper_bit = (state->hopper && ((space->machine().primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
+			return input_port_read(space->machine(), "COINS") | hopper_bit;
 		}
 
 		case 0x02:
@@ -1395,22 +1395,22 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( mgdh_keys_r )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
-	if (~state->input_select & 0x04)	return input_port_read(space->machine, "KEY0");
-	if (~state->input_select & 0x08)	return input_port_read(space->machine, "KEY1");
-	if (~state->input_select & 0x10)	return input_port_read(space->machine, "KEY2");
-	if (~state->input_select & 0x20)	return input_port_read(space->machine, "KEY3");
-	if (~state->input_select & 0x40)	return input_port_read(space->machine, "KEY4");
+	igs017_state *state = space->machine().driver_data<igs017_state>();
+	if (~state->input_select & 0x04)	return input_port_read(space->machine(), "KEY0");
+	if (~state->input_select & 0x08)	return input_port_read(space->machine(), "KEY1");
+	if (~state->input_select & 0x10)	return input_port_read(space->machine(), "KEY2");
+	if (~state->input_select & 0x20)	return input_port_read(space->machine(), "KEY3");
+	if (~state->input_select & 0x40)	return input_port_read(space->machine(), "KEY4");
 
-	if ((state->input_select & 0xfc) == 0xfc)	return input_port_read(space->machine, "DSW1");
+	if ((state->input_select & 0xfc) == 0xfc)	return input_port_read(space->machine(), "DSW1");
 
-	logerror("%s: warning, reading key with input_select = %02x\n", space->machine->describe_context(), state->input_select);
+	logerror("%s: warning, reading key with input_select = %02x\n", space->machine().describe_context(), state->input_select);
 	return 0xff;
 }
 
 static WRITE16_HANDLER( mgdha_magic_w )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	COMBINE_DATA(&state->igs_magic[offset]);
 
 	if (offset == 0)
@@ -1422,7 +1422,7 @@ static WRITE16_HANDLER( mgdha_magic_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				//  coin out     data & 0x40
-				coin_counter_w(space->machine, 0, data & 0x80);
+				coin_counter_w(space->machine(), 0, data & 0x80);
 			}
 
 			if ( data & ~0xc0 )
@@ -1446,7 +1446,7 @@ static WRITE16_HANDLER( mgdha_magic_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				// bit 7?
-				okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+				okim6295_device *oki = space->machine().device<okim6295_device>("oki");
 				oki->set_bank_base((data & 0x40) ? 0x40000 : 0);
 			}
 			break;
@@ -1469,22 +1469,22 @@ static WRITE16_HANDLER( mgdha_magic_w )
 
 static READ16_HANDLER( mgdha_magic_r )
 {
-	igs017_state *state = space->machine->driver_data<igs017_state>();
+	igs017_state *state = space->machine().driver_data<igs017_state>();
 	switch(state->igs_magic[0])
 	{
 		case 0x00:
 			return mgdh_keys_r(space, 0);
 
 		case 0x01:
-			return input_port_read(space->machine, "BUTTONS");
+			return input_port_read(space->machine(), "BUTTONS");
 
 		case 0x02:
-			return BITSWAP8(input_port_read(space->machine, "DSW2"), 0,1,2,3,4,5,6,7);
+			return BITSWAP8(input_port_read(space->machine(), "DSW2"), 0,1,2,3,4,5,6,7);
 
 		case 0x03:
 		{
-			UINT16 hopper_bit = (state->hopper && ((space->machine->primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
-			return input_port_read(space->machine, "COINS") | hopper_bit;
+			UINT16 hopper_bit = (state->hopper && ((space->machine().primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
+			return input_port_read(space->machine(), "COINS") | hopper_bit;
 		}
 
 		default:
@@ -2066,7 +2066,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( iqblocka_interrupt )
 {
-	igs017_state *state = device->machine->driver_data<igs017_state>();
+	igs017_state *state = device->machine().driver_data<igs017_state>();
 	if (cpu_getiloops(device) & 1)
 	{
 		 if (state->nmi_enable)
@@ -2093,7 +2093,7 @@ static const ppi8255_interface iqblocka_ppi8255_intf =
 
 static MACHINE_RESET( iqblocka )
 {
-	igs017_state *state = machine->driver_data<igs017_state>();
+	igs017_state *state = machine.driver_data<igs017_state>();
 	state->nmi_enable = 0;
 	state->irq_enable = 0;
 	state->input_select = 0;
@@ -2139,7 +2139,7 @@ MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( mgcs_interrupt )
 {
-	igs017_state *state = device->machine->driver_data<igs017_state>();
+	igs017_state *state = device->machine().driver_data<igs017_state>();
 	if (cpu_getiloops(device) & 1)
 	{
 		 if (state->irq2_enable)
@@ -2154,7 +2154,7 @@ static INTERRUPT_GEN( mgcs_interrupt )
 
 static MACHINE_RESET( mgcs )
 {
-	igs017_state *state = machine->driver_data<igs017_state>();
+	igs017_state *state = machine.driver_data<igs017_state>();
 	MACHINE_RESET_CALL( iqblocka );
 	state->irq1_enable = 0;
 	state->irq2_enable = 0;
@@ -2253,7 +2253,7 @@ MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( mgdh_interrupt )
 {
-	igs017_state *state = device->machine->driver_data<igs017_state>();
+	igs017_state *state = device->machine().driver_data<igs017_state>();
 	if (cpu_getiloops(device) & 1)
 	{
 		 if (state->irq2_enable)

@@ -398,13 +398,13 @@ D                                                                               
 
 static TIMER_CALLBACK( equites_nmi_callback )
 {
-	equites_state *state = machine->driver_data<equites_state>();
+	equites_state *state = machine.driver_data<equites_state>();
 	device_set_input_line(state->audio_cpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( equites_frq_adjuster_callback )
 {
-	equites_state *state = machine->driver_data<equites_state>();
+	equites_state *state = machine.driver_data<equites_state>();
 	UINT8 frq = input_port_read(machine, FRQ_ADJUSTER_TAG);
 
 	msm5232_set_clock(state->msm, MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
@@ -418,16 +418,16 @@ static TIMER_CALLBACK( equites_frq_adjuster_callback )
 
 static SOUND_START(equites)
 {
-	equites_state *state = machine->driver_data<equites_state>();
-	state->nmi_timer = machine->scheduler().timer_alloc(FUNC(equites_nmi_callback));
+	equites_state *state = machine.driver_data<equites_state>();
+	state->nmi_timer = machine.scheduler().timer_alloc(FUNC(equites_nmi_callback));
 
-	state->adjuster_timer = machine->scheduler().timer_alloc(FUNC(equites_frq_adjuster_callback));
+	state->adjuster_timer = machine.scheduler().timer_alloc(FUNC(equites_frq_adjuster_callback));
 	state->adjuster_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
 
 static WRITE8_HANDLER(equites_c0f8_w)
 {
-	equites_state *state = space->machine->driver_data<equites_state>();
+	equites_state *state = space->machine().driver_data<equites_state>();
 
 	switch (offset)
 	{
@@ -476,7 +476,7 @@ static WRITE8_HANDLER(equites_c0f8_w)
 
 static WRITE8_DEVICE_HANDLER( equites_8910porta_w )
 {
-	equites_state *state = device->machine->driver_data<equites_state>();
+	equites_state *state = device->machine().driver_data<equites_state>();
 
 	// bongo 1
 	sample_set_volume(device, 0, ((data & 0x30) >> 4) * 0.33);
@@ -497,7 +497,7 @@ popmessage("HH %d(%d) CYM %d(%d)", state->hihat, BIT(state->ay_port_b, 6), state
 
 static WRITE8_DEVICE_HANDLER( equites_8910portb_w )
 {
-	equites_state *state = device->machine->driver_data<equites_state>();
+	equites_state *state = device->machine().driver_data<equites_state>();
 #if POPDRUMKIT
 if (data & ~state->ay_port_b & 0x08) state->cymbal++;
 if (data & ~state->ay_port_b & 0x04) state->hihat++;
@@ -533,14 +533,14 @@ popmessage("HH %d(%d) CYM %d(%d)",state->hihat,BIT(state->ay_port_b,6),state->cy
 
 static WRITE8_HANDLER(equites_cymbal_ctrl_w)
 {
-	equites_state *state = space->machine->driver_data<equites_state>();
+	equites_state *state = space->machine().driver_data<equites_state>();
 	state->eq_cymbal_ctrl++;
 }
 
 
-static void equites_update_dac( running_machine *machine )
+static void equites_update_dac( running_machine &machine )
 {
-	equites_state *state = machine->driver_data<equites_state>();
+	equites_state *state = machine.driver_data<equites_state>();
 
 	// there is only one latch, which is used to drive two DAC channels.
 	// When the channel is enabled in the 4066, it goes to a series of
@@ -557,16 +557,16 @@ static void equites_update_dac( running_machine *machine )
 
 static WRITE8_HANDLER( equites_dac_latch_w )
 {
-	equites_state *state = space->machine->driver_data<equites_state>();
+	equites_state *state = space->machine().driver_data<equites_state>();
 	state->dac_latch = data << 2;
-	equites_update_dac(space->machine);
+	equites_update_dac(space->machine());
 }
 
 static WRITE8_HANDLER( equites_8155_portb_w )
 {
-	equites_state *state = space->machine->driver_data<equites_state>();
+	equites_state *state = space->machine().driver_data<equites_state>();
 	state->eq8155_port_b = data;
-	equites_update_dac(space->machine);
+	equites_update_dac(space->machine());
 }
 
 static void equites_msm5232_gate( device_t *device, int state )
@@ -590,7 +590,7 @@ static INTERRUPT_GEN( equites_interrupt )
 
 static WRITE8_HANDLER(equites_8155_w)
 {
-	equites_state *state = space->machine->driver_data<equites_state>();
+	equites_state *state = space->machine().driver_data<equites_state>();
 
 	// FIXME proper 8155 emulation must be implemented
 	switch( offset )
@@ -637,26 +637,26 @@ static WRITE8_HANDLER(equites_8155_w)
 #if HVOLTAGE_DEBUG
 static READ16_HANDLER(hvoltage_debug_r)
 {
-	return(input_port_read(space->machine, "FAKE"));
+	return(input_port_read(space->machine(), "FAKE"));
 }
 #endif
 
 
 static CUSTOM_INPUT( gekisou_unknown_status )
 {
-	equites_state *state = field->port->machine->driver_data<equites_state>();
+	equites_state *state = field->port->machine().driver_data<equites_state>();
 	return state->unknown_bit;
 }
 
 static WRITE16_HANDLER( gekisou_unknown_0_w )
 {
-	equites_state *state = space->machine->driver_data<equites_state>();
+	equites_state *state = space->machine().driver_data<equites_state>();
 	state->unknown_bit = 0;
 }
 
 static WRITE16_HANDLER( gekisou_unknown_1_w )
 {
-	equites_state *state = space->machine->driver_data<equites_state>();
+	equites_state *state = space->machine().driver_data<equites_state>();
 	state->unknown_bit = 1;
 }
 
@@ -666,7 +666,7 @@ static WRITE16_HANDLER( gekisou_unknown_1_w )
 
 static READ16_HANDLER(equites_spriteram_kludge_r)
 {
-	equites_state *state = space->machine->driver_data<equites_state>();
+	equites_state *state = space->machine().driver_data<equites_state>();
 	if (state->spriteram[0] == 0x5555)
 		return 0;
 	else
@@ -675,26 +675,26 @@ static READ16_HANDLER(equites_spriteram_kludge_r)
 
 static READ16_HANDLER(mcu_r)
 {
-	equites_state *state = space->machine->driver_data<equites_state>();
+	equites_state *state = space->machine().driver_data<equites_state>();
 	return 0xff00 | state->mcu_ram[offset];
 }
 
 static WRITE16_HANDLER(mcu_w)
 {
-	equites_state *state = space->machine->driver_data<equites_state>();
+	equites_state *state = space->machine().driver_data<equites_state>();
 	if (ACCESSING_BITS_0_7)
 		state->mcu_ram[offset] = data & 0xff;
 }
 
 static WRITE16_HANDLER( mcu_halt_assert_w )
 {
-	equites_state *state = space->machine->driver_data<equites_state>();
+	equites_state *state = space->machine().driver_data<equites_state>();
 	device_set_input_line(state->mcu, INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( mcu_halt_clear_w )
 {
-	equites_state *state = space->machine->driver_data<equites_state>();
+	equites_state *state = space->machine().driver_data<equites_state>();
 	device_set_input_line(state->mcu, INPUT_LINE_HALT, CLEAR_LINE);
 }
 
@@ -1189,13 +1189,13 @@ MACHINE_CONFIG_END
 
 static MACHINE_START( equites )
 {
-	equites_state *state = machine->driver_data<equites_state>();
+	equites_state *state = machine.driver_data<equites_state>();
 
-	state->mcu = machine->device("mcu");
-	state->audio_cpu = machine->device("audiocpu");
-	state->msm = machine->device<msm5232_device>("msm");
-	state->dac_1 = machine->device("dac1");
-	state->dac_2 = machine->device("dac2");
+	state->mcu = machine.device("mcu");
+	state->audio_cpu = machine.device("audiocpu");
+	state->msm = machine.device<msm5232_device>("msm");
+	state->dac_1 = machine.device("dac1");
+	state->dac_2 = machine.device("dac2");
 
 	state->save_item(NAME(state->fg_char_bank));
 	state->save_item(NAME(state->bgcolor));
@@ -1221,7 +1221,7 @@ static MACHINE_START( equites )
 
 static MACHINE_RESET( equites )
 {
-	equites_state *state = machine->driver_data<equites_state>();
+	equites_state *state = machine.driver_data<equites_state>();
 
 	flip_screen_set(machine, 0);
 
@@ -1856,9 +1856,9 @@ ROM_END
 /******************************************************************************/
 // Initializations
 
-static void unpack_block( running_machine *machine, const char *region, int offset, int size )
+static void unpack_block( running_machine &machine, const char *region, int offset, int size )
 {
-	UINT8 *rom = machine->region(region)->base();
+	UINT8 *rom = machine.region(region)->base();
 	int i;
 
 	for (i = 0; i < size; ++i)
@@ -1868,7 +1868,7 @@ static void unpack_block( running_machine *machine, const char *region, int offs
 	}
 }
 
-static void unpack_region( running_machine *machine, const char *region )
+static void unpack_region( running_machine &machine, const char *region )
 {
 	unpack_block(machine, region, 0x0000, 0x2000);
 	unpack_block(machine, region, 0x4000, 0x2000);
@@ -1899,8 +1899,8 @@ static DRIVER_INIT( gekisou )
 	unpack_region(machine, "gfx3");
 
 	// install special handlers for unknown device (protection?)
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x580000, 0x580001, FUNC(gekisou_unknown_0_w));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x5a0000, 0x5a0001, FUNC(gekisou_unknown_1_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x580000, 0x580001, FUNC(gekisou_unknown_0_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x5a0000, 0x5a0001, FUNC(gekisou_unknown_1_w));
 }
 
 static DRIVER_INIT( splndrbt )
@@ -1913,7 +1913,7 @@ static DRIVER_INIT( hvoltage )
 	unpack_region(machine, "gfx3");
 
 #if HVOLTAGE_DEBUG
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x000038, 0x000039, FUNC(hvoltage_debug_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x000038, 0x000039, FUNC(hvoltage_debug_r));
 #endif
 }
 

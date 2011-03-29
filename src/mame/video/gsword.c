@@ -15,13 +15,13 @@ static PALETTE_INIT( common )
 
 	/* characters */
 	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine->colortable, i, i);
+		colortable_entry_set_value(machine.colortable, i, i);
 
 	/* sprites */
 	for (i = 0x100; i < 0x200; i++)
 	{
 		UINT8 ctabentry = (BITSWAP8(color_prom[i - 0x100],7,6,5,4,0,1,2,3) & 0x0f) | 0x80;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 }
 
@@ -31,7 +31,7 @@ PALETTE_INIT( josvolly )
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x100);
+	machine.colortable = colortable_alloc(machine, 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -40,7 +40,7 @@ PALETTE_INIT( josvolly )
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -55,7 +55,7 @@ PALETTE_INIT( gsword )
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x100);
+	machine.colortable = colortable_alloc(machine, 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -81,7 +81,7 @@ PALETTE_INIT( gsword )
 		bit2 = (color_prom[i + 0x000] >> 3) & 1;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -92,7 +92,7 @@ PALETTE_INIT( gsword )
 
 WRITE8_HANDLER( gsword_videoram_w )
 {
-	gsword_state *state = space->machine->driver_data<gsword_state>();
+	gsword_state *state = space->machine().driver_data<gsword_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -100,17 +100,17 @@ WRITE8_HANDLER( gsword_videoram_w )
 
 WRITE8_HANDLER( gsword_charbank_w )
 {
-	gsword_state *state = space->machine->driver_data<gsword_state>();
+	gsword_state *state = space->machine().driver_data<gsword_state>();
 	if (state->charbank != data)
 	{
 		state->charbank = data;
-		tilemap_mark_all_tiles_dirty_all(space->machine);
+		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 }
 
 WRITE8_HANDLER( gsword_videoctrl_w )
 {
-	gsword_state *state = space->machine->driver_data<gsword_state>();
+	gsword_state *state = space->machine().driver_data<gsword_state>();
 	if (data & 0x8f)
 	{
 		popmessage("videoctrl %02x",data);
@@ -121,7 +121,7 @@ WRITE8_HANDLER( gsword_videoctrl_w )
 	if (state->charpalbank != ((data & 0x60) >> 5))
 	{
 		state->charpalbank = (data & 0x60) >> 5;
-		tilemap_mark_all_tiles_dirty_all(space->machine);
+		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 
 	/* bit 4 is flip screen */
@@ -129,7 +129,7 @@ WRITE8_HANDLER( gsword_videoctrl_w )
 	if (state->flipscreen != (data & 0x10))
 	{
 		state->flipscreen = data & 0x10;
-	    tilemap_mark_all_tiles_dirty_all(space->machine);
+	    tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 
 	/* bit 0 could be used but unknown */
@@ -139,13 +139,13 @@ WRITE8_HANDLER( gsword_videoctrl_w )
 
 WRITE8_HANDLER( gsword_scroll_w )
 {
-	gsword_state *state = space->machine->driver_data<gsword_state>();
+	gsword_state *state = space->machine().driver_data<gsword_state>();
 	tilemap_set_scrolly(state->bg_tilemap, 0, data);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	gsword_state *state = machine->driver_data<gsword_state>();
+	gsword_state *state = machine.driver_data<gsword_state>();
 	UINT8 *videoram = state->videoram;
 	int code = videoram[tile_index] + ((state->charbank & 0x03) << 8);
 	int color = ((code & 0x3c0) >> 6) + 16 * state->charpalbank;
@@ -156,14 +156,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( gsword )
 {
-	gsword_state *state = machine->driver_data<gsword_state>();
+	gsword_state *state = machine.driver_data<gsword_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 64);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	gsword_state *state = machine->driver_data<gsword_state>();
+	gsword_state *state = machine.driver_data<gsword_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spritexy_size - 1; offs+=2)
@@ -195,20 +195,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				flipx = !flipx;
 				flipy = !flipy;
 			}
-			drawgfx_transmask(bitmap,cliprect,machine->gfx[1+spritebank],
+			drawgfx_transmask(bitmap,cliprect,machine.gfx[1+spritebank],
 					tile,
 					color,
 					flipx,flipy,
 					sx,sy,
-					colortable_get_transpen_mask(machine->colortable, machine->gfx[1+spritebank], color, 0x8f));
+					colortable_get_transpen_mask(machine.colortable, machine.gfx[1+spritebank], color, 0x8f));
 		}
 	}
 }
 
 SCREEN_UPDATE( gsword )
 {
-	gsword_state *state = screen->machine->driver_data<gsword_state>();
+	gsword_state *state = screen->machine().driver_data<gsword_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

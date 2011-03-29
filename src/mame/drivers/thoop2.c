@@ -51,7 +51,7 @@ GFXDECODE_END
 
 static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 {
-	UINT8 *RAM = space->machine->region("oki")->base();
+	UINT8 *RAM = space->machine().region("oki")->base();
 
 	if (ACCESSING_BITS_0_7){
 		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f)*0x10000], 0x10000);
@@ -64,11 +64,11 @@ static WRITE16_HANDLER( thoop2_coin_w )
 		switch ((offset >> 3)){
 			case 0x00:	/* Coin Lockouts */
 			case 0x01:
-				coin_lockout_w(space->machine, (offset >> 3) & 0x01, ~data & 0x01);
+				coin_lockout_w(space->machine(), (offset >> 3) & 0x01, ~data & 0x01);
 				break;
 			case 0x02:	/* Coin Counters */
 			case 0x03:
-				coin_counter_w(space->machine, (offset >> 3) & 0x01, data & 0x01);
+				coin_counter_w(space->machine(), (offset >> 3) & 0x01, data & 0x01);
 				break;
 		}
 	}

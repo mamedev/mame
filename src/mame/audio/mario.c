@@ -398,11 +398,11 @@ DISCRETE_SOUND_END
 
 static void set_ea(address_space *space, int ea)
 {
-	mario_state	*state = space->machine->driver_data<mario_state>();
+	mario_state	*state = space->machine().driver_data<mario_state>();
 	//printf("ea: %d\n", ea);
 	//cputag_set_input_line(machine, "audiocpu", MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
 	if (state->eabank != NULL)
-		memory_set_bank(space->machine, state->eabank, ea);
+		memory_set_bank(space->machine(), state->eabank, ea);
 }
 
 /****************************************************************
@@ -413,10 +413,10 @@ static void set_ea(address_space *space, int ea)
 
 static SOUND_START( mario )
 {
-	mario_state	*state = machine->driver_data<mario_state>();
-	device_t *audiocpu = machine->device("audiocpu");
+	mario_state	*state = machine.driver_data<mario_state>();
+	device_t *audiocpu = machine.device("audiocpu");
 #if USE_8039
-	UINT8 *SND = machine->region("audiocpu")->base();
+	UINT8 *SND = machine.region("audiocpu")->base();
 
 	SND[0x1001] = 0x01;
 #endif
@@ -426,8 +426,8 @@ static SOUND_START( mario )
 	{
 		state->eabank = "bank1";
 		audiocpu->memory().space(AS_PROGRAM)->install_read_bank(0x000, 0x7ff, "bank1");
-		memory_configure_bank(machine, "bank1", 0, 1, machine->region("audiocpu")->base(), 0);
-	    memory_configure_bank(machine, "bank1", 1, 1, machine->region("audiocpu")->base() + 0x1000, 0x800);
+		memory_configure_bank(machine, "bank1", 0, 1, machine.region("audiocpu")->base(), 0);
+	    memory_configure_bank(machine, "bank1", 1, 1, machine.region("audiocpu")->base() + 0x1000, 0x800);
 	}
 
     state->save_item(NAME(state->last));
@@ -436,8 +436,8 @@ static SOUND_START( mario )
 
 static SOUND_RESET( mario )
 {
-	mario_state	*state = machine->driver_data<mario_state>();
-	address_space *space = machine->device("audiocpu")->memory().space(AS_PROGRAM);
+	mario_state	*state = machine.driver_data<mario_state>();
+	address_space *space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
 
 #if USE_8039
     set_ea(machine, 1);
@@ -482,8 +482,8 @@ static READ8_HANDLER( mario_sh_t1_r )
 
 static READ8_HANDLER( mario_sh_tune_r )
 {
-	UINT8 *SND = space->machine->region("audiocpu")->base();
-	UINT16 mask = space->machine->region("audiocpu")->bytes()-1;
+	UINT8 *SND = space->machine().region("audiocpu")->base();
+	UINT16 mask = space->machine().region("audiocpu")->bytes()-1;
 	UINT8 p2 = I8035_P2_R(space);
 
 	if ((p2 >> 7) & 1)
@@ -515,12 +515,12 @@ static WRITE8_HANDLER( mario_sh_p2_w )
 
 WRITE8_HANDLER( masao_sh_irqtrigger_w )
 {
-	mario_state	*state = space->machine->driver_data<mario_state>();
+	mario_state	*state = space->machine().driver_data<mario_state>();
 
 	if (state->last == 1 && data == 0)
 	{
 		/* setting bit 0 high then low triggers IRQ on the sound CPU */
-		cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
+		cputag_set_input_line_and_vector(space->machine(), "audiocpu", 0, HOLD_LINE, 0xff);
 	}
 
 	state->last = data;
@@ -548,15 +548,15 @@ WRITE8_DEVICE_HANDLER( mario_sh2_w )
 /* Misc samples */
 WRITE8_HANDLER( mario_sh3_w )
 {
-	mario_state	*state = space->machine->driver_data<mario_state>();
+	mario_state	*state = space->machine().driver_data<mario_state>();
 
 	switch (offset)
 	{
 		case 0: /* death */
 			if (data)
-				cputag_set_input_line(space->machine, "audiocpu",0,ASSERT_LINE);
+				cputag_set_input_line(space->machine(), "audiocpu",0,ASSERT_LINE);
 			else
-				cputag_set_input_line(space->machine, "audiocpu",0,CLEAR_LINE);
+				cputag_set_input_line(space->machine(), "audiocpu",0,CLEAR_LINE);
 			break;
 		case 1: /* get coin */
 			I8035_T_W_AH(space, 0,data & 1);
@@ -577,7 +577,7 @@ WRITE8_HANDLER( mario_sh3_w )
 			I8035_P1_W_AH(space, 3, data & 1);
 			break;
 		case 7: /* skid */
-			discrete_sound_w(space->machine->device("discrete"), DS_SOUND7_INP, data & 1);
+			discrete_sound_w(space->machine().device("discrete"), DS_SOUND7_INP, data & 1);
 			break;
 	}
 }

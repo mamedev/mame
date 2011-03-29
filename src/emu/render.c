@@ -405,7 +405,7 @@ void render_texture::release()
 	for (int scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
 	{
 		m_manager->invalidate_all(m_scaled[scalenum].bitmap);
-		auto_free(&m_manager->machine(), m_scaled[scalenum].bitmap);
+		auto_free(m_manager->machine(), m_scaled[scalenum].bitmap);
 		m_scaled[scalenum].bitmap = NULL;
 		m_scaled[scalenum].seqid = 0;
 	}
@@ -423,7 +423,7 @@ void render_texture::release()
 	m_palette = NULL;
 
 	// free any B/C/G lookup tables
-	auto_free(&m_manager->machine(), m_bcglookup);
+	auto_free(m_manager->machine(), m_bcglookup);
 	m_bcglookup = NULL;
 	m_bcglookup_entries = 0;
 }
@@ -467,7 +467,7 @@ void render_texture::set_bitmap(bitmap_t *bitmap, const rectangle *sbounds, int 
 		if (m_scaled[scalenum].bitmap != NULL)
 		{
 			m_manager->invalidate_all(m_scaled[scalenum].bitmap);
-			auto_free(&m_manager->machine(), m_scaled[scalenum].bitmap);
+			auto_free(m_manager->machine(), m_scaled[scalenum].bitmap);
 		}
 		m_scaled[scalenum].bitmap = NULL;
 		m_scaled[scalenum].seqid = 0;
@@ -545,11 +545,11 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 		if (scaled->bitmap != NULL)
 		{
 			m_manager->invalidate_all(scaled->bitmap);
-			auto_free(&m_manager->machine(), scaled->bitmap);
+			auto_free(m_manager->machine(), scaled->bitmap);
 		}
 
 		// allocate a new bitmap
-		scaled->bitmap = auto_alloc(&m_manager->machine(), bitmap_t(dwidth, dheight, BITMAP_FORMAT_ARGB32));
+		scaled->bitmap = auto_alloc(m_manager->machine(), bitmap_t(dwidth, dheight, BITMAP_FORMAT_ARGB32));
 		scaled->seqid = ++m_curseq;
 
 		// let the scaler do the work
@@ -599,9 +599,9 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 			numentries = palette_get_num_colors(m_palette) * palette_get_num_groups(m_palette);
 			if (m_bcglookup == NULL || m_bcglookup_entries < numentries)
 			{
-				rgb_t *newlookup = auto_alloc_array(&m_manager->machine(), rgb_t, numentries);
+				rgb_t *newlookup = auto_alloc_array(m_manager->machine(), rgb_t, numentries);
 				memcpy(newlookup, m_bcglookup, m_bcglookup_entries * sizeof(rgb_t));
-				auto_free(&m_manager->machine(), m_bcglookup);
+				auto_free(m_manager->machine(), m_bcglookup);
 				m_bcglookup = newlookup;
 				m_bcglookup_entries = numentries;
 			}
@@ -629,9 +629,9 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 			adjusted = palette_entry_list_adjusted(m_palette);
 			if (m_bcglookup == NULL || m_bcglookup_entries < 4 * 32)
 			{
-				rgb_t *newlookup = auto_alloc_array(&m_manager->machine(), rgb_t, 4 * 32);
+				rgb_t *newlookup = auto_alloc_array(m_manager->machine(), rgb_t, 4 * 32);
 				memcpy(newlookup, m_bcglookup, m_bcglookup_entries * sizeof(rgb_t));
-				auto_free(&m_manager->machine(), m_bcglookup);
+				auto_free(m_manager->machine(), m_bcglookup);
 				m_bcglookup = newlookup;
 				m_bcglookup_entries = 4 * 32;
 			}
@@ -664,9 +664,9 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 			adjusted = palette_entry_list_adjusted(m_palette);
 			if (m_bcglookup == NULL || m_bcglookup_entries < 4 * 256)
 			{
-				rgb_t *newlookup = auto_alloc_array(&m_manager->machine(), rgb_t, 4 * 256);
+				rgb_t *newlookup = auto_alloc_array(m_manager->machine(), rgb_t, 4 * 256);
 				memcpy(newlookup, m_bcglookup, m_bcglookup_entries * sizeof(rgb_t));
-				auto_free(&m_manager->machine(), m_bcglookup);
+				auto_free(m_manager->machine(), m_bcglookup);
 				m_bcglookup = newlookup;
 				m_bcglookup_entries = 4 * 256;
 			}
@@ -1051,7 +1051,7 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 	: m_next(NULL),
 	  m_manager(manager),
 	  m_curview(NULL),
-	  m_filelist(*auto_alloc(&manager.machine(), simple_list<layout_file>(manager.machine().respool()))),
+	  m_filelist(*auto_alloc(manager.machine(), simple_list<layout_file>(manager.machine().respool()))),
 	  m_flags(flags),
 	  m_listindex(0),
 	  m_width(640),
@@ -1110,7 +1110,7 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 
 render_target::~render_target()
 {
-	auto_free(&m_manager.machine(), &m_filelist);
+	auto_free(m_manager.machine(), &m_filelist);
 }
 
 
@@ -1703,7 +1703,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	bool result = true;
 	try
 	{
-		m_filelist.append(*auto_alloc(&m_manager.machine(), layout_file(m_manager.machine(), *rootnode, dirname)));
+		m_filelist.append(*auto_alloc(m_manager.machine(), layout_file(m_manager.machine(), *rootnode, dirname)));
 	}
 	catch (emu_fatalerror &err)
 	{
@@ -2458,11 +2458,11 @@ render_manager::render_manager(running_machine &machine)
 	  m_ui_target(NULL),
 	  m_live_textures(0),
 	  m_texture_allocator(machine.respool()),
-	  m_ui_container(auto_alloc(&machine, render_container(*this))),
+	  m_ui_container(auto_alloc(machine, render_container(*this))),
 	  m_screen_container_list(machine.respool())
 {
 	// register callbacks
-	config_register(&machine, "video", config_load_static, config_save_static);
+	config_register(machine, "video", config_load_static, config_save_static);
 
 	// create one container per screen
 	for (screen_device *screen = machine.first_screen(); screen != NULL; screen = screen->next_screen())
@@ -2527,7 +2527,7 @@ float render_manager::max_update_rate() const
 
 render_target *render_manager::target_alloc(const char *layoutfile, UINT32 flags)
 {
-	return &m_targetlist.append(*auto_alloc(&m_machine, render_target(*this, layoutfile, flags)));
+	return &m_targetlist.append(*auto_alloc(m_machine, render_target(*this, layoutfile, flags)));
 }
 
 
@@ -2621,7 +2621,7 @@ void render_manager::texture_free(render_texture *texture)
 
 render_font *render_manager::font_alloc(const char *filename)
 {
-	return auto_alloc(&m_machine, render_font(*this, filename));
+	return auto_alloc(m_machine, render_font(*this, filename));
 }
 
 
@@ -2631,7 +2631,7 @@ render_font *render_manager::font_alloc(const char *filename)
 
 void render_manager::font_free(render_font *font)
 {
-	auto_free(&m_machine, font);
+	auto_free(m_machine, font);
 }
 
 
@@ -2658,7 +2658,7 @@ void render_manager::invalidate_all(void *refptr)
 
 render_container *render_manager::container_alloc(screen_device *screen)
 {
-	render_container *container = auto_alloc(&m_machine, render_container(*this, screen));
+	render_container *container = auto_alloc(m_machine, render_container(*this, screen));
 	if (screen != NULL)
 		m_screen_container_list.append(*container);
 	return container;
@@ -2672,7 +2672,7 @@ render_container *render_manager::container_alloc(screen_device *screen)
 void render_manager::container_free(render_container *container)
 {
 	m_screen_container_list.detach(*container);
-	auto_free(&m_machine, container);
+	auto_free(m_machine, container);
 }
 
 
@@ -2681,9 +2681,9 @@ void render_manager::container_free(render_container *container)
 //  configuration file
 //-------------------------------------------------
 
-void render_manager::config_load_static(running_machine *machine, int config_type, xml_data_node *parentnode)
+void render_manager::config_load_static(running_machine &machine, int config_type, xml_data_node *parentnode)
 {
-	machine->render().config_load(config_type, parentnode);
+	machine.render().config_load(config_type, parentnode);
 }
 
 void render_manager::config_load(int config_type, xml_data_node *parentnode)
@@ -2745,9 +2745,9 @@ void render_manager::config_load(int config_type, xml_data_node *parentnode)
 //  file
 //-------------------------------------------------
 
-void render_manager::config_save_static(running_machine *machine, int config_type, xml_data_node *parentnode)
+void render_manager::config_save_static(running_machine &machine, int config_type, xml_data_node *parentnode)
 {
-	machine->render().config_save(config_type, parentnode);
+	machine.render().config_save(config_type, parentnode);
 }
 
 void render_manager::config_save(int config_type, xml_data_node *parentnode)

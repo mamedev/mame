@@ -143,7 +143,7 @@ static INTERRUPT_GEN( argus_interrupt )
 /* Handler called by the YM2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -165,11 +165,11 @@ static const ym2203_interface ym2203_config =
 
 static WRITE8_HANDLER( argus_bankselect_w )
 {
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 	int bankaddress;
 
 	bankaddress = 0x10000 + ((data & 7) * 0x4000);
-	memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);	 /* Select 8 banks of 16k */
+	memory_set_bankptr(space->machine(), "bank1", &RAM[bankaddress]);	 /* Select 8 banks of 16k */
 }
 
 

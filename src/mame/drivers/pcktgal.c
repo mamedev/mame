@@ -24,42 +24,42 @@
 
 static WRITE8_HANDLER( pcktgal_bank_w )
 {
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 
-	if (data & 1) { memory_set_bankptr(space->machine, "bank1", &RAM[0x4000]); }
-	else { memory_set_bankptr(space->machine, "bank1", &RAM[0x10000]); }
+	if (data & 1) { memory_set_bankptr(space->machine(), "bank1", &RAM[0x4000]); }
+	else { memory_set_bankptr(space->machine(), "bank1", &RAM[0x10000]); }
 
-	if (data & 2) { memory_set_bankptr(space->machine, "bank2", &RAM[0x6000]); }
-	else { memory_set_bankptr(space->machine, "bank2", &RAM[0x12000]); }
+	if (data & 2) { memory_set_bankptr(space->machine(), "bank2", &RAM[0x6000]); }
+	else { memory_set_bankptr(space->machine(), "bank2", &RAM[0x12000]); }
 }
 
 static WRITE8_HANDLER( pcktgal_sound_bank_w )
 {
-	memory_set_bank(space->machine, "bank3", (data >> 2) & 1);
+	memory_set_bank(space->machine(), "bank3", (data >> 2) & 1);
 }
 
 static WRITE8_HANDLER( pcktgal_sound_w )
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static void pcktgal_adpcm_int(device_t *device)
 {
-	pcktgal_state *state = device->machine->driver_data<pcktgal_state>();
+	pcktgal_state *state = device->machine().driver_data<pcktgal_state>();
 
 	msm5205_data_w(device,state->msm5205next >> 4);
 	state->msm5205next<<=4;
 
 	state->toggle = 1 - state->toggle;
 	if (state->toggle)
-		cputag_set_input_line(device->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
+		cputag_set_input_line(device->machine(), "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( pcktgal_adpcm_data_w )
 {
-	pcktgal_state *state = space->machine->driver_data<pcktgal_state>();
+	pcktgal_state *state = space->machine().driver_data<pcktgal_state>();
 	state->msm5205next=data;
 }
 
@@ -413,9 +413,9 @@ ROM_END
 static DRIVER_INIT( deco222 )
 {
 	int A;
-	address_space *space = machine->device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8 *rom = machine->region("audiocpu")->base();
+	UINT8 *rom = machine.region("audiocpu")->base();
 
 	space->set_decrypted_region(0x8000, 0xffff, decrypted);
 
@@ -423,17 +423,17 @@ static DRIVER_INIT( deco222 )
 	for (A = 0x8000;A < 0x18000;A++)
 		decrypted[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x20) << 1) | ((rom[A] & 0x40) >> 1);
 
-	memory_configure_bank(machine, "bank3", 0, 2, machine->region("audiocpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 2, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 	memory_configure_bank_decrypted(machine, "bank3", 0, 2, &decrypted[0x8000], 0x4000);
 }
 
 static DRIVER_INIT( graphics )
 {
-	UINT8 *rom = machine->region("gfx1")->base();
-	int len = machine->region("gfx1")->bytes();
+	UINT8 *rom = machine.region("gfx1")->base();
+	int len = machine.region("gfx1")->bytes();
 	int i,j,temp[16];
 
-	memory_configure_bank(machine, "bank3", 0, 2, machine->region("audiocpu")->base() + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 2, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 
 	/* Tile graphics roms have some swapped lines, original version only */
 	for (i = 0x00000;i < len;i += 32)

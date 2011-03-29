@@ -421,8 +421,8 @@ GtkWidget *dview_new(const gchar *widget_name, const gchar *string1, const gchar
 	return wdv;
 }
 
-void dview_set_debug_view(DView *dv, running_machine *machine, debug_view_type type)
+void dview_set_debug_view(DView *dv, running_machine &machine, debug_view_type type)
 {
-	dv->view = machine->debug_view().alloc_view(type, dview_update, dv);
+	dv->view = machine.debug_view().alloc_view(type, dview_update, dv);
 	dv->dv_type = type;
 }

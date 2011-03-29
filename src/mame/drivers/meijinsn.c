@@ -95,7 +95,7 @@ static WRITE16_HANDLER( sound_w )
 
 static READ16_HANDLER( alpha_mcu_r )
 {
-	meijinsn_state *state = space->machine->driver_data<meijinsn_state>();
+	meijinsn_state *state = space->machine().driver_data<meijinsn_state>();
 	static const UINT8 coinage1[2][2] = {{1,1}, {1,2}};
 	static const UINT8 coinage2[2][2] = {{1,5}, {2,1}};
 
@@ -104,7 +104,7 @@ static READ16_HANDLER( alpha_mcu_r )
 	switch (offset)
 	{
 		case 0: /* Dipswitch 2 */
-			state->shared_ram[0] = (source & 0xff00) | input_port_read(space->machine, "DSW");
+			state->shared_ram[0] = (source & 0xff00) | input_port_read(space->machine(), "DSW");
 			return 0;
 
 		case 0x22: /* Coin value */
@@ -115,16 +115,16 @@ static READ16_HANDLER( alpha_mcu_r )
 
 			state->credits = 0;
 
-			if ((input_port_read(space->machine, "COINS") & 0x3) == 3)
+			if ((input_port_read(space->machine(), "COINS") & 0x3) == 3)
 				state->mcu_latch = 0;
 
-			if ((input_port_read(space->machine, "COINS") & 0x1) == 0 && !state->mcu_latch)
+			if ((input_port_read(space->machine(), "COINS") & 0x1) == 0 && !state->mcu_latch)
 			{
 				state->shared_ram[0x29] = (source & 0xff00) | 0x22;	// coinA
 				state->shared_ram[0x22] = (source & 0xff00) | 0x00;
 				state->mcu_latch = 1;
 
-				state->coinvalue = (~input_port_read(space->machine, "DSW")>>3) & 1;
+				state->coinvalue = (~input_port_read(space->machine(), "DSW")>>3) & 1;
 
 				state->deposits1++;
 				if (state->deposits1 == coinage1[state->coinvalue][0])
@@ -135,13 +135,13 @@ static READ16_HANDLER( alpha_mcu_r )
 				else
 					state->credits = 0;
 			}
-			else if ((input_port_read(space->machine, "COINS") & 0x2) == 0 && !state->mcu_latch)
+			else if ((input_port_read(space->machine(), "COINS") & 0x2) == 0 && !state->mcu_latch)
 			{
 				state->shared_ram[0x29] = (source & 0xff00) | 0x22;	// coinA
 				state->shared_ram[0x22] = (source & 0xff00) | 0x00;
 				state->mcu_latch = 1;
 
-				state->coinvalue = (~input_port_read(space->machine, "DSW") >> 3) & 1;
+				state->coinvalue = (~input_port_read(space->machine(), "DSW") >> 3) & 1;
 
 				state->deposits2++;
 				if (state->deposits2 == coinage2[state->coinvalue][0])
@@ -251,7 +251,7 @@ static PALETTE_INIT( meijinsn )
 			3,	resistances_rg,	weights_g,	0,	1000+1000,
 			2,	resistances_b,	weights_b,	0,	1000+1000);
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -279,7 +279,7 @@ static PALETTE_INIT( meijinsn )
 
 static SCREEN_UPDATE(meijinsn)
 {
-	meijinsn_state *state = screen->machine->driver_data<meijinsn_state>();
+	meijinsn_state *state = screen->machine().driver_data<meijinsn_state>();
 	int offs;
 
 	for (offs = 0; offs < 0x4000; offs++)
@@ -320,7 +320,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( meijinsn )
 {
-	meijinsn_state *state = machine->driver_data<meijinsn_state>();
+	meijinsn_state *state = machine.driver_data<meijinsn_state>();
 
 	state->save_item(NAME(state->deposits1));
 	state->save_item(NAME(state->deposits2));
@@ -329,7 +329,7 @@ static MACHINE_START( meijinsn )
 
 static MACHINE_RESET( meijinsn )
 {
-	meijinsn_state *state = machine->driver_data<meijinsn_state>();
+	meijinsn_state *state = machine.driver_data<meijinsn_state>();
 
 	state->deposits1 = 0;
 	state->deposits2 = 0;

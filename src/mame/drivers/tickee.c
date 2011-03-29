@@ -56,9 +56,9 @@ public:
  *
  *************************************/
 
-INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *y)
+INLINE void get_crosshair_xy(running_machine &machine, int player, int *x, int *y)
 {
-	const rectangle &visarea = machine->primary_screen->visible_area();
+	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	*x = (((input_port_read(machine, player ? "GUNX2" : "GUNX1") & 0xff) * (visarea.max_x - visarea.min_x)) >> 8) + visarea.min_x;
 	*y = (((input_port_read(machine, player ? "GUNY2" : "GUNY1") & 0xff) * (visarea.max_y - visarea.min_y)) >> 8) + visarea.min_y;
@@ -74,9 +74,9 @@ INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *
 
 static TIMER_CALLBACK( trigger_gun_interrupt )
 {
-	tickee_state *state = machine->driver_data<tickee_state>();
+	tickee_state *state = machine.driver_data<tickee_state>();
 	int which = param & 1;
-	int beamx = (machine->primary_screen->hpos()/2)-58;
+	int beamx = (machine.primary_screen->hpos()/2)-58;
 
 	/* once we're ready to fire, set the X coordinate and assert the line */
 	state->gunx[which] = beamx;
@@ -95,11 +95,11 @@ static TIMER_CALLBACK( clear_gun_interrupt )
 
 static TIMER_CALLBACK( setup_gun_interrupts )
 {
-	tickee_state *state = machine->driver_data<tickee_state>();
+	tickee_state *state = machine.driver_data<tickee_state>();
 	int beamx, beamy;
 
 	/* set a timer to do this again next frame */
-	state->setup_gun_timer->adjust(machine->primary_screen->time_until_pos(0));
+	state->setup_gun_timer->adjust(machine.primary_screen->time_until_pos(0));
 
 	/* only do work if the palette is flashed */
 	if (state->control)
@@ -108,13 +108,13 @@ static TIMER_CALLBACK( setup_gun_interrupts )
 
 	/* generate interrupts for player 1's gun */
 	get_crosshair_xy(machine, 0, &beamx, &beamy);
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(beamy + state->beamyadd, beamx + state->beamxadd), FUNC(trigger_gun_interrupt), 0);
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(beamy + state->beamyadd + 1, beamx + state->beamxadd), FUNC(clear_gun_interrupt), 0);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->beamyadd, beamx + state->beamxadd), FUNC(trigger_gun_interrupt), 0);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->beamyadd + 1, beamx + state->beamxadd), FUNC(clear_gun_interrupt), 0);
 
 	/* generate interrupts for player 2's gun */
 	get_crosshair_xy(machine, 1, &beamx, &beamy);
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(beamy + state->beamyadd, beamx + state->beamxadd), FUNC(trigger_gun_interrupt), 1);
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(beamy + state->beamyadd + 1, beamx + state->beamxadd), FUNC(clear_gun_interrupt), 1);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->beamyadd, beamx + state->beamxadd), FUNC(trigger_gun_interrupt), 1);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->beamyadd + 1, beamx + state->beamxadd), FUNC(clear_gun_interrupt), 1);
 }
 
 
@@ -127,10 +127,10 @@ static TIMER_CALLBACK( setup_gun_interrupts )
 
 static VIDEO_START( tickee )
 {
-	tickee_state *state = machine->driver_data<tickee_state>();
+	tickee_state *state = machine.driver_data<tickee_state>();
 	/* start a timer going on the first scanline of every frame */
-	state->setup_gun_timer = machine->scheduler().timer_alloc(FUNC(setup_gun_interrupts));
-	state->setup_gun_timer->adjust(machine->primary_screen->time_until_pos(0));
+	state->setup_gun_timer = machine.scheduler().timer_alloc(FUNC(setup_gun_interrupts));
+	state->setup_gun_timer->adjust(machine.primary_screen->time_until_pos(0));
 }
 
 
@@ -143,10 +143,10 @@ static VIDEO_START( tickee )
 
 static void scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	tickee_state *state = screen.machine->driver_data<tickee_state>();
+	tickee_state *state = screen.machine().driver_data<tickee_state>();
 	UINT16 *src = &state->vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
-	const rgb_t *pens = tlc34076_get_pens(screen.machine->device("tlc34076"));
+	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = params->coladdr << 1;
 	int x;
 
@@ -169,10 +169,10 @@ static void scanline_update(screen_device &screen, bitmap_t *bitmap, int scanlin
 
 static void rapidfir_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	tickee_state *state = screen.machine->driver_data<tickee_state>();
+	tickee_state *state = screen.machine().driver_data<tickee_state>();
 	UINT16 *src = &state->vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
-	const rgb_t *pens = tlc34076_get_pens(screen.machine->device("tlc34076"));
+	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = params->coladdr << 1;
 	int x;
 
@@ -206,14 +206,14 @@ static void rapidfir_scanline_update(screen_device &screen, bitmap_t *bitmap, in
 
 static MACHINE_RESET( tickee )
 {
-	tickee_state *state = machine->driver_data<tickee_state>();
+	tickee_state *state = machine.driver_data<tickee_state>();
 	state->beamxadd = 50;
 	state->beamyadd = 0;
 }
 
 static MACHINE_RESET( rapidfir )
 {
-	tickee_state *state = machine->driver_data<tickee_state>();
+	tickee_state *state = machine.driver_data<tickee_state>();
 	state->beamxadd = 0;
 	state->beamyadd = -5;
 }
@@ -227,7 +227,7 @@ static MACHINE_RESET( rapidfir )
 
 static WRITE16_HANDLER( rapidfir_transparent_w )
 {
-	tickee_state *state = space->machine->driver_data<tickee_state>();
+	tickee_state *state = space->machine().driver_data<tickee_state>();
 	if (!(data & 0xff00)) mem_mask &= 0x00ff;
 	if (!(data & 0x00ff)) mem_mask &= 0xff00;
 	COMBINE_DATA(&state->vram[offset]);
@@ -236,14 +236,14 @@ static WRITE16_HANDLER( rapidfir_transparent_w )
 
 static READ16_HANDLER( rapidfir_transparent_r )
 {
-	tickee_state *state = space->machine->driver_data<tickee_state>();
+	tickee_state *state = space->machine().driver_data<tickee_state>();
 	return state->vram[offset];
 }
 
 
 static void rapidfir_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	tickee_state *state = space->machine->driver_data<tickee_state>();
+	tickee_state *state = space->machine().driver_data<tickee_state>();
 	if (address < 0x800000)
 		memcpy(shiftreg, &state->vram[TOWORD(address)], TOBYTE(0x2000));
 }
@@ -251,7 +251,7 @@ static void rapidfir_to_shiftreg(address_space *space, UINT32 address, UINT16 *s
 
 static void rapidfir_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	tickee_state *state = space->machine->driver_data<tickee_state>();
+	tickee_state *state = space->machine().driver_data<tickee_state>();
 	if (address < 0x800000)
 		memcpy(&state->vram[TOWORD(address)], shiftreg, TOBYTE(0x2000));
 }
@@ -266,7 +266,7 @@ static void rapidfir_from_shiftreg(address_space *space, UINT32 address, UINT16 
 
 static WRITE16_HANDLER( tickee_control_w )
 {
-	tickee_state *state = space->machine->driver_data<tickee_state>();
+	tickee_state *state = space->machine().driver_data<tickee_state>();
 	UINT16 olddata = state->control[offset];
 
 	/* offsets:
@@ -280,8 +280,8 @@ static WRITE16_HANDLER( tickee_control_w )
 
 	if (offset == 3)
 	{
-		ticket_dispenser_w(space->machine->device("ticket1"), 0, (data & 8) << 4);
-		ticket_dispenser_w(space->machine->device("ticket2"), 0, (data & 4) << 5);
+		ticket_dispenser_w(space->machine().device("ticket1"), 0, (data & 8) << 4);
+		ticket_dispenser_w(space->machine().device("ticket2"), 0, (data & 4) << 5);
 	}
 
 	if (olddata != state->control[offset])
@@ -304,14 +304,14 @@ static READ16_HANDLER( ffff_r )
 
 static READ16_HANDLER( rapidfir_gun1_r )
 {
-	tickee_state *state = space->machine->driver_data<tickee_state>();
+	tickee_state *state = space->machine().driver_data<tickee_state>();
 	return state->gunx[0];
 }
 
 
 static READ16_HANDLER( rapidfir_gun2_r )
 {
-	tickee_state *state = space->machine->driver_data<tickee_state>();
+	tickee_state *state = space->machine().driver_data<tickee_state>();
 	return state->gunx[1];
 }
 
@@ -329,7 +329,7 @@ static WRITE16_HANDLER( ff7f_w )
 
 static WRITE16_HANDLER( rapidfir_control_w )
 {
-	tickee_state *state = space->machine->driver_data<tickee_state>();
+	tickee_state *state = space->machine().driver_data<tickee_state>();
 	/* other bits like control on tickee? */
 	if (ACCESSING_BITS_0_7)
 		state->palette_bank = data & 1;

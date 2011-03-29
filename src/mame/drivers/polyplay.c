@@ -104,7 +104,7 @@ static const samples_interface polyplay_samples_interface =
 
 static MACHINE_RESET( polyplay )
 {
-	polyplay_state *state = machine->driver_data<polyplay_state>();
+	polyplay_state *state = machine.driver_data<polyplay_state>();
 	state->channel1_active = 0;
 	state->channel1_const = 0;
 	state->channel2_active = 0;
@@ -115,7 +115,7 @@ static MACHINE_RESET( polyplay )
 	polyplay_set_channel2(machine, 0);
 	polyplay_play_channel2(machine, 0);
 
-	state->timer = machine->device<timer_device>("timer");
+	state->timer = machine.device<timer_device>("timer");
 }
 
 
@@ -127,9 +127,9 @@ static INTERRUPT_GEN( periodic_interrupt )
 
 static INTERRUPT_GEN( coin_interrupt )
 {
-	polyplay_state *state = device->machine->driver_data<polyplay_state>();
+	polyplay_state *state = device->machine().driver_data<polyplay_state>();
 
-	if (input_port_read(device->machine, "INPUT") & 0x80)
+	if (input_port_read(device->machine(), "INPUT") & 0x80)
 		state->last = 0;
 	else
 	{
@@ -177,47 +177,47 @@ INPUT_PORTS_END
 
 static WRITE8_HANDLER( polyplay_sound_channel )
 {
-	polyplay_state *state = space->machine->driver_data<polyplay_state>();
+	polyplay_state *state = space->machine().driver_data<polyplay_state>();
 	switch(offset) {
 	case 0x00:
 		if (state->channel1_const) {
 			if (data <= 1) {
-				polyplay_set_channel1(space->machine, 0);
+				polyplay_set_channel1(space->machine(), 0);
 			}
 			state->channel1_const = 0;
-			polyplay_play_channel1(space->machine, data*state->prescale1);
+			polyplay_play_channel1(space->machine(), data*state->prescale1);
 
 		}
 		else {
 			state->prescale1 = (data & 0x20) ? 16 : 1;
 			if (data & 0x04) {
-				polyplay_set_channel1(space->machine, 1);
+				polyplay_set_channel1(space->machine(), 1);
 				state->channel1_const = 1;
 			}
 			if ((data == 0x41) || (data == 0x65) || (data == 0x45)) {
-				polyplay_set_channel1(space->machine, 0);
-				polyplay_play_channel1(space->machine, 0);
+				polyplay_set_channel1(space->machine(), 0);
+				polyplay_play_channel1(space->machine(), 0);
 			}
 		}
 		break;
 	case 0x01:
 		if (state->channel2_const) {
 			if (data <= 1) {
-				polyplay_set_channel2(space->machine, 0);
+				polyplay_set_channel2(space->machine(), 0);
 			}
 			state->channel2_const = 0;
-			polyplay_play_channel2(space->machine, data*state->prescale2);
+			polyplay_play_channel2(space->machine(), data*state->prescale2);
 
 		}
 		else {
 			state->prescale2 = (data & 0x20) ? 16 : 1;
 			if (data & 0x04) {
-				polyplay_set_channel2(space->machine, 1);
+				polyplay_set_channel2(space->machine(), 1);
 				state->channel2_const = 1;
 			}
 			if ((data == 0x41) || (data == 0x65) || (data == 0x45)) {
-				polyplay_set_channel2(space->machine, 0);
-				polyplay_play_channel2(space->machine, 0);
+				polyplay_set_channel2(space->machine(), 0);
+				polyplay_play_channel2(space->machine(), 0);
 			}
 		}
 		break;
@@ -226,7 +226,7 @@ static WRITE8_HANDLER( polyplay_sound_channel )
 
 static WRITE8_HANDLER( polyplay_start_timer2 )
 {
-	polyplay_state *state = space->machine->driver_data<polyplay_state>();
+	polyplay_state *state = space->machine().driver_data<polyplay_state>();
 	if (data == 0x03)
 		state->timer->reset();
 
@@ -236,7 +236,7 @@ static WRITE8_HANDLER( polyplay_start_timer2 )
 
 static READ8_HANDLER( polyplay_random_read )
 {
-	return space->machine->rand() & 0xff;
+	return space->machine().rand() & 0xff;
 }
 
 /* graphic structures */
@@ -353,7 +353,7 @@ ROM_END
 
 static TIMER_DEVICE_CALLBACK( polyplay_timer_callback )
 {
-	cputag_set_input_line_and_vector(timer.machine, "maincpu", 0, HOLD_LINE, 0x4c);
+	cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0x4c);
 }
 
 /* game driver */

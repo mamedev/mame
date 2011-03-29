@@ -93,14 +93,14 @@
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	suprridr_state *state = space->machine->driver_data<suprridr_state>();
+	suprridr_state *state = space->machine().driver_data<suprridr_state>();
 	state->nmi_enable = data;
 }
 
 
 static INTERRUPT_GEN( main_nmi_gen )
 {
-	suprridr_state *state = device->machine->driver_data<suprridr_state>();
+	suprridr_state *state = device->machine().driver_data<suprridr_state>();
 	if (state->nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -115,7 +115,7 @@ static INTERRUPT_GEN( main_nmi_gen )
 
 static TIMER_CALLBACK( delayed_sound_w )
 {
-	suprridr_state *state = machine->driver_data<suprridr_state>();
+	suprridr_state *state = machine.driver_data<suprridr_state>();
 	state->sound_data = param;
 	cputag_set_input_line(machine, "audiocpu", 0, ASSERT_LINE);
 }
@@ -123,20 +123,20 @@ static TIMER_CALLBACK( delayed_sound_w )
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	space->machine->scheduler().synchronize(FUNC(delayed_sound_w), data);
+	space->machine().scheduler().synchronize(FUNC(delayed_sound_w), data);
 }
 
 
 static READ8_DEVICE_HANDLER( sound_data_r )
 {
-	suprridr_state *state = device->machine->driver_data<suprridr_state>();
+	suprridr_state *state = device->machine().driver_data<suprridr_state>();
 	return state->sound_data;
 }
 
 
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
 }
 
 
@@ -150,7 +150,7 @@ static WRITE8_HANDLER( sound_irq_ack_w )
 static WRITE8_HANDLER( coin_lock_w )
 {
 	/* cleared when 9 credits are hit, but never reset! */
-/*  coin_lockout_global_w(space->machine, ~data & 1); */
+/*  coin_lockout_global_w(space->machine(), ~data & 1); */
 }
 
 
@@ -228,10 +228,10 @@ static CUSTOM_INPUT( suprridr_control_r )
 	UINT32 ret;
 
 	/* screen flip multiplexes controls */
-	if (suprridr_is_screen_flipped(field->port->machine))
-		ret = input_port_read(field->port->machine, SUPRRIDR_P2_CONTROL_PORT_TAG);
+	if (suprridr_is_screen_flipped(field->port->machine()))
+		ret = input_port_read(field->port->machine(), SUPRRIDR_P2_CONTROL_PORT_TAG);
 	else
-		ret = input_port_read(field->port->machine, SUPRRIDR_P1_CONTROL_PORT_TAG);
+		ret = input_port_read(field->port->machine(), SUPRRIDR_P1_CONTROL_PORT_TAG);
 
 	return ret;
 }

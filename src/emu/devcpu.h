@@ -286,8 +286,8 @@ const device_type name = basename##_device_config::static_alloc_device_config
 #define INTERRUPT_GEN(func)		void func(device_t *device)
 
 // helpers for using machine/cputag instead of cpu objects
-#define cputag_set_input_line(mach, tag, line, state)					device_execute((mach)->device(tag))->set_input_line(line, state)
-#define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	device_execute((mach)->device(tag))->set_input_line_and_vector(line, state, vec)
+#define cputag_set_input_line(mach, tag, line, state)					device_execute((mach).device(tag))->set_input_line(line, state)
+#define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	device_execute((mach).device(tag))->set_input_line_and_vector(line, state, vec)
 
 
 

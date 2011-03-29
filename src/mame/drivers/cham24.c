@@ -77,9 +77,9 @@ public:
 
 
 
-static void cham24_set_mirroring( running_machine *machine, int mirroring )
+static void cham24_set_mirroring( running_machine &machine, int mirroring )
 {
-	cham24_state *state = machine->driver_data<cham24_state>();
+	cham24_state *state = machine.driver_data<cham24_state>();
 	switch(mirroring)
 	{
 	case PPU_MIRROR_LOW:
@@ -112,14 +112,14 @@ static void cham24_set_mirroring( running_machine *machine, int mirroring )
 
 static WRITE8_HANDLER( nt_w )
 {
-	cham24_state *state = space->machine->driver_data<cham24_state>();
+	cham24_state *state = space->machine().driver_data<cham24_state>();
 	int page = ((offset & 0xc00) >> 10);
 	state->nt_page[page][offset & 0x3ff] = data;
 }
 
 static READ8_HANDLER( nt_r )
 {
-	cham24_state *state = space->machine->driver_data<cham24_state>();
+	cham24_state *state = space->machine().driver_data<cham24_state>();
 	int page = ((offset & 0xc00) >> 10);
 	return state->nt_page[page][offset & 0x3ff];
 
@@ -128,7 +128,7 @@ static READ8_HANDLER( nt_r )
 static WRITE8_HANDLER( sprite_dma_w )
 {
 	int source = (data & 7);
-	ppu2c0x_spriteram_dma(space, space->machine->device("ppu"), source);
+	ppu2c0x_spriteram_dma(space, space->machine().device("ppu"), source);
 }
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
@@ -149,13 +149,13 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 
 static READ8_HANDLER( cham24_IN0_r )
 {
-	cham24_state *state = space->machine->driver_data<cham24_state>();
+	cham24_state *state = space->machine().driver_data<cham24_state>();
 	return ((state->in_0 >> state->in_0_shift++) & 0x01) | 0x40;
 }
 
 static WRITE8_HANDLER( cham24_IN0_w )
 {
-	cham24_state *state = space->machine->driver_data<cham24_state>();
+	cham24_state *state = space->machine().driver_data<cham24_state>();
 	if (data & 0xfe)
 	{
 		//logerror("Unhandled cham24_IN0_w write: data = %02X\n", data);
@@ -169,14 +169,14 @@ static WRITE8_HANDLER( cham24_IN0_w )
 	state->in_0_shift = 0;
 	state->in_1_shift = 0;
 
-	state->in_0 = input_port_read(space->machine, "P1");
-	state->in_1 = input_port_read(space->machine, "P2");
+	state->in_0 = input_port_read(space->machine(), "P1");
+	state->in_1 = input_port_read(space->machine(), "P2");
 
 }
 
 static READ8_HANDLER( cham24_IN1_r )
 {
-	cham24_state *state = space->machine->driver_data<cham24_state>();
+	cham24_state *state = space->machine().driver_data<cham24_state>();
 	return ((state->in_1 >> state->in_1_shift++) & 0x01) | 0x40;
 }
 
@@ -188,14 +188,14 @@ static WRITE8_HANDLER( cham24_mapper_w )
 	UINT32 prg_bank_page_size = (offset >> 12) & 0x01;
 	UINT32 gfx_mirroring = (offset >> 13) & 0x01;
 
-	UINT8* dst = space->machine->region("maincpu")->base();
-	UINT8* src = space->machine->region("user1")->base();
+	UINT8* dst = space->machine().region("maincpu")->base();
+	UINT8* src = space->machine().region("user1")->base();
 
 	// switch PPU VROM bank
-	memory_set_bankptr(space->machine, "bank1", space->machine->region("gfx1")->base() + (0x2000 * gfx_bank));
+	memory_set_bankptr(space->machine(), "bank1", space->machine().region("gfx1")->base() + (0x2000 * gfx_bank));
 
 	// set gfx mirroring
-	cham24_set_mirroring(space->machine, gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	cham24_set_mirroring(space->machine(), gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	// switch PRG bank
 	if (prg_bank_page_size == 0)
@@ -269,7 +269,7 @@ static PALETTE_INIT( cham24 )
 
 static void ppu_irq( device_t *device, int *ppu_regs )
 {
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* our ppu interface                                            */
@@ -288,24 +288,24 @@ static VIDEO_START( cham24 )
 static SCREEN_UPDATE( cham24 )
 {
 	/* render the ppu */
-	ppu2c0x_render(screen->machine->device("ppu"), bitmap, 0, 0, 0, 0);
+	ppu2c0x_render(screen->machine().device("ppu"), bitmap, 0, 0, 0, 0);
 	return 0;
 }
 
 
 static MACHINE_START( cham24 )
 {
-	cham24_state *state = machine->driver_data<cham24_state>();
+	cham24_state *state = machine.driver_data<cham24_state>();
 	/* switch PRG rom */
-	UINT8* dst = machine->region("maincpu")->base();
-	UINT8* src = machine->region("user1")->base();
+	UINT8* dst = machine.region("maincpu")->base();
+	UINT8* src = machine.region("user1")->base();
 
 	memcpy(&dst[0x8000], &src[0x0f8000], 0x4000);
 	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
 
 	/* uses 8K swapping, all ROM!*/
-	machine->device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
-	memory_set_bankptr(machine, "bank1", machine->region("gfx1")->base());
+	machine.device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
+	memory_set_bankptr(machine, "bank1", machine.region("gfx1")->base());
 
 	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
 	state->nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
@@ -315,7 +315,7 @@ static MACHINE_START( cham24 )
 	state->nt_page[3] = state->nt_ram + 0xc00;
 
 	/* and read/write handlers */
-	machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(nt_r), FUNC(nt_w));
+	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(nt_r), FUNC(nt_w));
 }
 
 static DRIVER_INIT( cham24 )

@@ -33,22 +33,22 @@ Sound: AY-3-8912
 
 static WRITE8_HANDLER( usgames_rombank_w )
 {
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 
 //  logerror ("BANK WRITE? -%02x-\n",data);
 //popmessage("%02x",data);
 
-	memory_set_bankptr(space->machine,  "bank1",&RAM[ 0x10000 + 0x4000 * data] );
+	memory_set_bankptr(space->machine(),  "bank1",&RAM[ 0x10000 + 0x4000 * data] );
 }
 
 static WRITE8_HANDLER( lamps1_w )
 {
 	/* button lamps */
-	set_led_status(space->machine, 0,data & 0x01);
-	set_led_status(space->machine, 1,data & 0x02);
-	set_led_status(space->machine, 2,data & 0x04);
-	set_led_status(space->machine, 3,data & 0x08);
-	set_led_status(space->machine, 4,data & 0x10);
+	set_led_status(space->machine(), 0,data & 0x01);
+	set_led_status(space->machine(), 1,data & 0x02);
+	set_led_status(space->machine(), 2,data & 0x04);
+	set_led_status(space->machine(), 3,data & 0x08);
+	set_led_status(space->machine(), 4,data & 0x10);
 
 	/* bit 5 toggles all the time - extra lamp? */
 }

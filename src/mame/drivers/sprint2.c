@@ -32,24 +32,24 @@
 
 static DRIVER_INIT( sprint1 )
 {
-	sprint2_state *state = machine->driver_data<sprint2_state>();
+	sprint2_state *state = machine.driver_data<sprint2_state>();
 	state->game = 1;
 }
 static DRIVER_INIT( sprint2 )
 {
-	sprint2_state *state = machine->driver_data<sprint2_state>();
+	sprint2_state *state = machine.driver_data<sprint2_state>();
 	state->game = 2;
 }
 static DRIVER_INIT( dominos )
 {
-	sprint2_state *state = machine->driver_data<sprint2_state>();
+	sprint2_state *state = machine.driver_data<sprint2_state>();
 	state->game = 3;
 }
 
 
-static int service_mode(running_machine *machine)
+static int service_mode(running_machine &machine)
 {
-	sprint2_state *state = machine->driver_data<sprint2_state>();
+	sprint2_state *state = machine.driver_data<sprint2_state>();
 	UINT8 v = input_port_read(machine, "INB");
 
 	if (GAME_IS_SPRINT1)
@@ -71,8 +71,8 @@ static int service_mode(running_machine *machine)
 
 static INTERRUPT_GEN( sprint2 )
 {
-	sprint2_state *state = device->machine->driver_data<sprint2_state>();
-	device_t *discrete = device->machine->device("discrete");
+	sprint2_state *state = device->machine().driver_data<sprint2_state>();
+	device_t *discrete = device->machine().device("discrete");
 
 	/* handle steering wheels */
 
@@ -82,7 +82,7 @@ static INTERRUPT_GEN( sprint2 )
 
 		for (i = 0; i < 2; i++)
 		{
-			signed char delta = input_port_read(device->machine, i ? "DIAL_P2" : "DIAL_P1") - state->dial[i];
+			signed char delta = input_port_read(device->machine(), i ? "DIAL_P2" : "DIAL_P1") - state->dial[i];
 
 			if (delta < 0)
 			{
@@ -95,7 +95,7 @@ static INTERRUPT_GEN( sprint2 )
 
 			state->dial[i] += delta;
 
-			switch (input_port_read(device->machine, i ? "GEAR_P2" : "GEAR_P1") & 15)
+			switch (input_port_read(device->machine(), i ? "GEAR_P2" : "GEAR_P1") & 15)
 			{
 			case 1: state->gear[i] = 1; break;
 			case 2: state->gear[i] = 2; break;
@@ -111,30 +111,30 @@ static INTERRUPT_GEN( sprint2 )
 
 	/* interrupts and watchdog are disabled during service mode */
 
-	watchdog_enable(device->machine, !service_mode(device->machine));
+	watchdog_enable(device->machine(), !service_mode(device->machine()));
 
-	if (!service_mode(device->machine))
+	if (!service_mode(device->machine()))
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static READ8_HANDLER( sprint2_wram_r )
 {
-	sprint2_state *state = space->machine->driver_data<sprint2_state>();
+	sprint2_state *state = space->machine().driver_data<sprint2_state>();
 	return state->video_ram[0x380 + offset % 0x80];
 }
 
 
 static READ8_HANDLER( sprint2_dip_r )
 {
-	return (input_port_read(space->machine, "DSW") << (2 * ((offset & 3) ^ 3))) & 0xc0;
+	return (input_port_read(space->machine(), "DSW") << (2 * ((offset & 3) ^ 3))) & 0xc0;
 }
 
 
 static READ8_HANDLER( sprint2_input_A_r )
 {
-	sprint2_state *state = space->machine->driver_data<sprint2_state>();
-	UINT8 val = input_port_read(space->machine, "INA");
+	sprint2_state *state = space->machine().driver_data<sprint2_state>();
+	UINT8 val = input_port_read(space->machine(), "INA");
 
 	if (GAME_IS_SPRINT2)
 	{
@@ -152,8 +152,8 @@ static READ8_HANDLER( sprint2_input_A_r )
 
 static READ8_HANDLER( sprint2_input_B_r )
 {
-	sprint2_state *state = space->machine->driver_data<sprint2_state>();
-	UINT8 val = input_port_read(space->machine, "INB");
+	sprint2_state *state = space->machine().driver_data<sprint2_state>();
+	UINT8 val = input_port_read(space->machine(), "INB");
 
 	if (GAME_IS_SPRINT1)
 	{
@@ -168,19 +168,19 @@ static READ8_HANDLER( sprint2_input_B_r )
 
 static READ8_HANDLER( sprint2_sync_r )
 {
-	sprint2_state *state = space->machine->driver_data<sprint2_state>();
+	sprint2_state *state = space->machine().driver_data<sprint2_state>();
 	UINT8 val = 0;
 
 	if (state->attract != 0)
 		val |= 0x10;
 
-	if (space->machine->primary_screen->vpos() == 261)
+	if (space->machine().primary_screen->vpos() == 261)
 		val |= 0x20; /* VRESET */
 
-	if (space->machine->primary_screen->vpos() >= 224)
+	if (space->machine().primary_screen->vpos() >= 224)
 		val |= 0x40; /* VBLANK */
 
-	if (space->machine->primary_screen->vpos() >= 131)
+	if (space->machine().primary_screen->vpos() >= 131)
 		val |= 0x80; /* 60 Hz? */
 
 	return val;
@@ -189,38 +189,38 @@ static READ8_HANDLER( sprint2_sync_r )
 
 static READ8_HANDLER( sprint2_steering1_r )
 {
-	sprint2_state *state = space->machine->driver_data<sprint2_state>();
+	sprint2_state *state = space->machine().driver_data<sprint2_state>();
 	return state->steering[0];
 }
 static READ8_HANDLER( sprint2_steering2_r )
 {
-	sprint2_state *state = space->machine->driver_data<sprint2_state>();
+	sprint2_state *state = space->machine().driver_data<sprint2_state>();
 	return state->steering[1];
 }
 
 
 static WRITE8_HANDLER( sprint2_steering_reset1_w )
 {
-	sprint2_state *state = space->machine->driver_data<sprint2_state>();
+	sprint2_state *state = space->machine().driver_data<sprint2_state>();
 	state->steering[0] |= 0x80;
 }
 static WRITE8_HANDLER( sprint2_steering_reset2_w )
 {
-	sprint2_state *state = space->machine->driver_data<sprint2_state>();
+	sprint2_state *state = space->machine().driver_data<sprint2_state>();
 	state->steering[1] |= 0x80;
 }
 
 
 static WRITE8_HANDLER( sprint2_wram_w )
 {
-	sprint2_state *state = space->machine->driver_data<sprint2_state>();
+	sprint2_state *state = space->machine().driver_data<sprint2_state>();
 	state->video_ram[0x380 + offset % 0x80] = data;
 }
 
 
 static WRITE8_DEVICE_HANDLER( sprint2_attract_w )
 {
-	sprint2_state *state = device->machine->driver_data<sprint2_state>();
+	sprint2_state *state = device->machine().driver_data<sprint2_state>();
 	state->attract = offset & 1;
 
 	// also DOMINOS_ATTRACT_EN
@@ -248,11 +248,11 @@ static WRITE8_DEVICE_HANDLER( sprint2_skid2_w )
 
 static WRITE8_HANDLER( sprint2_lamp1_w )
 {
-	set_led_status(space->machine, 0, offset & 1);
+	set_led_status(space->machine(), 0, offset & 1);
 }
 static WRITE8_HANDLER( sprint2_lamp2_w )
 {
-	set_led_status(space->machine, 1, offset & 1);
+	set_led_status(space->machine(), 1, offset & 1);
 }
 
 

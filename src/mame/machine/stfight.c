@@ -38,9 +38,9 @@ Encryption PAL 16R4 on CPU board
 
 DRIVER_INIT( empcity )
 {
-	stfight_state *state = machine->driver_data<stfight_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine->region("maincpu")->base();
+	stfight_state *state = machine.driver_data<stfight_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine.region("maincpu")->base();
 	int A;
 
 	state->decrypt = auto_alloc_array(machine, UINT8, 0x8000);
@@ -70,7 +70,7 @@ DRIVER_INIT( empcity )
 
 DRIVER_INIT( stfight )
 {
-	stfight_state *state = machine->driver_data<stfight_state>();
+	stfight_state *state = machine.driver_data<stfight_state>();
 	DRIVER_INIT_CALL(empcity);
 
 	/* patch out a tight loop during startup - is the code waiting */
@@ -84,8 +84,8 @@ DRIVER_INIT( stfight )
 
 MACHINE_RESET( stfight )
 {
-	stfight_state *state = machine->driver_data<stfight_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	stfight_state *state = machine.driver_data<stfight_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	state->adpcm_data_offs = state->adpcm_data_end = 0;
 	state->toggle = 0;
 	state->fm_data = 0;
@@ -103,9 +103,9 @@ MACHINE_RESET( stfight )
 // - in fact I don't even know how/where it's switched in!
 static WRITE8_HANDLER( stfight_bank_w )
 {
-	UINT8   *ROM2 = space->machine->region("maincpu")->base() + 0x10000;
+	UINT8   *ROM2 = space->machine().region("maincpu")->base() + 0x10000;
 
-	memory_set_bankptr(space->machine,  "bank1", &ROM2[data<<14] );
+	memory_set_bankptr(space->machine(),  "bank1", &ROM2[data<<14] );
 }
 
 /*
@@ -122,7 +122,7 @@ INTERRUPT_GEN( stfight_vb_interrupt )
 {
     // Do a RST10
     device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);
-    device->machine->scheduler().timer_set(attotime::from_hz(120), FUNC(stfight_interrupt_1));
+    device->machine().scheduler().timer_set(attotime::from_hz(120), FUNC(stfight_interrupt_1));
 }
 
 /*
@@ -132,12 +132,12 @@ INTERRUPT_GEN( stfight_vb_interrupt )
 // Perhaps define dipswitches as active low?
 READ8_HANDLER( stfight_dsw_r )
 {
-    return( ~input_port_read(space->machine, offset ? "DSW1" : "DSW0") );
+    return( ~input_port_read(space->machine(), offset ? "DSW1" : "DSW0") );
 }
 
 READ8_HANDLER( stfight_coin_r )
 {
-	stfight_state *state = space->machine->driver_data<stfight_state>();
+	stfight_state *state = space->machine().driver_data<stfight_state>();
     int coin_mech_data;
     int i;
 
@@ -155,7 +155,7 @@ READ8_HANDLER( stfight_coin_r )
      *        since it's read by the 30Hz interrupt ISR
      */
 
-    coin_mech_data = input_port_read(space->machine, "COIN");
+    coin_mech_data = input_port_read(space->machine(), "COIN");
 
     for( i=0; i<2; i++ )
     {
@@ -171,7 +171,7 @@ READ8_HANDLER( stfight_coin_r )
 
 WRITE8_HANDLER( stfight_coin_w )
 {
-	stfight_state *state = space->machine->driver_data<stfight_state>();
+	stfight_state *state = space->machine().driver_data<stfight_state>();
     // interrogate coin mech
     state->coin_mech_query_active = 1;
     state->coin_mech_query = data;
@@ -193,8 +193,8 @@ static const int sampleLimits[] =
 
 void stfight_adpcm_int(device_t *device)
 {
-	stfight_state *state = device->machine->driver_data<stfight_state>();
-	UINT8 *SAMPLES = device->machine->region("adpcm")->base();
+	stfight_state *state = device->machine().driver_data<stfight_state>();
+	UINT8 *SAMPLES = device->machine().region("adpcm")->base();
 	int adpcm_data = SAMPLES[state->adpcm_data_offs & 0x7fff];
 
     // finished playing sample?
@@ -217,7 +217,7 @@ void stfight_adpcm_int(device_t *device)
 
 WRITE8_DEVICE_HANDLER( stfight_adpcm_control_w )
 {
-	stfight_state *state = device->machine->driver_data<stfight_state>();
+	stfight_state *state = device->machine().driver_data<stfight_state>();
     if( data < 0x08 )
     {
         state->adpcm_data_offs = sampleLimits[data];
@@ -237,14 +237,14 @@ WRITE8_HANDLER( stfight_e800_w )
 
 WRITE8_HANDLER( stfight_fm_w )
 {
-	stfight_state *state = space->machine->driver_data<stfight_state>();
+	stfight_state *state = space->machine().driver_data<stfight_state>();
     // the sound cpu ignores any fm data without bit 7 set
     state->fm_data = 0x80 | data;
 }
 
 READ8_HANDLER( stfight_fm_r )
 {
-	stfight_state *state = space->machine->driver_data<stfight_state>();
+	stfight_state *state = space->machine().driver_data<stfight_state>();
     int data = state->fm_data;
 
     // clear the latch?!?

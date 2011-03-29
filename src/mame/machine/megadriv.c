@@ -320,7 +320,7 @@ static int sh2_slave_vint_pending;
 static int _32x_fb_swap;
 static int _32x_hcount_reg,_32x_hcount_compare_val;
 
-void _32x_check_irqs(running_machine* machine);
+void _32x_check_irqs(running_machine& machine);
 
 #define SH2_VRES_IRQ_LEVEL 14
 #define SH2_VINT_IRQ_LEVEL 12
@@ -400,7 +400,7 @@ static UINT16* segacd_font_bits;
 static UINT16 scd_rammode;
 static UINT32 scd_mode_dmna_ret_flags ;
 
-static void segacd_mark_tiles_dirty(running_machine* machine, int offset);
+static void segacd_mark_tiles_dirty(running_machine& machine, int offset);
 
 static struct genesis_z80_vars
 {
@@ -629,7 +629,7 @@ static void vdp_vsram_write(UINT16 data)
 	megadrive_vdp_address &=0xffff;
 }
 
-static void write_cram_value(running_machine *machine, int offset, int data)
+static void write_cram_value(running_machine &machine, int offset, int data)
 {
 	megadrive_vdp_cram[offset] = data;
 
@@ -648,7 +648,7 @@ static void write_cram_value(running_machine *machine, int offset, int data)
 	}
 }
 
-static void vdp_cram_write(running_machine *machine, UINT16 data)
+static void vdp_cram_write(running_machine &machine, UINT16 data)
 {
 	int offset;
 	offset = (megadrive_vdp_address&0x7e)>>1;
@@ -661,7 +661,7 @@ static void vdp_cram_write(running_machine *machine, UINT16 data)
 }
 
 
-static void megadriv_vdp_data_port_w(running_machine *machine, int data)
+static void megadriv_vdp_data_port_w(running_machine &machine, int data)
 {
 	megadrive_vdp_command_pending = 0;
 
@@ -757,7 +757,7 @@ static void megadriv_vdp_data_port_w(running_machine *machine, int data)
 
 
 
-static void megadrive_vdp_set_register(running_machine *machine, int regnum, UINT8 value)
+static void megadrive_vdp_set_register(running_machine &machine, int regnum, UINT8 value)
 {
 	megadrive_vdp_register[regnum] = value;
 
@@ -804,7 +804,7 @@ static void megadrive_vdp_set_register(running_machine *machine, int regnum, UIN
 //  if (regnum == 0x0a)
 //      mame_printf_debug("Set HINT Reload Register to %d on scanline %d\n",value, genesis_scanline_counter);
 
-//  mame_printf_debug("%s: Setting VDP Register #%02x to %02x\n",machine->describe_context(), regnum,value);
+//  mame_printf_debug("%s: Setting VDP Register #%02x to %02x\n",machine.describe_context(), regnum,value);
 }
 
 static void update_megadrive_vdp_code_and_address(void)
@@ -816,14 +816,14 @@ static void update_megadrive_vdp_code_and_address(void)
                             ((megadrive_vdp_command_part2 & 0x0003) << 14);
 }
 
-static UINT16 (*vdp_get_word_from_68k_mem)(running_machine *machine, UINT32 source);
+static UINT16 (*vdp_get_word_from_68k_mem)(running_machine &machine, UINT32 source);
 
-static UINT16 vdp_get_word_from_68k_mem_default(running_machine *machine, UINT32 source)
+static UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source)
 {
 	// should we limit the valid areas here?
 	// how does this behave with the segacd etc?
 	// note, the RV bit on 32x is important for this to work, because it causes a normal cart mapping - see tempo
-	address_space *space68k = machine->device<legacy_cpu_device>("maincpu")->space();
+	address_space *space68k = machine.device<legacy_cpu_device>("maincpu")->space();
 
 	//printf("vdp_get_word_from_68k_mem_default %08x\n", source);
 
@@ -850,7 +850,7 @@ static UINT16 vdp_get_word_from_68k_mem_default(running_machine *machine, UINT32
 	else
 	{
 		printf("DMA Read unmapped %06x\n",source);
-		return machine->rand();
+		return machine.rand();
 	}
 
 
@@ -909,14 +909,14 @@ static void megadrive_do_insta_vram_copy(UINT32 source, UINT16 length)
 }
 
 /* Instant, but we pause the 68k a bit */
-static void megadrive_do_insta_68k_to_vram_dma(running_machine *machine, UINT32 source,int length)
+static void megadrive_do_insta_68k_to_vram_dma(running_machine &machine, UINT32 source,int length)
 {
 	int count;
 
 	if (length==0x00) length = 0xffff;
 
 	/* This is a hack until real DMA timings are implemented */
-	device_spin_until_time(machine->device("maincpu"), attotime::from_nsec(length * 1000 / 3500));
+	device_spin_until_time(machine.device("maincpu"), attotime::from_nsec(length * 1000 / 3500));
 
 	for (count = 0;count<(length>>1);count++)
 	{
@@ -936,7 +936,7 @@ static void megadrive_do_insta_68k_to_vram_dma(running_machine *machine, UINT32 
 }
 
 
-static void megadrive_do_insta_68k_to_cram_dma(running_machine *machine,UINT32 source,UINT16 length)
+static void megadrive_do_insta_68k_to_cram_dma(running_machine &machine,UINT32 source,UINT16 length)
 {
 	int count;
 
@@ -964,7 +964,7 @@ static void megadrive_do_insta_68k_to_cram_dma(running_machine *machine,UINT32 s
 
 }
 
-static void megadrive_do_insta_68k_to_vsram_dma(running_machine *machine,UINT32 source,UINT16 length)
+static void megadrive_do_insta_68k_to_vsram_dma(running_machine &machine,UINT32 source,UINT16 length)
 {
 	int count;
 
@@ -992,7 +992,7 @@ static void megadrive_do_insta_68k_to_vsram_dma(running_machine *machine,UINT32 
 }
 
 /* This can be simplified quite a lot.. */
-static void handle_dma_bits(running_machine *machine)
+static void handle_dma_bits(running_machine &machine)
 {
 
 	if (megadrive_vdp_code&0x20)
@@ -1001,7 +1001,7 @@ static void handle_dma_bits(running_machine *machine)
 		UINT16 length;
 		source = (MEGADRIVE_REG15_DMASOURCE1 | (MEGADRIVE_REG16_DMASOURCE2<<8) | ((MEGADRIVE_REG17_DMASOURCE3&0xff)<<16))<<1;
 		length = (MEGADRIVE_REG13_DMALENGTH1 | (MEGADRIVE_REG14_DMALENGTH2<<8))<<1;
-	//  mame_printf_debug("%s 68k DMAtran set source %06x length %04x dest %04x enabled %01x code %02x %02x\n", machine->describe_context(), source, length, megadrive_vdp_address,MEGADRIVE_REG01_DMA_ENABLE, megadrive_vdp_code,MEGADRIVE_REG0F_AUTO_INC);
+	//  mame_printf_debug("%s 68k DMAtran set source %06x length %04x dest %04x enabled %01x code %02x %02x\n", machine.describe_context(), source, length, megadrive_vdp_address,MEGADRIVE_REG01_DMA_ENABLE, megadrive_vdp_code,MEGADRIVE_REG0F_AUTO_INC);
 
 	}
 
@@ -1124,7 +1124,7 @@ static void handle_dma_bits(running_machine *machine)
 	}
 }
 
-static void megadriv_vdp_ctrl_port_w(running_machine *machine, int data)
+static void megadriv_vdp_ctrl_port_w(running_machine &machine, int data)
 {
 //  logerror("write to vdp control port %04x\n",data);
 	megadrive_vram_fill_pending = 0; // ??
@@ -1181,13 +1181,13 @@ WRITE16_HANDLER( megadriv_vdp_w )
 				data = (data&0xff00) | data>>8;
 			//  mame_printf_debug("8-bit write VDP data port access, offset %04x data %04x mem_mask %04x\n",offset,data,mem_mask);
 			}
-			megadriv_vdp_data_port_w(space->machine, data);
+			megadriv_vdp_data_port_w(space->machine(), data);
 			break;
 
 		case 0x04:
 		case 0x06:
 			if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit write VDP control port access, offset %04x data %04x mem_mask %04x\n",offset,data,mem_mask);
-			megadriv_vdp_ctrl_port_w(space->machine, data);
+			megadriv_vdp_ctrl_port_w(space->machine(), data);
 			break;
 
 		case 0x08:
@@ -1201,8 +1201,8 @@ WRITE16_HANDLER( megadriv_vdp_w )
 		case 0x12:
 		case 0x14:
 		case 0x16:
-			if (ACCESSING_BITS_0_7) sn76496_w(space->machine->device("snsnd"), 0, data & 0xff);
-			//if (ACCESSING_BITS_8_15) sn76496_w(space->machine->device("snsnd"), 0, (data >>8) & 0xff);
+			if (ACCESSING_BITS_0_7) sn76496_w(space->machine().device("snsnd"), 0, data & 0xff);
+			//if (ACCESSING_BITS_8_15) sn76496_w(space->machine().device("snsnd"), 0, (data >>8) & 0xff);
 			break;
 
 		default:
@@ -1226,11 +1226,11 @@ static UINT16 vdp_cram_r(void)
 	return megadrive_vdp_cram[(megadrive_vdp_address&0x7e)>>1];
 }
 
-static UINT16 megadriv_vdp_data_port_r(running_machine *machine)
+static UINT16 megadriv_vdp_data_port_r(running_machine &machine)
 {
 	UINT16 retdata=0;
 
-	//return machine->rand();
+	//return machine.rand();
 
 	megadrive_vdp_command_pending = 0;
 
@@ -1244,12 +1244,12 @@ static UINT16 megadriv_vdp_data_port_r(running_machine *machine)
 
 		case 0x0001:
 			logerror("Attempting to READ from DATA PORT in VRAM WRITE MODE\n");
-			retdata = machine->rand();
+			retdata = machine.rand();
 			break;
 
 		case 0x0003:
 			logerror("Attempting to READ from DATA PORT in CRAM WRITE MODE\n");
-			retdata = machine->rand();
+			retdata = machine.rand();
 			break;
 
 		case 0x0004:
@@ -1270,7 +1270,7 @@ static UINT16 megadriv_vdp_data_port_r(running_machine *machine)
 
 		default:
 			logerror("Attempting to READ from DATA PORT in #UNDEFINED# MODE\n");
-			retdata = machine->rand();
+			retdata = machine.rand();
 			break;
 	}
 
@@ -1570,14 +1570,14 @@ READ16_HANDLER( megadriv_vdp_r )
 		case 0x00:
 		case 0x02:
 			if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read data port access, offset %04x mem_mask %04x\n",offset,mem_mask);
-			retvalue = megadriv_vdp_data_port_r(space->machine);
+			retvalue = megadriv_vdp_data_port_r(space->machine());
 			break;
 
 		case 0x04:
 		case 0x06:
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read control port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_vdp_ctrl_port_r();
-		//  retvalue = space->machine->rand();
+		//  retvalue = space->machine().rand();
 		//  mame_printf_debug("%06x: Read Control Port at scanline %d hpos %d (return %04x)\n",cpu_get_pc(space->cpu),genesis_scanline_counter, get_hposition(),retvalue);
 			break;
 
@@ -1587,7 +1587,7 @@ READ16_HANDLER( megadriv_vdp_r )
 		case 0x0e:
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read HV counter port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_read_hv_counters();
-		//  retvalue = space->machine->rand();
+		//  retvalue = space->machine().rand();
 		//  mame_printf_debug("%06x: Read HV counters at scanline %d hpos %d (return %04x)\n",cpu_get_pc(space->cpu),genesis_scanline_counter, get_hposition(),retvalue);
 			break;
 
@@ -1611,7 +1611,7 @@ READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read)
 	}
 	else
 	{
-		logerror("%s: 68000 attempting to access YM2612 (read) without bus\n", device->machine->describe_context());
+		logerror("%s: 68000 attempting to access YM2612 (read) without bus\n", device->machine().describe_context());
 		return 0;
 	}
 
@@ -1629,7 +1629,7 @@ WRITE8_DEVICE_HANDLER( megadriv_68k_YM2612_write)
 	}
 	else
 	{
-		logerror("%s: 68000 attempting to access YM2612 (write) without bus\n", device->machine->describe_context());
+		logerror("%s: 68000 attempting to access YM2612 (write) without bus\n", device->machine().describe_context());
 	}
 }
 
@@ -1642,19 +1642,19 @@ static TIMER_CALLBACK( io_timeout_timer_callback )
 	io_stage[(int)(FPTR)ptr] = -1;
 }
 
-static void init_megadri6_io(running_machine *machine)
+static void init_megadri6_io(running_machine &machine)
 {
 	int i;
 
 	for (i=0; i<3; i++)
 	{
-		io_timeout[i] = machine->scheduler().timer_alloc(FUNC(io_timeout_timer_callback), (void*)(FPTR)i);
+		io_timeout[i] = machine.scheduler().timer_alloc(FUNC(io_timeout_timer_callback), (void*)(FPTR)i);
 	}
 }
 
 /* pointers to our io data read/write functions */
-UINT8 (*megadrive_io_read_data_port_ptr)(running_machine *machine, int offset);
-void (*megadrive_io_write_data_port_ptr)(running_machine *machine, int offset, UINT16 data);
+UINT8 (*megadrive_io_read_data_port_ptr)(running_machine &machine, int offset);
+void (*megadrive_io_write_data_port_ptr)(running_machine &machine, int offset, UINT16 data);
 
 /*
 
@@ -1756,7 +1756,7 @@ UINT8 megadrive_io_ctrl_regs[3];
 static UINT8 megadrive_io_tx_regs[3];
 int megadrive_6buttons_pad = 0;
 
-static void megadrive_reset_io(running_machine *machine)
+static void megadrive_reset_io(running_machine &machine)
 {
 	int i;
 
@@ -1777,7 +1777,7 @@ static void megadrive_reset_io(running_machine *machine)
 }
 
 /************* 6 buttons version **************************/
-static UINT8 megadrive_io_read_data_port_6button(running_machine *machine, int portnum)
+static UINT8 megadrive_io_read_data_port_6button(running_machine &machine, int portnum)
 {
 	UINT8 retdata, helper = (megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from megadrive_io_data_regs
 	static const char *const pad3names[] = { "PAD1", "PAD2", "IN0", "UNK" };
@@ -1829,7 +1829,7 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine *machine, int p
 
 
 /************* 3 buttons version **************************/
-static UINT8 megadrive_io_read_data_port_3button(running_machine *machine, int portnum)
+static UINT8 megadrive_io_read_data_port_3button(running_machine &machine, int portnum)
 {
 	UINT8 retdata, helper = (megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from megadrive_io_data_regs
 	static const char *const pad3names[] = { "PAD1", "PAD2", "IN0", "UNK" };
@@ -1852,7 +1852,7 @@ static UINT8 megadrive_io_read_data_port_3button(running_machine *machine, int p
 }
 
 /* used by megatech bios, the test mode accesses the joypad/stick inputs like this */
-UINT8 megatech_bios_port_cc_dc_r(running_machine *machine, int offset, int ctrl)
+UINT8 megatech_bios_port_cc_dc_r(running_machine &machine, int offset, int ctrl)
 {
 	UINT8 retdata;
 
@@ -1921,7 +1921,7 @@ READ16_HANDLER( megadriv_68k_io_read )
           D0 : Bit 0 of version number
       */
 
-	//return (space->machine->rand()&0x0f0f)|0xf0f0;//0x0000;
+	//return (space->machine().rand()&0x0f0f)|0xf0f0;//0x0000;
 	switch (offset)
 	{
 		case 0:
@@ -1942,7 +1942,7 @@ READ16_HANDLER( megadriv_68k_io_read )
 		case 0x2:
 		case 0x3:
 //          retdata = megadrive_io_read_data_port(offset-1);
-			retdata = megadrive_io_read_data_port_ptr(space->machine, offset-1);
+			retdata = megadrive_io_read_data_port_ptr(space->machine(), offset-1);
 			break;
 
 		case 0x4:
@@ -1971,7 +1971,7 @@ READ16_HANDLER( megadriv_68k_io_read )
 }
 
 
-static void megadrive_io_write_data_port_3button(running_machine *machine, int portnum, UINT16 data)
+static void megadrive_io_write_data_port_3button(running_machine &machine, int portnum, UINT16 data)
 {
 	megadrive_io_data_regs[portnum] = data;
 	//mame_printf_debug("Writing IO Data Register #%d data %04x\n",portnum,data);
@@ -1981,14 +1981,14 @@ static void megadrive_io_write_data_port_3button(running_machine *machine, int p
 
 /****************************** 6 buttons version*****************************/
 
-static void megadrive_io_write_data_port_6button(running_machine *machine, int portnum, UINT16 data)
+static void megadrive_io_write_data_port_6button(running_machine &machine, int portnum, UINT16 data)
 {
 	if (megadrive_io_ctrl_regs[portnum]&0x40)
 	{
 		if (((megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
 		{
 			io_stage[portnum]++;
-			io_timeout[portnum]->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+			io_timeout[portnum]->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 		}
 
 	}
@@ -2001,23 +2001,23 @@ static void megadrive_io_write_data_port_6button(running_machine *machine, int p
 
 /*************************** 3 buttons version ****************************/
 
-static void megadrive_io_write_ctrl_port(running_machine *machine, int portnum, UINT16 data)
+static void megadrive_io_write_ctrl_port(running_machine &machine, int portnum, UINT16 data)
 {
 	megadrive_io_ctrl_regs[portnum] = data;
 //  mame_printf_debug("Setting IO Control Register #%d data %04x\n",portnum,data);
 }
 
-static void megadrive_io_write_tx_port(running_machine *machine, int portnum, UINT16 data)
+static void megadrive_io_write_tx_port(running_machine &machine, int portnum, UINT16 data)
 {
 	megadrive_io_tx_regs[portnum] = data;
 }
 
-static void megadrive_io_write_rx_port(running_machine *machine, int portnum, UINT16 data)
+static void megadrive_io_write_rx_port(running_machine &machine, int portnum, UINT16 data)
 {
 
 }
 
-static void megadrive_io_write_sctrl_port(running_machine *machine, int portnum, UINT16 data)
+static void megadrive_io_write_sctrl_port(running_machine &machine, int portnum, UINT16 data)
 {
 
 }
@@ -2040,30 +2040,30 @@ WRITE16_HANDLER( megadriv_68k_io_write )
 		case 0x2:
 		case 0x3:
 //          megadrive_io_write_data_port(offset-1,data);
-			megadrive_io_write_data_port_ptr(space->machine, offset-1,data);
+			megadrive_io_write_data_port_ptr(space->machine(), offset-1,data);
 			break;
 
 		case 0x4:
 		case 0x5:
 		case 0x6:
-			megadrive_io_write_ctrl_port(space->machine,offset-4,data);
+			megadrive_io_write_ctrl_port(space->machine(),offset-4,data);
 			break;
 
 		/* Serial I/O Registers */
 
-		case 0x7: megadrive_io_write_tx_port(space->machine,0,data); break;
-		case 0x8: megadrive_io_write_rx_port(space->machine,0,data); break;
-		case 0x9: megadrive_io_write_sctrl_port(space->machine,0,data); break;
+		case 0x7: megadrive_io_write_tx_port(space->machine(),0,data); break;
+		case 0x8: megadrive_io_write_rx_port(space->machine(),0,data); break;
+		case 0x9: megadrive_io_write_sctrl_port(space->machine(),0,data); break;
 
 
-		case 0xa: megadrive_io_write_tx_port(space->machine,1,data); break;
-		case 0xb: megadrive_io_write_rx_port(space->machine,1,data); break;
-		case 0xc: megadrive_io_write_sctrl_port(space->machine,1,data); break;
+		case 0xa: megadrive_io_write_tx_port(space->machine(),1,data); break;
+		case 0xb: megadrive_io_write_rx_port(space->machine(),1,data); break;
+		case 0xc: megadrive_io_write_sctrl_port(space->machine(),1,data); break;
 			break;
 
-		case 0xd: megadrive_io_write_tx_port(space->machine,2,data); break;
-		case 0xe: megadrive_io_write_rx_port(space->machine,2,data); break;
-		case 0xf: megadrive_io_write_sctrl_port(space->machine,2,data); break;
+		case 0xd: megadrive_io_write_tx_port(space->machine(),2,data); break;
+		case 0xe: megadrive_io_write_rx_port(space->machine(),2,data); break;
+		case 0xf: megadrive_io_write_sctrl_port(space->machine(),2,data); break;
 			break;
 	}
 
@@ -2114,7 +2114,7 @@ static READ16_HANDLER( megadriv_68k_read_z80_ram )
 	else
 	{
 		logerror("%06x: 68000 attempting to access Z80 (read) address space without bus\n", cpu_get_pc(space->cpu));
-		return space->machine->rand();
+		return space->machine().rand();
 	}
 }
 
@@ -2156,7 +2156,7 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
        the value is never zero.  Time Killers is the most fussy, and doesn't like the
        read_next_instruction function from system16, so I just return a random value
        in the unused bits */
-	UINT16 nextvalue = space->machine->rand();//read_next_instruction(space)&0xff00;
+	UINT16 nextvalue = space->machine().rand();//read_next_instruction(space)&0xff00;
 
 
 	/* Check if the 68k has the z80 bus */
@@ -2195,7 +2195,7 @@ static TIMER_CALLBACK( megadriv_z80_run_state )
 	if ( genz80.z80_is_reset )
 	{
 		devtag_reset( machine, "genesis_snd_z80" );
-		machine->device<cpu_device>( "genesis_snd_z80" )->suspend(SUSPEND_REASON_HALT, 1 );
+		machine.device<cpu_device>( "genesis_snd_z80" )->suspend(SUSPEND_REASON_HALT, 1 );
 		devtag_reset( machine, "ymsnd" );
 	}
 	else
@@ -2203,11 +2203,11 @@ static TIMER_CALLBACK( megadriv_z80_run_state )
 		/* Check if z80 has the bus */
 		if ( genz80.z80_has_bus )
 		{
-			machine->device<cpu_device>( "genesis_snd_z80" )->resume(SUSPEND_REASON_HALT );
+			machine.device<cpu_device>( "genesis_snd_z80" )->resume(SUSPEND_REASON_HALT );
 		}
 		else
 		{
-			machine->device<cpu_device>( "genesis_snd_z80" )->suspend(SUSPEND_REASON_HALT, 1 );
+			machine.device<cpu_device>( "genesis_snd_z80" )->suspend(SUSPEND_REASON_HALT, 1 );
 		}
 	}
 }
@@ -2258,7 +2258,7 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 
 	/* If the z80 is running, sync the z80 execution state */
 	if ( ! genz80.z80_is_reset )
-		space->machine->scheduler().timer_set( attotime::zero, FUNC(megadriv_z80_run_state ));
+		space->machine().scheduler().timer_set( attotime::zero, FUNC(megadriv_z80_run_state ));
 }
 
 static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
@@ -2302,7 +2302,7 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 			genz80.z80_is_reset = 1;
 		}
 	}
-	space->machine->scheduler().timer_set( attotime::zero, FUNC(megadriv_z80_run_state ));
+	space->machine().scheduler().timer_set( attotime::zero, FUNC(megadriv_z80_run_state ));
 }
 
 
@@ -2312,14 +2312,14 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 //   z80 area of the 68k if games misbehave
 static READ8_HANDLER( z80_read_68k_banked_data )
 {
-	address_space *space68k = space->machine->device<legacy_cpu_device>("maincpu")->space();
+	address_space *space68k = space->machine().device<legacy_cpu_device>("maincpu")->space();
 	UINT8 ret = space68k->read_byte(genz80.z80_bank_addr+offset);
 	return ret;
 }
 
 static WRITE8_HANDLER( z80_write_68k_banked_data )
 {
-	address_space *space68k = space->machine->device<legacy_cpu_device>("maincpu")->space();
+	address_space *space68k = space->machine().device<legacy_cpu_device>("maincpu")->space();
 	space68k->write_byte(genz80.z80_bank_addr+offset,data);
 }
 
@@ -2332,7 +2332,7 @@ static WRITE8_HANDLER( megadriv_z80_vdp_write )
 		case 0x13:
 		case 0x15:
 		case 0x17:
-			sn76496_w(space->machine->device("snsnd"), 0, data);
+			sn76496_w(space->machine().device("snsnd"), 0, data);
 			break;
 
 		default:
@@ -2346,7 +2346,7 @@ static WRITE8_HANDLER( megadriv_z80_vdp_write )
 static READ8_HANDLER( megadriv_z80_vdp_read )
 {
 	mame_printf_debug("megadriv_z80_vdp_read %02x\n",offset);
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static READ8_HANDLER( megadriv_z80_unmapped_read )
@@ -2441,7 +2441,7 @@ static WRITE16_HANDLER( _32x_68k_palette_w )
 
 	_32x_palette_lookup[offset] = (r << 10) | (g << 5) | (b << 0) | (p << 15);
 
-	palette_set_color_rgb(space->machine,offset+0x40,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(space->machine(),offset+0x40,pal5bit(r),pal5bit(g),pal5bit(b));
 
 }
 
@@ -2561,7 +2561,7 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 
 			// install the game rom in the normal 0x000000-0x03fffff space used by the genesis - this allows VDP DMA operations to work as they have to be from this area or RAM
 			// it should also UNMAP the banked rom area...
-			space->install_rom(0x0000100, 0x03fffff, space->machine->region("gamecart")->base() + 0x100);
+			space->install_rom(0x0000100, 0x03fffff, space->machine().region("gamecart")->base() + 0x100);
 		}
 		else
 		{
@@ -2569,7 +2569,7 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 
 			// this is actually blank / nop area
 			// we should also map the banked area back (we don't currently unmap it tho)
-			space->install_rom(0x0000100, 0x03fffff, space->machine->region("maincpu")->base()+0x100);
+			space->install_rom(0x0000100, 0x03fffff, space->machine().region("maincpu")->base()+0x100);
 		}
 
 		if((a15106_reg & 4) == 0) // clears the FIFO state
@@ -2602,7 +2602,7 @@ static UINT16 dreq_src_addr[2],dreq_dst_addr[2],dreq_size;
 
 static READ16_HANDLER( _32x_dreq_common_r )
 {
-	address_space* _68kspace = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space* _68kspace = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (offset)
 	{
@@ -2673,7 +2673,7 @@ static READ16_HANDLER( _32x_dreq_common_r )
 
 static WRITE16_HANDLER( _32x_dreq_common_w )
 {
-	address_space* _68kspace = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space* _68kspace = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (offset)
 	{
@@ -2759,8 +2759,8 @@ static WRITE16_HANDLER( _32x_dreq_common_w )
 						current_fifo_block = fifo_block_b;
 						current_fifo_readblock = fifo_block_a;
 						// incase we have a stalled DMA in progress, let the SH2 know there is data available
-						sh2_notify_dma_data_available(space->machine->device("32x_master_sh2"));
-						sh2_notify_dma_data_available(space->machine->device("32x_slave_sh2"));
+						sh2_notify_dma_data_available(space->machine().device("32x_master_sh2"));
+						sh2_notify_dma_data_available(space->machine().device("32x_slave_sh2"));
 
 					}
 					current_fifo_write_pos = 0;
@@ -2774,8 +2774,8 @@ static WRITE16_HANDLER( _32x_dreq_common_w )
 						current_fifo_block = fifo_block_a;
 						current_fifo_readblock = fifo_block_b;
 						// incase we have a stalled DMA in progress, let the SH2 know there is data available
-						sh2_notify_dma_data_available(space->machine->device("32x_master_sh2"));
-						sh2_notify_dma_data_available(space->machine->device("32x_slave_sh2"));
+						sh2_notify_dma_data_available(space->machine().device("32x_master_sh2"));
+						sh2_notify_dma_data_available(space->machine().device("32x_slave_sh2"));
 
 					}
 
@@ -2861,12 +2861,12 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		if (data & 0x01)
 		{
 			_32x_adapter_enabled = 1;
-			space->install_rom(0x0880000, 0x08fffff, space->machine->region("gamecart")->base()); // 'fixed' 512kb rom bank
+			space->install_rom(0x0880000, 0x08fffff, space->machine().region("gamecart")->base()); // 'fixed' 512kb rom bank
 
 			space->install_read_bank(0x0900000, 0x09fffff, "bank12"); // 'bankable' 1024kb rom bank
-			memory_set_bankptr(space->machine,  "bank12", space->machine->region("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
+			memory_set_bankptr(space->machine(),  "bank12", space->machine().region("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
 
-			space->install_rom(0x0000000, 0x03fffff, space->machine->region("32x_68k_bios")->base());
+			space->install_rom(0x0000000, 0x03fffff, space->machine().region("32x_68k_bios")->base());
 
 			/* VDP area */
 			space->install_legacy_readwrite_handler(0x0a15180, 0x0a1518b, FUNC(_32x_common_vdp_regs_r), FUNC(_32x_common_vdp_regs_w)); // common / shared VDP regs
@@ -2876,14 +2876,14 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 
 
 
-			space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x000070, 0x000073, FUNC(_32x_68k_hint_vector_r), FUNC(_32x_68k_hint_vector_w)); // h interrupt vector
+			space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x000070, 0x000073, FUNC(_32x_68k_hint_vector_r), FUNC(_32x_68k_hint_vector_w)); // h interrupt vector
 		}
 		else
 		{
 			_32x_adapter_enabled = 0;
 
-			space->install_rom(0x0000000, 0x03fffff, space->machine->region("gamecart")->base());
-			space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x000070, 0x000073, FUNC(_32x_68k_hint_vector_r), FUNC(_32x_68k_hint_vector_w)); // h interrupt vector
+			space->install_rom(0x0000000, 0x03fffff, space->machine().region("gamecart")->base());
+			space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x000070, 0x000073, FUNC(_32x_68k_hint_vector_r), FUNC(_32x_68k_hint_vector_w)); // h interrupt vector
 		}
 	}
 
@@ -2950,7 +2950,7 @@ static WRITE16_HANDLER( _32x_68k_a15104_w )
 		_32x_68k_a15104_reg = (_32x_68k_a15104_reg & 0x00ff) | (data & 0xff00);
 	}
 
-	memory_set_bankptr(space->machine,  "bank12", space->machine->region("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
+	memory_set_bankptr(space->machine(),  "bank12", space->machine().region("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
 }
 
 /**********************************************************************************************/
@@ -2966,7 +2966,7 @@ static UINT16 commsram[8];
 // reads
 static READ16_HANDLER( _32x_68k_commsram_r )
 {
-	if (_32X_COMMS_PORT_SYNC) space->machine->scheduler().synchronize();
+	if (_32X_COMMS_PORT_SYNC) space->machine().scheduler().synchronize();
 	return commsram[offset];
 }
 
@@ -2974,7 +2974,7 @@ static READ16_HANDLER( _32x_68k_commsram_r )
 static WRITE16_HANDLER( _32x_68k_commsram_w )
 {
 	COMBINE_DATA(&commsram[offset]);
-	if (_32X_COMMS_PORT_SYNC) space->machine->scheduler().synchronize();
+	if (_32X_COMMS_PORT_SYNC) space->machine().scheduler().synchronize();
 }
 
 /**********************************************************************************************/
@@ -3026,8 +3026,8 @@ static TIMER_CALLBACK( _32x_pwm_callback )
 		switch(pwm_ctrl & 3)
 		{
 			case 0: lch_index_r++; /*Speaker OFF*/ break;
-			case 1: dac_signed_data_16_w(machine->device("lch_pwm"), cur_lch[lch_index_r++]); break;
-			case 2: dac_signed_data_16_w(machine->device("rch_pwm"), cur_lch[lch_index_r++]); break;
+			case 1: dac_signed_data_16_w(machine.device("lch_pwm"), cur_lch[lch_index_r++]); break;
+			case 2: dac_signed_data_16_w(machine.device("rch_pwm"), cur_lch[lch_index_r++]); break;
 			case 3: popmessage("Undefined PWM Lch value 3, contact MESSdev"); break;
 		}
 
@@ -3041,8 +3041,8 @@ static TIMER_CALLBACK( _32x_pwm_callback )
 		switch((pwm_ctrl & 0xc) >> 2)
 		{
 			case 0: rch_index_r++; /*Speaker OFF*/ break;
-			case 1: dac_signed_data_16_w(machine->device("rch_pwm"), cur_rch[rch_index_r++]); break;
-			case 2: dac_signed_data_16_w(machine->device("lch_pwm"), cur_rch[rch_index_r++]); break;
+			case 1: dac_signed_data_16_w(machine.device("rch_pwm"), cur_rch[rch_index_r++]); break;
+			case 2: dac_signed_data_16_w(machine.device("lch_pwm"), cur_rch[rch_index_r++]); break;
 			case 3: popmessage("Undefined PWM Rch value 3, contact MESSdev"); break;
 		}
 
@@ -3241,7 +3241,7 @@ static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 {
 	// what happens if the z80 accesses it, what authorization do we use? which address space do we get?? the z80 *can* write here and to the framebuffer via the window
 
-	address_space* _68kspace = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space* _68kspace = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (space!= _68kspace)
 	{
@@ -3401,7 +3401,7 @@ static WRITE16_HANDLER( _32x_sh2_master_4000_w )
 		//if (sh2_master_hint_enable) printf("sh2_master_hint_enable enable!\n");
 		//if (sh2_master_pwmint_enable) printf("sh2_master_pwn_enable enable!\n");
 
-		_32x_check_irqs(space->machine);
+		_32x_check_irqs(space->machine());
 	}
 }
 
@@ -3439,7 +3439,7 @@ static WRITE16_HANDLER( _32x_sh2_slave_4000_w )
 		//if (sh2_slave_hint_enable) printf("sh2_slave_hint_enable enable!\n");
 		//if (sh2_slave_pwmint_enable) printf("sh2_slave_pwm_enable enable!\n");
 
-		_32x_check_irqs(space->machine);
+		_32x_check_irqs(space->machine());
 
 	}
 }
@@ -3508,8 +3508,8 @@ static WRITE16_HANDLER( _32x_sh2_slave_4014_w ) { device_set_input_line(_32x_sla
 // VINT (vertical interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_4016_w ){ sh2_master_vint_pending = 0; _32x_check_irqs(space->machine); }
-static WRITE16_HANDLER( _32x_sh2_slave_4016_w ) { sh2_slave_vint_pending = 0; _32x_check_irqs(space->machine); }
+static WRITE16_HANDLER( _32x_sh2_master_4016_w ){ sh2_master_vint_pending = 0; _32x_check_irqs(space->machine()); }
+static WRITE16_HANDLER( _32x_sh2_slave_4016_w ) { sh2_slave_vint_pending = 0; _32x_check_irqs(space->machine()); }
 
 /**********************************************************************************************/
 // SH2 side 4018
@@ -3967,7 +3967,7 @@ UINT16* segacd_dataram;
 
 
 
-INLINE void write_pixel(running_machine* machine, UINT8 pix, int pixeloffset )
+INLINE void write_pixel(running_machine& machine, UINT8 pix, int pixeloffset )
 {
 
 	int shift = 12-(4*(pixeloffset&0x3));
@@ -4003,7 +4003,7 @@ INLINE void write_pixel(running_machine* machine, UINT8 pix, int pixeloffset )
 
 		default:
 		case 0x03:
-			pix = machine->rand() & 0x000f;
+			pix = machine.rand() & 0x000f;
 			segacd_dataram[offset] = segacd_dataram[offset] &~ datamask;
 			segacd_dataram[offset] |= pix << shift;
 			break;
@@ -4028,7 +4028,7 @@ UINT16 segacd_1meg_mode_word_read(int offset, UINT16 mem_mask)
 }
 
 
-void segacd_1meg_mode_word_write(running_machine* machine, int offset, UINT16 data, UINT16 mem_mask, int use_pm)
+void segacd_1meg_mode_word_write(running_machine& machine, int offset, UINT16 data, UINT16 mem_mask, int use_pm)
 {
 	offset *= 2;
 
@@ -4205,7 +4205,7 @@ void CDC_UpdateHEAD(void)
 }
 
 
-void scd_ctrl_checks(running_machine* machine)
+void scd_ctrl_checks(running_machine& machine)
 {
 	CDC_STATB0 = 0x80;
 
@@ -4231,7 +4231,7 @@ void scd_advance_current_readpos(void)
 	CDC_PT &= 0x7fff;
 }
 
-int Read_LBA_To_Buffer(running_machine* machine)
+int Read_LBA_To_Buffer(running_machine& machine)
 {
 	bool data_track = false;
 	if (CDD_CONTROL & 0x0100) data_track = true;
@@ -4273,7 +4273,7 @@ int Read_LBA_To_Buffer(running_machine* machine)
 	return 0;
 }
 
-static void CheckCommand(running_machine* machine)
+static void CheckCommand(running_machine& machine)
 {
 	if (CDD_DONE)
 	{
@@ -4299,14 +4299,14 @@ void CDD_GetStatus(void)
 }
 
 
-void CDD_Stop(running_machine *machine)
+void CDD_Stop(running_machine &machine)
 {
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
 	SCD_STATUS = CDD_STOPPED;
 	CDD_STATUS = 0x0000;
 	SET_CDD_DATA_MODE
-	cdda_stop_audio( machine->device( "cdda" ) ); //stop any pending CD-DA
+	cdda_stop_audio( machine.device( "cdda" ) ); //stop any pending CD-DA
 }
 
 
@@ -4422,7 +4422,7 @@ static UINT32 getmsf_from_regs(void)
 	return msf;
 }
 
-void CDD_Play(running_machine *machine)
+void CDD_Play(running_machine &machine)
 {
 	CLEAR_CDD_RESULT
 	UINT32 msf = getmsf_from_regs();
@@ -4436,7 +4436,7 @@ void CDD_Play(running_machine *machine)
 	printf("%d Track played\n",SCD_CURTRK);
 	CDD_MIN = to_bcd(SCD_CURTRK, false);
 	if(!(CURRENT_TRACK_IS_DATA))
-		cdda_start_audio( machine->device( "cdda" ), SCD_CURLBA, end_msf - SCD_CURLBA );
+		cdda_start_audio( machine.device( "cdda" ), SCD_CURLBA, end_msf - SCD_CURLBA );
 	SET_CDC_READ
 }
 
@@ -4455,7 +4455,7 @@ void CDD_Seek(void)
 }
 
 
-void CDD_Pause(running_machine *machine)
+void CDD_Pause(running_machine &machine)
 {
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
@@ -4463,12 +4463,12 @@ void CDD_Pause(running_machine *machine)
 	CDD_STATUS = SCD_STATUS;
 	SET_CDD_DATA_MODE
 
-	//segacd.current_frame = cdda_get_audio_lba( machine->device( "cdda" ) );
+	//segacd.current_frame = cdda_get_audio_lba( machine.device( "cdda" ) );
 	//if(!(CURRENT_TRACK_IS_DATA))
-	cdda_pause_audio( machine->device( "cdda" ), 1 );
+	cdda_pause_audio( machine.device( "cdda" ), 1 );
 }
 
-void CDD_Resume(running_machine *machine)
+void CDD_Resume(running_machine &machine)
 {
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
@@ -4479,17 +4479,17 @@ void CDD_Resume(running_machine *machine)
 	CDD_MIN = to_bcd (SCD_CURTRK, false);
 	SET_CDC_READ
 	//if(!(CURRENT_TRACK_IS_DATA))
-	cdda_pause_audio( machine->device( "cdda" ), 0 );
+	cdda_pause_audio( machine.device( "cdda" ), 0 );
 }
 
 
-void CDD_FF(running_machine *machine)
+void CDD_FF(running_machine &machine)
 {
 	fatalerror("Fast Forward unsupported\n");
 }
 
 
-void CDD_RW(running_machine *machine)
+void CDD_RW(running_machine &machine)
 {
 	fatalerror("Fast Rewind unsupported\n");
 }
@@ -4564,7 +4564,7 @@ void lc89510_Reset(void)
 	CDC_REG0 = CDC_REG1 = CDC_DMA_ADDR = SCD_STATUS_CDC = CDD_DONE = 0;
 }
 
-void CDC_End_Transfer(running_machine* machine)
+void CDC_End_Transfer(running_machine& machine)
 {
 	STOP_CDC_DMA
 	CDC_REG0 |= 0x8000;
@@ -4578,9 +4578,9 @@ void CDC_End_Transfer(running_machine* machine)
 	}
 }
 
-void CDC_Do_DMA(running_machine* machine, int rate)
+void CDC_Do_DMA(running_machine& machine, int rate)
 {
-	address_space* space = machine->device("segacd_68k")->memory().space(AS_PROGRAM);
+	address_space* space = machine.device("segacd_68k")->memory().space(AS_PROGRAM);
 
 	UINT32 dstoffset, length;
 	UINT8 *dest;
@@ -4661,7 +4661,7 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 						dest[dstoffset+1] = data >>8;
 						dest[dstoffset+0] = data&0xff;
 
-						segacd_mark_tiles_dirty(space->machine, dstoffset/2);
+						segacd_mark_tiles_dirty(space->machine(), dstoffset/2);
 					}
 					else
 					{
@@ -4669,11 +4669,11 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 
 						if (!(scd_rammode & 1))
 						{
-							segacd_1meg_mode_word_write(space->machine,(dstoffset+0x20000)/2, data, 0xffff, 0);
+							segacd_1meg_mode_word_write(space->machine(),(dstoffset+0x20000)/2, data, 0xffff, 0);
 						}
 						else
 						{
-							segacd_1meg_mode_word_write(space->machine,(dstoffset+0x00000)/2, data, 0xffff, 0);
+							segacd_1meg_mode_word_write(space->machine(),(dstoffset+0x00000)/2, data, 0xffff, 0);
 						}
 					}
 
@@ -4712,7 +4712,7 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 
 
 
-UINT16 CDC_Host_r(running_machine* machine, UINT16 type)
+UINT16 CDC_Host_r(running_machine& machine, UINT16 type)
 {
 	UINT16 destination = CDC_REG0 & 0x0700;
 
@@ -4838,7 +4838,7 @@ void CDC_Reg_w(UINT8 data)
 	}
 }
 
-void CDD_Process(running_machine* machine, int reason)
+void CDD_Process(running_machine& machine, int reason)
 {
 	CDD_Export();
 	CHECK_SCD_LV4_INTERRUPT
@@ -4881,7 +4881,7 @@ static const char *const CDD_import_cmdnames[] =
 	"<undefined>"			// F
 };
 
-void CDD_Import(running_machine* machine)
+void CDD_Import(running_machine& machine)
 {
 	if(CDD_TX[1] != 2 && CDD_TX[1] != 0)
 		printf("%s\n",CDD_import_cmdnames[CDD_TX[1]]);
@@ -4927,7 +4927,7 @@ static tilemap_t    *segacd_stampmap[4];
 
 static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 
 	UINT16 old_halt = a12000_halt_reset_reg;
 
@@ -4938,24 +4938,24 @@ static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 		// reset line
 		if (a12000_halt_reset_reg&0x0001)
 		{
-			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "segacd_68k", INPUT_LINE_RESET, CLEAR_LINE);
 			if (!(old_halt&0x0001)) printf("clear reset slave\n");
 		}
 		else
 		{
-			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "segacd_68k", INPUT_LINE_RESET, ASSERT_LINE);
 			if ((old_halt&0x0001)) printf("assert reset slave\n");
 		}
 
 		// request BUS
 		if (a12000_halt_reset_reg&0x0002)
 		{
-			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "segacd_68k", INPUT_LINE_HALT, ASSERT_LINE);
 			if (!(old_halt&0x0002)) printf("halt slave\n");
 		}
 		else
 		{
-			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "segacd_68k", INPUT_LINE_HALT, CLEAR_LINE);
 			if ((old_halt&0x0002)) printf("resume slave\n");
 		}
 	}
@@ -4964,7 +4964,7 @@ static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 	{
 		if (a12000_halt_reset_reg&0x0100)
 		{
-			running_machine* machine = space->machine;
+			running_machine& machine = space->machine();
 			CHECK_SCD_LV2_INTERRUPT
 		}
 
@@ -4980,7 +4980,7 @@ static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 
 static READ16_HANDLER( scd_a12000_halt_reset_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 
 	return a12000_halt_reset_reg;
 }
@@ -4999,7 +4999,7 @@ static READ16_HANDLER( scd_a12000_halt_reset_r )
 
 static READ16_HANDLER( scd_a12002_memory_mode_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 
 	int temp = scd_rammode;
 	int temp2 = 0;
@@ -5037,7 +5037,7 @@ static WRITE8_HANDLER( scd_a12002_memory_mode_w_8_15 )
 
 static WRITE8_HANDLER( scd_a12002_memory_mode_w_0_7 )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 
 
 	//printf("scd_a12002_memory_mode_w_0_7 %04x\n",data);
@@ -5063,7 +5063,7 @@ static WRITE8_HANDLER( scd_a12002_memory_mode_w_0_7 )
 
 static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 
 	if (ACCESSING_BITS_8_15)
 		scd_a12002_memory_mode_w_8_15(space, 0, data>>8);
@@ -5077,7 +5077,7 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 
 static READ16_HANDLER( segacd_sub_memory_mode_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 
 	int temp = scd_rammode;
 	int temp2 = 0;
@@ -5099,7 +5099,7 @@ WRITE8_HANDLER( segacd_sub_memory_mode_w_8_15 )
 
 WRITE8_HANDLER( segacd_sub_memory_mode_w_0_7 )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 
 
 	segacd_memory_priority_mode = (data&0x0018)>>3;
@@ -5159,7 +5159,7 @@ WRITE8_HANDLER( segacd_sub_memory_mode_w_0_7 )
 static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 {
 	//printf("segacd_sub_memory_mode_w %04x %04x\n", data, mem_mask);
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 
 	if (ACCESSING_BITS_8_15)
 		segacd_sub_memory_mode_w_8_15(space, 0, data>>8);
@@ -5182,13 +5182,13 @@ static UINT16 segacd_comms_flags = 0x0000;
 
 static READ16_HANDLER( segacd_comms_flags_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 	return segacd_comms_flags;
 }
 
 static WRITE16_HANDLER( segacd_comms_flags_subcpu_w )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 
 	if (ACCESSING_BITS_8_15) // Dragon's Lair
 	{
@@ -5204,7 +5204,7 @@ static WRITE16_HANDLER( segacd_comms_flags_subcpu_w )
 
 static WRITE16_HANDLER( segacd_comms_flags_maincpu_w )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -5244,7 +5244,7 @@ static IRQ_CALLBACK(segacd_sub_int_callback)
 	{
 		// clear this bit
 		a12000_halt_reset_reg &= ~0x0100;
-		cputag_set_input_line(device->machine, "segacd_68k", 2, CLEAR_LINE);
+		cputag_set_input_line(device->machine(), "segacd_68k", 2, CLEAR_LINE);
 	}
 
 	return (0x60+irqline*4)/4; // vector address
@@ -5255,19 +5255,19 @@ UINT16 segacd_comms_part2[0x8];
 
 static READ16_HANDLER( segacd_comms_main_part1_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 	return segacd_comms_part1[offset];
 }
 
 static WRITE16_HANDLER( segacd_comms_main_part1_w )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 	COMBINE_DATA(&segacd_comms_part1[offset]);
 }
 
 static READ16_HANDLER( segacd_comms_main_part2_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 	return segacd_comms_part2[offset];
 }
 
@@ -5279,7 +5279,7 @@ static WRITE16_HANDLER( segacd_comms_main_part2_w )
 
 static READ16_HANDLER( segacd_comms_sub_part1_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 	return segacd_comms_part1[offset];
 }
 
@@ -5290,13 +5290,13 @@ static WRITE16_HANDLER( segacd_comms_sub_part1_w )
 
 static READ16_HANDLER( segacd_comms_sub_part2_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 	return segacd_comms_part2[offset];
 }
 
 static WRITE16_HANDLER( segacd_comms_sub_part2_w )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 	COMBINE_DATA(&segacd_comms_part2[offset]);
 }
 
@@ -5414,7 +5414,7 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 		if (!(scd_rammode&1))
 		{
 			COMBINE_DATA(&segacd_dataram[offset]);
-			segacd_mark_tiles_dirty(space->machine, offset);
+			segacd_mark_tiles_dirty(space->machine(), offset);
 		}
 		else
 		{
@@ -5432,11 +5432,11 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 			// ret bit set by sub cpu determines which half of WorkRAM we have access to?
 			if (scd_rammode&1)
 			{
-				segacd_1meg_mode_word_write(space->machine, offset+0x20000/2, data, mem_mask, 0);
+				segacd_1meg_mode_word_write(space->machine(), offset+0x20000/2, data, mem_mask, 0);
 			}
 			else
 			{
-				segacd_1meg_mode_word_write(space->machine, offset+0x00000/2, data, mem_mask, 0);
+				segacd_1meg_mode_word_write(space->machine(), offset+0x00000/2, data, mem_mask, 0);
 			}
 		}
 		else
@@ -5465,13 +5465,13 @@ static READ16_HANDLER( scd_hint_vector_r )
 
 static READ16_HANDLER( scd_a12006_hint_register_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 	return segacd_hint_register;
 }
 
 static WRITE16_HANDLER( scd_a12006_hint_register_w )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 	COMBINE_DATA(&segacd_hint_register);
 }
 
@@ -5673,25 +5673,25 @@ _32x32_START
 _32x32_END
 
 
-static void segacd_mark_tiles_dirty(running_machine* machine, int offset)
+static void segacd_mark_tiles_dirty(running_machine& machine, int offset)
 {
-	gfx_element_mark_dirty(machine->gfx[0], (offset*2)/(SEGACD_BYTES_PER_TILE16));
-	gfx_element_mark_dirty(machine->gfx[1], (offset*2)/(SEGACD_BYTES_PER_TILE16));
-	gfx_element_mark_dirty(machine->gfx[2], (offset*2)/(SEGACD_BYTES_PER_TILE16));
-	gfx_element_mark_dirty(machine->gfx[3], (offset*2)/(SEGACD_BYTES_PER_TILE16));
-	gfx_element_mark_dirty(machine->gfx[4], (offset*2)/(SEGACD_BYTES_PER_TILE16));
-	gfx_element_mark_dirty(machine->gfx[5], (offset*2)/(SEGACD_BYTES_PER_TILE16));
-	gfx_element_mark_dirty(machine->gfx[6], (offset*2)/(SEGACD_BYTES_PER_TILE16));
-	gfx_element_mark_dirty(machine->gfx[7], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx_element_mark_dirty(machine.gfx[0], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx_element_mark_dirty(machine.gfx[1], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx_element_mark_dirty(machine.gfx[2], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx_element_mark_dirty(machine.gfx[3], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx_element_mark_dirty(machine.gfx[4], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx_element_mark_dirty(machine.gfx[5], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx_element_mark_dirty(machine.gfx[6], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx_element_mark_dirty(machine.gfx[7], (offset*2)/(SEGACD_BYTES_PER_TILE16));
 
-	gfx_element_mark_dirty(machine->gfx[8], (offset*2)/(SEGACD_BYTES_PER_TILE32));
-	gfx_element_mark_dirty(machine->gfx[9], (offset*2)/(SEGACD_BYTES_PER_TILE32));
-	gfx_element_mark_dirty(machine->gfx[10],(offset*2)/(SEGACD_BYTES_PER_TILE32));
-	gfx_element_mark_dirty(machine->gfx[11],(offset*2)/(SEGACD_BYTES_PER_TILE32));
-	gfx_element_mark_dirty(machine->gfx[12],(offset*2)/(SEGACD_BYTES_PER_TILE32));
-	gfx_element_mark_dirty(machine->gfx[13],(offset*2)/(SEGACD_BYTES_PER_TILE32));
-	gfx_element_mark_dirty(machine->gfx[14],(offset*2)/(SEGACD_BYTES_PER_TILE32));
-	gfx_element_mark_dirty(machine->gfx[15],(offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx_element_mark_dirty(machine.gfx[8], (offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx_element_mark_dirty(machine.gfx[9], (offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx_element_mark_dirty(machine.gfx[10],(offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx_element_mark_dirty(machine.gfx[11],(offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx_element_mark_dirty(machine.gfx[12],(offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx_element_mark_dirty(machine.gfx[13],(offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx_element_mark_dirty(machine.gfx[14],(offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx_element_mark_dirty(machine.gfx[15],(offset*2)/(SEGACD_BYTES_PER_TILE32));
 }
 
 
@@ -5806,7 +5806,7 @@ static TILE_GET_INFO( get_stampmap_32x32_16x16_tile_info )
 
 // non-tilemap functions to get a pixel from a 'tilemap' based on the above, but looking up each pixel, as to avoid the heavy cache bitmap
 
-INLINE UINT8 get_stampmap_16x16_1x1_tile_info_pixel(running_machine* machine, int xpos, int ypos)
+INLINE UINT8 get_stampmap_16x16_1x1_tile_info_pixel(running_machine& machine, int xpos, int ypos)
 {
 	const int tilesize = 4; // 0xf pixels
 	const int tilemapsize = 0x0f;
@@ -5836,7 +5836,7 @@ INLINE UINT8 get_stampmap_16x16_1x1_tile_info_pixel(running_machine* machine, in
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_1x1(tile_region,tileno,(int)tile_index);
 
-	const gfx_element *gfx = machine->gfx[tile_region];
+	const gfx_element *gfx = machine.gfx[tile_region];
 	tileno %= gfx->total_elements;
 
 	if (tileno==0) return 0x00;
@@ -5845,7 +5845,7 @@ INLINE UINT8 get_stampmap_16x16_1x1_tile_info_pixel(running_machine* machine, in
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-INLINE UINT8 get_stampmap_32x32_1x1_tile_info_pixel(running_machine* machine, int xpos, int ypos)
+INLINE UINT8 get_stampmap_32x32_1x1_tile_info_pixel(running_machine& machine, int xpos, int ypos)
 {
 	const int tilesize = 5; // 0x1f pixels
 	const int tilemapsize = 0x07;
@@ -5875,7 +5875,7 @@ INLINE UINT8 get_stampmap_32x32_1x1_tile_info_pixel(running_machine* machine, in
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_1x1(tile_region,tileno,(int)tile_index);
 
-	const gfx_element *gfx = machine->gfx[tile_region];
+	const gfx_element *gfx = machine.gfx[tile_region];
 	tileno %= gfx->total_elements;
 
 	if (tileno==0) return 0x00; // does this apply in this mode?
@@ -5884,7 +5884,7 @@ INLINE UINT8 get_stampmap_32x32_1x1_tile_info_pixel(running_machine* machine, in
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-INLINE UINT8 get_stampmap_16x16_16x16_tile_info_pixel(running_machine* machine, int xpos, int ypos)
+INLINE UINT8 get_stampmap_16x16_16x16_tile_info_pixel(running_machine& machine, int xpos, int ypos)
 {
 	const int tilesize = 4; // 0xf pixels
 	const int tilemapsize = 0xff;
@@ -5914,7 +5914,7 @@ INLINE UINT8 get_stampmap_16x16_16x16_tile_info_pixel(running_machine* machine, 
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_16x16(tile_region,tileno,(int)tile_index);
 
-	const gfx_element *gfx = machine->gfx[tile_region];
+	const gfx_element *gfx = machine.gfx[tile_region];
 	tileno %= gfx->total_elements;
 
 	if (tileno==0) return 0x00; // does this apply in this mode
@@ -5923,7 +5923,7 @@ INLINE UINT8 get_stampmap_16x16_16x16_tile_info_pixel(running_machine* machine, 
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-INLINE UINT8 get_stampmap_32x32_16x16_tile_info_pixel(running_machine* machine, int xpos, int ypos)
+INLINE UINT8 get_stampmap_32x32_16x16_tile_info_pixel(running_machine& machine, int xpos, int ypos)
 {
 	const int tilesize = 5; // 0x1f pixels
 	const int tilemapsize = 0x7f;
@@ -5953,7 +5953,7 @@ INLINE UINT8 get_stampmap_32x32_16x16_tile_info_pixel(running_machine* machine, 
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_16x16(tile_region,tileno,(int)tile_index);
 
-	const gfx_element *gfx = machine->gfx[tile_region];
+	const gfx_element *gfx = machine.gfx[tile_region];
 	tileno %= gfx->total_elements;
 
 	if (tileno==0) return 0x00;
@@ -5969,12 +5969,12 @@ static TIMER_CALLBACK( segacd_access_timer_callback )
 
 READ16_HANDLER( cdc_data_sub_r )
 {
-	return CDC_Host_r(space->machine, READ_SUB);
+	return CDC_Host_r(space->machine(), READ_SUB);
 }
 
 READ16_HANDLER( cdc_data_main_r )
 {
-	return CDC_Host_r(space->machine, READ_MAIN);
+	return CDC_Host_r(space->machine(), READ_MAIN);
 }
 
 
@@ -5996,9 +5996,9 @@ READ16_HANDLER( segacd_stopwatch_timer_r )
 
 
 /* main CPU map set up in INIT */
-void segacd_init_main_cpu( running_machine* machine )
+void segacd_init_main_cpu( running_machine& machine )
 {
-	address_space* space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	segacd_4meg_prgbank = 0;
 
@@ -6006,67 +6006,67 @@ void segacd_init_main_cpu( running_machine* machine )
 	space->unmap_readwrite        (0x020000,0x3fffff);
 
 //  space->install_read_bank(0x0020000, 0x003ffff, "scd_4m_prgbank");
-//  memory_set_bankptr(space->machine,  "scd_4m_prgbank", segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
+//  memory_set_bankptr(space->machine(),  "scd_4m_prgbank", segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
 	space->install_legacy_read_handler (0x0020000, 0x003ffff, FUNC(scd_4m_prgbank_ram_r) );
 	space->install_legacy_write_handler (0x0020000, 0x003ffff, FUNC(scd_4m_prgbank_ram_w) );
 	segacd_wordram_mapped = 1;
 
 
-	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x200000, 0x23ffff, FUNC(segacd_main_dataram_part1_r), FUNC(segacd_main_dataram_part1_w)); // RAM shared with sub
+	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x200000, 0x23ffff, FUNC(segacd_main_dataram_part1_r), FUNC(segacd_main_dataram_part1_w)); // RAM shared with sub
 
-	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12000, 0xa12001, FUNC(scd_a12000_halt_reset_r), FUNC(scd_a12000_halt_reset_w)); // sub-cpu control
-	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12002, 0xa12003, FUNC(scd_a12002_memory_mode_r), FUNC(scd_a12002_memory_mode_w)); // memory mode / write protect
-	//space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12004, 0xa12005, FUNC(segacd_cdc_mode_address_r), FUNC(segacd_cdc_mode_address_w));
-	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12006, 0xa12007, FUNC(scd_a12006_hint_register_r), FUNC(scd_a12006_hint_register_w)); // where HINT points on main CPU
-	//space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler     (0xa12008, 0xa12009, FUNC(cdc_data_main_r));
-
-
-	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa1200c, 0xa1200d, FUNC(segacd_stopwatch_timer_r), FUNC(segacd_stopwatch_timer_w)); // starblad
-
-	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa1200e, 0xa1200f, FUNC(segacd_comms_flags_r), FUNC(segacd_comms_flags_maincpu_w)); // communication flags block
-
-	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12010, 0xa1201f, FUNC(segacd_comms_main_part1_r), FUNC(segacd_comms_main_part1_w));
-	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12020, 0xa1202f, FUNC(segacd_comms_main_part2_r), FUNC(segacd_comms_main_part2_w));
+	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12000, 0xa12001, FUNC(scd_a12000_halt_reset_r), FUNC(scd_a12000_halt_reset_w)); // sub-cpu control
+	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12002, 0xa12003, FUNC(scd_a12002_memory_mode_r), FUNC(scd_a12002_memory_mode_w)); // memory mode / write protect
+	//space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12004, 0xa12005, FUNC(segacd_cdc_mode_address_r), FUNC(segacd_cdc_mode_address_w));
+	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12006, 0xa12007, FUNC(scd_a12006_hint_register_r), FUNC(scd_a12006_hint_register_w)); // where HINT points on main CPU
+	//space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler     (0xa12008, 0xa12009, FUNC(cdc_data_main_r));
 
 
+	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa1200c, 0xa1200d, FUNC(segacd_stopwatch_timer_r), FUNC(segacd_stopwatch_timer_w)); // starblad
 
-	device_set_irq_callback(machine->device("segacd_68k"), segacd_sub_int_callback);
+	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa1200e, 0xa1200f, FUNC(segacd_comms_flags_r), FUNC(segacd_comms_flags_maincpu_w)); // communication flags block
+
+	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12010, 0xa1201f, FUNC(segacd_comms_main_part1_r), FUNC(segacd_comms_main_part1_w));
+	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12020, 0xa1202f, FUNC(segacd_comms_main_part2_r), FUNC(segacd_comms_main_part2_w));
+
+
+
+	device_set_irq_callback(machine.device("segacd_68k"), segacd_sub_int_callback);
 
 	space->install_legacy_read_handler (0x0000070, 0x0000073, FUNC(scd_hint_vector_r) );
 
-	segacd_gfx_conversion_timer = machine->scheduler().timer_alloc(FUNC(segacd_gfx_conversion_timer_callback));
+	segacd_gfx_conversion_timer = machine.scheduler().timer_alloc(FUNC(segacd_gfx_conversion_timer_callback));
 	segacd_gfx_conversion_timer->adjust(attotime::never);
 
-	//segacd_dmna_ret_timer = machine->scheduler().timer_alloc(FUNC(segacd_dmna_ret_timer_callback));
+	//segacd_dmna_ret_timer = machine.scheduler().timer_alloc(FUNC(segacd_dmna_ret_timer_callback));
 	segacd_gfx_conversion_timer->adjust(attotime::never);
 
-	segacd_hock_timer = machine->scheduler().timer_alloc(FUNC(segacd_access_timer_callback));
+	segacd_hock_timer = machine.scheduler().timer_alloc(FUNC(segacd_access_timer_callback));
 //  segacd_hock_timer->adjust( attotime::from_nsec(20000000), 0, attotime::from_nsec(20000000));
 	segacd_hock_timer->adjust( attotime::from_hz(75),0, attotime::from_hz(75));
 
-	segacd_irq3_timer = machine->scheduler().timer_alloc(FUNC(segacd_irq3_timer_callback));
+	segacd_irq3_timer = machine.scheduler().timer_alloc(FUNC(segacd_irq3_timer_callback));
 	segacd_irq3_timer->adjust(attotime::never);
 
 
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[0] = gfx_element_alloc(machine, &sega_16x16_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[1] = gfx_element_alloc(machine, &sega_16x16_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[2] = gfx_element_alloc(machine, &sega_16x16_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[3] = gfx_element_alloc(machine, &sega_16x16_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[4] = gfx_element_alloc(machine, &sega_16x16_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[5] = gfx_element_alloc(machine, &sega_16x16_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[6] = gfx_element_alloc(machine, &sega_16x16_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[7] = gfx_element_alloc(machine, &sega_16x16_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[0] = gfx_element_alloc(machine, &sega_16x16_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[1] = gfx_element_alloc(machine, &sega_16x16_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[2] = gfx_element_alloc(machine, &sega_16x16_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[3] = gfx_element_alloc(machine, &sega_16x16_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[4] = gfx_element_alloc(machine, &sega_16x16_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[5] = gfx_element_alloc(machine, &sega_16x16_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[6] = gfx_element_alloc(machine, &sega_16x16_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[7] = gfx_element_alloc(machine, &sega_16x16_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
 
-	machine->gfx[8] = gfx_element_alloc(machine, &sega_32x32_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[9] = gfx_element_alloc(machine, &sega_32x32_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[10]= gfx_element_alloc(machine, &sega_32x32_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[11]= gfx_element_alloc(machine, &sega_32x32_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[12]= gfx_element_alloc(machine, &sega_32x32_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[13]= gfx_element_alloc(machine, &sega_32x32_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[14]= gfx_element_alloc(machine, &sega_32x32_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[15]= gfx_element_alloc(machine, &sega_32x32_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[8] = gfx_element_alloc(machine, &sega_32x32_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[9] = gfx_element_alloc(machine, &sega_32x32_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[10]= gfx_element_alloc(machine, &sega_32x32_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[11]= gfx_element_alloc(machine, &sega_32x32_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[12]= gfx_element_alloc(machine, &sega_32x32_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[13]= gfx_element_alloc(machine, &sega_32x32_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[14]= gfx_element_alloc(machine, &sega_32x32_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[15]= gfx_element_alloc(machine, &sega_32x32_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
 
 	segacd_stampmap[0] = tilemap_create(machine, get_stampmap_16x16_1x1_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 	segacd_stampmap[1] = tilemap_create(machine, get_stampmap_32x32_1x1_tile_info, tilemap_scan_rows, 32, 32, 8, 8);
@@ -6083,7 +6083,7 @@ static TIMER_DEVICE_CALLBACK( scd_dma_timer_callback )
 
 	#define RATE 256
 	if (sega_cd_connected)
-		CDC_Do_DMA(timer.machine, RATE);
+		CDC_Do_DMA(timer.machine(), RATE);
 
 	// timed reset of flags
 	scd_mode_dmna_ret_flags |= 0x0021;
@@ -6106,15 +6106,15 @@ static MACHINE_RESET( segacd )
 	{
 		device_t *device;
 
-		device = machine->device("cdrom");
+		device = machine.device("cdrom");
 		if ( device )
 		{
 			segacd.cd = cd_get_cdrom_file(device);
 			if ( segacd.cd )
 			{
 				segacd.toc = cdrom_get_toc( segacd.cd );
-				cdda_set_cdrom( machine->device("cdda"), segacd.cd );
-				cdda_stop_audio( machine->device( "cdda" ) ); //stop any pending CD-DA
+				cdda_set_cdrom( machine.device("cdda"), segacd.cd );
+				cdda_stop_audio( machine.device( "cdda" ) ); //stop any pending CD-DA
 			}
 		}
 	}
@@ -6128,7 +6128,7 @@ static MACHINE_RESET( segacd )
 
 
 	hock_cmd = 0;
-	stopwatch_timer = machine->device<timer_device>("sw_timer");
+	stopwatch_timer = machine.device<timer_device>("sw_timer");
 
 	scd_dma_timer->adjust(attotime::zero);
 
@@ -6238,7 +6238,7 @@ static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 		if (scd_rammode&1)
 		{
 			COMBINE_DATA(&segacd_dataram[offset]);
-			segacd_mark_tiles_dirty(space->machine, offset);
+			segacd_mark_tiles_dirty(space->machine(), offset);
 		}
 		else
 		{
@@ -6265,11 +6265,11 @@ static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 
 		if (scd_rammode&1)
 		{
-			segacd_1meg_mode_word_write(space->machine, offset/2+0x00000/2, data , mem_mask, 1);
+			segacd_1meg_mode_word_write(space->machine(), offset/2+0x00000/2, data , mem_mask, 1);
 		}
 		else
 		{
-			segacd_1meg_mode_word_write(space->machine, offset/2+0x20000/2, data, mem_mask, 1);
+			segacd_1meg_mode_word_write(space->machine(), offset/2+0x20000/2, data, mem_mask, 1);
 		}
 
 	//  printf("Unspported: segacd_sub_dataram_part1_w in mode 1 (Word RAM Expander - 1 Byte Per Pixel) %04x\n", data);
@@ -6313,11 +6313,11 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 		// ret bit set by sub cpu determines which half of WorkRAM we have access to?
 		if (scd_rammode&1)
 		{
-			segacd_1meg_mode_word_write(space->machine,offset+0x00000/2, data, mem_mask, 0);
+			segacd_1meg_mode_word_write(space->machine(),offset+0x00000/2, data, mem_mask, 0);
 		}
 		else
 		{
-			segacd_1meg_mode_word_write(space->machine,offset+0x20000/2, data, mem_mask, 0);
+			segacd_1meg_mode_word_write(space->machine(),offset+0x20000/2, data, mem_mask, 0);
 		}
 
 	}
@@ -6327,7 +6327,7 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 
 static READ16_HANDLER( segacd_irq_mask_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 	return segacd_irq_mask;
 }
 
@@ -6336,7 +6336,7 @@ static WRITE16_HANDLER( segacd_irq_mask_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		UINT16 control = CDD_CONTROL;
-		if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+		if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 	//  printf("segacd_irq_mask_w %04x %04x (CDD control is %04x)\n",data, mem_mask, control);
 
 		if (data & 0x10)
@@ -6346,7 +6346,7 @@ static WRITE16_HANDLER( segacd_irq_mask_w )
 				if (!(segacd_irq_mask & 0x10))
 				{
 					segacd_irq_mask = data & 0x7e;
-					CDD_Process(space->machine, 0);
+					CDD_Process(space->machine(), 0);
 					return;
 				}
 			}
@@ -6364,7 +6364,7 @@ static WRITE16_HANDLER( segacd_irq_mask_w )
 
 static READ16_HANDLER( segacd_cdd_ctrl_r )
 {
-	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 	return CDD_CONTROL;
 }
 
@@ -6374,7 +6374,7 @@ static WRITE16_HANDLER( segacd_cdd_ctrl_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		UINT16 control = CDD_CONTROL;
-		if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+		if (SEGACD_FORCE_SYNCS) space->machine().scheduler().synchronize();
 
 		//printf("segacd_cdd_ctrl_w %04x %04x (control %04x irq %04x\n", data, mem_mask, control, segacd_irq_mask);
 
@@ -6386,7 +6386,7 @@ static WRITE16_HANDLER( segacd_cdd_ctrl_w )
 			{
 				if (segacd_irq_mask&0x10)
 				{
-					CDD_Process(space->machine, 1);
+					CDD_Process(space->machine(), 1);
 				}
 			}
 		}
@@ -6412,7 +6412,7 @@ static WRITE8_HANDLER( segacd_cdd_tx_w )
 
 	if(offset == 9)
 	{
-		CDD_Import(space->machine);
+		CDD_Import(space->machine());
 	}
 }
 
@@ -6460,12 +6460,12 @@ static WRITE16_HANDLER( segacd_stampsize_w )
 // the lower 3 bits of segacd_imagebuffer_hdot_size are set
 
 // this really needs to be doing it's own lookups rather than depending on the inefficient MAME cache..
-INLINE UINT8 read_pixel_from_stampmap( running_machine* machine, bitmap_t* srcbitmap, int x, int y)
+INLINE UINT8 read_pixel_from_stampmap( running_machine& machine, bitmap_t* srcbitmap, int x, int y)
 {
 /*
     if (!srcbitmap)
     {
-        return machine->rand();
+        return machine.rand();
     }
 
     if (x >= srcbitmap->width) return 0;
@@ -6545,7 +6545,7 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 				//int i;
 				UINT8 pix = 0x0;
 
-				pix = read_pixel_from_stampmap(space->machine, srcbitmap, xbase>>(3+8), ybase>>(3+8));
+				pix = read_pixel_from_stampmap(space->machine(), srcbitmap, xbase>>(3+8), ybase>>(3+8));
 
 				xbase += deltax;
 				ybase += deltay;
@@ -6565,10 +6565,10 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 
 				offset+=countx & 0x7;
 
-				write_pixel( space->machine, pix, offset );
+				write_pixel( space->machine(), pix, offset );
 
-				segacd_mark_tiles_dirty(space->machine, (offset>>3));
-				segacd_mark_tiles_dirty(space->machine, (offset>>3)+1);
+				segacd_mark_tiles_dirty(space->machine(), (offset>>3));
+				segacd_mark_tiles_dirty(space->machine(), (offset>>3)+1);
 
 			}
 
@@ -6719,7 +6719,7 @@ WRITE16_HANDLER( segacd_cdfader_w )
 
 	//printf("%f\n",cdfader_vol);
 
-	cdda_set_volume(space->machine->device("cdda"), cdfader_vol);
+	cdda_set_volume(space->machine().device("cdda"), cdfader_vol);
 }
 
 READ16_HANDLER( segacd_backupram_r )
@@ -6871,7 +6871,7 @@ INLINE void overwrite_write(UINT16 *dst, UINT16 d)
 
 static UINT32 pm_io(address_space *space, int reg, int write, UINT32 d)
 {
-	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
 	if (state->emu_status & SSP_PMC_SET)
 	{
 		state->pmac_read[write ? reg + 6 : reg] = state->pmc.d;
@@ -6925,7 +6925,7 @@ static UINT32 pm_io(address_space *space, int reg, int write, UINT32 d)
 			int addr = state->pmac_read[reg]&0xffff;
 			if      ((mode & 0xfff0) == 0x0800) // ROM, inc 1, verified to be correct
 			{
-				UINT16 *ROM = (UINT16 *) space->machine->region("maincpu")->base();
+				UINT16 *ROM = (UINT16 *) space->machine().region("maincpu")->base();
 				state->pmac_read[reg] += 1;
 				d = ROM[addr|((mode&0xf)<<16)];
 			}
@@ -6954,7 +6954,7 @@ static UINT32 pm_io(address_space *space, int reg, int write, UINT32 d)
 
 static READ16_HANDLER( read_PM0 )
 {
-	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
 	UINT32 d = pm_io(space, 0, 0, 0);
 	if (d != (UINT32)-1) return d;
 	d = state->XST2;
@@ -6964,7 +6964,7 @@ static READ16_HANDLER( read_PM0 )
 
 static WRITE16_HANDLER( write_PM0 )
 {
-	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
 	UINT32 r = pm_io(space, 0, 1, data);
 	if (r != (UINT32)-1) return;
 	state->XST2 = data; // ?
@@ -7002,7 +7002,7 @@ static WRITE16_HANDLER( write_PM2 )
 
 static READ16_HANDLER( read_XST )
 {
-	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
 	UINT32 d = pm_io(space, 3, 0, 0);
 	if (d != (UINT32)-1) return d;
 
@@ -7011,7 +7011,7 @@ static READ16_HANDLER( read_XST )
 
 static WRITE16_HANDLER( write_XST )
 {
-	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
 	UINT32 r = pm_io(space, 3, 1, data);
 	if (r != (UINT32)-1) return;
 
@@ -7031,7 +7031,7 @@ static WRITE16_HANDLER( write_PM4 )
 
 static READ16_HANDLER( read_PMC )
 {
-	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
 	if (state->emu_status & SSP_PMC_HAVE_ADDR) {
 		state->emu_status |= SSP_PMC_SET;
 		state->emu_status &= ~SSP_PMC_HAVE_ADDR;
@@ -7044,7 +7044,7 @@ static READ16_HANDLER( read_PMC )
 
 static WRITE16_HANDLER( write_PMC )
 {
-	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
 	if (state->emu_status & SSP_PMC_HAVE_ADDR) {
 		state->emu_status |= SSP_PMC_SET;
 		state->emu_status &= ~SSP_PMC_HAVE_ADDR;
@@ -7057,7 +7057,7 @@ static WRITE16_HANDLER( write_PMC )
 
 static READ16_HANDLER( read_AL )
 {
-	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
 	state->emu_status &= ~(SSP_PMC_SET|SSP_PMC_HAVE_ADDR);
 	return 0;
 }
@@ -7070,7 +7070,7 @@ static WRITE16_HANDLER( write_AL )
 
 static READ16_HANDLER( svp_68k_io_r )
 {
-	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
 	UINT32 d;
 	switch (offset)
 	{
@@ -7086,7 +7086,7 @@ static READ16_HANDLER( svp_68k_io_r )
 
 static WRITE16_HANDLER( svp_68k_io_w )
 {
-	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
 	switch (offset)
 	{
 		// 0xa15000, 0xa15002
@@ -7101,7 +7101,7 @@ static WRITE16_HANDLER( svp_68k_io_w )
 static READ16_HANDLER( svp_68k_cell1_r )
 {
 	// this is rewritten 68k test code
-	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
 	UINT32 a1 = offset;
 	a1 = (a1 & 0x7001) | ((a1 & 0x3e) << 6) | ((a1 & 0xfc0) >> 5);
 	return ((UINT16 *)state->dram)[a1];
@@ -7110,7 +7110,7 @@ static READ16_HANDLER( svp_68k_cell1_r )
 static READ16_HANDLER( svp_68k_cell2_r )
 {
 	// this is rewritten 68k test code
-	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	mdsvp_state *state = space->machine().driver_data<mdsvp_state>();
 	UINT32 a1 = offset;
 	a1 = (a1 & 0x7801) | ((a1 & 0x1e) << 6) | ((a1 & 0x7e0) >> 4);
 	return ((UINT16 *)state->dram)[a1];
@@ -7134,7 +7134,7 @@ ADDRESS_MAP_END
 
 
 /* emulate testmode plug */
-static UINT8 megadrive_io_read_data_port_svp(running_machine *machine, int portnum)
+static UINT8 megadrive_io_read_data_port_svp(running_machine &machine, int portnum)
 {
 	if (portnum == 0 && input_port_read_safe(machine, "MEMORY_TEST", 0x00))
 	{
@@ -7151,9 +7151,9 @@ static READ16_HANDLER( svp_speedup_r )
 }
 
 
-static void svp_init(running_machine *machine)
+static void svp_init(running_machine &machine)
 {
-	mdsvp_state *state = machine->driver_data<mdsvp_state>();
+	mdsvp_state *state = machine.driver_data<mdsvp_state>();
 	UINT8 *ROM;
 
 	memset(state->pmac_read, 0, ARRAY_LENGTH(state->pmac_read));
@@ -7167,18 +7167,18 @@ static void svp_init(running_machine *machine)
 
 	/* SVP stuff */
 	state->dram = auto_alloc_array(machine, UINT8, 0x20000);
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x300000, 0x31ffff, state->dram);
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15000, 0xa150ff, FUNC(svp_68k_io_r), FUNC(svp_68k_io_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x300000, 0x31ffff, state->dram);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15000, 0xa150ff, FUNC(svp_68k_io_r), FUNC(svp_68k_io_w));
 	// "cell arrange" 1 and 2
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x390000, 0x39ffff, FUNC(svp_68k_cell1_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3a0000, 0x3affff, FUNC(svp_68k_cell2_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x390000, 0x39ffff, FUNC(svp_68k_cell1_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3a0000, 0x3affff, FUNC(svp_68k_cell2_r));
 
-	machine->device("svp")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x438, 0x438, FUNC(svp_speedup_r));
+	machine.device("svp")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x438, 0x438, FUNC(svp_speedup_r));
 
 	state->iram = auto_alloc_array(machine, UINT8, 0x800);
 	memory_set_bankptr(machine,  "bank3", state->iram);
 	/* SVP ROM just shares m68k region.. */
-	ROM = machine->region("maincpu")->base();
+	ROM = machine.region("maincpu")->base();
 	memory_set_bankptr(machine,  "bank4", ROM + 0x800);
 
 	megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_svp;
@@ -7227,7 +7227,7 @@ VIDEO_START(megadriv)
 {
 	int x;
 
-	render_bitmap = machine->primary_screen->alloc_compatible_bitmap();
+	render_bitmap = machine.primary_screen->alloc_compatible_bitmap();
 
 	megadrive_vdp_vram  = auto_alloc_array(machine, UINT16, 0x10000/2);
 	megadrive_vdp_cram  = auto_alloc_array(machine, UINT16, 0x80/2);
@@ -7284,7 +7284,7 @@ SCREEN_UPDATE(megadriv)
 	/* reference */
 
 //  time_elapsed_since_crap = frame_timer->time_elapsed();
-//  xxx = screen->machine->device<device>("maincpu")->attotime_to_cycles(time_elapsed_since_crap);
+//  xxx = screen->machine().device<device>("maincpu")->attotime_to_cycles(time_elapsed_since_crap);
 //  mame_printf_debug("update cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
 
 	return 0;
@@ -8552,7 +8552,7 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 static UINT32 _32x_linerender[320+258]; // tmp buffer (bigger than it needs to be to simplify RLE decode)
 
 /* This converts our render buffer to real screen colours */
-static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine, int scanline)
+static void genesis_render_videobuffer_to_screenbuffer(running_machine &machine, int scanline)
 {
 	UINT16*lineptr;
 	int x;
@@ -8774,7 +8774,7 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 					case 0x1a000: // (sprite)shadow set, highlight set - not possible
 					case 0x1e000: // (sprite)shadow set, highlight set, normal set, not possible
 					default:
-						lineptr[x] = machine->rand()&0x3f;
+						lineptr[x] = machine.rand()&0x3f;
 					break;
 				}
 			}
@@ -8805,7 +8805,7 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 	}
 }
 
-static void genesis_render_scanline(running_machine *machine, int scanline)
+static void genesis_render_scanline(running_machine &machine, int scanline)
 {
 	//if (MEGADRIVE_REG01_DMA_ENABLE==0) mame_printf_debug("off\n");
 	genesis_render_spriteline_to_spritebuffer(genesis_scanline_counter);
@@ -9115,11 +9115,11 @@ static TIMER_DEVICE_CALLBACK( render_timer_callback )
 {
 	if (genesis_scanline_counter>=0 && genesis_scanline_counter<megadrive_visible_scanlines)
 	{
-		genesis_render_scanline(timer.machine, genesis_scanline_counter);
+		genesis_render_scanline(timer.machine(), genesis_scanline_counter);
 	}
 }
 
-void _32x_check_irqs(running_machine* machine)
+void _32x_check_irqs(running_machine& machine)
 {
 
 	if (sh2_master_vint_enable && sh2_master_vint_pending) device_set_input_line(_32x_master_cpu,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
@@ -9137,7 +9137,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
        top-left of the screen.  The first scanline is scanline 0 (we set scanline to -1 in
        VIDEO_EOF) */
 
-	timer.machine->scheduler().synchronize();
+	timer.machine().scheduler().synchronize();
 	/* Compensate for some rounding errors
 
        When the counter reaches 261 we should have reached the end of the frame, however due
@@ -9164,7 +9164,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 			{
 				sh2_master_vint_pending = 1;
 				sh2_slave_vint_pending = 1;
-				_32x_check_irqs(timer.machine);
+				_32x_check_irqs(timer.machine());
 			}
 
 		}
@@ -9220,16 +9220,16 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 		}
 
 
-		if (timer.machine->device("genesis_snd_z80") != NULL)
+		if (timer.machine().device("genesis_snd_z80") != NULL)
 		{
 			if (genesis_scanline_counter == megadrive_z80irq_scanline)
 			{
 				if ((genz80.z80_has_bus == 1) && (genz80.z80_is_reset == 0))
-					cputag_set_input_line(timer.machine, "genesis_snd_z80", 0, HOLD_LINE);
+					cputag_set_input_line(timer.machine(), "genesis_snd_z80", 0, HOLD_LINE);
 			}
 			if (genesis_scanline_counter == megadrive_z80irq_scanline + 1)
 			{
-				cputag_set_input_line(timer.machine, "genesis_snd_z80", 0, CLEAR_LINE);
+				cputag_set_input_line(timer.machine(), "genesis_snd_z80", 0, CLEAR_LINE);
 			}
 		}
 
@@ -9248,14 +9248,14 @@ static TIMER_DEVICE_CALLBACK( irq6_on_callback )
 	{
 //      megadrive_irq6_pending = 1;
 		if (MEGADRIVE_REG01_IRQ6_ENABLE || genesis_always_irq6)
-			cputag_set_input_line(timer.machine, "maincpu", 6, HOLD_LINE);
+			cputag_set_input_line(timer.machine(), "maincpu", 6, HOLD_LINE);
 	}
 }
 
 static TIMER_DEVICE_CALLBACK( irq4_on_callback )
 {
 	//mame_printf_debug("irq4 active on %d\n",genesis_scanline_counter);
-	cputag_set_input_line(timer.machine, "maincpu", 4, HOLD_LINE);
+	cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
 }
 
 /*****************************************************************************************/
@@ -9311,25 +9311,25 @@ MACHINE_RESET( megadriv )
 		break;
 	}
 
-	if (machine->device("genesis_snd_z80") != NULL)
+	if (machine.device("genesis_snd_z80") != NULL)
 	{
 		genz80.z80_is_reset = 1;
 		genz80.z80_has_bus = 1;
 		genz80.z80_bank_addr = 0;
 		genesis_scanline_counter = -1;
-		machine->scheduler().timer_set( attotime::zero, FUNC(megadriv_z80_run_state ));
+		machine.scheduler().timer_set( attotime::zero, FUNC(megadriv_z80_run_state ));
 	}
 
 	megadrive_imode = 0;
 
 	megadrive_reset_io(machine);
 
-	frame_timer = machine->device<timer_device>("frame_timer");
-	scanline_timer = machine->device<timer_device>("scanline_timer");
-	render_timer = machine->device<timer_device>("render_timer");
+	frame_timer = machine.device<timer_device>("frame_timer");
+	scanline_timer = machine.device<timer_device>("scanline_timer");
+	render_timer = machine.device<timer_device>("render_timer");
 
-	irq6_on_timer = machine->device<timer_device>("irq6_timer");
-	irq4_on_timer = machine->device<timer_device>("irq4_timer");
+	irq6_on_timer = machine.device<timer_device>("irq6_timer");
+	irq4_on_timer = machine.device<timer_device>("irq4_timer");
 
 	frame_timer->adjust(attotime::zero);
 	scanline_timer->adjust(attotime::zero);
@@ -9337,7 +9337,7 @@ MACHINE_RESET( megadriv )
 	if (genesis_other_hacks)
 	{
 	//  set_refresh_rate(megadriv_framerate);
-	//  machine->device("maincpu")->set_clock_scale(0.9950f); /* Fatal Rewind is very fussy... (and doesn't work now anyway, so don't bother with this) */
+	//  machine.device("maincpu")->set_clock_scale(0.9950f); /* Fatal Rewind is very fussy... (and doesn't work now anyway, so don't bother with this) */
 
 		memset(megadrive_ram,0x00,0x10000);
 	}
@@ -9483,7 +9483,7 @@ int megadrive_z80irq_hpos = 320;
 	visarea.min_y = 0;
 	visarea.max_y = megadrive_visible_scanlines-1;
 
-	machine->primary_screen->configure(scr_width, megadrive_visible_scanlines, visarea, HZ_TO_ATTOSECONDS(megadriv_framerate));
+	machine.primary_screen->configure(scr_width, megadrive_visible_scanlines, visarea, HZ_TO_ATTOSECONDS(megadriv_framerate));
 
 	if (0)
 	{
@@ -9494,7 +9494,7 @@ int megadrive_z80irq_hpos = 320;
 		frametime = ATTOSECONDS_PER_SECOND/megadriv_framerate;
 
 		//time_elapsed_since_crap = frame_timer->time_elapsed();
-		//xxx = machine->device<cpudevice>("maincpu")->attotime_to_cycles(time_elapsed_since_crap);
+		//xxx = machine.device<cpudevice>("maincpu")->attotime_to_cycles(time_elapsed_since_crap);
 		//mame_printf_debug("---------- cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
 		//mame_printf_debug("---------- framet %d, %08x %08x\n",xxx, (UINT32)(frametime>>32),(UINT32)(frametime&0xffffffff));
 		frame_timer->adjust(attotime::zero);
@@ -9527,7 +9527,7 @@ static NVRAM_HANDLER( megadriv )
 			{
 				int x;
 				for (x=0;x<megadriv_backupram_length/2;x++)
-					megadriv_backupram[x]=0xffff;//machine->rand(); // dino dini's needs 0xff or game rules are broken
+					megadriv_backupram[x]=0xffff;//machine.rand(); // dino dini's needs 0xff or game rules are broken
 			}
 		}
 	}
@@ -9850,10 +9850,10 @@ static int megadriv_tas_callback(device_t *device)
 	return 0; // writeback not allowed
 }
 
-static void megadriv_init_common(running_machine *machine)
+static void megadriv_init_common(running_machine &machine)
 {
 	/* Look to see if this system has the standard Sound Z80 */
-	_genesis_snd_z80_cpu = machine->device<cpu_device>("genesis_snd_z80");
+	_genesis_snd_z80_cpu = machine.device<cpu_device>("genesis_snd_z80");
 	if (_genesis_snd_z80_cpu != NULL)
 	{
 		//printf("GENESIS Sound Z80 cpu found '%s'\n", _genesis_snd_z80_cpu->tag() );
@@ -9863,14 +9863,14 @@ static void megadriv_init_common(running_machine *machine)
 	}
 
 	/* Look to see if this system has the 32x Master SH2 */
-	_32x_master_cpu = machine->device<cpu_device>("32x_master_sh2");
+	_32x_master_cpu = machine.device<cpu_device>("32x_master_sh2");
 	if (_32x_master_cpu != NULL)
 	{
 		printf("32x MASTER SH2 cpu found '%s'\n", _32x_master_cpu->tag() );
 	}
 
 	/* Look to see if this system has the 32x Slave SH2 */
-	_32x_slave_cpu = machine->device<cpu_device>("32x_slave_sh2");
+	_32x_slave_cpu = machine.device<cpu_device>("32x_slave_sh2");
 	if (_32x_slave_cpu != NULL)
 	{
 		printf("32x SLAVE SH2 cpu found '%s'\n", _32x_slave_cpu->tag() );
@@ -9887,35 +9887,35 @@ static void megadriv_init_common(running_machine *machine)
 
 	if(_32x_is_connected)
 	{
-		_32x_pwm_timer = machine->scheduler().timer_alloc(FUNC(_32x_pwm_callback));
+		_32x_pwm_timer = machine.scheduler().timer_alloc(FUNC(_32x_pwm_callback));
 		_32x_pwm_timer->adjust(attotime::never);
 	}
 
 	sega_cd_connected = 0;
 	segacd_wordram_mapped = 0;
-	_segacd_68k_cpu = machine->device<cpu_device>("segacd_68k");
+	_segacd_68k_cpu = machine.device<cpu_device>("segacd_68k");
 	if (_segacd_68k_cpu != NULL)
 	{
 		printf("Sega CD secondary 68k cpu found '%s'\n", _segacd_68k_cpu->tag() );
 		sega_cd_connected = 1;
 		segacd_init_main_cpu(machine);
-		scd_dma_timer = machine->device<timer_device>("scd_dma_timer");
+		scd_dma_timer = machine.device<timer_device>("scd_dma_timer");
 
 	}
 
-	_svp_cpu = machine->device<cpu_device>("svp");
+	_svp_cpu = machine.device<cpu_device>("svp");
 	if (_svp_cpu != NULL)
 	{
 		printf("SVP (cpu) found '%s'\n", _svp_cpu->tag() );
 	}
 
-	device_set_irq_callback(machine->device("maincpu"), genesis_int_callback);
+	device_set_irq_callback(machine.device("maincpu"), genesis_int_callback);
 	megadriv_backupram = NULL;
 	megadriv_backupram_length = 0;
 
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_default;
 
-	m68k_set_tas_callback(machine->device("maincpu"), megadriv_tas_callback);
+	m68k_set_tas_callback(machine.device("maincpu"), megadriv_tas_callback);
 
 	// the drivers which need 6 buttons pad set this to 1 in their init befare calling the megadrive init
 	if (megadrive_6buttons_pad)
@@ -9936,7 +9936,7 @@ static void megadriv_init_common(running_machine *machine)
           some games specify a single address, (start 200001, end 200001)
           this usually means there is serial eeprom instead */
 		int i;
-		UINT16 *rom = (UINT16*)machine->region("maincpu")->base();
+		UINT16 *rom = (UINT16*)machine.region("maincpu")->base();
 
 		mame_printf_debug("DEBUG:: Header: Backup RAM string (ignore for games without)\n");
 		for (i=0;i<12;i++)
@@ -10041,32 +10041,32 @@ static WRITE8_HANDLER( z80_unmapped_w )
 
 
 /* sets the megadrive z80 to it's normal ports / map */
-void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine, const char* tag)
+void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const char* tag)
 {
-	device_t *ym = machine->device("ymsnd");
+	device_t *ym = machine.device("ymsnd");
 
 	/* INIT THE PORTS *********************************************************************************************/
-	machine->device(tag)->memory().space(AS_IO)->install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_port_r), FUNC(z80_unmapped_port_w));
+	machine.device(tag)->memory().space(AS_IO)->install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_port_r), FUNC(z80_unmapped_port_w));
 
 	/* catch any addresses that don't get mapped */
-	machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_r), FUNC(z80_unmapped_w));
+	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_r), FUNC(z80_unmapped_w));
 
 
-	machine->device(tag)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x1fff, "bank1");
+	machine.device(tag)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x1fff, "bank1");
 	memory_set_bankptr(machine,  "bank1", genz80.z80_prgram );
 
-	machine->device(tag)->memory().space(AS_PROGRAM)->install_ram(0x0000, 0x1fff, genz80.z80_prgram);
+	machine.device(tag)->memory().space(AS_PROGRAM)->install_ram(0x0000, 0x1fff, genz80.z80_prgram);
 
 
 	// not allowed??
-//  machine->device(tag)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x2000, 0x3fff, "bank1");
+//  machine.device(tag)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x2000, 0x3fff, "bank1");
 
-	machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*ym, 0x4000, 0x4003, FUNC(ym2612_r), FUNC(ym2612_w));
-	machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_write_handler    (0x6000, 0x6000, FUNC(megadriv_z80_z80_bank_w));
-	machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_write_handler    (0x6001, 0x6001, FUNC(megadriv_z80_z80_bank_w));
-	machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_read_handler     (0x6100, 0x7eff, FUNC(megadriv_z80_unmapped_read));
-	machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x7f00, 0x7fff, FUNC(megadriv_z80_vdp_read), FUNC(megadriv_z80_vdp_write));
-	machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8000, 0xffff, FUNC(z80_read_68k_banked_data), FUNC(z80_write_68k_banked_data));
+	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*ym, 0x4000, 0x4003, FUNC(ym2612_r), FUNC(ym2612_w));
+	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_write_handler    (0x6000, 0x6000, FUNC(megadriv_z80_z80_bank_w));
+	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_write_handler    (0x6001, 0x6001, FUNC(megadriv_z80_z80_bank_w));
+	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_read_handler     (0x6100, 0x7eff, FUNC(megadriv_z80_unmapped_read));
+	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x7f00, 0x7fff, FUNC(megadriv_z80_vdp_read), FUNC(megadriv_z80_vdp_write));
+	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8000, 0xffff, FUNC(z80_read_68k_banked_data), FUNC(z80_write_68k_banked_data));
 }
 
 // these are tests for 'special case' hardware to make sure I don't break anything while rearranging things
@@ -10096,24 +10096,24 @@ DRIVER_INIT( _32x )
 
 	if (_32x_adapter_enabled == 0)
 	{
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_rom(0x0000000, 0x03fffff, machine->region("gamecart")->base());
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x000070, 0x000073, FUNC(_32x_68k_hint_vector_r), FUNC(_32x_68k_hint_vector_w)); // h interrupt vector
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_rom(0x0000000, 0x03fffff, machine.region("gamecart")->base());
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x000070, 0x000073, FUNC(_32x_68k_hint_vector_r), FUNC(_32x_68k_hint_vector_w)); // h interrupt vector
 	};
 
 
 	a15100_reg = 0x0000;
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15100, 0xa15101, FUNC(_32x_68k_a15100_r), FUNC(_32x_68k_a15100_w)); // framebuffer control regs
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15102, 0xa15103, FUNC(_32x_68k_a15102_r), FUNC(_32x_68k_a15102_w)); // send irq to sh2
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15104, 0xa15105, FUNC(_32x_68k_a15104_r), FUNC(_32x_68k_a15104_w)); // 68k BANK rom set
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15106, 0xa15107, FUNC(_32x_68k_a15106_r), FUNC(_32x_68k_a15106_w)); // dreq stuff
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15108, 0xa15113, FUNC(_32x_dreq_common_r), FUNC(_32x_dreq_common_w)); // dreq src / dst / length /fifo
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15100, 0xa15101, FUNC(_32x_68k_a15100_r), FUNC(_32x_68k_a15100_w)); // framebuffer control regs
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15102, 0xa15103, FUNC(_32x_68k_a15102_r), FUNC(_32x_68k_a15102_w)); // send irq to sh2
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15104, 0xa15105, FUNC(_32x_68k_a15104_r), FUNC(_32x_68k_a15104_w)); // 68k BANK rom set
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15106, 0xa15107, FUNC(_32x_68k_a15106_r), FUNC(_32x_68k_a15106_w)); // dreq stuff
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15108, 0xa15113, FUNC(_32x_dreq_common_r), FUNC(_32x_dreq_common_w)); // dreq src / dst / length /fifo
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa1511a, 0xa1511b, FUNC(_32x_68k_a1511a_r), FUNC(_32x_68k_a1511a_w)); // SEGA TV
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa1511a, 0xa1511b, FUNC(_32x_68k_a1511a_r), FUNC(_32x_68k_a1511a_w)); // SEGA TV
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15120, 0xa1512f, FUNC(_32x_68k_commsram_r), FUNC(_32x_68k_commsram_w)); // comms reg 0-7
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15130, 0xa1513f, FUNC(_32x_pwm_r), FUNC(_32x_68k_pwm_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15120, 0xa1512f, FUNC(_32x_68k_commsram_r), FUNC(_32x_68k_commsram_w)); // comms reg 0-7
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15130, 0xa1513f, FUNC(_32x_pwm_r), FUNC(_32x_68k_pwm_w));
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0a130ec, 0x0a130ef, FUNC(_32x_68k_MARS_r)); // system ID
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0a130ec, 0x0a130ef, FUNC(_32x_68k_MARS_r)); // system ID
 
 
 	/* Interrupts are masked / disabled at first */
@@ -10138,8 +10138,8 @@ DRIVER_INIT( _32x )
 	_32x_240mode = 0;
 
 // checking if these help brutal, they don't.
-	sh2drc_set_options(machine->device("32x_master_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
-	sh2drc_set_options(machine->device("32x_slave_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
+	sh2drc_set_options(machine.device("32x_master_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
+	sh2drc_set_options(machine.device("32x_slave_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
 
 	DRIVER_INIT_CALL(megadriv);
 }

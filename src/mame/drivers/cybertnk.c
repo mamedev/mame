@@ -190,7 +190,7 @@ public:
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	cybertnk_state *state = machine->driver_data<cybertnk_state>();
+	cybertnk_state *state = machine.driver_data<cybertnk_state>();
 	int code = state->tx_vram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -201,7 +201,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 static VIDEO_START( cybertnk )
 {
-	cybertnk_state *state = machine->driver_data<cybertnk_state>();
+	cybertnk_state *state = machine.driver_data<cybertnk_state>();
 	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,8,8,128,32);
 	tilemap_set_transparent_pen(state->tx_tilemap,0);
 }
@@ -218,9 +218,9 @@ static void draw_pixel( bitmap_t* bitmap, const rectangle *cliprect, int y, int 
 
 static SCREEN_UPDATE( cybertnk )
 {
-	cybertnk_state *state = screen->machine->driver_data<cybertnk_state>();
-	device_t *left_screen  = screen->machine->device("lscreen");
-	device_t *right_screen = screen->machine->device("rscreen");
+	cybertnk_state *state = screen->machine().driver_data<cybertnk_state>();
+	device_t *left_screen  = screen->machine().device("lscreen");
+	device_t *right_screen = screen->machine().device("rscreen");
 	int screen_shift = 0;
 
 	if (screen==left_screen)
@@ -236,11 +236,11 @@ static SCREEN_UPDATE( cybertnk )
 	tilemap_set_scrolldx(state->tx_tilemap, screen_shift, screen_shift);
 
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	{
 		int i;
-		const gfx_element *gfx = screen->machine->gfx[3];
+		const gfx_element *gfx = screen->machine().gfx[3];
 
 
 		for (i=0;i<0x1000/4;i+=4)
@@ -258,7 +258,7 @@ static SCREEN_UPDATE( cybertnk )
 
 	{
 		int count,x,y;
-		const gfx_element *gfx = screen->machine->gfx[2];
+		const gfx_element *gfx = screen->machine().gfx[2];
 
 		count = 0;
 
@@ -279,7 +279,7 @@ static SCREEN_UPDATE( cybertnk )
 
 	{
 		int count,x,y;
-		const gfx_element *gfx = screen->machine->gfx[1];
+		const gfx_element *gfx = screen->machine().gfx[1];
 
 		count = 0;
 
@@ -301,7 +301,7 @@ static SCREEN_UPDATE( cybertnk )
 	/* non-tile based spriteram (BARE-BONES, looks pretty complex) */
 	if(1)
 	{
-		const UINT8 *blit_ram = screen->machine->region("spr_gfx")->base();
+		const UINT8 *blit_ram = screen->machine().region("spr_gfx")->base();
 		int offs,x,y,z,xsize,ysize,yi,xi,col_bank,fx,zoom;
 		UINT32 spr_offs,spr_offs_helper;
 		int xf,yf,xz,yz;
@@ -354,11 +354,11 @@ static SCREEN_UPDATE( cybertnk )
 							dot|= col_bank<<4;
 							if(fx)
 							{
-								draw_pixel(bitmap, cliprect, y+yz, x+xsize-(xz)+screen_shift, screen->machine->pens[dot]);
+								draw_pixel(bitmap, cliprect, y+yz, x+xsize-(xz)+screen_shift, screen->machine().pens[dot]);
 							}
 							else
 							{
-								draw_pixel(bitmap, cliprect, y+yz, x+xz+screen_shift, screen->machine->pens[dot]);
+								draw_pixel(bitmap, cliprect, y+yz, x+xz+screen_shift, screen->machine().pens[dot]);
 							}
 						}
 						xf+=zoom;
@@ -386,11 +386,11 @@ static SCREEN_UPDATE( cybertnk )
 							dot|= col_bank<<4;
 							if(fx)
 							{
-								draw_pixel(bitmap, cliprect, y+yz, x+xsize-(xz)+screen_shift, screen->machine->pens[dot]);
+								draw_pixel(bitmap, cliprect, y+yz, x+xsize-(xz)+screen_shift, screen->machine().pens[dot]);
 							}
 							else
 							{
-								draw_pixel(bitmap, cliprect, y+yz, x+xz+screen_shift, screen->machine->pens[dot]);
+								draw_pixel(bitmap, cliprect, y+yz, x+xz+screen_shift, screen->machine().pens[dot]);
 							}
 						}
 						xf+=zoom;
@@ -433,47 +433,47 @@ static SCREEN_UPDATE( cybertnk )
 		if(0) //sprite gfx debug viewer
 		{
 			int x,y,count;
-			const UINT8 *blit_ram = screen->machine->region("spr_gfx")->base();
+			const UINT8 *blit_ram = screen->machine().region("spr_gfx")->base();
 
-			if(input_code_pressed(screen->machine, KEYCODE_Z))
+			if(input_code_pressed(screen->machine(), KEYCODE_Z))
 			state->test_x++;
 
-			if(input_code_pressed(screen->machine, KEYCODE_X))
+			if(input_code_pressed(screen->machine(), KEYCODE_X))
 			state->test_x--;
 
-			if(input_code_pressed(screen->machine, KEYCODE_A))
+			if(input_code_pressed(screen->machine(), KEYCODE_A))
 			state->test_y++;
 
-			if(input_code_pressed(screen->machine, KEYCODE_S))
+			if(input_code_pressed(screen->machine(), KEYCODE_S))
 			state->test_y--;
 
-			if(input_code_pressed(screen->machine, KEYCODE_Q))
+			if(input_code_pressed(screen->machine(), KEYCODE_Q))
 			state->start_offs+=0x200;
 
-			if(input_code_pressed(screen->machine, KEYCODE_W))
+			if(input_code_pressed(screen->machine(), KEYCODE_W))
 			state->start_offs-=0x200;
 
-			if(input_code_pressed_once(screen->machine, KEYCODE_T))
+			if(input_code_pressed_once(screen->machine(), KEYCODE_T))
 			state->start_offs+=0x20000;
 
-			if(input_code_pressed_once(screen->machine, KEYCODE_Y))
+			if(input_code_pressed_once(screen->machine(), KEYCODE_Y))
 			state->start_offs-=0x20000;
 
-			if(input_code_pressed(screen->machine, KEYCODE_E))
+			if(input_code_pressed(screen->machine(), KEYCODE_E))
 			state->start_offs+=4;
 
-			if(input_code_pressed(screen->machine, KEYCODE_R))
+			if(input_code_pressed(screen->machine(), KEYCODE_R))
 			state->start_offs-=4;
 
-			if(input_code_pressed(screen->machine, KEYCODE_D))
+			if(input_code_pressed(screen->machine(), KEYCODE_D))
 			state->color_pen++;
 
-			if(input_code_pressed(screen->machine, KEYCODE_F))
+			if(input_code_pressed(screen->machine(), KEYCODE_F))
 			state->color_pen--;
 
 			popmessage("%02x %02x %04x %02x",state->test_x,state->test_y,state->start_offs,state->color_pen);
 
-			bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+			bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
 			count = (state->start_offs);
 
@@ -490,28 +490,28 @@ static SCREEN_UPDATE( cybertnk )
 					color|= ((blit_ram[count+3] & 0xff) << 0);
 
 					dot = (color & 0xf0000000) >> 28;
-					*BITMAP_ADDR16(bitmap, y, x+0) = screen->machine->pens[dot+(state->color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+0) = screen->machine().pens[dot+(state->color_pen<<4)];
 
 					dot = (color & 0x0f000000) >> 24;
-					*BITMAP_ADDR16(bitmap, y, x+4) = screen->machine->pens[dot+(state->color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+4) = screen->machine().pens[dot+(state->color_pen<<4)];
 
 					dot = (color & 0x00f00000) >> 20;
-					*BITMAP_ADDR16(bitmap, y, x+1) = screen->machine->pens[dot+(state->color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+1) = screen->machine().pens[dot+(state->color_pen<<4)];
 
 					dot = (color & 0x000f0000) >> 16;
-					*BITMAP_ADDR16(bitmap, y, x+5) = screen->machine->pens[dot+(state->color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+5) = screen->machine().pens[dot+(state->color_pen<<4)];
 
 					dot = (color & 0x0000f000) >> 12;
-					*BITMAP_ADDR16(bitmap, y, x+2) = screen->machine->pens[dot+(state->color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+2) = screen->machine().pens[dot+(state->color_pen<<4)];
 
 					dot = (color & 0x00000f00) >> 8;
-					*BITMAP_ADDR16(bitmap, y, x+6) = screen->machine->pens[dot+(state->color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+6) = screen->machine().pens[dot+(state->color_pen<<4)];
 
 					dot = (color & 0x000000f0) >> 4;
-					*BITMAP_ADDR16(bitmap, y, x+3) = screen->machine->pens[dot+(state->color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+3) = screen->machine().pens[dot+(state->color_pen<<4)];
 
 					dot = (color & 0x0000000f) >> 0;
-					*BITMAP_ADDR16(bitmap, y, x+7) = screen->machine->pens[dot+(state->color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+7) = screen->machine().pens[dot+(state->color_pen<<4)];
 
 					count+=4;
 				}
@@ -526,18 +526,18 @@ static SCREEN_UPDATE( cybertnk )
 
 static WRITE16_HANDLER( tx_vram_w )
 {
-	cybertnk_state *state = space->machine->driver_data<cybertnk_state>();
+	cybertnk_state *state = space->machine().driver_data<cybertnk_state>();
 	COMBINE_DATA(&state->tx_vram[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap,offset);
 }
 
 static READ16_HANDLER( io_r )
 {
-	cybertnk_state *state = space->machine->driver_data<cybertnk_state>();
+	cybertnk_state *state = space->machine().driver_data<cybertnk_state>();
 	switch( offset )
 	{
 		case 2/2:
-			return input_port_read(space->machine, "DSW1");
+			return input_port_read(space->machine(), "DSW1");
 
 		// 0x00110007 is controller device select
 		// 0x001100D5 is controller data
@@ -546,15 +546,15 @@ static READ16_HANDLER( io_r )
 			switch( (state->io_ram[6/2]) & 0xff )
 			{
 				case 0:
-					state->io_ram[0xd4/2] = input_port_read(space->machine, "TRAVERSE");
+					state->io_ram[0xd4/2] = input_port_read(space->machine(), "TRAVERSE");
 					break;
 
 				case 0x20:
-					state->io_ram[0xd4/2] = input_port_read(space->machine, "ELEVATE");
+					state->io_ram[0xd4/2] = input_port_read(space->machine(), "ELEVATE");
 					break;
 
 				case 0x40:
-					state->io_ram[0xd4/2] = input_port_read(space->machine, "ACCEL");
+					state->io_ram[0xd4/2] = input_port_read(space->machine(), "ACCEL");
 					break;
 
 				case 0x42:
@@ -566,7 +566,7 @@ static READ16_HANDLER( io_r )
 					break;
 
 				case 0x60:
-					state->io_ram[0xd4/2] = input_port_read(space->machine, "HANDLE");
+					state->io_ram[0xd4/2] = input_port_read(space->machine(), "HANDLE");
 					break;
 
 				//default:
@@ -575,13 +575,13 @@ static READ16_HANDLER( io_r )
 			return 0;
 
 		case 6/2:
-			return input_port_read(space->machine, "IN0"); // high half
+			return input_port_read(space->machine(), "IN0"); // high half
 
 		case 8/2:
-			return input_port_read(space->machine, "IN0"); // low half
+			return input_port_read(space->machine(), "IN0"); // low half
 
 		case 0xa/2:
-			return input_port_read(space->machine, "DSW2");
+			return input_port_read(space->machine(), "DSW2");
 
 		case 0xd4/2:
 			return state->io_ram[offset]; // controller data
@@ -596,7 +596,7 @@ static READ16_HANDLER( io_r )
 
 static WRITE16_HANDLER( io_w )
 {
-	cybertnk_state *state = space->machine->driver_data<cybertnk_state>();
+	cybertnk_state *state = space->machine().driver_data<cybertnk_state>();
 	COMBINE_DATA(&state->io_ram[offset]);
 
 	switch( offset )
@@ -604,7 +604,7 @@ static WRITE16_HANDLER( io_w )
 		case 0/2:
 			// sound data
 			if (ACCESSING_BITS_0_7)
-				cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+				cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 			else
 				LOG_UNKNOWN_WRITE
 			break;
@@ -669,7 +669,7 @@ static WRITE16_HANDLER( io_w )
 
 static READ8_HANDLER( soundport_r )
 {
-	cybertnk_state *state = space->machine->driver_data<cybertnk_state>();
+	cybertnk_state *state = space->machine().driver_data<cybertnk_state>();
 	return state->io_ram[0] & 0xff;
 }
 
@@ -1003,7 +1003,7 @@ DRIVER_INIT( cybertnk )
     UINT8* road_data;
     int i;
 
-    road_data = machine->region("road_data")->base();
+    road_data = machine.region("road_data")->base();
     for (i=0;i < 0x40000;i++)
     {
         road_data[i] = BITSWAP8(road_data[i],3,2,1,0,7,6,5,4);

@@ -41,14 +41,14 @@ Memo:
 
 static WRITE8_HANDLER( ojankohs_rombank_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x3f);
+	memory_set_bank(space->machine(), "bank1", data & 0x3f);
 }
 
 static WRITE8_HANDLER( ojankoy_rombank_w )
 {
-	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 
-	memory_set_bank(space->machine, "bank1", data & 0x1f);
+	memory_set_bank(space->machine(), "bank1", data & 0x1f);
 
 	state->adpcm_reset = BIT(data, 5);
 	if (!state->adpcm_reset)
@@ -59,7 +59,7 @@ static WRITE8_HANDLER( ojankoy_rombank_w )
 
 static WRITE8_DEVICE_HANDLER( ojankohs_adpcm_reset_w )
 {
-	ojankohs_state *state = device->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = device->machine().driver_data<ojankohs_state>();
 	state->adpcm_reset = BIT(data, 0);
 	state->vclk_left = 0;
 
@@ -68,14 +68,14 @@ static WRITE8_DEVICE_HANDLER( ojankohs_adpcm_reset_w )
 
 static WRITE8_HANDLER( ojankohs_msm5205_w )
 {
-	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	state->adpcm_data = data;
 	state->vclk_left = 2;
 }
 
 static void ojankohs_adpcm_int( device_t *device )
 {
-	ojankohs_state *state = device->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = device->machine().driver_data<ojankohs_state>();
 
 	/* skip if we're reset */
 	if (!state->adpcm_reset)
@@ -96,9 +96,9 @@ static void ojankohs_adpcm_int( device_t *device )
 
 static WRITE8_HANDLER( ojankoc_ctrl_w )
 {
-	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
+	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 
 	state->adpcm_reset = BIT(data, 4);
 	msm5205_reset_w(state->msm, !BIT(data, 4));
@@ -107,29 +107,29 @@ static WRITE8_HANDLER( ojankoc_ctrl_w )
 
 static WRITE8_HANDLER( ojankohs_portselect_w )
 {
-	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	state->portselect = data;
 }
 
 static READ8_HANDLER( ojankohs_keymatrix_r )
 {
-	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	int ret;
 
 	switch (state->portselect)
 	{
-		case 0x01:	ret = input_port_read(space->machine, "KEY0");	break;
-		case 0x02:	ret = input_port_read(space->machine, "KEY1"); break;
-		case 0x04:	ret = input_port_read(space->machine, "KEY2"); break;
-		case 0x08:	ret = input_port_read(space->machine, "KEY3"); break;
-		case 0x10:	ret = input_port_read(space->machine, "KEY4"); break;
+		case 0x01:	ret = input_port_read(space->machine(), "KEY0");	break;
+		case 0x02:	ret = input_port_read(space->machine(), "KEY1"); break;
+		case 0x04:	ret = input_port_read(space->machine(), "KEY2"); break;
+		case 0x08:	ret = input_port_read(space->machine(), "KEY3"); break;
+		case 0x10:	ret = input_port_read(space->machine(), "KEY4"); break;
 		case 0x20:	ret = 0xff; break;
 		case 0x3f:	ret = 0xff;
-					ret &= input_port_read(space->machine, "KEY0");
-					ret &= input_port_read(space->machine, "KEY1");
-					ret &= input_port_read(space->machine, "KEY2");
-					ret &= input_port_read(space->machine, "KEY3");
-					ret &= input_port_read(space->machine, "KEY4");
+					ret &= input_port_read(space->machine(), "KEY0");
+					ret &= input_port_read(space->machine(), "KEY1");
+					ret &= input_port_read(space->machine(), "KEY2");
+					ret &= input_port_read(space->machine(), "KEY3");
+					ret &= input_port_read(space->machine(), "KEY4");
 					break;
 		default:	ret = 0xff;
 					logerror("PC:%04X unknown %02X\n", cpu_get_pc(space->cpu), state->portselect);
@@ -141,7 +141,7 @@ static READ8_HANDLER( ojankohs_keymatrix_r )
 
 static READ8_HANDLER( ojankoc_keymatrix_r )
 {
-	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	int i;
 	int ret = 0;
 	static const char *const keynames[2][5] =
@@ -153,48 +153,48 @@ static READ8_HANDLER( ojankoc_keymatrix_r )
 	for (i = 0; i < 5; i++)
 	{
 		if (!BIT(state->portselect, i))
-			ret |= input_port_read(space->machine, keynames[offset][i]);
+			ret |= input_port_read(space->machine(), keynames[offset][i]);
 	}
 
-	return (ret & 0x3f) | (input_port_read(space->machine, offset ? "IN1" : "IN0") & 0xc0);
+	return (ret & 0x3f) | (input_port_read(space->machine(), offset ? "IN1" : "IN0") & 0xc0);
 }
 
 static READ8_DEVICE_HANDLER( ojankohs_ay8910_0_r )
 {
 	// DIPSW 1
-	return (((input_port_read(device->machine, "DSW1") & 0x01) << 7) | ((input_port_read(device->machine, "DSW1") & 0x02) << 5) |
-	        ((input_port_read(device->machine, "DSW1") & 0x04) << 3) | ((input_port_read(device->machine, "DSW1") & 0x08) << 1) |
-	        ((input_port_read(device->machine, "DSW1") & 0x10) >> 1) | ((input_port_read(device->machine, "DSW1") & 0x20) >> 3) |
-	        ((input_port_read(device->machine, "DSW1") & 0x40) >> 5) | ((input_port_read(device->machine, "DSW1") & 0x80) >> 7));
+	return (((input_port_read(device->machine(), "DSW1") & 0x01) << 7) | ((input_port_read(device->machine(), "DSW1") & 0x02) << 5) |
+	        ((input_port_read(device->machine(), "DSW1") & 0x04) << 3) | ((input_port_read(device->machine(), "DSW1") & 0x08) << 1) |
+	        ((input_port_read(device->machine(), "DSW1") & 0x10) >> 1) | ((input_port_read(device->machine(), "DSW1") & 0x20) >> 3) |
+	        ((input_port_read(device->machine(), "DSW1") & 0x40) >> 5) | ((input_port_read(device->machine(), "DSW1") & 0x80) >> 7));
 }
 
 static READ8_DEVICE_HANDLER( ojankohs_ay8910_1_r )
 {
 	// DIPSW 1
-	return (((input_port_read(device->machine, "DSW2") & 0x01) << 7) | ((input_port_read(device->machine, "DSW2") & 0x02) << 5) |
-	        ((input_port_read(device->machine, "DSW2") & 0x04) << 3) | ((input_port_read(device->machine, "DSW2") & 0x08) << 1) |
-	        ((input_port_read(device->machine, "DSW2") & 0x10) >> 1) | ((input_port_read(device->machine, "DSW2") & 0x20) >> 3) |
-	        ((input_port_read(device->machine, "DSW2") & 0x40) >> 5) | ((input_port_read(device->machine, "DSW2") & 0x80) >> 7));
+	return (((input_port_read(device->machine(), "DSW2") & 0x01) << 7) | ((input_port_read(device->machine(), "DSW2") & 0x02) << 5) |
+	        ((input_port_read(device->machine(), "DSW2") & 0x04) << 3) | ((input_port_read(device->machine(), "DSW2") & 0x08) << 1) |
+	        ((input_port_read(device->machine(), "DSW2") & 0x10) >> 1) | ((input_port_read(device->machine(), "DSW2") & 0x20) >> 3) |
+	        ((input_port_read(device->machine(), "DSW2") & 0x40) >> 5) | ((input_port_read(device->machine(), "DSW2") & 0x80) >> 7));
 }
 
 static READ8_HANDLER( ccasino_dipsw3_r )
 {
-	return (input_port_read(space->machine, "DSW3") ^ 0xff);		// DIPSW 3
+	return (input_port_read(space->machine(), "DSW3") ^ 0xff);		// DIPSW 3
 }
 
 static READ8_HANDLER( ccasino_dipsw4_r )
 {
-	return (input_port_read(space->machine, "DSW4") ^ 0xff);		// DIPSW 4
+	return (input_port_read(space->machine(), "DSW4") ^ 0xff);		// DIPSW 4
 }
 
 static WRITE8_HANDLER( ojankoy_coinctr_w )
 {
-	coin_counter_w(space->machine, 0, BIT(data, 0));
+	coin_counter_w(space->machine(), 0, BIT(data, 0));
 }
 
 static WRITE8_HANDLER( ccasino_coinctr_w )
 {
-	coin_counter_w(space->machine, 0, BIT(data, 1));
+	coin_counter_w(space->machine(), 0, BIT(data, 1));
 }
 
 
@@ -795,10 +795,10 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( common )
 {
-	ojankohs_state *state = machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->msm = machine->device("msm");
+	state->maincpu = machine.device("maincpu");
+	state->msm = machine.device("msm");
 
 	state->save_item(NAME(state->gfxreg));
 	state->save_item(NAME(state->flipscreen));
@@ -814,7 +814,7 @@ static MACHINE_START( common )
 
 static MACHINE_START( ojankohs )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 0x40, &ROM[0x10000], 0x4000);
 
@@ -823,7 +823,7 @@ static MACHINE_START( ojankohs )
 
 static MACHINE_START( ojankoy )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 0x20, &ROM[0x10000], 0x4000);
 
@@ -832,7 +832,7 @@ static MACHINE_START( ojankoy )
 
 static MACHINE_START( ojankoc )
 {
-	UINT8 *ROM = machine->region("user1")->base();
+	UINT8 *ROM = machine.region("user1")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 0x10, &ROM[0x0000], 0x8000);
 
@@ -841,7 +841,7 @@ static MACHINE_START( ojankoc )
 
 static MACHINE_RESET( ojankohs )
 {
-	ojankohs_state *state = machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
 	state->portselect = 0;
 

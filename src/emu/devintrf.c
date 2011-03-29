@@ -189,7 +189,7 @@ void device_list::static_exit(running_machine &machine)
 {
 	// first let the debugger save comments
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debug_comment_save(&machine);
+		debug_comment_save(machine);
 
 	// then nuke the devices
 	machine.m_devicelist.reset();
@@ -201,7 +201,7 @@ void device_list::static_exit(running_machine &machine)
 //  about to save
 //-------------------------------------------------
 
-void device_list::static_pre_save(running_machine *machine, void *param)
+void device_list::static_pre_save(running_machine &machine, void *param)
 {
 	device_list *list = reinterpret_cast<device_list *>(param);
 	for (device_t *device = list->first(); device != NULL; device = device->next())
@@ -214,7 +214,7 @@ void device_list::static_pre_save(running_machine *machine, void *param)
 //  completed a load
 //-------------------------------------------------
 
-void device_list::static_post_load(running_machine *machine, void *param)
+void device_list::static_post_load(running_machine &machine, void *param)
 {
 	device_list *list = reinterpret_cast<device_list *>(param);
 	for (device_t *device = list->first(); device != NULL; device = device->next())
@@ -545,8 +545,7 @@ void device_interface::interface_debug_setup()
 //-------------------------------------------------
 
 device_t::device_t(running_machine &_machine, const device_config &config)
-	: machine(&_machine),
-	  m_machine(_machine),
+	: m_machine(_machine),
 	  m_state_manager(_machine.state()),
 	  m_debug(NULL),
 	  m_execute(NULL),
@@ -573,7 +572,7 @@ device_t::device_t(running_machine &_machine, const device_config &config)
 
 device_t::~device_t()
 {
-	auto_free(&m_machine, m_debug);
+	auto_free(m_machine, m_debug);
 }
 
 
@@ -737,13 +736,13 @@ void device_t::start()
 		intf->interface_pre_start();
 
 	// remember the number of state registrations
-	int state_registrations = machine->state().registration_count();
+	int state_registrations = m_machine.state().registration_count();
 
 	// start the device
 	device_start();
 
 	// complain if nothing was registered by the device
-	state_registrations = machine->state().registration_count() - state_registrations;
+	state_registrations = m_machine.state().registration_count() - state_registrations;
 	device_execute_interface *exec;
 	device_sound_interface *sound;
 	if (state_registrations == 0 && (interface(exec) || interface(sound)))
@@ -763,7 +762,7 @@ void device_t::start()
 	// if we're debugging, create a device_debug object
 	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		m_debug = auto_alloc(&m_machine, device_debug(*this));
+		m_debug = auto_alloc(m_machine, device_debug(*this));
 		debug_setup();
 	}
 
@@ -983,7 +982,7 @@ device_t *device_t::auto_finder_base::find_device(device_t &base, const char *ta
 
 void *device_t::auto_finder_base::find_shared_ptr(device_t &base, const char *tag)
 {
-	return memory_get_shared(*base.machine, tag);
+	return memory_get_shared(base.machine(), tag);
 }
 
 
@@ -994,6 +993,6 @@ void *device_t::auto_finder_base::find_shared_ptr(device_t &base, const char *ta
 size_t device_t::auto_finder_base::find_shared_size(device_t &base, const char *tag)
 {
 	size_t result = 0;
-	memory_get_shared(*base.machine, tag, result);
+	memory_get_shared(base.machine(), tag, result);
 	return result;
 }

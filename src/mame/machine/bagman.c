@@ -201,7 +201,7 @@ UINT8 row, column, val;
 
 WRITE8_HANDLER( bagman_pal16r6_w )
 {
-	bagman_state *state = space->machine->driver_data<bagman_state>();
+	bagman_state *state = space->machine().driver_data<bagman_state>();
 UINT8 line;
 
 	line = offset * 4;
@@ -211,8 +211,8 @@ UINT8 line;
 
 MACHINE_RESET( bagman )
 {
-	bagman_state *state = machine->driver_data<bagman_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	bagman_state *state = machine.driver_data<bagman_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	bagman_pal16r6_w(space, 0, 1);	/*pin 2*/
 	bagman_pal16r6_w(space, 1, 1);	/*pin 3*/
 	bagman_pal16r6_w(space, 2, 1);	/*pin 4*/
@@ -226,7 +226,7 @@ MACHINE_RESET( bagman )
 
 READ8_HANDLER( bagman_pal16r6_r )
 {
-	bagman_state *state = space->machine->driver_data<bagman_state>();
+	bagman_state *state = space->machine().driver_data<bagman_state>();
 	update_pal(state);
 	return	(state->outvalue[6]) + (state->outvalue[5] << 1) + (state->outvalue[4] << 2) +
 		(state->outvalue[3] << 3) + (state->outvalue[2] << 4) + (state->outvalue[1] << 5);

@@ -18,7 +18,7 @@
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	toobin_state *state = machine->driver_data<toobin_state>();
+	toobin_state *state = machine.driver_data<toobin_state>();
 	UINT16 data = state->alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 0x0f;
@@ -28,7 +28,7 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	toobin_state *state = machine->driver_data<toobin_state>();
+	toobin_state *state = machine.driver_data<toobin_state>();
 	UINT16 data1 = state->playfield[tile_index * 2];
 	UINT16 data2 = state->playfield[tile_index * 2 + 1];
 	int code = data2 & 0x3fff;
@@ -83,7 +83,7 @@ VIDEO_START( toobin )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	toobin_state *state = machine->driver_data<toobin_state>();
+	toobin_state *state = machine.driver_data<toobin_state>();
 
 	/* initialize the playfield */
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 128,64);
@@ -96,7 +96,7 @@ VIDEO_START( toobin )
 	tilemap_set_transparent_pen(state->alpha_tilemap, 0);
 
 	/* allocate a playfield bitmap for rendering */
-	state->pfbitmap = auto_bitmap_alloc(machine, machine->primary_screen->width(), machine->primary_screen->height(), BITMAP_FORMAT_INDEXED16);
+	state->pfbitmap = auto_bitmap_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height(), BITMAP_FORMAT_INDEXED16);
 
 	state->save_item(NAME(state->brightness));
 }
@@ -111,11 +111,11 @@ VIDEO_START( toobin )
 
 WRITE16_HANDLER( toobin_paletteram_w )
 {
-	toobin_state *state = space->machine->driver_data<toobin_state>();
+	toobin_state *state = space->machine().driver_data<toobin_state>();
 	int newword;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	newword = space->machine->generic.paletteram.u16[offset];
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	newword = space->machine().generic.paletteram.u16[offset];
 
 	{
 		int red =   (((newword >> 10) & 31) * 224) >> 5;
@@ -126,18 +126,18 @@ WRITE16_HANDLER( toobin_paletteram_w )
 		if (green) green += 38;
 		if (blue) blue += 38;
 
-		palette_set_color(space->machine, offset & 0x3ff, MAKE_RGB(red, green, blue));
+		palette_set_color(space->machine(), offset & 0x3ff, MAKE_RGB(red, green, blue));
 		if (!(newword & 0x8000))
-			palette_set_pen_contrast(space->machine, offset & 0x3ff, state->brightness);
+			palette_set_pen_contrast(space->machine(), offset & 0x3ff, state->brightness);
 		else
-			palette_set_pen_contrast(space->machine, offset & 0x3ff, 1.0);
+			palette_set_pen_contrast(space->machine(), offset & 0x3ff, 1.0);
 	}
 }
 
 
 WRITE16_HANDLER( toobin_intensity_w )
 {
-	toobin_state *state = space->machine->driver_data<toobin_state>();
+	toobin_state *state = space->machine().driver_data<toobin_state>();
 	int i;
 
 	if (ACCESSING_BITS_0_7)
@@ -145,8 +145,8 @@ WRITE16_HANDLER( toobin_intensity_w )
 		state->brightness = (double)(~data & 0x1f) / 31.0;
 
 		for (i = 0; i < 0x400; i++)
-			if (!(space->machine->generic.paletteram.u16[i] & 0x8000))
-				palette_set_pen_contrast(space->machine, i, state->brightness);
+			if (!(space->machine().generic.paletteram.u16[i] & 0x8000))
+				palette_set_pen_contrast(space->machine(), i, state->brightness);
 	}
 }
 
@@ -160,14 +160,14 @@ WRITE16_HANDLER( toobin_intensity_w )
 
 WRITE16_HANDLER( toobin_xscroll_w )
 {
-	toobin_state *state = space->machine->driver_data<toobin_state>();
+	toobin_state *state = space->machine().driver_data<toobin_state>();
 	UINT16 oldscroll = *state->xscroll;
 	UINT16 newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
 	tilemap_set_scrollx(state->playfield_tilemap, 0, newscroll >> 6);
@@ -180,14 +180,14 @@ WRITE16_HANDLER( toobin_xscroll_w )
 
 WRITE16_HANDLER( toobin_yscroll_w )
 {
-	toobin_state *state = space->machine->driver_data<toobin_state>();
+	toobin_state *state = space->machine().driver_data<toobin_state>();
 	UINT16 oldscroll = *state->yscroll;
 	UINT16 newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
 	tilemap_set_scrolly(state->playfield_tilemap, 0, newscroll >> 6);
@@ -213,7 +213,7 @@ WRITE16_HANDLER( toobin_slip_w )
 
 	/* if the SLIP is changing, force a partial update first */
 	if (oldslip != newslip)
-		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 
 	/* update the data */
 	atarimo_0_slipram_w(space, offset, data, mem_mask);
@@ -229,9 +229,9 @@ WRITE16_HANDLER( toobin_slip_w )
 
 SCREEN_UPDATE( toobin )
 {
-	toobin_state *state = screen->machine->driver_data<toobin_state>();
-	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
-	const rgb_t *palette = palette_entry_list_adjusted(screen->machine->palette);
+	toobin_state *state = screen->machine().driver_data<toobin_state>();
+	bitmap_t *priority_bitmap = screen->machine().priority_bitmap;
+	const rgb_t *palette = palette_entry_list_adjusted(screen->machine().palette);
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y;

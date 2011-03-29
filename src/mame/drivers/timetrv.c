@@ -46,20 +46,20 @@ static VIDEO_START( timetrv )
 
 static SCREEN_UPDATE( timetrv )
 {
-	timetrv_state *state = screen->machine->driver_data<timetrv_state>();
+	timetrv_state *state = screen->machine().driver_data<timetrv_state>();
 	popmessage("%s%s",state->led_vram_lo,state->led_vram_hi);
 	return 0;
 }
 
 static READ8_HANDLER( test1_r )
 {
-	return input_port_read(space->machine, "IN0");//space->machine->rand();
+	return input_port_read(space->machine(), "IN0");//space->machine().rand();
 }
 
 static READ8_HANDLER( test2_r )
 {
 	/*bit 7,eeprom read bit*/
-	return (input_port_read(space->machine, "IN1") & 0x7f);//space->machine->rand();
+	return (input_port_read(space->machine(), "IN1") & 0x7f);//space->machine().rand();
 }
 
 
@@ -70,7 +70,7 @@ static READ8_HANDLER( in_r )
 
 static READ8_HANDLER( ld_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static ADDRESS_MAP_START( timetrv_map, AS_PROGRAM, 8 )

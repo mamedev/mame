@@ -141,7 +141,7 @@ device_config *mc146818_device_config::static_alloc_device_config(const machine_
 
 device_t *mc146818_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, mc146818_device(machine, *this));
+	return auto_alloc(machine, mc146818_device(machine, *this));
 }
 
 
@@ -436,7 +436,7 @@ READ8_MEMBER( mc146818_device::read )
 		switch (m_index % MC146818_DATA_SIZE) {
 		case 0xa:
 			data = m_data[m_index  % MC146818_DATA_SIZE];
-			if ((space.machine->time() - m_last_refresh) < attotime::from_hz(32768))
+			if ((space.machine().time() - m_last_refresh) < attotime::from_hz(32768))
 				data |= 0x80;
 #if 0
 			/* for pc1512 bios realtime clock test */

@@ -14,7 +14,7 @@
  *
  *************************************/
 
-static void get_tile_info_common( running_machine *machine, tile_data *tileinfo, tilemap_memory_index tile_index, UINT8 *alpha_videoram )
+static void get_tile_info_common( running_machine &machine, tile_data *tileinfo, tilemap_memory_index tile_index, UINT8 *alpha_videoram )
 {
 	int code = alpha_videoram[tile_index] & 0x3f;
 	int flip = alpha_videoram[tile_index] & 0x40;
@@ -29,21 +29,21 @@ static void get_tile_info_common( running_machine *machine, tile_data *tileinfo,
 
 static TILE_GET_INFO( alpha1_get_tile_info )
 {
-	atarifb_state *state = machine->driver_data<atarifb_state>();
+	atarifb_state *state = machine.driver_data<atarifb_state>();
 	get_tile_info_common(machine, tileinfo, tile_index, state->alphap1_videoram);
 }
 
 
 static TILE_GET_INFO( alpha2_get_tile_info )
 {
-	atarifb_state *state = machine->driver_data<atarifb_state>();
+	atarifb_state *state = machine.driver_data<atarifb_state>();
 	get_tile_info_common(machine, tileinfo, tile_index, state->alphap2_videoram);
 }
 
 
 static TILE_GET_INFO( field_get_tile_info )
 {
-	atarifb_state *state = machine->driver_data<atarifb_state>();
+	atarifb_state *state = machine.driver_data<atarifb_state>();
 	int code = state->field_videoram[tile_index] & 0x3f;
 	int flipyx = state->field_videoram[tile_index] >> 6;
 
@@ -61,7 +61,7 @@ static TILE_GET_INFO( field_get_tile_info )
 
 WRITE8_HANDLER( atarifb_alpha1_videoram_w )
 {
-	atarifb_state *state = space->machine->driver_data<atarifb_state>();
+	atarifb_state *state = space->machine().driver_data<atarifb_state>();
 
 	state->alphap1_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->alpha1_tilemap, offset);
@@ -70,7 +70,7 @@ WRITE8_HANDLER( atarifb_alpha1_videoram_w )
 
 WRITE8_HANDLER( atarifb_alpha2_videoram_w )
 {
-	atarifb_state *state = space->machine->driver_data<atarifb_state>();
+	atarifb_state *state = space->machine().driver_data<atarifb_state>();
 
 	state->alphap2_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->alpha2_tilemap, offset);
@@ -79,7 +79,7 @@ WRITE8_HANDLER( atarifb_alpha2_videoram_w )
 
 WRITE8_HANDLER( atarifb_field_videoram_w )
 {
-	atarifb_state *state = space->machine->driver_data<atarifb_state>();
+	atarifb_state *state = space->machine().driver_data<atarifb_state>();
 
 	state->field_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->field_tilemap, offset);
@@ -95,7 +95,7 @@ WRITE8_HANDLER( atarifb_field_videoram_w )
 
 VIDEO_START( atarifb )
 {
-	atarifb_state *state = machine->driver_data<atarifb_state>();
+	atarifb_state *state = machine.driver_data<atarifb_state>();
 
 	state->alpha1_tilemap = tilemap_create(machine, alpha1_get_tile_info, tilemap_scan_cols, 8, 8, 3, 32);
 	state->alpha2_tilemap = tilemap_create(machine, alpha2_get_tile_info, tilemap_scan_cols, 8, 8, 3, 32);
@@ -104,9 +104,9 @@ VIDEO_START( atarifb )
 
 
 
-static void draw_playfield_and_alpha( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int playfield_x_offset, int playfield_y_offset )
+static void draw_playfield_and_alpha( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int playfield_x_offset, int playfield_y_offset )
 {
-	atarifb_state *state = machine->driver_data<atarifb_state>();
+	atarifb_state *state = machine.driver_data<atarifb_state>();
 	static const rectangle bigfield_area = { 4 * 8, 34 * 8 - 1, 0 * 8, 32 * 8 - 1 };
 
 	int scroll_x[1];
@@ -121,9 +121,9 @@ static void draw_playfield_and_alpha( running_machine *machine, bitmap_t *bitmap
 }
 
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int gfx, int is_soccer )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int gfx, int is_soccer )
 {
-	atarifb_state *state = machine->driver_data<atarifb_state>();
+	atarifb_state *state = machine.driver_data<atarifb_state>();
 	static const rectangle bigfield_area = { 4 * 8, 34 * 8 - 1, 0 * 8, 32 * 8 - 1 };
 
 	int obj;
@@ -152,14 +152,14 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		{
 			shade = ((state->spriteram[obj * 2 + 1 + 0x20]) & 0x07);
 
-			drawgfx_transpen(bitmap, &bigfield_area, machine->gfx[gfx + 1],
+			drawgfx_transpen(bitmap, &bigfield_area, machine.gfx[gfx + 1],
 				charcode, shade,
 				flipx, flipy, sx, sy, 0);
 
 			shade = ((state->spriteram[obj * 2 + 1 + 0x20]) & 0x08) >> 3;
 		}
 
-		drawgfx_transpen(bitmap, &bigfield_area, machine->gfx[gfx],
+		drawgfx_transpen(bitmap, &bigfield_area, machine.gfx[gfx],
 				charcode, shade,
 				flipx, flipy, sx, sy, 0);
 
@@ -171,7 +171,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			if ((charcode == 0x11) && (sy == 0x07))
 			{
 				sy = 0xf1; /* When multiplexed, it's 0x10...why? */
-				drawgfx_transpen(bitmap, &bigfield_area, machine->gfx[gfx],
+				drawgfx_transpen(bitmap, &bigfield_area, machine.gfx[gfx],
 					charcode, 0,
 					flipx, flipy, sx, sy, 0);
 			}
@@ -182,9 +182,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( atarifb )
 {
-	draw_playfield_and_alpha(screen->machine, bitmap, cliprect, 0, 0);
+	draw_playfield_and_alpha(screen->machine(), bitmap, cliprect, 0, 0);
 
-	draw_sprites(screen->machine, bitmap, cliprect, 1, 0);
+	draw_sprites(screen->machine(), bitmap, cliprect, 1, 0);
 
 	return 0;
 }
@@ -192,9 +192,9 @@ SCREEN_UPDATE( atarifb )
 
 SCREEN_UPDATE( abaseb )
 {
-	draw_playfield_and_alpha(screen->machine, bitmap, cliprect, -8, 0);
+	draw_playfield_and_alpha(screen->machine(), bitmap, cliprect, -8, 0);
 
-	draw_sprites(screen->machine, bitmap, cliprect, 1, 0);
+	draw_sprites(screen->machine(), bitmap, cliprect, 1, 0);
 
 	return 0;
 }
@@ -202,9 +202,9 @@ SCREEN_UPDATE( abaseb )
 
 SCREEN_UPDATE( soccer )
 {
-	draw_playfield_and_alpha(screen->machine, bitmap, cliprect, 0, 8);
+	draw_playfield_and_alpha(screen->machine(), bitmap, cliprect, 0, 8);
 
-	draw_sprites(screen->machine, bitmap, cliprect, 2, 1);
+	draw_sprites(screen->machine(), bitmap, cliprect, 2, 1);
 
 	return 0;
 }

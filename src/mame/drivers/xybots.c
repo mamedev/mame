@@ -31,9 +31,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	xybots_state *state = machine->driver_data<xybots_state>();
+	xybots_state *state = machine.driver_data<xybots_state>();
 	cputag_set_input_line(machine, "maincpu", 1, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 2, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -47,7 +47,7 @@ static MACHINE_START( xybots )
 
 static MACHINE_RESET( xybots )
 {
-	xybots_state *state = machine->driver_data<xybots_state>();
+	xybots_state *state = machine.driver_data<xybots_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_slapstic_reset(state);
@@ -65,8 +65,8 @@ static MACHINE_RESET( xybots )
 
 static READ16_HANDLER( special_port1_r )
 {
-	xybots_state *state = space->machine->driver_data<xybots_state>();
-	int result = input_port_read(space->machine, "FFE200");
+	xybots_state *state = space->machine().driver_data<xybots_state>();
+	int result = input_port_read(space->machine(), "FFE200");
 
 	if (state->cpu_to_sound_ready) result ^= 0x0200;
 	result ^= state->h256 ^= 0x0400;
@@ -392,9 +392,9 @@ ROM_END
 
 static DRIVER_INIT( xybots )
 {
-	xybots_state *state = machine->driver_data<xybots_state>();
+	xybots_state *state = machine.driver_data<xybots_state>();
 	state->h256 = 0x0400;
-	atarigen_slapstic_init(machine->device("maincpu"), 0x008000, 0, 107);
+	atarigen_slapstic_init(machine.device("maincpu"), 0x008000, 0, 107);
 	atarijsa_init(machine, "FFE200", 0x0100);
 }
 

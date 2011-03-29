@@ -270,9 +270,9 @@ static READ8_HANDLER( spacduel_IN3_r )
 	int res2;
 	int res3;
 
-	res1 = input_port_read(space->machine, "IN3");
-	res2 = input_port_read(space->machine, "IN4");
-	res3 = input_port_read_safe(space->machine, "DSW2", 0);
+	res1 = input_port_read(space->machine(), "IN3");
+	res2 = input_port_read(space->machine(), "IN4");
+	res3 = input_port_read_safe(space->machine(), "DSW2", 0);
 	res = 0x00;
 
 	switch (offset & 0x07)
@@ -316,7 +316,7 @@ static READ8_HANDLER( spacduel_IN3_r )
 
 static CUSTOM_INPUT( clock_r )
 {
-	return (field->port->machine->device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
+	return (field->port->machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
 }
 
 
@@ -328,7 +328,7 @@ static CUSTOM_INPUT( clock_r )
 
 static WRITE8_HANDLER( bwidow_misc_w )
 {
-	bwidow_state *state = space->machine->driver_data<bwidow_state>();
+	bwidow_state *state = space->machine().driver_data<bwidow_state>();
 	/*
         0x10 = p1 led
         0x20 = p2 led
@@ -337,10 +337,10 @@ static WRITE8_HANDLER( bwidow_misc_w )
     */
 
 	if (data == state->lastdata) return;
-	set_led_status(space->machine, 0,~data & 0x10);
-	set_led_status(space->machine, 1,~data & 0x20);
-	coin_counter_w(space->machine, 0, data & 0x01);
-	coin_counter_w(space->machine, 1, data & 0x02);
+	set_led_status(space->machine(), 0,~data & 0x10);
+	set_led_status(space->machine(), 1,~data & 0x20);
+	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(space->machine(), 1, data & 0x02);
 	state->lastdata = data;
 }
 
@@ -352,7 +352,7 @@ static WRITE8_HANDLER( bwidow_misc_w )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 

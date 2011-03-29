@@ -21,7 +21,7 @@ public:
 	size_t         spriteram_size;
 
 	/* video-related */
-	pen_t          (*map_color)(running_machine *machine, UINT8 x, UINT8 y);
+	pen_t          (*map_color)(running_machine &machine, UINT8 x, UINT8 y);
 	int            color_registers[3];
 	int            background_enable;
 	int            magspot_pen_mask;

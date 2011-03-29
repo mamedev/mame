@@ -149,9 +149,9 @@ int sidEmuReset(_SID6581 *This)
 }
 
 
-static void filterTableInit(running_machine *machine)
+static void filterTableInit(running_machine &machine)
 {
-	int sample_rate = machine->sample_rate();
+	int sample_rate = machine.sample_rate();
 	UINT16 uk;
 	/* Parameter calculation has not been moved to a separate function */
 	/* by purpose. */
@@ -233,8 +233,8 @@ void sid6581_init (_SID6581 *This)
 
 	This->filter.Enabled = TRUE;
 
-	sidInitMixerEngine(This->device->machine);
-	filterTableInit(This->device->machine);
+	sidInitMixerEngine(This->device->machine());
+	filterTableInit(This->device->machine());
 
 	sidInitWaveformTables(This->type);
 
@@ -323,7 +323,7 @@ void sid6581_port_w (_SID6581 *This, int offset, int data)
 	}
 }
 
-int sid6581_port_r (running_machine *machine, _SID6581 *This, int offset)
+int sid6581_port_r (running_machine &machine, _SID6581 *This, int offset)
 {
     int data;
 /* SIDPLAY reads last written at a sid address value */

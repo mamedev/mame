@@ -73,9 +73,9 @@ static VIDEO_START(diverboy)
 {
 }
 
-static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine& machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	diverboy_state *state = machine->driver_data<diverboy_state>();
+	diverboy_state *state = machine.driver_data<diverboy_state>();
 	UINT16 *source = state->spriteram;
 	UINT16 *finish = source + (state->spriteram_size / 2);
 
@@ -95,9 +95,9 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 
 		bank = (source[1] & 0x0002) >> 1;
 
-		if (!flash || (machine->primary_screen->frame_number() & 1))
+		if (!flash || (machine.primary_screen->frame_number() & 1))
 		{
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[bank],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[bank],
 					number,
 					colr,
 					0,0,
@@ -111,15 +111,15 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 
 static SCREEN_UPDATE(diverboy)
 {
-//  bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
-	draw_sprites(screen->machine, bitmap, cliprect);
+//  bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
 
 static WRITE16_HANDLER( soundcmd_w )
 {
-	diverboy_state *state = space->machine->driver_data<diverboy_state>();
+	diverboy_state *state = space->machine().driver_data<diverboy_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -244,9 +244,9 @@ GFXDECODE_END
 
 static MACHINE_START( diverboy )
 {
-	diverboy_state *state = machine->driver_data<diverboy_state>();
+	diverboy_state *state = machine.driver_data<diverboy_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 }
 
 static MACHINE_CONFIG_START( diverboy, diverboy_state )

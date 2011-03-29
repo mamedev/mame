@@ -249,55 +249,55 @@ public:
 
 static WRITE32_HANDLER( paletteram32_w )
 {
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
-	data = space->machine->generic.paletteram.u32[offset];
-	palette_set_color_rgb(space->machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	data = space->machine().generic.paletteram.u32[offset];
+	palette_set_color_rgb(space->machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static void voodoo_vblank_0(device_t *device, int param)
 {
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, param ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static void voodoo_vblank_1(device_t *device, int param)
 {
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ1, param ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ1, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ32_HANDLER( gticlub_k001604_tile_r )
 {
-	device_t *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = space->machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	return k001604_tile_r(k001604, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( gticlub_k001604_tile_w )
 {
-	device_t *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = space->machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	k001604_tile_w(k001604, offset, data, mem_mask);
 }
 
 
 static READ32_HANDLER( gticlub_k001604_char_r )
 {
-	device_t *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = space->machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	return k001604_char_r(k001604, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( gticlub_k001604_char_w )
 {
-	device_t *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = space->machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	k001604_char_w(k001604, offset, data, mem_mask);
 }
 
 static READ32_HANDLER( gticlub_k001604_reg_r )
 {
-	device_t *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = space->machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	return k001604_reg_r(k001604, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( gticlub_k001604_reg_w )
 {
-	device_t *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = space->machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	k001604_reg_w(k001604, offset, data, mem_mask);
 }
 
@@ -321,15 +321,15 @@ static const eeprom_interface eeprom_intf =
 static READ8_HANDLER( sysreg_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
-	device_t *adc1038 = space->machine->device("adc1038");
-	device_t *eeprom = space->machine->device("eeprom");
+	device_t *adc1038 = space->machine().device("adc1038");
+	device_t *eeprom = space->machine().device("eeprom");
 
 	switch (offset)
 	{
 		case 0:
 		case 1:
 		case 3:
-			return input_port_read(space->machine, portnames[offset]);
+			return input_port_read(space->machine(), portnames[offset]);
 
 		case 2:
 			return adc1038_sars_read(adc1038) << 7;
@@ -356,8 +356,8 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
-	device_t *adc1038 = space->machine->device("adc1038");
-	device_t *eeprom = space->machine->device("eeprom");
+	device_t *adc1038 = space->machine().device("adc1038");
+	device_t *eeprom = space->machine().device("eeprom");
 
 	switch (offset)
 	{
@@ -374,10 +374,10 @@ static WRITE8_HANDLER( sysreg_w )
 
 		case 4:
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
-				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
-				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			adc1038_di_write(adc1038, (data >> 0) & 1);
 			adc1038_clk_write(adc1038, (data >> 1) & 1);
@@ -391,13 +391,13 @@ static WRITE8_HANDLER( sysreg_w )
 
 static MACHINE_START( gticlub )
 {
-	gticlub_state *state = machine->driver_data<gticlub_state>();
+	gticlub_state *state = machine.driver_data<gticlub_state>();
 
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine->device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x000fffff, FALSE, state->work_ram);
+	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x000fffff, FALSE, state->work_ram);
 }
 
 static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32 )
@@ -436,25 +436,25 @@ ADDRESS_MAP_END
 
 static READ32_HANDLER( dsp_dataram0_r )
 {
-	gticlub_state *state = space->machine->driver_data<gticlub_state>();
+	gticlub_state *state = space->machine().driver_data<gticlub_state>();
 	return state->sharc_dataram_0[offset] & 0xffff;
 }
 
 static WRITE32_HANDLER( dsp_dataram0_w )
 {
-	gticlub_state *state = space->machine->driver_data<gticlub_state>();
+	gticlub_state *state = space->machine().driver_data<gticlub_state>();
 	state->sharc_dataram_0[offset] = data;
 }
 
 static READ32_HANDLER( dsp_dataram1_r )
 {
-	gticlub_state *state = space->machine->driver_data<gticlub_state>();
+	gticlub_state *state = space->machine().driver_data<gticlub_state>();
 	return state->sharc_dataram_1[offset] & 0xffff;
 }
 
 static WRITE32_HANDLER( dsp_dataram1_w )
 {
-	gticlub_state *state = space->machine->driver_data<gticlub_state>();
+	gticlub_state *state = space->machine().driver_data<gticlub_state>();
 	state->sharc_dataram_1[offset] = data;
 }
 
@@ -698,12 +698,12 @@ static TIMER_CALLBACK( irq_off )
 	cputag_set_input_line(machine, "audiocpu", param, CLEAR_LINE);
 }
 
-static void sound_irq_callback( running_machine *machine, int irq )
+static void sound_irq_callback( running_machine &machine, int irq )
 {
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
 	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
-	machine->scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off), line);
+	machine.scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off), line);
 }
 
 static const k056800_interface gticlub_k056800_interface =
@@ -717,10 +717,10 @@ static int adc1038_input_callback( device_t *device, int input )
 	int value = 0;
 	switch (input)
 	{
-	case 0: value = input_port_read(device->machine, "AN0"); break;
-	case 1: value = input_port_read(device->machine, "AN1"); break;
-	case 2: value = input_port_read(device->machine, "AN2"); break;
-	case 3: value = input_port_read(device->machine, "AN3"); break;
+	case 0: value = input_port_read(device->machine(), "AN0"); break;
+	case 1: value = input_port_read(device->machine(), "AN1"); break;
+	case 2: value = input_port_read(device->machine(), "AN2"); break;
+	case 3: value = input_port_read(device->machine(), "AN3"); break;
 	case 4: value = 0x000; break;
 	case 5: value = 0x000; break;
 	case 6: value = 0x000; break;
@@ -1152,22 +1152,22 @@ ROM_END
 
 static DRIVER_INIT(gticlub)
 {
-	gticlub_state *state = machine->driver_data<gticlub_state>();
+	gticlub_state *state = machine.driver_data<gticlub_state>();
 
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_GTICLUB);
 
 	state->sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
 
-	K001005_preprocess_texture_data(machine->region("gfx1")->base(), machine->region("gfx1")->bytes(), 1);
+	K001005_preprocess_texture_data(machine.region("gfx1")->base(), machine.region("gfx1")->bytes(), 1);
 }
 
 static DRIVER_INIT(hangplt)
 {
-	gticlub_state *state = machine->driver_data<gticlub_state>();
+	gticlub_state *state = machine.driver_data<gticlub_state>();
 
 	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HANGPLT);
-	set_cgboard_texture_bank(machine, 0, "bank5", machine->region("user5")->base());
-	set_cgboard_texture_bank(machine, 1, "bank6", machine->region("user5")->base());
+	set_cgboard_texture_bank(machine, 0, "bank5", machine.region("user5")->base());
+	set_cgboard_texture_bank(machine, 1, "bank6", machine.region("user5")->base());
 
 	state->sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
 	state->sharc_dataram_1 = auto_alloc_array(machine, UINT32, 0x100000/4);

@@ -134,14 +134,14 @@ static VIDEO_START( bmcbowl )
 
 static SCREEN_UPDATE( bmcbowl )
 {
-	bmcbowl_state *state = screen->machine->driver_data<bmcbowl_state>();
+	bmcbowl_state *state = screen->machine().driver_data<bmcbowl_state>();
 /*
       280x230,4 bitmap layers, 8bpp,
         missing scroll and priorities   (maybe fixed ones)
 */
 
 	int x,y,z,pixdat;
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
 	z=0;
 	for (y=0;y<230;y++)
@@ -184,7 +184,7 @@ static SCREEN_UPDATE( bmcbowl )
 
 static READ16_HANDLER( bmc_random_read )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static READ16_HANDLER( bmc_protection_r )
@@ -201,20 +201,20 @@ static READ16_HANDLER( bmc_protection_r )
 			break;
 	}
 	logerror("Protection read @ %X\n",cpu_get_previouspc(space->cpu));
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static WRITE16_HANDLER( bmc_RAMDAC_offset_w )
 {
-	bmcbowl_state *state = space->machine->driver_data<bmcbowl_state>();
+	bmcbowl_state *state = space->machine().driver_data<bmcbowl_state>();
 	state->clr_offset=data*3;
 }
 
 static WRITE16_HANDLER( bmc_RAMDAC_color_w )
 {
-	bmcbowl_state *state = space->machine->driver_data<bmcbowl_state>();
+	bmcbowl_state *state = space->machine().driver_data<bmcbowl_state>();
 	state->bmc_colorram[state->clr_offset]=data;
-	palette_set_color_rgb(space->machine,state->clr_offset/3,pal6bit(state->bmc_colorram[(state->clr_offset/3)*3]),pal6bit(state->bmc_colorram[(state->clr_offset/3)*3+1]),pal6bit(state->bmc_colorram[(state->clr_offset/3)*3+2]));
+	palette_set_color_rgb(space->machine(),state->clr_offset/3,pal6bit(state->bmc_colorram[(state->clr_offset/3)*3]),pal6bit(state->bmc_colorram[(state->clr_offset/3)*3+1]),pal6bit(state->bmc_colorram[(state->clr_offset/3)*3+2]));
 	state->clr_offset=(state->clr_offset+1)%768;
 }
 
@@ -226,7 +226,7 @@ static WRITE16_HANDLER( scroll_w )
 
 static READ8_DEVICE_HANDLER(via_b_in)
 {
-	return input_port_read(device->machine, "IN3");
+	return input_port_read(device->machine(), "IN3");
 }
 
 
@@ -299,7 +299,7 @@ static void init_stats(bmcbowl_state *state, const UINT8 *table, int table_len, 
 
 static NVRAM_HANDLER( bmcbowl )
 {
-	bmcbowl_state *state = machine->driver_data<bmcbowl_state>();
+	bmcbowl_state *state = machine.driver_data<bmcbowl_state>();
 	int i;
 
 	if (read_or_write)
@@ -446,20 +446,20 @@ INPUT_PORTS_END
 
 static READ8_DEVICE_HANDLER(dips1_r)
 {
-	bmcbowl_state *state = device->machine->driver_data<bmcbowl_state>();
+	bmcbowl_state *state = device->machine().driver_data<bmcbowl_state>();
 	switch(state->bmc_input)
 	{
-			case 0x00:	return  input_port_read(device->machine, "IN1");
-			case 0x40:	return  input_port_read(device->machine, "IN2");
+			case 0x00:	return  input_port_read(device->machine(), "IN1");
+			case 0x40:	return  input_port_read(device->machine(), "IN2");
 	}
-	logerror("%s:unknown input - %X\n",device->machine->describe_context(),state->bmc_input);
+	logerror("%s:unknown input - %X\n",device->machine().describe_context(),state->bmc_input);
 	return 0xff;
 }
 
 
 static WRITE8_DEVICE_HANDLER(input_mux_w)
 {
-	bmcbowl_state *state = device->machine->driver_data<bmcbowl_state>();
+	bmcbowl_state *state = device->machine().driver_data<bmcbowl_state>();
 	state->bmc_input=data;
 }
 
@@ -552,7 +552,7 @@ ROM_END
 
 static DRIVER_INIT(bmcbowl)
 {
-	bmcbowl_state *state = machine->driver_data<bmcbowl_state>();
+	bmcbowl_state *state = machine.driver_data<bmcbowl_state>();
 	state->bmc_colorram = auto_alloc_array(machine, UINT8, 768);
 }
 

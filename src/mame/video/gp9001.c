@@ -222,7 +222,7 @@ device_config *gp9001vdp_device_config::static_alloc_device_config(const machine
 
 device_t *gp9001vdp_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, gp9001vdp_device(machine, *this));
+	return auto_alloc(machine, gp9001vdp_device(machine, *this));
 }
 
 void gp9001vdp_device_config::static_set_gfx_region(device_config *device, int gfxregion)
@@ -343,12 +343,12 @@ void gp9001vdp_device::create_tilemaps(int region)
 
 void gp9001vdp_device::device_start()
 {
-	top.vram16 = auto_alloc_array_clear(machine, UINT16, GP9001_TOP_VRAM_SIZE/2);
-	fg.vram16 = auto_alloc_array_clear(machine, UINT16, GP9001_FG_VRAM_SIZE/2);
-	bg.vram16 = auto_alloc_array_clear(machine, UINT16, GP9001_BG_VRAM_SIZE/2);
+	top.vram16 = auto_alloc_array_clear(m_machine, UINT16, GP9001_TOP_VRAM_SIZE/2);
+	fg.vram16 = auto_alloc_array_clear(m_machine, UINT16, GP9001_FG_VRAM_SIZE/2);
+	bg.vram16 = auto_alloc_array_clear(m_machine, UINT16, GP9001_BG_VRAM_SIZE/2);
 
-	sp.vram16 = auto_alloc_array_clear(machine, UINT16, GP9001_SPRITERAM_SIZE/2);
-	sp.vram16_buffer = auto_alloc_array_clear(machine, UINT16, GP9001_SPRITERAM_SIZE/2);
+	sp.vram16 = auto_alloc_array_clear(m_machine, UINT16, GP9001_SPRITERAM_SIZE/2);
+	sp.vram16_buffer = auto_alloc_array_clear(m_machine, UINT16, GP9001_SPRITERAM_SIZE/2);
 
 	create_tilemaps(m_gfxregion);
 
@@ -462,7 +462,7 @@ static WRITE16_DEVICE_HANDLER( gp9001_devvideoram16_w )
 
 static READ16_DEVICE_HANDLER( gp9001_vdpstatus_r )
 {
-	return ((device->machine->primary_screen->vpos() + 15) % 262) >= 245;
+	return ((device->machine().primary_screen->vpos() + 15) % 262) >= 245;
 }
 
 static WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_select_w )
@@ -773,9 +773,9 @@ WRITE16_DEVICE_HANDLER( pipibibi_bootleg_spriteram16_w )
     Sprite Handlers
 ***************************************************************************/
 
-void gp9001vdp_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8* primap )
+void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8* primap )
 {
-	const gfx_element *gfx = machine->gfx[tile_region+1];
+	const gfx_element *gfx = machine.gfx[tile_region+1];
 
 	int offs, old_x, old_y;
 
@@ -888,7 +888,7 @@ void gp9001vdp_device::draw_sprites( running_machine *machine, bitmap_t *bitmap,
 
 					{
 						int yy, xx;
-						const pen_t *paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+						const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
 						const UINT8* srcdata = gfx_element_get_data(gfx, sprite);
 						int count = 0;
 						int ystart, yend, yinc;
@@ -966,10 +966,10 @@ void gp9001vdp_device::draw_sprites( running_machine *machine, bitmap_t *bitmap,
     Draw the game screen in the given bitmap_t.
 ***************************************************************************/
 
-void gp9001vdp_device::gp9001_draw_custom_tilemap(running_machine* machine, bitmap_t* bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable )
+void gp9001vdp_device::gp9001_draw_custom_tilemap(running_machine& machine, bitmap_t* bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable )
 {
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 	int y,x;
 	bitmap_t *tmb = tilemap_get_pixmap(tilemap);
 	UINT16* srcptr;
@@ -1019,7 +1019,7 @@ static const UINT8 gp9001_sprprimap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14
 
 static const UINT8 batsugun_prienable0[16]={ 1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1 };
 
-void gp9001vdp_device::gp9001_render_vdp(running_machine* machine, bitmap_t* bitmap, const rectangle* cliprect)
+void gp9001vdp_device::gp9001_render_vdp(running_machine& machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	if (gp9001_gfxrom_is_banked && gp9001_gfxrom_bank_dirty)
 	{

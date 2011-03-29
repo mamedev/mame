@@ -33,10 +33,10 @@ const UINT8 ga2_v25_opcode_table[256] = {
 
 #undef xxxx
 
-void decrypt_ga2_protrom(running_machine *machine)
+void decrypt_ga2_protrom(running_machine &machine)
 {
 	int i;
-	UINT8 *rom = machine->region("mcu")->base();
+	UINT8 *rom = machine.region("mcu")->base();
 	UINT8* temp = auto_alloc_array(machine, UINT8, 0x100000);
 
 	// make copy of ROM so original can be overwritten
@@ -56,7 +56,7 @@ WRITE16_HANDLER( ga2_dpram_w )
 
 READ16_HANDLER( ga2_dpram_r )
 {
-	segas32_state *state = space->machine->driver_data<segas32_state>();
+	segas32_state *state = space->machine().driver_data<segas32_state>();
 	return (state->ga2_dpram[offset])|(state->ga2_dpram[offset+1]<<8);
 }
 
@@ -103,7 +103,7 @@ READ16_HANDLER(ga2_wakeup_protection_r)
 
 WRITE16_HANDLER(sonic_level_load_protection)
 {
-	segas32_state *state = space->machine->driver_data<segas32_state>();
+	segas32_state *state = space->machine().driver_data<segas32_state>();
 	UINT16 level;
 //Perform write
 	state->system32_workram[CLEARED_LEVELS / 2] = (data & mem_mask) | (state->system32_workram[CLEARED_LEVELS / 2] & ~mem_mask);
@@ -115,7 +115,7 @@ WRITE16_HANDLER(sonic_level_load_protection)
 		}
 		else
 		{
-			const UINT8 *ROM = space->machine->region("maincpu")->base();
+			const UINT8 *ROM = space->machine().region("maincpu")->base();
 			level =  *((ROM + LEVEL_ORDER_ARRAY) + (state->system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
 			level |= *((ROM + LEVEL_ORDER_ARRAY) + (state->system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
 		}
@@ -138,7 +138,7 @@ WRITE16_HANDLER(sonic_level_load_protection)
 // and can write things into work RAM.  we simulate that here for burning rival.
 READ16_HANDLER(brival_protection_r)
 {
-	segas32_state *state = space->machine->driver_data<segas32_state>();
+	segas32_state *state = space->machine().driver_data<segas32_state>();
 	if (mem_mask == 0xffff)	// only trap on word-wide reads
 	{
 		switch (offset)
@@ -155,7 +155,7 @@ READ16_HANDLER(brival_protection_r)
 
 WRITE16_HANDLER(brival_protection_w)
 {
-	segas32_state *state = space->machine->driver_data<segas32_state>();
+	segas32_state *state = space->machine().driver_data<segas32_state>();
 	static const int protAddress[6][2] =
 	{
 		{ 0x109517, 0x00/2 },
@@ -167,7 +167,7 @@ WRITE16_HANDLER(brival_protection_w)
 	};
 	char ret[32];
 	int curProtType;
-	UINT8 *ROM = space->machine->region("maincpu")->base();
+	UINT8 *ROM = space->machine().region("maincpu")->base();
 
 	switch (offset)
 	{
@@ -307,7 +307,7 @@ READ16_HANDLER(arf_wakeup_protection_r)
  ******************************************************************************/
 WRITE16_HANDLER( jleague_protection_w )
 {
-	segas32_state *state = space->machine->driver_data<segas32_state>();
+	segas32_state *state = space->machine().driver_data<segas32_state>();
 	COMBINE_DATA( &state->system32_workram[0xf700/2 + offset ] );
 
 	switch( offset )
@@ -351,7 +351,7 @@ WRITE16_HANDLER( jleague_protection_w )
 
 READ16_HANDLER( arescue_dsp_r )
 {
-	segas32_state *state = space->machine->driver_data<segas32_state>();
+	segas32_state *state = space->machine().driver_data<segas32_state>();
 	if( offset == 4/2 )
 	{
 		switch( state->arescue_dsp_io[0] )
@@ -381,7 +381,7 @@ READ16_HANDLER( arescue_dsp_r )
 
 WRITE16_HANDLER( arescue_dsp_w )
 {
-	segas32_state *state = space->machine->driver_data<segas32_state>();
+	segas32_state *state = space->machine().driver_data<segas32_state>();
 	COMBINE_DATA(&state->arescue_dsp_io[offset]);
 }
 

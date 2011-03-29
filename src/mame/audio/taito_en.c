@@ -44,7 +44,7 @@ static WRITE16_HANDLER(f3_68000_share_w)
 
 static WRITE16_HANDLER( f3_es5505_bank_w )
 {
-	UINT32 max_banks_this_game=(space->machine->region("ensoniq.0")->bytes()/0x200000)-1;
+	UINT32 max_banks_this_game=(space->machine().region("ensoniq.0")->bytes()/0x200000)-1;
 
 #if 0
 {
@@ -56,7 +56,7 @@ static WRITE16_HANDLER( f3_es5505_bank_w )
 
 	/* mask out unused bits */
 	data &= max_banks_this_game;
-	es5505_voice_bank_w(space->machine->device("ensoniq"),offset,data<<20);
+	es5505_voice_bank_w(space->machine().device("ensoniq"),offset,data<<20);
 }
 
 static WRITE16_HANDLER( f3_volume_w )
@@ -82,8 +82,8 @@ static TIMER_DEVICE_CALLBACK( taito_en_timer_callback )
 	/* Only cause IRQ if the mask is set to allow it */
 	if (m68681_imr & 0x08)
 	{
-		device_set_input_line_vector(timer.machine->device("audiocpu"), 6, vector_reg);
-		cputag_set_input_line(timer.machine, "audiocpu", 6, ASSERT_LINE);
+		device_set_input_line_vector(timer.machine().device("audiocpu"), 6, vector_reg);
+		cputag_set_input_line(timer.machine(), "audiocpu", 6, ASSERT_LINE);
 		imr_status |= 0x08;
 	}
 }
@@ -103,7 +103,7 @@ static READ16_HANDLER(f3_68681_r)
 	/* IRQ ack */
 	if (offset == 0x0f)
 	{
-		cputag_set_input_line(space->machine, "audiocpu", 6, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", 6, CLEAR_LINE);
 		return 0;
 	}
 
@@ -128,7 +128,7 @@ static WRITE16_HANDLER(f3_68681_w)
 				case 3:
 					logerror("Counter:  X1/Clk - divided by 16, counter is %04x, so interrupt every %d cycles\n",counter,(M68000_CLOCK/M68681_CLOCK)*counter*16);
 					timer_mode=TIMER_SINGLESHOT;
-					timer = space->machine->device<timer_device>("timer_68681");
+					timer = space->machine().device<timer_device>("timer_68681");
 					timer->adjust(downcast<cpu_device *>(space->cpu)->cycles_to_attotime((M68000_CLOCK/M68681_CLOCK)*counter*16));
 					break;
 				case 4:
@@ -140,7 +140,7 @@ static WRITE16_HANDLER(f3_68681_w)
 				case 6:
 					logerror("Timer:  X1/Clk, counter is %04x, so interrupt every %d cycles\n",counter,(M68000_CLOCK/M68681_CLOCK)*counter);
 					timer_mode=TIMER_PULSE;
-					timer = space->machine->device<timer_device>("timer_68681");
+					timer = space->machine().device<timer_device>("timer_68681");
 					timer->adjust(downcast<cpu_device *>(space->cpu)->cycles_to_attotime((M68000_CLOCK/M68681_CLOCK)*counter), 0, downcast<cpu_device *>(space->cpu)->cycles_to_attotime((M68000_CLOCK/M68681_CLOCK)*counter));
 					break;
 				case 7:
@@ -187,7 +187,7 @@ static READ16_HANDLER(es5510_dsp_r)
 */
 //  offset<<=1;
 
-//if (offset<7 && es5510_dsp_ram[0]!=0xff) return space->machine->rand()%0xffff;
+//if (offset<7 && es5510_dsp_ram[0]!=0xff) return space->machine().rand()%0xffff;
 
 	if (offset==0x12) return 0;
 
@@ -199,7 +199,7 @@ static READ16_HANDLER(es5510_dsp_r)
 
 static WRITE16_HANDLER(es5510_dsp_w)
 {
-	UINT8 *snd_mem = (UINT8 *)space->machine->region("ensoniq.0")->base();
+	UINT8 *snd_mem = (UINT8 *)space->machine().region("ensoniq.0")->base();
 
 //  if (offset>4 && offset!=0x80  && offset!=0xa0  && offset!=0xc0  && offset!=0xe0)
 //      logerror("%06x: DSP write offset %04x %04x\n",cpu_get_pc(space->cpu),offset,data);
@@ -257,7 +257,7 @@ ADDRESS_MAP_END
 SOUND_RESET( taito_f3_soundsystem_reset )
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
-	UINT16 *ROM = (UINT16 *)machine->region("audiocpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.region("audiocpu")->base();
 	memory_set_bankptr(machine, "bank1",&ROM[0x80000]);
 	memory_set_bankptr(machine, "bank2",&ROM[0x90000]);
 	memory_set_bankptr(machine, "bank3",&ROM[0xa0000]);
@@ -268,10 +268,10 @@ SOUND_RESET( taito_f3_soundsystem_reset )
 	sound_ram[3]=ROM[0x80003];
 
 	/* reset CPU to catch any banking of startup vectors */
-	machine->device("audiocpu")->reset();
+	machine.device("audiocpu")->reset();
 	//cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
-	f3_shared_ram = (UINT32 *)memory_get_shared(*machine, "f3_shared");
+	f3_shared_ram = (UINT32 *)memory_get_shared(machine, "f3_shared");
 }
 
 static const es5505_interface es5505_taito_f3_config =

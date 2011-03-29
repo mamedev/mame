@@ -56,7 +56,7 @@ The 2 ay-8910 read ports are responsible for reading the sound commands.
 
 static READ8_DEVICE_HANDLER( timer_r )
 {
-	jack_state *state = device->machine->driver_data<jack_state>();
+	jack_state *state = device->machine().driver_data<jack_state>();
 
 	/* wrong! there should be no need for timer_rate, the same function */
 	/* should work for both games */
@@ -66,7 +66,7 @@ static READ8_DEVICE_HANDLER( timer_r )
 
 static WRITE8_HANDLER( jack_sh_command_w )
 {
-	jack_state *state = space->machine->driver_data<jack_state>();
+	jack_state *state = space->machine().driver_data<jack_state>();
 	soundlatch_w(space, 0, data);
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
@@ -76,17 +76,17 @@ static WRITE8_HANDLER( jack_sh_command_w )
 
 static WRITE8_HANDLER( joinem_misc_w )
 {
-	jack_state *state = space->machine->driver_data<jack_state>();
-	flip_screen_set(space->machine, data & 0x80);
+	jack_state *state = space->machine().driver_data<jack_state>();
+	flip_screen_set(space->machine(), data & 0x80);
 	state->joinem_snd_bit = data & 1;
 }
 
 static CUSTOM_INPUT( sound_check_r )
 {
-	jack_state *state = field->port->machine->driver_data<jack_state>();
+	jack_state *state = field->port->machine().driver_data<jack_state>();
 	UINT8 ret = 0;
 
-	if ((input_port_read(field->port->machine, "IN2") & 0x80) && !state->joinem_snd_bit)
+	if ((input_port_read(field->port->machine(), "IN2") & 0x80) && !state->joinem_snd_bit)
 		ret = 1;
 
 	return ret;
@@ -98,7 +98,7 @@ static CUSTOM_INPUT( sound_check_r )
 
 static READ8_HANDLER( striv_question_r )
 {
-	jack_state *state = space->machine->driver_data<jack_state>();
+	jack_state *state = space->machine().driver_data<jack_state>();
 
 	// Set-up the remap table for every 16 bytes
 	if ((offset & 0xc00) == 0x800)
@@ -114,7 +114,7 @@ static READ8_HANDLER( striv_question_r )
 	// Read the actual byte from question roms
 	else
 	{
-		UINT8 *ROM = space->machine->region("user1")->base();
+		UINT8 *ROM = space->machine().region("user1")->base();
 		int real_address;
 
 		real_address = state->question_address | (offset & 0x3f0) | state->remap_address[offset & 0x0f];
@@ -794,9 +794,9 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( jack )
 {
-	jack_state *state = machine->driver_data<jack_state>();
+	jack_state *state = machine.driver_data<jack_state>();
 
-	state->audiocpu = machine->device<cpu_device>("audiocpu");
+	state->audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->joinem_snd_bit));
 	state->save_item(NAME(state->question_address));
@@ -806,7 +806,7 @@ static MACHINE_START( jack )
 
 static MACHINE_RESET( jack )
 {
-	jack_state *state = machine->driver_data<jack_state>();
+	jack_state *state = machine.driver_data<jack_state>();
 	int i;
 
 	state->joinem_snd_bit = 0;
@@ -866,7 +866,7 @@ static INTERRUPT_GEN( joinem_interrupts )
 		device_set_input_line(device, 0, HOLD_LINE);
 	else
 	{
-		if (!(input_port_read(device->machine, "IN2") & 0x80))
+		if (!(input_port_read(device->machine(), "IN2") & 0x80))
 			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -1303,11 +1303,11 @@ ROM_END
  *
  *************************************/
 
-static void treahunt_decode( running_machine *machine )
+static void treahunt_decode( running_machine &machine )
 {
 	int A;
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine->region("maincpu")->base();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine.region("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x4000);
 	int data;
 
@@ -1350,33 +1350,33 @@ static void treahunt_decode( running_machine *machine )
 
 static DRIVER_INIT( jack )
 {
-	jack_state *state = machine->driver_data<jack_state>();
+	jack_state *state = machine.driver_data<jack_state>();
 	state->timer_rate = 128;
 }
 
 static DRIVER_INIT( treahunt )
 {
-	jack_state *state = machine->driver_data<jack_state>();
+	jack_state *state = machine.driver_data<jack_state>();
 	state->timer_rate = 128;
 	treahunt_decode(machine);
 }
 
 static DRIVER_INIT( zzyzzyxx )
 {
-	jack_state *state = machine->driver_data<jack_state>();
+	jack_state *state = machine.driver_data<jack_state>();
 	state->timer_rate = 16;
 }
 
 static DRIVER_INIT( loverboy )
 {
-	jack_state *state = machine->driver_data<jack_state>();
+	jack_state *state = machine.driver_data<jack_state>();
 
 	/* this doesn't make sense.. the startup code, and irq0 have jumps to 0..
        I replace the startup jump with another jump to what appears to be
        the start of the game code.
 
        ToDo: Figure out what's really going on */
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	ROM[0x13] = 0x01;
 	ROM[0x12] = 0x9d;
 
@@ -1386,8 +1386,8 @@ static DRIVER_INIT( loverboy )
 
 static DRIVER_INIT( striv )
 {
-	jack_state *state = machine->driver_data<jack_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	jack_state *state = machine.driver_data<jack_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	UINT8 data;
 	int A;
 
@@ -1414,10 +1414,10 @@ static DRIVER_INIT( striv )
 	}
 
 	// Set-up the weirdest questions read ever done
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc000, 0xcfff, FUNC(striv_question_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc000, 0xcfff, FUNC(striv_question_r));
 
 	// Nop out unused sprites writes
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xb000, 0xb0ff);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xb000, 0xb0ff);
 
 	state->timer_rate = 128;
 }

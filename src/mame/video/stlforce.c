@@ -7,7 +7,7 @@
 
 static TILE_GET_INFO( get_stlforce_bg_tile_info )
 {
-	stlforce_state *state = machine->driver_data<stlforce_state>();
+	stlforce_state *state = machine.driver_data<stlforce_state>();
 	int tileno,colour;
 
 	tileno = state->bg_videoram[tile_index] & 0x0fff;
@@ -18,7 +18,7 @@ static TILE_GET_INFO( get_stlforce_bg_tile_info )
 
 WRITE16_HANDLER( stlforce_bg_videoram_w )
 {
-	stlforce_state *state = space->machine->driver_data<stlforce_state>();
+	stlforce_state *state = space->machine().driver_data<stlforce_state>();
 
 	state->bg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
@@ -28,7 +28,7 @@ WRITE16_HANDLER( stlforce_bg_videoram_w )
 
 static TILE_GET_INFO( get_stlforce_mlow_tile_info )
 {
-	stlforce_state *state = machine->driver_data<stlforce_state>();
+	stlforce_state *state = machine.driver_data<stlforce_state>();
 	int tileno,colour;
 
 	tileno = state->mlow_videoram[tile_index] & 0x0fff;
@@ -42,7 +42,7 @@ static TILE_GET_INFO( get_stlforce_mlow_tile_info )
 
 WRITE16_HANDLER( stlforce_mlow_videoram_w )
 {
-	stlforce_state *state = space->machine->driver_data<stlforce_state>();
+	stlforce_state *state = space->machine().driver_data<stlforce_state>();
 
 	state->mlow_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->mlow_tilemap,offset);
@@ -52,7 +52,7 @@ WRITE16_HANDLER( stlforce_mlow_videoram_w )
 
 static TILE_GET_INFO( get_stlforce_mhigh_tile_info )
 {
-	stlforce_state *state = machine->driver_data<stlforce_state>();
+	stlforce_state *state = machine.driver_data<stlforce_state>();
 	int tileno,colour;
 
 	tileno = state->mhigh_videoram[tile_index] & 0x0fff;
@@ -66,7 +66,7 @@ static TILE_GET_INFO( get_stlforce_mhigh_tile_info )
 
 WRITE16_HANDLER( stlforce_mhigh_videoram_w )
 {
-	stlforce_state *state = space->machine->driver_data<stlforce_state>();
+	stlforce_state *state = space->machine().driver_data<stlforce_state>();
 
 	state->mhigh_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->mhigh_tilemap,offset);
@@ -76,7 +76,7 @@ WRITE16_HANDLER( stlforce_mhigh_videoram_w )
 
 static TILE_GET_INFO( get_stlforce_tx_tile_info )
 {
-	stlforce_state *state = machine->driver_data<stlforce_state>();
+	stlforce_state *state = machine.driver_data<stlforce_state>();
 	int tileno,colour;
 
 	tileno = state->tx_videoram[tile_index] & 0x0fff;
@@ -91,7 +91,7 @@ static TILE_GET_INFO( get_stlforce_tx_tile_info )
 
 WRITE16_HANDLER( stlforce_tx_videoram_w )
 {
-	stlforce_state *state = space->machine->driver_data<stlforce_state>();
+	stlforce_state *state = space->machine().driver_data<stlforce_state>();
 
 	state->tx_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tx_tilemap,offset);
@@ -99,12 +99,12 @@ WRITE16_HANDLER( stlforce_tx_videoram_w )
 
 /* sprites - quite a bit still needs doing .. */
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	stlforce_state *state = machine->driver_data<stlforce_state>();
+	stlforce_state *state = machine.driver_data<stlforce_state>();
 	const UINT16 *source = state->spriteram+0x0;
 	const UINT16 *finish = state->spriteram+0x800;
-	const gfx_element *gfx = machine->gfx[2];
+	const gfx_element *gfx = machine.gfx[2];
 	int ypos, xpos, attr, num;
 
 	while (source<finish)
@@ -133,7 +133,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( stlforce )
 {
-	stlforce_state *state = screen->machine->driver_data<stlforce_state>();
+	stlforce_state *state = screen->machine().driver_data<stlforce_state>();
 	int i;
 
 	if (state->vidattrram[6] & 1)
@@ -179,14 +179,14 @@ SCREEN_UPDATE( stlforce )
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->mlow_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->mhigh_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect);
+	draw_sprites(screen->machine(), bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
 	return 0;
 }
 
 VIDEO_START( stlforce )
 {
-	stlforce_state *state = machine->driver_data<stlforce_state>();
+	stlforce_state *state = machine.driver_data<stlforce_state>();
 
 	state->bg_tilemap    = tilemap_create(machine, get_stlforce_bg_tile_info,   tilemap_scan_cols,      16,16,64,16);
 	state->mlow_tilemap  = tilemap_create(machine, get_stlforce_mlow_tile_info, tilemap_scan_cols, 16,16,64,16);

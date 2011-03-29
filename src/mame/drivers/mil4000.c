@@ -112,7 +112,7 @@ public:
 
 static TILE_GET_INFO( get_sc0_tile_info )
 {
-	mil4000_state *state = machine->driver_data<mil4000_state>();
+	mil4000_state *state = machine.driver_data<mil4000_state>();
 	UINT32 data = (state->sc0_vram[tile_index*2]<<16) | state->sc0_vram[tile_index*2+1];
 	int tile = data >> 14;
 	int color = (state->sc0_vram[tile_index*2+1] & 0x1f)+0;
@@ -126,7 +126,7 @@ static TILE_GET_INFO( get_sc0_tile_info )
 
 static TILE_GET_INFO( get_sc1_tile_info )
 {
-	mil4000_state *state = machine->driver_data<mil4000_state>();
+	mil4000_state *state = machine.driver_data<mil4000_state>();
 	UINT32 data = (state->sc1_vram[tile_index*2]<<16) | state->sc1_vram[tile_index*2+1];
 	int tile = data >> 14;
 	int color = (state->sc1_vram[tile_index*2+1] & 0x1f)+0x10;
@@ -140,7 +140,7 @@ static TILE_GET_INFO( get_sc1_tile_info )
 
 static TILE_GET_INFO( get_sc2_tile_info )
 {
-	mil4000_state *state = machine->driver_data<mil4000_state>();
+	mil4000_state *state = machine.driver_data<mil4000_state>();
 	UINT32 data = (state->sc2_vram[tile_index*2]<<16) | state->sc2_vram[tile_index*2+1];
 	int tile = data >> 14;
 	int color = (state->sc2_vram[tile_index*2+1] & 0x1f)+0x20;
@@ -154,7 +154,7 @@ static TILE_GET_INFO( get_sc2_tile_info )
 
 static TILE_GET_INFO( get_sc3_tile_info )
 {
-	mil4000_state *state = machine->driver_data<mil4000_state>();
+	mil4000_state *state = machine.driver_data<mil4000_state>();
 	UINT32 data = (state->sc3_vram[tile_index*2]<<16) | state->sc3_vram[tile_index*2+1];
 	int tile = data >> 14;
 	int color = (state->sc3_vram[tile_index*2+1] & 0x1f)+0x30;
@@ -168,7 +168,7 @@ static TILE_GET_INFO( get_sc3_tile_info )
 
 static VIDEO_START(mil4000)
 {
-	mil4000_state *state = machine->driver_data<mil4000_state>();
+	mil4000_state *state = machine.driver_data<mil4000_state>();
 	state->sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,64,64);
 	state->sc1_tilemap = tilemap_create(machine, get_sc1_tile_info,tilemap_scan_rows,8,8,64,64);
 	state->sc2_tilemap = tilemap_create(machine, get_sc2_tile_info,tilemap_scan_rows,8,8,64,64);
@@ -181,7 +181,7 @@ static VIDEO_START(mil4000)
 
 static SCREEN_UPDATE(mil4000)
 {
-	mil4000_state *state = screen->machine->driver_data<mil4000_state>();
+	mil4000_state *state = screen->machine().driver_data<mil4000_state>();
 	tilemap_draw(bitmap,cliprect,state->sc0_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->sc1_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->sc2_tilemap,0,0);
@@ -192,7 +192,7 @@ static SCREEN_UPDATE(mil4000)
 /*TODO*/
 static READ16_HANDLER( hvretrace_r )
 {
-	mil4000_state *state = space->machine->driver_data<mil4000_state>();
+	mil4000_state *state = space->machine().driver_data<mil4000_state>();
 	UINT16 res;
 
 	res = 0;
@@ -214,28 +214,28 @@ static READ16_HANDLER( hvretrace_r )
 
 static WRITE16_HANDLER( sc0_vram_w )
 {
-	mil4000_state *state = space->machine->driver_data<mil4000_state>();
+	mil4000_state *state = space->machine().driver_data<mil4000_state>();
 	state->sc0_vram[offset] = data;
 	tilemap_mark_tile_dirty(state->sc0_tilemap,offset/2);
 }
 
 static WRITE16_HANDLER( sc1_vram_w )
 {
-	mil4000_state *state = space->machine->driver_data<mil4000_state>();
+	mil4000_state *state = space->machine().driver_data<mil4000_state>();
 	state->sc1_vram[offset] = data;
 	tilemap_mark_tile_dirty(state->sc1_tilemap,offset/2);
 }
 
 static WRITE16_HANDLER( sc2_vram_w )
 {
-	mil4000_state *state = space->machine->driver_data<mil4000_state>();
+	mil4000_state *state = space->machine().driver_data<mil4000_state>();
 	state->sc2_vram[offset] = data;
 	tilemap_mark_tile_dirty(state->sc2_tilemap,offset/2);
 }
 
 static WRITE16_HANDLER( sc3_vram_w )
 {
-	mil4000_state *state = space->machine->driver_data<mil4000_state>();
+	mil4000_state *state = space->machine().driver_data<mil4000_state>();
 	state->sc3_vram[offset] = data;
 	tilemap_mark_tile_dirty(state->sc3_tilemap,offset/2);
 }
@@ -257,7 +257,7 @@ static WRITE16_HANDLER( output_w )
 	int i;
 
 	for(i=0;i<3;i++)
-		coin_counter_w(space->machine, i, data & 0x2000);
+		coin_counter_w(space->machine(), i, data & 0x2000);
 
 	output_set_lamp_value(0, (data) & 1);		/* HOLD1 */
 	output_set_lamp_value(1, (data >> 1) & 1);	/* HOLD2 */

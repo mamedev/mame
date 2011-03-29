@@ -126,11 +126,11 @@
 
 static TIMER_CALLBACK( interrupt_callback )
 {
-	spacefb_state *state = machine->driver_data<spacefb_state>();
+	spacefb_state *state = machine.driver_data<spacefb_state>();
 	int next_vpos;
 
 	/* compute vector and set the interrupt line */
-	int vpos = machine->primary_screen->vpos();
+	int vpos = machine.primary_screen->vpos();
 	UINT8 vector = 0xc7 | ((vpos & 0x40) >> 2) | ((~vpos & 0x40) >> 3);
 	cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, vector);
 
@@ -140,21 +140,21 @@ static TIMER_CALLBACK( interrupt_callback )
 	else
 		next_vpos = SPACEFB_INT_TRIGGER_COUNT_1;
 
-	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(next_vpos));
+	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(next_vpos));
 }
 
 
-static void create_interrupt_timer(running_machine *machine)
+static void create_interrupt_timer(running_machine &machine)
 {
-	spacefb_state *state = machine->driver_data<spacefb_state>();
-	state->interrupt_timer = machine->scheduler().timer_alloc(FUNC(interrupt_callback));
+	spacefb_state *state = machine.driver_data<spacefb_state>();
+	state->interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
 }
 
 
-static void start_interrupt_timer(running_machine *machine)
+static void start_interrupt_timer(running_machine &machine)
 {
-	spacefb_state *state = machine->driver_data<spacefb_state>();
-	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(SPACEFB_INT_TRIGGER_COUNT_1));
+	spacefb_state *state = machine.driver_data<spacefb_state>();
+	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(SPACEFB_INT_TRIGGER_COUNT_1));
 }
 
 
@@ -180,7 +180,7 @@ static MACHINE_START( spacefb )
 
 static MACHINE_RESET( spacefb )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_IO);
+	address_space *space = machine.device("maincpu")->memory().space(AS_IO);
 	/* the 3 output ports are cleared on reset */
 	spacefb_port_0_w(space, 0, 0);
 	spacefb_port_1_w(space, 0, 0);

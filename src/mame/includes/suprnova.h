@@ -17,7 +17,7 @@ extern UINT32 *skns_pal_regs, *skns_v3_regs, *skns_spc_regs;
 
 void skns_sprite_kludge(int x, int y);
 void skns_draw_sprites(
-	running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
+	running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect,
 	UINT32* spriteram_source, size_t spriteram_size,
 	UINT8* gfx_source, size_t gfx_length,
 	UINT32* sprite_regs );

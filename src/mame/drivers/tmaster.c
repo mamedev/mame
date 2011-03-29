@@ -149,7 +149,7 @@ public:
 
 static WRITE16_DEVICE_HANDLER( tmaster_oki_bank_w )
 {
-	tmaster_state *state = device->machine->driver_data<tmaster_state>();
+	tmaster_state *state = device->machine().driver_data<tmaster_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		// data & 0x0800?
@@ -171,7 +171,7 @@ static WRITE16_DEVICE_HANDLER( tmaster_oki_bank_w )
 
 static void duart_irq_handler(device_t *device, UINT8 vector)
 {
-	cputag_set_input_line_and_vector(device->machine, "maincpu", 4, HOLD_LINE, vector);
+	cputag_set_input_line_and_vector(device->machine(), "maincpu", 4, HOLD_LINE, vector);
 };
 
 static void duart_tx(device_t *device, int channel, UINT8 data)
@@ -182,9 +182,9 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
 	}
 };
 
-static void microtouch_tx(running_machine *machine, UINT8 data)
+static void microtouch_tx(running_machine &machine, UINT8 data)
 {
-	tmaster_state *state = machine->driver_data<tmaster_state>();
+	tmaster_state *state = machine.driver_data<tmaster_state>();
 	duart68681_rx_data(state->duart68681, 0, data);
 }
 
@@ -205,10 +205,10 @@ static UINT8 binary_to_BCD(UINT8 data)
 
 static READ16_HANDLER(rtc_r)
 {
-	tmaster_state *state = space->machine->driver_data<tmaster_state>();
+	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	system_time systime;
 
-	space->machine->current_datetime(systime);
+	space->machine().current_datetime(systime);
 	state->rtc_ram[0x1] = binary_to_BCD(systime.local_time.second);
 	state->rtc_ram[0x2] = binary_to_BCD(systime.local_time.minute);
 	state->rtc_ram[0x3] = binary_to_BCD(systime.local_time.hour);
@@ -222,7 +222,7 @@ static READ16_HANDLER(rtc_r)
 
 static WRITE16_HANDLER(rtc_w)
 {
-	tmaster_state *state = space->machine->driver_data<tmaster_state>();
+	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	if ( offset == 0 )
 	{
 		state->rtc_ram[0x0] = data & 0xff;
@@ -290,13 +290,13 @@ static int galgames_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high
 
 static VIDEO_START( tmaster )
 {
-	tmaster_state *state = machine->driver_data<tmaster_state>();
+	tmaster_state *state = machine.driver_data<tmaster_state>();
 	int layer, buffer;
 	for (layer = 0; layer < 2; layer++)
 	{
 		for (buffer = 0; buffer < 2; buffer++)
 		{
-			state->bitmap[layer][buffer] = machine->primary_screen->alloc_compatible_bitmap();
+			state->bitmap[layer][buffer] = machine.primary_screen->alloc_compatible_bitmap();
 			bitmap_fill(state->bitmap[layer][buffer], NULL, 0xff);
 		}
 	}
@@ -306,28 +306,28 @@ static VIDEO_START( tmaster )
 
 static VIDEO_START( galgames )
 {
-	tmaster_state *state = machine->driver_data<tmaster_state>();
+	tmaster_state *state = machine.driver_data<tmaster_state>();
 	VIDEO_START_CALL( tmaster );
 	state->compute_addr = galgames_compute_addr;
 }
 
 static SCREEN_UPDATE( tmaster )
 {
-	tmaster_state *state = screen->machine->driver_data<tmaster_state>();
+	tmaster_state *state = screen->machine().driver_data<tmaster_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed(screen->machine, KEYCODE_Z))
+	if (input_code_pressed(screen->machine(), KEYCODE_Z))
 	{
 		int mask = 0;
-		if (input_code_pressed(screen->machine, KEYCODE_Q))	mask |= 1;
-		if (input_code_pressed(screen->machine, KEYCODE_W))	mask |= 2;
+		if (input_code_pressed(screen->machine(), KEYCODE_Q))	mask |= 1;
+		if (input_code_pressed(screen->machine(), KEYCODE_W))	mask |= 2;
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif
 
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
 	if (layers_ctrl & 1)	copybitmap_trans(bitmap, state->bitmap[0][(state->regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
 	if (layers_ctrl & 2)	copybitmap_trans(bitmap, state->bitmap[1][(state->regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
@@ -337,22 +337,22 @@ static SCREEN_UPDATE( tmaster )
 
 static WRITE16_HANDLER( tmaster_color_w )
 {
-	tmaster_state *state = space->machine->driver_data<tmaster_state>();
+	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	COMBINE_DATA( &state->color );
 }
 
 static WRITE16_HANDLER( tmaster_addr_w )
 {
-	tmaster_state *state = space->machine->driver_data<tmaster_state>();
+	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	COMBINE_DATA( &state->addr );
 }
 
-static void tmaster_draw(running_machine *machine)
+static void tmaster_draw(running_machine &machine)
 {
-	tmaster_state *state = machine->driver_data<tmaster_state>();
+	tmaster_state *state = machine.driver_data<tmaster_state>();
 	int x,y,x0,x1,y0,y1,dx,dy,flipx,flipy,sx,sy,sw,sh, addr, mode, layer,buffer, color;
 
-	UINT8 *gfxdata	=	machine->region( "blitter" )->base() + state->gfx_offs;
+	UINT8 *gfxdata	=	machine.region( "blitter" )->base() + state->gfx_offs;
 
 	UINT16 pen;
 
@@ -376,7 +376,7 @@ static void tmaster_draw(running_machine *machine)
 
 #ifdef MAME_DEBUG
 #if 0
-	logerror("%s: blit w %03x, h %02x, x %03x, y %02x, src %06x, fill/addr %04x, repl/color %04x, mode %02x\n", machine->describe_context(),
+	logerror("%s: blit w %03x, h %02x, x %03x, y %02x, src %06x, fill/addr %04x, repl/color %04x, mode %02x\n", machine.describe_context(),
 			sw,sh,sx,sy, addr, state->addr, state->color, mode
 	);
 #endif
@@ -401,7 +401,7 @@ static void tmaster_draw(running_machine *machine)
 		case 0x00:							// blit with transparency
 			if (addr > state->gfx_size - sw*sh)
 			{
-				logerror("%s: blit error, addr %06x out of bounds\n", machine->describe_context(),addr);
+				logerror("%s: blit error, addr %06x out of bounds\n", machine.describe_context(),addr);
 				addr = state->gfx_size - sw*sh;
 			}
 
@@ -464,13 +464,13 @@ static void tmaster_draw(running_machine *machine)
 
 static WRITE16_HANDLER( tmaster_blitter_w )
 {
-	tmaster_state *state = space->machine->driver_data<tmaster_state>();
+	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	COMBINE_DATA( state->regs + offset );
 	switch (offset*2)
 	{
 		case 0x0e:
-			tmaster_draw(space->machine);
-			cputag_set_input_line(space->machine, "maincpu", 2, HOLD_LINE);
+			tmaster_draw(space->machine());
+			cputag_set_input_line(space->machine(), "maincpu", 2, HOLD_LINE);
 			break;
 	}
 }
@@ -492,7 +492,7 @@ static READ16_HANDLER( tmaster_blitter_r )
 
 static READ16_HANDLER( tmaster_coins_r )
 {
-	return input_port_read(space->machine, "COIN")|(space->machine->rand()&0x0800);
+	return input_port_read(space->machine(), "COIN")|(space->machine().rand()&0x0800);
 }
 
 static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16 )
@@ -566,21 +566,21 @@ static const char *const galgames_eeprom_names[5] = { GALGAMES_EEPROM_BIOS, GALG
 
 static READ16_HANDLER( galgames_eeprom_r )
 {
-	tmaster_state *state = space->machine->driver_data<tmaster_state>();
-	device_t *eeprom = space->machine->device(galgames_eeprom_names[state->galgames_cart]);
+	tmaster_state *state = space->machine().driver_data<tmaster_state>();
+	device_t *eeprom = space->machine().device(galgames_eeprom_names[state->galgames_cart]);
 
 	return eeprom_read_bit(eeprom) ? 0x80 : 0x00;
 }
 
 static WRITE16_HANDLER( galgames_eeprom_w )
 {
-	tmaster_state *state = space->machine->driver_data<tmaster_state>();
+	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	if (data & ~0x0003)
 		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(space->cpu),data);
 
 	if ( ACCESSING_BITS_0_7 )
 	{
-		device_t *eeprom = space->machine->device(galgames_eeprom_names[state->galgames_cart]);
+		device_t *eeprom = space->machine().device(galgames_eeprom_names[state->galgames_cart]);
 
 		// latch the bit
 		eeprom_write_bit(eeprom, data & 0x0001);
@@ -594,7 +594,7 @@ static WRITE16_HANDLER( galgames_eeprom_w )
 
 static WRITE16_HANDLER( galgames_palette_offset_w )
 {
-	tmaster_state *state = space->machine->driver_data<tmaster_state>();
+	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->palette_offset = data & 0xff;
@@ -603,7 +603,7 @@ static WRITE16_HANDLER( galgames_palette_offset_w )
 }
 static WRITE16_HANDLER( galgames_palette_data_w )
 {
-	tmaster_state *state = space->machine->driver_data<tmaster_state>();
+	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->palette_data[state->palette_index] = data & 0xff;
@@ -611,7 +611,7 @@ static WRITE16_HANDLER( galgames_palette_data_w )
 		{
 			int palette_base;
 			for (palette_base = 0; palette_base < 0x1000; palette_base += 0x100)
-				palette_set_color(space->machine, state->palette_offset + palette_base, MAKE_RGB(state->palette_data[0], state->palette_data[1], state->palette_data[2]));
+				palette_set_color(space->machine(), state->palette_offset + palette_base, MAKE_RGB(state->palette_data[0], state->palette_data[1], state->palette_data[2]));
 			state->palette_index = 0;
 			state->palette_offset++;
 		}
@@ -621,19 +621,19 @@ static WRITE16_HANDLER( galgames_palette_data_w )
 // Sound
 static READ16_HANDLER( galgames_okiram_r )
 {
-	return space->machine->region("oki")->base()[offset] | 0xff00;
+	return space->machine().region("oki")->base()[offset] | 0xff00;
 }
 static WRITE16_HANDLER( galgames_okiram_w )
 {
 	if (ACCESSING_BITS_0_7)
-		space->machine->region("oki")->base()[offset] = data & 0xff;
+		space->machine().region("oki")->base()[offset] = data & 0xff;
 }
 
 // Carts (preliminary, PIC communication is not implemented)
 
-static void galgames_update_rombank(running_machine *machine, UINT32 cart)
+static void galgames_update_rombank(running_machine &machine, UINT32 cart)
 {
-	tmaster_state *state = machine->driver_data<tmaster_state>();
+	tmaster_state *state = machine.driver_data<tmaster_state>();
 	state->galgames_cart = cart;
 
 	state->gfx_offs = 0x200000 * cart;
@@ -656,7 +656,7 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 		{
 			case 0x07:		// 7 resets the eeprom
 				for (i = 0; i < 5; i++)
-					eeprom_set_cs_line(space->machine->device(galgames_eeprom_names[i]), ASSERT_LINE);
+					eeprom_set_cs_line(space->machine().device(galgames_eeprom_names[i]), ASSERT_LINE);
 				break;
 
 			case 0x00:
@@ -664,13 +664,13 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 			case 0x02:
 			case 0x03:
 			case 0x04:
-				eeprom_set_cs_line(space->machine->device(galgames_eeprom_names[data & 0xff]), CLEAR_LINE);
-				galgames_update_rombank(space->machine, data & 0xff);
+				eeprom_set_cs_line(space->machine().device(galgames_eeprom_names[data & 0xff]), CLEAR_LINE);
+				galgames_update_rombank(space->machine(), data & 0xff);
 				break;
 
 			default:
-				eeprom_set_cs_line(space->machine->device(galgames_eeprom_names[0]), CLEAR_LINE);
-				galgames_update_rombank(space->machine, 0);
+				eeprom_set_cs_line(space->machine().device(galgames_eeprom_names[0]), CLEAR_LINE);
+				galgames_update_rombank(space->machine(), 0);
 				logerror("%06x: unknown cart sel = %04x\n", cpu_get_pc(space->cpu), data);
 				break;
 		}
@@ -684,7 +684,7 @@ static READ16_HANDLER( galgames_cart_clock_r )
 
 static WRITE16_HANDLER( galgames_cart_clock_w )
 {
-	tmaster_state *state = space->machine->driver_data<tmaster_state>();
+	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		// bit 3 = clock
@@ -692,14 +692,14 @@ static WRITE16_HANDLER( galgames_cart_clock_w )
 		// ROM/RAM banking
 		if ((data & 0xf7) == 0x05)
 		{
-			memory_set_bank(space->machine, GALGAMES_BANK_000000_R, GALGAMES_RAM);	// ram
-			galgames_update_rombank(space->machine, state->galgames_cart);
+			memory_set_bank(space->machine(), GALGAMES_BANK_000000_R, GALGAMES_RAM);	// ram
+			galgames_update_rombank(space->machine(), state->galgames_cart);
 			logerror("%06x: romram bank = %04x\n", cpu_get_pc(space->cpu), data);
 		}
 		else
 		{
-			memory_set_bank(space->machine, GALGAMES_BANK_000000_R, GALGAMES_ROM0);	// rom
-			memory_set_bank(space->machine, GALGAMES_BANK_200000_R, GALGAMES_RAM);	// ram
+			memory_set_bank(space->machine(), GALGAMES_BANK_000000_R, GALGAMES_ROM0);	// rom
+			memory_set_bank(space->machine(), GALGAMES_BANK_200000_R, GALGAMES_RAM);	// ram
 			logerror("%06x: unknown romram bank = %04x\n", cpu_get_pc(space->cpu), data);
 		}
 	}
@@ -869,11 +869,11 @@ static MACHINE_START( tmaster )
 
 static MACHINE_RESET( tmaster )
 {
-	tmaster_state *state = machine->driver_data<tmaster_state>();
+	tmaster_state *state = machine.driver_data<tmaster_state>();
 	state->gfx_offs = 0;
-	state->gfx_size = machine->region("blitter")->bytes();
+	state->gfx_size = machine.region("blitter")->bytes();
 
-	state->duart68681 = machine->device( "duart68681" );
+	state->duart68681 = machine.device( "duart68681" );
 }
 
 static INTERRUPT_GEN( tm3k_interrupt )
@@ -945,7 +945,7 @@ static INTERRUPT_GEN( galgames_interrupt )
 
 static MACHINE_RESET( galgames )
 {
-	tmaster_state *state = machine->driver_data<tmaster_state>();
+	tmaster_state *state = machine.driver_data<tmaster_state>();
 	state->gfx_offs = 0;
 	state->gfx_size = 0x200000;
 
@@ -959,7 +959,7 @@ static MACHINE_RESET( galgames )
 
 	galgames_update_rombank(machine, 0);
 
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 }
 
 static MACHINE_CONFIG_START( galgames, tmaster_state )
@@ -1620,7 +1620,7 @@ ROM_END
 
 static DRIVER_INIT( tm4k )
 {
-	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// protection
 	ROM[0x834ce/2] = 0x4e75;
@@ -1641,7 +1641,7 @@ Protection resembles that of tm5k rather than tm4ka:
 
 static DRIVER_INIT( tm4ka )
 {
-	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// protection
 	ROM[0x83476/2] = 0x4e75;
@@ -1663,7 +1663,7 @@ Protection starts:
 
 static DRIVER_INIT( tm4kb )
 {
-	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// protection
 	ROM[0x82b7a/2] = 0x4e75;
@@ -1684,7 +1684,7 @@ Protection starts:
 
 static DRIVER_INIT( tm5k )
 {
-	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// protection
 	ROM[0x96002/2] = 0x4e75;
@@ -1707,7 +1707,7 @@ Protection starts:
 
 static DRIVER_INIT( tm5kca )
 {
-	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// protection
 	ROM[0x95ffe/2] = 0x4e75;
@@ -1719,7 +1719,7 @@ static DRIVER_INIT( tm5kca )
 
 static DRIVER_INIT( tm5ka )
 {
-	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// protection
 	ROM[0x96b30/2] = 0x4e75;
@@ -1740,7 +1740,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7k )
 {
-	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// protection
 	ROM[0x81730/2] = 0x4e75;
@@ -1763,7 +1763,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7ka )
 {
-	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// protection
 	ROM[0x81594/2] = 0x4e75;
@@ -1786,7 +1786,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7keval ) /* kit came with a security key labeled A-21657-004, which is a TM5000 key */
 {
-	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// protection
 	ROM[0x8949e/2] = 0x4e75;
@@ -1809,7 +1809,7 @@ Protection starts:
 
 static DRIVER_INIT( tm8k )
 {
-	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// protection
 	ROM[0x78b70/2] = 0x4e75;
@@ -1832,8 +1832,8 @@ Protection starts:
 
 static DRIVER_INIT( galgames )
 {
-	tmaster_state *state = machine->driver_data<tmaster_state>();
-	UINT8 *ROM	=	machine->region("maincpu")->base();
+	tmaster_state *state = machine.driver_data<tmaster_state>();
+	UINT8 *ROM	=	machine.region("maincpu")->base();
 	int cart;
 
 	// RAM bank at 0x000000-0x03ffff and 0x200000-0x23ffff
@@ -1855,9 +1855,9 @@ static DRIVER_INIT( galgames )
 
 	for (cart = 1; cart <= 4; cart++)
 	{
-		UINT8 *CART = machine->region("maincpu")->base();
+		UINT8 *CART = machine.region("maincpu")->base();
 
-		if  (0x200000 * (cart+1) <= machine->region("maincpu")->bytes())
+		if  (0x200000 * (cart+1) <= machine.region("maincpu")->bytes())
 			CART += 0x200000 * cart;
 
 		memory_configure_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_ROM0+cart, 1, CART,          0x40000);
@@ -1867,7 +1867,7 @@ static DRIVER_INIT( galgames )
 
 static DRIVER_INIT( galgame2 )
 {
-	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// Patch BIOS to see the game code as first cartridge (until the PIC therein is emulated)
 	ROM[0x118da/2] = 0x4a06;

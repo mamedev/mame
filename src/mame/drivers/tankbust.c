@@ -26,25 +26,25 @@ To do:
 
 static TIMER_CALLBACK( soundlatch_callback )
 {
-	tankbust_state *state = machine->driver_data<tankbust_state>();
+	tankbust_state *state = machine.driver_data<tankbust_state>();
 	state->latch = param;
 }
 
 static WRITE8_HANDLER( tankbust_soundlatch_w )
 {
-	space->machine->scheduler().synchronize(FUNC(soundlatch_callback), data);
+	space->machine().scheduler().synchronize(FUNC(soundlatch_callback), data);
 }
 
 static READ8_DEVICE_HANDLER( tankbust_soundlatch_r )
 {
-	tankbust_state *state = device->machine->driver_data<tankbust_state>();
+	tankbust_state *state = device->machine().driver_data<tankbust_state>();
 	return state->latch;
 }
 
 //port B of ay8910#0
 static READ8_DEVICE_HANDLER( tankbust_soundtimer_r )
 {
-	tankbust_state *state = device->machine->driver_data<tankbust_state>();
+	tankbust_state *state = device->machine().driver_data<tankbust_state>();
 	int ret;
 
 	state->timer1++;
@@ -64,7 +64,7 @@ static TIMER_CALLBACK( soundirqline_callback )
 
 static WRITE8_HANDLER( tankbust_e0xx_w )
 {
-	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	tankbust_state *state = space->machine().driver_data<tankbust_state>();
 	state->e0xx_data[offset] = data;
 
 #if 0
@@ -82,11 +82,11 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
 	break;
 
 	case 1:	/* 0xe001 (value 0 then 1) written right after the soundlatch_w */
-		space->machine->scheduler().synchronize(FUNC(soundirqline_callback), data);
+		space->machine().scheduler().synchronize(FUNC(soundirqline_callback), data);
 	break;
 
 	case 2:	/* 0xe002 coin counter */
-		coin_counter_w(space->machine, 0, data&1);
+		coin_counter_w(space->machine(), 0, data&1);
 	break;
 
 	case 6:	/* 0xe006 screen disable ?? or disable screen update */
@@ -100,15 +100,15 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
 	case 7: /* 0xe007 bankswitch */
 		/* bank 1 at 0x6000-9fff = from 0x10000 when bit0=0 else from 0x14000 */
 		/* bank 2 at 0xa000-bfff = from 0x18000 when bit0=0 else from 0x1a000 */
-		memory_set_bankptr(space->machine,  "bank1", space->machine->region("maincpu")->base() + 0x10000 + ((data&1) * 0x4000) );
-		memory_set_bankptr(space->machine,  "bank2", space->machine->region("maincpu")->base() + 0x18000 + ((data&1) * 0x2000) ); /* verified (the game will reset after the "game over" otherwise) */
+		memory_set_bankptr(space->machine(),  "bank1", space->machine().region("maincpu")->base() + 0x10000 + ((data&1) * 0x4000) );
+		memory_set_bankptr(space->machine(),  "bank2", space->machine().region("maincpu")->base() + 0x18000 + ((data&1) * 0x2000) ); /* verified (the game will reset after the "game over" otherwise) */
 	break;
 	}
 }
 
 static READ8_HANDLER( debug_output_area_r )
 {
-	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	tankbust_state *state = space->machine().driver_data<tankbust_state>();
 	return state->e0xx_data[offset];
 }
 
@@ -174,7 +174,7 @@ static READ8_HANDLER( read_from_unmapped_memory )
 
 static READ8_HANDLER( some_changing_input )
 {
-	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	tankbust_state *state = space->machine().driver_data<tankbust_state>();
 	state->variable_data += 8;
 	return state->variable_data;
 }
@@ -320,7 +320,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_RESET( tankbust )
 {
-	tankbust_state *state = machine->driver_data<tankbust_state>();
+	tankbust_state *state = machine.driver_data<tankbust_state>();
 	state->variable_data = 0x11;
 }
 

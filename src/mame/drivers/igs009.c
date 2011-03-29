@@ -58,14 +58,14 @@ public:
 
 static WRITE8_HANDLER( gp98_reel1_ram_w )
 {
-	igs009_state *state = space->machine->driver_data<igs009_state>();
+	igs009_state *state = space->machine().driver_data<igs009_state>();
 	state->gp98_reel1_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->gp98_reel1_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_jingbell_reel1_tile_info )
 {
-	igs009_state *state = machine->driver_data<igs009_state>();
+	igs009_state *state = machine.driver_data<igs009_state>();
 	int code = state->gp98_reel1_ram[tile_index];
 
 	SET_TILE_INFO(
@@ -78,7 +78,7 @@ static TILE_GET_INFO( get_jingbell_reel1_tile_info )
 
 static TILE_GET_INFO( get_gp98_reel1_tile_info )
 {
-	igs009_state *state = machine->driver_data<igs009_state>();
+	igs009_state *state = machine.driver_data<igs009_state>();
 	int code = state->gp98_reel1_ram[tile_index];
 
 	SET_TILE_INFO(
@@ -91,14 +91,14 @@ static TILE_GET_INFO( get_gp98_reel1_tile_info )
 
 static WRITE8_HANDLER( gp98_reel2_ram_w )
 {
-	igs009_state *state = space->machine->driver_data<igs009_state>();
+	igs009_state *state = space->machine().driver_data<igs009_state>();
 	state->gp98_reel2_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->gp98_reel2_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_jingbell_reel2_tile_info )
 {
-	igs009_state *state = machine->driver_data<igs009_state>();
+	igs009_state *state = machine.driver_data<igs009_state>();
 	int code = state->gp98_reel2_ram[tile_index];
 
 	SET_TILE_INFO(
@@ -110,7 +110,7 @@ static TILE_GET_INFO( get_jingbell_reel2_tile_info )
 
 static TILE_GET_INFO( get_gp98_reel2_tile_info )
 {
-	igs009_state *state = machine->driver_data<igs009_state>();
+	igs009_state *state = machine.driver_data<igs009_state>();
 	int code = state->gp98_reel2_ram[tile_index];
 
 	SET_TILE_INFO(
@@ -124,14 +124,14 @@ static TILE_GET_INFO( get_gp98_reel2_tile_info )
 
 static WRITE8_HANDLER( gp98_reel3_ram_w )
 {
-	igs009_state *state = space->machine->driver_data<igs009_state>();
+	igs009_state *state = space->machine().driver_data<igs009_state>();
 	state->gp98_reel3_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->gp98_reel3_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_jingbell_reel3_tile_info )
 {
-	igs009_state *state = machine->driver_data<igs009_state>();
+	igs009_state *state = machine.driver_data<igs009_state>();
 	int code = state->gp98_reel3_ram[tile_index];
 
 	SET_TILE_INFO(
@@ -143,7 +143,7 @@ static TILE_GET_INFO( get_jingbell_reel3_tile_info )
 
 static TILE_GET_INFO( get_gp98_reel3_tile_info )
 {
-	igs009_state *state = machine->driver_data<igs009_state>();
+	igs009_state *state = machine.driver_data<igs009_state>();
 	int code = state->gp98_reel3_ram[tile_index];
 
 	SET_TILE_INFO(
@@ -157,14 +157,14 @@ static TILE_GET_INFO( get_gp98_reel3_tile_info )
 
 static WRITE8_HANDLER( gp98_reel4_ram_w )
 {
-	igs009_state *state = space->machine->driver_data<igs009_state>();
+	igs009_state *state = space->machine().driver_data<igs009_state>();
 	state->gp98_reel4_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->gp98_reel4_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_jingbell_reel4_tile_info )
 {
-	igs009_state *state = machine->driver_data<igs009_state>();
+	igs009_state *state = machine.driver_data<igs009_state>();
 	int code = state->gp98_reel4_ram[tile_index];
 
 	SET_TILE_INFO(
@@ -176,7 +176,7 @@ static TILE_GET_INFO( get_jingbell_reel4_tile_info )
 
 static TILE_GET_INFO( get_gp98_reel4_tile_info )
 {
-	igs009_state *state = machine->driver_data<igs009_state>();
+	igs009_state *state = machine.driver_data<igs009_state>();
 	int code = state->gp98_reel4_ram[tile_index];
 
 	SET_TILE_INFO(
@@ -194,7 +194,7 @@ static TILE_GET_INFO( get_gp98_reel4_tile_info )
 
 static WRITE8_HANDLER( bg_scroll_w )
 {
-	igs009_state *state = space->machine->driver_data<igs009_state>();
+	igs009_state *state = space->machine().driver_data<igs009_state>();
 	state->bg_scroll[offset] = data;
 //  tilemap_set_scrolly(bg_tilemap,offset,data);
 }
@@ -202,28 +202,28 @@ static WRITE8_HANDLER( bg_scroll_w )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	igs009_state *state = machine->driver_data<igs009_state>();
+	igs009_state *state = machine.driver_data<igs009_state>();
 	int code = state->fg_tile_ram[tile_index] | (state->fg_color_ram[tile_index] << 8);
 	SET_TILE_INFO(1, code, (4*(code >> 14)+3), 0);
 }
 
 static WRITE8_HANDLER( fg_tile_w )
 {
-	igs009_state *state = space->machine->driver_data<igs009_state>();
+	igs009_state *state = space->machine().driver_data<igs009_state>();
 	state->fg_tile_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
 }
 
 static WRITE8_HANDLER( fg_color_w )
 {
-	igs009_state *state = space->machine->driver_data<igs009_state>();
+	igs009_state *state = space->machine().driver_data<igs009_state>();
 	state->fg_color_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
 }
 
 static VIDEO_START(jingbell)
 {
-	igs009_state *state = machine->driver_data<igs009_state>();
+	igs009_state *state = machine.driver_data<igs009_state>();
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	0x80,0x20);
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
@@ -241,7 +241,7 @@ static VIDEO_START(jingbell)
 
 static VIDEO_START(gp98)
 {
-	igs009_state *state = machine->driver_data<igs009_state>();
+	igs009_state *state = machine.driver_data<igs009_state>();
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	0x80,0x20);
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
@@ -260,16 +260,16 @@ static VIDEO_START(gp98)
 
 static SCREEN_UPDATE(jingbell)
 {
-	igs009_state *state = screen->machine->driver_data<igs009_state>();
+	igs009_state *state = screen->machine().driver_data<igs009_state>();
 	int layers_ctrl = state->video_enable ? -1 : 0;
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed(screen->machine, KEYCODE_Z))
+	if (input_code_pressed(screen->machine(), KEYCODE_Z))
 	{
 		int mask = 0;
-		if (input_code_pressed(screen->machine, KEYCODE_Q))	mask |= 1;
-		if (input_code_pressed(screen->machine, KEYCODE_W))	mask |= 2;
-		if (input_code_pressed(screen->machine, KEYCODE_A))	mask |= 4;
+		if (input_code_pressed(screen->machine(), KEYCODE_Q))	mask |= 1;
+		if (input_code_pressed(screen->machine(), KEYCODE_W))	mask |= 2;
+		if (input_code_pressed(screen->machine(), KEYCODE_A))	mask |= 4;
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif
@@ -303,7 +303,7 @@ static SCREEN_UPDATE(jingbell)
 			clip.min_y = startclipmin;
 			clip.max_y = startclipmin+2;
 
-			bitmap_fill(bitmap,&clip,screen->machine->pens[rowenable]);
+			bitmap_fill(bitmap,&clip,screen->machine().pens[rowenable]);
 
 			if (rowenable==0)
 			{ // 0 and 1 are the same? or is there a global switchoff?
@@ -327,7 +327,7 @@ static SCREEN_UPDATE(jingbell)
 		}
 
 	}
-	else					bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	else					bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
@@ -342,8 +342,8 @@ static SCREEN_UPDATE(jingbell)
 
 static CUSTOM_INPUT( hopper_r )
 {
-	igs009_state *state = field->port->machine->driver_data<igs009_state>();
-	return state->hopper && !(field->port->machine->primary_screen->frame_number()%10);
+	igs009_state *state = field->port->machine().driver_data<igs009_state>();
+	return state->hopper && !(field->port->machine().primary_screen->frame_number()%10);
 }
 
 
@@ -356,19 +356,19 @@ static void show_out(igs009_state *state)
 
 static WRITE8_HANDLER( jingbell_nmi_and_coins_w )
 {
-	igs009_state *state = space->machine->driver_data<igs009_state>();
+	igs009_state *state = space->machine().driver_data<igs009_state>();
 	if ((state->nmi_enable ^ data) & (~0xdd))
 	{
 		logerror("PC %06X: nmi_and_coins = %02x\n",cpu_get_pc(space->cpu),data);
 //      popmessage("%02x",data);
 	}
 
-	coin_counter_w(space->machine, 0,		data & 0x01);	// coin_a
-	coin_counter_w(space->machine, 1,		data & 0x04);	// coin_c
-	coin_counter_w(space->machine, 2,		data & 0x08);	// key in
-	coin_counter_w(space->machine, 3,		data & 0x10);	// coin state->out mech
+	coin_counter_w(space->machine(), 0,		data & 0x01);	// coin_a
+	coin_counter_w(space->machine(), 1,		data & 0x04);	// coin_c
+	coin_counter_w(space->machine(), 2,		data & 0x08);	// key in
+	coin_counter_w(space->machine(), 3,		data & 0x10);	// coin state->out mech
 
-	set_led_status(space->machine, 6,		data & 0x40);	// led for coin state->out / state->hopper active
+	set_led_status(space->machine(), 6,		data & 0x40);	// led for coin state->out / state->hopper active
 
 	state->nmi_enable = data;	//  data & 0x80     // nmi enable?
 
@@ -378,9 +378,9 @@ static WRITE8_HANDLER( jingbell_nmi_and_coins_w )
 
 static WRITE8_HANDLER( jingbell_video_and_leds_w )
 {
-	igs009_state *state = space->machine->driver_data<igs009_state>();
-	set_led_status(space->machine, 4,	  data & 0x01);	// start?
-	set_led_status(space->machine, 5,	  data & 0x04);	// l_bet?
+	igs009_state *state = space->machine().driver_data<igs009_state>();
+	set_led_status(space->machine(), 4,	  data & 0x01);	// start?
+	set_led_status(space->machine(), 5,	  data & 0x04);	// l_bet?
 
 	state->video_enable	=	  data & 0x40;
 	state->hopper			=	(~data)& 0x80;
@@ -391,11 +391,11 @@ static WRITE8_HANDLER( jingbell_video_and_leds_w )
 
 static WRITE8_HANDLER( jingbell_leds_w )
 {
-	igs009_state *state = space->machine->driver_data<igs009_state>();
-	set_led_status(space->machine, 0, data & 0x01);	// stop_1
-	set_led_status(space->machine, 1, data & 0x02);	// stop_2
-	set_led_status(space->machine, 2, data & 0x04);	// stop_3
-	set_led_status(space->machine, 3, data & 0x08);	// stop
+	igs009_state *state = space->machine().driver_data<igs009_state>();
+	set_led_status(space->machine(), 0, data & 0x01);	// stop_1
+	set_led_status(space->machine(), 1, data & 0x02);	// stop_2
+	set_led_status(space->machine(), 2, data & 0x04);	// stop_3
+	set_led_status(space->machine(), 3, data & 0x08);	// stop
 	// data & 0x10?
 
 	state->out[2] = data;
@@ -405,7 +405,7 @@ static WRITE8_HANDLER( jingbell_leds_w )
 
 static WRITE8_HANDLER( jingbell_magic_w )
 {
-	igs009_state *state = space->machine->driver_data<igs009_state>();
+	igs009_state *state = space->machine().driver_data<igs009_state>();
 	state->igs_magic[offset] = data;
 
 	if (offset == 0)
@@ -424,15 +424,15 @@ static WRITE8_HANDLER( jingbell_magic_w )
 
 static READ8_HANDLER( jingbell_magic_r )
 {
-	igs009_state *state = space->machine->driver_data<igs009_state>();
+	igs009_state *state = space->machine().driver_data<igs009_state>();
 	switch(state->igs_magic[0])
 	{
 		case 0x00:
-			if ( !(state->igs_magic[1] & 0x01) )	return input_port_read(space->machine, "DSW1");
-			if ( !(state->igs_magic[1] & 0x02) )	return input_port_read(space->machine, "DSW2");
-			if ( !(state->igs_magic[1] & 0x04) )	return input_port_read(space->machine, "DSW3");
-			if ( !(state->igs_magic[1] & 0x08) )	return input_port_read(space->machine, "DSW4");
-			if ( !(state->igs_magic[1] & 0x10) )	return input_port_read(space->machine, "DSW5");
+			if ( !(state->igs_magic[1] & 0x01) )	return input_port_read(space->machine(), "DSW1");
+			if ( !(state->igs_magic[1] & 0x02) )	return input_port_read(space->machine(), "DSW2");
+			if ( !(state->igs_magic[1] & 0x04) )	return input_port_read(space->machine(), "DSW3");
+			if ( !(state->igs_magic[1] & 0x08) )	return input_port_read(space->machine(), "DSW4");
+			if ( !(state->igs_magic[1] & 0x10) )	return input_port_read(space->machine(), "DSW5");
 			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[1]);
 			break;
 
@@ -658,7 +658,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( jingbell )
 {
-	igs009_state *state = machine->driver_data<igs009_state>();
+	igs009_state *state = machine.driver_data<igs009_state>();
 	state->nmi_enable		=	0;
 	state->hopper			=	0;
 	state->video_enable	=	1;
@@ -666,7 +666,7 @@ static MACHINE_RESET( jingbell )
 
 static INTERRUPT_GEN( jingbell_interrupt )
 {
-	igs009_state *state = device->machine->driver_data<igs009_state>();
+	igs009_state *state = device->machine().driver_data<igs009_state>();
 	 if (state->nmi_enable & 0x80)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -778,8 +778,8 @@ ROM_END
 static DRIVER_INIT( jingbell )
 {
 	int i;
-	UINT8 *rom  = (UINT8 *)machine->region("maincpu")->base();
-	size_t size = machine->region("maincpu")->bytes();
+	UINT8 *rom  = (UINT8 *)machine.region("maincpu")->base();
+	size_t size = machine.region("maincpu")->bytes();
 
 	for (i=0; i<size; i++)
 	{

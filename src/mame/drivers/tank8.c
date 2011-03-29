@@ -11,9 +11,9 @@ Atari Tank 8 driver
 
 
 
-void tank8_set_collision(running_machine *machine, int index)
+void tank8_set_collision(running_machine &machine, int index)
 {
-	tank8_state *state = machine->driver_data<tank8_state>();
+	tank8_state *state = machine.driver_data<tank8_state>();
 	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	state->collision_index = index;
@@ -22,29 +22,29 @@ void tank8_set_collision(running_machine *machine, int index)
 
 static MACHINE_RESET( tank8 )
 {
-	tank8_state *state = machine->driver_data<tank8_state>();
+	tank8_state *state = machine.driver_data<tank8_state>();
 	state->collision_index = 0;
 }
 
 
 static READ8_HANDLER( tank8_collision_r )
 {
-	tank8_state *state = space->machine->driver_data<tank8_state>();
+	tank8_state *state = space->machine().driver_data<tank8_state>();
 	return state->collision_index;
 }
 
 static WRITE8_HANDLER( tank8_lockout_w )
 {
-	coin_lockout_w(space->machine, offset, ~data & 1);
+	coin_lockout_w(space->machine(), offset, ~data & 1);
 }
 
 
 static WRITE8_HANDLER( tank8_int_reset_w )
 {
-	tank8_state *state = space->machine->driver_data<tank8_state>();
+	tank8_state *state = space->machine().driver_data<tank8_state>();
 	state->collision_index &= ~0x3f;
 
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( tank8_crash_w )
@@ -467,10 +467,10 @@ ROM_END
 
 static DRIVER_INIT( decode )
 {
-	const UINT8* DECODE = machine->region("user1")->base();
+	const UINT8* DECODE = machine.region("user1")->base();
 
-	UINT8* p1 = machine->region("maincpu")->base() + 0x00000;
-	UINT8* p2 = machine->region("maincpu")->base() + 0x10000;
+	UINT8* p1 = machine.region("maincpu")->base() + 0x00000;
+	UINT8* p2 = machine.region("maincpu")->base() + 0x10000;
 
 	int i;
 

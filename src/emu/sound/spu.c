@@ -285,7 +285,7 @@ device_config *spu_device_config::static_alloc_device_config(const machine_confi
 
 device_t *spu_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, spu_device(machine, *this));
+	return auto_alloc(machine, spu_device(machine, *this));
 }
 
 class adpcm_decoder
@@ -3121,18 +3121,18 @@ void spu_device::flush_cdda(const unsigned int sector)
 
 // MAME I/O stuff.  This can get cleaner when machine/psx.c does.
 
-static void spu_dma_read( running_machine *machine, UINT32 n_address, INT32 n_size )
+static void spu_dma_read( running_machine &machine, UINT32 n_address, INT32 n_size )
 {
-	spu_device *spu = machine->device<spu_device>("spu");
-	UINT8 *psxram = (UINT8 *)memory_get_shared(*machine, "share1");
+	spu_device *spu = machine.device<spu_device>("spu");
+	UINT8 *psxram = (UINT8 *)memory_get_shared(machine, "share1");
 
 	spu->start_dma(psxram + n_address, false, n_size*4);
 }
 
-static void spu_dma_write( running_machine *machine, UINT32 n_address, INT32 n_size )
+static void spu_dma_write( running_machine &machine, UINT32 n_address, INT32 n_size )
 {
-	spu_device *spu = machine->device<spu_device>("spu");
-	UINT8 *psxram = (UINT8 *)memory_get_shared(*machine, "share1");
+	spu_device *spu = machine.device<spu_device>("spu");
+	UINT8 *psxram = (UINT8 *)memory_get_shared(machine, "share1");
 
 //  printf("SPU DMA write from %x, size %x\n", n_address, n_size);
 
@@ -3141,12 +3141,12 @@ static void spu_dma_write( running_machine *machine, UINT32 n_address, INT32 n_s
 
 READ16_HANDLER( spu_r )
 {
-	spu_device *spu = space->machine->device<spu_device>("spu");
+	spu_device *spu = space->machine().device<spu_device>("spu");
 
 	if (!spu->installed_dma_hooks)
 	{
-		psx_dma_install_read_handler(space->machine, 4, spu_dma_read);
-		psx_dma_install_write_handler(space->machine, 4, spu_dma_write);
+		psx_dma_install_read_handler(space->machine(), 4, spu_dma_read);
+		psx_dma_install_write_handler(space->machine(), 4, spu_dma_write);
 		spu->installed_dma_hooks = true;
 	}
 
@@ -3155,12 +3155,12 @@ READ16_HANDLER( spu_r )
 
 WRITE16_HANDLER( spu_w )
 {
-	spu_device *spu = space->machine->device<spu_device>("spu");
+	spu_device *spu = space->machine().device<spu_device>("spu");
 
 	if (!spu->installed_dma_hooks)
 	{
-		psx_dma_install_read_handler(space->machine, 4, spu_dma_read);
-		psx_dma_install_write_handler(space->machine, 4, spu_dma_write);
+		psx_dma_install_read_handler(space->machine(), 4, spu_dma_read);
+		psx_dma_install_write_handler(space->machine(), 4, spu_dma_write);
 		spu->installed_dma_hooks = true;
 	}
 

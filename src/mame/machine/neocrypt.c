@@ -528,18 +528,18 @@ static void decrypt(UINT8 *r0, UINT8 *r1,
 }
 
 
-static void neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
+static void neogeo_gfx_decrypt(running_machine &machine, int extra_xor)
 {
 	int rom_size;
 	UINT8 *buf;
 	UINT8 *rom;
 	int rpos;
 
-	rom_size = machine->region("sprites")->bytes();
+	rom_size = machine.region("sprites")->bytes();
 
 	buf = auto_alloc_array(machine, UINT8, rom_size);
 
-	rom = machine->region("sprites")->base();
+	rom = machine.region("sprites")->base();
 
 	// Data xor
 	for (rpos = 0;rpos < rom_size/4;rpos++)
@@ -592,13 +592,13 @@ static void neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
 
 
 /* the S data comes from the end of the C data */
-void neogeo_sfix_decrypt(running_machine *machine)
+void neogeo_sfix_decrypt(running_machine &machine)
 {
 	int i;
-	int rom_size = machine->region("sprites")->bytes();
-	int tx_size = machine->region("fixed")->bytes();
-	UINT8 *src = machine->region("sprites")->base()+rom_size-tx_size;
-	UINT8 *dst = machine->region("fixed")->base();
+	int rom_size = machine.region("sprites")->bytes();
+	int tx_size = machine.region("fixed")->bytes();
+	UINT8 *src = machine.region("sprites")->base()+rom_size-tx_size;
+	UINT8 *dst = machine.region("fixed")->base();
 
 	for (i = 0;i < tx_size;i++)
 		dst[i] = src[(i & ~0x1f) + ((i & 7) << 2) + ((~i & 8) >> 2) + ((i & 0x10) >> 4)];
@@ -606,7 +606,7 @@ void neogeo_sfix_decrypt(running_machine *machine)
 
 
 /* CMC42 protection chip */
-void kof99_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
+void kof99_neogeo_gfx_decrypt(running_machine &machine, int extra_xor)
 {
 	type0_t03 =          kof99_type0_t03;
 	type0_t12 =          kof99_type0_t12;
@@ -623,7 +623,7 @@ void kof99_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
 
 
 /* CMC50 protection chip */
-void kof2000_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
+void kof2000_neogeo_gfx_decrypt(running_machine &machine, int extra_xor)
 {
 	type0_t03 =          kof2000_type0_t03;
 	type0_t12 =          kof2000_type0_t12;
@@ -640,7 +640,7 @@ void kof2000_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
 
 
 /* CMC42 protection chip */
-void cmc42_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
+void cmc42_neogeo_gfx_decrypt(running_machine &machine, int extra_xor)
 {
 	type0_t03 =          kof99_type0_t03;
 	type0_t12 =          kof99_type0_t12;
@@ -656,7 +656,7 @@ void cmc42_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
 
 
 /* CMC50 protection chip */
-void cmc50_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
+void cmc50_neogeo_gfx_decrypt(running_machine &machine, int extra_xor)
 {
 	type0_t03 =          kof2000_type0_t03;
 	type0_t12 =          kof2000_type0_t12;
@@ -672,13 +672,13 @@ void cmc50_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
 
 
 /* ms5pcb and svcpcb have an additional scramble on top of the standard CMC scrambling */
-void svcpcb_gfx_decrypt(running_machine *machine)
+void svcpcb_gfx_decrypt(running_machine &machine)
 {
 	static const UINT8 xorval[ 4 ] = { 0x34, 0x21, 0xc4, 0xe9 };
 	int i;
 	int ofst;
-	int rom_size = machine->region( "sprites" )->bytes();
-	UINT8 *rom = machine->region( "sprites" )->base();
+	int rom_size = machine.region( "sprites" )->bytes();
+	UINT8 *rom = machine.region( "sprites" )->base();
 	UINT8 *buf = auto_alloc_array(machine, UINT8,  rom_size );
 
 	for( i = 0; i < rom_size; i++ )
@@ -707,11 +707,11 @@ void svcpcb_gfx_decrypt(running_machine *machine)
 
 
 /* and a further swap on the s1 data */
-void svcpcb_s1data_decrypt(running_machine *machine)
+void svcpcb_s1data_decrypt(running_machine &machine)
 {
 	int i;
-	UINT8 *s1 = machine->region( "fixed" )->base();
-	size_t s1_size = machine->region( "fixed" )->bytes();
+	UINT8 *s1 = machine.region( "fixed" )->base();
+	size_t s1_size = machine.region( "fixed" )->bytes();
 
 	for( i = 0; i < s1_size; i++ ) // Decrypt S
 	{
@@ -722,13 +722,13 @@ void svcpcb_s1data_decrypt(running_machine *machine)
 
 /* kf2k3pcb has an additional scramble on top of the standard CMC scrambling */
 /* Thanks to Razoola & Halrin for the info */
-void kf2k3pcb_gfx_decrypt(running_machine *machine)
+void kf2k3pcb_gfx_decrypt(running_machine &machine)
 {
 	static const UINT8 xorval[ 4 ] = { 0x34, 0x21, 0xc4, 0xe9 };
 	int i;
 	int ofst;
-	int rom_size = machine->region( "sprites" )->bytes();
-	UINT8 *rom = machine->region( "sprites" )->base();
+	int rom_size = machine.region( "sprites" )->bytes();
+	UINT8 *rom = machine.region( "sprites" )->base();
 	UINT8 *buf = auto_alloc_array(machine, UINT8,  rom_size );
 
 	for ( i = 0; i < rom_size; i++ )
@@ -753,31 +753,31 @@ void kf2k3pcb_gfx_decrypt(running_machine *machine)
 
 
 /* and a further swap on the s1 data */
-void kf2k3pcb_decrypt_s1data(running_machine *machine)
+void kf2k3pcb_decrypt_s1data(running_machine &machine)
 {
 	UINT8 *src;
 	UINT8 *dst;
 	int i;
-	int tx_size = machine->region( "fixed" )->bytes();
-	int srom_size = machine->region( "sprites" )->bytes();
+	int tx_size = machine.region( "fixed" )->bytes();
+	int srom_size = machine.region( "sprites" )->bytes();
 
-	src = machine->region( "sprites" )->base() + srom_size - 0x1000000 - 0x80000; // Decrypt S
-	dst = machine->region( "fixed" )->base();
-
-	for( i = 0; i < tx_size / 2; i++ )
-	{
-		dst[ i ] = src[ (i & ~0x1f) + ((i & 7) << 2) + ((~i & 8) >> 2) + ((i & 0x10) >> 4) ];
-	}
-
-	src = machine->region( "sprites" )->base() + srom_size - 0x80000;
-	dst = machine->region( "fixed" )->base() + 0x80000;
+	src = machine.region( "sprites" )->base() + srom_size - 0x1000000 - 0x80000; // Decrypt S
+	dst = machine.region( "fixed" )->base();
 
 	for( i = 0; i < tx_size / 2; i++ )
 	{
 		dst[ i ] = src[ (i & ~0x1f) + ((i & 7) << 2) + ((~i & 8) >> 2) + ((i & 0x10) >> 4) ];
 	}
 
-	dst = machine->region( "fixed" )->base();
+	src = machine.region( "sprites" )->base() + srom_size - 0x80000;
+	dst = machine.region( "fixed" )->base() + 0x80000;
+
+	for( i = 0; i < tx_size / 2; i++ )
+	{
+		dst[ i ] = src[ (i & ~0x1f) + ((i & 7) << 2) + ((~i & 8) >> 2) + ((i & 0x10) >> 4) ];
+	}
+
+	dst = machine.region( "fixed" )->base();
 
 	for( i = 0; i < tx_size; i++ )
 	{
@@ -885,11 +885,11 @@ static int m1_address_scramble(int address, UINT16 key)
 }
 
 
-void neogeo_cmc50_m1_decrypt(running_machine *machine)
+void neogeo_cmc50_m1_decrypt(running_machine &machine)
 {
-	UINT8* rom = machine->region("audiocrypt")->base();
+	UINT8* rom = machine.region("audiocrypt")->base();
 	size_t rom_size = 0x80000;
-	UINT8* rom2 = machine->region("audiocpu")->base();
+	UINT8* rom2 = machine.region("audiocpu")->base();
 
 	UINT8* buffer = auto_alloc_array(machine, UINT8, rom_size);
 
@@ -912,7 +912,7 @@ void neogeo_cmc50_m1_decrypt(running_machine *machine)
 	#if 0
 	{
 		FILE *fp;
-		const char *gamename = machine->system().name;
+		const char *gamename = machine.system().name;
 		char filename[256];
 		sprintf(filename, "%s_m1.dump", gamename);
 
@@ -929,7 +929,7 @@ void neogeo_cmc50_m1_decrypt(running_machine *machine)
 	#if 0
 	{
 		FILE *fp;
-		const char *gamename = machine->system().name;
+		const char *gamename = machine.system().name;
 		char filename[256];
 		sprintf(filename, "%s_m1extra.dump", gamename);
 
@@ -954,9 +954,9 @@ NeoGeo 'P' ROM encryption
 
 
 /* Kof98 uses an early encryption, quite different from the others */
-void kof98_decrypt_68k(running_machine *machine)
+void kof98_decrypt_68k(running_machine &machine)
 {
-	UINT8 *src = machine->region("maincpu")->base();
+	UINT8 *src = machine.region("maincpu")->base();
 	UINT8 *dst = auto_alloc_array(machine, UINT8, 0x200000);
 	int i, j, k;
 	static const UINT32 sec[]={0x000000,0x100000,0x000004,0x100004,0x10000a,0x00000a,0x10000e,0x00000e};
@@ -1001,12 +1001,12 @@ void kof98_decrypt_68k(running_machine *machine)
 
 
 /* kof99, garou, garouo, mslug3 and kof2000 have and SMA chip which contains program code and decrypts the 68k roms */
-void kof99_decrypt_68k(running_machine *machine)
+void kof99_decrypt_68k(running_machine &machine)
 {
 	UINT16 *rom;
 	int i,j;
 
-	rom = (UINT16 *)(machine->region("maincpu")->base() + 0x100000);
+	rom = (UINT16 *)(machine.region("maincpu")->base() + 0x100000);
 	/* swap data lines on the whole ROMs */
 	for (i = 0;i < 0x800000/2;i++)
 	{
@@ -1025,7 +1025,7 @@ void kof99_decrypt_68k(running_machine *machine)
 	}
 
 	/* swap address lines & relocate fixed part */
-	rom = (UINT16 *)machine->region("maincpu")->base();
+	rom = (UINT16 *)machine.region("maincpu")->base();
 	for (i = 0;i < 0x0c0000/2;i++)
 	{
 		rom[i] = rom[0x700000/2 + BITSWAP24(i,23,22,21,20,19,18,11,6,14,17,16,5,8,10,12,0,4,3,2,7,9,15,13,1)];
@@ -1033,13 +1033,13 @@ void kof99_decrypt_68k(running_machine *machine)
 }
 
 
-void garou_decrypt_68k(running_machine *machine)
+void garou_decrypt_68k(running_machine &machine)
 {
 	UINT16 *rom;
 	int i,j;
 
 	/* thanks to Razoola and Mr K for the info */
-	rom = (UINT16 *)(machine->region("maincpu")->base() + 0x100000);
+	rom = (UINT16 *)(machine.region("maincpu")->base() + 0x100000);
 	/* swap data lines on the whole ROMs */
 	for (i = 0;i < 0x800000/2;i++)
 	{
@@ -1047,14 +1047,14 @@ void garou_decrypt_68k(running_machine *machine)
 	}
 
 	/* swap address lines & relocate fixed part */
-	rom = (UINT16 *)machine->region("maincpu")->base();
+	rom = (UINT16 *)machine.region("maincpu")->base();
 	for (i = 0;i < 0x0c0000/2;i++)
 	{
 		rom[i] = rom[0x710000/2 + BITSWAP24(i,23,22,21,20,19,18,4,5,16,14,7,9,6,13,17,15,3,1,2,12,11,8,10,0)];
 	}
 
 	/* swap address lines for the banked part */
-	rom = (UINT16 *)(machine->region("maincpu")->base() + 0x100000);
+	rom = (UINT16 *)(machine.region("maincpu")->base() + 0x100000);
 	for (i = 0;i < 0x800000/2;i+=0x8000/2)
 	{
 		UINT16 buffer[0x8000/2];
@@ -1067,13 +1067,13 @@ void garou_decrypt_68k(running_machine *machine)
 }
 
 
-void garouo_decrypt_68k(running_machine *machine)
+void garouo_decrypt_68k(running_machine &machine)
 {
 	UINT16 *rom;
 	int i,j;
 
 	/* thanks to Razoola and Mr K for the info */
-	rom = (UINT16 *)(machine->region("maincpu")->base() + 0x100000);
+	rom = (UINT16 *)(machine.region("maincpu")->base() + 0x100000);
 	/* swap data lines on the whole ROMs */
 	for (i = 0;i < 0x800000/2;i++)
 	{
@@ -1081,14 +1081,14 @@ void garouo_decrypt_68k(running_machine *machine)
 	}
 
 	/* swap address lines & relocate fixed part */
-	rom = (UINT16 *)machine->region("maincpu")->base();
+	rom = (UINT16 *)machine.region("maincpu")->base();
 	for (i = 0;i < 0x0c0000/2;i++)
 	{
 		rom[i] = rom[0x7f8000/2 + BITSWAP24(i,23,22,21,20,19,18,5,16,11,2,6,7,17,3,12,8,14,4,0,9,1,10,15,13)];
 	}
 
 	/* swap address lines for the banked part */
-	rom = (UINT16 *)(machine->region("maincpu")->base() + 0x100000);
+	rom = (UINT16 *)(machine.region("maincpu")->base() + 0x100000);
 	for (i = 0;i < 0x800000/2;i+=0x8000/2)
 	{
 		UINT16 buffer[0x8000/2];
@@ -1101,13 +1101,13 @@ void garouo_decrypt_68k(running_machine *machine)
 }
 
 
-void mslug3_decrypt_68k(running_machine *machine)
+void mslug3_decrypt_68k(running_machine &machine)
 {
 	UINT16 *rom;
 	int i,j;
 
 	/* thanks to Razoola and Mr K for the info */
-	rom = (UINT16 *)(machine->region("maincpu")->base() + 0x100000);
+	rom = (UINT16 *)(machine.region("maincpu")->base() + 0x100000);
 	/* swap data lines on the whole ROMs */
 	for (i = 0;i < 0x800000/2;i++)
 	{
@@ -1115,14 +1115,14 @@ void mslug3_decrypt_68k(running_machine *machine)
 	}
 
 	/* swap address lines & relocate fixed part */
-	rom = (UINT16 *)machine->region("maincpu")->base();
+	rom = (UINT16 *)machine.region("maincpu")->base();
 	for (i = 0;i < 0x0c0000/2;i++)
 	{
 		rom[i] = rom[0x5d0000/2 + BITSWAP24(i,23,22,21,20,19,18,15,2,1,13,3,0,9,6,16,4,11,5,7,12,17,14,10,8)];
 	}
 
 	/* swap address lines for the banked part */
-	rom = (UINT16 *)(machine->region("maincpu")->base() + 0x100000);
+	rom = (UINT16 *)(machine.region("maincpu")->base() + 0x100000);
 	for (i = 0;i < 0x800000/2;i+=0x10000/2)
 	{
 		UINT16 buffer[0x10000/2];
@@ -1135,13 +1135,13 @@ void mslug3_decrypt_68k(running_machine *machine)
 }
 
 
-void kof2000_decrypt_68k(running_machine *machine)
+void kof2000_decrypt_68k(running_machine &machine)
 {
 	UINT16 *rom;
 	int i,j;
 
 	/* thanks to Razoola and Mr K for the info */
-	rom = (UINT16 *)(machine->region("maincpu")->base() + 0x100000);
+	rom = (UINT16 *)(machine.region("maincpu")->base() + 0x100000);
 	/* swap data lines on the whole ROMs */
 	for (i = 0;i < 0x800000/2;i++)
 	{
@@ -1160,7 +1160,7 @@ void kof2000_decrypt_68k(running_machine *machine)
 	}
 
 	/* swap address lines & relocate fixed part */
-	rom = (UINT16 *)machine->region("maincpu")->base();
+	rom = (UINT16 *)machine.region("maincpu")->base();
 	for (i = 0;i < 0x0c0000/2;i++)
 	{
 		rom[i] = rom[0x73a000/2 + BITSWAP24(i,23,22,21,20,19,18,8,4,15,13,3,14,16,2,6,17,7,12,10,0,5,11,1,9)];
@@ -1169,11 +1169,11 @@ void kof2000_decrypt_68k(running_machine *machine)
 
 
 /* kof2002, matrim, samsho5, samsh5sp have some simple block swapping */
-void kof2002_decrypt_68k(running_machine *machine)
+void kof2002_decrypt_68k(running_machine &machine)
 {
 	int i;
 	static const int sec[]={0x100000,0x280000,0x300000,0x180000,0x000000,0x380000,0x200000,0x080000};
-	UINT8 *src = machine->region("maincpu")->base()+0x100000;
+	UINT8 *src = machine.region("maincpu")->base()+0x100000;
 	UINT8 *dst = auto_alloc_array(machine, UINT8, 0x400000);
 	memcpy( dst, src, 0x400000 );
 	for( i=0; i<8; ++i )
@@ -1184,11 +1184,11 @@ void kof2002_decrypt_68k(running_machine *machine)
 }
 
 
-void matrim_decrypt_68k(running_machine *machine)
+void matrim_decrypt_68k(running_machine &machine)
 {
 	int i;
 	static const int sec[]={0x100000,0x280000,0x300000,0x180000,0x000000,0x380000,0x200000,0x080000};
-	UINT8 *src = machine->region("maincpu")->base()+0x100000;
+	UINT8 *src = machine.region("maincpu")->base()+0x100000;
 	UINT8 *dst = auto_alloc_array(machine, UINT8, 0x400000);
 	memcpy( dst, src, 0x400000);
 	for( i=0; i<8; ++i )
@@ -1199,11 +1199,11 @@ void matrim_decrypt_68k(running_machine *machine)
 }
 
 
-void samsho5_decrypt_68k(running_machine *machine)
+void samsho5_decrypt_68k(running_machine &machine)
 {
 	int i;
 	static const int sec[]={0x000000,0x080000,0x700000,0x680000,0x500000,0x180000,0x200000,0x480000,0x300000,0x780000,0x600000,0x280000,0x100000,0x580000,0x400000,0x380000};
-	UINT8 *src = machine->region("maincpu")->base();
+	UINT8 *src = machine.region("maincpu")->base();
 	UINT8 *dst = auto_alloc_array(machine, UINT8, 0x800000);
 
 	memcpy( dst, src, 0x800000 );
@@ -1215,11 +1215,11 @@ void samsho5_decrypt_68k(running_machine *machine)
 }
 
 
-void samsh5sp_decrypt_68k(running_machine *machine)
+void samsh5sp_decrypt_68k(running_machine &machine)
 {
 	int i;
 	static const int sec[]={0x000000,0x080000,0x500000,0x480000,0x600000,0x580000,0x700000,0x280000,0x100000,0x680000,0x400000,0x780000,0x200000,0x380000,0x300000,0x180000};
-	UINT8 *src = machine->region("maincpu")->base();
+	UINT8 *src = machine.region("maincpu")->base();
 	UINT8 *dst = auto_alloc_array(machine, UINT8, 0x800000);
 
 	memcpy( dst, src, 0x800000 );
@@ -1232,14 +1232,14 @@ void samsh5sp_decrypt_68k(running_machine *machine)
 
 
 /* kf2k3pcb, kof2003, kof2003h, mslug5 and svc have updated P rom scramble */
-void mslug5_decrypt_68k(running_machine *machine)
+void mslug5_decrypt_68k(running_machine &machine)
 {
 	static const UINT8 xor1[ 0x20 ] = { 0xc2, 0x4b, 0x74, 0xfd, 0x0b, 0x34, 0xeb, 0xd7, 0x10, 0x6d, 0xf9, 0xce, 0x5d, 0xd5, 0x61, 0x29, 0xf5, 0xbe, 0x0d, 0x82, 0x72, 0x45, 0x0f, 0x24, 0xb3, 0x34, 0x1b, 0x99, 0xea, 0x09, 0xf3, 0x03 };
 	static const UINT8 xor2[ 0x20 ] = { 0x36, 0x09, 0xb0, 0x64, 0x95, 0x0f, 0x90, 0x42, 0x6e, 0x0f, 0x30, 0xf6, 0xe5, 0x08, 0x30, 0x64, 0x08, 0x04, 0x00, 0x2f, 0x72, 0x09, 0xa0, 0x13, 0xc9, 0x0b, 0xa0, 0x3e, 0xc2, 0x00, 0x40, 0x2b };
 	int i;
 	int ofst;
 	int rom_size = 0x800000;
-	UINT8 *rom = machine->region( "maincpu" )->base();
+	UINT8 *rom = machine.region( "maincpu" )->base();
 	UINT8 *buf = auto_alloc_array(machine, UINT8,  rom_size );
 
 	for( i = 0; i < 0x100000; i++ )
@@ -1277,14 +1277,14 @@ void mslug5_decrypt_68k(running_machine *machine)
 }
 
 
-void svc_px_decrypt(running_machine *machine)
+void svc_px_decrypt(running_machine &machine)
 {
 	static const UINT8 xor1[ 0x20 ] = { 0x3b, 0x6a, 0xf7, 0xb7, 0xe8, 0xa9, 0x20, 0x99, 0x9f, 0x39, 0x34, 0x0c, 0xc3, 0x9a, 0xa5, 0xc8, 0xb8, 0x18, 0xce, 0x56, 0x94, 0x44, 0xe3, 0x7a, 0xf7, 0xdd, 0x42, 0xf0, 0x18, 0x60, 0x92, 0x9f };
 	static const UINT8 xor2[ 0x20 ] = { 0x69, 0x0b, 0x60, 0xd6, 0x4f, 0x01, 0x40, 0x1a, 0x9f, 0x0b, 0xf0, 0x75, 0x58, 0x0e, 0x60, 0xb4, 0x14, 0x04, 0x20, 0xe4, 0xb9, 0x0d, 0x10, 0x89, 0xeb, 0x07, 0x30, 0x90, 0x50, 0x0e, 0x20, 0x26 };
 	int i;
 	int ofst;
 	int rom_size = 0x800000;
-	UINT8 *rom = machine->region( "maincpu" )->base();
+	UINT8 *rom = machine.region( "maincpu" )->base();
 	UINT8 *buf = auto_alloc_array(machine, UINT8,  rom_size );
 
 	for( i = 0; i < 0x100000; i++ )
@@ -1322,13 +1322,13 @@ void svc_px_decrypt(running_machine *machine)
 }
 
 
-void kf2k3pcb_decrypt_68k(running_machine *machine)
+void kf2k3pcb_decrypt_68k(running_machine &machine)
 {
 	static const UINT8 xor2[ 0x20 ] = { 0xb4, 0x0f, 0x40, 0x6c, 0x38, 0x07, 0xd0, 0x3f, 0x53, 0x08, 0x80, 0xaa, 0xbe, 0x07, 0xc0, 0xfa, 0xd0, 0x08, 0x10, 0xd2, 0xf1, 0x03, 0x70, 0x7e, 0x87, 0x0b, 0x40, 0xf6, 0x2a, 0x0a, 0xe0, 0xf9 };
 	int i;
 	int ofst;
 	int rom_size = 0x900000;
-	UINT8 *rom = machine->region( "maincpu" )->base();
+	UINT8 *rom = machine.region( "maincpu" )->base();
 	UINT8 *buf = auto_alloc_array(machine, UINT8,  rom_size );
 
 	for (i = 0; i < 0x100000; i++)
@@ -1364,14 +1364,14 @@ void kf2k3pcb_decrypt_68k(running_machine *machine)
 }
 
 
-void kof2003_decrypt_68k(running_machine *machine)
+void kof2003_decrypt_68k(running_machine &machine)
 {
 	static const UINT8 xor1[0x20] = { 0x3b, 0x6a, 0xf7, 0xb7, 0xe8, 0xa9, 0x20, 0x99, 0x9f, 0x39, 0x34, 0x0c, 0xc3, 0x9a, 0xa5, 0xc8, 0xb8, 0x18, 0xce, 0x56, 0x94, 0x44, 0xe3, 0x7a, 0xf7, 0xdd, 0x42, 0xf0, 0x18, 0x60, 0x92, 0x9f };
 	static const UINT8 xor2[0x20] = { 0x2f, 0x02, 0x60, 0xbb, 0x77, 0x01, 0x30, 0x08, 0xd8, 0x01, 0xa0, 0xdf, 0x37, 0x0a, 0xf0, 0x65, 0x28, 0x03, 0xd0, 0x23, 0xd3, 0x03, 0x70, 0x42, 0xbb, 0x06, 0xf0, 0x28, 0xba, 0x0f, 0xf0, 0x7a };
 	int i;
 	int ofst;
 	int rom_size = 0x900000;
-	UINT8 *rom = machine->region( "maincpu" )->base();
+	UINT8 *rom = machine.region( "maincpu" )->base();
 	UINT8 *buf = auto_alloc_array(machine, UINT8,  rom_size );
 
 	for (i = 0; i < 0x100000; i++)
@@ -1412,14 +1412,14 @@ void kof2003_decrypt_68k(running_machine *machine)
 
 
 // Thanks to IQ_132 for the info
-void kof2003h_decrypt_68k(running_machine *machine)
+void kof2003h_decrypt_68k(running_machine &machine)
 {
 	static const UINT8 xor1[0x20] = { 0xc2, 0x4b, 0x74, 0xfd, 0x0b, 0x34, 0xeb, 0xd7, 0x10, 0x6d, 0xf9, 0xce, 0x5d, 0xd5, 0x61, 0x29, 0xf5, 0xbe, 0x0d, 0x82, 0x72, 0x45, 0x0f, 0x24, 0xb3, 0x34, 0x1b, 0x99, 0xea, 0x09, 0xf3, 0x03 };
 	static const UINT8 xor2[0x20] = { 0x2b, 0x09, 0xd0, 0x7f, 0x51, 0x0b, 0x10, 0x4c, 0x5b, 0x07, 0x70, 0x9d, 0x3e, 0x0b, 0xb0, 0xb6, 0x54, 0x09, 0xe0, 0xcc, 0x3d, 0x0d, 0x80, 0x99, 0x87, 0x03, 0x90, 0x82, 0xfe, 0x04, 0x20, 0x18 };
 	int i;
 	int ofst;
 	int rom_size = 0x900000;
-	UINT8 *rom = machine->region( "maincpu" )->base();
+	UINT8 *rom = machine.region( "maincpu" )->base();
 	UINT8 *buf = auto_alloc_array(machine, UINT8,  rom_size );
 
 	for (i = 0; i < 0x100000; i++)
@@ -1467,10 +1467,10 @@ NeoGeo 'V' (PCM) ROM encryption
 ***************************************************************************/
 
 /* Neo-Pcm2 Drivers for Encrypted V Roms */
-void neo_pcm2_snk_1999(running_machine *machine, int value)
+void neo_pcm2_snk_1999(running_machine &machine, int value)
 {	/* thanks to Elsemi for the NEO-PCM2 info */
-	UINT16 *rom = (UINT16 *)machine->region("ymsnd")->base();
-	int size = machine->region("ymsnd")->bytes();
+	UINT16 *rom = (UINT16 *)machine.region("ymsnd")->base();
+	int size = machine.region("ymsnd")->bytes();
 	int i, j;
 
 	if( rom != NULL )
@@ -1491,7 +1491,7 @@ void neo_pcm2_snk_1999(running_machine *machine, int value)
 
 
 /* the later PCM2 games have additional scrambling */
-void neo_pcm2_swap(running_machine *machine, int value)
+void neo_pcm2_swap(running_machine &machine, int value)
 {
 	static const UINT32 addrs[7][2]={
 		{0x000000,0xa5000},
@@ -1509,7 +1509,7 @@ void neo_pcm2_swap(running_machine *machine, int value)
 		{0xcb,0x29,0x7d,0x43,0xd2,0x3a,0xc2,0xb4},
 		{0x4b,0xa4,0x63,0x46,0xf0,0x91,0xea,0x62},
 		{0x4b,0xa4,0x63,0x46,0xf0,0x91,0xea,0x62}};
-	UINT8 *src = machine->region("ymsnd")->base();
+	UINT8 *src = machine.region("ymsnd")->base();
 	UINT8 *buf = auto_alloc_array(machine, UINT8, 0x1000000);
 	int i, j, d;
 
@@ -1533,7 +1533,7 @@ NeoGeo 'SP1' (BIOS) ROM encryption
 
 
 /* only found on kf2k3pcb */
-void kof2003biosdecode(running_machine *machine)
+void kof2003biosdecode(running_machine &machine)
 {
 	static const UINT8 address[0x80]={
 		0xb9,0xb8,0x36,0x37,0x3d,0x3c,0xb2,0xb3,
@@ -1553,7 +1553,7 @@ void kof2003biosdecode(running_machine *machine)
 		0xd3,0xd2,0x5c,0x5d,0x57,0x56,0xd8,0xd9,
 		0xd3,0xd2,0x5c,0x5d,0x57,0x56,0xd8,0xd9,
 	};
-	UINT16*src= (UINT16*)machine->region( "mainbios" )->base();
+	UINT16*src= (UINT16*)machine.region( "mainbios" )->base();
 	UINT16*buf= auto_alloc_array(machine, UINT16, 0x80000/2);
 	int	a,addr;
 

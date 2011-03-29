@@ -271,19 +271,19 @@ static DEVICE_START( tms9927 )
 		tms->hpixels_per_column = tms->intf->hpixels_per_column;
 
 		/* get the screen device */
-		tms->screen = downcast<screen_device *>(device->machine->device(tms->intf->screen_tag));
+		tms->screen = downcast<screen_device *>(device->machine().device(tms->intf->screen_tag));
 		assert(tms->screen != NULL);
 
 		/* get the self-load PROM */
 		if (tms->intf->selfload_region != NULL)
 		{
-			tms->selfload = device->machine->region(tms->intf->selfload_region)->base();
+			tms->selfload = device->machine().region(tms->intf->selfload_region)->base();
 			assert(tms->selfload != NULL);
 		}
 	}
 
 	/* register for state saving */
-	device->machine->state().register_postload(tms9927_state_save_postload, tms);
+	device->machine().state().register_postload(tms9927_state_save_postload, tms);
 
 	device->save_item(NAME(tms->clock));
 	device->save_item(NAME(tms->reg));

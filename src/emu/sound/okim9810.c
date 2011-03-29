@@ -101,7 +101,7 @@ device_config *okim9810_device_config::static_alloc_device_config(const machine_
 
 device_t *okim9810_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, okim9810_device(machine, *this));
+	return auto_alloc(machine, okim9810_device(machine, *this));
 }
 
 

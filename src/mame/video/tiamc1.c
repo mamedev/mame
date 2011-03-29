@@ -13,7 +13,7 @@
 
 WRITE8_HANDLER( tiamc1_videoram_w )
 {
-	tiamc1_state *state = space->machine->driver_data<tiamc1_state>();
+	tiamc1_state *state = space->machine().driver_data<tiamc1_state>();
 	if(!(state->layers_ctrl & 2))
 		state->charram[offset + 0x0000] = data;
 	if(!(state->layers_ctrl & 4))
@@ -24,7 +24,7 @@ WRITE8_HANDLER( tiamc1_videoram_w )
 		state->charram[offset + 0x1800] = data;
 
 	if ((state->layers_ctrl & (16|8|4|2)) != (16|8|4|2))
-		gfx_element_mark_dirty(space->machine->gfx[0], (offset / 8) & 0xff);
+		gfx_element_mark_dirty(space->machine().gfx[0], (offset / 8) & 0xff);
 
 	if(!(state->layers_ctrl & 1)) {
 		state->tileram[offset] = data;
@@ -37,58 +37,58 @@ WRITE8_HANDLER( tiamc1_videoram_w )
 
 WRITE8_HANDLER( tiamc1_bankswitch_w )
 {
-	tiamc1_state *state = space->machine->driver_data<tiamc1_state>();
+	tiamc1_state *state = space->machine().driver_data<tiamc1_state>();
 	if ((data & 128) != (state->layers_ctrl & 128))
-		tilemap_mark_all_tiles_dirty_all(space->machine);
+		tilemap_mark_all_tiles_dirty_all(space->machine());
 
 	state->layers_ctrl = data;
 }
 
 WRITE8_HANDLER( tiamc1_sprite_x_w )
 {
-	tiamc1_state *state = space->machine->driver_data<tiamc1_state>();
+	tiamc1_state *state = space->machine().driver_data<tiamc1_state>();
 	state->spriteram_x[offset] = data;
 }
 
 WRITE8_HANDLER( tiamc1_sprite_y_w )
 {
-	tiamc1_state *state = space->machine->driver_data<tiamc1_state>();
+	tiamc1_state *state = space->machine().driver_data<tiamc1_state>();
 	state->spriteram_y[offset] = data;
 }
 
 WRITE8_HANDLER( tiamc1_sprite_a_w )
 {
-	tiamc1_state *state = space->machine->driver_data<tiamc1_state>();
+	tiamc1_state *state = space->machine().driver_data<tiamc1_state>();
 	state->spriteram_a[offset] = data;
 }
 
 WRITE8_HANDLER( tiamc1_sprite_n_w )
 {
-	tiamc1_state *state = space->machine->driver_data<tiamc1_state>();
+	tiamc1_state *state = space->machine().driver_data<tiamc1_state>();
 	state->spriteram_n[offset] = data;
 }
 
 WRITE8_HANDLER( tiamc1_bg_vshift_w )
 {
-	tiamc1_state *state = space->machine->driver_data<tiamc1_state>();
+	tiamc1_state *state = space->machine().driver_data<tiamc1_state>();
 	state->bg_vshift = data;
 }
 
 WRITE8_HANDLER( tiamc1_bg_hshift_w )
 {
-	tiamc1_state *state = space->machine->driver_data<tiamc1_state>();
+	tiamc1_state *state = space->machine().driver_data<tiamc1_state>();
 	state->bg_hshift = data;
 }
 
 WRITE8_HANDLER( tiamc1_palette_w )
 {
-	tiamc1_state *state = space->machine->driver_data<tiamc1_state>();
-	palette_set_color(space->machine, offset, state->palette[data]);
+	tiamc1_state *state = space->machine().driver_data<tiamc1_state>();
+	palette_set_color(space->machine(), offset, state->palette[data]);
 }
 
 PALETTE_INIT( tiamc1 )
 {
-	tiamc1_state *state = machine->driver_data<tiamc1_state>();
+	tiamc1_state *state = machine.driver_data<tiamc1_state>();
 	// Voltage computed by Proteus
 	//static const float g_v[8]={1.05f,0.87f,0.81f,0.62f,0.44f,0.25f,0.19f,0.00f};
 	//static const float r_v[8]={1.37f,1.13f,1.00f,0.75f,0.63f,0.38f,0.25f,0.00f};
@@ -122,19 +122,19 @@ PALETTE_INIT( tiamc1 )
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	tiamc1_state *state = machine->driver_data<tiamc1_state>();
+	tiamc1_state *state = machine.driver_data<tiamc1_state>();
 	SET_TILE_INFO(0, state->tileram[tile_index], 0, 0);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	tiamc1_state *state = machine->driver_data<tiamc1_state>();
+	tiamc1_state *state = machine.driver_data<tiamc1_state>();
 	SET_TILE_INFO(0, state->tileram[tile_index + 1024], 0, 0);
 }
 
 VIDEO_START( tiamc1 )
 {
-	tiamc1_state *state = machine->driver_data<tiamc1_state>();
+	tiamc1_state *state = machine.driver_data<tiamc1_state>();
 	UINT8 *video_ram;
 
 	video_ram = auto_alloc_array_clear(machine, UINT8, 0x3040);
@@ -162,12 +162,12 @@ VIDEO_START( tiamc1 )
 	state_save_register_global(machine, state->bg_vshift);
 	state_save_register_global(machine, state->bg_hshift);
 
-	gfx_element_set_source(machine->gfx[0], state->charram);
+	gfx_element_set_source(machine.gfx[0], state->charram);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	tiamc1_state *state = machine->driver_data<tiamc1_state>();
+	tiamc1_state *state = machine.driver_data<tiamc1_state>();
 	int offs;
 
 	for (offs = 0; offs < 16; offs++)
@@ -181,7 +181,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		spritecode = state->spriteram_n[offs] ^ 0xff;
 
 		if (!(state->spriteram_a[offs] & 0x01))
-			drawgfx_transpen(bitmap, cliprect, machine->gfx[1],
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[1],
 				spritecode,
 				0,
 				flipx, flipy,
@@ -191,7 +191,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( tiamc1 )
 {
-	tiamc1_state *state = screen->machine->driver_data<tiamc1_state>();
+	tiamc1_state *state = screen->machine().driver_data<tiamc1_state>();
 #if 0
 	int i;
 
@@ -214,7 +214,7 @@ SCREEN_UPDATE( tiamc1 )
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap1, 0, 0);
 
 
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 
 	return 0;
 }

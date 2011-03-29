@@ -210,7 +210,7 @@ static WRITE8_HANDLER( seawolf2_lamps_w )
 
 static WRITE8_HANDLER( seawolf2_sound_1_w )  // Port 40
 {
-	device_t *samples = space->machine->device("samples");
+	device_t *samples = space->machine().device("samples");
 	UINT8 rising_bits = data & ~port_1_last;
 	port_1_last = data;
 
@@ -225,7 +225,7 @@ static WRITE8_HANDLER( seawolf2_sound_1_w )  // Port 40
 
 static WRITE8_HANDLER( seawolf2_sound_2_w )  // Port 41
 {
-	device_t *samples = space->machine->device("samples");
+	device_t *samples = space->machine().device("samples");
 	UINT8 rising_bits = data & ~port_2_last;
 	port_2_last = data;
 
@@ -250,7 +250,7 @@ static WRITE8_HANDLER( seawolf2_sound_2_w )  // Port 41
 	if (rising_bits & 0x10) sample_start(samples, 8, 3, 0);  /* Right Sonar */
 	if (rising_bits & 0x20) sample_start(samples, 3, 3, 0);  /* Left Sonar */
 
-	coin_counter_w(space->machine, 0, data & 0x40);    /* Coin Counter */
+	coin_counter_w(space->machine(), 0, data & 0x40);    /* Coin Counter */
 }
 
 
@@ -264,7 +264,7 @@ static WRITE8_HANDLER( seawolf2_sound_2_w )  // Port 41
 static CUSTOM_INPUT( ebases_trackball_r )
 {
 	static const char *const names[] = { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" };
-	return input_port_read(field->port->machine, names[input_select]);
+	return input_port_read(field->port->machine(), names[input_select]);
 }
 
 
@@ -276,7 +276,7 @@ static WRITE8_HANDLER( ebases_trackball_select_w )
 
 static WRITE8_HANDLER( ebases_coin_w )
 {
-	coin_counter_w(space->machine, 0, data & 1);
+	coin_counter_w(space->machine(), 0, data & 1);
 }
 
 
@@ -289,9 +289,9 @@ static WRITE8_HANDLER( ebases_coin_w )
 
 static READ8_HANDLER( spacezap_io_r )
 {
-	coin_counter_w(space->machine, 0, (offset >> 8) & 1);
-	coin_counter_w(space->machine, 1, (offset >> 9) & 1);
-	return input_port_read_safe(space->machine, "P3HANDLE", 0xff);
+	coin_counter_w(space->machine(), 0, (offset >> 8) & 1);
+	coin_counter_w(space->machine(), 1, (offset >> 9) & 1);
+	return input_port_read_safe(space->machine(), "P3HANDLE", 0xff);
 }
 
 
@@ -308,13 +308,13 @@ static READ8_HANDLER( wow_io_r )
 
 	switch ((offset >> 9) & 7)
 	{
-		case 0: coin_counter_w(space->machine, 0, data);		break;
-		case 1: coin_counter_w(space->machine, 1, data);		break;
+		case 0: coin_counter_w(space->machine(), 0, data);		break;
+		case 1: coin_counter_w(space->machine(), 1, data);		break;
 		case 2: astrocade_sparkle[0] = data;	break;
 		case 3: astrocade_sparkle[1] = data;	break;
 		case 4: astrocade_sparkle[2] = data;	break;
 		case 5: astrocade_sparkle[3] = data;	break;
-		case 7: coin_counter_w(space->machine, 2, data);		break;
+		case 7: coin_counter_w(space->machine(), 2, data);		break;
 	}
 	return 0xff;
 }
@@ -333,15 +333,15 @@ static READ8_HANDLER( gorf_io_1_r )
 
 	switch ((offset >> 9) & 7)
 	{
-		case 0: coin_counter_w(space->machine, 0, data);		break;
-		case 1: coin_counter_w(space->machine, 1, data);		break;
+		case 0: coin_counter_w(space->machine(), 0, data);		break;
+		case 1: coin_counter_w(space->machine(), 1, data);		break;
 		case 2: astrocade_sparkle[0] = data;	break;
 		case 3: astrocade_sparkle[1] = data;	break;
 		case 4: astrocade_sparkle[2] = data;	break;
 		case 5: astrocade_sparkle[3] = data;	break;
 		case 6:
-			space->machine->device<astrocade_device>("astrocade1")->set_output_gain(0, data ? 0.0 : 1.0);
-			space->machine->device<samples_device>("samples")->set_output_gain(0, data ? 1.0 : 0.0);
+			space->machine().device<astrocade_device>("astrocade1")->set_output_gain(0, data ? 0.0 : 1.0);
+			space->machine().device<samples_device>("samples")->set_output_gain(0, data ? 1.0 : 0.0);
 			break;
 		case 7:	mame_printf_debug("io_1:%d\n", data); break;
 	}
@@ -381,11 +381,11 @@ static READ8_HANDLER( robby_io_r )
 
 	switch ((offset >> 9) & 7)
 	{
-		case 0: coin_counter_w(space->machine, 0, data);	break;
-		case 1: coin_counter_w(space->machine, 1, data);	break;
-		case 2: coin_counter_w(space->machine, 2, data);	break;
-		case 6: set_led_status(space->machine, 0, data);	break;
-		case 7: set_led_status(space->machine, 1, data);	break;
+		case 0: coin_counter_w(space->machine(), 0, data);	break;
+		case 1: coin_counter_w(space->machine(), 1, data);	break;
+		case 2: coin_counter_w(space->machine(), 2, data);	break;
+		case 6: set_led_status(space->machine(), 0, data);	break;
+		case 7: set_led_status(space->machine(), 1, data);	break;
 	}
 	return 0xff;
 }
@@ -400,10 +400,10 @@ static READ8_HANDLER( robby_io_r )
 
 static READ8_HANDLER( profpac_io_1_r )
 {
-	coin_counter_w(space->machine, 0, (offset >> 8) & 1);
-	coin_counter_w(space->machine, 1, (offset >> 9) & 1);
-	set_led_status(space->machine, 0, (offset >> 10) & 1);
-	set_led_status(space->machine, 1, (offset >> 11) & 1);
+	coin_counter_w(space->machine(), 0, (offset >> 8) & 1);
+	coin_counter_w(space->machine(), 1, (offset >> 9) & 1);
+	set_led_status(space->machine(), 0, (offset >> 10) & 1);
+	set_led_status(space->machine(), 1, (offset >> 11) & 1);
 	return 0xff;
 }
 
@@ -432,14 +432,14 @@ static WRITE8_HANDLER( profpac_banksw_w )
 
 	/* set the main banking */
 	space->install_read_bank(0x4000, 0xbfff, "bank1");
-	memory_set_bankptr(space->machine, "bank1", space->machine->region("user1")->base() + 0x8000 * bank);
+	memory_set_bankptr(space->machine(), "bank1", space->machine().region("user1")->base() + 0x8000 * bank);
 
 	/* bank 0 reads video RAM in the 4000-7FFF range */
 	if (bank == 0)
 		space->install_legacy_read_handler(0x4000, 0x7fff, FUNC(profpac_videoram_r));
 
 	/* if we have a 640k EPROM board, map that on top of the 4000-7FFF range if specified */
-	if ((data & 0x80) && space->machine->region("user2")->base() != NULL)
+	if ((data & 0x80) && space->machine().region("user2")->base() != NULL)
 	{
 		/* Note: There is a jumper which could change the base offset to 0xa8 instead */
 		bank = data - 0x80;
@@ -448,7 +448,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 		if (bank < 0x28)
 		{
 			space->install_read_bank(0x4000, 0x7fff, "bank2");
-			memory_set_bankptr(space->machine, "bank2", space->machine->region("user2")->base() + 0x4000 * bank);
+			memory_set_bankptr(space->machine(), "bank2", space->machine().region("user2")->base() + 0x4000 * bank);
 		}
 		else
 			space->unmap_read(0x4000, 0x7fff);
@@ -458,7 +458,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 
 static STATE_POSTLOAD( profbank_banksw_restore )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_IO);
+	address_space *space = machine.device("maincpu")->memory().space(AS_IO);
 
 	profpac_banksw_w(space, 0, profpac_bank);
 }
@@ -473,10 +473,10 @@ static STATE_POSTLOAD( profbank_banksw_restore )
 
 static READ8_HANDLER( demndrgn_io_r )
 {
-	coin_counter_w(space->machine, 0, (offset >> 8) & 1);
-	coin_counter_w(space->machine, 1, (offset >> 9) & 1);
-	set_led_status(space->machine, 0, (offset >> 10) & 1);
-	set_led_status(space->machine, 1, (offset >> 11) & 1);
+	coin_counter_w(space->machine(), 0, (offset >> 8) & 1);
+	coin_counter_w(space->machine(), 1, (offset >> 9) & 1);
+	set_led_status(space->machine(), 0, (offset >> 10) & 1);
+	set_led_status(space->machine(), 1, (offset >> 11) & 1);
 	input_select = (offset >> 12) & 1;
 	return 0xff;
 }
@@ -485,7 +485,7 @@ static READ8_HANDLER( demndrgn_io_r )
 static CUSTOM_INPUT( demndragn_joystick_r )
 {
 	static const char *const names[] = { "MOVEX", "MOVEY" };
-	return input_port_read(field->port->machine, names[input_select]);
+	return input_port_read(field->port->machine(), names[input_select]);
 }
 
 
@@ -526,7 +526,7 @@ static const ay8910_interface ay8912_interface =
 static WRITE8_HANDLER( tenpindx_sound_w )
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -554,7 +554,7 @@ static WRITE8_HANDLER( tenpindx_lamp_w )
 
 static WRITE8_HANDLER( tenpindx_counter_w )
 {
-	coin_counter_w(space->machine, 0, (data >> 0) & 1);
+	coin_counter_w(space->machine(), 0, (data >> 0) & 1);
 	if (data & 0xfc) mame_printf_debug("tenpindx_counter_w = %02X\n", data);
 }
 
@@ -1729,54 +1729,54 @@ ROM_END
 static DRIVER_INIT( seawolf2 )
 {
 	astrocade_video_config = 0x00;
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x40, 0x40, 0, 0xff18, FUNC(seawolf2_sound_1_w));
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x41, 0x41, 0, 0xff18, FUNC(seawolf2_sound_2_w));
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x42, 0x43, 0, 0xff18, FUNC(seawolf2_lamps_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x40, 0x40, 0, 0xff18, FUNC(seawolf2_sound_1_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x41, 0x41, 0, 0xff18, FUNC(seawolf2_sound_2_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x42, 0x43, 0, 0xff18, FUNC(seawolf2_lamps_w));
 }
 
 
 static DRIVER_INIT( ebases )
 {
 	astrocade_video_config = AC_SOUND_PRESENT;
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x20, 0x20, 0, 0xff07, FUNC(ebases_coin_w));
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x28, 0x28, 0, 0xff07, FUNC(ebases_trackball_select_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x20, 0x20, 0, 0xff07, FUNC(ebases_coin_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x28, 0x28, 0, 0xff07, FUNC(ebases_trackball_select_w));
 }
 
 
 static DRIVER_INIT( spacezap )
 {
 	astrocade_video_config = AC_SOUND_PRESENT | AC_MONITOR_BW;
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x13, 0x13, 0x03ff, 0xff00, FUNC(spacezap_io_r));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x13, 0x13, 0x03ff, 0xff00, FUNC(spacezap_io_r));
 }
 
 
 static DRIVER_INIT( wow )
 {
 	astrocade_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x15, 0x15, 0x0fff, 0xff00, FUNC(wow_io_r));
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x17, 0x17, 0xffff, 0xff00, FUNC(wow_speech_r));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x15, 0x15, 0x0fff, 0xff00, FUNC(wow_io_r));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x17, 0x17, 0xffff, 0xff00, FUNC(wow_speech_r));
 }
 
 
 static DRIVER_INIT( gorf )
 {
 	astrocade_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x15, 0x15, 0x0fff, 0xff00, FUNC(gorf_io_1_r));
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x16, 0x16, 0x0fff, 0xff00, FUNC(gorf_io_2_r));
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x17, 0x17, 0xffff, 0xff00, FUNC(gorf_speech_r));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x15, 0x15, 0x0fff, 0xff00, FUNC(gorf_io_1_r));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x16, 0x16, 0x0fff, 0xff00, FUNC(gorf_io_2_r));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x17, 0x17, 0xffff, 0xff00, FUNC(gorf_speech_r));
 }
 
 
 static DRIVER_INIT( robby )
 {
 	astrocade_video_config = AC_SOUND_PRESENT;
-	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x15, 0x15, 0x0fff, 0xff00, FUNC(robby_io_r));
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x15, 0x15, 0x0fff, 0xff00, FUNC(robby_io_r));
 }
 
 
 static DRIVER_INIT( profpac )
 {
-	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
 
 	astrocade_video_config = AC_SOUND_PRESENT;
 	iospace->install_legacy_read_handler(0x14, 0x14, 0x0fff, 0xff00, FUNC(profpac_io_1_r));
@@ -1784,13 +1784,13 @@ static DRIVER_INIT( profpac )
 
 	/* reset banking */
 	profpac_banksw_w(iospace, 0, 0);
-	machine->state().register_postload(profbank_banksw_restore, NULL);
+	machine.state().register_postload(profbank_banksw_restore, NULL);
 }
 
 
 static DRIVER_INIT( demndrgn )
 {
-	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
 
 	astrocade_video_config = 0x00;
 	iospace->install_legacy_read_handler(0x14, 0x14, 0x1fff, 0xff00, FUNC(demndrgn_io_r));
@@ -1800,13 +1800,13 @@ static DRIVER_INIT( demndrgn )
 
 	/* reset banking */
 	profpac_banksw_w(iospace, 0, 0);
-	machine->state().register_postload(profbank_banksw_restore, NULL);
+	machine.state().register_postload(profbank_banksw_restore, NULL);
 }
 
 
 static DRIVER_INIT( tenpindx )
 {
-	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
 
 	astrocade_video_config = 0x00;
 	iospace->install_read_port(0x60, 0x60, 0x0000, 0xff00, "P60");
@@ -1821,7 +1821,7 @@ static DRIVER_INIT( tenpindx )
 
 	/* reset banking */
 	profpac_banksw_w(iospace, 0, 0);
-	machine->state().register_postload(profbank_banksw_restore, NULL);
+	machine.state().register_postload(profbank_banksw_restore, NULL);
 }
 
 

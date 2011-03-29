@@ -547,9 +547,9 @@ static void SCSP_Init(device_t *device, scsp_state *scsp, const scsp_interface *
 		scsp->SCSPRAM += intf->roffset;
 	}
 
-	scsp->timerA = device->machine->scheduler().timer_alloc(FUNC(timerA_cb), scsp);
-	scsp->timerB = device->machine->scheduler().timer_alloc(FUNC(timerB_cb), scsp);
-	scsp->timerC = device->machine->scheduler().timer_alloc(FUNC(timerC_cb), scsp);
+	scsp->timerA = device->machine().scheduler().timer_alloc(FUNC(timerA_cb), scsp);
+	scsp->timerB = device->machine().scheduler().timer_alloc(FUNC(timerB_cb), scsp);
+	scsp->timerC = device->machine().scheduler().timer_alloc(FUNC(timerC_cb), scsp);
 
 	for(i=0;i<0x400;++i)
 	{
@@ -639,9 +639,9 @@ static void SCSP_Init(device_t *device, scsp_state *scsp, const scsp_interface *
 		scsp->Slots[i].EG.state=RELEASE;
 	}
 
-	LFO_Init(device->machine);
-	scsp->buffertmpl=auto_alloc_array_clear(device->machine, signed int, 44100);
-	scsp->buffertmpr=auto_alloc_array_clear(device->machine, signed int, 44100);
+	LFO_Init(device->machine());
+	scsp->buffertmpl=auto_alloc_array_clear(device->machine(), signed int, 44100);
+	scsp->buffertmpr=auto_alloc_array_clear(device->machine(), signed int, 44100);
 
 	// no "pend"
 	scsp->udata.data[0x20/2] = 0;
@@ -696,7 +696,7 @@ static void SCSP_UpdateSlotReg(scsp_state *scsp,int s,int r)
 static void SCSP_UpdateReg(scsp_state *scsp, int reg)
 {
 	/* temporary hack until this is converted to a device */
-	address_space *space = scsp->device->machine->firstcpu->memory().space(AS_PROGRAM);
+	address_space *space = scsp->device->machine().firstcpu->memory().space(AS_PROGRAM);
 	switch(reg&0x3f)
 	{
 		case 0x2:
@@ -716,7 +716,7 @@ static void SCSP_UpdateReg(scsp_state *scsp, int reg)
 			break;
 		case 0x6:
 		case 0x7:
-			scsp_midi_in(space->machine->device("scsp"), 0, scsp->udata.data[0x6/2]&0xff, 0);
+			scsp_midi_in(space->machine().device("scsp"), 0, scsp->udata.data[0x6/2]&0xff, 0);
 			break;
 		case 0x12:
 		case 0x13:
@@ -1214,7 +1214,7 @@ static void dma_scsp(address_space *space, scsp_state *scsp)
 
 	/*Job done,request a dma end irq*/
 	if(scsp_regs[0x1e/2] & 0x10)
-		device_set_input_line(space->machine->device("audiocpu"),dma_transfer_end,HOLD_LINE);
+		device_set_input_line(space->machine().device("audiocpu"),dma_transfer_end,HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1249,7 +1249,7 @@ static DEVICE_START( scsp )
 	{
 		scsp->Int68kCB = intf->irq_callback;
 
-		scsp->stream = device->machine->sound().stream_alloc(*device, 0, 2, 44100, scsp, SCSP_Update);
+		scsp->stream = device->machine().sound().stream_alloc(*device, 0, 2, 44100, scsp, SCSP_Update);
 	}
 }
 
@@ -1318,7 +1318,7 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 		scsp->scsp_dtlg = scsp_regs[0x416/2] & 0x0ffe;
 		if(scsp_dexe)
 		{
-			dma_scsp(device->machine->firstcpu->memory().space(AS_PROGRAM), scsp);
+			dma_scsp(device->machine().firstcpu->memory().space(AS_PROGRAM), scsp);
 			scsp_regs[0x416/2]^=0x1000;//disable starting bit
 		}
 		break;
@@ -1326,7 +1326,7 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 		case 0x42a:
 			if(stv_scu && !(stv_scu[40] & 0x40) /*&& scsp_regs[0x42c/2] & 0x20*/)/*Main CPU allow sound irq*/
 			{
-				device_set_input_line_and_vector(device->machine->firstcpu, 9, HOLD_LINE , 0x46);
+				device_set_input_line_and_vector(device->machine().firstcpu, 9, HOLD_LINE , 0x46);
 			    logerror("SCSP: Main CPU interrupt\n");
 			}
 		break;

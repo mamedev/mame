@@ -259,14 +259,14 @@ static DEVICE_START( es5503 )
 		chip->oscillators[osc].irqpend = 0;
 		chip->oscillators[osc].accumulator = 0;
 
-		chip->oscillators[osc].timer = device->machine->scheduler().timer_alloc(FUNC(es5503_timer_cb), &chip->oscillators[osc]);
+		chip->oscillators[osc].timer = device->machine().scheduler().timer_alloc(FUNC(es5503_timer_cb), &chip->oscillators[osc]);
 		chip->oscillators[osc].chip = (void *)chip;
 	}
 
 	chip->oscsenabled = 1;
 
 	chip->output_rate = (device->clock()/8)/34;	// (input clock / 8) / # of oscs. enabled + 2
-	chip->stream = device->machine->sound().stream_alloc(*device, 0, 2, chip->output_rate, chip, es5503_pcm_update);
+	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, chip->output_rate, chip, es5503_pcm_update);
 }
 
 READ8_DEVICE_HANDLER( es5503_r )

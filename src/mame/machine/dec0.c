@@ -16,17 +16,17 @@ Data East machine functions - Bryan McPhail, mish@tendril.co.uk
 
 READ16_HANDLER( dec0_controls_r )
 {
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 & 2 joystick & buttons */
-			return input_port_read(space->machine, "INPUTS");
+			return input_port_read(space->machine(), "INPUTS");
 
 		case 2: /* Credits, start buttons */
-			return input_port_read(space->machine, "SYSTEM");
+			return input_port_read(space->machine(), "SYSTEM");
 
 		case 4: /* Byte 4: Dipswitch bank 2, Byte 5: Dipswitch Bank 1 */
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 
 		case 8: /* Intel 8751 mc, Bad Dudes & Heavy Barrel only */
 			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", cpu_get_pc(space->cpu), 0x30c000+offset, state->i8751_return);
@@ -44,10 +44,10 @@ READ16_HANDLER( dec0_rotary_r )
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 rotary */
-			return ~(1 << input_port_read(space->machine, "AN0"));
+			return ~(1 << input_port_read(space->machine(), "AN0"));
 
 		case 8: /* Player 2 rotary */
-			return ~(1 << input_port_read(space->machine, "AN1"));
+			return ~(1 << input_port_read(space->machine(), "AN1"));
 
 		default:
 			logerror("Unknown rotary read at 300000 %02x\n", offset);
@@ -63,19 +63,19 @@ READ16_HANDLER( midres_controls_r )
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 Joystick + start, Player 2 Joystick + start */
-			return input_port_read(space->machine, "INPUTS");
+			return input_port_read(space->machine(), "INPUTS");
 
 		case 2: /* Dipswitches */
-			return input_port_read(space->machine, "DSW");
+			return input_port_read(space->machine(), "DSW");
 
 		case 4: /* Player 1 rotary */
-			return ~(1 << input_port_read(space->machine, "AN0"));
+			return ~(1 << input_port_read(space->machine(), "AN0"));
 
 		case 6: /* Player 2 rotary */
-			return ~(1 << input_port_read(space->machine, "AN1"));
+			return ~(1 << input_port_read(space->machine(), "AN1"));
 
 		case 8: /* Credits, start buttons */
-			return input_port_read(space->machine, "SYSTEM");
+			return input_port_read(space->machine(), "SYSTEM");
 
 		case 12:
 			return 0;	/* ?? watchdog ?? */
@@ -92,7 +92,7 @@ READ16_HANDLER( midres_controls_r )
 
 READ8_HANDLER( hippodrm_prot_r )
 {
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 //logerror("6280 PC %06x - Read %06x\n",cpu_getpc(),offset+0x1d0000);
 	if (state->hippodrm_lsb==0x45) return 0x4e;
 	if (state->hippodrm_lsb==0x92) return 0x15;
@@ -101,7 +101,7 @@ READ8_HANDLER( hippodrm_prot_r )
 
 WRITE8_HANDLER( hippodrm_prot_w )
 {
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 	switch (offset) {
 		case 4:	state->hippodrm_msb=data; break;
 		case 5:	state->hippodrm_lsb=data; break;
@@ -111,26 +111,26 @@ WRITE8_HANDLER( hippodrm_prot_w )
 
 READ8_HANDLER( hippodrm_shared_r )
 {
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 	return state->share[offset];
 }
 
 WRITE8_HANDLER( hippodrm_shared_w )
 {
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 	state->share[offset]=data;
 }
 
 static READ16_HANDLER( hippodrm_68000_share_r )
 {
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 	if (offset==0) device_yield(space->cpu); /* A wee helper */
 	return state->share[offset]&0xff;
 }
 
 static WRITE16_HANDLER( hippodrm_68000_share_w )
 {
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 	state->share[offset]=data&0xff;
 }
 
@@ -173,7 +173,7 @@ static WRITE16_HANDLER( hippodrm_68000_share_w )
 
 READ8_HANDLER(dec0_mcu_port_r )
 {
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 	int latchEnable=state->i8751_ports[2]>>4;
 
 	// P0 connected to 4 latches
@@ -194,15 +194,15 @@ READ8_HANDLER(dec0_mcu_port_r )
 
 WRITE8_HANDLER(dec0_mcu_port_w )
 {
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 	state->i8751_ports[offset]=data;
 
 	if (offset==2)
 	{
 		if ((data&0x4)==0)
-			cputag_set_input_line(space->machine, "maincpu", 5, HOLD_LINE);
+			cputag_set_input_line(space->machine(), "maincpu", 5, HOLD_LINE);
 		if ((data&0x8)==0)
-			cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, CLEAR_LINE);
+			cputag_set_input_line(space->machine(), "mcu", MCS51_INT1_LINE, CLEAR_LINE);
 		if ((data&0x40)==0)
 			state->i8751_return=(state->i8751_return&0xff00)|(state->i8751_ports[0]);
 		if ((data&0x80)==0)
@@ -210,9 +210,9 @@ WRITE8_HANDLER(dec0_mcu_port_w )
 	}
 }
 
-static void baddudes_i8751_write(running_machine *machine, int data)
+static void baddudes_i8751_write(running_machine &machine, int data)
 {
-	dec0_state *state = machine->driver_data<dec0_state>();
+	dec0_state *state = machine.driver_data<dec0_state>();
 	state->i8751_return=0;
 
 	switch (data&0xffff) {
@@ -234,13 +234,13 @@ static void baddudes_i8751_write(running_machine *machine, int data)
 		case 0x75b: state->i8751_return=0x70f; break;
 	}
 
-	if (!state->i8751_return) logerror("%s: warning - write unknown command %02x to 8571\n",machine->describe_context(),data);
+	if (!state->i8751_return) logerror("%s: warning - write unknown command %02x to 8571\n",machine.describe_context(),data);
 	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
 }
 
-static void birdtry_i8751_write(running_machine *machine, int data)
+static void birdtry_i8751_write(running_machine &machine, int data)
 {
-	dec0_state *state = machine->driver_data<dec0_state>();
+	dec0_state *state = machine.driver_data<dec0_state>();
 	static int	pwr,
 				hgt;
 
@@ -305,14 +305,14 @@ static void birdtry_i8751_write(running_machine *machine, int data)
 		/*These are activated after a shot (???)*/
 		case 0x6ca: state->i8751_return = 0xff;      break;
 		case 0x7ff: state->i8751_return = 0x200;     break;
-		default: logerror("%s: warning - write unknown command %02x to 8571\n",machine->describe_context(),data);
+		default: logerror("%s: warning - write unknown command %02x to 8571\n",machine.describe_context(),data);
 	}
 	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
 }
 
-void dec0_i8751_write(running_machine *machine, int data)
+void dec0_i8751_write(running_machine &machine, int data)
 {
-	dec0_state *state = machine->driver_data<dec0_state>();
+	dec0_state *state = machine.driver_data<dec0_state>();
 	state->i8751_command=data;
 
 	/* Writes to this address cause an IRQ to the i8751 microcontroller */
@@ -320,12 +320,12 @@ void dec0_i8751_write(running_machine *machine, int data)
 	if (state->GAME == 2) baddudes_i8751_write(machine, data);
 	if (state->GAME == 3) birdtry_i8751_write(machine, data);
 
-	//logerror("%s: warning - write %02x to i8751\n",machine->describe_context(),data);
+	//logerror("%s: warning - write %02x to i8751\n",machine.describe_context(),data);
 }
 
-void dec0_i8751_reset(running_machine *machine)
+void dec0_i8751_reset(running_machine &machine)
 {
-	dec0_state *state = machine->driver_data<dec0_state>();
+	dec0_state *state = machine.driver_data<dec0_state>();
 	state->i8751_return=state->i8751_command=0;
 }
 
@@ -333,7 +333,7 @@ void dec0_i8751_reset(running_machine *machine)
 
 static WRITE16_HANDLER( sprite_mirror_w )
 {
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 	COMBINE_DATA(&state->spriteram[offset]);
 }
 
@@ -341,7 +341,7 @@ static WRITE16_HANDLER( sprite_mirror_w )
 
 static READ16_HANDLER( robocop_68000_share_r )
 {
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 //logerror("%08x: Share read %04x\n",cpu_get_pc(space->cpu),offset);
 
 	return state->robocop_shared_ram[offset];
@@ -349,21 +349,21 @@ static READ16_HANDLER( robocop_68000_share_r )
 
 static WRITE16_HANDLER( robocop_68000_share_w )
 {
-	dec0_state *state = space->machine->driver_data<dec0_state>();
+	dec0_state *state = space->machine().driver_data<dec0_state>();
 //  logerror("%08x: Share write %04x %04x\n",cpu_get_pc(space->cpu),offset,data);
 
 	state->robocop_shared_ram[offset]=data&0xff;
 
 	if (offset == 0x7ff) /* A control address - not standard ram */
-		cputag_set_input_line(space->machine, "sub", 0, HOLD_LINE);
+		cputag_set_input_line(space->machine(), "sub", 0, HOLD_LINE);
 }
 
 /******************************************************************************/
 
-static void h6280_decrypt(running_machine *machine, const char *cputag)
+static void h6280_decrypt(running_machine &machine, const char *cputag)
 {
 	int i;
-	UINT8 *RAM = machine->region(cputag)->base();
+	UINT8 *RAM = machine.region(cputag)->base();
 
 	/* Read each byte, decrypt it */
 	for (i = 0x00000; i < 0x10000; i++)
@@ -372,10 +372,10 @@ static void h6280_decrypt(running_machine *machine, const char *cputag)
 
 DRIVER_INIT( hippodrm )
 {
-	UINT8 *RAM = machine->region("sub")->base();
+	UINT8 *RAM = machine.region("sub")->base();
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x180000, 0x180fff, FUNC(hippodrm_68000_share_r), FUNC(hippodrm_68000_share_w));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xffc800, 0xffcfff, FUNC(sprite_mirror_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x180000, 0x180fff, FUNC(hippodrm_68000_share_r), FUNC(hippodrm_68000_share_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xffc800, 0xffcfff, FUNC(sprite_mirror_w));
 
 	h6280_decrypt(machine, "sub");
 
@@ -388,7 +388,7 @@ DRIVER_INIT( hippodrm )
 
 DRIVER_INIT( slyspy )
 {
-	UINT8 *RAM = machine->region("audiocpu")->base();
+	UINT8 *RAM = machine.region("audiocpu")->base();
 
 	h6280_decrypt(machine, "audiocpu");
 
@@ -399,30 +399,30 @@ DRIVER_INIT( slyspy )
 
 DRIVER_INIT( robocop )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x180000, 0x180fff, FUNC(robocop_68000_share_r), FUNC(robocop_68000_share_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x180000, 0x180fff, FUNC(robocop_68000_share_r), FUNC(robocop_68000_share_w));
 }
 
 DRIVER_INIT( baddudes )
 {
-	dec0_state *state = machine->driver_data<dec0_state>();
+	dec0_state *state = machine.driver_data<dec0_state>();
 	state->GAME = 2;
 }
 
 DRIVER_INIT( hbarrel )
 {
-	dec0_state *state = machine->driver_data<dec0_state>();
+	dec0_state *state = machine.driver_data<dec0_state>();
 	state->GAME = 1;
 }
 
 DRIVER_INIT( birdtry )
 {
-	dec0_state *state = machine->driver_data<dec0_state>();
+	dec0_state *state = machine.driver_data<dec0_state>();
 	UINT8 *src, tmp;
 	int i, j, k;
 
 	state->GAME=3;
 
-	src = machine->region("gfx4")->base();
+	src = machine.region("gfx4")->base();
 
 	/* some parts of the graphic have bytes swapped */
 	for (k = 0;k < 0x70000;k += 0x20000)

@@ -24,7 +24,7 @@ static struct
 	UINT16 *videoram;
 	int gfxbank;
 	UINT8 *maskBaseAddr;
-	void (*cb)( running_machine *machine, UINT16 code, int *gfx, int *mask);
+	void (*cb)( running_machine &machine, UINT16 code, int *gfx, int *mask);
 } mTilemapInfo;
 
 void namco_tilemap_invalidate( void )
@@ -36,7 +36,7 @@ void namco_tilemap_invalidate( void )
 	}
 } /* namco_tilemap_invalidate */
 
-INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT16 *vram)
+INLINE void get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,UINT16 *vram)
 {
 	int tile, mask;
 	mTilemapInfo.cb( machine, vram[tile_index], &tile, &mask );
@@ -52,8 +52,8 @@ static TILE_GET_INFO( get_tile_info4 ) { get_tile_info(machine,tileinfo,tile_ind
 static TILE_GET_INFO( get_tile_info5 ) { get_tile_info(machine,tileinfo,tile_index,&mTilemapInfo.videoram[0x4408]); }
 
 void
-namco_tilemap_init( running_machine *machine, int gfxbank, void *maskBaseAddr,
-	void (*cb)( running_machine *machine, UINT16 code, int *gfx, int *mask) )
+namco_tilemap_init( running_machine &machine, int gfxbank, void *maskBaseAddr,
+	void (*cb)( running_machine &machine, UINT16 code, int *gfx, int *mask) )
 {
 	int i;
 	mTilemapInfo.gfxbank = gfxbank;
@@ -275,8 +275,8 @@ static void zdrawgfxzoom(
 	{
 		if( gfx )
 		{
-			int shadow_offset = (gfx->machine->config().m_video_attributes&VIDEO_HAS_SHADOWS)?gfx->machine->total_colors():0;
-			const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			int shadow_offset = (gfx->machine().config().m_video_attributes&VIDEO_HAS_SHADOWS)?gfx->machine().total_colors():0;
+			const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
 			int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
@@ -341,7 +341,7 @@ static void zdrawgfxzoom(
 				if( ex>sx )
 				{ /* skip if inner loop doesn't draw anything */
 					int y;
-					bitmap_t *priority_bitmap = gfx->machine->priority_bitmap;
+					bitmap_t *priority_bitmap = gfx->machine().priority_bitmap;
 					if( priority_bitmap )
 					{
 						for( y=sy; y<ey; y++ )
@@ -411,13 +411,13 @@ static void zdrawgfxzoom(
 } /* zdrawgfxzoom */
 
 void
-namcos2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri, int control )
+namcos2_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri, int control )
 {
 	int offset = (control & 0x000f) * (128*4);
 	int loop;
 	if( pri==0 )
 	{
-		bitmap_fill( machine->priority_bitmap, cliprect , 0);
+		bitmap_fill( machine.priority_bitmap, cliprect , 0);
 	}
 	for( loop=0; loop < 128; loop++ )
 	{
@@ -467,7 +467,7 @@ namcos2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle
 				int scaley = (sizey<<16)/((word0&0x0200)?0x20:0x10);
 				if(scalex && scaley)
 				{
-					gfx_element *gfx = machine->gfx[rgn];
+					gfx_element *gfx = machine.gfx[rgn];
 
 					if( (word0&0x0200)==0 )
 						gfx_element_set_source_clip(gfx, (word1&0x0001) ? 16 : 0, 16, (word1&0x0002) ? 16 : 0, 16);
@@ -491,7 +491,7 @@ namcos2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle
 } /* namcos2_draw_sprites */
 
 void
-namcos2_draw_sprites_metalhawk(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+namcos2_draw_sprites_metalhawk(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
 	/**
      * word#0
@@ -528,7 +528,7 @@ namcos2_draw_sprites_metalhawk(running_machine *machine, bitmap_t *bitmap, const
 	int loop;
 	if( pri==0 )
 	{
-		bitmap_fill( machine->priority_bitmap, cliprect , 0);
+		bitmap_fill( machine.priority_bitmap, cliprect , 0);
 	}
 	for( loop=0; loop < 128; loop++ )
 	{
@@ -611,7 +611,7 @@ namcos2_draw_sprites_metalhawk(running_machine *machine, bitmap_t *bitmap, const
 			zdrawgfxzoom(
 				bitmap,
 				&rect,
-				machine->gfx[0],
+				machine.gfx[0],
 				sprn, color,
 				flipx,flipy,
 				sx,sy,
@@ -703,7 +703,7 @@ nth_byte32( const UINT32 *pSource, int which )
 
 /**************************************************************************************************************/
 
-static int (*mpCodeToTile)( running_machine *machine, int code ); /* sprite banking callback */
+static int (*mpCodeToTile)( running_machine &machine, int code ); /* sprite banking callback */
 static int mGfxC355;	/* gfx bank for sprites */
 
 /**
@@ -717,9 +717,9 @@ static int mGfxC355;	/* gfx bank for sprites */
  * 0x14000 sprite list (page1)
  */
 static void
-draw_spriteC355(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT16 *pSource, int pri, int zpos )
+draw_spriteC355(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT16 *pSource, int pri, int zpos )
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = machine.generic.spriteram.u16;
 	unsigned screen_height_remaining, screen_width_remaining;
 	unsigned source_height_remaining, source_width_remaining;
 	int hpos,vpos;
@@ -876,7 +876,7 @@ draw_spriteC355(running_machine *machine, bitmap_t *bitmap, const rectangle *cli
 				zdrawgfxzoom(
 					bitmap,
 					&clip,
-					machine->gfx[mGfxC355],
+					machine.gfx[mGfxC355],
 					mpCodeToTile(machine, tile) + offset,
 					color,
 					flipx,flipy,
@@ -900,13 +900,13 @@ draw_spriteC355(running_machine *machine, bitmap_t *bitmap, const rectangle *cli
 } /* draw_spriteC355 */
 
 
-static int DefaultCodeToTile( running_machine *machine, int code )
+static int DefaultCodeToTile( running_machine &machine, int code )
 {
 	return code;
 }
 
 void
-namco_obj_init( running_machine *machine, int gfxbank, int palXOR, int (*codeToTile)( running_machine *machine, int code ) )
+namco_obj_init( running_machine &machine, int gfxbank, int palXOR, int (*codeToTile)( running_machine &machine, int code ) )
 {
 	mGfxC355 = gfxbank;
 	mPalXOR = palXOR;
@@ -918,13 +918,13 @@ namco_obj_init( running_machine *machine, int gfxbank, int palXOR, int (*codeToT
 	{
 		mpCodeToTile = DefaultCodeToTile;
 	}
-	machine->generic.spriteram.u16 = auto_alloc_array(machine, UINT16, 0x20000/2);
-	memset( machine->generic.spriteram.u16, 0, 0x20000 ); /* needed for Nebulas Ray */
+	machine.generic.spriteram.u16 = auto_alloc_array(machine, UINT16, 0x20000/2);
+	memset( machine.generic.spriteram.u16, 0, 0x20000 ); /* needed for Nebulas Ray */
 	memset( mSpritePos,0x00,sizeof(mSpritePos) );
 } /* namcosC355_init */
 
 static void
-DrawObjectList(running_machine *machine,
+DrawObjectList(running_machine &machine,
 		bitmap_t *bitmap,
 		const rectangle *cliprect,
 		int pri,
@@ -942,36 +942,36 @@ DrawObjectList(running_machine *machine,
 } /* DrawObjectList */
 
 void
-namco_obj_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+namco_obj_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
 //  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
 	if( pri==0 )
 	{
-		bitmap_fill( machine->priority_bitmap, cliprect , 0);
+		bitmap_fill( machine.priority_bitmap, cliprect , 0);
 	}
 //  if( offs==0 )
 	{ /* boot */
-		DrawObjectList(machine, bitmap,cliprect,pri,&machine->generic.spriteram.u16[0x02000/2], &machine->generic.spriteram.u16[0x00000/2] );
+		DrawObjectList(machine, bitmap,cliprect,pri,&machine.generic.spriteram.u16[0x02000/2], &machine.generic.spriteram.u16[0x00000/2] );
 	}
 //  else
 	{
-		DrawObjectList(machine, bitmap,cliprect,pri,&machine->generic.spriteram.u16[0x14000/2], &machine->generic.spriteram.u16[0x10000/2] );
+		DrawObjectList(machine, bitmap,cliprect,pri,&machine.generic.spriteram.u16[0x14000/2], &machine.generic.spriteram.u16[0x10000/2] );
 	}
 } /* namco_obj_draw */
 
 WRITE16_HANDLER( namco_obj16_w )
 {
-	COMBINE_DATA( &space->machine->generic.spriteram.u16[offset] );
+	COMBINE_DATA( &space->machine().generic.spriteram.u16[offset] );
 } /* namco_obj16_w */
 
 READ16_HANDLER( namco_obj16_r )
 {
-	return space->machine->generic.spriteram.u16[offset];
+	return space->machine().generic.spriteram.u16[offset];
 } /* namco_obj16_r */
 
 WRITE32_HANDLER( namco_obj32_w )
 {
-	UINT16 *spriteram16 = space->machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = space->machine().generic.spriteram.u16;
 	UINT32 v;
 	offset *= 2;
 	v = (spriteram16[offset]<<16)|spriteram16[offset+1];
@@ -982,14 +982,14 @@ WRITE32_HANDLER( namco_obj32_w )
 
 READ32_HANDLER( namco_obj32_r )
 {
-	UINT16 *spriteram16 = space->machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = space->machine().generic.spriteram.u16;
 	offset *= 2;
 	return (spriteram16[offset]<<16)|spriteram16[offset+1];
 } /* namco_obj32_r */
 
 WRITE32_HANDLER( namco_obj32_le_w )
 {
-	UINT16 *spriteram16 = space->machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = space->machine().generic.spriteram.u16;
 	UINT32 v;
 	offset *= 2;
 	v = (spriteram16[offset+1]<<16)|spriteram16[offset];
@@ -1000,7 +1000,7 @@ WRITE32_HANDLER( namco_obj32_le_w )
 
 READ32_HANDLER( namco_obj32_le_r )
 {
-	UINT16 *spriteram16 = space->machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = space->machine().generic.spriteram.u16;
 	offset *= 2;
 	return (spriteram16[offset+1]<<16)|spriteram16[offset];
 } /* namco_obj32_r */
@@ -1030,7 +1030,7 @@ static const char * mRozMaskRegion;
  * Graphics ROM addressing varies across games.
  */
 static void
-roz_get_info( running_machine *machine, tile_data *tileinfo, int tile_index, int which)
+roz_get_info( running_machine &machine, tile_data *tileinfo, int tile_index, int which)
 {
 	UINT16 tile = rozvideoram16[tile_index];
 	int bank, mangle;
@@ -1091,7 +1091,7 @@ roz_get_info( running_machine *machine, tile_data *tileinfo, int tile_index, int
 		break;
 	}
 	SET_TILE_INFO( mRozGfxBank,mangle,0/*color*/,0/*flag*/ );
-	tileinfo->mask_data = 32*tile + (UINT8 *)machine->region( mRozMaskRegion )->base();
+	tileinfo->mask_data = 32*tile + (UINT8 *)machine.region( mRozMaskRegion )->base();
 } /* roz_get_info */
 
 static
@@ -1118,7 +1118,7 @@ TILEMAP_MAPPER( namco_roz_scan )
 } /* namco_roz_scan*/
 
 void
-namco_roz_init( running_machine *machine, int gfxbank, const char * maskregion )
+namco_roz_init( running_machine &machine, int gfxbank, const char * maskregion )
 {
 	int i;
 	static const tile_get_info_func roz_info[ROZ_TILEMAP_COUNT] =
@@ -1566,12 +1566,12 @@ WRITE16_HANDLER( namco_road16_w )
 	else
 	{
 		offset -= 0x10000/2;
-		gfx_element_mark_dirty(space->machine->gfx[mRoadGfxBank], offset/WORDS_PER_ROAD_TILE);
+		gfx_element_mark_dirty(space->machine().gfx[mRoadGfxBank], offset/WORDS_PER_ROAD_TILE);
 	}
 }
 
 void
-namco_road_init(running_machine *machine, int gfxbank )
+namco_road_init(running_machine &machine, int gfxbank )
 {
 	gfx_element *pGfx;
 
@@ -1582,7 +1582,7 @@ namco_road_init(running_machine *machine, int gfxbank )
 
 	pGfx = gfx_element_alloc( machine, &RoadTileLayout, 0x10000+(UINT8 *)mpRoadRAM, 0x3f, 0xf00);
 
-	machine->gfx[gfxbank] = pGfx;
+	machine.gfx[gfxbank] = pGfx;
 	mpRoadTilemap = tilemap_create(machine,
 		get_road_info,tilemap_scan_rows,
 		ROAD_TILE_SIZE,ROAD_TILE_SIZE,
@@ -1599,9 +1599,9 @@ namco_road_set_transparent_color(pen_t pen)
 }
 
 void
-namco_road_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+namco_road_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
-	const UINT8 *clut = (const UINT8 *)machine->region("user3")->base();
+	const UINT8 *clut = (const UINT8 *)machine.region("user3")->base();
 	bitmap_t *pSourceBitmap;
 	unsigned yscroll;
 	int i;
@@ -1660,7 +1660,7 @@ namco_road_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cli
 						{
 							int pen = pSourceGfx[sourcex>>16];
 
-							if(colortable_entry_get_value(machine->colortable, pen) != mRoadTransparentColor)
+							if(colortable_entry_get_value(machine.colortable, pen) != mRoadTransparentColor)
 							{
 								if( clut )
 								{

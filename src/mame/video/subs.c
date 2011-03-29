@@ -12,13 +12,13 @@ WRITE8_HANDLER( subs_invert1_w )
 {
 	if ((offset & 0x01) == 1)
 	{
-		palette_set_color(space->machine, 0, MAKE_RGB(0x00, 0x00, 0x00));
-		palette_set_color(space->machine, 1, MAKE_RGB(0xFF, 0xFF, 0xFF));
+		palette_set_color(space->machine(), 0, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(space->machine(), 1, MAKE_RGB(0xFF, 0xFF, 0xFF));
 	}
 	else
 	{
-		palette_set_color(space->machine, 1, MAKE_RGB(0x00, 0x00, 0x00));
-		palette_set_color(space->machine, 0, MAKE_RGB(0xFF, 0xFF, 0xFF));
+		palette_set_color(space->machine(), 1, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(space->machine(), 0, MAKE_RGB(0xFF, 0xFF, 0xFF));
 	}
 }
 
@@ -26,27 +26,27 @@ WRITE8_HANDLER( subs_invert2_w )
 {
 	if ((offset & 0x01) == 1)
 	{
-		palette_set_color(space->machine, 2, MAKE_RGB(0x00, 0x00, 0x00));
-		palette_set_color(space->machine, 3, MAKE_RGB(0xFF, 0xFF, 0xFF));
+		palette_set_color(space->machine(), 2, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(space->machine(), 3, MAKE_RGB(0xFF, 0xFF, 0xFF));
 	}
 	else
 	{
-		palette_set_color(space->machine, 3, MAKE_RGB(0x00, 0x00, 0x00));
-		palette_set_color(space->machine, 2, MAKE_RGB(0xFF, 0xFF, 0xFF));
+		palette_set_color(space->machine(), 3, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(space->machine(), 2, MAKE_RGB(0xFF, 0xFF, 0xFF));
 	}
 }
 
 
 SCREEN_UPDATE( subs )
 {
-	subs_state *state = screen->machine->driver_data<subs_state>();
+	subs_state *state = screen->machine().driver_data<subs_state>();
 	UINT8 *videoram = state->videoram;
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
-	device_t *left_screen  = screen->machine->device("lscreen");
-	device_t *right_screen = screen->machine->device("rscreen");
-	device_t *discrete = screen->machine->device("discrete");
+	device_t *left_screen  = screen->machine().device("lscreen");
+	device_t *right_screen = screen->machine().device("rscreen");
+	device_t *discrete = screen->machine().device("discrete");
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
@@ -81,11 +81,11 @@ SCREEN_UPDATE( subs )
 		if (screen == left_screen)
 		{
 			if ((left_enable || left_sonar_window) && (!right_sonar_window))
-				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
+				drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],
 						charcode, 1,
 						0,0,sx,sy);
 			else
-				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
+				drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],
 						0, 1,
 						0,0,sx,sy);
 		}
@@ -94,11 +94,11 @@ SCREEN_UPDATE( subs )
 		if (screen == right_screen)
 		{
 			if ((right_enable || right_sonar_window) && (!left_sonar_window))
-				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
+				drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],
 						charcode, 0,
 						0,0,sx,sy);
 			else
-				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
+				drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],
 						0, 0,
 						0,0,sx,sy);
 		}
@@ -127,7 +127,7 @@ SCREEN_UPDATE( subs )
 		if (screen == left_screen)
 		{
 			if ((offs!=0) || (sub_enable))
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],
 						charcode + 32 * prom_set,
 						0,
 						0,0,sx,sy,0);
@@ -138,7 +138,7 @@ SCREEN_UPDATE( subs )
 		if (screen == right_screen)
 		{
 			if ((offs!=1) || (sub_enable))
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],
 						charcode + 32 * prom_set,
 						0,
 						0,0,sx,sy,0);

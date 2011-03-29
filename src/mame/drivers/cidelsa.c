@@ -54,7 +54,7 @@ WRITE8_MEMBER( cidelsa_state::draco_sound_bankswitch_w )
 
 	int bank = BIT(data, 3);
 
-	memory_set_bank(&m_machine, "bank1", bank);
+	memory_set_bank(m_machine, "bank1", bank);
 }
 
 WRITE8_MEMBER( cidelsa_state::draco_sound_g_w )
@@ -136,9 +136,9 @@ WRITE8_MEMBER( cidelsa_state::altair_out1_w )
         7   CONT. M1
     */
 
-	set_led_status(&m_machine, 0, data & 0x08); // 1P
-	set_led_status(&m_machine, 1, data & 0x10); // 2P
-	set_led_status(&m_machine, 2, data & 0x20); // FIRE
+	set_led_status(m_machine, 0, data & 0x08); // 1P
+	set_led_status(m_machine, 1, data & 0x10); // 2P
+	set_led_status(m_machine, 2, data & 0x20); // FIRE
 }
 
 WRITE8_MEMBER( cidelsa_state::draco_out1_w )
@@ -281,14 +281,14 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( cdp1869_pcb_r )
 {
-	cidelsa_state *state = field->port->machine->driver_data<cidelsa_state>();
+	cidelsa_state *state = field->port->machine().driver_data<cidelsa_state>();
 
 	return state->m_cdp1869_pcb;
 }
 
 static INPUT_CHANGED( ef_w )
 {
-	cputag_set_input_line(field->port->machine, CDP1802_TAG, (int)(FPTR)param, newval);
+	cputag_set_input_line(field->port->machine(), CDP1802_TAG, (int)(FPTR)param, newval);
 }
 
 static INPUT_PORTS_START( destryer )
@@ -437,14 +437,14 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( set_cpu_mode )
 {
-	cidelsa_state *state = machine->driver_data<cidelsa_state>();
+	cidelsa_state *state = machine.driver_data<cidelsa_state>();
 
 	state->m_reset = 1;
 }
 
 static MACHINE_START( cidelsa )
 {
-	cidelsa_state *state = machine->driver_data<cidelsa_state>();
+	cidelsa_state *state = machine.driver_data<cidelsa_state>();
 
 	/* register for state saving */
 	state->save_item(NAME(state->m_reset));
@@ -452,12 +452,12 @@ static MACHINE_START( cidelsa )
 
 static MACHINE_START( draco )
 {
-	cidelsa_state *state = machine->driver_data<cidelsa_state>();
+	cidelsa_state *state = machine.driver_data<cidelsa_state>();
 
 	MACHINE_START_CALL( cidelsa );
 
 	/* setup COP402 memory banking */
-	memory_configure_bank(machine, "bank1", 0, 2, machine->region(COP402N_TAG)->base(), 0x400);
+	memory_configure_bank(machine, "bank1", 0, 2, machine.region(COP402N_TAG)->base(), 0x400);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for state saving */

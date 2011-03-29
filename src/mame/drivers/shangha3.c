@@ -44,7 +44,7 @@ write    read
 */
 static READ16_HANDLER( shangha3_prot_r )
 {
-	shangha3_state *state = space->machine->driver_data<shangha3_state>();
+	shangha3_state *state = space->machine().driver_data<shangha3_state>();
 	static const int result[] = { 0x0,0x1,0x3,0x7,0xf,0xe,0xc,0x8,0x0};
 
 	logerror("PC %04x: read 20004e\n",cpu_get_pc(space->cpu));
@@ -59,7 +59,7 @@ static WRITE16_HANDLER( shangha3_prot_w )
 
 static READ16_HANDLER( heberpop_gfxrom_r )
 {
-	UINT8 *ROM = space->machine->region("gfx1")->base();
+	UINT8 *ROM = space->machine().region("gfx1")->base();
 
 	return ROM[2*offset] | (ROM[2*offset+1] << 8);
 }
@@ -70,10 +70,10 @@ static WRITE16_HANDLER( shangha3_coinctrl_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_lockout_w(space->machine, 0,~data & 0x0400);
-		coin_lockout_w(space->machine, 1,~data & 0x0400);
-		coin_counter_w(space->machine, 0,data & 0x0100);
-		coin_counter_w(space->machine, 1,data & 0x0200);
+		coin_lockout_w(space->machine(), 0,~data & 0x0400);
+		coin_lockout_w(space->machine(), 1,~data & 0x0400);
+		coin_counter_w(space->machine(), 0,data & 0x0100);
+		coin_counter_w(space->machine(), 1,data & 0x0200);
 	}
 }
 
@@ -82,12 +82,12 @@ static WRITE16_HANDLER( heberpop_coinctrl_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* the sound ROM bank is selected by the main CPU! */
-		space->machine->device<okim6295_device>("oki")->set_bank_base((data & 0x08) ? 0x40000 : 0x00000);
+		space->machine().device<okim6295_device>("oki")->set_bank_base((data & 0x08) ? 0x40000 : 0x00000);
 
-		coin_lockout_w(space->machine, 0,~data & 0x04);
-		coin_lockout_w(space->machine, 1,~data & 0x04);
-		coin_counter_w(space->machine, 0,data & 0x01);
-		coin_counter_w(space->machine, 1,data & 0x02);
+		coin_lockout_w(space->machine(), 0,~data & 0x04);
+		coin_lockout_w(space->machine(), 1,~data & 0x04);
+		coin_counter_w(space->machine(), 0,data & 0x01);
+		coin_counter_w(space->machine(), 1,data & 0x02);
 	}
 }
 
@@ -96,12 +96,12 @@ static WRITE16_HANDLER( blocken_coinctrl_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* the sound ROM bank is selected by the main CPU! */
-		space->machine->device<okim6295_device>("oki")->set_bank_base(((data >> 4) & 3) * 0x40000);
+		space->machine().device<okim6295_device>("oki")->set_bank_base(((data >> 4) & 3) * 0x40000);
 
-		coin_lockout_w(space->machine, 0,~data & 0x04);
-		coin_lockout_w(space->machine, 1,~data & 0x04);
-		coin_counter_w(space->machine, 0,data & 0x01);
-		coin_counter_w(space->machine, 1,data & 0x02);
+		coin_lockout_w(space->machine(), 0,~data & 0x04);
+		coin_lockout_w(space->machine(), 1,~data & 0x04);
+		coin_counter_w(space->machine(), 0,data & 0x01);
+		coin_counter_w(space->machine(), 1,data & 0x02);
 	}
 }
 
@@ -111,7 +111,7 @@ static WRITE16_HANDLER( heberpop_sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);	/* RST 38h */
+		cputag_set_input_line_and_vector(space->machine(), "audiocpu", 0, HOLD_LINE, 0xff);	/* RST 38h */
 	}
 }
 
@@ -458,7 +458,7 @@ static const ay8910_interface ay8910_config =
 
 static void irqhandler(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, linestate);
+	cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, linestate);
 }
 
 static const ym3438_interface ym3438_config =
@@ -657,14 +657,14 @@ ROM_END
 
 static DRIVER_INIT( shangha3 )
 {
-	shangha3_state *state = machine->driver_data<shangha3_state>();
+	shangha3_state *state = machine.driver_data<shangha3_state>();
 
 	state->do_shadows = 1;
 }
 
 static DRIVER_INIT( heberpop )
 {
-	shangha3_state *state = machine->driver_data<shangha3_state>();
+	shangha3_state *state = machine.driver_data<shangha3_state>();
 
 	state->do_shadows = 0;
 }

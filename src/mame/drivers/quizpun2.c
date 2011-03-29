@@ -74,14 +74,14 @@ public:
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	quizpun2_state *state = machine->driver_data<quizpun2_state>();
+	quizpun2_state *state = machine.driver_data<quizpun2_state>();
 	UINT16 code = state->bg_ram[ tile_index * 2 ] + state->bg_ram[ tile_index * 2 + 1 ] * 256;
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	quizpun2_state *state = machine->driver_data<quizpun2_state>();
+	quizpun2_state *state = machine.driver_data<quizpun2_state>();
 	UINT16 code  = state->fg_ram[ tile_index * 4 ] + state->fg_ram[ tile_index * 4 + 1 ] * 256;
 	UINT8  color = state->fg_ram[ tile_index * 4 + 2 ];
 	SET_TILE_INFO(1, code, color & 0x0f, 0);
@@ -89,21 +89,21 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static WRITE8_HANDLER( bg_ram_w )
 {
-	quizpun2_state *state = space->machine->driver_data<quizpun2_state>();
+	quizpun2_state *state = space->machine().driver_data<quizpun2_state>();
 	state->bg_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tmap, offset/2);
 }
 
 static WRITE8_HANDLER( fg_ram_w )
 {
-	quizpun2_state *state = space->machine->driver_data<quizpun2_state>();
+	quizpun2_state *state = space->machine().driver_data<quizpun2_state>();
 	state->fg_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tmap, offset/4);
 }
 
 static VIDEO_START(quizpun2)
 {
-	quizpun2_state *state = machine->driver_data<quizpun2_state>();
+	quizpun2_state *state = machine.driver_data<quizpun2_state>();
 	state->bg_tmap = tilemap_create(	machine, get_bg_tile_info, tilemap_scan_rows,	8,16, 0x20,0x20	);
 	state->fg_tmap = tilemap_create(	machine, get_fg_tile_info, tilemap_scan_rows,	8,16, 0x20,0x20	);
 
@@ -113,23 +113,23 @@ static VIDEO_START(quizpun2)
 
 static SCREEN_UPDATE(quizpun2)
 {
-	quizpun2_state *state = screen->machine->driver_data<quizpun2_state>();
+	quizpun2_state *state = screen->machine().driver_data<quizpun2_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed(screen->machine, KEYCODE_Z))
+	if (input_code_pressed(screen->machine(), KEYCODE_Z))
 	{
 		int msk = 0;
-		if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
-		if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
+		if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1;
+		if (input_code_pressed(screen->machine(), KEYCODE_W))	msk |= 2;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, state->bg_tmap,  TILEMAP_DRAW_OPAQUE, 0);
-	else					bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	else					bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
-bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, state->fg_tmap, 0, 0);
 
 	return 0;
@@ -148,7 +148,7 @@ bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 static MACHINE_RESET( quizpun2 )
 {
-	quizpun2_state *state = machine->driver_data<quizpun2_state>();
+	quizpun2_state *state = machine.driver_data<quizpun2_state>();
 	struct prot_t &prot = state->prot;
 	prot.state = STATE_IDLE;
 	prot.wait_param = 0;
@@ -159,7 +159,7 @@ static MACHINE_RESET( quizpun2 )
 
 static void log_protection( address_space *space, const char *warning )
 {
-	quizpun2_state *state = space->machine->driver_data<quizpun2_state>();
+	quizpun2_state *state = space->machine().driver_data<quizpun2_state>();
 	struct prot_t &prot = state->prot;
 	logerror("%04x: protection - %s (state %x, wait %x, param %02x, cmd %02x, addr %02x)\n", cpu_get_pc(space->cpu), warning,
 		prot.state,
@@ -172,7 +172,7 @@ static void log_protection( address_space *space, const char *warning )
 
 static READ8_HANDLER( quizpun2_protection_r )
 {
-	quizpun2_state *state = space->machine->driver_data<quizpun2_state>();
+	quizpun2_state *state = space->machine().driver_data<quizpun2_state>();
 	struct prot_t &prot = state->prot;
 	UINT8 ret;
 
@@ -207,7 +207,7 @@ static READ8_HANDLER( quizpun2_protection_r )
 
 		case STATE_EEPROM_R:		// EEPROM read
 		{
-			UINT8 *eeprom = space->machine->region("eeprom")->base();
+			UINT8 *eeprom = space->machine().region("eeprom")->base();
 			ret = eeprom[prot.addr];
 			break;
 		}
@@ -228,13 +228,13 @@ static READ8_HANDLER( quizpun2_protection_r )
 
 static WRITE8_HANDLER( quizpun2_protection_w )
 {
-	quizpun2_state *state = space->machine->driver_data<quizpun2_state>();
+	quizpun2_state *state = space->machine().driver_data<quizpun2_state>();
 	struct prot_t &prot = state->prot;
 	switch ( prot.state )
 	{
 		case STATE_EEPROM_W:
 		{
-			UINT8 *eeprom = space->machine->region("eeprom")->base();
+			UINT8 *eeprom = space->machine().region("eeprom")->base();
 			eeprom[prot.addr] = data;
 			prot.addr++;
 			if ((prot.addr % 8) == 0)
@@ -301,19 +301,19 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 
 static WRITE8_HANDLER( quizpun2_rombank_w )
 {
-	UINT8 *ROM = space->machine->region("maincpu")->base();
-	memory_set_bankptr(space->machine,  "bank1", &ROM[ 0x10000 + 0x2000 * (data & 0x1f) ] );
+	UINT8 *ROM = space->machine().region("maincpu")->base();
+	memory_set_bankptr(space->machine(),  "bank1", &ROM[ 0x10000 + 0x2000 * (data & 0x1f) ] );
 }
 
 static WRITE8_HANDLER( quizpun2_irq_ack )
 {
-	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( quizpun2_soundlatch_w )
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( quizpun2_map, AS_PROGRAM, 8 )

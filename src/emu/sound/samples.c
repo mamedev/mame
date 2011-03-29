@@ -48,7 +48,7 @@ INLINE samples_info *get_safe_token(device_t *device)
     read_wav_sample - read a WAV file as a sample
 -------------------------------------------------*/
 
-static int read_wav_sample(running_machine *machine, emu_file &file, loaded_sample *sample)
+static int read_wav_sample(running_machine &machine, emu_file &file, loaded_sample *sample)
 {
 	unsigned long offset = 0;
 	UINT32 length, rate, filesize;
@@ -177,14 +177,14 @@ static int read_wav_sample(running_machine *machine, emu_file &file, loaded_samp
     readsamples - load all samples
 -------------------------------------------------*/
 
-loaded_samples *readsamples(running_machine *machine, const char *const *samplenames, const char *basename)
+loaded_samples *readsamples(running_machine &machine, const char *const *samplenames, const char *basename)
 {
 	loaded_samples *samples;
 	int skipfirst = 0;
 	int i;
 
 	/* if the user doesn't want to use samples, bail */
-	if (!machine->options().samples())
+	if (!machine.options().samples())
 		return NULL;
 	if (samplenames == 0 || samplenames[0] == 0)
 		return NULL;
@@ -206,7 +206,7 @@ loaded_samples *readsamples(running_machine *machine, const char *const *samplen
 	for (i = 0; i < samples->total; i++)
 		if (samplenames[i+skipfirst][0])
 		{
-			emu_file file(machine->options().sample_path(), OPEN_FLAG_READ);
+			emu_file file(machine.options().sample_path(), OPEN_FLAG_READ);
 
 			file_error filerr = file.open(basename, PATH_SEPARATOR, samplenames[i+skipfirst]);
 			if (filerr != FILERR_NONE && skipfirst)
@@ -251,7 +251,7 @@ void sample_start(device_t *device,int channel,int samplenum,int loop)
 	chan->pos = 0;
 	chan->frac = 0;
 	chan->basefreq = sample->frequency;
-	chan->step = ((INT64)chan->basefreq << FRAC_BITS) / info->device->machine->sample_rate();
+	chan->step = ((INT64)chan->basefreq << FRAC_BITS) / info->device->machine().sample_rate();
 	chan->loop = loop;
 }
 
@@ -275,7 +275,7 @@ void sample_start_raw(device_t *device,int channel,const INT16 *sampledata,int s
 	chan->pos = 0;
 	chan->frac = 0;
 	chan->basefreq = frequency;
-	chan->step = ((INT64)chan->basefreq << FRAC_BITS) / info->device->machine->sample_rate();
+	chan->step = ((INT64)chan->basefreq << FRAC_BITS) / info->device->machine().sample_rate();
 	chan->loop = loop;
 }
 
@@ -292,7 +292,7 @@ void sample_set_freq(device_t *device,int channel,int freq)
 	/* force an update before we start */
 	chan->stream->update();
 
-	chan->step = ((INT64)freq << FRAC_BITS) / info->device->machine->sample_rate();
+	chan->step = ((INT64)freq << FRAC_BITS) / info->device->machine().sample_rate();
 }
 
 
@@ -468,15 +468,15 @@ static DEVICE_START( samples )
 
 	/* read audio samples */
 	if (intf->samplenames)
-		info->samples = readsamples(device->machine, intf->samplenames,device->machine->system().name);
+		info->samples = readsamples(device->machine(), intf->samplenames,device->machine().system().name);
 
 	/* allocate channels */
 	info->numchannels = intf->channels;
 	assert(info->numchannels < MAX_CHANNELS);
-	info->channel = auto_alloc_array(device->machine, sample_channel, info->numchannels);
+	info->channel = auto_alloc_array(device->machine(), sample_channel, info->numchannels);
 	for (i = 0; i < info->numchannels; i++)
 	{
-	    info->channel[i].stream = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), &info->channel[i], sample_update_sound);
+	    info->channel[i].stream = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), &info->channel[i], sample_update_sound);
 
 		info->channel[i].source = NULL;
 		info->channel[i].source_num = -1;
@@ -493,7 +493,7 @@ static DEVICE_START( samples )
         device->save_item(NAME(info->channel[i].loop), i);
         device->save_item(NAME(info->channel[i].paused), i);
 	}
-	device->machine->state().register_postload(samples_postload, info);
+	device->machine().state().register_postload(samples_postload, info);
 
 	/* initialize any custom handlers */
 	if (intf->start)

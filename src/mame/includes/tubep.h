@@ -41,7 +41,7 @@ public:
 
 /*----------- defined in video/tubep.c -----------*/
 
-void tubep_vblank_end(running_machine *machine);
+void tubep_vblank_end(running_machine &machine);
 PALETTE_INIT( tubep );
 SCREEN_UPDATE( tubep );
 PALETTE_INIT( rjammer );

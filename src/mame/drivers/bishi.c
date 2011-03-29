@@ -92,27 +92,27 @@ Notes:
 
 static READ16_HANDLER( control_r )
 {
-	bishi_state *state = space->machine->driver_data<bishi_state>();
+	bishi_state *state = space->machine().driver_data<bishi_state>();
 	return state->cur_control;
 }
 
 static WRITE16_HANDLER( control_w )
 {
 	// bit 8 = interrupt gate
-	bishi_state *state = space->machine->driver_data<bishi_state>();
+	bishi_state *state = space->machine().driver_data<bishi_state>();
 	COMBINE_DATA(&state->cur_control);
 }
 
 static WRITE16_HANDLER( control2_w )
 {
 	// bit 12 = part of the banking calculation for the K056832 ROM readback
-	bishi_state *state = space->machine->driver_data<bishi_state>();
+	bishi_state *state = space->machine().driver_data<bishi_state>();
 	COMBINE_DATA(&state->cur_control2);
 }
 
 static INTERRUPT_GEN(bishi_interrupt)
 {
-	bishi_state *state = device->machine->driver_data<bishi_state>();
+	bishi_state *state = device->machine().driver_data<bishi_state>();
 	if (state->cur_control & 0x800)
 	{
 		switch (cpu_getiloops(device))
@@ -131,12 +131,12 @@ static INTERRUPT_GEN(bishi_interrupt)
 /* compensate for a bug in the ram/rom test */
 static READ16_HANDLER( bishi_mirror_r )
 {
-	return space->machine->generic.paletteram.u16[offset];
+	return space->machine().generic.paletteram.u16[offset];
 }
 
 static READ16_HANDLER( bishi_K056832_rom_r )
 {
-	bishi_state *state = space->machine->driver_data<bishi_state>();
+	bishi_state *state = space->machine().driver_data<bishi_state>();
 	UINT16 ouroffs;
 
 	ouroffs = (offset >> 1) * 8;
@@ -369,7 +369,7 @@ INPUT_PORTS_END
 
 static void sound_irq_gen(device_t *device, int state)
 {
-	bishi_state *bishi = device->machine->driver_data<bishi_state>();
+	bishi_state *bishi = device->machine().driver_data<bishi_state>();
 	if (state)
 		device_set_input_line(bishi->maincpu, M68K_IRQ_1, ASSERT_LINE);
 	else
@@ -400,12 +400,12 @@ static const k054338_interface bishi_k054338_intf =
 
 static MACHINE_START( bishi )
 {
-	bishi_state *state = machine->driver_data<bishi_state>();
+	bishi_state *state = machine.driver_data<bishi_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->k056832 = machine->device("k056832");
-	state->k054338 = machine->device("k054338");
-	state->k055555 = machine->device("k055555");
+	state->maincpu = machine.device("maincpu");
+	state->k056832 = machine.device("k056832");
+	state->k054338 = machine.device("k054338");
+	state->k055555 = machine.device("k055555");
 
 	state->save_item(NAME(state->cur_control));
 	state->save_item(NAME(state->cur_control2));
@@ -413,7 +413,7 @@ static MACHINE_START( bishi )
 
 static MACHINE_RESET( bishi )
 {
-	bishi_state *state = machine->driver_data<bishi_state>();
+	bishi_state *state = machine.driver_data<bishi_state>();
 	state->cur_control = 0;
 	state->cur_control2 = 0;
 }

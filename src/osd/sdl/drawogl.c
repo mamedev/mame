@@ -553,7 +553,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 
 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 	//Moved into init
-	//load_gl_lib(*window->machine);
+	//load_gl_lib(window->machine());
 
 	// create the SDL window
 
@@ -602,7 +602,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, video_config.waitvsync ? 1 : 0);
 	#endif
 
-	load_gl_lib(*window->machine);
+	load_gl_lib(window->machine());
 
 	// create the SDL surface (which creates the window in windowed mode)
 	sdl->sdlsurf = SDL_SetVideoMode(width, height,
@@ -1206,7 +1206,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 	// figure out if we're vector
 	scrnum = is_vector = 0;
-	for (screen = window->machine->config().first_screen(); screen != NULL; screen = screen->next_screen())
+	for (screen = window->machine().config().first_screen(); screen != NULL; screen = screen->next_screen())
 	{
 		if (scrnum == window->index)
 		{
@@ -1240,7 +1240,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		// we're doing nothing 3d, so the Z-buffer is currently not interesting
 		glDisable(GL_DEPTH_TEST);
 
-		if (window->machine->options().antialias())
+		if (window->machine().options().antialias())
 		{
 			// enable antialiasing for lines
 			glEnable(GL_LINE_SMOOTH);
@@ -2956,7 +2956,7 @@ static void texture_shader_update(sdl_window_info *window, texture_info *texture
 
 		scrnum = 0;
 		container = (render_container *)NULL;
-		for (screen_device *screen = window->machine->first_screen(); screen != NULL; screen = screen->next_screen())
+		for (screen_device *screen = window->machine().first_screen(); screen != NULL; screen = screen->next_screen())
 		{
 			if (scrnum == window->start_viewscreen)
 			{
@@ -2972,9 +2972,9 @@ static void texture_shader_update(sdl_window_info *window, texture_info *texture
 			container->get_user_settings(settings);
 			//FIXME: Intended behaviour
 #if 1
-			vid_attributes[0] = window->machine->options().gamma();
-			vid_attributes[1] = window->machine->options().contrast();
-			vid_attributes[2] = window->machine->options().brightness();
+			vid_attributes[0] = window->machine().options().gamma();
+			vid_attributes[1] = window->machine().options().contrast();
+			vid_attributes[2] = window->machine().options().brightness();
 #else
 			vid_attributes[0] = settings.gamma;
 			vid_attributes[1] = settings.contrast;

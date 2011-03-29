@@ -382,9 +382,9 @@ static void words_to_sensors(UINT16 word1, UINT16 word2, UINT16 word3, UINT8 bea
  *
  *************************************/
 
-static void compute_sensors(running_machine *machine)
+static void compute_sensors(running_machine &machine)
 {
-	itech8_state *state = machine->driver_data<itech8_state>();
+	itech8_state *state = machine.driver_data<itech8_state>();
 	UINT16 inter1, inter2, inter3;
 	UINT16 word1 = 0, word2 = 0, word3 = 0;
 	UINT8 beams;
@@ -398,7 +398,7 @@ static void compute_sensors(running_machine *machine)
 	inters_to_words(inter1, inter2, inter3, &beams, &word1, &word2, &word3);
 	words_to_sensors(word1, word2, word3, beams, &state->sensor0, &state->sensor1, &state->sensor2, &state->sensor3);
 
-	logerror("%15f: Sensor values: %04x %04x %04x %04x\n", machine->time().as_double(), state->sensor0, state->sensor1, state->sensor2, state->sensor3);
+	logerror("%15f: Sensor values: %04x %04x %04x %04x\n", machine.time().as_double(), state->sensor0, state->sensor1, state->sensor2, state->sensor3);
 }
 
 
@@ -411,7 +411,7 @@ static void compute_sensors(running_machine *machine)
 
 READ8_HANDLER( slikz80_port_r )
 {
-	itech8_state *state = space->machine->driver_data<itech8_state>();
+	itech8_state *state = space->machine().driver_data<itech8_state>();
 	int result = 0;
 
 	/* if we have nothing, return 0x03 */
@@ -442,7 +442,7 @@ READ8_HANDLER( slikz80_port_r )
 
 WRITE8_HANDLER( slikz80_port_w )
 {
-	itech8_state *state = space->machine->driver_data<itech8_state>();
+	itech8_state *state = space->machine().driver_data<itech8_state>();
 	state->z80_port_val = data;
 	state->z80_clear_to_send = 0;
 }
@@ -457,7 +457,7 @@ WRITE8_HANDLER( slikz80_port_w )
 
 READ8_HANDLER( slikshot_z80_r )
 {
-	itech8_state *state = space->machine->driver_data<itech8_state>();
+	itech8_state *state = space->machine().driver_data<itech8_state>();
 	/* allow the Z80 to send us stuff now */
 	state->z80_clear_to_send = 1;
 	return state->z80_port_val;
@@ -473,7 +473,7 @@ READ8_HANDLER( slikshot_z80_r )
 
 READ8_HANDLER( slikshot_z80_control_r )
 {
-	itech8_state *state = space->machine->driver_data<itech8_state>();
+	itech8_state *state = space->machine().driver_data<itech8_state>();
 	return state->z80_ctrl;
 }
 
@@ -487,14 +487,14 @@ READ8_HANDLER( slikshot_z80_control_r )
 
 static TIMER_CALLBACK( delayed_z80_control_w )
 {
-	itech8_state *state = machine->driver_data<itech8_state>();
+	itech8_state *state = machine.driver_data<itech8_state>();
 	int data = param;
 
 	/* bit 4 controls the reset line on the Z80 */
 
 	/* this is a big kludge: only allow a reset if the Z80 is stopped */
 	/* at its endpoint; otherwise, we never get a result from the Z80 */
-	if ((data & 0x10) || cpu_get_reg(machine->device("sub"), Z80_PC) == 0x13a)
+	if ((data & 0x10) || cpu_get_reg(machine.device("sub"), Z80_PC) == 0x13a)
 	{
 		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
@@ -504,7 +504,7 @@ static TIMER_CALLBACK( delayed_z80_control_w )
 	}
 
 	/* boost the interleave whenever this is written to */
-	machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 
 	/* stash the new value */
 	state->z80_ctrl = data;
@@ -513,7 +513,7 @@ static TIMER_CALLBACK( delayed_z80_control_w )
 
 WRITE8_HANDLER( slikshot_z80_control_w )
 {
-	space->machine->scheduler().synchronize(FUNC(delayed_z80_control_w), data);
+	space->machine().scheduler().synchronize(FUNC(delayed_z80_control_w), data);
 }
 
 
@@ -527,7 +527,7 @@ WRITE8_HANDLER( slikshot_z80_control_w )
 
 VIDEO_START( slikshot )
 {
-	itech8_state *state = machine->driver_data<itech8_state>();
+	itech8_state *state = machine.driver_data<itech8_state>();
 	VIDEO_START_CALL( itech8 );
 
 	state->z80_ctrl = 0;
@@ -551,7 +551,7 @@ VIDEO_START( slikshot )
 
 SCREEN_UPDATE( slikshot )
 {
-	itech8_state *state = screen->machine->driver_data<itech8_state>();
+	itech8_state *state = screen->machine().driver_data<itech8_state>();
 	int totaldy, totaldx;
 	int temp, i;
 
@@ -559,8 +559,8 @@ SCREEN_UPDATE( slikshot )
 	SCREEN_UPDATE_CALL(itech8_2page);
 
 	/* add the current X,Y positions to the list */
-	state->xbuffer[state->ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen->machine, "FAKEX", 0);
-	state->ybuffer[state->ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen->machine, "FAKEY", 0);
+	state->xbuffer[state->ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen->machine(), "FAKEX", 0);
+	state->ybuffer[state->ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen->machine(), "FAKEY", 0);
 	state->ybuffer_next++;
 
 	/* determine where to draw the starting point */
@@ -595,7 +595,7 @@ SCREEN_UPDATE( slikshot )
 		if (temp >=  0x90) temp =  0x90;
 		state->curx = temp;
 
-		compute_sensors(screen->machine);
+		compute_sensors(screen->machine());
 //      popmessage("V=%02x,%02x  X=%02x", state->curvx, state->curvy, state->curx);
 		state->crosshair_vis = 0;
 	}

@@ -129,9 +129,9 @@ INPUT_PORTS_END
 
 static READ32_HANDLER( simpl156_inputs_read )
 {
-	simpl156_state *state = space->machine->driver_data<simpl156_state>();
+	simpl156_state *state = space->machine().driver_data<simpl156_state>();
 	int eep = eeprom_read_bit(state->eeprom);
-	UINT32 returndata = input_port_read(space->machine, "IN0") ^ 0xffff0000;
+	UINT32 returndata = input_port_read(space->machine(), "IN0") ^ 0xffff0000;
 
 	returndata ^= ((eep << 8));
 	return returndata;
@@ -139,7 +139,7 @@ static READ32_HANDLER( simpl156_inputs_read )
 
 static READ32_HANDLER( simpl156_palette_r )
 {
-	return space->machine->generic.paletteram.u16[offset]^0xffff0000;
+	return space->machine().generic.paletteram.u16[offset]^0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_palette_w )
@@ -150,11 +150,11 @@ static WRITE32_HANDLER( simpl156_palette_w )
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 	color = offset;
 
-	dat = space->machine->generic.paletteram.u16[offset] & 0xffff;
-	palette_set_color_rgb(space->machine,color,pal5bit(dat >> 0),pal5bit(dat >> 5),pal5bit(dat >> 10));
+	dat = space->machine().generic.paletteram.u16[offset] & 0xffff;
+	palette_set_color_rgb(space->machine(),color,pal5bit(dat >> 0),pal5bit(dat >> 5),pal5bit(dat >> 10));
 }
 
 
@@ -162,14 +162,14 @@ static READ32_HANDLER(  simpl156_system_r )
 {
 	UINT32 returndata;
 
-	returndata = input_port_read(space->machine, "IN1");
+	returndata = input_port_read(space->machine(), "IN1");
 
 	return returndata;
 }
 
 static WRITE32_HANDLER( simpl156_eeprom_w )
 {
-	simpl156_state *state = space->machine->driver_data<simpl156_state>();
+	simpl156_state *state = space->machine().driver_data<simpl156_state>();
 	//int okibank;
 
 	//okibank = data & 0x07;
@@ -186,13 +186,13 @@ static WRITE32_HANDLER( simpl156_eeprom_w )
 
 static READ32_HANDLER( simpl156_spriteram_r )
 {
-	simpl156_state *state = space->machine->driver_data<simpl156_state>();
+	simpl156_state *state = space->machine().driver_data<simpl156_state>();
 	return state->spriteram[offset] ^ 0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_spriteram_w )
 {
-	simpl156_state *state = space->machine->driver_data<simpl156_state>();
+	simpl156_state *state = space->machine().driver_data<simpl156_state>();
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
@@ -202,13 +202,13 @@ static WRITE32_HANDLER( simpl156_spriteram_w )
 
 static READ32_HANDLER( simpl156_mainram_r )
 {
-	simpl156_state *state = space->machine->driver_data<simpl156_state>();
+	simpl156_state *state = space->machine().driver_data<simpl156_state>();
 	return state->mainram[offset]^0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_mainram_w )
 {
-	simpl156_state *state = space->machine->driver_data<simpl156_state>();
+	simpl156_state *state = space->machine().driver_data<simpl156_state>();
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
@@ -217,13 +217,13 @@ static WRITE32_HANDLER( simpl156_mainram_w )
 
 static READ32_HANDLER( simpl156_pf1_rowscroll_r )
 {
-	simpl156_state *state = space->machine->driver_data<simpl156_state>();
+	simpl156_state *state = space->machine().driver_data<simpl156_state>();
 	return state->pf1_rowscroll[offset] ^ 0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_pf1_rowscroll_w )
 {
-	simpl156_state *state = space->machine->driver_data<simpl156_state>();
+	simpl156_state *state = space->machine().driver_data<simpl156_state>();
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
@@ -232,13 +232,13 @@ static WRITE32_HANDLER( simpl156_pf1_rowscroll_w )
 
 static READ32_HANDLER( simpl156_pf2_rowscroll_r )
 {
-	simpl156_state *state = space->machine->driver_data<simpl156_state>();
+	simpl156_state *state = space->machine().driver_data<simpl156_state>();
 	return state->pf2_rowscroll[offset] ^ 0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_pf2_rowscroll_w )
 {
-	simpl156_state *state = space->machine->driver_data<simpl156_state>();
+	simpl156_state *state = space->machine().driver_data<simpl156_state>();
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
@@ -1033,8 +1033,8 @@ ROM_END
 
 static DRIVER_INIT( simpl156 )
 {
-	UINT8 *rom = machine->region("okimusic")->base();
-	int length = machine->region("okimusic")->bytes();
+	UINT8 *rom = machine.region("okimusic")->base();
+	int length = machine.region("okimusic")->bytes();
 	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
 
 	UINT32 x;
@@ -1065,7 +1065,7 @@ static DRIVER_INIT( simpl156 )
 /* Everything seems more stable if we run the CPU speed x4 and use Idle skips.. maybe it has an internal multipler? */
 static READ32_HANDLER( joemacr_speedup_r )
 {
-	simpl156_state *state = space->machine->driver_data<simpl156_state>();
+	simpl156_state *state = space->machine().driver_data<simpl156_state>();
 	if (cpu_get_pc(space->cpu) == 0x284)
 		device_spin_until_time(space->cpu, attotime::from_usec(400));
 	return state->systemram[0x18/4];
@@ -1074,13 +1074,13 @@ static READ32_HANDLER( joemacr_speedup_r )
 
 static DRIVER_INIT( joemacr )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0201018, 0x020101b, FUNC(joemacr_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0201018, 0x020101b, FUNC(joemacr_speedup_r) );
 	DRIVER_INIT_CALL(simpl156);
 }
 
 static READ32_HANDLER( chainrec_speedup_r )
 {
-	simpl156_state *state = space->machine->driver_data<simpl156_state>();
+	simpl156_state *state = space->machine().driver_data<simpl156_state>();
 	if (cpu_get_pc(space->cpu) == 0x2d4)
 		device_spin_until_time(space->cpu, attotime::from_usec(400));
 	return state->systemram[0x18/4];
@@ -1088,13 +1088,13 @@ static READ32_HANDLER( chainrec_speedup_r )
 
 static DRIVER_INIT( chainrec )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0201018, 0x020101b, FUNC(chainrec_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0201018, 0x020101b, FUNC(chainrec_speedup_r) );
 	DRIVER_INIT_CALL(simpl156);
 }
 
 static READ32_HANDLER( prtytime_speedup_r )
 {
-	simpl156_state *state = space->machine->driver_data<simpl156_state>();
+	simpl156_state *state = space->machine().driver_data<simpl156_state>();
 	if (cpu_get_pc(space->cpu) == 0x4f0)
 		device_spin_until_time(space->cpu, attotime::from_usec(400));
 	return state->systemram[0xae0/4];
@@ -1102,14 +1102,14 @@ static READ32_HANDLER( prtytime_speedup_r )
 
 static DRIVER_INIT( prtytime )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0201ae0, 0x0201ae3, FUNC(prtytime_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0201ae0, 0x0201ae3, FUNC(prtytime_speedup_r) );
 	DRIVER_INIT_CALL(simpl156);
 }
 
 
 static READ32_HANDLER( charlien_speedup_r )
 {
-	simpl156_state *state = space->machine->driver_data<simpl156_state>();
+	simpl156_state *state = space->machine().driver_data<simpl156_state>();
 	if (cpu_get_pc(space->cpu) == 0xc8c8)
 		device_spin_until_time(space->cpu, attotime::from_usec(400));
 	return state->systemram[0x10/4];
@@ -1117,13 +1117,13 @@ static READ32_HANDLER( charlien_speedup_r )
 
 static DRIVER_INIT( charlien )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0201010, 0x0201013, FUNC(charlien_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0201010, 0x0201013, FUNC(charlien_speedup_r) );
 	DRIVER_INIT_CALL(simpl156);
 }
 
 static READ32_HANDLER( osman_speedup_r )
 {
-	simpl156_state *state = space->machine->driver_data<simpl156_state>();
+	simpl156_state *state = space->machine().driver_data<simpl156_state>();
 	if (cpu_get_pc(space->cpu) == 0x5974)
 		device_spin_until_time(space->cpu, attotime::from_usec(400));
 	return state->systemram[0x10/4];
@@ -1131,7 +1131,7 @@ static READ32_HANDLER( osman_speedup_r )
 
 static DRIVER_INIT( osman )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0201010, 0x0201013, FUNC(osman_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0201010, 0x0201013, FUNC(osman_speedup_r) );
 	DRIVER_INIT_CALL(simpl156);
 
 }

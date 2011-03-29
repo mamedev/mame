@@ -36,12 +36,12 @@ static PALETTE_INIT( skyraid )
 
 static READ8_HANDLER( skyraid_port_0_r )
 {
-	skyraid_state *state = space->machine->driver_data<skyraid_state>();
-	UINT8 val = input_port_read(space->machine, "LANGUAGE");
+	skyraid_state *state = space->machine().driver_data<skyraid_state>();
+	UINT8 val = input_port_read(space->machine(), "LANGUAGE");
 
-	if (input_port_read(space->machine, "STICKY") > state->analog_range)
+	if (input_port_read(space->machine(), "STICKY") > state->analog_range)
 		val |= 0x40;
-	if (input_port_read(space->machine, "STICKX") > state->analog_range)
+	if (input_port_read(space->machine(), "STICKX") > state->analog_range)
 		val |= 0x80;
 
 	return val;
@@ -50,7 +50,7 @@ static READ8_HANDLER( skyraid_port_0_r )
 
 static WRITE8_HANDLER( skyraid_range_w )
 {
-	skyraid_state *state = space->machine->driver_data<skyraid_state>();
+	skyraid_state *state = space->machine().driver_data<skyraid_state>();
 
 	state->analog_range = data & 0x3f;
 }
@@ -58,7 +58,7 @@ static WRITE8_HANDLER( skyraid_range_w )
 
 static WRITE8_HANDLER( skyraid_offset_w )
 {
-	skyraid_state *state = space->machine->driver_data<skyraid_state>();
+	skyraid_state *state = space->machine().driver_data<skyraid_state>();
 
 	state->analog_offset = data & 0x3f;
 }
@@ -66,7 +66,7 @@ static WRITE8_HANDLER( skyraid_offset_w )
 
 static WRITE8_HANDLER( skyraid_scroll_w )
 {
-	skyraid_state *state = space->machine->driver_data<skyraid_state>();
+	skyraid_state *state = space->machine().driver_data<skyraid_state>();
 
 	state->scroll = data;
 }

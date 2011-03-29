@@ -54,7 +54,7 @@ Dip locations verified with Fabtek manual for the trackball version
 
 static MACHINE_RESET( cabalbl )
 {
-	cabal_state *state = machine->driver_data<cabal_state>();
+	cabal_state *state = machine.driver_data<cabal_state>();
 	state->sound_command1 = state->sound_command2 = 0xff;
 }
 
@@ -63,7 +63,7 @@ static MACHINE_RESET( cabalbl )
 
 static WRITE16_HANDLER( cabalbl_sndcmd_w )
 {
-	cabal_state *state = space->machine->driver_data<cabal_state>();
+	cabal_state *state = space->machine().driver_data<cabal_state>();
 
 	switch (offset)
 	{
@@ -81,25 +81,25 @@ static WRITE16_HANDLER( cabalbl_sndcmd_w )
 
 static WRITE16_HANDLER( track_reset_w )
 {
-	cabal_state *state = space->machine->driver_data<cabal_state>();
+	cabal_state *state = space->machine().driver_data<cabal_state>();
 	int i;
 	static const char *const track_names[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	for (i = 0; i < 4; i++)
-		state->last[i] = input_port_read(space->machine, track_names[i]);
+		state->last[i] = input_port_read(space->machine(), track_names[i]);
 }
 
 static READ16_HANDLER( track_r )
 {
-	cabal_state *state = space->machine->driver_data<cabal_state>();
+	cabal_state *state = space->machine().driver_data<cabal_state>();
 
 	switch (offset)
 	{
 		default:
-		case 0:	return (( input_port_read(space->machine, "IN0") - state->last[0]) & 0x00ff)		 | (((input_port_read(space->machine, "IN2") - state->last[2]) & 0x00ff) << 8);	/* X lo */
-		case 1:	return (((input_port_read(space->machine, "IN0") - state->last[0]) & 0xff00) >> 8) | (( input_port_read(space->machine, "IN2") - state->last[2]) & 0xff00);			/* X hi */
-		case 2:	return (( input_port_read(space->machine, "IN1") - state->last[1]) & 0x00ff)		 | (((input_port_read(space->machine, "IN3") - state->last[3]) & 0x00ff) << 8);	/* Y lo */
-		case 3:	return (((input_port_read(space->machine, "IN1") - state->last[1]) & 0xff00) >> 8) | (( input_port_read(space->machine, "IN3") - state->last[3]) & 0xff00);			/* Y hi */
+		case 0:	return (( input_port_read(space->machine(), "IN0") - state->last[0]) & 0x00ff)		 | (((input_port_read(space->machine(), "IN2") - state->last[2]) & 0x00ff) << 8);	/* X lo */
+		case 1:	return (((input_port_read(space->machine(), "IN0") - state->last[0]) & 0xff00) >> 8) | (( input_port_read(space->machine(), "IN2") - state->last[2]) & 0xff00);			/* X hi */
+		case 2:	return (( input_port_read(space->machine(), "IN1") - state->last[1]) & 0x00ff)		 | (((input_port_read(space->machine(), "IN3") - state->last[3]) & 0x00ff) << 8);	/* Y lo */
+		case 3:	return (((input_port_read(space->machine(), "IN1") - state->last[1]) & 0xff00) >> 8) | (( input_port_read(space->machine(), "IN3") - state->last[3]) & 0xff00);			/* Y hi */
 	}
 }
 
@@ -114,7 +114,7 @@ static WRITE16_HANDLER( cabal_sound_irq_trigger_word_w )
 
 static WRITE16_HANDLER( cabalbl_sound_irq_trigger_word_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 
@@ -162,22 +162,22 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( cabalbl_snd2_r )
 {
-	cabal_state *state = space->machine->driver_data<cabal_state>();
+	cabal_state *state = space->machine().driver_data<cabal_state>();
 
 	return BITSWAP8(state->sound_command2, 7,2,4,5,3,6,1,0);
 }
 
 static READ8_HANDLER( cabalbl_snd1_r )
 {
-	cabal_state *state = space->machine->driver_data<cabal_state>();
+	cabal_state *state = space->machine().driver_data<cabal_state>();
 
 	return BITSWAP8(state->sound_command1, 7,2,4,5,3,6,1,0);
 }
 
 static WRITE8_HANDLER( cabalbl_coin_w )
 {
-	coin_counter_w(space->machine, 0, data & 1);
-	coin_counter_w(space->machine, 1, data & 2);
+	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(space->machine(), 1, data & 2);
 
 	//data & 0x40? video enable?
 }
@@ -464,7 +464,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface cabalbl_ym2151_interface =
@@ -835,11 +835,11 @@ ROM_END
 
 
 
-static void seibu_sound_bootleg(running_machine *machine,const char *cpu,int length)
+static void seibu_sound_bootleg(running_machine &machine,const char *cpu,int length)
 {
-	address_space *space = machine->device(cpu)->memory().space(AS_PROGRAM);
+	address_space *space = machine.device(cpu)->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
-	UINT8 *rom = machine->region(cpu)->base();
+	UINT8 *rom = machine.region(cpu)->base();
 
 	space->set_decrypted_region(0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
 

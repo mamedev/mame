@@ -394,7 +394,7 @@ void device_image_interface::setup_working_directory()
     if (try_change_working_directory("software"))
     {
         /* now down to a directory for this computer */
-        gamedrv = &device().machine->system();
+        gamedrv = &device().machine().system();
         while(gamedrv && !try_change_working_directory(gamedrv->name))
         {
             gamedrv = driver_get_compatible(gamedrv);
@@ -431,7 +431,7 @@ UINT8 *device_image_interface::get_software_region(const char *tag)
 		return NULL;
 
 	sprintf( full_tag, "%s:%s", device().tag(), tag );
-	return device().machine->region( full_tag )->base();
+	return device().machine().region( full_tag )->base();
 }
 
 
@@ -444,7 +444,7 @@ UINT32 device_image_interface::get_software_region_length(const char *tag)
     char full_tag[256];
 
     sprintf( full_tag, "%s:%s", device().tag(), tag );
-    return device().machine->region( full_tag )->bytes();
+    return device().machine().region( full_tag )->bytes();
 }
 
 
@@ -582,9 +582,9 @@ UINT32 device_image_interface::crc()
 -------------------------------------------------*/
 void device_image_interface::battery_load(void *buffer, int length, int fill)
 {
-    astring *fname = astring_assemble_4(astring_alloc(), device().machine->system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
+    astring *fname = astring_assemble_4(astring_alloc(), device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
 
-    image_battery_load_by_name(device().machine->options(), astring_c(fname), buffer, length, fill);
+    image_battery_load_by_name(device().machine().options(), astring_c(fname), buffer, length, fill);
     astring_free(fname);
 }
 
@@ -596,9 +596,9 @@ void device_image_interface::battery_load(void *buffer, int length, int fill)
 -------------------------------------------------*/
 void device_image_interface::battery_save(const void *buffer, int length)
 {
-    astring *fname = astring_assemble_4(astring_alloc(), device().machine->system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
+    astring *fname = astring_assemble_4(astring_alloc(), device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
 
-    image_battery_save_by_name(device().machine->options(), astring_c(fname), buffer, length);
+    image_battery_save_by_name(device().machine().options(), astring_c(fname), buffer, length);
     astring_free(fname);
 }
 

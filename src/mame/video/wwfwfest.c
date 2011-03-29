@@ -18,7 +18,7 @@
 
 WRITE16_HANDLER( wwfwfest_fg0_videoram_w )
 {
-	wwfwfest_state *state = space->machine->driver_data<wwfwfest_state>();
+	wwfwfest_state *state = space->machine().driver_data<wwfwfest_state>();
 	/* Videoram is 8 bit, upper & lower byte writes end up in the same place */
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7) {
 		COMBINE_DATA(&state->fg0_videoram[offset]);
@@ -33,14 +33,14 @@ WRITE16_HANDLER( wwfwfest_fg0_videoram_w )
 
 WRITE16_HANDLER( wwfwfest_bg0_videoram_w )
 {
-	wwfwfest_state *state = space->machine->driver_data<wwfwfest_state>();
+	wwfwfest_state *state = space->machine().driver_data<wwfwfest_state>();
 	COMBINE_DATA(&state->bg0_videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg0_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( wwfwfest_bg1_videoram_w )
 {
-	wwfwfest_state *state = space->machine->driver_data<wwfwfest_state>();
+	wwfwfest_state *state = space->machine().driver_data<wwfwfest_state>();
 	COMBINE_DATA(&state->bg1_videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg1_tilemap,offset);
 }
@@ -50,7 +50,7 @@ WRITE16_HANDLER( wwfwfest_bg1_videoram_w )
 *******************************************************************************/
 static TILE_GET_INFO( get_fg0_tile_info )
 {
-	wwfwfest_state *state = machine->driver_data<wwfwfest_state>();
+	wwfwfest_state *state = machine.driver_data<wwfwfest_state>();
 	/*- FG0 RAM Format -**
 
       4 bytes per tile
@@ -82,7 +82,7 @@ static TILE_GET_INFO( get_fg0_tile_info )
 
 static TILE_GET_INFO( get_bg0_tile_info )
 {
-	wwfwfest_state *state = machine->driver_data<wwfwfest_state>();
+	wwfwfest_state *state = machine.driver_data<wwfwfest_state>();
 	/*- BG0 RAM Format -**
 
       4 bytes per tile
@@ -113,7 +113,7 @@ static TILE_GET_INFO( get_bg0_tile_info )
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	wwfwfest_state *state = machine->driver_data<wwfwfest_state>();
+	wwfwfest_state *state = machine.driver_data<wwfwfest_state>();
 	/*- BG1 RAM Format -**
 
       2 bytes per tile
@@ -144,9 +144,9 @@ static TILE_GET_INFO( get_bg1_tile_info )
  sprite drawing could probably be improved a bit
 *******************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	wwfwfest_state *state = machine->driver_data<wwfwfest_state>();
+	wwfwfest_state *state = machine.driver_data<wwfwfest_state>();
 	/*- SPR RAM Format -**
 
       16 bytes per sprite
@@ -167,8 +167,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
     **- End of Comments -*/
 
-	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
-	const gfx_element *gfx = machine->gfx[1];
+	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
+	const gfx_element *gfx = machine.gfx[1];
 	UINT16 *source = buffered_spriteram16;
 	UINT16 *finish = source + 0x2000/2;
 
@@ -227,7 +227,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_START( wwfwfest )
 {
-	wwfwfest_state *state = machine->driver_data<wwfwfest_state>();
+	wwfwfest_state *state = machine.driver_data<wwfwfest_state>();
     state_save_register_global(machine, state->pri);
     state_save_register_global(machine, state->bg0_scrollx);
     state_save_register_global(machine, state->bg0_scrolly);
@@ -247,7 +247,7 @@ VIDEO_START( wwfwfest )
 
 VIDEO_START( wwfwfstb )
 {
-	wwfwfest_state *state = machine->driver_data<wwfwfest_state>();
+	wwfwfest_state *state = machine.driver_data<wwfwfest_state>();
 	VIDEO_START_CALL(wwfwfest);
 
 	state->sprite_xoff = 2;
@@ -257,7 +257,7 @@ VIDEO_START( wwfwfstb )
 
 SCREEN_UPDATE( wwfwfest )
 {
-	wwfwfest_state *state = screen->machine->driver_data<wwfwfest_state>();
+	wwfwfest_state *state = screen->machine().driver_data<wwfwfest_state>();
 	if (state->pri == 0x0078) {
 		tilemap_set_scrolly( state->bg0_tilemap, 0, state->bg0_scrolly  );
 		tilemap_set_scrollx( state->bg0_tilemap, 0, state->bg0_scrollx  + state->bg0_dx);
@@ -275,13 +275,13 @@ SCREEN_UPDATE( wwfwfest )
 	if (state->pri == 0x007b) {
 		tilemap_draw(bitmap,cliprect,state->bg0_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,state->bg1_tilemap,0,0);
-		draw_sprites(screen->machine, bitmap,cliprect);
+		draw_sprites(screen->machine(), bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,state->fg0_tilemap,0,0);
 	}
 
 	if (state->pri == 0x007c) {
 		tilemap_draw(bitmap,cliprect,state->bg0_tilemap,TILEMAP_DRAW_OPAQUE,0);
-		draw_sprites(screen->machine, bitmap,cliprect);
+		draw_sprites(screen->machine(), bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,state->bg1_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,state->fg0_tilemap,0,0);
 	}
@@ -289,7 +289,7 @@ SCREEN_UPDATE( wwfwfest )
 	if (state->pri == 0x0078) {
 		tilemap_draw(bitmap,cliprect,state->bg1_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,state->bg0_tilemap,0,0);
-		draw_sprites(screen->machine, bitmap,cliprect);
+		draw_sprites(screen->machine(), bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,state->fg0_tilemap,0,0);
 	}
 	return 0;

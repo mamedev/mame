@@ -30,9 +30,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	klax_state *state = machine->driver_data<klax_state>();
+	klax_state *state = machine.driver_data<klax_state>();
 	cputag_set_input_line(machine, "maincpu", 4, state->video_int_state || state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -40,8 +40,8 @@ static void update_interrupts(running_machine *machine)
 static void scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
-	if ((scanline & 32) == 0 && !(input_port_read(screen.machine, "P1") & 0x800))
-		atarigen_scanline_int_gen(screen.machine->device("maincpu"));
+	if ((scanline & 32) == 0 && !(input_port_read(screen.machine(), "P1") & 0x800))
+		atarigen_scanline_int_gen(screen.machine().device("maincpu"));
 }
 
 
@@ -67,11 +67,11 @@ static MACHINE_START( klax )
 
 static MACHINE_RESET( klax )
 {
-	klax_state *state = machine->driver_data<klax_state>();
+	klax_state *state = machine.driver_data<klax_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine->primary_screen, scanline_update, 32);
+	atarigen_scanline_timer_reset(*machine.primary_screen, scanline_update, 32);
 }
 
 

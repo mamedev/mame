@@ -87,7 +87,7 @@ device_config *er2055_device_config::static_alloc_device_config(const machine_co
 
 device_t *er2055_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, er2055_device(machine, *this));
+	return auto_alloc(machine, er2055_device(machine, *this));
 }
 
 

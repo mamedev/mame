@@ -25,20 +25,20 @@ static MACHINE_START( timelimt )
 
 static MACHINE_RESET( timelimt )
 {
-	timelimt_state *state = machine->driver_data<timelimt_state>();
+	timelimt_state *state = machine.driver_data<timelimt_state>();
 	state->nmi_enabled = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	timelimt_state *state = space->machine->driver_data<timelimt_state>();
+	timelimt_state *state = space->machine().driver_data<timelimt_state>();
 	state->nmi_enabled = data & 1;	/* bit 0 = nmi enable */
 }
 
 static WRITE8_HANDLER( sound_reset_w )
 {
 	if (data & 1)
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 /***************************************************************************/
@@ -224,7 +224,7 @@ static const ay8910_interface ay8910_config =
 
 static INTERRUPT_GEN( timelimt_irq )
 {
-	timelimt_state *state = device->machine->driver_data<timelimt_state>();
+	timelimt_state *state = device->machine().driver_data<timelimt_state>();
 	if ( state->nmi_enabled )
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }

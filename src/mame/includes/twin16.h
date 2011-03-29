@@ -29,7 +29,7 @@ public:
 
 /*----------- defined in drivers/twin16.c -----------*/
 
-int twin16_spriteram_process_enable( running_machine *machine );
+int twin16_spriteram_process_enable( running_machine &machine );
 
 
 /*----------- defined in video/twin16.c -----------*/
@@ -44,4 +44,4 @@ VIDEO_START( twin16 );
 SCREEN_UPDATE( twin16 );
 SCREEN_EOF( twin16 );
 
-void twin16_spriteram_process( running_machine *machine );
+void twin16_spriteram_process( running_machine &machine );

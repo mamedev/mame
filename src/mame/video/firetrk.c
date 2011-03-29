@@ -20,7 +20,7 @@ static const rectangle playfield_window = { 0x02a, 0x115, 0x000, 0x0ff };
 
 PALETTE_INIT( firetrk )
 {
-	firetrk_state *state = machine->driver_data<firetrk_state>();
+	firetrk_state *state = machine.driver_data<firetrk_state>();
 	int i;
 
 	static const UINT8 colortable_source[] =
@@ -57,7 +57,7 @@ PALETTE_INIT( firetrk )
 }
 
 
-static void prom_to_palette(running_machine *machine, int number, UINT8 val)
+static void prom_to_palette(running_machine &machine, int number, UINT8 val)
 {
 	palette_set_color(machine, number, MAKE_RGB(pal1bit(val >> 2), pal1bit(val >> 1), pal1bit(val >> 0)));
 }
@@ -65,7 +65,7 @@ static void prom_to_palette(running_machine *machine, int number, UINT8 val)
 
 PALETTE_INIT( montecar )
 {
-	firetrk_state *state = machine->driver_data<firetrk_state>();
+	firetrk_state *state = machine.driver_data<firetrk_state>();
 	int i;
 
 	static const UINT8 colortable_source[] =
@@ -122,7 +122,7 @@ PALETTE_INIT( montecar )
 
 static TILE_GET_INFO( firetrk_get_tile_info1 )
 {
-	firetrk_state *state = machine->driver_data<firetrk_state>();
+	firetrk_state *state = machine.driver_data<firetrk_state>();
 	int code = state->playfield_ram[tile_index] & 0x3f;
 	int color = (state->playfield_ram[tile_index] >> 6) & 0x03;
 
@@ -138,7 +138,7 @@ static TILE_GET_INFO( firetrk_get_tile_info1 )
 
 static TILE_GET_INFO( superbug_get_tile_info1 )
 {
-	firetrk_state *state = machine->driver_data<firetrk_state>();
+	firetrk_state *state = machine.driver_data<firetrk_state>();
 	int code = state->playfield_ram[tile_index] & 0x3f;
 	int color = (state->playfield_ram[tile_index] >> 6) & 0x03;
 
@@ -154,7 +154,7 @@ static TILE_GET_INFO( superbug_get_tile_info1 )
 
 static TILE_GET_INFO( montecar_get_tile_info1 )
 {
-	firetrk_state *state = machine->driver_data<firetrk_state>();
+	firetrk_state *state = machine.driver_data<firetrk_state>();
 	int code = state->playfield_ram[tile_index] & 0x3f;
 	int color = (state->playfield_ram[tile_index] >> 6) & 0x03;
 
@@ -167,7 +167,7 @@ static TILE_GET_INFO( montecar_get_tile_info1 )
 
 static TILE_GET_INFO( firetrk_get_tile_info2 )
 {
-	firetrk_state *state = machine->driver_data<firetrk_state>();
+	firetrk_state *state = machine.driver_data<firetrk_state>();
 	UINT8 code = state->playfield_ram[tile_index] & 0x3f;
 	int color = 0;
 
@@ -184,7 +184,7 @@ static TILE_GET_INFO( firetrk_get_tile_info2 )
 
 static TILE_GET_INFO( superbug_get_tile_info2 )
 {
-	firetrk_state *state = machine->driver_data<firetrk_state>();
+	firetrk_state *state = machine.driver_data<firetrk_state>();
 	UINT8 code = state->playfield_ram[tile_index] & 0x3f;
 	int color = 0;
 
@@ -201,7 +201,7 @@ static TILE_GET_INFO( superbug_get_tile_info2 )
 
 static TILE_GET_INFO( montecar_get_tile_info2 )
 {
-	firetrk_state *state = machine->driver_data<firetrk_state>();
+	firetrk_state *state = machine.driver_data<firetrk_state>();
 	UINT8 code = state->playfield_ram[tile_index];
 	int color = 0;
 
@@ -224,9 +224,9 @@ static TILE_GET_INFO( montecar_get_tile_info2 )
 
 VIDEO_START( firetrk )
 {
-	firetrk_state *state = machine->driver_data<firetrk_state>();
-	state->helper1 = machine->primary_screen->alloc_compatible_bitmap();
-	state->helper2 = machine->primary_screen->alloc_compatible_bitmap();
+	firetrk_state *state = machine.driver_data<firetrk_state>();
+	state->helper1 = machine.primary_screen->alloc_compatible_bitmap();
+	state->helper2 = machine.primary_screen->alloc_compatible_bitmap();
 
 	state->tilemap1 = tilemap_create(machine, firetrk_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
 	state->tilemap2 = tilemap_create(machine, firetrk_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
@@ -235,9 +235,9 @@ VIDEO_START( firetrk )
 
 VIDEO_START( superbug )
 {
-	firetrk_state *state = machine->driver_data<firetrk_state>();
-	state->helper1 = machine->primary_screen->alloc_compatible_bitmap();
-	state->helper2 = machine->primary_screen->alloc_compatible_bitmap();
+	firetrk_state *state = machine.driver_data<firetrk_state>();
+	state->helper1 = machine.primary_screen->alloc_compatible_bitmap();
+	state->helper2 = machine.primary_screen->alloc_compatible_bitmap();
 
 	state->tilemap1 = tilemap_create(machine, superbug_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
 	state->tilemap2 = tilemap_create(machine, superbug_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
@@ -246,18 +246,18 @@ VIDEO_START( superbug )
 
 VIDEO_START( montecar )
 {
-	firetrk_state *state = machine->driver_data<firetrk_state>();
-	state->helper1 = machine->primary_screen->alloc_compatible_bitmap();
-	state->helper2 = machine->primary_screen->alloc_compatible_bitmap();
+	firetrk_state *state = machine.driver_data<firetrk_state>();
+	state->helper1 = machine.primary_screen->alloc_compatible_bitmap();
+	state->helper2 = machine.primary_screen->alloc_compatible_bitmap();
 
 	state->tilemap1 = tilemap_create(machine, montecar_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
 	state->tilemap2 = tilemap_create(machine, montecar_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
 }
 
 
-static void firetrk_draw_car(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, gfx_element **gfx, int which, int flash)
+static void firetrk_draw_car(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, gfx_element **gfx, int which, int flash)
 {
-	firetrk_state *state = machine->driver_data<firetrk_state>();
+	firetrk_state *state = machine.driver_data<firetrk_state>();
 	int gfx_bank, code, color, flip_x, flip_y, x, y;
 
 	if (which)
@@ -285,9 +285,9 @@ static void firetrk_draw_car(running_machine *machine, bitmap_t *bitmap, const r
 }
 
 
-static void superbug_draw_car(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, gfx_element **gfx, int flash)
+static void superbug_draw_car(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, gfx_element **gfx, int flash)
 {
-	firetrk_state *state = machine->driver_data<firetrk_state>();
+	firetrk_state *state = machine.driver_data<firetrk_state>();
 	int gfx_bank = (*state->car_rot & 0x10) ? 4 : 3;
 	int code = ~*state->car_rot & 0x03;
 	int color = flash ? 1 : 0;
@@ -298,9 +298,9 @@ static void superbug_draw_car(running_machine *machine, bitmap_t *bitmap, const 
 }
 
 
-static void montecar_draw_car(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, gfx_element **gfx, int which, int is_collision_detection)
+static void montecar_draw_car(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, gfx_element **gfx, int which, int is_collision_detection)
 {
-	firetrk_state *state = machine->driver_data<firetrk_state>();
+	firetrk_state *state = machine.driver_data<firetrk_state>();
 	int gfx_bank, code, color, flip_x, flip_y, x, y;
 
 	if (which)
@@ -359,8 +359,8 @@ static void check_collision(firetrk_state *state, int which)
 
 SCREEN_UPDATE( firetrk )
 {
-	firetrk_state *state = screen->machine->driver_data<firetrk_state>();
-	tilemap_mark_all_tiles_dirty_all(screen->machine);
+	firetrk_state *state = screen->machine().driver_data<firetrk_state>();
+	tilemap_mark_all_tiles_dirty_all(screen->machine());
 	tilemap_set_scrollx(state->tilemap1, 0, *state->scroll_x - 37);
 	tilemap_set_scrollx(state->tilemap2, 0, *state->scroll_x - 37);
 	tilemap_set_scrolly(state->tilemap1, 0, *state->scroll_y);
@@ -368,21 +368,21 @@ SCREEN_UPDATE( firetrk )
 
 	bitmap_fill(bitmap, cliprect, 0);
 	tilemap_draw(bitmap, &playfield_window, state->tilemap1, 0, 0);
-	firetrk_draw_car(screen->machine, bitmap, &playfield_window, screen->machine->gfx, 0, state->flash);
-	firetrk_draw_car(screen->machine, bitmap, &playfield_window, screen->machine->gfx, 1, state->flash);
-	draw_text(bitmap, cliprect, screen->machine->gfx, state->alpha_num_ram + 0x00, 296, 0x10, 0x10);
-	draw_text(bitmap, cliprect, screen->machine->gfx, state->alpha_num_ram + 0x10,   8, 0x10, 0x10);
+	firetrk_draw_car(screen->machine(), bitmap, &playfield_window, screen->machine().gfx, 0, state->flash);
+	firetrk_draw_car(screen->machine(), bitmap, &playfield_window, screen->machine().gfx, 1, state->flash);
+	draw_text(bitmap, cliprect, screen->machine().gfx, state->alpha_num_ram + 0x00, 296, 0x10, 0x10);
+	draw_text(bitmap, cliprect, screen->machine().gfx, state->alpha_num_ram + 0x10,   8, 0x10, 0x10);
 
 	if (cliprect->max_y == screen->visible_area().max_y)
 	{
 		tilemap_draw(state->helper1, &playfield_window, state->tilemap2, 0, 0);
 
 		bitmap_fill(state->helper2, &playfield_window, 0xff);
-		firetrk_draw_car(screen->machine, state->helper2, &playfield_window, screen->machine->gfx, 0, FALSE);
+		firetrk_draw_car(screen->machine(), state->helper2, &playfield_window, screen->machine().gfx, 0, FALSE);
 		check_collision(state, 0);
 
 		bitmap_fill(state->helper2, &playfield_window, 0xff);
-		firetrk_draw_car(screen->machine, state->helper2, &playfield_window, screen->machine->gfx, 1, FALSE);
+		firetrk_draw_car(screen->machine(), state->helper2, &playfield_window, screen->machine().gfx, 1, FALSE);
 		check_collision(state, 1);
 
 		*state->blink = FALSE;
@@ -394,8 +394,8 @@ SCREEN_UPDATE( firetrk )
 
 SCREEN_UPDATE( superbug )
 {
-	firetrk_state *state = screen->machine->driver_data<firetrk_state>();
-	tilemap_mark_all_tiles_dirty_all(screen->machine);
+	firetrk_state *state = screen->machine().driver_data<firetrk_state>();
+	tilemap_mark_all_tiles_dirty_all(screen->machine());
 	tilemap_set_scrollx(state->tilemap1, 0, *state->scroll_x - 37);
 	tilemap_set_scrollx(state->tilemap2, 0, *state->scroll_x - 37);
 	tilemap_set_scrolly(state->tilemap1, 0, *state->scroll_y);
@@ -403,16 +403,16 @@ SCREEN_UPDATE( superbug )
 
 	bitmap_fill(bitmap, cliprect, 0);
 	tilemap_draw(bitmap, &playfield_window, state->tilemap1, 0, 0);
-	superbug_draw_car(screen->machine, bitmap, &playfield_window, screen->machine->gfx, state->flash);
-	draw_text(bitmap, cliprect, screen->machine->gfx, state->alpha_num_ram + 0x00, 296, 0x10, 0x10);
-	draw_text(bitmap, cliprect, screen->machine->gfx, state->alpha_num_ram + 0x10,   8, 0x10, 0x10);
+	superbug_draw_car(screen->machine(), bitmap, &playfield_window, screen->machine().gfx, state->flash);
+	draw_text(bitmap, cliprect, screen->machine().gfx, state->alpha_num_ram + 0x00, 296, 0x10, 0x10);
+	draw_text(bitmap, cliprect, screen->machine().gfx, state->alpha_num_ram + 0x10,   8, 0x10, 0x10);
 
 	if (cliprect->max_y == screen->visible_area().max_y)
 	{
 		tilemap_draw(state->helper1, &playfield_window, state->tilemap2, 0, 0);
 
 		bitmap_fill(state->helper2, &playfield_window, 0xff);
-		superbug_draw_car(screen->machine, state->helper2, &playfield_window, screen->machine->gfx, FALSE);
+		superbug_draw_car(screen->machine(), state->helper2, &playfield_window, screen->machine().gfx, FALSE);
 		check_collision(state, 0);
 
 		*state->blink = FALSE;
@@ -424,8 +424,8 @@ SCREEN_UPDATE( superbug )
 
 SCREEN_UPDATE( montecar )
 {
-	firetrk_state *state = screen->machine->driver_data<firetrk_state>();
-	tilemap_mark_all_tiles_dirty_all(screen->machine);
+	firetrk_state *state = screen->machine().driver_data<firetrk_state>();
+	tilemap_mark_all_tiles_dirty_all(screen->machine());
 	tilemap_set_scrollx(state->tilemap1, 0, *state->scroll_x - 37);
 	tilemap_set_scrollx(state->tilemap2, 0, *state->scroll_x - 37);
 	tilemap_set_scrolly(state->tilemap1, 0, *state->scroll_y);
@@ -433,21 +433,21 @@ SCREEN_UPDATE( montecar )
 
 	bitmap_fill(bitmap, cliprect, 0x2c);
 	tilemap_draw(bitmap, &playfield_window, state->tilemap1, 0, 0);
-	montecar_draw_car(screen->machine, bitmap, &playfield_window, screen->machine->gfx, 0, FALSE);
-	montecar_draw_car(screen->machine, bitmap, &playfield_window, screen->machine->gfx, 1, FALSE);
-	draw_text(bitmap, cliprect, screen->machine->gfx, state->alpha_num_ram + 0x00, 24, 0x20, 0x08);
-	draw_text(bitmap, cliprect, screen->machine->gfx, state->alpha_num_ram + 0x20, 16, 0x20, 0x08);
+	montecar_draw_car(screen->machine(), bitmap, &playfield_window, screen->machine().gfx, 0, FALSE);
+	montecar_draw_car(screen->machine(), bitmap, &playfield_window, screen->machine().gfx, 1, FALSE);
+	draw_text(bitmap, cliprect, screen->machine().gfx, state->alpha_num_ram + 0x00, 24, 0x20, 0x08);
+	draw_text(bitmap, cliprect, screen->machine().gfx, state->alpha_num_ram + 0x20, 16, 0x20, 0x08);
 
 	if (cliprect->max_y == screen->visible_area().max_y)
 	{
 		tilemap_draw(state->helper1, &playfield_window, state->tilemap2, 0, 0);
 
 		bitmap_fill(state->helper2, &playfield_window, 0xff);
-		montecar_draw_car(screen->machine, state->helper2, &playfield_window, screen->machine->gfx, 0, TRUE);
+		montecar_draw_car(screen->machine(), state->helper2, &playfield_window, screen->machine().gfx, 0, TRUE);
 		check_collision(state, 0);
 
 		bitmap_fill(state->helper2, &playfield_window, 0xff);
-		montecar_draw_car(screen->machine, state->helper2, &playfield_window, screen->machine->gfx, 1, TRUE);
+		montecar_draw_car(screen->machine(), state->helper2, &playfield_window, screen->machine().gfx, 1, TRUE);
 		check_collision(state, 1);
 	}
 

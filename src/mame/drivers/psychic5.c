@@ -318,7 +318,7 @@ The first sprite data is located at f20b,then f21b and so on.
 
 static MACHINE_RESET( psychic5 )
 {
-	psychic5_state *state = machine->driver_data<psychic5_state>();
+	psychic5_state *state = machine.driver_data<psychic5_state>();
 	state->bank_latch = 0xff;
 	flip_screen_set(machine, 0);
 }
@@ -346,47 +346,47 @@ static INTERRUPT_GEN( psychic5_interrupt )
 
 static READ8_HANDLER( psychic5_bankselect_r )
 {
-	psychic5_state *state = space->machine->driver_data<psychic5_state>();
+	psychic5_state *state = space->machine().driver_data<psychic5_state>();
 	return state->bank_latch;
 }
 
 static WRITE8_HANDLER( psychic5_bankselect_w )
 {
-	psychic5_state *state = space->machine->driver_data<psychic5_state>();
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	psychic5_state *state = space->machine().driver_data<psychic5_state>();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 	int bankaddress;
 
 	if (state->bank_latch != data)
 	{
 		state->bank_latch = data;
 		bankaddress = 0x10000 + ((data & 3) * 0x4000);
-		memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);	 /* Select 4 banks of 16k */
+		memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);	 /* Select 4 banks of 16k */
 	}
 }
 
 static WRITE8_HANDLER( bombsa_bankselect_w )
 {
-	psychic5_state *state = space->machine->driver_data<psychic5_state>();
-	UINT8 *RAM = space->machine->region("maincpu")->base();
+	psychic5_state *state = space->machine().driver_data<psychic5_state>();
+	UINT8 *RAM = space->machine().region("maincpu")->base();
 	int bankaddress;
 
 	if (state->bank_latch != data)
 	{
 		state->bank_latch = data;
 		bankaddress = 0x10000 + ((data & 7) * 0x4000);
-		memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);	 /* Select 8 banks of 16k */
+		memory_set_bankptr(space->machine(), "bank1", &RAM[bankaddress]);	 /* Select 8 banks of 16k */
 	}
 }
 
 static WRITE8_HANDLER( psychic5_coin_counter_w )
 {
-	coin_counter_w(space->machine, 0, data & 0x01);
-	coin_counter_w(space->machine, 1, data & 0x02);
+	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(space->machine(), 1, data & 0x02);
 
 	// bit 7 toggles flip screen
 	if (data & 0x80)
 	{
-		flip_screen_set(space->machine, !flip_screen_get(space->machine));
+		flip_screen_set(space->machine(), !flip_screen_get(space->machine()));
 	}
 }
 
@@ -395,7 +395,7 @@ static WRITE8_HANDLER( bombsa_flipscreen_w )
 	// bit 7 toggles flip screen
 	if (data & 0x80)
 	{
-		flip_screen_set(space->machine, !flip_screen_get(space->machine));
+		flip_screen_set(space->machine(), !flip_screen_get(space->machine()));
 	}
 }
 
@@ -646,7 +646,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

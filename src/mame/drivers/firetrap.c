@@ -179,13 +179,13 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 static WRITE8_HANDLER( firetrap_nmi_disable_w )
 {
-	firetrap_state *state = space->machine->driver_data<firetrap_state>();
+	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	state->nmi_enable = ~data & 1;
 }
 
 static WRITE8_HANDLER( firetrap_bankselect_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x03);
+	memory_set_bank(space->machine(), "bank1", data & 0x03);
 }
 
 static READ8_HANDLER( firetrap_8751_bootleg_r )
@@ -193,9 +193,9 @@ static READ8_HANDLER( firetrap_8751_bootleg_r )
 	/* Check for coin insertion */
 	/* the following only works in the bootleg version, which doesn't have an */
 	/* 8751 - the real thing is much more complicated than that. */
-	firetrap_state *state = space->machine->driver_data<firetrap_state>();
+	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	UINT8 coin = 0;
-	UINT8 port = input_port_read(space->machine, "IN2") & 0x70;
+	UINT8 port = input_port_read(space->machine(), "IN2") & 0x70;
 
 	if (cpu_get_pc(space->cpu) == 0x1188)
 		return ~state->coin_command_pending;
@@ -217,7 +217,7 @@ static READ8_HANDLER( firetrap_8751_bootleg_r )
 
 static READ8_HANDLER( firetrap_8751_r )
 {
-	firetrap_state *state = space->machine->driver_data<firetrap_state>();
+	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	//logerror("PC:%04x read from 8751\n",cpu_get_pc(space->cpu));
 	return state->i8751_return;
 }
@@ -244,7 +244,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	};
 	static const int i8751_coin_data[]={ 0x00, 0xb7 };
 	static const int i8751_36_data[]={ 0x00, 0xbc };
-	firetrap_state *state = space->machine->driver_data<firetrap_state>();
+	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 
 	/* End of command - important to note, as coin input is supressed while commands are pending */
 	if (data == 0x26)
@@ -308,26 +308,26 @@ static WRITE8_HANDLER( firetrap_8751_w )
 
 static WRITE8_HANDLER( firetrap_sound_command_w )
 {
-	firetrap_state *state = space->machine->driver_data<firetrap_state>();
+	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	soundlatch_w(space, offset, data);
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( firetrap_sound_2400_w )
 {
-	firetrap_state *state = space->machine->driver_data<firetrap_state>();
+	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	msm5205_reset_w(state->msm, ~data & 0x01);
 	state->irq_enable = data & 0x02;
 }
 
 static WRITE8_HANDLER( firetrap_sound_bankselect_w )
 {
-	memory_set_bank(space->machine, "bank2", data & 0x01);
+	memory_set_bank(space->machine(), "bank2", data & 0x01);
 }
 
 static void firetrap_adpcm_int( device_t *device )
 {
-	firetrap_state *state = device->machine->driver_data<firetrap_state>();
+	firetrap_state *state = device->machine().driver_data<firetrap_state>();
 
 	msm5205_data_w(device, state->msm5205next >> 4);
 	state->msm5205next <<= 4;
@@ -339,13 +339,13 @@ static void firetrap_adpcm_int( device_t *device )
 
 static WRITE8_HANDLER( firetrap_adpcm_data_w )
 {
-	firetrap_state *state = space->machine->driver_data<firetrap_state>();
+	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	state->msm5205next = data;
 }
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(space->machine, data);
+	flip_screen_set(space->machine(), data);
 }
 
 
@@ -576,9 +576,9 @@ static const msm5205_interface msm5205_config =
 
 static INTERRUPT_GEN( firetrap )
 {
-	firetrap_state *state = device->machine->driver_data<firetrap_state>();
+	firetrap_state *state = device->machine().driver_data<firetrap_state>();
 	UINT8 coin = 0;
-	UINT8 port = input_port_read(device->machine, "COIN") & 0x07;
+	UINT8 port = input_port_read(device->machine(), "COIN") & 0x07;
 
 	/* Check for coin IRQ */
 	if (cpu_getiloops(device))
@@ -613,7 +613,7 @@ static INTERRUPT_GEN( firetrap )
 
 static INTERRUPT_GEN( bootleg )
 {
-	firetrap_state *state = device->machine->driver_data<firetrap_state>();
+	firetrap_state *state = device->machine().driver_data<firetrap_state>();
 
 	if (state->nmi_enable)
 		device_set_input_line (device, INPUT_LINE_NMI, PULSE_LINE);
@@ -622,13 +622,13 @@ static INTERRUPT_GEN( bootleg )
 
 static MACHINE_START( firetrap )
 {
-	firetrap_state *state = machine->driver_data<firetrap_state>();
-	UINT8 *MAIN = machine->region("maincpu")->base();
-	UINT8 *SOUND = machine->region("audiocpu")->base();
+	firetrap_state *state = machine.driver_data<firetrap_state>();
+	UINT8 *MAIN = machine.region("maincpu")->base();
+	UINT8 *SOUND = machine.region("audiocpu")->base();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->msm = machine->device("msm");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->msm = machine.device("msm");
 
 	memory_configure_bank(machine, "bank1", 0, 4, &MAIN[0x10000], 0x4000);
 	memory_configure_bank(machine, "bank2", 0, 2, &SOUND[0x10000], 0x4000);
@@ -650,7 +650,7 @@ static MACHINE_START( firetrap )
 
 static MACHINE_RESET( firetrap )
 {
-	firetrap_state *state = machine->driver_data<firetrap_state>();
+	firetrap_state *state = machine.driver_data<firetrap_state>();
 	int i;
 
 	for (i = 0; i < 2; i++)

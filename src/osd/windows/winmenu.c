@@ -61,7 +61,7 @@ LRESULT CALLBACK winwindow_video_window_proc_ui(HWND wnd, UINT message, WPARAM w
 //  win_create_menu
 //============================================================
 
-int win_create_menu(running_machine *machine, HMENU *menus)
+int win_create_menu(running_machine &machine, HMENU *menus)
 {
 	return 0;
 }

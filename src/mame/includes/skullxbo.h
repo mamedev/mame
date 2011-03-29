@@ -24,4 +24,4 @@ WRITE16_HANDLER( skullxbo_mobmsb_w );
 VIDEO_START( skullxbo );
 SCREEN_UPDATE( skullxbo );
 
-void skullxbo_scanline_update(running_machine *machine, int param);
+void skullxbo_scanline_update(running_machine &machine, int param);

@@ -124,14 +124,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 static WRITE8_HANDLER( mermaid_ay8910_write_port_w )
 {
-	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	if (state->ay8910_enable[0]) ay8910_data_w(state->ay1, offset, data);
 	if (state->ay8910_enable[1]) ay8910_data_w(state->ay2, offset, data);
 }
 
 static WRITE8_HANDLER( mermaid_ay8910_control_port_w )
 {
-	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	if (state->ay8910_enable[0]) ay8910_address_w(state->ay1, offset, data);
 	if (state->ay8910_enable[1]) ay8910_address_w(state->ay2, offset, data);
 }
@@ -169,28 +169,28 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( rougien_sample_rom_lo_w )
 {
-	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 
 	state->adpcm_rom_sel = (data & 1) | (state->adpcm_rom_sel & 2);
 }
 
 static WRITE8_HANDLER( rougien_sample_rom_hi_w )
 {
-	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 
 	state->adpcm_rom_sel = ((data & 1)<<1) | (state->adpcm_rom_sel & 1);
 }
 
 static WRITE8_HANDLER( rougien_sample_playback_w )
 {
-	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 
 	if((state->adpcm_play_reg & 1) && ((data & 1) == 0))
 	{
 		state->adpcm_pos = state->adpcm_rom_sel*0x1000;
 		state->adpcm_end = state->adpcm_pos+0x1000;
 		state->adpcm_idle = 0;
-		msm5205_reset_w(space->machine->device("adpcm"), 0);
+		msm5205_reset_w(space->machine().device("adpcm"), 0);
 	}
 
 	state->adpcm_play_reg = data & 1;
@@ -362,11 +362,11 @@ GFXDECODE_END
 
 static MACHINE_START( mermaid )
 {
-	mermaid_state *state = machine->driver_data<mermaid_state>();
+	mermaid_state *state = machine.driver_data<mermaid_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->ay1 = machine->device("ay1");
-	state->ay2 = machine->device("ay2");
+	state->maincpu = machine.device("maincpu");
+	state->ay1 = machine.device("ay1");
+	state->ay2 = machine.device("ay2");
 
 	state->save_item(NAME(state->coll_bit0));
 	state->save_item(NAME(state->coll_bit1));
@@ -387,7 +387,7 @@ static MACHINE_START( mermaid )
 
 static MACHINE_RESET( mermaid )
 {
-	mermaid_state *state = machine->driver_data<mermaid_state>();
+	mermaid_state *state = machine.driver_data<mermaid_state>();
 
 	state->coll_bit0 = 0;
 	state->coll_bit1 = 0;
@@ -405,7 +405,7 @@ static MACHINE_RESET( mermaid )
 /* Similar to Jantotsu, apparently the HW has three ports that controls what kind of sample should be played. Every sample size is 0x1000. */
 static void rougien_adpcm_int( device_t *device )
 {
-	mermaid_state *state = device->machine->driver_data<mermaid_state>();
+	mermaid_state *state = device->machine().driver_data<mermaid_state>();
 
 //  popmessage("%08x",state->adpcm_pos);
 
@@ -417,7 +417,7 @@ static void rougien_adpcm_int( device_t *device )
 	}
 	else
 	{
-		UINT8 *ROM = device->machine->region("adpcm")->base();
+		UINT8 *ROM = device->machine().region("adpcm")->base();
 
 		state->adpcm_data = ((state->adpcm_trigger ? (ROM[state->adpcm_pos] & 0x0f) : (ROM[state->adpcm_pos] & 0xf0) >> 4));
 		msm5205_data_w(device, state->adpcm_data & 0xf);

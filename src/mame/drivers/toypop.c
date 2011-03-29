@@ -39,7 +39,7 @@ TODO:
 
 static READ16_HANDLER( toypop_m68000_sharedram_r )
 {
-	toypop_state *state = space->machine->driver_data<toypop_state>();
+	toypop_state *state = space->machine().driver_data<toypop_state>();
 	return state->m68000_sharedram[offset];
 }
 
@@ -47,44 +47,44 @@ static WRITE16_HANDLER( toypop_m68000_sharedram_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toypop_state *state = space->machine->driver_data<toypop_state>();
+		toypop_state *state = space->machine().driver_data<toypop_state>();
 		state->m68000_sharedram[offset] = data & 0xff;
 	}
 }
 
 static READ8_HANDLER( toypop_main_interrupt_enable_r )
 {
-	cpu_interrupt_enable(space->machine->device("maincpu"), 1);
+	cpu_interrupt_enable(space->machine().device("maincpu"), 1);
 	return 0;
 }
 
 static WRITE8_HANDLER( toypop_main_interrupt_enable_w )
 {
-	cpu_interrupt_enable(space->machine->device("maincpu"), 1);
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cpu_interrupt_enable(space->machine().device("maincpu"), 1);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_main_interrupt_disable_w )
 {
-	cpu_interrupt_enable(space->machine->device("maincpu"), 0);
+	cpu_interrupt_enable(space->machine().device("maincpu"), 0);
 }
 
 static WRITE8_HANDLER( toypop_sound_interrupt_enable_acknowledge_w )
 {
-	cpu_interrupt_enable(space->machine->device("audiocpu"), 1);
-	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
+	cpu_interrupt_enable(space->machine().device("audiocpu"), 1);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_interrupt_disable_w )
 {
-	cpu_interrupt_enable(space->machine->device("audiocpu"), 0);
+	cpu_interrupt_enable(space->machine().device("audiocpu"), 0);
 }
 
 static TIMER_CALLBACK( namcoio_run )
 {
-	device_t *io58xx = machine->device("58xx");
-	device_t *io56xx_1 = machine->device("56xx_1");
-	device_t *io56xx_2 = machine->device("56xx_2");
+	device_t *io58xx = machine.device("58xx");
+	device_t *io56xx_1 = machine.device("56xx_1");
+	device_t *io56xx_2 = machine.device("56xx_2");
 
 	switch (param)
 	{
@@ -102,50 +102,50 @@ static TIMER_CALLBACK( namcoio_run )
 
 static INTERRUPT_GEN( toypop_main_interrupt )
 {
-	device_t *namcoio_0 = device->machine->device("58xx");
-	device_t *namcoio_1 = device->machine->device("56xx_1");
-	device_t *namcoio_2 = device->machine->device("56xx_2");
+	device_t *namcoio_0 = device->machine().device("58xx");
+	device_t *namcoio_1 = device->machine().device("56xx_1");
+	device_t *namcoio_2 = device->machine().device("56xx_2");
 
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
 								// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_0))		/* give the cpu a tiny bit of time to write the command before processing it */
-		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run));
+		device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run));
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
-		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run), 1);
+		device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run), 1);
 
 	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
-		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run), 2);
+		device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run), 2);
 
 }
 
 static WRITE8_HANDLER( toypop_sound_clear_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_assert_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( toypop_m68000_clear_w )
 {
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_m68000_assert_w )
 {
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( disable_interrupts )
 {
-	toypop_state *state = machine->driver_data<toypop_state>();
-	cpu_interrupt_enable(machine->device("maincpu"), 0);
+	toypop_state *state = machine.driver_data<toypop_state>();
+	cpu_interrupt_enable(machine.device("maincpu"), 0);
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-	cpu_interrupt_enable(machine->device("audiocpu"), 0);
+	cpu_interrupt_enable(machine.device("audiocpu"), 0);
 	cputag_set_input_line(machine, "audiocpu", 0, CLEAR_LINE);
 	state->interrupt_enable_68k = 0;
 }
@@ -154,25 +154,25 @@ static MACHINE_RESET( toypop )
 {
 	/* we must do this on a timer in order to have it take effect */
 	/* otherwise, the reset process will override our changes */
-	machine->scheduler().synchronize(FUNC(disable_interrupts));
+	machine.scheduler().synchronize(FUNC(disable_interrupts));
 }
 
 static INTERRUPT_GEN( toypop_m68000_interrupt )
 {
-	toypop_state *state = device->machine->driver_data<toypop_state>();
+	toypop_state *state = device->machine().driver_data<toypop_state>();
 	if (state->interrupt_enable_68k)
 		device_set_input_line(device, 6, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( toypop_m68000_interrupt_enable_w )
 {
-	toypop_state *state = space->machine->driver_data<toypop_state>();
+	toypop_state *state = space->machine().driver_data<toypop_state>();
 	state->interrupt_enable_68k = 1;
 }
 
 static WRITE16_HANDLER( toypop_m68000_interrupt_disable_w )
 {
-	toypop_state *state = space->machine->driver_data<toypop_state>();
+	toypop_state *state = space->machine().driver_data<toypop_state>();
 	state->interrupt_enable_68k = 0;
 }
 
@@ -491,25 +491,25 @@ static const namco_interface namco_config =
 
 ***************************************************************************/
 
-static READ8_DEVICE_HANDLER( dipA_l )	{ return input_port_read(device->machine, "DSW1"); }				// dips A
-static READ8_DEVICE_HANDLER( dipA_h )	{ return input_port_read(device->machine, "DSW1") >> 4; }			// dips A
-static READ8_DEVICE_HANDLER( dipB_l )	{ return input_port_read(device->machine, "DSW2"); }				// dips B
-static READ8_DEVICE_HANDLER( dipB_h )	{ return input_port_read(device->machine, "DSW2") >> 4; }			// dips B
+static READ8_DEVICE_HANDLER( dipA_l )	{ return input_port_read(device->machine(), "DSW1"); }				// dips A
+static READ8_DEVICE_HANDLER( dipA_h )	{ return input_port_read(device->machine(), "DSW1") >> 4; }			// dips A
+static READ8_DEVICE_HANDLER( dipB_l )	{ return input_port_read(device->machine(), "DSW2"); }				// dips B
+static READ8_DEVICE_HANDLER( dipB_h )	{ return input_port_read(device->machine(), "DSW2") >> 4; }			// dips B
 
 static WRITE8_DEVICE_HANDLER( out_coin0 )
 {
-	coin_lockout_global_w(device->machine, data & 4);
-	coin_counter_w(device->machine, 0, ~data & 8);
+	coin_lockout_global_w(device->machine(), data & 4);
+	coin_counter_w(device->machine(), 0, ~data & 8);
 }
 
 static WRITE8_DEVICE_HANDLER( out_coin1 )
 {
-	coin_counter_w(device->machine, 1, ~data & 1);
+	coin_counter_w(device->machine(), 1, ~data & 1);
 }
 
 static WRITE8_DEVICE_HANDLER( flip )
 {
-	flip_screen_set(device->machine, data & 1);
+	flip_screen_set(device->machine(), data & 1);
 }
 
 /* chip #0: player inputs, buttons, coins */

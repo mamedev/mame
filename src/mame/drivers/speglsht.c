@@ -151,26 +151,26 @@ ADDRESS_MAP_END
 
 static READ32_HANDLER(shared_r)
 {
-	speglsht_state *state = space->machine->driver_data<speglsht_state>();
+	speglsht_state *state = space->machine().driver_data<speglsht_state>();
 	return state->shared[offset];
 }
 
 static WRITE32_HANDLER(shared_w)
 {
-	speglsht_state *state = space->machine->driver_data<speglsht_state>();
+	speglsht_state *state = space->machine().driver_data<speglsht_state>();
 	state->shared[offset]=data&0xff;
 }
 
 static WRITE32_HANDLER(videoreg_w)
 {
-	speglsht_state *state = space->machine->driver_data<speglsht_state>();
+	speglsht_state *state = space->machine().driver_data<speglsht_state>();
 	COMBINE_DATA(&state->videoreg);
 }
 
 
 static WRITE32_HANDLER(cop_w)
 {
-	speglsht_state *state = space->machine->driver_data<speglsht_state>();
+	speglsht_state *state = space->machine().driver_data<speglsht_state>();
 	COMBINE_DATA(&state->cop_ram[offset]);
 
 	if(state->cop_ram[offset]&0x8000) //fix (sign)
@@ -182,7 +182,7 @@ static WRITE32_HANDLER(cop_w)
 //matrix * vector
 static READ32_HANDLER(cop_r)
 {
-	speglsht_state *state = space->machine->driver_data<speglsht_state>();
+	speglsht_state *state = space->machine().driver_data<speglsht_state>();
 	INT32 *cop=(INT32*)&state->cop_ram[0];
 
 	union
@@ -217,7 +217,7 @@ static READ32_HANDLER(cop_r)
 
 static READ32_HANDLER(irq_ack_clear)
 {
-	cputag_set_input_line(space->machine, "sub", R3000_IRQ4, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "sub", R3000_IRQ4, CLEAR_LINE);
 	return 0;
 }
 
@@ -329,13 +329,13 @@ static const r3000_cpu_core r3000_config =
 
 static MACHINE_RESET(speglsht)
 {
-	speglsht_state *state = machine->driver_data<speglsht_state>();
+	speglsht_state *state = machine.driver_data<speglsht_state>();
 	memset(state->shared,0,0x1000);
 }
 
 static VIDEO_START(speglsht)
 {
-	speglsht_state *state = machine->driver_data<speglsht_state>();
+	speglsht_state *state = machine.driver_data<speglsht_state>();
 	state->bitmap = auto_bitmap_alloc(machine, 512, 5122, BITMAP_FORMAT_INDEXED16 );
 	VIDEO_START_CALL(st0016);
 }
@@ -347,7 +347,7 @@ static VIDEO_START(speglsht)
 
 static SCREEN_UPDATE(speglsht)
 {
-	speglsht_state *state = screen->machine->driver_data<speglsht_state>();
+	speglsht_state *state = screen->machine().driver_data<speglsht_state>();
 	int x,y,dy;
 
 	dy=(state->videoreg&0x20)?(256*512):0; //visible frame
@@ -373,7 +373,7 @@ static SCREEN_UPDATE(speglsht)
 		{
 			if(srcline[x])
 			{
-				rgb_t color=palette_get_color(screen->machine, srcline[x]);
+				rgb_t color=palette_get_color(screen->machine(), srcline[x]);
 				PLOT_PIXEL_RGB(x,y,RGB_RED(color),RGB_GREEN(color),RGB_BLUE(color));
 			}
 		}

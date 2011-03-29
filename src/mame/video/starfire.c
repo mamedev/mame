@@ -17,11 +17,11 @@ static TIMER_CALLBACK( starfire_scanline_callback );
 
 VIDEO_START( starfire )
 {
-	starfire_state *state = machine->driver_data<starfire_state>();
+	starfire_state *state = machine.driver_data<starfire_state>();
 
-	state->starfire_screen = machine->primary_screen->alloc_compatible_bitmap();
-	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(starfire_scanline_callback));
-	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(STARFIRE_VBEND), STARFIRE_VBEND);
+	state->starfire_screen = machine.primary_screen->alloc_compatible_bitmap();
+	state->scanline_timer = machine.scheduler().timer_alloc(FUNC(starfire_scanline_callback));
+	state->scanline_timer->adjust(machine.primary_screen->time_until_pos(STARFIRE_VBEND), STARFIRE_VBEND);
 
     /* register for state saving */
 	state->save_item(NAME(state->starfire_vidctrl));
@@ -39,7 +39,7 @@ VIDEO_START( starfire )
 
 WRITE8_HANDLER( starfire_colorram_w )
 {
-	starfire_state *state = space->machine->driver_data<starfire_state>();
+	starfire_state *state = space->machine().driver_data<starfire_state>();
 
     /* handle writes to the pseudo-color RAM */
 	if ((offset & 0xe0) == 0)
@@ -74,7 +74,7 @@ WRITE8_HANDLER( starfire_colorram_w )
 
 READ8_HANDLER( starfire_colorram_r )
 {
-	starfire_state *state = space->machine->driver_data<starfire_state>();
+	starfire_state *state = space->machine().driver_data<starfire_state>();
 
 	/* handle writes to the pseudo-color RAM, which also happen on reads */
 	if ((offset & 0xe0) == 0)
@@ -106,7 +106,7 @@ WRITE8_HANDLER( starfire_videoram_w )
 	int sh, lr, dm, ds, mask, d0, dalu;
 	int offset1 = offset & 0x1fff;
 	int offset2 = (offset + 0x100) & 0x1fff;
-	starfire_state *state = space->machine->driver_data<starfire_state>();
+	starfire_state *state = space->machine().driver_data<starfire_state>();
 
 	/* PROT */
 	if (!(offset & 0xe0) && !(state->starfire_vidctrl1 & 0x20))
@@ -187,7 +187,7 @@ READ8_HANDLER( starfire_videoram_r )
 	int sh, mask, d0;
 	int offset1 = offset & 0x1fff;
 	int offset2 = (offset + 0x100) & 0x1fff;
-    starfire_state *state = space->machine->driver_data<starfire_state>();
+    starfire_state *state = space->machine().driver_data<starfire_state>();
 
 	/* selector 6A */
 	if (offset & 0x2000)
@@ -221,10 +221,10 @@ READ8_HANDLER( starfire_videoram_r )
  *
  *************************************/
 
-static void get_pens(running_machine *machine, pen_t *pens)
+static void get_pens(running_machine &machine, pen_t *pens)
 {
 	offs_t offs;
-    starfire_state *state = machine->driver_data<starfire_state>();
+    starfire_state *state = machine.driver_data<starfire_state>();
 
 	for (offs = 0; offs < STARFIRE_NUM_PENS; offs++)
 	{
@@ -236,7 +236,7 @@ static void get_pens(running_machine *machine, pen_t *pens)
 
 static TIMER_CALLBACK( starfire_scanline_callback )
 {
-    starfire_state *state = machine->driver_data<starfire_state>();
+    starfire_state *state = machine.driver_data<starfire_state>();
     pen_t pens[STARFIRE_NUM_PENS];
 	int y = param;
 
@@ -265,12 +265,12 @@ static TIMER_CALLBACK( starfire_scanline_callback )
 
 	y++;
 	if (y >= STARFIRE_VBSTART) y = STARFIRE_VBEND;
-	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(y), y);
+	state->scanline_timer->adjust(machine.primary_screen->time_until_pos(y), y);
 }
 
 SCREEN_UPDATE( starfire )
 {
-	starfire_state *state = screen->machine->driver_data<starfire_state>();
+	starfire_state *state = screen->machine().driver_data<starfire_state>();
     copybitmap(bitmap, state->starfire_screen, 0, 0, 0, 0, cliprect);
 
 	return 0;

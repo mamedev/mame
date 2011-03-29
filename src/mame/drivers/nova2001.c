@@ -135,20 +135,20 @@ e000 - e7ff        R/W      Work RAM
 
 static CUSTOM_INPUT( ninjakun_io_A002_ctrl_r )
 {
-	nova2001_state *state = field->port->machine->driver_data<nova2001_state>();
+	nova2001_state *state = field->port->machine().driver_data<nova2001_state>();
 	return state->ninjakun_io_a002_ctrl;
 }
 
 static WRITE8_HANDLER( ninjakun_cpu1_io_A002_w )
 {
-	nova2001_state *state = space->machine->driver_data<nova2001_state>();
+	nova2001_state *state = space->machine().driver_data<nova2001_state>();
 	if( data == 0x80 ) state->ninjakun_io_a002_ctrl |= 0x01;
 	if( data == 0x40 ) state->ninjakun_io_a002_ctrl &= ~0x02;
 }
 
 static WRITE8_HANDLER( ninjakun_cpu2_io_A002_w )
 {
-	nova2001_state *state = space->machine->driver_data<nova2001_state>();
+	nova2001_state *state = space->machine().driver_data<nova2001_state>();
 	if( data == 0x40 ) state->ninjakun_io_a002_ctrl |= 0x02;
 	if( data == 0x80 ) state->ninjakun_io_a002_ctrl &= ~0x01;
 }
@@ -163,7 +163,7 @@ static WRITE8_HANDLER( ninjakun_cpu2_io_A002_w )
 
 static MACHINE_START( ninjakun )
 {
-	nova2001_state *state = machine->driver_data<nova2001_state>();
+	nova2001_state *state = machine.driver_data<nova2001_state>();
 	/* Save State Stuff */
 	state_save_register_global(machine, state->ninjakun_io_a002_ctrl);
 }
@@ -986,11 +986,11 @@ This code is overly generic because it is used for several games in ninjakd2.c
 
 ******************************************************************************/
 
-static void lineswap_gfx_roms(running_machine *machine, const char *region, const int bit)
+static void lineswap_gfx_roms(running_machine &machine, const char *region, const int bit)
 {
-	const int length = machine->region(region)->bytes();
+	const int length = machine.region(region)->bytes();
 
-	UINT8* const src = machine->region(region)->base();
+	UINT8* const src = machine.region(region)->base();
 
 	UINT8* const temp = auto_alloc_array(machine, UINT8, length);
 

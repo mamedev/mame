@@ -18,12 +18,12 @@
 
 static WRITE8_DEVICE_HANDLER ( unknown_port_1_w )
 {
-	//logerror("%s: write to unknow port 1: 0x%02x\n", device->machine->describe_context(), data);
+	//logerror("%s: write to unknow port 1: 0x%02x\n", device->machine().describe_context(), data);
 }
 
 static WRITE8_DEVICE_HANDLER ( unknown_port_2_w )
 {
-	//logerror("%s: write to unknow port 2: 0x%02x\n", device->machine->describe_context(), data);
+	//logerror("%s: write to unknow port 2: 0x%02x\n", device->machine().describe_context(), data);
 }
 
 static WRITE8_HANDLER ( coinlock_w )
@@ -243,8 +243,8 @@ GFXDECODE_END
 
 static MACHINE_START( chaknpop )
 {
-	chaknpop_state *state = machine->driver_data<chaknpop_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	chaknpop_state *state = machine.driver_data<chaknpop_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
 
@@ -259,7 +259,7 @@ static MACHINE_START( chaknpop )
 
 static MACHINE_RESET( chaknpop )
 {
-	chaknpop_state *state = machine->driver_data<chaknpop_state>();
+	chaknpop_state *state = machine.driver_data<chaknpop_state>();
 
 	state->gfxmode = 0;
 	state->flip_x = 0;

@@ -205,7 +205,7 @@ static void draw_char(bitmap_t *bitmap, const rectangle *cliprect, const gfx_ele
 	int i,j;
 	const UINT8 *dp;
 	int index = 0;
-	const pen_t *pens = gfx->machine->pens;
+	const pen_t *pens = gfx->machine().pens;
 
 	dp = gfx_element_get_data(gfx, ch);
 
@@ -226,9 +226,9 @@ static void draw_char(bitmap_t *bitmap, const rectangle *cliprect, const gfx_ele
 	}
 }
 
-static void draw_framebuffer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_framebuffer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	mediagx_state *state = machine->driver_data<mediagx_state>();
+	mediagx_state *state = machine.driver_data<mediagx_state>();
 	int i, j;
 	int width, height;
 	int line_delta = (state->disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
@@ -253,7 +253,7 @@ static void draw_framebuffer(running_machine *machine, bitmap_t *bitmap, const r
 		visarea.min_x = visarea.min_y = 0;
 		visarea.max_x = width - 1;
 		visarea.max_y = height - 1;
-		machine->primary_screen->configure(width, height * 262 / 240, visarea, machine->primary_screen->frame_period().attoseconds);
+		machine.primary_screen->configure(width, height * 262 / 240, visarea, machine.primary_screen->frame_period().attoseconds);
 	}
 
 	if (state->disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)		// 8-bit mode
@@ -319,11 +319,11 @@ static void draw_framebuffer(running_machine *machine, bitmap_t *bitmap, const r
 	}
 }
 
-static void draw_cga(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_cga(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	mediagx_state *state = machine->driver_data<mediagx_state>();
+	mediagx_state *state = machine.driver_data<mediagx_state>();
 	int i, j;
-	const gfx_element *gfx = machine->gfx[0];
+	const gfx_element *gfx = machine.gfx[0];
 	UINT32 *cga = state->cga_ram;
 	int index = 0;
 
@@ -345,21 +345,21 @@ static void draw_cga(running_machine *machine, bitmap_t *bitmap, const rectangle
 
 static SCREEN_UPDATE(mediagx)
 {
-	mediagx_state *state = screen->machine->driver_data<mediagx_state>();
+	mediagx_state *state = screen->machine().driver_data<mediagx_state>();
 	bitmap_fill(bitmap, cliprect, 0);
 
-	draw_framebuffer(screen->machine, bitmap, cliprect);
+	draw_framebuffer(screen->machine(), bitmap, cliprect);
 
 	if (state->disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)	// don't show MDA text screen on 16-bit mode. this is basically a hack
 	{
-		draw_cga(screen->machine, bitmap, cliprect);
+		draw_cga(screen->machine(), bitmap, cliprect);
 	}
 	return 0;
 }
 
 static READ32_HANDLER( disp_ctrl_r )
 {
-	mediagx_state *state = space->machine->driver_data<mediagx_state>();
+	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 	UINT32 r = state->disp_ctrl_reg[offset];
 
 	switch (offset)
@@ -367,7 +367,7 @@ static READ32_HANDLER( disp_ctrl_r )
 		case DC_TIMING_CFG:
 			r |= 0x40000000;
 
-			if (space->machine->primary_screen->vpos() >= state->frame_height)
+			if (space->machine().primary_screen->vpos() >= state->frame_height)
 				r &= ~0x40000000;
 
 #if SPEEDUP_HACKS
@@ -382,7 +382,7 @@ static READ32_HANDLER( disp_ctrl_r )
 
 static WRITE32_HANDLER( disp_ctrl_w )
 {
-	mediagx_state *state = space->machine->driver_data<mediagx_state>();
+	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
 	COMBINE_DATA(state->disp_ctrl_reg + offset);
 }
@@ -423,14 +423,14 @@ static WRITE32_DEVICE_HANDLER( fdc_w )
 
 static READ32_HANDLER( memory_ctrl_r )
 {
-	mediagx_state *state = space->machine->driver_data<mediagx_state>();
+	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
 	return state->memory_ctrl_reg[offset];
 }
 
 static WRITE32_HANDLER( memory_ctrl_w )
 {
-	mediagx_state *state = space->machine->driver_data<mediagx_state>();
+	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
 	//mame_printf_debug("memory_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	if (offset == 7)
@@ -456,7 +456,7 @@ static WRITE32_HANDLER( memory_ctrl_w )
 
 static READ32_HANDLER( biu_ctrl_r )
 {
-	mediagx_state *state = space->machine->driver_data<mediagx_state>();
+	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
 	if (offset == 0)
 	{
@@ -467,7 +467,7 @@ static READ32_HANDLER( biu_ctrl_r )
 
 static WRITE32_HANDLER( biu_ctrl_w )
 {
-	mediagx_state *state = space->machine->driver_data<mediagx_state>();
+	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
 	//mame_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	COMBINE_DATA(state->biu_ctrl_reg + offset);
@@ -487,7 +487,7 @@ static WRITE32_HANDLER(bios_ram_w)
 
 static UINT8 mediagx_config_reg_r(device_t *device)
 {
-	mediagx_state *state = device->machine->driver_data<mediagx_state>();
+	mediagx_state *state = device->machine().driver_data<mediagx_state>();
 
 	//mame_printf_debug("mediagx_config_reg_r %02X\n", mediagx_config_reg_sel);
 	return state->mediagx_config_regs[state->mediagx_config_reg_sel];
@@ -495,7 +495,7 @@ static UINT8 mediagx_config_reg_r(device_t *device)
 
 static void mediagx_config_reg_w(device_t *device, UINT8 data)
 {
-	mediagx_state *state = device->machine->driver_data<mediagx_state>();
+	mediagx_state *state = device->machine().driver_data<mediagx_state>();
 
 	//mame_printf_debug("mediagx_config_reg_w %02X, %02X\n", mediagx_config_reg_sel, data);
 	state->mediagx_config_regs[state->mediagx_config_reg_sel] = data;
@@ -522,7 +522,7 @@ static READ8_DEVICE_HANDLER( io20_r )
 
 static WRITE8_DEVICE_HANDLER( io20_w )
 {
-	mediagx_state *state = device->machine->driver_data<mediagx_state>();
+	mediagx_state *state = device->machine().driver_data<mediagx_state>();
 
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x02)
@@ -541,27 +541,27 @@ static WRITE8_DEVICE_HANDLER( io20_w )
 
 static READ32_HANDLER( parallel_port_r )
 {
-	mediagx_state *state = space->machine->driver_data<mediagx_state>();
+	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 	UINT32 r = 0;
 	//static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7", "IN8" }; // but parallel_pointer takes values 0 -> 23
 
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 nibble = state->parallel_latched;//(input_port_read_safe(space->machine, state->portnames[state->parallel_pointer / 3], 0) >> (4 * (state->parallel_pointer % 3))) & 15;
+		UINT8 nibble = state->parallel_latched;//(input_port_read_safe(space->machine(), state->portnames[state->parallel_pointer / 3], 0) >> (4 * (state->parallel_pointer % 3))) & 15;
 		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
 		logerror("%08X:parallel_port_r()\n", cpu_get_pc(space->cpu));
 #if 0
 		if (state->controls_data == 0x18)
 		{
-			r |= input_port_read(space->machine, "IN0") << 8;
+			r |= input_port_read(space->machine(), "IN0") << 8;
 		}
 		else if (state->controls_data == 0x60)
 		{
-			r |= input_port_read(space->machine, "IN1") << 8;
+			r |= input_port_read(space->machine(), "IN1") << 8;
 		}
 		else if (state->controls_data == 0xff || state->controls_data == 0x50)
 		{
-			r |= input_port_read(space->machine, "IN2") << 8;
+			r |= input_port_read(space->machine(), "IN2") << 8;
 		}
 
 		//r |= state->control_read << 8;
@@ -577,7 +577,7 @@ static READ32_HANDLER( parallel_port_r )
 
 static WRITE32_HANDLER( parallel_port_w )
 {
-	mediagx_state *state = space->machine->driver_data<mediagx_state>();
+	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7", "IN8" };	// but parallel_pointer takes values 0 -> 23
 
 	COMBINE_DATA( &state->parport );
@@ -601,7 +601,7 @@ static WRITE32_HANDLER( parallel_port_w )
 
 		logerror("%08X:", cpu_get_pc(space->cpu));
 
-		state->parallel_latched = (input_port_read_safe(space->machine, portnames[state->parallel_pointer / 3], 0) >> (4 * (state->parallel_pointer % 3))) & 15;
+		state->parallel_latched = (input_port_read_safe(space->machine(), portnames[state->parallel_pointer / 3], 0) >> (4 * (state->parallel_pointer % 3))) & 15;
 		//parallel_pointer++;
 		//logerror("[%02X] Advance pointer to %d\n", data, parallel_pointer);
 		switch (data & 0xfc)
@@ -661,7 +661,7 @@ static WRITE32_HANDLER( parallel_port_w )
 
 static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
-	mediagx_state *state = busdevice->machine->driver_data<mediagx_state>();
+	mediagx_state *state = busdevice->machine().driver_data<mediagx_state>();
 
 	//mame_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 	switch (reg)
@@ -674,7 +674,7 @@ static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, 
 
 static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
-	mediagx_state *state = busdevice->machine->driver_data<mediagx_state>();
+	mediagx_state *state = busdevice->machine().driver_data<mediagx_state>();
 
 	//mame_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
 	COMBINE_DATA(state->cx5510_regs + (reg/4));
@@ -684,7 +684,7 @@ static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, in
 
 static TIMER_DEVICE_CALLBACK( sound_timer_callback )
 {
-	mediagx_state *state = timer.machine->driver_data<mediagx_state>();
+	mediagx_state *state = timer.machine().driver_data<mediagx_state>();
 
 	state->ad1847_sample_counter = 0;
 	timer.adjust(attotime::from_msec(10));
@@ -696,9 +696,9 @@ static TIMER_DEVICE_CALLBACK( sound_timer_callback )
 	state->dacr_ptr = 0;
 }
 
-static void ad1847_reg_write(running_machine *machine, int reg, UINT8 data)
+static void ad1847_reg_write(running_machine &machine, int reg, UINT8 data)
 {
-	mediagx_state *state = machine->driver_data<mediagx_state>();
+	mediagx_state *state = machine.driver_data<mediagx_state>();
 	static const int divide_factor[] = { 3072, 1536, 896, 768, 448, 384, 512, 2560 };
 
 	switch (reg)
@@ -737,7 +737,7 @@ static void ad1847_reg_write(running_machine *machine, int reg, UINT8 data)
 
 static READ32_HANDLER( ad1847_r )
 {
-	mediagx_state *state = space->machine->driver_data<mediagx_state>();
+	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
 	switch (offset)
 	{
@@ -749,7 +749,7 @@ static READ32_HANDLER( ad1847_r )
 
 static WRITE32_HANDLER( ad1847_w )
 {
-	mediagx_state *state = space->machine->driver_data<mediagx_state>();
+	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
 	if (offset == 0)
 	{
@@ -769,7 +769,7 @@ static WRITE32_HANDLER( ad1847_w )
 	else if (offset == 3)
 	{
 		int reg = (data >> 8) & 0xf;
-		ad1847_reg_write(space->machine, reg, data & 0xff);
+		ad1847_reg_write(space->machine(), reg, data & 0xff);
 	}
 }
 
@@ -783,7 +783,7 @@ static WRITE32_HANDLER( ad1847_w )
 
 static READ8_HANDLER(at_page8_r)
 {
-	mediagx_state *state = space->machine->driver_data<mediagx_state>();
+	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 	UINT8 data = state->at_pages[offset % 0x10];
 
 	switch(offset % 8)
@@ -807,7 +807,7 @@ static READ8_HANDLER(at_page8_r)
 
 static WRITE8_HANDLER(at_page8_w)
 {
-	mediagx_state *state = space->machine->driver_data<mediagx_state>();
+	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
 	state->at_pages[offset % 0x10] = data;
 
@@ -831,7 +831,7 @@ static WRITE8_HANDLER(at_page8_w)
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( device, state );
@@ -840,7 +840,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 
 static READ8_HANDLER( pc_dma_read_byte )
 {
-	mediagx_state *state = space->machine->driver_data<mediagx_state>();
+	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
@@ -850,7 +850,7 @@ static READ8_HANDLER( pc_dma_read_byte )
 
 static WRITE8_HANDLER( pc_dma_write_byte )
 {
-	mediagx_state *state = space->machine->driver_data<mediagx_state>();
+	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
@@ -859,7 +859,7 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 
 static void set_dma_channel(device_t *device, int channel, int _state)
 {
-	mediagx_state *state = device->machine->driver_data<mediagx_state>();
+	mediagx_state *state = device->machine().driver_data<mediagx_state>();
 
 	if (!_state) state->dma_channel = channel;
 }
@@ -1006,7 +1006,7 @@ INPUT_PORTS_END
 
 static IRQ_CALLBACK(irq_callback)
 {
-	mediagx_state *state = device->machine->driver_data<mediagx_state>();
+	mediagx_state *state = device->machine().driver_data<mediagx_state>();
 	int r;
 
 	r = pic8259_acknowledge( state->pic8259_2);
@@ -1019,13 +1019,13 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_START(mediagx)
 {
-	mediagx_state *state = machine->driver_data<mediagx_state>();
+	mediagx_state *state = machine.driver_data<mediagx_state>();
 
-	state->pit8254 = machine->device<pit8254_device>( "pit8254" );
-	state->pic8259_1 = machine->device<pic8259_device>( "pic8259_master" );
-	state->pic8259_2 = machine->device<pic8259_device>( "pic8259_slave" );
-	state->dma8237_1 = machine->device<i8237_device>( "dma8237_1" );
-	state->dma8237_2 = machine->device<i8237_device>( "dma8237_2" );
+	state->pit8254 = machine.device<pit8254_device>( "pit8254" );
+	state->pic8259_1 = machine.device<pic8259_device>( "pic8259_master" );
+	state->pic8259_2 = machine.device<pic8259_device>( "pic8259_slave" );
+	state->dma8237_1 = machine.device<i8237_device>( "dma8237_1" );
+	state->dma8237_2 = machine.device<i8237_device>( "dma8237_2" );
 
 	state->dacl = auto_alloc_array(machine, INT16, 65536);
 	state->dacr = auto_alloc_array(machine, INT16, 65536);
@@ -1033,19 +1033,19 @@ static MACHINE_START(mediagx)
 
 static MACHINE_RESET(mediagx)
 {
-	mediagx_state *state = machine->driver_data<mediagx_state>();
-	UINT8 *rom = machine->region("bios")->base();
+	mediagx_state *state = machine.driver_data<mediagx_state>();
+	UINT8 *rom = machine.region("bios")->base();
 
-	device_set_irq_callback(machine->device("maincpu"), irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), irq_callback);
 
 	memcpy(state->bios_ram, rom, 0x40000);
-	machine->device("maincpu")->reset();
+	machine.device("maincpu")->reset();
 
-	timer_device *sound_timer = machine->device<timer_device>("sound_timer");
+	timer_device *sound_timer = machine.device<timer_device>("sound_timer");
 	sound_timer->adjust(attotime::from_msec(10));
 
-	state->dmadac[0] = machine->device<dmadac_sound_device>("dac1");
-	state->dmadac[1] = machine->device<dmadac_sound_device>("dac2");
+	state->dmadac[0] = machine.device<dmadac_sound_device>("dac1");
+	state->dmadac[1] = machine.device<dmadac_sound_device>("dac2");
 	dmadac_enable(&state->dmadac[0], 2, 1);
 	devtag_reset(machine, "ide");
 }
@@ -1058,7 +1058,7 @@ static MACHINE_RESET(mediagx)
 
 static WRITE_LINE_DEVICE_HANDLER( mediagx_pic8259_1_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface mediagx_pic8259_1_config =
@@ -1150,28 +1150,28 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static void set_gate_a20(running_machine *machine, int a20)
+static void set_gate_a20(running_machine &machine, int a20)
 {
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, a20);
 }
 
-static void keyboard_interrupt(running_machine *machine, int _state)
+static void keyboard_interrupt(running_machine &machine, int _state)
 {
-	mediagx_state *state = machine->driver_data<mediagx_state>();
+	mediagx_state *state = machine.driver_data<mediagx_state>();
 
 	pic8259_ir1_w(state->pic8259_1, _state);
 }
 
 static void ide_interrupt(device_t *device, int _state)
 {
-	mediagx_state *state = device->machine->driver_data<mediagx_state>();
+	mediagx_state *state = device->machine().driver_data<mediagx_state>();
 
 	pic8259_ir6_w(state->pic8259_2, _state);
 }
 
-static int mediagx_get_out2(running_machine *machine)
+static int mediagx_get_out2(running_machine &machine)
 {
-	mediagx_state *state = machine->driver_data<mediagx_state>();
+	mediagx_state *state = machine.driver_data<mediagx_state>();
 
 	return pit8253_get_output( state->pit8254, 2 );
 }
@@ -1181,16 +1181,16 @@ static const struct kbdc8042_interface at8042 =
 	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, mediagx_get_out2
 };
 
-static void mediagx_set_keyb_int(running_machine *machine, int _state)
+static void mediagx_set_keyb_int(running_machine &machine, int _state)
 {
-	mediagx_state *state = machine->driver_data<mediagx_state>();
+	mediagx_state *state = machine.driver_data<mediagx_state>();
 
 	pic8259_ir1_w(state->pic8259_1, _state);
 }
 
-static void init_mediagx(running_machine *machine)
+static void init_mediagx(running_machine &machine)
 {
-	mediagx_state *state = machine->driver_data<mediagx_state>();
+	mediagx_state *state = machine.driver_data<mediagx_state>();
 
 	state->frame_width = state->frame_height = 1;
 
@@ -1203,7 +1203,7 @@ static void init_mediagx(running_machine *machine)
 
 INLINE UINT32 generic_speedup(address_space *space, int idx)
 {
-	mediagx_state *state = space->machine->driver_data<mediagx_state>();
+	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
 	if (cpu_get_pc(space->cpu) == state->speedup_table[idx].pc)
 	{
@@ -1244,9 +1244,9 @@ static void report_speedups(running_machine &machine)
 }
 #endif
 
-static void install_speedups(running_machine *machine, const speedup_entry *entries, int count)
+static void install_speedups(running_machine &machine, const speedup_entry *entries, int count)
 {
-	mediagx_state *state = machine->driver_data<mediagx_state>();
+	mediagx_state *state = machine.driver_data<mediagx_state>();
 	int i;
 
 	assert(count < ARRAY_LENGTH(speedup_handlers));
@@ -1255,10 +1255,10 @@ static void install_speedups(running_machine *machine, const speedup_entry *entr
 	state->speedup_count = count;
 
 	for (i = 0; i < count; i++)
-		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(entries[i].offset, entries[i].offset + 3, FUNC(speedup_handlers[i]));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(entries[i].offset, entries[i].offset + 3, FUNC(speedup_handlers[i]));
 
 #ifdef MAME_DEBUG
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, report_speedups);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, report_speedups);
 #endif
 }
 

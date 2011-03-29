@@ -25,70 +25,70 @@ static WRITE8_DEVICE_HANDLER( p4c_w ) { taxidrvr_spritectrl_w(device,8,data); }
 
 static READ8_DEVICE_HANDLER( p0a_r )
 {
-	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
 	return state->latchA;
 }
 
 static READ8_DEVICE_HANDLER( p0c_r )
 {
-	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
 	return (state->s1 << 7);
 }
 
 static WRITE8_DEVICE_HANDLER( p0b_w )
 {
-	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
 	state->latchB = data;
 }
 
 static WRITE8_DEVICE_HANDLER( p0c_w )
 {
-	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
 	state->s2 = data & 1;
 
 	state->bghide = data & 2;
 
 	/* bit 2 toggles during gameplay */
 
-	flip_screen_set(device->machine, data & 8);
+	flip_screen_set(device->machine(), data & 8);
 
 //  popmessage("%02x",data&0x0f);
 }
 
 static READ8_DEVICE_HANDLER( p1b_r )
 {
-	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
 	return state->latchB;
 }
 
 static READ8_DEVICE_HANDLER( p1c_r )
 {
-	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
-	return (state->s2 << 7) | (state->s4 << 6) | ((input_port_read(device->machine, "SERVCOIN") & 1) << 4);
+	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
+	return (state->s2 << 7) | (state->s4 << 6) | ((input_port_read(device->machine(), "SERVCOIN") & 1) << 4);
 }
 
 static WRITE8_DEVICE_HANDLER( p1a_w )
 {
-	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
 	state->latchA = data;
 }
 
 static WRITE8_DEVICE_HANDLER( p1c_w )
 {
-	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
 	state->s1 = data & 1;
 	state->s3 = (data & 2) >> 1;
 }
 
 static READ8_DEVICE_HANDLER( p8910_0a_r )
 {
-	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
 	return state->latchA;
 }
 
 static READ8_DEVICE_HANDLER( p8910_1a_r )
 {
-	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
 	return state->s3;
 }
 
@@ -96,7 +96,7 @@ static READ8_DEVICE_HANDLER( p8910_1a_r )
    original, since it works anyway even if the communication is flawed. */
 static WRITE8_DEVICE_HANDLER( p8910_0b_w )
 {
-	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
 	state->s4 = data & 1;
 }
 

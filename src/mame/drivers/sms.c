@@ -241,7 +241,7 @@ public:
 
 static WRITE8_HANDLER(bankswitch_w)
 {
-	memory_set_bank(space->machine, "bank1", data);
+	memory_set_bank(space->machine(), "bank1", data);
 }
 
 /*************************************
@@ -252,7 +252,7 @@ static WRITE8_HANDLER(bankswitch_w)
 
 static READ8_HANDLER(link_r)
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	switch(offset)
 	{
 		case 0:
@@ -269,7 +269,7 @@ static READ8_HANDLER(link_r)
 
 static WRITE8_HANDLER(link_w)
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	switch(offset)
 	{
 		case 0:
@@ -285,13 +285,13 @@ static WRITE8_HANDLER(link_w)
 
 static READ8_HANDLER(z80_8088_r)
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	return state->communication_port_status;
 }
 
 static READ8_HANDLER(p03_r)
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	switch(offset)
 	{
 		case 0:
@@ -306,7 +306,7 @@ static READ8_HANDLER(p03_r)
 
 static WRITE8_HANDLER(p03_w)
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	switch(offset)
 	{
 		case 0:
@@ -401,9 +401,9 @@ static WRITE8_DEVICE_HANDLER(ppi0_b_w)
 	output_set_lamp_value(8, !BIT(data,7)); /* Stand Light */
 	output_set_lamp_value(9, !BIT(data,6)); /* Cancel Light */
 
-	coin_counter_w(device->machine, 0, BIT(data,1));
-	coin_lockout_w(device->machine, 0, BIT(data,5));
-	coin_lockout_w(device->machine, 1, BIT(data,4));
+	coin_counter_w(device->machine(), 0, BIT(data,1));
+	coin_lockout_w(device->machine(), 0, BIT(data,5));
+	coin_lockout_w(device->machine(), 1, BIT(data,4));
 }
 
 static const ppi8255_interface ppi8255_intf[2] =
@@ -434,7 +434,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 static WRITE8_HANDLER(video_w)
 {
-	sms_state *state = space->machine->driver_data<sms_state>();
+	sms_state *state = space->machine().driver_data<sms_state>();
 	state->vid_regs[offset] = data;
 	if ( offset == 5 )
 	{
@@ -464,8 +464,8 @@ static WRITE8_HANDLER(video_w)
 
 static VIDEO_START( sms )
 {
-	sms_state *state = machine->driver_data<sms_state>();
-	state->bitmap = machine->primary_screen->alloc_compatible_bitmap();
+	sms_state *state = machine.driver_data<sms_state>();
+	state->bitmap = machine.primary_screen->alloc_compatible_bitmap();
 
 	state_save_register_global_array(machine, state->vid_regs);
 	state_save_register_global_bitmap(machine, state->bitmap);
@@ -473,7 +473,7 @@ static VIDEO_START( sms )
 
 static SCREEN_UPDATE( sms )
 {
-	sms_state *state = screen->machine->driver_data<sms_state>();
+	sms_state *state = screen->machine().driver_data<sms_state>();
 	copybitmap(bitmap, state->bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
@@ -531,8 +531,8 @@ ADDRESS_MAP_END
 
 static MACHINE_START( sms )
 {
-	sms_state *state = machine->driver_data<sms_state>();
-	memory_configure_bank(machine, "bank1", 0, 16, machine->region("questions")->base(), 0x4000);
+	sms_state *state = machine.driver_data<sms_state>();
+	memory_configure_bank(machine, "bank1", 0, 16, machine.region("questions")->base(), 0x4000);
 
 	state_save_register_global(machine, state->communication_port_status);
 	state_save_register_global_array(machine, state->communication_port);
@@ -540,14 +540,14 @@ static MACHINE_START( sms )
 
 static MACHINE_START( sureshot )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 	state_save_register_global(machine, state->communication_port_status);
 	state_save_register_global_array(machine, state->communication_port);
 }
 
 static MACHINE_RESET( sms )
 {
-	sms_state *state = machine->driver_data<sms_state>();
+	sms_state *state = machine.driver_data<sms_state>();
 	state->communication_port_status = 0;
 }
 

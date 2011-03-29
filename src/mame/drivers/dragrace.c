@@ -13,13 +13,13 @@ Atari Drag Race Driver
 
 static TIMER_DEVICE_CALLBACK( dragrace_frame_callback )
 {
-	dragrace_state *state = timer.machine->driver_data<dragrace_state>();
+	dragrace_state *state = timer.machine().driver_data<dragrace_state>();
 	int i;
 	static const char *const portnames[] = { "P1", "P2" };
 
 	for (i = 0; i < 2; i++)
 	{
-		switch (input_port_read(timer.machine, portnames[i]))
+		switch (input_port_read(timer.machine(), portnames[i]))
 		{
 		case 0x01: state->gear[i] = 1; break;
 		case 0x02: state->gear[i] = 2; break;
@@ -30,13 +30,13 @@ static TIMER_DEVICE_CALLBACK( dragrace_frame_callback )
 	}
 
 	/* watchdog is disabled during service mode */
-	watchdog_enable(timer.machine, input_port_read(timer.machine, "IN0") & 0x20);
+	watchdog_enable(timer.machine(), input_port_read(timer.machine(), "IN0") & 0x20);
 }
 
 
-static void dragrace_update_misc_flags( running_machine *machine )
+static void dragrace_update_misc_flags( running_machine &machine )
 {
-	dragrace_state *state = machine->driver_data<dragrace_state>();
+	dragrace_state *state = machine.driver_data<dragrace_state>();
 	/* 0x0900 = set 3SPEED1         0x00000001
      * 0x0901 = set 4SPEED1         0x00000002
      * 0x0902 = set 5SPEED1         0x00000004
@@ -90,7 +90,7 @@ static void dragrace_update_misc_flags( running_machine *machine )
 
 static WRITE8_HANDLER( dragrace_misc_w )
 {
-	dragrace_state *state = space->machine->driver_data<dragrace_state>();
+	dragrace_state *state = space->machine().driver_data<dragrace_state>();
 
 	/* Set/clear individual bit */
 	UINT32 mask = 1 << offset;
@@ -99,24 +99,24 @@ static WRITE8_HANDLER( dragrace_misc_w )
 	else
 		state->misc_flags &= (~mask);
 	logerror("Set   %#6x, Mask=%#10x, Flag=%#10x, Data=%x\n", 0x0900 + offset, mask, state->misc_flags, data & 0x01);
-	dragrace_update_misc_flags(space->machine);
+	dragrace_update_misc_flags(space->machine());
 }
 
 static WRITE8_HANDLER( dragrace_misc_clear_w )
 {
-	dragrace_state *state = space->machine->driver_data<dragrace_state>();
+	dragrace_state *state = space->machine().driver_data<dragrace_state>();
 
 	/* Clear 8 bits */
 	UINT32 mask = 0xff << (((offset >> 3) & 0x03) * 8);
 	state->misc_flags &= (~mask);
 	logerror("Clear %#6x, Mask=%#10x, Flag=%#10x, Data=%x\n", 0x0920 + offset, mask, state->misc_flags, data & 0x01);
-	dragrace_update_misc_flags(space->machine);
+	dragrace_update_misc_flags(space->machine());
 }
 
 static READ8_HANDLER( dragrace_input_r )
 {
-	dragrace_state *state = space->machine->driver_data<dragrace_state>();
-	int val = input_port_read(space->machine, "IN2");
+	dragrace_state *state = space->machine().driver_data<dragrace_state>();
+	int val = input_port_read(space->machine(), "IN2");
 	static const char *const portnames[] = { "IN0", "IN1" };
 
 	UINT8 maskA = 1 << (offset % 8);
@@ -126,7 +126,7 @@ static READ8_HANDLER( dragrace_input_r )
 
 	for (i = 0; i < 2; i++)
 	{
-		int in = input_port_read(space->machine, portnames[i]);
+		int in = input_port_read(space->machine(), portnames[i]);
 
 		if (state->gear[i] != 0)
 			in &= ~(1 << state->gear[i]);
@@ -149,7 +149,7 @@ static READ8_HANDLER( dragrace_steering_r )
 
 	for (i = 0; i < 2; i++)
 	{
-		int dial = input_port_read(space->machine, dialnames[i]);
+		int dial = input_port_read(space->machine(), dialnames[i]);
 
 		bitA[i] = ((dial + 1) / 2) & 1;
 		bitB[i] = ((dial + 0) / 2) & 1;
@@ -163,7 +163,7 @@ static READ8_HANDLER( dragrace_steering_r )
 
 static READ8_HANDLER( dragrace_scanline_r )
 {
-	return (space->machine->primary_screen->vpos() ^ 0xf0) | 0x0f;
+	return (space->machine().primary_screen->vpos() ^ 0xf0) | 0x0f;
 }
 
 
@@ -316,9 +316,9 @@ static PALETTE_INIT( dragrace )
 
 static MACHINE_START( dragrace )
 {
-	dragrace_state *state = machine->driver_data<dragrace_state>();
+	dragrace_state *state = machine.driver_data<dragrace_state>();
 
-	state->discrete = machine->device("discrete");
+	state->discrete = machine.device("discrete");
 
 	state->save_item(NAME(state->misc_flags));
 	state->save_item(NAME(state->gear));
@@ -326,7 +326,7 @@ static MACHINE_START( dragrace )
 
 static MACHINE_RESET( dragrace )
 {
-	dragrace_state *state = machine->driver_data<dragrace_state>();
+	dragrace_state *state = machine.driver_data<dragrace_state>();
 
 	state->misc_flags = 0;
 	state->gear[0] = 0;

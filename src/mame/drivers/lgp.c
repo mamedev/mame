@@ -90,11 +90,11 @@ public:
 /* VIDEO GOODS */
 static SCREEN_UPDATE( lgp )
 {
-	lgp_state *state = screen->machine->driver_data<lgp_state>();
+	lgp_state *state = screen->machine().driver_data<lgp_state>();
 	int charx, chary;
 
 	/* make color 0 transparent */
-	palette_set_color(screen->machine, 0, MAKE_ARGB(0,0,0,0));
+	palette_set_color(screen->machine(), 0, MAKE_ARGB(0,0,0,0));
 
 	/* clear */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -108,7 +108,7 @@ static SCREEN_UPDATE( lgp )
 
 			/* Somewhere there's a flag that offsets the tilemap by 0x100*x */
 			/* Palette is likely set somewhere as well (tile_control_ram?) */
-			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0],
+			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0],
 					state->tile_ram[current_screen_character],
 					0,
 					0, 0, charx*8, chary*8, 0);
@@ -123,13 +123,13 @@ static SCREEN_UPDATE( lgp )
 /* Main Z80 R/W */
 static READ8_HANDLER(ldp_read)
 {
-	lgp_state *state = space->machine->driver_data<lgp_state>();
+	lgp_state *state = space->machine().driver_data<lgp_state>();
 	return laserdisc_data_r(state->laserdisc);
 }
 
 static WRITE8_HANDLER(ldp_write)
 {
-	lgp_state *state = space->machine->driver_data<lgp_state>();
+	lgp_state *state = space->machine().driver_data<lgp_state>();
 	laserdisc_data_w(state->laserdisc,data);
 }
 
@@ -333,7 +333,7 @@ static TIMER_CALLBACK( irq_stop )
 
 static INTERRUPT_GEN( vblank_callback_lgp )
 {
-	lgp_state *state = device->machine->driver_data<lgp_state>();
+	lgp_state *state = device->machine().driver_data<lgp_state>();
 	// NMI
 	//device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 
@@ -345,9 +345,9 @@ static INTERRUPT_GEN( vblank_callback_lgp )
 
 static MACHINE_START( lgp )
 {
-	lgp_state *state = machine->driver_data<lgp_state>();
-	state->laserdisc = machine->device("laserdisc");
-	state->irq_timer = machine->scheduler().timer_alloc(FUNC(irq_stop));
+	lgp_state *state = machine.driver_data<lgp_state>();
+	state->laserdisc = machine.device("laserdisc");
+	state->irq_timer = machine.scheduler().timer_alloc(FUNC(irq_stop));
 }
 
 

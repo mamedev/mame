@@ -633,7 +633,7 @@ void sdl_osd_interface::init(running_machine &machine)
 			exit(-1);
 		}
 
-	if (sdlvideo_init(&machine))
+	if (sdlvideo_init(machine))
 	{
 		osd_exit(machine);
 		mame_printf_error("sdlvideo_init: Initialization failed!\n\n\n");
@@ -642,11 +642,11 @@ void sdl_osd_interface::init(running_machine &machine)
 		exit(-1);
 	}
 
-	sdlinput_init(&machine);
+	sdlinput_init(machine);
 
-	sdlaudio_init(&machine);
+	sdlaudio_init(machine);
 
-	sdloutput_init(&machine);
+	sdloutput_init(machine);
 
 	if (options.oslog())
 		machine.add_logerror_callback(output_oslog);
@@ -659,7 +659,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	/* only enable watchdog if seconds_to_run is enabled *and* relatively short (time taken from ui.c) */
 	if ((watchdog_timeout != 0) && (str > 0) && (str < 60*5 ))
 	{
-		m_watchdog = auto_alloc(&machine, watchdog);
+		m_watchdog = auto_alloc(machine, watchdog);
 		m_watchdog->setTimeout(watchdog_timeout);
 	}
 
@@ -802,7 +802,7 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
       color_space = CGColorSpaceCreateDeviceRGB();
       bits_per_component = 8;
 
-      bitmap = auto_alloc(&machine(), bitmap_t(bitmap_width, bitmap_height, BITMAP_FORMAT_ARGB32));
+      bitmap = auto_alloc(machine(), bitmap_t(bitmap_width, bitmap_height, BITMAP_FORMAT_ARGB32));
 
       context_ref = CGBitmapContextCreate( bitmap->base, bitmap_width, bitmap_height, bits_per_component, bitmap->rowpixels*4, color_space, bitmap_info );
 
@@ -1063,7 +1063,7 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
 	if (drawsurf)
 	{
 		// allocate a MAME destination bitmap
-		bitmap = auto_alloc(&machine(), bitmap_t(drawsurf->w, drawsurf->h, BITMAP_FORMAT_ARGB32));
+		bitmap = auto_alloc(machine(), bitmap_t(drawsurf->w, drawsurf->h, BITMAP_FORMAT_ARGB32));
 
 		// copy the rendered character image into it
 		for (int y = 0; y < bitmap->height; y++)

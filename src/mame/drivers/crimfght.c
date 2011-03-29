@@ -26,13 +26,13 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking );
 
 static WRITE8_HANDLER( crimfght_coin_w )
 {
-	coin_counter_w(space->machine, 0, data & 1);
-	coin_counter_w(space->machine, 1, data & 2);
+	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(space->machine(), 1, data & 2);
 }
 
 static WRITE8_HANDLER( crimfght_sh_irqtrigger_w )
 {
-	crimfght_state *state = space->machine->driver_data<crimfght_state>();
+	crimfght_state *state = space->machine().driver_data<crimfght_state>();
 	soundlatch_w(space, offset, data);
 	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
@@ -42,7 +42,7 @@ static WRITE8_DEVICE_HANDLER( crimfght_snd_bankswitch_w )
 	/* b1: bank for channel A */
 	/* b0: bank for channel B */
 
-	crimfght_state *state = device->machine->driver_data<crimfght_state>();
+	crimfght_state *state = device->machine().driver_data<crimfght_state>();
 	int bank_A = BIT(data, 1);
 	int bank_B = BIT(data, 0);
 
@@ -51,7 +51,7 @@ static WRITE8_DEVICE_HANDLER( crimfght_snd_bankswitch_w )
 
 static READ8_HANDLER( k052109_051960_r )
 {
-	crimfght_state *state = space->machine->driver_data<crimfght_state>();
+	crimfght_state *state = space->machine().driver_data<crimfght_state>();
 
 	if (k052109_get_rmrd_line(state->k052109) == CLEAR_LINE)
 	{
@@ -68,7 +68,7 @@ static READ8_HANDLER( k052109_051960_r )
 
 static WRITE8_HANDLER( k052109_051960_w )
 {
-	crimfght_state *state = space->machine->driver_data<crimfght_state>();
+	crimfght_state *state = space->machine().driver_data<crimfght_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
 		k051937_w(state->k051960, offset - 0x3800, data);
@@ -257,22 +257,22 @@ static const k051960_interface crimfght_k051960_intf =
 
 static MACHINE_START( crimfght )
 {
-	crimfght_state *state = machine->driver_data<crimfght_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	crimfght_state *state = machine.driver_data<crimfght_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank2", 0, 12, &ROM[0x10000], 0x2000);
 	memory_set_bank(machine, "bank2", 0);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->k052109 = machine->device("k052109");
-	state->k051960 = machine->device("k051960");
-	state->k007232 = machine->device("k007232");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->k052109 = machine.device("k052109");
+	state->k051960 = machine.device("k051960");
+	state->k007232 = machine.device("k007232");
 }
 
 static MACHINE_RESET( crimfght )
 {
-	konami_configure_set_lines(machine->device("maincpu"), crimfght_banking);
+	konami_configure_set_lines(machine.device("maincpu"), crimfght_banking);
 }
 
 static MACHINE_CONFIG_START( crimfght, crimfght_state )
@@ -405,14 +405,14 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 {
-	crimfght_state *state = device->machine->driver_data<crimfght_state>();
+	crimfght_state *state = device->machine().driver_data<crimfght_state>();
 
 	/* bit 5 = select work RAM or palette */
 	if (lines & 0x20)
 	{
 		device->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x03ff, "bank3");
 		device->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0000, 0x03ff, FUNC(paletteram_xBBBBBGGGGGRRRRR_be_w));
-		memory_set_bankptr(device->machine, "bank3", device->machine->generic.paletteram.v);
+		memory_set_bankptr(device->machine(), "bank3", device->machine().generic.paletteram.v);
 	}
 	else
 		device->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x03ff, "bank1");								/* RAM */
@@ -420,7 +420,7 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 	/* bit 6 = enable char ROM reading through the video RAM */
 	k052109_set_rmrd_line(state->k052109, (lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
-	memory_set_bank(device->machine, "bank2", lines & 0x0f);
+	memory_set_bank(device->machine(), "bank2", lines & 0x0f);
 }
 
 GAME( 1989, crimfght,  0,        crimfght, crimfght, 0, ROT0, "Konami", "Crime Fighters (US 4 players)", GAME_SUPPORTS_SAVE )

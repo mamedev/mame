@@ -46,11 +46,11 @@ To Do:
 
 static WRITE8_HANDLER( yunsung8_bankswitch_w )
 {
-	yunsung8_state *state = space->machine->driver_data<yunsung8_state>();
+	yunsung8_state *state = space->machine().driver_data<yunsung8_state>();
 
 	state->layers_ctrl = data & 0x30;	// Layers enable
 
-	memory_set_bank(space->machine, "bank1", data & 0x07);
+	memory_set_bank(space->machine(), "bank1", data & 0x07);
 
 	if (data & ~0x37)
 		logerror("CPU #0 - PC %04X: Bank %02X\n", cpu_get_pc(space->cpu), data);
@@ -99,15 +99,15 @@ static WRITE8_DEVICE_HANDLER( yunsung8_sound_bankswitch_w )
 {
 	msm5205_reset_w(device, data & 0x20);
 
-	memory_set_bank(device->machine, "bank2", data & 0x07);
+	memory_set_bank(device->machine(), "bank2", data & 0x07);
 
 	if (data != (data & (~0x27)))
-		logerror("%s: Bank %02X\n", device->machine->describe_context(), data);
+		logerror("%s: Bank %02X\n", device->machine().describe_context(), data);
 }
 
 static WRITE8_HANDLER( yunsung8_adpcm_w )
 {
-	yunsung8_state *state = space->machine->driver_data<yunsung8_state>();
+	yunsung8_state *state = space->machine().driver_data<yunsung8_state>();
 
 	/* Swap the nibbles */
 	state->adpcm = ((data & 0xf) << 4) | ((data >> 4) & 0xf);
@@ -448,7 +448,7 @@ GFXDECODE_END
 
 static void yunsung8_adpcm_int( device_t *device )
 {
-	yunsung8_state *state = device->machine->driver_data<yunsung8_state>();
+	yunsung8_state *state = device->machine().driver_data<yunsung8_state>();
 
 	msm5205_data_w(device, state->adpcm >> 4);
 	state->adpcm <<= 4;
@@ -467,9 +467,9 @@ static const msm5205_interface yunsung8_msm5205_interface =
 
 static MACHINE_START( yunsung8 )
 {
-	yunsung8_state *state = machine->driver_data<yunsung8_state>();
-	UINT8 *MAIN = machine->region("maincpu")->base();
-	UINT8 *AUDIO = machine->region("audiocpu")->base();
+	yunsung8_state *state = machine.driver_data<yunsung8_state>();
+	UINT8 *MAIN = machine.region("maincpu")->base();
+	UINT8 *AUDIO = machine.region("audiocpu")->base();
 
 	state->videoram_0 = state->videoram + 0x0000;	// Ram is banked
 	state->videoram_1 = state->videoram + 0x2000;
@@ -479,7 +479,7 @@ static MACHINE_START( yunsung8 )
 	memory_configure_bank(machine, "bank2", 0, 3, &AUDIO[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank2", 3, 5, &AUDIO[0x10000], 0x4000);
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->videoram));
 	state->save_item(NAME(state->layers_ctrl));
@@ -490,7 +490,7 @@ static MACHINE_START( yunsung8 )
 
 static MACHINE_RESET( yunsung8 )
 {
-	yunsung8_state *state = machine->driver_data<yunsung8_state>();
+	yunsung8_state *state = machine.driver_data<yunsung8_state>();
 
 	state->videobank = 0;
 	state->layers_ctrl = 0;

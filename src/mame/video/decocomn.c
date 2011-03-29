@@ -50,21 +50,21 @@ WRITE16_DEVICE_HANDLER( decocomn_nonbuffered_palette_w )
 {
 	int r,g,b;
 
-	COMBINE_DATA(&device->machine->generic.paletteram.u16[offset]);
+	COMBINE_DATA(&device->machine().generic.paletteram.u16[offset]);
 	if (offset&1) offset--;
 
-	b = (device->machine->generic.paletteram.u16[offset] >> 0) & 0xff;
-	g = (device->machine->generic.paletteram.u16[offset + 1] >> 8) & 0xff;
-	r = (device->machine->generic.paletteram.u16[offset + 1] >> 0) & 0xff;
+	b = (device->machine().generic.paletteram.u16[offset] >> 0) & 0xff;
+	g = (device->machine().generic.paletteram.u16[offset + 1] >> 8) & 0xff;
+	r = (device->machine().generic.paletteram.u16[offset + 1] >> 0) & 0xff;
 
-	palette_set_color(device->machine, offset / 2, MAKE_RGB(r,g,b));
+	palette_set_color(device->machine(), offset / 2, MAKE_RGB(r,g,b));
 }
 
 WRITE16_DEVICE_HANDLER( decocomn_buffered_palette_w )
 {
 	decocomn_state *decocomn = get_safe_token(device);
 
-	COMBINE_DATA(&device->machine->generic.paletteram.u16[offset]);
+	COMBINE_DATA(&device->machine().generic.paletteram.u16[offset]);
 
 	decocomn->dirty_palette[offset / 2] = 1;
 }
@@ -72,7 +72,7 @@ WRITE16_DEVICE_HANDLER( decocomn_buffered_palette_w )
 WRITE16_DEVICE_HANDLER( decocomn_palette_dma_w )
 {
 	decocomn_state *decocomn = get_safe_token(device);
-	const int m = device->machine->total_colors();
+	const int m = device->machine().total_colors();
 	int r, g, b, i;
 
 	for (i = 0; i < m; i++)
@@ -81,11 +81,11 @@ WRITE16_DEVICE_HANDLER( decocomn_palette_dma_w )
 		{
 			decocomn->dirty_palette[i] = 0;
 
-			b = (device->machine->generic.paletteram.u16[i * 2] >> 0) & 0xff;
-			g = (device->machine->generic.paletteram.u16[i * 2 + 1] >> 8) & 0xff;
-			r = (device->machine->generic.paletteram.u16[i * 2 + 1] >> 0) & 0xff;
+			b = (device->machine().generic.paletteram.u16[i * 2] >> 0) & 0xff;
+			g = (device->machine().generic.paletteram.u16[i * 2 + 1] >> 8) & 0xff;
+			r = (device->machine().generic.paletteram.u16[i * 2 + 1] >> 0) & 0xff;
 
-			palette_set_color(device->machine, i, MAKE_RGB(r,g,b));
+			palette_set_color(device->machine(), i, MAKE_RGB(r,g,b));
 		}
 	}
 }
@@ -133,8 +133,8 @@ void decocomn_pdrawgfx(
 	decocomn_state *decocomn = get_safe_token(device);
 	int ox, oy, cx, cy;
 	int x_index, y_index, x, y;
-	bitmap_t *priority_bitmap = gfx->machine->priority_bitmap;
-	const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	bitmap_t *priority_bitmap = gfx->machine().priority_bitmap;
+	const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 	const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 	/* check bounds */
@@ -205,14 +205,14 @@ static DEVICE_START( decocomn )
 	const decocomn_interface *intf = get_interface(device);
 	int width, height;
 
-	decocomn->screen = device->machine->device<screen_device>(intf->screen);
+	decocomn->screen = device->machine().device<screen_device>(intf->screen);
 	width = decocomn->screen->width();
 	height = decocomn->screen->height();
 
-	decocomn->sprite_priority_bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED8);
+	decocomn->sprite_priority_bitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED8);
 
-	decocomn->dirty_palette = auto_alloc_array_clear(device->machine, UINT8, 4096);
-	decocomn->raster_display_list = auto_alloc_array_clear(device->machine, UINT16, 20 * 256 / 2);
+	decocomn->dirty_palette = auto_alloc_array_clear(device->machine(), UINT8, 4096);
+	decocomn->raster_display_list = auto_alloc_array_clear(device->machine(), UINT16, 20 * 256 / 2);
 
 
 

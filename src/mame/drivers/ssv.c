@@ -177,16 +177,16 @@ Notes:
 ***************************************************************************/
 
 /* Update the IRQ state based on all possible causes */
-static void update_irq_state(running_machine *machine)
+static void update_irq_state(running_machine &machine)
 {
-	ssv_state *state = machine->driver_data<ssv_state>();
+	ssv_state *state = machine.driver_data<ssv_state>();
 
 	cputag_set_input_line(machine, "maincpu", 0, (state->requested_int & state->irq_enable)? ASSERT_LINE : CLEAR_LINE);
 }
 
 static IRQ_CALLBACK(ssv_irq_callback)
 {
-	ssv_state *state = device->machine->driver_data<ssv_state>();
+	ssv_state *state = device->machine().driver_data<ssv_state>();
 
 	int i;
 	for ( i = 0; i <= 7; i++ )
@@ -202,12 +202,12 @@ static IRQ_CALLBACK(ssv_irq_callback)
 
 static WRITE16_HANDLER( ssv_irq_ack_w )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 	int level = ((offset * 2) & 0x70) >> 4;
 
 	state->requested_int &= ~(1 << level);
 
-	update_irq_state(space->machine);
+	update_irq_state(space->machine());
 }
 
 /*
@@ -230,43 +230,43 @@ static WRITE16_HANDLER( ssv_irq_ack_w )
 */
 static WRITE16_HANDLER( ssv_irq_enable_w )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	COMBINE_DATA(&state->irq_enable);
 }
 
 static INTERRUPT_GEN( ssv_interrupt )
 {
-	ssv_state *state = device->machine->driver_data<ssv_state>();
+	ssv_state *state = device->machine().driver_data<ssv_state>();
 
 	if (cpu_getiloops(device))
 	{
 		if (state->interrupt_ultrax)
 		{
 			state->requested_int |= 1 << 1;	// needed by ultrax to coin up, breaks cairblad
-			update_irq_state(device->machine);
+			update_irq_state(device->machine());
 		}
 	}
 	else
 	{
 		state->requested_int |= 1 << 3;	// vblank
-		update_irq_state(device->machine);
+		update_irq_state(device->machine());
 	}
 }
 
 static INTERRUPT_GEN( gdfs_interrupt )
 {
-	ssv_state *state = device->machine->driver_data<ssv_state>();
+	ssv_state *state = device->machine().driver_data<ssv_state>();
 
 	if (cpu_getiloops(device))
 	{
 		state->requested_int |= 1 << 6;	// reads lightgun (4 times for 4 axis)
-		update_irq_state(device->machine);
+		update_irq_state(device->machine());
 	}
 	else
 	{
 		state->requested_int |= 1 << 3;	// vblank
-		update_irq_state(device->machine);
+		update_irq_state(device->machine());
 	}
 }
 
@@ -298,12 +298,12 @@ static WRITE16_HANDLER( ssv_lockout_w )
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(space->machine, 1,~data & 0x01);
-		coin_lockout_w(space->machine, 0,~data & 0x02);
-		coin_counter_w(space->machine, 1, data & 0x04);
-		coin_counter_w(space->machine, 0, data & 0x08);
+		coin_lockout_w(space->machine(), 1,~data & 0x01);
+		coin_lockout_w(space->machine(), 0,~data & 0x02);
+		coin_counter_w(space->machine(), 1, data & 0x04);
+		coin_counter_w(space->machine(), 0, data & 0x08);
 //                        data & 0x40?
-		ssv_enable_video( space->machine, data & 0x80);
+		ssv_enable_video( space->machine(), data & 0x80);
 	}
 }
 
@@ -313,21 +313,21 @@ static WRITE16_HANDLER( ssv_lockout_inv_w )
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(space->machine, 1, data & 0x01);
-		coin_lockout_w(space->machine, 0, data & 0x02);
-		coin_counter_w(space->machine, 1, data & 0x04);
-		coin_counter_w(space->machine, 0, data & 0x08);
+		coin_lockout_w(space->machine(), 1, data & 0x01);
+		coin_lockout_w(space->machine(), 0, data & 0x02);
+		coin_counter_w(space->machine(), 1, data & 0x04);
+		coin_counter_w(space->machine(), 0, data & 0x08);
 //                        data & 0x40?
-		ssv_enable_video( space->machine, data & 0x80);
+		ssv_enable_video( space->machine(), data & 0x80);
 	}
 }
 
 static MACHINE_RESET( ssv )
 {
-	ssv_state *state = machine->driver_data<ssv_state>();
+	ssv_state *state = machine.driver_data<ssv_state>();
 	state->requested_int = 0;
-	device_set_irq_callback(machine->device("maincpu"), ssv_irq_callback);
-	memory_set_bankptr(machine, "bank1", machine->region("user1")->base());
+	device_set_irq_callback(machine.device("maincpu"), ssv_irq_callback);
+	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
 }
 
 
@@ -349,21 +349,21 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( dsp_dr_r )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	return state->m_dsp->snesdsp_read(true);
 }
 
 static WRITE16_HANDLER( dsp_dr_w )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	state->m_dsp->snesdsp_write(true, data);
 }
 
 static READ16_HANDLER( dsp_r )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 	UINT16 temp = state->m_dsp->dataram_r(offset/2);
 	UINT16 res;
 
@@ -381,7 +381,7 @@ static READ16_HANDLER( dsp_r )
 
 static WRITE16_HANDLER( dsp_w )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 	UINT16 temp = state->m_dsp->dataram_r(offset/2);
 
 	if (offset & 1)
@@ -437,7 +437,7 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 
 static READ16_HANDLER( drifto94_rand_r )
 {
-	return space->machine->rand() & 0xffff;
+	return space->machine().rand() & 0xffff;
 }
 
 static ADDRESS_MAP_START( drifto94_map, AS_PROGRAM, 16 )
@@ -460,18 +460,18 @@ ADDRESS_MAP_END
 
 static READ16_DEVICE_HANDLER( gdfs_eeprom_r )
 {
-	ssv_state *state = device->machine->driver_data<ssv_state>();
+	ssv_state *state = device->machine().driver_data<ssv_state>();
 	static const char *const gunnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
 
-	return (((state->gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read(device->machine, gunnames[state->gdfs_lightgun_select])) | (eeprom_read_bit(device) << 8);
+	return (((state->gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read(device->machine(), gunnames[state->gdfs_lightgun_select])) | (eeprom_read_bit(device) << 8);
 }
 
 static WRITE16_DEVICE_HANDLER( gdfs_eeprom_w )
 {
-	ssv_state *state = device->machine->driver_data<ssv_state>();
+	ssv_state *state = device->machine().driver_data<ssv_state>();
 
 	if (data & ~0x7b00)
-		logerror("%s - Unknown EEPROM bit written %04X\n",device->machine->describe_context(),data);
+		logerror("%s - Unknown EEPROM bit written %04X\n",device->machine().describe_context(),data);
 
 	if ( ACCESSING_BITS_8_15 )
 	{
@@ -497,17 +497,17 @@ static WRITE16_DEVICE_HANDLER( gdfs_eeprom_w )
 
 static READ16_HANDLER( gdfs_gfxram_r )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	return state->eaglshot_gfxram[offset + state->gdfs_gfxram_bank * 0x100000/2];
 }
 
 static WRITE16_HANDLER( gdfs_gfxram_w )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 	offset += state->gdfs_gfxram_bank * 0x100000/2;
 	COMBINE_DATA(&state->eaglshot_gfxram[offset]);
-	gfx_element_mark_dirty(space->machine->gfx[2], offset / (16*8/2));
+	gfx_element_mark_dirty(space->machine().gfx[2], offset / (16*8/2));
 }
 
 static READ16_HANDLER( gdfs_blitram_r )
@@ -525,7 +525,7 @@ static READ16_HANDLER( gdfs_blitram_r )
 
 static WRITE16_HANDLER( gdfs_blitram_w )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 	UINT16 *gdfs_blitram = state->gdfs_blitram;
 
 	COMBINE_DATA(&gdfs_blitram[offset]);
@@ -555,8 +555,8 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 			UINT32 dst	=	(gdfs_blitram[0xc4/2] + (gdfs_blitram[0xc6/2] << 16)) << 4;
 			UINT32 len	=	(gdfs_blitram[0xc8/2]) << 4;
 
-			UINT8 *rom	=	space->machine->region("gfx2")->base();
-			size_t size	=	space->machine->region("gfx2")->bytes();
+			UINT8 *rom	=	space->machine().region("gfx2")->base();
+			size_t size	=	space->machine().region("gfx2")->bytes();
 
 			if ( (src+len <= size) && (dst+len <= 4 * 0x100000) )
 			{
@@ -568,7 +568,7 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 				dst /= 16*8;
 				while (len--)
 				{
-					gfx_element_mark_dirty(space->machine->gfx[2], dst);
+					gfx_element_mark_dirty(space->machine().gfx[2], dst);
 					dst++;
 				}
 			}
@@ -612,13 +612,13 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( hypreact_input_r )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 	UINT16 input_sel = *state->input_sel;
 
-	if (input_sel & 0x0001)	return input_port_read(space->machine, "KEY0");
-	if (input_sel & 0x0002)	return input_port_read(space->machine, "KEY1");
-	if (input_sel & 0x0004)	return input_port_read(space->machine, "KEY2");
-	if (input_sel & 0x0008)	return input_port_read(space->machine, "KEY3");
+	if (input_sel & 0x0001)	return input_port_read(space->machine(), "KEY0");
+	if (input_sel & 0x0002)	return input_port_read(space->machine(), "KEY1");
+	if (input_sel & 0x0004)	return input_port_read(space->machine(), "KEY2");
+	if (input_sel & 0x0008)	return input_port_read(space->machine(), "KEY3");
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(space->cpu),input_sel);
 	return 0xffff;
 }
@@ -702,14 +702,14 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( ssv_mainram_r )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	return state->mainram[offset];
 }
 
 static WRITE16_HANDLER( ssv_mainram_w )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	COMBINE_DATA(&state->mainram[offset]);
 }
@@ -740,13 +740,13 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( srmp4_input_r )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 	UINT16 input_sel = *state->input_sel;
 
-	if (input_sel & 0x0002)	return input_port_read(space->machine, "KEY0");
-	if (input_sel & 0x0004)	return input_port_read(space->machine, "KEY1");
-	if (input_sel & 0x0008)	return input_port_read(space->machine, "KEY2");
-	if (input_sel & 0x0010)	return input_port_read(space->machine, "KEY3");
+	if (input_sel & 0x0002)	return input_port_read(space->machine(), "KEY0");
+	if (input_sel & 0x0004)	return input_port_read(space->machine(), "KEY1");
+	if (input_sel & 0x0008)	return input_port_read(space->machine(), "KEY2");
+	if (input_sel & 0x0010)	return input_port_read(space->machine(), "KEY3");
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(space->cpu),input_sel);
 	return 0xffff;
 }
@@ -778,7 +778,7 @@ static WRITE16_HANDLER( srmp7_sound_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		device_t *device = space->machine->device("ensoniq");
+		device_t *device = space->machine().device("ensoniq");
 		int bank = 0x400000/2 * (data & 1);	// UINT16 address
 		int voice;
 		for (voice = 0; voice < 32; voice++)
@@ -789,13 +789,13 @@ static WRITE16_HANDLER( srmp7_sound_bank_w )
 
 static READ16_HANDLER( srmp7_input_r )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 	UINT16 input_sel = *state->input_sel;
 
-	if (input_sel & 0x0002)	return input_port_read(space->machine, "KEY0");
-	if (input_sel & 0x0004)	return input_port_read(space->machine, "KEY1");
-	if (input_sel & 0x0008)	return input_port_read(space->machine, "KEY2");
-	if (input_sel & 0x0010)	return input_port_read(space->machine, "KEY3");
+	if (input_sel & 0x0002)	return input_port_read(space->machine(), "KEY0");
+	if (input_sel & 0x0004)	return input_port_read(space->machine(), "KEY1");
+	if (input_sel & 0x0008)	return input_port_read(space->machine(), "KEY2");
+	if (input_sel & 0x0010)	return input_port_read(space->machine(), "KEY3");
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(space->cpu),input_sel);
 	return 0xffff;
 }
@@ -838,12 +838,12 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( sxyreact_ballswitch_r )
 {
-	return input_port_read_safe(space->machine, "SERVICE", 0);
+	return input_port_read_safe(space->machine(), "SERVICE", 0);
 }
 
 static READ16_HANDLER( sxyreact_dial_r )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	return ((state->sxyreact_serial >> 1) & 0x80);
 }
@@ -853,10 +853,10 @@ static WRITE16_HANDLER( sxyreact_dial_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		ssv_state *state = space->machine->driver_data<ssv_state>();
+		ssv_state *state = space->machine().driver_data<ssv_state>();
 
 		if (data & 0x20)
-			state->sxyreact_serial = input_port_read_safe(space->machine, "PADDLE", 0) & 0xff;
+			state->sxyreact_serial = input_port_read_safe(space->machine(), "PADDLE", 0) & 0xff;
 
 		if ( (state->sxyreact_dial & 0x40) && !(data & 0x40) )	// $40 -> $00
 			state->sxyreact_serial <<= 1;						// shift 1 bit
@@ -919,7 +919,7 @@ ADDRESS_MAP_END
 
 static READ32_HANDLER(latch32_r)
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	if(!offset)
 		state->latches[2]&=~2;
@@ -928,17 +928,17 @@ static READ32_HANDLER(latch32_r)
 
 static WRITE32_HANDLER(latch32_w)
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	if(!offset)
 		state->latches[2]|=1;
 	COMBINE_DATA(&state->latches[offset]);
-	space->machine->scheduler().synchronize();
+	space->machine().scheduler().synchronize();
 }
 
 static READ16_HANDLER(latch16_r)
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	if(!offset)
 		state->latches[2]&=~1;
@@ -947,12 +947,12 @@ static READ16_HANDLER(latch16_r)
 
 static WRITE16_HANDLER(latch16_w)
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	if(!offset)
 		state->latches[2]|=2;
 	state->latches[offset]=data;
-	space->machine->scheduler().synchronize();
+	space->machine().scheduler().synchronize();
 }
 
 static ADDRESS_MAP_START( jsk_map, AS_PROGRAM, 16 )
@@ -979,9 +979,9 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( eaglshot_gfxrom_r )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
-	UINT8 *rom	=	space->machine->region("gfx1")->base();
-	size_t size	=	space->machine->region("gfx1")->bytes();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
+	UINT8 *rom	=	space->machine().region("gfx1")->base();
+	size_t size	=	space->machine().region("gfx1")->bytes();
 
 	offset = offset * 2 + state->gfxrom_select * 0x200000;
 
@@ -995,22 +995,22 @@ static WRITE16_HANDLER( eaglshot_gfxrom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		ssv_state *state = space->machine->driver_data<ssv_state>();
+		ssv_state *state = space->machine().driver_data<ssv_state>();
 		state->gfxrom_select = data;
 	}
 }
 
 static READ16_HANDLER( eaglshot_trackball_r )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	switch(state->trackball_select)
 	{
-		case 0x60:	return (input_port_read(space->machine, "TRACKX") >> 8) & 0xff;
-		case 0x40:	return (input_port_read(space->machine, "TRACKX") >> 0) & 0xff;
+		case 0x60:	return (input_port_read(space->machine(), "TRACKX") >> 8) & 0xff;
+		case 0x40:	return (input_port_read(space->machine(), "TRACKX") >> 0) & 0xff;
 
-		case 0x70:	return (input_port_read(space->machine, "TRACKY") >> 8) & 0xff;
-		case 0x50:	return (input_port_read(space->machine, "TRACKY") >> 0) & 0xff;
+		case 0x70:	return (input_port_read(space->machine(), "TRACKY") >> 8) & 0xff;
+		case 0x50:	return (input_port_read(space->machine(), "TRACKY") >> 0) & 0xff;
 	}
 	return 0;
 }
@@ -1019,7 +1019,7 @@ static WRITE16_HANDLER( eaglshot_trackball_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		ssv_state *state = space->machine->driver_data<ssv_state>();
+		ssv_state *state = space->machine().driver_data<ssv_state>();
 		state->trackball_select = data;
 	}
 }
@@ -1028,19 +1028,19 @@ static WRITE16_HANDLER( eaglshot_trackball_w )
 
 static READ16_HANDLER( eaglshot_gfxram_r )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	return state->eaglshot_gfxram[offset + (state->scroll[0x76/2] & 0xf) * 0x40000/2];
 }
 
 static WRITE16_HANDLER( eaglshot_gfxram_w )
 {
-	ssv_state *state = space->machine->driver_data<ssv_state>();
+	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	offset += (state->scroll[0x76/2] & 0xf) * 0x40000/2;
 	COMBINE_DATA(&state->eaglshot_gfxram[offset]);
-	gfx_element_mark_dirty(space->machine->gfx[0], offset / (16*8/2));
-	gfx_element_mark_dirty(space->machine->gfx[1], offset / (16*8/2));
+	gfx_element_mark_dirty(space->machine().gfx[0], offset / (16*8/2));
+	gfx_element_mark_dirty(space->machine().gfx[1], offset / (16*8/2));
 }
 
 
@@ -2646,9 +2646,9 @@ static const es5506_interface es5506_config =
 
 ***************************************************************************/
 
-static void init_ssv(running_machine *machine, int interrupt_ultrax)
+static void init_ssv(running_machine &machine, int interrupt_ultrax)
 {
-	ssv_state *state = machine->driver_data<ssv_state>();
+	ssv_state *state = machine.driver_data<ssv_state>();
 	int i;
 	for (i = 0; i < 16; i++)
 		state->tile_code[i]	=	( (i & 8) ? (1 << 16) : 0 ) +
@@ -2659,9 +2659,9 @@ static void init_ssv(running_machine *machine, int interrupt_ultrax)
 	state->interrupt_ultrax = interrupt_ultrax;
 }
 
-static void init_hypreac2(running_machine *machine)
+static void init_hypreac2(running_machine &machine)
 {
-	ssv_state *state = machine->driver_data<ssv_state>();
+	ssv_state *state = machine.driver_data<ssv_state>();
 	int i;
 
 	for (i = 0; i < 16; i++)
@@ -2669,11 +2669,11 @@ static void init_hypreac2(running_machine *machine)
 }
 
 // massages the data from the BPMicro-compatible dump to runnable form
-static void init_st010(running_machine *machine)
+static void init_st010(running_machine &machine)
 {
-	UINT8 *dspsrc = (UINT8 *)machine->region("st010")->base();
-	UINT32 *dspprg = (UINT32 *)machine->region("dspprg")->base();
-	UINT16 *dspdata = (UINT16 *)machine->region("dspdata")->base();
+	UINT8 *dspsrc = (UINT8 *)machine.region("st010")->base();
+	UINT32 *dspprg = (UINT32 *)machine.region("dspprg")->base();
+	UINT16 *dspdata = (UINT16 *)machine.region("dspdata")->base();
 
 	// copy DSP program
 	for (int i = 0; i < 0x10000; i+= 4)
@@ -2700,7 +2700,7 @@ static DRIVER_INIT( meosism )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( mslider )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( ryorioh )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( srmp4 )			{	init_ssv(machine, 0);
-//  ((UINT16 *)machine->region("user1")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
+//  ((UINT16 *)machine.region("user1")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
 static DRIVER_INIT( srmp7 )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( stmblade )		{	init_ssv(machine, 0); init_st010(machine); }

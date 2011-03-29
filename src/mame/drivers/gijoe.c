@@ -60,13 +60,13 @@ static const eeprom_interface eeprom_intf =
 
 static READ16_HANDLER( control2_r )
 {
-	gijoe_state *state = space->machine->driver_data<gijoe_state>();
+	gijoe_state *state = space->machine().driver_data<gijoe_state>();
 	return state->cur_control2;
 }
 
 static WRITE16_HANDLER( control2_w )
 {
-	gijoe_state *state = space->machine->driver_data<gijoe_state>();
+	gijoe_state *state = space->machine().driver_data<gijoe_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -76,7 +76,7 @@ static WRITE16_HANDLER( control2_w )
 		/* bit 3  (unknown: coin) */
 		/* bit 5  is enable irq 6 */
 		/* bit 7  (unknown: enable irq 5?) */
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 
 		state->cur_control2 = data;
 
@@ -85,9 +85,9 @@ static WRITE16_HANDLER( control2_w )
 	}
 }
 
-static void gijoe_objdma( running_machine *machine )
+static void gijoe_objdma( running_machine &machine )
 {
-	gijoe_state *state = machine->driver_data<gijoe_state>();
+	gijoe_state *state = machine.driver_data<gijoe_state>();
 	UINT16 *src_head, *src_tail, *dst_head, *dst_tail;
 
 	src_head = state->spriteram;
@@ -112,7 +112,7 @@ static void gijoe_objdma( running_machine *machine )
 
 static TIMER_CALLBACK( dmaend_callback )
 {
-	gijoe_state *state = machine->driver_data<gijoe_state>();
+	gijoe_state *state = machine.driver_data<gijoe_state>();
 
 	if (state->cur_control2 & 0x0020)
 		device_set_input_line(state->maincpu, 6, HOLD_LINE);
@@ -120,7 +120,7 @@ static TIMER_CALLBACK( dmaend_callback )
 
 static INTERRUPT_GEN( gijoe_interrupt )
 {
-	gijoe_state *state = device->machine->driver_data<gijoe_state>();
+	gijoe_state *state = device->machine().driver_data<gijoe_state>();
 
 	// global interrupt masking (*this game only)
 	if (!k056832_is_irq_enabled(state->k056832, 0))
@@ -128,7 +128,7 @@ static INTERRUPT_GEN( gijoe_interrupt )
 
 	if (k053246_is_irq_enabled(state->k053246))
 	{
-		gijoe_objdma(device->machine);
+		gijoe_objdma(device->machine());
 
 		// 42.7us(clr) + 341.3us(xfer) delay at 6Mhz dotclock
 		state->dmadelay_timer->adjust(JOE_DMADELAY);
@@ -150,7 +150,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	gijoe_state *state = space->machine->driver_data<gijoe_state>();
+	gijoe_state *state = space->machine().driver_data<gijoe_state>();
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
@@ -161,7 +161,7 @@ static READ16_HANDLER( sound_status_r )
 
 static void sound_nmi( device_t *device )
 {
-	gijoe_state *state = device->machine->driver_data<gijoe_state>();
+	gijoe_state *state = device->machine().driver_data<gijoe_state>();
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -276,23 +276,23 @@ static const k053247_interface gijoe_k053247_intf =
 
 static MACHINE_START( gijoe )
 {
-	gijoe_state *state = machine->driver_data<gijoe_state>();
+	gijoe_state *state = machine.driver_data<gijoe_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->k054539 = machine->device("k054539");
-	state->k056832 = machine->device("k056832");
-	state->k053246 = machine->device("k053246");
-	state->k053251 = machine->device("k053251");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->k054539 = machine.device("k054539");
+	state->k056832 = machine.device("k056832");
+	state->k053246 = machine.device("k053246");
+	state->k053251 = machine.device("k053251");
 
-	state->dmadelay_timer = machine->scheduler().timer_alloc(FUNC(dmaend_callback));
+	state->dmadelay_timer = machine.scheduler().timer_alloc(FUNC(dmaend_callback));
 
 	state->save_item(NAME(state->cur_control2));
 }
 
 static MACHINE_RESET( gijoe )
 {
-	gijoe_state *state = machine->driver_data<gijoe_state>();
+	gijoe_state *state = machine.driver_data<gijoe_state>();
 	state->cur_control2 = 0;
 }
 

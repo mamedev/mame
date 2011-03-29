@@ -132,7 +132,7 @@ static DEVICE_START( snapquick )
 	snapquick_token *token = get_token(device);
 
 	/* allocate a timer */
-	token->timer = device->machine->scheduler().timer_alloc(FUNC(process_snapshot_or_quickload), (void *) dynamic_cast<device_image_interface *>(device));
+	token->timer = device->machine().scheduler().timer_alloc(FUNC(process_snapshot_or_quickload), (void *) dynamic_cast<device_image_interface *>(device));
 
 }
 
@@ -298,7 +298,7 @@ static int z80bin_load_file(device_image_interface *image, const char *file_type
 			image->message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			return IMAGE_INIT_FAIL;
 		}
-		image->device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(j, data);
+		image->device().machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte(j, data);
 	}
 
 	return IMAGE_INIT_PASS;
@@ -326,17 +326,17 @@ static QUICKLOAD_LOAD( z80bin )
 		config = (const z80bin_config *)downcast<const legacy_device_config_base &>(image.device().baseconfig()).inline_config();
 
 		/* check to see if autorun is on (I hate how this works) */
-		autorun = input_port_read_safe(image.device().machine, "CONFIG", 0xFF) & 1;
+		autorun = input_port_read_safe(image.device().machine(), "CONFIG", 0xFF) & 1;
 
 		/* start program */
 		if (config->execute != NULL)
 		{
-			(*config->execute)(image.device().machine, start_addr, end_addr, exec_addr, autorun);
+			(*config->execute)(image.device().machine(), start_addr, end_addr, exec_addr, autorun);
 		}
 		else
 		{
 			if (autorun)
-				cpu_set_reg(image.device().machine->device("maincpu"), STATE_GENPC, exec_addr);
+				cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, exec_addr);
 		}
 	}
 

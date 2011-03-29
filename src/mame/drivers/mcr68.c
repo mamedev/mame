@@ -70,8 +70,8 @@
 
 READ8_DEVICE_HANDLER( zwackery_port_2_r )
 {
-	int result = input_port_read(device->machine, "IN2");
-	int wheel = input_port_read(device->machine, "IN5");
+	int result = input_port_read(device->machine(), "IN2");
+	int wheel = input_port_read(device->machine(), "IN5");
 
 	return result | ((wheel >> 2) & 0x3e);
 }
@@ -101,7 +101,7 @@ static READ16_HANDLER( zwackery_6840_r )
 
 static WRITE16_HANDLER( xenophobe_control_w )
 {
-	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	COMBINE_DATA(&state->control_word);
 /*  soundsgood_reset_w(~state->control_word & 0x0020);*/
 	soundsgood_data_w(space, offset, ((state->control_word & 0x000f) << 1) | ((state->control_word & 0x0010) >> 4));
@@ -117,7 +117,7 @@ static WRITE16_HANDLER( xenophobe_control_w )
 
 static WRITE16_HANDLER( blasted_control_w )
 {
-	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	COMBINE_DATA(&state->control_word);
 /*  soundsgood_reset_w(~state->control_word & 0x0020);*/
 	soundsgood_data_w(space, offset, (state->control_word >> 8) & 0x1f);
@@ -133,11 +133,11 @@ static WRITE16_HANDLER( blasted_control_w )
 
 static READ16_HANDLER( spyhunt2_port_0_r )
 {
-	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	static const char *const portnames[] = { "AN1", "AN2", "AN3", "AN4" };
-	int result = input_port_read(space->machine, "IN0");
+	int result = input_port_read(space->machine(), "IN0");
 	int which = (state->control_word >> 3) & 3;
-	int analog = input_port_read(space->machine, portnames[which]);
+	int analog = input_port_read(space->machine(), portnames[which]);
 
 	return result | ((soundsgood_status_r(space, 0) & 1) << 5) | (analog << 8);
 }
@@ -145,20 +145,20 @@ static READ16_HANDLER( spyhunt2_port_0_r )
 
 static READ16_HANDLER( spyhunt2_port_1_r )
 {
-	int result = input_port_read(space->machine, "IN1");
+	int result = input_port_read(space->machine(), "IN1");
 	return result | ((turbocs_status_r(space, 0) & 1) << 7);
 }
 
 
 static WRITE16_HANDLER( spyhunt2_control_w )
 {
-	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	COMBINE_DATA(&state->control_word);
 
 /*  turbocs_reset_w(~state->control_word & 0x0080);*/
 	turbocs_data_w(space, offset, (state->control_word >> 8) & 0x001f);
 
-	soundsgood_reset_w(space->machine, ~state->control_word & 0x2000);
+	soundsgood_reset_w(space->machine(), ~state->control_word & 0x2000);
 	soundsgood_data_w(space, offset, (state->control_word >> 8) & 0x001f);
 }
 
@@ -199,19 +199,19 @@ static const UINT8 translate49[7] = { 0x7, 0x3, 0x1, 0x0, 0xc, 0xe, 0xf };
 
 static READ16_HANDLER( archrivl_port_1_r )
 {
-	return (translate49[input_port_read(space->machine, "49WAYY2") >> 4] << 12) |
-			(translate49[input_port_read(space->machine, "49WAYX2") >> 4] << 8) |
-			(translate49[input_port_read(space->machine, "49WAYY1") >> 4] << 4) |
-			(translate49[input_port_read(space->machine, "49WAYX1") >> 4] << 0);
+	return (translate49[input_port_read(space->machine(), "49WAYY2") >> 4] << 12) |
+			(translate49[input_port_read(space->machine(), "49WAYX2") >> 4] << 8) |
+			(translate49[input_port_read(space->machine(), "49WAYY1") >> 4] << 4) |
+			(translate49[input_port_read(space->machine(), "49WAYX1") >> 4] << 0);
 }
 
 
 static WRITE16_HANDLER( archrivl_control_w )
 {
-	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	COMBINE_DATA(&state->control_word);
 	williams_cvsd_reset_w(~state->control_word & 0x0400);
-	williams_cvsd_data_w(space->machine, state->control_word & 0x3ff);
+	williams_cvsd_data_w(space->machine(), state->control_word & 0x3ff);
 }
 
 
@@ -224,7 +224,7 @@ static WRITE16_HANDLER( archrivl_control_w )
 
 static WRITE16_HANDLER( pigskin_protection_w )
 {
-	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	/* ignore upper-byte only */
 	if (ACCESSING_BITS_0_7)
 	{
@@ -242,7 +242,7 @@ static WRITE16_HANDLER( pigskin_protection_w )
 
 static READ16_HANDLER( pigskin_protection_r )
 {
-	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	/* based on the last 5 bytes return a value */
 	if (state->protection_data[4] == 0xe3 && state->protection_data[3] == 0x94)
 		return 0x00;	/* must be <= 1 */
@@ -264,18 +264,18 @@ static READ16_HANDLER( pigskin_protection_r )
 static READ16_HANDLER( pigskin_port_1_r )
 {
 	/* see archrivl_port_1_r for 49-way joystick description */
-	return input_port_read(space->machine, "IN1") |
-			(translate49[input_port_read(space->machine, "49WAYX1") >> 4] << 12) |
-			(translate49[input_port_read(space->machine, "49WAYY1") >> 4] << 8);
+	return input_port_read(space->machine(), "IN1") |
+			(translate49[input_port_read(space->machine(), "49WAYX1") >> 4] << 12) |
+			(translate49[input_port_read(space->machine(), "49WAYY1") >> 4] << 8);
 }
 
 
 static READ16_HANDLER( pigskin_port_2_r )
 {
 	/* see archrivl_port_1_r for 49-way joystick description */
-	return input_port_read(space->machine, "DSW") |
-			(translate49[input_port_read(space->machine, "49WAYX2") >> 4] << 12) |
-			(translate49[input_port_read(space->machine, "49WAYY2") >> 4] << 8);
+	return input_port_read(space->machine(), "DSW") |
+			(translate49[input_port_read(space->machine(), "49WAYX2") >> 4] << 12) |
+			(translate49[input_port_read(space->machine(), "49WAYY2") >> 4] << 8);
 }
 
 
@@ -288,9 +288,9 @@ static READ16_HANDLER( pigskin_port_2_r )
 
 static READ16_HANDLER( trisport_port_1_r )
 {
-	int xaxis = (INT8)input_port_read(space->machine, "AN1");
-	int yaxis = (INT8)input_port_read(space->machine, "AN2");
-	int result = input_port_read(space->machine, "IN1");
+	int xaxis = (INT8)input_port_read(space->machine(), "AN1");
+	int yaxis = (INT8)input_port_read(space->machine(), "AN2");
+	int result = input_port_read(space->machine(), "IN1");
 
 	result |= (xaxis & 0x3c) << 6;
 	result |= (yaxis & 0x3c) << 10;
@@ -1544,9 +1544,9 @@ ROM_END
  *
  *************************************/
 
-static void mcr68_common_init(running_machine *machine, int sound_board, int clip, int xoffset)
+static void mcr68_common_init(running_machine &machine, int sound_board, int clip, int xoffset)
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	mcr_sound_init(machine, sound_board);
 
 	state->sprite_clip = clip;
@@ -1558,69 +1558,69 @@ static void mcr68_common_init(running_machine *machine, int sound_board, int cli
 
 static DRIVER_INIT( zwackery )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_CHIP_SQUEAK_DELUXE, 0, 0);
 
 	/* Zwackery doesn't care too much about this value; currently taken from Blasted */
-	state->timing_factor = attotime::from_hz(machine->device("maincpu")->unscaled_clock() / 10) * (256 + 16);
+	state->timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 }
 
 
 static DRIVER_INIT( xenophob )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_SOUNDS_GOOD, 0, -4);
 
 	/* Xenophobe doesn't care too much about this value; currently taken from Blasted */
-	state->timing_factor = attotime::from_hz(machine->device("maincpu")->unscaled_clock() / 10) * (256 + 16);
+	state->timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* install control port handler */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0cffff, FUNC(xenophobe_control_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0cffff, FUNC(xenophobe_control_w));
 }
 
 
 static DRIVER_INIT( spyhunt2 )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_TURBO_CHIP_SQUEAK | MCR_SOUNDS_GOOD, 0, -6);
 
 	/* Spy Hunter 2 doesn't care too much about this value; currently taken from Blasted */
-	state->timing_factor = attotime::from_hz(machine->device("maincpu")->unscaled_clock() / 10) * (256 + 16);
+	state->timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* analog port handling is a bit tricky */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0cffff, FUNC(spyhunt2_control_w));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0d0000, 0x0dffff, FUNC(spyhunt2_port_0_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0e0000, 0x0effff, FUNC(spyhunt2_port_1_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0cffff, FUNC(spyhunt2_control_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0d0000, 0x0dffff, FUNC(spyhunt2_port_0_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0e0000, 0x0effff, FUNC(spyhunt2_port_1_r));
 }
 
 
 static DRIVER_INIT( blasted )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_SOUNDS_GOOD, 0, 0);
 
 	/* Blasted checks the timing of VBLANK relative to the 493 interrupt */
 	/* VBLANK is required to come within 220-256 E clocks (i.e., 2200-2560 CPU clocks) */
 	/* after the 493; we also allow 16 E clocks for latency  */
-	state->timing_factor = attotime::from_hz(machine->device("maincpu")->unscaled_clock() / 10) * (256 + 16);
+	state->timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0cffff, FUNC(blasted_control_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0cffff, FUNC(blasted_control_w));
 
 	/* 6840 is mapped to the lower 8 bits */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0a0000, 0x0a000f, FUNC(mcr68_6840_lower_r), FUNC(mcr68_6840_lower_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0a0000, 0x0a000f, FUNC(mcr68_6840_lower_r), FUNC(mcr68_6840_lower_w));
 }
 
 static DRIVER_INIT( intlaser )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_SOUNDS_GOOD, 0, 0);
 
 	/* Copied from Blasted */
-	state->timing_factor = attotime::from_hz(machine->device("maincpu")->unscaled_clock() / 10) * (256 + 16);
+	state->timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0cffff, FUNC(blasted_control_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0cffff, FUNC(blasted_control_w));
 
 }
 
@@ -1628,30 +1628,30 @@ static DRIVER_INIT( intlaser )
 
 static DRIVER_INIT( archrivl )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_WILLIAMS_SOUND, 16, 0);
 
 	/* Arch Rivals doesn't care too much about this value; currently taken from Blasted */
-	state->timing_factor = attotime::from_hz(machine->device("maincpu")->unscaled_clock() / 10) * (256 + 16);
+	state->timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0cffff, FUNC(archrivl_control_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0cffff, FUNC(archrivl_control_w));
 
 	/* 49-way joystick handling is a bit tricky */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0e0000, 0x0effff, FUNC(archrivl_port_1_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0e0000, 0x0effff, FUNC(archrivl_port_1_r));
 
 	/* 6840 is mapped to the lower 8 bits */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0a0000, 0x0a000f, FUNC(mcr68_6840_lower_r), FUNC(mcr68_6840_lower_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0a0000, 0x0a000f, FUNC(mcr68_6840_lower_r), FUNC(mcr68_6840_lower_w));
 }
 
 
 static DRIVER_INIT( pigskin )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_WILLIAMS_SOUND, 16, 0);
 
 	/* Pigskin doesn't care too much about this value; currently taken from Tri-Sports */
-	state->timing_factor = attotime::from_hz(machine->device("maincpu")->unscaled_clock() / 10) * 115;
+	state->timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * 115;
 
 	state_save_register_global_array(machine, state->protection_data);
 }
@@ -1659,13 +1659,13 @@ static DRIVER_INIT( pigskin )
 
 static DRIVER_INIT( trisport )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_WILLIAMS_SOUND, 0, 0);
 
 	/* Tri-Sports checks the timing of VBLANK relative to the 493 interrupt */
 	/* VBLANK is required to come within 87-119 E clocks (i.e., 870-1190 CPU clocks) */
 	/* after the 493 */
-	state->timing_factor = attotime::from_hz(machine->device("maincpu")->unscaled_clock() / 10) * 115;
+	state->timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * 115;
 }
 
 

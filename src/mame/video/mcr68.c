@@ -19,20 +19,20 @@
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	UINT16 *videoram = state->videoram;
 	int data = LOW_BYTE(videoram[tile_index * 2]) | (LOW_BYTE(videoram[tile_index * 2 + 1]) << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0xc00);
 	int color = (~data >> 12) & 3;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
-	if (machine->gfx[0]->total_elements < 0x1000)
+	if (machine.gfx[0]->total_elements < 0x1000)
 		tileinfo->category = (data >> 15) & 1;
 }
 
 
 static TILE_GET_INFO( zwackery_get_bg_tile_info )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	UINT16 *videoram = state->videoram;
 	int data = videoram[tile_index];
 	int color = (data >> 13) & 7;
@@ -42,7 +42,7 @@ static TILE_GET_INFO( zwackery_get_bg_tile_info )
 
 static TILE_GET_INFO( zwackery_get_fg_tile_info )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	UINT16 *videoram = state->videoram;
 	int data = videoram[tile_index];
 	int color = (data >> 13) & 7;
@@ -60,7 +60,7 @@ static TILE_GET_INFO( zwackery_get_fg_tile_info )
 
 VIDEO_START( mcr68 )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	/* initialize the background tilemap */
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  16,16, 32,32);
 	tilemap_set_transparent_pen(state->bg_tilemap, 0);
@@ -69,10 +69,10 @@ VIDEO_START( mcr68 )
 
 VIDEO_START( zwackery )
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
-	const UINT8 *colordatabase = (const UINT8 *)machine->region("gfx3")->base();
-	gfx_element *gfx0 = machine->gfx[0];
-	gfx_element *gfx2 = machine->gfx[2];
+	mcr68_state *state = machine.driver_data<mcr68_state>();
+	const UINT8 *colordatabase = (const UINT8 *)machine.region("gfx3")->base();
+	gfx_element *gfx0 = machine.gfx[0];
+	gfx_element *gfx2 = machine.gfx[2];
 	UINT8 *srcdata0, *dest0;
 	UINT8 *srcdata2, *dest2;
 	int code, y, x;
@@ -153,9 +153,9 @@ WRITE16_HANDLER( mcr68_paletteram_w )
 {
 	int newword;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	newword = space->machine->generic.paletteram.u16[offset];
-	palette_set_color_rgb(space->machine, offset, pal3bit(newword >> 6), pal3bit(newword >> 0), pal3bit(newword >> 3));
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	newword = space->machine().generic.paletteram.u16[offset];
+	palette_set_color_rgb(space->machine(), offset, pal3bit(newword >> 6), pal3bit(newword >> 0), pal3bit(newword >> 3));
 }
 
 
@@ -163,9 +163,9 @@ WRITE16_HANDLER( zwackery_paletteram_w )
 {
 	int newword;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	newword = space->machine->generic.paletteram.u16[offset];
-	palette_set_color_rgb(space->machine, offset, pal5bit(~newword >> 10), pal5bit(~newword >> 0), pal5bit(~newword >> 5));
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	newword = space->machine().generic.paletteram.u16[offset];
+	palette_set_color_rgb(space->machine(), offset, pal5bit(~newword >> 10), pal5bit(~newword >> 0), pal5bit(~newword >> 5));
 }
 
 
@@ -178,7 +178,7 @@ WRITE16_HANDLER( zwackery_paletteram_w )
 
 WRITE16_HANDLER( mcr68_videoram_w )
 {
-	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	UINT16 *videoram = state->videoram;
 	COMBINE_DATA(&videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
@@ -187,7 +187,7 @@ WRITE16_HANDLER( mcr68_videoram_w )
 
 WRITE16_HANDLER( zwackery_videoram_w )
 {
-	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	UINT16 *videoram = state->videoram;
 	COMBINE_DATA(&videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -197,7 +197,7 @@ WRITE16_HANDLER( zwackery_videoram_w )
 
 WRITE16_HANDLER( zwackery_spriteram_w )
 {
-	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	/* yech -- Zwackery relies on the upper 8 bits of a spriteram read being $ff! */
 	/* to make this happen we always write $ff in the upper 8 bits */
 	COMBINE_DATA(&state->spriteram[offset]);
@@ -212,10 +212,10 @@ WRITE16_HANDLER( zwackery_spriteram_w )
  *
  *************************************/
 
-static void mcr68_update_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void mcr68_update_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
-	rectangle sprite_clip = machine->primary_screen->visible_area();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
+	rectangle sprite_clip = machine.primary_screen->visible_area();
 	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
@@ -224,7 +224,7 @@ static void mcr68_update_sprites(running_machine *machine, bitmap_t *bitmap, con
 	sprite_clip.max_x -= state->sprite_clip;
 	sect_rect(&sprite_clip, cliprect);
 
-	bitmap_fill(machine->priority_bitmap,&sprite_clip,1);
+	bitmap_fill(machine.priority_bitmap,&sprite_clip,1);
 
 	/* loop over sprite RAM */
 	for (offs = state->spriteram_size / 2 - 4;offs >= 0;offs -= 4)
@@ -256,23 +256,23 @@ static void mcr68_update_sprites(running_machine *machine, bitmap_t *bitmap, con
             The color 8 is used to cover over other sprites. */
 
 		/* first draw the sprite, visible */
-		pdrawgfx_transmask(bitmap, &sprite_clip, machine->gfx[1], code, color, flipx, flipy, x, y,
-				machine->priority_bitmap, 0x00, 0x0101);
+		pdrawgfx_transmask(bitmap, &sprite_clip, machine.gfx[1], code, color, flipx, flipy, x, y,
+				machine.priority_bitmap, 0x00, 0x0101);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		pdrawgfx_transmask(bitmap, &sprite_clip, machine->gfx[1], code, color, flipx, flipy, x, y,
-				machine->priority_bitmap, 0x02, 0xfeff);
+		pdrawgfx_transmask(bitmap, &sprite_clip, machine.gfx[1], code, color, flipx, flipy, x, y,
+				machine.priority_bitmap, 0x02, 0xfeff);
 	}
 }
 
 
-static void zwackery_update_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void zwackery_update_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
-	mcr68_state *state = machine->driver_data<mcr68_state>();
+	mcr68_state *state = machine.driver_data<mcr68_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
-	bitmap_fill(machine->priority_bitmap,cliprect,1);
+	bitmap_fill(machine.priority_bitmap,cliprect,1);
 
 	/* loop over sprite RAM */
 	for (offs = state->spriteram_size / 2 - 4;offs >= 0;offs -= 4)
@@ -314,12 +314,12 @@ static void zwackery_update_sprites(running_machine *machine, bitmap_t *bitmap, 
             The color 8 is used to cover over other sprites. */
 
 		/* first draw the sprite, visible */
-		pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, x, y,
-				machine->priority_bitmap, 0x00, 0x0101);
+		pdrawgfx_transmask(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy, x, y,
+				machine.priority_bitmap, 0x00, 0x0101);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, x, y,
-				machine->priority_bitmap, 0x02, 0xfeff);
+		pdrawgfx_transmask(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy, x, y,
+				machine.priority_bitmap, 0x02, 0xfeff);
 	}
 }
 
@@ -333,35 +333,35 @@ static void zwackery_update_sprites(running_machine *machine, bitmap_t *bitmap, 
 
 SCREEN_UPDATE( mcr68 )
 {
-	mcr68_state *state = screen->machine->driver_data<mcr68_state>();
+	mcr68_state *state = screen->machine().driver_data<mcr68_state>();
 	/* draw the background */
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
 	/* draw the low-priority sprites */
-	mcr68_update_sprites(screen->machine, bitmap, cliprect, 0);
+	mcr68_update_sprites(screen->machine(), bitmap, cliprect, 0);
 
     /* redraw tiles with priority over sprites */
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 1, 0);
 
 	/* draw the high-priority sprites */
-	mcr68_update_sprites(screen->machine, bitmap, cliprect, 1);
+	mcr68_update_sprites(screen->machine(), bitmap, cliprect, 1);
 	return 0;
 }
 
 
 SCREEN_UPDATE( zwackery )
 {
-	mcr68_state *state = screen->machine->driver_data<mcr68_state>();
+	mcr68_state *state = screen->machine().driver_data<mcr68_state>();
 	/* draw the background */
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* draw the low-priority sprites */
-	zwackery_update_sprites(screen->machine, bitmap, cliprect, 0);
+	zwackery_update_sprites(screen->machine(), bitmap, cliprect, 0);
 
     /* redraw tiles with priority over sprites */
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 1, 0);
 
 	/* draw the high-priority sprites */
-	zwackery_update_sprites(screen->machine, bitmap, cliprect, 1);
+	zwackery_update_sprites(screen->machine(), bitmap, cliprect, 1);
 	return 0;
 }

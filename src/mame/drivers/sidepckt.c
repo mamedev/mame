@@ -24,23 +24,23 @@ i8751 protection simluation and other fixes by Bryan McPhail, 15/10/00.
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( sidepckt_i8751_r )
 {
-	sidepckt_state *state = space->machine->driver_data<sidepckt_state>();
+	sidepckt_state *state = space->machine().driver_data<sidepckt_state>();
 	return state->i8751_return;
 }
 
 static WRITE8_HANDLER( sidepckt_i8751_w )
 {
-	sidepckt_state *state = space->machine->driver_data<sidepckt_state>();
+	sidepckt_state *state = space->machine().driver_data<sidepckt_state>();
 	static const int table_1[]={5,3,2};
 	static const int table_2[]={0x8e,0x42,0xad,0x58,0xec,0x85,0xdd,0x4c,0xad,0x9f,0x00,0x4c,0x7e,0x42,0xa2,0xff};
 	static const int table_3[]={0xbd,0x73,0x80,0xbd,0x73,0xa7,0xbd,0x73,0xe0,0x7e,0x72,0x56,0xff,0xff,0xff,0xff};
 
-	cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
+	cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
 	/* This function takes multiple parameters */
 	if (state->in_math==1) {
@@ -76,12 +76,12 @@ static WRITE8_HANDLER( sidepckt_i8751_w )
 
 static WRITE8_HANDLER( sidepctj_i8751_w )
 {
-	sidepckt_state *state = space->machine->driver_data<sidepckt_state>();
+	sidepckt_state *state = space->machine().driver_data<sidepckt_state>();
 	static const int table_1[]={5,3,0};
 	static const int table_2[]={0x8e,0x42,0xb2,0x58,0xec,0x85,0xdd,0x4c,0xad,0x9f,0x00,0x4c,0x7e,0x42,0xa7,0xff};
 	static const int table_3[]={0xbd,0x71,0xc8,0xbd,0x71,0xef,0xbd,0x72,0x28,0x7e,0x70,0x9e,0xff,0xff,0xff,0xff};
 
-	cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
+	cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
 	/* This function takes multiple parameters */
 	if (state->in_math==1) {
@@ -249,7 +249,7 @@ GFXDECODE_END
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
 static void irqhandler(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, linestate);
 }
 
 static const ym3526_interface ym3526_config =
@@ -379,14 +379,14 @@ ROM_END
 
 static DRIVER_INIT( sidepckt )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3014, 0x3014, FUNC(sidepckt_i8751_r) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x3018, 0x3018, FUNC(sidepckt_i8751_w)  );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3014, 0x3014, FUNC(sidepckt_i8751_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x3018, 0x3018, FUNC(sidepckt_i8751_w)  );
 }
 
 static DRIVER_INIT( sidepctj )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3014, 0x3014, FUNC(sidepckt_i8751_r) );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x3018, 0x3018, FUNC(sidepctj_i8751_w)  );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3014, 0x3014, FUNC(sidepckt_i8751_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x3018, 0x3018, FUNC(sidepctj_i8751_w)  );
 }
 
 

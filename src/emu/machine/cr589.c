@@ -110,7 +110,7 @@ static void cr589_write_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 
 static void cr589_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
-	running_machine *machine = scsiInstance->machine;
+	running_machine &machine = scsiInstance->machine();
 	SCSICr589 *our_this = (SCSICr589 *)SCSIThis( &SCSIClassCr589, scsiInstance );
 
 	our_this->download = 0;

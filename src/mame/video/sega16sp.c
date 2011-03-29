@@ -76,11 +76,11 @@ INLINE const sega16sp_interface *get_interface( device_t *device )
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_hangon_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_hangon_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 numbanks = machine->region("gfx2")->bytes() / 0x10000;
-	const UINT16 *spritebase = (const UINT16 *)machine->region("gfx2")->base();
-	const UINT8 *zoom = (const UINT8 *)machine->region("proms")->base();
+	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
+	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
+	const UINT8 *zoom = (const UINT8 *)machine.region("proms")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
@@ -135,7 +135,7 @@ void segaic16_sprites_hangon_draw(running_machine *machine, device_t *device, bi
 			if (y >= cliprect->min_y && y <= cliprect->max_y)
 			{
 				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
 				int xacc = 0x00;
 
 				/* note that the System 16A sprites have a design flaw that allows the address */
@@ -241,11 +241,11 @@ void segaic16_sprites_hangon_draw(running_machine *machine, device_t *device, bi
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_sharrier_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_sharrier_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 numbanks = machine->region("gfx2")->bytes() / 0x20000;
-	const UINT32 *spritebase = (const UINT32 *)machine->region("gfx2")->base();
-	const UINT8 *zoom = (const UINT8 *)machine->region("proms")->base();
+	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x20000;
+	const UINT32 *spritebase = (const UINT32 *)machine.region("gfx2")->base();
+	const UINT8 *zoom = (const UINT8 *)machine.region("proms")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
@@ -301,7 +301,7 @@ void segaic16_sprites_sharrier_draw(running_machine *machine, device_t *device, 
 			if (y >= cliprect->min_y && y <= cliprect->max_y)
 			{
 				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
 				int xacc = 0x00;
 
 				/* note that the System 16A sprites have a design flaw that allows the address */
@@ -412,10 +412,10 @@ void segaic16_sprites_sharrier_draw(running_machine *machine, device_t *device, 
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_16a_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_16a_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 numbanks = machine->region("gfx2")->bytes() / 0x10000;
-	const UINT16 *spritebase = (const UINT16 *)machine->region("gfx2")->base();
+	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
+	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
@@ -470,7 +470,7 @@ void segaic16_sprites_16a_draw(running_machine *machine, device_t *device, bitma
 			if (y >= cliprect->min_y && y <= cliprect->max_y)
 			{
 				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
 
 				/* note that the System 16A sprites have a design flaw that allows the address */
 				/* to carry into the flip flag, which is the topmost bit -- it is very important */
@@ -573,18 +573,18 @@ void segaic16_sprites_16a_draw(running_machine *machine, device_t *device, bitma
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_16b_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_16b_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks;
 	const UINT16 *spritebase;
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
-	spritebase = (const UINT16 *)machine->region("gfx2")->base();
+	spritebase = (const UINT16 *)machine.region("gfx2")->base();
 	if (!spritebase)
 		return;
 
-	numbanks = machine->region("gfx2")->bytes() / 0x20000;
+	numbanks = machine.region("gfx2")->bytes() / 0x20000;
 
 	/* first scan forward to find the end of the list */
 	for (data = sega16sp->spriteram; data < sega16sp->spriteram + sega16sp->ramsize/2; data += 8)
@@ -659,7 +659,7 @@ void segaic16_sprites_16b_draw(running_machine *machine, device_t *device, bitma
 			if (y >= cliprect->min_y && y <= cliprect->max_y)
 			{
 				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
 				int xacc;
 
 				/* compute the initial X zoom accumulator; this is verified on the real PCB */
@@ -739,10 +739,10 @@ void segaic16_sprites_16b_draw(running_machine *machine, device_t *device, bitma
 		pri[x] = 0;															\
 	}																		\
 
-void segaic16_sprites_yboard_16b_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_yboard_16b_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 numbanks = machine->region("gfx2")->bytes() / 0x20000;
-	const UINT16 *spritebase = (const UINT16 *)machine->region("gfx2")->base();
+	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x20000;
+	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
@@ -812,7 +812,7 @@ void segaic16_sprites_yboard_16b_draw(running_machine *machine, device_t *device
 			if (y >= cliprect->min_y && y <= cliprect->max_y)
 			{
 				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
 				int xacc;
 
 				/* compute the initial X zoom accumulator; this is verified on the real PCB */
@@ -917,10 +917,10 @@ void segaic16_sprites_yboard_16b_draw(running_machine *machine, device_t *device
 		pri[x] = 0xff;														\
 	}																		\
 
-static void segaic16_sprites_xboard_outrun_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int type)
+static void segaic16_sprites_xboard_outrun_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int type)
 {
-	UINT8 numbanks = machine->region("gfx2")->bytes() / 0x40000;
-	const UINT32 *spritebase = (const UINT32 *)machine->region("gfx2")->base();
+	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x40000;
+	const UINT32 *spritebase = (const UINT32 *)machine.region("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
@@ -981,7 +981,7 @@ static void segaic16_sprites_xboard_outrun_draw(running_machine *machine, device
 			if (y >= cliprect->min_y && y <= cliprect->max_y)
 			{
 				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
 				int xacc = 0;
 
 				/* non-flipped case */
@@ -1043,12 +1043,12 @@ static void segaic16_sprites_xboard_outrun_draw(running_machine *machine, device
 	}
 }
 
-void segaic16_sprites_outrun_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_outrun_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	segaic16_sprites_xboard_outrun_draw(machine, device, bitmap, cliprect, SEGAIC16_SPRITES_OUTRUN);
 }
 
-void segaic16_sprites_xboard_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_xboard_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	segaic16_sprites_xboard_outrun_draw(machine, device, bitmap, cliprect, SEGAIC16_SPRITES_XBOARD);
 }
@@ -1088,10 +1088,10 @@ void segaic16_sprites_xboard_draw(running_machine *machine, device_t *device, bi
 	if (x >= minx && x <= maxx && ind < 0x1fe)								\
 		dest[x] = ind | colorpri;											\
 
-void segaic16_sprites_yboard_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 numbanks = machine->region("gfx1")->bytes() / 0x80000;
-	const UINT64 *spritebase = (const UINT64 *)machine->region("gfx1")->base();
+	UINT8 numbanks = machine.region("gfx1")->bytes() / 0x80000;
+	const UINT64 *spritebase = (const UINT64 *)machine.region("gfx1")->base();
 	const UINT16 *rotatebase = segaic16_rotate[0].buffer ? segaic16_rotate[0].buffer : segaic16_rotate[0].rotateram;
 	UINT8 visited[0x1000];
 	sega16sp_state *sega16sp = get_safe_token(device);
@@ -1326,7 +1326,7 @@ void segaic16_sprites_yboard_draw(running_machine *machine, device_t *device, bi
 			if (y >= cliprect->min_y && y <= cliprect->max_y)							\
 			{																			\
 				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);								\
-				UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);						\
+				UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);						\
 																						\
 				/* note that the System 16A sprites have a design flaw that allows the address */		\
 				/* to carry into the flip flag, which is the topmost bit -- it is very important */		\
@@ -1382,10 +1382,10 @@ void segaic16_sprites_yboard_draw(running_machine *machine, device_t *device, bi
 
 
 
-void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 numbanks = machine->region("gfx2")->bytes() / 0x10000;
-	const UINT16 *spritebase = (const UINT16 *)machine->region("gfx2")->base();
+	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
+	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
@@ -1405,10 +1405,10 @@ void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine *machine, device_t 
 }
 
 /* 4 player passing shot is different to this.. */
-void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 numbanks = machine->region("gfx2")->bytes() / 0x10000;
-	const UINT16 *spritebase = (const UINT16 *)machine->region("gfx2")->base();
+	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
+	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
@@ -1427,10 +1427,10 @@ void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine *machine, device_
 	}
 }
 
-void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 numbanks = machine->region("gfx2")->bytes() / 0x10000;
-	const UINT16 *spritebase = (const UINT16 *)machine->region("gfx2")->base();
+	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
+	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
@@ -1461,9 +1461,9 @@ void segaic16_sprites_draw(device_t *screen, bitmap_t *bitmap, const rectangle *
 	sega16sp_state *sega16sp;
 
 	if (!which)
-		device = screen->machine->device("segaspr1");
+		device = screen->machine().device("segaspr1");
 	else
-		device = screen->machine->device("segaspr2");
+		device = screen->machine().device("segaspr2");
 
 	if (!device)
 		fatalerror("segaic16_sprites_draw device not found\n");
@@ -1475,7 +1475,7 @@ void segaic16_sprites_draw(device_t *screen, bitmap_t *bitmap, const rectangle *
 	else
 		sega16sp->spriteram = segaic16_spriteram_1;
 
-	(*sega16sp->draw)(screen->machine, device, bitmap, cliprect);
+	(*sega16sp->draw)(screen->machine(), device, bitmap, cliprect);
 }
 
 
@@ -1486,14 +1486,14 @@ void segaic16_sprites_draw(device_t *screen, bitmap_t *bitmap, const rectangle *
  *
  *************************************/
 
-void segaic16_sprites_set_bank(running_machine *machine, int which, int banknum, int offset)
+void segaic16_sprites_set_bank(running_machine &machine, int which, int banknum, int offset)
 {
 	device_t* device = 0;
 
 	if (!which)
-		device = machine->device("segaspr1");
+		device = machine.device("segaspr1");
 	else
-		device = machine->device("segaspr2");
+		device = machine.device("segaspr2");
 
 	if (!device)
 		fatalerror("segaic16_sprites_set_bank device not found\n");
@@ -1502,7 +1502,7 @@ void segaic16_sprites_set_bank(running_machine *machine, int which, int banknum,
 
 	if (sega16sp->bank[banknum] != offset)
 	{
-		screen_device *screen = machine->primary_screen;
+		screen_device *screen = machine.primary_screen;
 		screen->update_partial(screen->vpos());
 		sega16sp->bank[banknum] = offset;
 	}
@@ -1516,14 +1516,14 @@ void segaic16_sprites_set_bank(running_machine *machine, int which, int banknum,
  *
  *************************************/
 
-void segaic16_sprites_set_flip(running_machine *machine, int which, int flip)
+void segaic16_sprites_set_flip(running_machine &machine, int which, int flip)
 {
 	device_t* device = 0;
 
 	if (!which)
-		device = machine->device("segaspr1");
+		device = machine.device("segaspr1");
 	else
-		device = machine->device("segaspr2");
+		device = machine.device("segaspr2");
 
 	if (!device)
 		fatalerror("segaic16_sprites_set_flip device not found\n");
@@ -1533,7 +1533,7 @@ void segaic16_sprites_set_flip(running_machine *machine, int which, int flip)
 	flip = (flip != 0);
 	if (sega16sp->flip != flip)
 	{
-		screen_device *screen = machine->primary_screen;
+		screen_device *screen = machine.primary_screen;
 		screen->update_partial(screen->vpos());
 		sega16sp->flip = flip;
 	}
@@ -1547,14 +1547,14 @@ void segaic16_sprites_set_flip(running_machine *machine, int which, int flip)
  *
  *************************************/
 
-void segaic16_sprites_set_shadow(running_machine *machine, int which, int shadow)
+void segaic16_sprites_set_shadow(running_machine &machine, int which, int shadow)
 {
 	device_t* device = 0;
 
 	if (!which)
-		device = machine->device("segaspr1");
+		device = machine.device("segaspr1");
 	else
-		device = machine->device("segaspr2");
+		device = machine.device("segaspr2");
 
 	if (!device)
 		fatalerror("segaic16_sprites_set_shadow device not found\n");
@@ -1564,7 +1564,7 @@ void segaic16_sprites_set_shadow(running_machine *machine, int which, int shadow
 	shadow = (shadow != 0);
 	if (sega16sp->shadow != shadow)
 	{
-		screen_device *screen = machine->primary_screen;
+		screen_device *screen = machine.primary_screen;
 		screen->update_partial(screen->vpos());
 		sega16sp->shadow = shadow;
 	}
@@ -1614,7 +1614,7 @@ WRITE16_HANDLER( segaic16_sprites_draw_0_w )
 {
 	device_t* device = 0;
 
-	device = space->machine->device("segaspr1");
+	device = space->machine().device("segaspr1");
 
 	if (!device)
 		fatalerror("segaic16_sprites_draw_0_w device not found\n");
@@ -1627,7 +1627,7 @@ WRITE16_HANDLER( segaic16_sprites_draw_1_w )
 {
 	device_t* device = 0;
 
-	device = space->machine->device("segaspr2");
+	device = space->machine().device("segaspr2");
 
 	if (!device)
 		fatalerror("segaic16_sprites_draw_1_w device not found\n");
@@ -1660,7 +1660,7 @@ static DEVICE_START( sega16sp )
 	sega16sp->draw = intf->draw;
 
 	if (intf->buffer)
-		sega16sp->buffer = auto_alloc_array(device->machine, UINT16, sega16sp->ramsize/2);
+		sega16sp->buffer = auto_alloc_array(device->machine(), UINT16, sega16sp->ramsize/2);
 
 
 	device->save_item(NAME(sega16sp->flip));

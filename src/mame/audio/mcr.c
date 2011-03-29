@@ -91,7 +91,7 @@ static UINT8 squawkntalk_tms_strobes;
  *
  *************************************/
 
-static void ssio_compute_ay8910_modulation(running_machine *machine);
+static void ssio_compute_ay8910_modulation(running_machine &machine);
 
 
 
@@ -101,14 +101,14 @@ static void ssio_compute_ay8910_modulation(running_machine *machine);
  *
  *************************************/
 
-void mcr_sound_init(running_machine *machine, UINT8 config)
+void mcr_sound_init(running_machine &machine, UINT8 config)
 {
 	mcr_sound_config = config;
 
 	/* SSIO */
 	if (mcr_sound_config & MCR_SSIO)
 	{
-		ssio_sound_cpu = machine->device("ssiocpu");
+		ssio_sound_cpu = machine.device("ssiocpu");
 		ssio_compute_ay8910_modulation(machine);
 		state_save_register_global_array(machine, ssio_data);
 		state_save_register_global(machine, ssio_status);
@@ -121,28 +121,28 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 	/* Turbo Chip Squeak */
 	if (mcr_sound_config & MCR_TURBO_CHIP_SQUEAK)
 	{
-		turbocs_sound_cpu = machine->device("tcscpu");
+		turbocs_sound_cpu = machine.device("tcscpu");
 		state_save_register_global(machine, turbocs_status);
 	}
 
 	/* Chip Squeak Deluxe */
 	if (mcr_sound_config & MCR_CHIP_SQUEAK_DELUXE)
 	{
-		csdeluxe_sound_cpu = machine->device("csdcpu");
+		csdeluxe_sound_cpu = machine.device("csdcpu");
 		state_save_register_global(machine, csdeluxe_status);
 	}
 
 	/* Sounds Good */
 	if (mcr_sound_config & MCR_SOUNDS_GOOD)
 	{
-		soundsgood_sound_cpu = machine->device("sgcpu");
+		soundsgood_sound_cpu = machine.device("sgcpu");
 		state_save_register_global(machine, soundsgood_status);
 	}
 
 	/* Squawk n Talk */
 	if (mcr_sound_config & MCR_SQUAWK_N_TALK)
 	{
-		squawkntalk_sound_cpu = machine->device("sntcpu");
+		squawkntalk_sound_cpu = machine.device("sntcpu");
 		state_save_register_global(machine, squawkntalk_tms_command);
 		state_save_register_global(machine, squawkntalk_tms_strobes);
 	}
@@ -153,7 +153,7 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 }
 
 
-void mcr_sound_reset(running_machine *machine)
+void mcr_sound_reset(running_machine &machine)
 {
 	/* SSIO */
 	if (mcr_sound_config & MCR_SSIO)
@@ -240,9 +240,9 @@ void mcr_sound_reset(running_machine *machine)
         frequency of sound output. So we simply apply a volume
         adjustment to each voice according to the duty cycle.
 */
-static void ssio_compute_ay8910_modulation(running_machine *machine)
+static void ssio_compute_ay8910_modulation(running_machine &machine)
 {
-	UINT8 *prom = machine->region("proms")->base();
+	UINT8 *prom = machine.region("proms")->base();
 	int volval;
 
 	/* loop over all possible values of the duty cycle */
@@ -314,10 +314,10 @@ static TIMER_CALLBACK( ssio_delayed_data_w )
 	ssio_data[param >> 8] = param & 0xff;
 }
 
-static void ssio_update_volumes(running_machine *machine)
+static void ssio_update_volumes(running_machine &machine)
 {
-	device_t *ay0 = machine->device("ssio.1");
-	device_t *ay1 = machine->device("ssio.2");
+	device_t *ay0 = machine.device("ssio.1");
+	device_t *ay1 = machine.device("ssio.2");
 	ay8910_set_volume(ay0, 0, ssio_mute ? 0 : ssio_ayvolume_lookup[ssio_duty_cycle[0][0]]);
 	ay8910_set_volume(ay0, 1, ssio_mute ? 0 : ssio_ayvolume_lookup[ssio_duty_cycle[0][1]]);
 	ay8910_set_volume(ay0, 2, ssio_mute ? 0 : ssio_ayvolume_lookup[ssio_duty_cycle[0][2]]);
@@ -330,21 +330,21 @@ static WRITE8_DEVICE_HANDLER( ssio_porta0_w )
 {
 	ssio_duty_cycle[0][0] = data & 15;
 	ssio_duty_cycle[0][1] = data >> 4;
-	ssio_update_volumes(device->machine);
+	ssio_update_volumes(device->machine());
 }
 
 static WRITE8_DEVICE_HANDLER( ssio_portb0_w )
 {
 	ssio_duty_cycle[0][2] = data & 15;
 	ssio_overall[0] = (data >> 4) & 7;
-	ssio_update_volumes(device->machine);
+	ssio_update_volumes(device->machine());
 }
 
 static WRITE8_DEVICE_HANDLER( ssio_porta1_w )
 {
 	ssio_duty_cycle[1][0] = data & 15;
 	ssio_duty_cycle[1][1] = data >> 4;
-	ssio_update_volumes(device->machine);
+	ssio_update_volumes(device->machine());
 }
 
 static WRITE8_DEVICE_HANDLER( ssio_portb1_w )
@@ -352,13 +352,13 @@ static WRITE8_DEVICE_HANDLER( ssio_portb1_w )
 	ssio_duty_cycle[1][2] = data & 15;
 	ssio_overall[1] = (data >> 4) & 7;
 	ssio_mute = data & 0x80;
-	ssio_update_volumes(device->machine);
+	ssio_update_volumes(device->machine());
 }
 
 /********* external interfaces ***********/
 WRITE8_HANDLER( ssio_data_w )
 {
-	space->machine->scheduler().synchronize(FUNC(ssio_delayed_data_w), (offset << 8) | (data & 0xff));
+	space->machine().scheduler().synchronize(FUNC(ssio_delayed_data_w), (offset << 8) | (data & 0xff));
 }
 
 READ8_HANDLER( ssio_status_r )
@@ -366,7 +366,7 @@ READ8_HANDLER( ssio_status_r )
 	return ssio_status;
 }
 
-void ssio_reset_w(running_machine *machine, int state)
+void ssio_reset_w(running_machine &machine, int state)
 {
 	/* going high halts the CPU */
 	if (state)
@@ -389,7 +389,7 @@ void ssio_reset_w(running_machine *machine, int state)
 READ8_HANDLER( ssio_input_port_r )
 {
 	static const char *const port[] = { "SSIO.IP0", "SSIO.IP1", "SSIO.IP2", "SSIO.IP3", "SSIO.IP4" };
-	UINT8 result = input_port_read_safe(space->machine, port[offset], 0xff);
+	UINT8 result = input_port_read_safe(space->machine(), port[offset], 0xff);
 	if (ssio_custom_input[offset])
 		result = (result & ~ssio_custom_input_mask[offset]) |
 		         ((*ssio_custom_input[offset])(space, offset) & ssio_custom_input_mask[offset]);
@@ -491,7 +491,7 @@ MACHINE_CONFIG_END
 static WRITE8_DEVICE_HANDLER( csdeluxe_porta_w )
 {
 	dacval = (dacval & ~0x3fc) | (data << 2);
-	dac_signed_data_16_w(device->machine->device("csddac"), dacval << 6);
+	dac_signed_data_16_w(device->machine().device("csddac"), dacval << 6);
 }
 
 static WRITE8_DEVICE_HANDLER( csdeluxe_portb_w )
@@ -499,7 +499,7 @@ static WRITE8_DEVICE_HANDLER( csdeluxe_portb_w )
 	UINT8 z_mask = pia6821_get_port_b_z_mask(device);
 
 	dacval = (dacval & ~0x003) | (data >> 6);
-	dac_signed_data_16_w(device->machine->device("csddac"), dacval << 6);
+	dac_signed_data_16_w(device->machine().device("csddac"), dacval << 6);
 
 	if (~z_mask & 0x10)  csdeluxe_status = (csdeluxe_status & ~1) | ((data >> 4) & 1);
 	if (~z_mask & 0x20)  csdeluxe_status = (csdeluxe_status & ~2) | ((data >> 4) & 2);
@@ -514,14 +514,14 @@ static WRITE_LINE_DEVICE_HANDLER( csdeluxe_irq )
 
 static TIMER_CALLBACK( csdeluxe_delayed_data_w )
 {
-	device_t *pia = machine->device("csdpia");
+	device_t *pia = machine.device("csdpia");
 
 	pia6821_portb_w(pia, 0, param & 0x0f);
 	pia6821_ca1_w(pia, ~param & 0x10);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 static READ16_DEVICE_HANDLER( csdeluxe_pia_r )
@@ -548,7 +548,7 @@ static WRITE16_DEVICE_HANDLER( csdeluxe_pia_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( csdeluxe_data_w )
 {
-	space->machine->scheduler().synchronize(FUNC(csdeluxe_delayed_data_w), data);
+	space->machine().scheduler().synchronize(FUNC(csdeluxe_delayed_data_w), data);
 }
 
 READ8_HANDLER( csdeluxe_status_r )
@@ -556,7 +556,7 @@ READ8_HANDLER( csdeluxe_status_r )
 	return csdeluxe_status;
 }
 
-void csdeluxe_reset_w(running_machine *machine, int state)
+void csdeluxe_reset_w(running_machine &machine, int state)
 {
 	device_set_input_line(csdeluxe_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -629,7 +629,7 @@ MACHINE_CONFIG_END
 static WRITE8_DEVICE_HANDLER( soundsgood_porta_w )
 {
 	dacval = (dacval & ~0x3fc) | (data << 2);
-	dac_signed_data_16_w(device->machine->device("sgdac"), dacval << 6);
+	dac_signed_data_16_w(device->machine().device("sgdac"), dacval << 6);
 }
 
 static WRITE8_DEVICE_HANDLER( soundsgood_portb_w )
@@ -637,7 +637,7 @@ static WRITE8_DEVICE_HANDLER( soundsgood_portb_w )
 	UINT8 z_mask = pia6821_get_port_b_z_mask(device);
 
 	dacval = (dacval & ~0x003) | (data >> 6);
-	dac_signed_data_16_w(device->machine->device("sgdac"), dacval << 6);
+	dac_signed_data_16_w(device->machine().device("sgdac"), dacval << 6);
 
 	if (~z_mask & 0x10)  soundsgood_status = (soundsgood_status & ~1) | ((data >> 4) & 1);
 	if (~z_mask & 0x20)  soundsgood_status = (soundsgood_status & ~2) | ((data >> 4) & 2);
@@ -652,21 +652,21 @@ static WRITE_LINE_DEVICE_HANDLER( soundsgood_irq )
 
 static TIMER_CALLBACK( soundsgood_delayed_data_w )
 {
-	device_t *pia = machine->device("sgpia");
+	device_t *pia = machine.device("sgpia");
 
 	pia6821_portb_w(pia, 0, (param >> 1) & 0x0f);
 	pia6821_ca1_w(pia, ~param & 0x01);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
+	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
 }
 
 
 /********* external interfaces ***********/
 WRITE8_HANDLER( soundsgood_data_w )
 {
-	space->machine->scheduler().synchronize(FUNC(soundsgood_delayed_data_w), data);
+	space->machine().scheduler().synchronize(FUNC(soundsgood_delayed_data_w), data);
 }
 
 READ8_HANDLER( soundsgood_status_r )
@@ -674,7 +674,7 @@ READ8_HANDLER( soundsgood_status_r )
 	return soundsgood_status;
 }
 
-void soundsgood_reset_w(running_machine *machine, int state)
+void soundsgood_reset_w(running_machine &machine, int state)
 {
 //if (state) mame_printf_debug("SG Reset\n");
 	device_set_input_line(soundsgood_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
@@ -737,13 +737,13 @@ MACHINE_CONFIG_END
 static WRITE8_DEVICE_HANDLER( turbocs_porta_w )
 {
 	dacval = (dacval & ~0x3fc) | (data << 2);
-	dac_signed_data_16_w(device->machine->device("tcsdac"), dacval << 6);
+	dac_signed_data_16_w(device->machine().device("tcsdac"), dacval << 6);
 }
 
 static WRITE8_DEVICE_HANDLER( turbocs_portb_w )
 {
 	dacval = (dacval & ~0x003) | (data >> 6);
-	dac_signed_data_16_w(device->machine->device("tcsdac"), dacval << 6);
+	dac_signed_data_16_w(device->machine().device("tcsdac"), dacval << 6);
 	turbocs_status = (data >> 4) & 3;
 }
 
@@ -756,21 +756,21 @@ static WRITE_LINE_DEVICE_HANDLER( turbocs_irq )
 
 static TIMER_CALLBACK( turbocs_delayed_data_w )
 {
-	device_t *pia = machine->device("tcspia");
+	device_t *pia = machine.device("tcspia");
 
 	pia6821_portb_w(pia, 0, (param >> 1) & 0x0f);
 	pia6821_ca1_w(pia, ~param & 0x01);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 
 /********* external interfaces ***********/
 WRITE8_HANDLER( turbocs_data_w )
 {
-	space->machine->scheduler().synchronize(FUNC(turbocs_delayed_data_w), data);
+	space->machine().scheduler().synchronize(FUNC(turbocs_delayed_data_w), data);
 }
 
 READ8_HANDLER( turbocs_status_r )
@@ -778,7 +778,7 @@ READ8_HANDLER( turbocs_status_r )
 	return turbocs_status;
 }
 
-void turbocs_reset_w(running_machine *machine, int state)
+void turbocs_reset_w(running_machine &machine, int state)
 {
 	device_set_input_line(turbocs_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -853,7 +853,7 @@ static WRITE8_DEVICE_HANDLER( squawkntalk_porta2_w )
 
 static WRITE8_DEVICE_HANDLER( squawkntalk_portb2_w )
 {
-	device_t *tms = device->machine->device("sntspeech");
+	device_t *tms = device->machine().device("sntspeech");
 
 	/* bits 0-1 select read/write strobes on the TMS5200 */
 	data &= 0x03;
@@ -884,8 +884,8 @@ static WRITE8_DEVICE_HANDLER( squawkntalk_portb2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( squawkntalk_irq )
 {
-	device_t *pia0 = device->machine->device("sntpia0");
-	device_t *pia1 = device->machine->device("sntpia1");
+	device_t *pia0 = device->machine().device("sntpia0");
+	device_t *pia1 = device->machine().device("sntpia1");
 	int combined_state = pia6821_get_irq_a(pia0) | pia6821_get_irq_b(pia0) | pia6821_get_irq_a(pia1) | pia6821_get_irq_b(pia1);
 
 	device_set_input_line(squawkntalk_sound_cpu, M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -893,7 +893,7 @@ static WRITE_LINE_DEVICE_HANDLER( squawkntalk_irq )
 
 static TIMER_CALLBACK( squawkntalk_delayed_data_w )
 {
-	device_t *pia0 = machine->device("sntpia0");
+	device_t *pia0 = machine.device("sntpia0");
 
 	pia6821_porta_w(pia0, 0, ~param & 0x0f);
 	pia6821_cb1_w(pia0, ~param & 0x10);
@@ -903,10 +903,10 @@ static TIMER_CALLBACK( squawkntalk_delayed_data_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( squawkntalk_data_w )
 {
-	space->machine->scheduler().synchronize(FUNC(squawkntalk_delayed_data_w), data);
+	space->machine().scheduler().synchronize(FUNC(squawkntalk_delayed_data_w), data);
 }
 
-void squawkntalk_reset_w(running_machine *machine, int state)
+void squawkntalk_reset_w(running_machine &machine, int state)
 {
 	device_set_input_line(squawkntalk_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -88,15 +88,15 @@ static DEVICE_START( ymf262 )
 	info->chip = ymf262_init(device,device->clock(),rate);
 	assert_always(info->chip != NULL, "Error creating YMF262 chip");
 
-	info->stream = device->machine->sound().stream_alloc(*device,0,4,rate,info,ymf262_stream_update);
+	info->stream = device->machine().sound().stream_alloc(*device,0,4,rate,info,ymf262_stream_update);
 
 	/* YMF262 setup */
 	ymf262_set_timer_handler (info->chip, timer_handler_262, info);
 	ymf262_set_irq_handler   (info->chip, IRQHandler_262, info);
 	ymf262_set_update_handler(info->chip, _stream_update, info);
 
-	info->timer[0] = device->machine->scheduler().timer_alloc(FUNC(timer_callback_262_0), info);
-	info->timer[1] = device->machine->scheduler().timer_alloc(FUNC(timer_callback_262_1), info);
+	info->timer[0] = device->machine().scheduler().timer_alloc(FUNC(timer_callback_262_0), info);
+	info->timer[1] = device->machine().scheduler().timer_alloc(FUNC(timer_callback_262_1), info);
 }
 
 static DEVICE_STOP( ymf262 )

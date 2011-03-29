@@ -62,7 +62,7 @@ public:
 
 static TILE_GET_INFO( get_sc0_tile_info )
 {
-	caswin_state *state = machine->driver_data<caswin_state>();
+	caswin_state *state = machine.driver_data<caswin_state>();
 	int tile = (state->sc0_vram[tile_index] | ((state->sc0_attr[tile_index] & 0x70)<<4)) & 0x7ff;
 	int colour = state->sc0_attr[tile_index] & 0xf;
 
@@ -75,27 +75,27 @@ static TILE_GET_INFO( get_sc0_tile_info )
 
 static VIDEO_START(vvillage)
 {
-	caswin_state *state = machine->driver_data<caswin_state>();
+	caswin_state *state = machine.driver_data<caswin_state>();
 	state->sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
 static SCREEN_UPDATE(vvillage)
 {
-	caswin_state *state = screen->machine->driver_data<caswin_state>();
+	caswin_state *state = screen->machine().driver_data<caswin_state>();
 	tilemap_draw(bitmap,cliprect,state->sc0_tilemap,0,0);
 	return 0;
 }
 
 static WRITE8_HANDLER( sc0_vram_w )
 {
-	caswin_state *state = space->machine->driver_data<caswin_state>();
+	caswin_state *state = space->machine().driver_data<caswin_state>();
 	state->sc0_vram[offset] = data;
 	tilemap_mark_tile_dirty(state->sc0_tilemap,offset);
 }
 
 static WRITE8_HANDLER( sc0_attr_w )
 {
-	caswin_state *state = space->machine->driver_data<caswin_state>();
+	caswin_state *state = space->machine().driver_data<caswin_state>();
 	state->sc0_attr[offset] = data;
 	tilemap_mark_tile_dirty(state->sc0_tilemap,offset);
 }
@@ -110,7 +110,7 @@ static WRITE8_HANDLER( vvillage_scroll_w )
 /*---- ---x flip screen */
 static WRITE8_HANDLER( vvillage_vregs_w )
 {
-	flip_screen_set(space->machine, data & 1);
+	flip_screen_set(space->machine(), data & 1);
 }
 
 /**********************
@@ -121,16 +121,16 @@ static WRITE8_HANDLER( vvillage_vregs_w )
 
 static READ8_HANDLER( vvillage_rng_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 
 static WRITE8_HANDLER( vvillage_output_w )
 {
-	coin_counter_w(space->machine, 0,data & 1);
-	coin_counter_w(space->machine, 1,data & 1);
+	coin_counter_w(space->machine(), 0,data & 1);
+	coin_counter_w(space->machine(), 1,data & 1);
 	// data & 4 payout counter
-	coin_lockout_w(space->machine, 0,data & 0x20);
-	coin_lockout_w(space->machine, 1,data & 0x20);
+	coin_lockout_w(space->machine(), 0,data & 0x20);
+	coin_lockout_w(space->machine(), 1,data & 0x20);
 }
 
 static WRITE8_HANDLER( vvillage_lamps_w )
@@ -142,11 +142,11 @@ static WRITE8_HANDLER( vvillage_lamps_w )
     ---- --x- lamp button 2
     ---- ---x lamp button 1
     */
-	set_led_status(space->machine, 0, data & 0x01);
-	set_led_status(space->machine, 1, data & 0x02);
-	set_led_status(space->machine, 2, data & 0x04);
-	set_led_status(space->machine, 3, data & 0x08);
-	set_led_status(space->machine, 4, data & 0x10);
+	set_led_status(space->machine(), 0, data & 0x01);
+	set_led_status(space->machine(), 1, data & 0x02);
+	set_led_status(space->machine(), 2, data & 0x04);
+	set_led_status(space->machine(), 3, data & 0x08);
+	set_led_status(space->machine(), 4, data & 0x10);
 }
 
 static ADDRESS_MAP_START( vvillage_mem, AS_PROGRAM, 8 )

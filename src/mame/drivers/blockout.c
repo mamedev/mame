@@ -83,7 +83,7 @@ static INTERRUPT_GEN( blockout_interrupt )
 
 static WRITE16_HANDLER( blockout_sound_command_w )
 {
-	blockout_state *state = space->machine->driver_data<blockout_state>();
+	blockout_state *state = space->machine().driver_data<blockout_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -237,7 +237,7 @@ INPUT_PORTS_END
 /* handler called by the 2151 emulator when the internal timers cause an IRQ */
 static void blockout_irq_handler(device_t *device, int irq)
 {
-	blockout_state *state = device->machine->driver_data<blockout_state>();
+	blockout_state *state = device->machine().driver_data<blockout_state>();
 	device_set_input_line_and_vector(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
@@ -255,16 +255,16 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_START( blockout )
 {
-	blockout_state *state = machine->driver_data<blockout_state>();
+	blockout_state *state = machine.driver_data<blockout_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->color));
 }
 
 static MACHINE_RESET( blockout )
 {
-	blockout_state *state = machine->driver_data<blockout_state>();
+	blockout_state *state = machine.driver_data<blockout_state>();
 
 	state->color = 0;
 }

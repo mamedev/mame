@@ -111,7 +111,7 @@ static WRITE8_DEVICE_HANDLER( yiear_VLM5030_control_w )
 
 static INTERRUPT_GEN( yiear_nmi_interrupt )
 {
-	yiear_state *state = device->machine->driver_data<yiear_state>();
+	yiear_state *state = device->machine().driver_data<yiear_state>();
 
 	/* can't use nmi_line_pulse() because interrupt_enable_w() effects it */
 	if (state->yiear_nmi_enable)
@@ -244,14 +244,14 @@ GFXDECODE_END
 
 static MACHINE_START( yiear )
 {
-	yiear_state *state = machine->driver_data<yiear_state>();
+	yiear_state *state = machine.driver_data<yiear_state>();
 
 	state->save_item(NAME(state->yiear_nmi_enable));
 }
 
 static MACHINE_RESET( yiear )
 {
-	yiear_state *state = machine->driver_data<yiear_state>();
+	yiear_state *state = machine.driver_data<yiear_state>();
 
 	state->yiear_nmi_enable = 0;
 }

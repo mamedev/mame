@@ -12,9 +12,9 @@
 #include "video/konicdev.h"
 #include "includes/moo.h"
 
-void moo_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
+void moo_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
 {
-	moo_state *state = machine->driver_data<moo_state>();
+	moo_state *state = machine.driver_data<moo_state>();
 	int pri = (*color & 0x03e0) >> 4;
 
 	if (pri <= state->layerpri[2])
@@ -29,21 +29,21 @@ void moo_sprite_callback( running_machine *machine, int *code, int *color, int *
 	*color = state->sprite_colorbase | (*color & 0x001f);
 }
 
-void moo_tile_callback( running_machine *machine, int layer, int *code, int *color, int *flags )
+void moo_tile_callback( running_machine &machine, int layer, int *code, int *color, int *flags )
 {
-	moo_state *state = machine->driver_data<moo_state>();
+	moo_state *state = machine.driver_data<moo_state>();
 	*color = state->layer_colorbase[layer] | (*color >> 2 & 0x0f);
 }
 
 VIDEO_START(moo)
 {
-	moo_state *state = machine->driver_data<moo_state>();
+	moo_state *state = machine.driver_data<moo_state>();
 
-	assert(machine->primary_screen->format() == BITMAP_FORMAT_RGB32);
+	assert(machine.primary_screen->format() == BITMAP_FORMAT_RGB32);
 
 	state->alpha_enabled = 0;
 
-	if (!strcmp(machine->system().name, "bucky") || !strcmp(machine->system().name, "buckyua") || !strcmp(machine->system().name, "buckyaa"))
+	if (!strcmp(machine.system().name, "bucky") || !strcmp(machine.system().name, "buckyua") || !strcmp(machine.system().name, "buckyaa"))
 	{
 		// Bucky doesn't chain tilemaps
 		k056832_set_layer_association(state->k056832, 0);
@@ -65,7 +65,7 @@ VIDEO_START(moo)
 
 SCREEN_UPDATE(moo)
 {
-	moo_state *state = screen->machine->driver_data<moo_state>();
+	moo_state *state = screen->machine().driver_data<moo_state>();
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };
 	int layers[3];
 	int new_colorbase, plane, dirty, alpha;
@@ -112,7 +112,7 @@ SCREEN_UPDATE(moo)
 	k054338_update_all_shadows(state->k054338, 0);
 	k054338_fill_backcolor(state->k054338, bitmap, 0);
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	if (state->layerpri[0] < k053251_get_priority(state->k053251, K053251_CI1))	/* bucky hides back layer behind background */
 		k056832_tilemap_draw(state->k056832, bitmap, cliprect, layers[0], 0, 1);

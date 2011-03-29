@@ -193,7 +193,7 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 
 static TILE_GET_INFO( get_bg0tile_info )
 {
-	tecmosys_state *state = machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 
 	SET_TILE_INFO(
 			1,
@@ -204,14 +204,14 @@ static TILE_GET_INFO( get_bg0tile_info )
 
 static WRITE16_HANDLER( bg0_tilemap_w )
 {
-	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	COMBINE_DATA(&state->bg0tilemap_ram[offset]);
 	tilemap_mark_tile_dirty(state->bg0tilemap,offset/2);
 }
 
 static TILE_GET_INFO( get_bg1tile_info )
 {
-	tecmosys_state *state = machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 
 	SET_TILE_INFO(
 			2,
@@ -222,14 +222,14 @@ static TILE_GET_INFO( get_bg1tile_info )
 
 static WRITE16_HANDLER( bg1_tilemap_w )
 {
-	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	COMBINE_DATA(&state->bg1tilemap_ram[offset]);
 	tilemap_mark_tile_dirty(state->bg1tilemap,offset/2);
 }
 
 static TILE_GET_INFO( get_bg2tile_info )
 {
-	tecmosys_state *state = machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 
 	SET_TILE_INFO(
 			3,
@@ -240,14 +240,14 @@ static TILE_GET_INFO( get_bg2tile_info )
 
 static WRITE16_HANDLER( bg2_tilemap_w )
 {
-	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	COMBINE_DATA(&state->bg2tilemap_ram[offset]);
 	tilemap_mark_tile_dirty(state->bg2tilemap,offset/2);
 }
 
 static TILE_GET_INFO( get_tile_info )
 {
-	tecmosys_state *state = machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 
 	SET_TILE_INFO(
 			0,
@@ -258,7 +258,7 @@ static TILE_GET_INFO( get_tile_info )
 
 static WRITE16_HANDLER( fg_tilemap_w )
 {
-	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	COMBINE_DATA(&state->fgtilemap_ram[offset]);
 	tilemap_mark_tile_dirty(state->txt_tilemap,offset/2);
 }
@@ -280,7 +280,7 @@ static WRITE16_HANDLER( sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0x00, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -296,7 +296,7 @@ static WRITE16_HANDLER( sound_w )
 
 static WRITE16_HANDLER( unk880000_w )
 {
-	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	COMBINE_DATA(&state->_880000regs[offset]);
 
 	switch( offset )
@@ -312,7 +312,7 @@ static WRITE16_HANDLER( unk880000_w )
 			break;
 
 		case 0x22/2:
-			watchdog_reset( space->machine );
+			watchdog_reset( space->machine() );
 			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(space->cpu) );
 			break;
 
@@ -324,7 +324,7 @@ static WRITE16_HANDLER( unk880000_w )
 
 static READ16_HANDLER( unk880000_r )
 {
-	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	//UINT16 ret = state->_880000regs[offset];
 
 	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, cpu_get_pc(space->cpu), state->_880000regs[offset] );
@@ -334,7 +334,7 @@ static READ16_HANDLER( unk880000_r )
 	switch( offset )
 	{
 		case 0:
-			if ( space->machine->primary_screen->vpos() >= 240) return 0;
+			if ( space->machine().primary_screen->vpos() >= 240) return 0;
 			else return 1;
 
 		default:
@@ -360,7 +360,7 @@ static WRITE16_DEVICE_HANDLER( eeprom_w )
 }
 
 
-INLINE void set_color_555(running_machine *machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+INLINE void set_color_555(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
 	palette_set_color_rgb(machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
@@ -368,28 +368,28 @@ INLINE void set_color_555(running_machine *machine, pen_t color, int rshift, int
 
 static WRITE16_HANDLER( tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w )
 {
-	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	COMBINE_DATA(&state->tilemap_paletteram16[offset]);
-	set_color_555(space->machine, offset+0x4000, 5, 10, 0, state->tilemap_paletteram16[offset]);
+	set_color_555(space->machine(), offset+0x4000, 5, 10, 0, state->tilemap_paletteram16[offset]);
 }
 
 static WRITE16_HANDLER( bg0_tilemap_lineram_w )
 {
-	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	COMBINE_DATA(&state->bg0tilemap_lineram[offset]);
 	if (data!=0x0000) popmessage("non 0 write to bg0 lineram %04x %04x",offset,data);
 }
 
 static WRITE16_HANDLER( bg1_tilemap_lineram_w )
 {
-	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	COMBINE_DATA(&state->bg1tilemap_lineram[offset]);
 	if (data!=0x0000) popmessage("non 0 write to bg1 lineram %04x %04x",offset,data);
 }
 
 static WRITE16_HANDLER( bg2_tilemap_lineram_w )
 {
-	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	COMBINE_DATA(&state->bg2tilemap_lineram[offset]);
 	if (data!=0x0000) popmessage("non 0 write to bg2 lineram %04x %04x",offset,data);
 }
@@ -512,14 +512,14 @@ GFXDECODE_END
 
 static WRITE8_HANDLER( deroon_bankswitch_w )
 {
-	memory_set_bankptr(space->machine,  "bank1", space->machine->region("audiocpu")->base() + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
+	memory_set_bankptr(space->machine(),  "bank1", space->machine().region("audiocpu")->base() + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
 }
 
 static WRITE8_HANDLER( tecmosys_oki_bank_w )
 {
 	UINT8 upperbank = (data & 0x30) >> 4;
 	UINT8 lowerbank = (data & 0x03) >> 0;
-	UINT8* region = space->machine->region("oki")->base();
+	UINT8* region = space->machine().region("oki")->base();
 
 	memcpy( region+0x00000, region+0x80000 + lowerbank * 0x20000, 0x20000  );
 	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
@@ -545,7 +545,7 @@ ADDRESS_MAP_END
 
 static VIDEO_START(deroon)
 {
-	tecmosys_state *state = machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 	state->sprite_bitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
 	bitmap_fill(state->sprite_bitmap, NULL, 0x4000);
 
@@ -570,10 +570,10 @@ static VIDEO_START(deroon)
 
 }
 
-static void tecmosys_render_sprites_to_bitmap(running_machine *machine, bitmap_t *bitmap, UINT16 extrax, UINT16 extray )
+static void tecmosys_render_sprites_to_bitmap(running_machine &machine, bitmap_t *bitmap, UINT16 extrax, UINT16 extray )
 {
-	tecmosys_state *state = machine->driver_data<tecmosys_state>();
-	UINT8 *gfxsrc    = machine->region       ( "gfx1" )->base();
+	tecmosys_state *state = machine.driver_data<tecmosys_state>();
+	UINT8 *gfxsrc    = machine.region       ( "gfx1" )->base();
 	int i;
 
 	/* render sprites (with priority information) to temp bitmap */
@@ -686,10 +686,10 @@ static void tecmosys_tilemap_copy_to_compose(tecmosys_state *state, UINT16 pri)
 	}
 }
 
-static void tecmosys_do_final_mix(running_machine *machine, bitmap_t* bitmap)
+static void tecmosys_do_final_mix(running_machine &machine, bitmap_t* bitmap)
 {
-	tecmosys_state *state = machine->driver_data<tecmosys_state>();
-	const pen_t *paldata = machine->pens;
+	tecmosys_state *state = machine.driver_data<tecmosys_state>();
+	const pen_t *paldata = machine.pens;
 	int y,x;
 	UINT16 *srcptr;
 	UINT16 *srcptr2;
@@ -720,7 +720,7 @@ static void tecmosys_do_final_mix(running_machine *machine, bitmap_t* bitmap)
 
 			if (srcptr2[x]&0x3fff)
 			{
-				penvalue2 = machine->generic.paletteram.u16[srcptr2[x]&0x3fff];
+				penvalue2 = machine.generic.paletteram.u16[srcptr2[x]&0x3fff];
 				colour2 = paldata[srcptr2[x]&0x3fff];
 			}
 			else
@@ -761,9 +761,9 @@ static void tecmosys_do_final_mix(running_machine *machine, bitmap_t* bitmap)
 
 static SCREEN_UPDATE(deroon)
 {
-	tecmosys_state *state = screen->machine->driver_data<tecmosys_state>();
+	tecmosys_state *state = screen->machine().driver_data<tecmosys_state>();
 
-	bitmap_fill(bitmap,cliprect,screen->machine->pens[0x4000]);
+	bitmap_fill(bitmap,cliprect,screen->machine().pens[0x4000]);
 
 
 	tilemap_set_scrolly( state->bg0tilemap, 0, state->c80000regs[1]+16);
@@ -794,7 +794,7 @@ static SCREEN_UPDATE(deroon)
 	tecmosys_tilemap_copy_to_compose(state, 0xc000);
 
 
-	tecmosys_do_final_mix(screen->machine, bitmap);
+	tecmosys_do_final_mix(screen->machine(), bitmap);
 
 /*
     popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x | %04x %04x %04x %04x  | %04x %04x %04x %04x  | %04x %04x %04x %04x  | %04x %04x %04x %04x",
@@ -815,7 +815,7 @@ static SCREEN_UPDATE(deroon)
 //    state->a80000regs[0],     state->a80000regs[1],     state->a80000regs[2]);
 
 	// prepare sprites for NEXT frame - causes 1 frame palette errors, but prevents sprite lag in tkdensho, which is correct?
-	tecmosys_render_sprites_to_bitmap(screen->machine, bitmap, state->_880000regs[0x0], state->_880000regs[0x1]);
+	tecmosys_render_sprites_to_bitmap(screen->machine(), bitmap, state->_880000regs[0x0], state->_880000regs[0x1]);
 
 
 	return 0;
@@ -859,7 +859,7 @@ static SCREEN_UPDATE(deroon)
 static void sound_irq(device_t *device, int irq)
 {
 	/* IRQ */
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf262_interface tecmosys_ymf262_interface =
@@ -1046,10 +1046,10 @@ ROM_START( tkdenshoa )
 	ROM_LOAD( "ae500w07.ad1", 0x080000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
 ROM_END
 
-static void tecmosys_decramble(running_machine *machine)
+static void tecmosys_decramble(running_machine &machine)
 {
-	UINT8 *gfxsrc    = machine->region       ( "gfx1" )->base();
-	size_t  srcsize = machine->region( "gfx1" )->bytes();
+	UINT8 *gfxsrc    = machine.region       ( "gfx1" )->base();
+	size_t  srcsize = machine.region( "gfx1" )->bytes();
 	int i;
 
 	for (i=0; i < srcsize; i+=4)

@@ -32,7 +32,7 @@ public:
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	wink_state *state = machine->driver_data<wink_state>();
+	wink_state *state = machine.driver_data<wink_state>();
 	UINT8 *videoram = state->videoram;
 	int code = videoram[tile_index];
 	code |= 0x200 * state->tile_bank;
@@ -48,20 +48,20 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( wink )
 {
-	wink_state *state = machine->driver_data<wink_state>();
+	wink_state *state = machine.driver_data<wink_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE( wink )
 {
-	wink_state *state = screen->machine->driver_data<wink_state>();
+	wink_state *state = screen->machine().driver_data<wink_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
 
 static WRITE8_HANDLER( bgram_w )
 {
-	wink_state *state = space->machine->driver_data<wink_state>();
+	wink_state *state = space->machine().driver_data<wink_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -75,31 +75,31 @@ static WRITE8_HANDLER( player_mux_w )
 
 static WRITE8_HANDLER( tile_banking_w )
 {
-	wink_state *state = space->machine->driver_data<wink_state>();
+	wink_state *state = space->machine().driver_data<wink_state>();
 	state->tile_bank = data & 1;
 	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 }
 
 static WRITE8_HANDLER( wink_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset,data & 1);
+	coin_counter_w(space->machine(), offset,data & 1);
 }
 
 static READ8_HANDLER( analog_port_r )
 {
-	return input_port_read(space->machine, /* player_mux ? "DIAL2" : */ "DIAL1");
+	return input_port_read(space->machine(), /* player_mux ? "DIAL2" : */ "DIAL1");
 }
 
 static READ8_HANDLER( player_inputs_r )
 {
-	return input_port_read(space->machine, /* player_mux ? "INPUTS2" : */ "INPUTS1");
+	return input_port_read(space->machine(), /* player_mux ? "INPUTS2" : */ "INPUTS1");
 }
 
 static WRITE8_HANDLER( sound_irq_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 	//sync with sound cpu (but it still loses some soundlatches...)
-	//space->machine->scheduler().synchronize();
+	//space->machine().scheduler().synchronize();
 }
 
 static ADDRESS_MAP_START( wink_map, AS_PROGRAM, 8 )
@@ -304,7 +304,7 @@ GFXDECODE_END
 
 static READ8_DEVICE_HANDLER( sound_r )
 {
-	wink_state *state = device->machine->driver_data<wink_state>();
+	wink_state *state = device->machine().driver_data<wink_state>();
 	return state->sound_flag;
 }
 
@@ -321,13 +321,13 @@ static const ay8910_interface ay8912_interface =
 //AY portA is fed by an input clock at 15625 Hz
 static INTERRUPT_GEN( wink_sound )
 {
-	wink_state *state = device->machine->driver_data<wink_state>();
+	wink_state *state = device->machine().driver_data<wink_state>();
 	state->sound_flag ^= 0x80;
 }
 
 static MACHINE_RESET( wink )
 {
-	wink_state *state = machine->driver_data<wink_state>();
+	wink_state *state = machine.driver_data<wink_state>();
 	state->sound_flag = 0;
 }
 
@@ -404,7 +404,7 @@ ROM_END
 static DRIVER_INIT( wink )
 {
 	UINT32 i;
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x8000);
 
 	// protection module reverse engineered by HIGHWAYMAN

@@ -29,9 +29,9 @@ static WRITE8_HANDLER( srumbler_bankswitch_w )
       that as well to be 100% accurate.
      */
 	int i;
-	UINT8 *ROM = space->machine->region("user1")->base();
-	UINT8 *prom1 = space->machine->region("proms")->base() + (data & 0xf0);
-	UINT8 *prom2 = space->machine->region("proms")->base() + 0x100 + ((data & 0x0f) << 4);
+	UINT8 *ROM = space->machine().region("user1")->base();
+	UINT8 *prom1 = space->machine().region("proms")->base() + (data & 0xf0);
+	UINT8 *prom2 = space->machine().region("proms")->base() + 0x100 + ((data & 0x0f) << 4);
 
 	for (i = 0x05;i < 0x10;i++)
 	{
@@ -40,13 +40,13 @@ static WRITE8_HANDLER( srumbler_bankswitch_w )
 		/* bit 2 of prom1 selects ROM or RAM - not supported */
 
 		sprintf(bankname, "%04x", i*0x1000);
-		memory_set_bankptr(space->machine, bankname,&ROM[bank*0x1000]);
+		memory_set_bankptr(space->machine(), bankname,&ROM[bank*0x1000]);
 	}
 }
 
 static MACHINE_RESET( srumbler )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	/* initialize banked ROM pointers */
 	srumbler_bankswitch_w(space,0,0);
 }

@@ -239,7 +239,7 @@
 
 static INTERRUPT_GEN( lazercmd_timer )
 {
-	lazercmd_state *state = device->machine->driver_data<lazercmd_state>();
+	lazercmd_state *state = device->machine().driver_data<lazercmd_state>();
 
 	if (++state->timer_count >= 64 * 128)
 	{
@@ -251,7 +251,7 @@ static INTERRUPT_GEN( lazercmd_timer )
 
 static INTERRUPT_GEN( bbonk_timer )
 {
-	lazercmd_state *state = device->machine->driver_data<lazercmd_state>();
+	lazercmd_state *state = device->machine().driver_data<lazercmd_state>();
 
 	if (++state->timer_count >= 64 * 128)
 		state->timer_count = 0;
@@ -283,13 +283,13 @@ static WRITE8_HANDLER( lazercmd_data_port_w )
 /* triggered by REDD,r opcode */
 static READ8_HANDLER( lazercmd_data_port_r )
 {
-	UINT8 data = input_port_read(space->machine, "DSW") & 0x0f;
+	UINT8 data = input_port_read(space->machine(), "DSW") & 0x0f;
 	return data;
 }
 
 static WRITE8_HANDLER( lazercmd_hardware_w )
 {
-	lazercmd_state *state = space->machine->driver_data<lazercmd_state>();
+	lazercmd_state *state = space->machine().driver_data<lazercmd_state>();
 
 	switch (offset)
 	{
@@ -313,7 +313,7 @@ static WRITE8_HANDLER( lazercmd_hardware_w )
 
 static WRITE8_HANDLER( medlanes_hardware_w )
 {
-	lazercmd_state *state = space->machine->driver_data<lazercmd_state>();
+	lazercmd_state *state = space->machine().driver_data<lazercmd_state>();
 
 	switch (offset)
 	{
@@ -340,7 +340,7 @@ static WRITE8_HANDLER( medlanes_hardware_w )
 
 static WRITE8_HANDLER( bbonk_hardware_w )
 {
-	lazercmd_state *state = space->machine->driver_data<lazercmd_state>();
+	lazercmd_state *state = space->machine().driver_data<lazercmd_state>();
 
 	switch (offset)
 	{
@@ -361,22 +361,22 @@ static WRITE8_HANDLER( bbonk_hardware_w )
 
 static READ8_HANDLER( lazercmd_hardware_r )
 {
-	lazercmd_state *state = space->machine->driver_data<lazercmd_state>();
+	lazercmd_state *state = space->machine().driver_data<lazercmd_state>();
 	UINT8 data = 0;
 
 	switch (offset)
 	{
 		case 0: 			   /* player 1 joysticks */
-			data = input_port_read(space->machine, "IN0");
+			data = input_port_read(space->machine(), "IN0");
 			break;
 		case 1: 			   /* player 2 joysticks */
-			data = input_port_read(space->machine, "IN1");
+			data = input_port_read(space->machine(), "IN1");
 			break;
 		case 2: 			   /* player 1 + 2 buttons */
-			data = input_port_read(space->machine, "IN3");
+			data = input_port_read(space->machine(), "IN3");
 			break;
 		case 3: 			   /* coin slot + start buttons */
-			data = input_port_read(space->machine, "IN2");
+			data = input_port_read(space->machine(), "IN2");
 			break;
 		case 4: 			   /* vertical scan counter */
 			data = ((state->timer_count & 0x10) >> 1) | ((state->timer_count & 0x20) >> 3)
@@ -601,9 +601,9 @@ static PALETTE_INIT( lazercmd )
 
 static MACHINE_START( lazercmd )
 {
-	lazercmd_state *state = machine->driver_data<lazercmd_state>();
+	lazercmd_state *state = machine.driver_data<lazercmd_state>();
 
-	state->dac = machine->device("dac");
+	state->dac = machine.device("dac");
 
 	state->save_item(NAME(state->marker_x));
 	state->save_item(NAME(state->marker_y));
@@ -614,7 +614,7 @@ static MACHINE_START( lazercmd )
 
 static MACHINE_RESET( lazercmd )
 {
-	lazercmd_state *state = machine->driver_data<lazercmd_state>();
+	lazercmd_state *state = machine.driver_data<lazercmd_state>();
 
 	state->marker_x = 0;
 	state->marker_y = 0;
@@ -789,7 +789,7 @@ ROM_END
 static DRIVER_INIT( lazercmd )
 {
 	int i, y;
-	UINT8 *gfx = machine->region("gfx1")->base();
+	UINT8 *gfx = machine.region("gfx1")->base();
 
 /******************************************************************
  * To show the maze bit #6 and #7 of the video ram are used.
@@ -818,7 +818,7 @@ static DRIVER_INIT( lazercmd )
 static DRIVER_INIT( medlanes )
 {
 	int i, y;
-	UINT8 *gfx = machine->region("gfx1")->base();
+	UINT8 *gfx = machine.region("gfx1")->base();
 
 /******************************************************************
  * To show the maze bit #6 and #7 of the video ram are used.
@@ -847,7 +847,7 @@ static DRIVER_INIT( medlanes )
 static DRIVER_INIT( bbonk )
 {
 	int i, y;
-	UINT8 *gfx = machine->region("gfx1")->base();
+	UINT8 *gfx = machine.region("gfx1")->base();
 
 /******************************************************************
  * To show the maze bit #6 and #7 of the video ram are used.

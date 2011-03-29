@@ -15,7 +15,7 @@ Video hardware
 
 WRITE8_HANDLER( drmicro_videoram_w )
 {
-	drmicro_state *state = space->machine->driver_data<drmicro_state>();
+	drmicro_state *state = space->machine().driver_data<drmicro_state>();
 	state->videoram[offset] = data;
 
 	if (offset < 0x800)
@@ -29,7 +29,7 @@ WRITE8_HANDLER( drmicro_videoram_w )
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	drmicro_state *state = machine->driver_data<drmicro_state>();
+	drmicro_state *state = machine.driver_data<drmicro_state>();
 	int code, col, flags;
 
 	code = state->videoram[tile_index + 0x0800];
@@ -44,7 +44,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	drmicro_state *state = machine->driver_data<drmicro_state>();
+	drmicro_state *state = machine.driver_data<drmicro_state>();
 	int code, col, flags;
 
 	code = state->videoram[tile_index + 0x0000];
@@ -64,7 +64,7 @@ PALETTE_INIT( drmicro )
 	int i;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x20);
+	machine.colortable = colortable_alloc(machine, 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -90,7 +90,7 @@ PALETTE_INIT( drmicro )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -99,13 +99,13 @@ PALETTE_INIT( drmicro )
 	for (i = 0; i < 0x200; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 }
 
 VIDEO_START( drmicro)
 {
-	drmicro_state *state = machine->driver_data<drmicro_state>();
+	drmicro_state *state = machine.driver_data<drmicro_state>();
 
 	state->videoram = auto_alloc_array(machine, UINT8, 0x1000);
 	state->save_pointer(NAME(state->videoram), 0x1000);
@@ -118,7 +118,7 @@ VIDEO_START( drmicro)
 
 SCREEN_UPDATE( drmicro )
 {
-	drmicro_state *state = screen->machine->driver_data<drmicro_state>();
+	drmicro_state *state = screen->machine().driver_data<drmicro_state>();
 	int offs, adr, g;
 	int chr, col, attr;
 	int x, y, fx, fy;
@@ -150,7 +150,7 @@ SCREEN_UPDATE( drmicro )
 			else
 				x = (240 - x) & 0xff;
 
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[3-g],
+			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[3-g],
 					chr,
 					col,
 					fx,fy,
@@ -158,7 +158,7 @@ SCREEN_UPDATE( drmicro )
 
 			if (x > 240)
 			{
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[3-g],
+				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[3-g],
 						chr,
 						col,
 						fx,fy,

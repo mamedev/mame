@@ -66,55 +66,55 @@ J1100072A
 
 static WRITE8_HANDLER( beg_banking_w )
 {
-	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	state->beg_bank = data;
 
 /* d0-d3 connect to A11-A14 of the ROMs (via ls273 latch)
    d4-d7 select one of ROMs (via ls273(above) and then ls154)
 */
-	memory_set_bank(space->machine, "bank1", state->beg_bank & 0xff); /* empty sockets for IC37-IC44 ROMS */
+	memory_set_bank(space->machine(), "bank1", state->beg_bank & 0xff); /* empty sockets for IC37-IC44 ROMS */
 }
 
 static TIMER_CALLBACK( from_sound_latch_callback )
 {
-	bigevglf_state *state = machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 	state->from_sound = param & 0xff;
 	state->sound_state |= 2;
 }
 static WRITE8_HANDLER( beg_fromsound_w )	/* write to D800 sets bit 1 in status */
 {
-	space->machine->scheduler().synchronize(FUNC(from_sound_latch_callback), (cpu_get_pc(space->cpu) << 16) | data);
+	space->machine().scheduler().synchronize(FUNC(from_sound_latch_callback), (cpu_get_pc(space->cpu) << 16) | data);
 }
 
 static READ8_HANDLER( beg_fromsound_r )
 {
-	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	/* set a timer to force synchronization after the read */
-	space->machine->scheduler().synchronize();
+	space->machine().scheduler().synchronize();
 	return state->from_sound;
 }
 
 static READ8_HANDLER( beg_soundstate_r )
 {
-	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	UINT8 ret = state->sound_state;
 	/* set a timer to force synchronization after the read */
-	space->machine->scheduler().synchronize();
+	space->machine().scheduler().synchronize();
 	state->sound_state &= ~2; /* read from port 21 clears bit 1 in status */
 	return ret;
 }
 
 static READ8_HANDLER( soundstate_r )
 {
-	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	/* set a timer to force synchronization after the read */
-	space->machine->scheduler().synchronize();
+	space->machine().scheduler().synchronize();
 	return state->sound_state;
 }
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	bigevglf_state *state = machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 
 	if (state->sound_nmi_enable)
 		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -125,27 +125,27 @@ static TIMER_CALLBACK( nmi_callback )
 
 static WRITE8_HANDLER( sound_command_w )	/* write to port 20 clears bit 0 in status */
 {
-	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	state->for_sound = data;
-	space->machine->scheduler().synchronize(FUNC(nmi_callback), data);
+	space->machine().scheduler().synchronize(FUNC(nmi_callback), data);
 }
 
 static READ8_HANDLER( sound_command_r )	/* read from D800 sets bit 0 in status */
 {
-	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	state->sound_state |= 1;
 	return state->for_sound;
 }
 
 static WRITE8_HANDLER( nmi_disable_w )
 {
-	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
 	{
@@ -156,7 +156,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 static TIMER_CALLBACK( deferred_ls74_w )
 {
-	bigevglf_state *state = machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 	int offs = (param >> 8) & 255;
 	int data = param & 255;
 	state->beg13_ls74[offs] = data;
@@ -165,27 +165,27 @@ static TIMER_CALLBACK( deferred_ls74_w )
 /* do this on a timer to let the CPUs synchronize */
 static WRITE8_HANDLER( beg13_a_clr_w )
 {
-	space->machine->scheduler().synchronize(FUNC(deferred_ls74_w), (0 << 8) | 0);
+	space->machine().scheduler().synchronize(FUNC(deferred_ls74_w), (0 << 8) | 0);
 }
 
 static WRITE8_HANDLER( beg13_b_clr_w )
 {
-	space->machine->scheduler().synchronize(FUNC(deferred_ls74_w), (1 << 8) | 0);
+	space->machine().scheduler().synchronize(FUNC(deferred_ls74_w), (1 << 8) | 0);
 }
 
 static WRITE8_HANDLER( beg13_a_set_w )
 {
-	space->machine->scheduler().synchronize(FUNC(deferred_ls74_w), (0 << 8) | 1);
+	space->machine().scheduler().synchronize(FUNC(deferred_ls74_w), (0 << 8) | 1);
 }
 
 static WRITE8_HANDLER( beg13_b_set_w )
 {
-	space->machine->scheduler().synchronize(FUNC(deferred_ls74_w), (1 << 8) | 1);
+	space->machine().scheduler().synchronize(FUNC(deferred_ls74_w), (1 << 8) | 1);
 }
 
 static READ8_HANDLER( beg_status_r )
 {
-	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 
 /* d0 = Q of 74ls74 IC13(partA)
    d1 = Q of 74ls74 IC13(partB)
@@ -197,30 +197,30 @@ static READ8_HANDLER( beg_status_r )
 
 */
 	/* set a timer to force synchronization after the read */
-	space->machine->scheduler().synchronize();
+	space->machine().scheduler().synchronize();
 	return (state->beg13_ls74[0] << 0) | (state->beg13_ls74[1] << 1);
 }
 
 
 static READ8_HANDLER( beg_trackball_x_r )
 {
-	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	static const char *const portx_name[2] = { "P1X", "P2X" };
 
-	return input_port_read(space->machine, portx_name[state->port_select]);
+	return input_port_read(space->machine(), portx_name[state->port_select]);
 }
 
 static READ8_HANDLER( beg_trackball_y_r )
 {
-	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	static const char *const porty_name[2] = { "P1Y", "P2Y" };
 
-	return input_port_read(space->machine, porty_name[state->port_select]);
+	return input_port_read(space->machine(), porty_name[state->port_select]);
 }
 
 static WRITE8_HANDLER( beg_port08_w )
 {
-	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	state->port_select = (data & 0x04) >> 2;
 }
 
@@ -342,7 +342,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( sub_cpu_mcu_coin_port_r )
 {
-	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	/*
             bit 0 and bit 1 = coin inputs
             bit 3 and bit 4 = MCU status
@@ -350,7 +350,7 @@ static READ8_HANDLER( sub_cpu_mcu_coin_port_r )
 
     */
 	state->mcu_coin_bit5 ^= 0x20;
-	return bigevglf_mcu_status_r(space, 0) | (input_port_read(space->machine, "PORT04") & 3) | state->mcu_coin_bit5;	/* bit 0 and bit 1 - coin inputs */
+	return bigevglf_mcu_status_r(space, 0) | (input_port_read(space->machine(), "PORT04") & 3) | state->mcu_coin_bit5;	/* bit 0 and bit 1 - coin inputs */
 }
 
 static ADDRESS_MAP_START( bigevglf_sub_portmap, AS_IO, 8 )
@@ -432,10 +432,10 @@ static const msm5232_interface msm5232_config =
 
 static MACHINE_START( bigevglf )
 {
-	bigevglf_state *state = machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 
-	state->audiocpu = machine->device("audiocpu");
-	state->mcu = machine->device("mcu");
+	state->audiocpu = machine.device("audiocpu");
+	state->mcu = machine.device("mcu");
 
 	state->save_item(NAME(state->vidram_bank));
 	state->save_item(NAME(state->plane_selected));
@@ -469,7 +469,7 @@ static MACHINE_START( bigevglf )
 
 static MACHINE_RESET( bigevglf )
 {
-	bigevglf_state *state = machine->driver_data<bigevglf_state>();
+	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 
 	state->vidram_bank = 0;
 	state->plane_selected = 0;
@@ -634,7 +634,7 @@ ROM_END
 
 static DRIVER_INIT( bigevglf )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 0xff, &ROM[0x10000], 0x800);
 }
 

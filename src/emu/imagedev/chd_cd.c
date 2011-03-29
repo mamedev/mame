@@ -87,7 +87,7 @@ static DEVICE_IMAGE_LOAD(cdrom)
 		if ( err )
 			goto error;
 	} else {
-		chd  = get_disk_handle(image.device().machine, image.device().subtag(tempstring,"cdrom"));
+		chd  = get_disk_handle(image.device().machine(), image.device().subtag(tempstring,"cdrom"));
 	}
 
 	/* open the CHD file */

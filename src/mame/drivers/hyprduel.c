@@ -46,9 +46,9 @@ fix comms so it boots, it's a bit of a hack for hyperduel at the moment ;-)
                                 Interrupts
 ***************************************************************************/
 
-static void update_irq_state( running_machine *machine )
+static void update_irq_state( running_machine &machine )
 {
-	hyprduel_state *state = machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	int irq = state->requested_int & ~*state->irq_enable;
 
 	device_set_input_line(state->maincpu, 3, (irq & state->int_num) ? ASSERT_LINE : CLEAR_LINE);
@@ -56,13 +56,13 @@ static void update_irq_state( running_machine *machine )
 
 static TIMER_CALLBACK( vblank_end_callback )
 {
-	hyprduel_state *state = machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	state->requested_int &= ~param;
 }
 
 static INTERRUPT_GEN( hyprduel_interrupt )
 {
-	hyprduel_state *state = device->machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = device->machine().driver_data<hyprduel_state>();
 	int line = RASTER_LINES - cpu_getiloops(device);
 
 	if (line == RASTER_LINES)
@@ -71,23 +71,23 @@ static INTERRUPT_GEN( hyprduel_interrupt )
 		state->requested_int |= 0x20;
 		device_set_input_line(device, 2, HOLD_LINE);
 		/* the duration is a guess */
-		device->machine->scheduler().timer_set(attotime::from_usec(2500), FUNC(vblank_end_callback), 0x20);
+		device->machine().scheduler().timer_set(attotime::from_usec(2500), FUNC(vblank_end_callback), 0x20);
 	}
 	else
 		state->requested_int |= 0x12;		/* hsync */
 
-	update_irq_state(device->machine);
+	update_irq_state(device->machine());
 }
 
 static READ16_HANDLER( hyprduel_irq_cause_r )
 {
-	hyprduel_state *state = space->machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
 	return state->requested_int;
 }
 
 static WRITE16_HANDLER( hyprduel_irq_cause_w )
 {
-	hyprduel_state *state = space->machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data == state->int_num)
@@ -95,14 +95,14 @@ static WRITE16_HANDLER( hyprduel_irq_cause_w )
 		else
 			state->requested_int &= ~(data & *state->irq_enable);
 
-		update_irq_state(space->machine);
+		update_irq_state(space->machine());
 	}
 }
 
 
 static WRITE16_HANDLER( hyprduel_subcpu_control_w )
 {
-	hyprduel_state *state = space->machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
 
 	switch (data)
 	{
@@ -135,10 +135,10 @@ static WRITE16_HANDLER( hyprduel_subcpu_control_w )
 
 static READ16_HANDLER( hyprduel_cpusync_trigger1_r )
 {
-	hyprduel_state *state = space->machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
 	if (state->cpu_trigger == 1001)
 	{
-		space->machine->scheduler().trigger(1001);
+		space->machine().scheduler().trigger(1001);
 		state->cpu_trigger = 0;
 	}
 
@@ -147,7 +147,7 @@ static READ16_HANDLER( hyprduel_cpusync_trigger1_r )
 
 static WRITE16_HANDLER( hyprduel_cpusync_trigger1_w )
 {
-	hyprduel_state *state = space->machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
 	COMBINE_DATA(&state->sharedram1[0x00040e / 2 + offset]);
 
 	if (((state->sharedram1[0x00040e / 2] << 16) + state->sharedram1[0x000410 / 2]) != 0x00)
@@ -163,10 +163,10 @@ static WRITE16_HANDLER( hyprduel_cpusync_trigger1_w )
 
 static READ16_HANDLER( hyprduel_cpusync_trigger2_r )
 {
-	hyprduel_state *state = space->machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
 	if (state->cpu_trigger == 1002)
 	{
-		space->machine->scheduler().trigger(1002);
+		space->machine().scheduler().trigger(1002);
 		state->cpu_trigger = 0;
 	}
 
@@ -175,7 +175,7 @@ static READ16_HANDLER( hyprduel_cpusync_trigger2_r )
 
 static WRITE16_HANDLER( hyprduel_cpusync_trigger2_w )
 {
-	hyprduel_state *state = space->machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
 	COMBINE_DATA(&state->sharedram1[0x000408 / 2 + offset]);
 
 	if (ACCESSING_BITS_8_15)
@@ -191,7 +191,7 @@ static WRITE16_HANDLER( hyprduel_cpusync_trigger2_w )
 
 static TIMER_CALLBACK( magerror_irq_callback )
 {
-	hyprduel_state *state = machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	device_set_input_line(state->subcpu, 1, HOLD_LINE);
 }
 
@@ -209,9 +209,9 @@ static TIMER_CALLBACK( magerror_irq_callback )
 
 static READ16_HANDLER( hyprduel_bankedrom_r )
 {
-	hyprduel_state *state = space->machine->driver_data<hyprduel_state>();
-	UINT8 *ROM = space->machine->region("gfx1")->base();
-	size_t  len = space->machine->region("gfx1")->bytes();
+	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
+	UINT8 *ROM = space->machine().region("gfx1")->base();
+	size_t  len = space->machine().region("gfx1")->bytes();
 
 	offset = offset * 2 + 0x10000 * (*state->rombank);
 
@@ -267,7 +267,7 @@ static READ16_HANDLER( hyprduel_bankedrom_r )
 
 static TIMER_CALLBACK( hyprduel_blit_done )
 {
-	hyprduel_state *state = machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	state->requested_int |= 1 << state->blitter_bit;
 	update_irq_state(machine);
 }
@@ -285,19 +285,19 @@ INLINE void blt_write( address_space *space, const int tmap, const offs_t offs, 
 		case 2:	hyprduel_vram_1_w(space, offs, data, mask);	break;
 		case 3:	hyprduel_vram_2_w(space, offs, data, mask);	break;
 	}
-//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", space->machine->describe_context(), tmap, offs, data, mask);
+//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", space->machine().describe_context(), tmap, offs, data, mask);
 }
 
 
 static WRITE16_HANDLER( hyprduel_blitter_w )
 {
-	hyprduel_state *state = space->machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
 	COMBINE_DATA(&state->blitter_regs[offset]);
 
 	if (offset == 0xc / 2)
 	{
-		UINT8 *src = space->machine->region("gfx1")->base();
-		size_t  src_len = space->machine->region("gfx1")->bytes();
+		UINT8 *src = space->machine().region("gfx1")->base();
+		size_t  src_len = space->machine().region("gfx1")->bytes();
 
 		UINT32 tmap = (state->blitter_regs[0x00 / 2] << 16) + state->blitter_regs[0x02 / 2];
 		UINT32 src_offs = (state->blitter_regs[0x04 / 2] << 16) + state->blitter_regs[0x06 / 2];
@@ -342,7 +342,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
                        another blit. */
 					if (b1 == 0)
 					{
-						space->machine->scheduler().timer_set(attotime::from_usec(500), FUNC(hyprduel_blit_done));
+						space->machine().scheduler().timer_set(attotime::from_usec(500), FUNC(hyprduel_blit_done));
 						return;
 					}
 
@@ -623,7 +623,7 @@ GFXDECODE_END
 
 static void sound_irq( device_t *device, int state )
 {
-	hyprduel_state *hyprduel = device->machine->driver_data<hyprduel_state>();
+	hyprduel_state *hyprduel = device->machine().driver_data<hyprduel_state>();
 	device_set_input_line(hyprduel->subcpu, 1, HOLD_LINE);
 }
 
@@ -638,7 +638,7 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_RESET( hyprduel )
 {
-	hyprduel_state *state = machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 
 	/* start with cpu2 halted */
 	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
@@ -652,10 +652,10 @@ static MACHINE_RESET( hyprduel )
 
 static MACHINE_START( hyprduel )
 {
-	hyprduel_state *state = machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->subcpu = machine->device("sub");
+	state->maincpu = machine.device("maincpu");
+	state->subcpu = machine.device("sub");
 
 	state->save_item(NAME(state->blitter_bit));
 	state->save_item(NAME(state->requested_int));
@@ -665,7 +665,7 @@ static MACHINE_START( hyprduel )
 
 static MACHINE_START( magerror )
 {
-	hyprduel_state *state = machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 
 	MACHINE_START_CALL(hyprduel);
 	state->magerror_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(968));		/* tempo? */
@@ -807,23 +807,23 @@ ROM_END
 
 static DRIVER_INIT( hyprduel )
 {
-	hyprduel_state *state = machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 
 	state->int_num = 0x02;
 
 	/* cpu synchronization (severe timings) */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc0040e, 0xc00411, FUNC(hyprduel_cpusync_trigger1_w));
-	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00408, 0xc00409, FUNC(hyprduel_cpusync_trigger1_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00408, 0xc00409, FUNC(hyprduel_cpusync_trigger2_w));
-	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfff34c, 0xfff34d, FUNC(hyprduel_cpusync_trigger2_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc0040e, 0xc00411, FUNC(hyprduel_cpusync_trigger1_w));
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00408, 0xc00409, FUNC(hyprduel_cpusync_trigger1_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00408, 0xc00409, FUNC(hyprduel_cpusync_trigger2_w));
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfff34c, 0xfff34d, FUNC(hyprduel_cpusync_trigger2_r));
 }
 
 static DRIVER_INIT( magerror )
 {
-	hyprduel_state *state = machine->driver_data<hyprduel_state>();
+	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 
 	state->int_num = 0x01;
-	state->magerror_irq_timer = machine->scheduler().timer_alloc(FUNC(magerror_irq_callback));
+	state->magerror_irq_timer = machine.scheduler().timer_alloc(FUNC(magerror_irq_callback));
 }
 
 

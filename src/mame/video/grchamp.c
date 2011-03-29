@@ -16,7 +16,7 @@ PALETTE_INIT( grchamp )
 {
 	static const int resistances[3] = { 100, 270, 470 };
 	double rweights[3], gweights[3], bweights[2];
-	grchamp_state *state = machine->driver_data<grchamp_state>();
+	grchamp_state *state = machine.driver_data<grchamp_state>();
 	int i;
 
 	/* compute the color output resistor weights */
@@ -54,46 +54,46 @@ PALETTE_INIT( grchamp )
 
 WRITE8_HANDLER( grchamp_left_w )
 {
-	grchamp_state *state = space->machine->driver_data<grchamp_state>();
+	grchamp_state *state = space->machine().driver_data<grchamp_state>();
 	state->leftram[offset] = data;
 	tilemap_mark_tile_dirty(state->left_tilemap, offset);
 }
 
 WRITE8_HANDLER( grchamp_center_w )
 {
-	grchamp_state *state = space->machine->driver_data<grchamp_state>();
+	grchamp_state *state = space->machine().driver_data<grchamp_state>();
 	state->centerram[offset] = data;
 	tilemap_mark_tile_dirty(state->center_tilemap, offset);
 }
 
 WRITE8_HANDLER( grchamp_right_w )
 {
-	grchamp_state *state = space->machine->driver_data<grchamp_state>();
+	grchamp_state *state = space->machine().driver_data<grchamp_state>();
 	state->rightram[offset] = data;
 	tilemap_mark_tile_dirty(state->right_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	grchamp_state *state = machine->driver_data<grchamp_state>();
+	grchamp_state *state = machine.driver_data<grchamp_state>();
 	SET_TILE_INFO(0, state->videoram[tile_index], 0, 0);
 }
 
 static TILE_GET_INFO( get_left_tile_info )
 {
-	grchamp_state *state = machine->driver_data<grchamp_state>();
+	grchamp_state *state = machine.driver_data<grchamp_state>();
 	SET_TILE_INFO(1, state->leftram[tile_index], 0, 0);
 }
 
 static TILE_GET_INFO( get_right_tile_info )
 {
-	grchamp_state *state = machine->driver_data<grchamp_state>();
+	grchamp_state *state = machine.driver_data<grchamp_state>();
 	SET_TILE_INFO(2, state->rightram[tile_index], 0, 0);
 }
 
 static TILE_GET_INFO( get_center_tile_info )
 {
-	grchamp_state *state = machine->driver_data<grchamp_state>();
+	grchamp_state *state = machine.driver_data<grchamp_state>();
 	SET_TILE_INFO(3, state->centerram[tile_index], 0, 0);
 }
 
@@ -105,9 +105,9 @@ static TILEMAP_MAPPER( get_memory_offset )
 
 VIDEO_START( grchamp )
 {
-	grchamp_state *state = machine->driver_data<grchamp_state>();
+	grchamp_state *state = machine.driver_data<grchamp_state>();
 
-	state->work_bitmap = auto_bitmap_alloc(machine,32,32,machine->primary_screen->format());
+	state->work_bitmap = auto_bitmap_alloc(machine,32,32,machine.primary_screen->format());
 
 	/* allocate tilemaps for each of the three sections */
 	state->text_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows,  8,8, 32,32);
@@ -117,11 +117,11 @@ VIDEO_START( grchamp )
 }
 
 #if 0
-static int collision_check(running_machine *machine, grchamp_state *state, bitmap_t *bitmap, int which )
+static int collision_check(running_machine &machine, grchamp_state *state, bitmap_t *bitmap, int which )
 {
-	int bgcolor = machine->pens[0];
-	int sprite_transp = machine->pens[0x24];
-	const rectangle *visarea = machine->primary_screen->visible_area();
+	int bgcolor = machine.pens[0];
+	int sprite_transp = machine.pens[0x24];
+	const rectangle *visarea = machine.primary_screen->visible_area();
 	int y0 = 240 - state->cpu0_out[3];
 	int x0 = 256 - state->cpu0_out[2];
 	int x,y,sx,sy;
@@ -133,7 +133,7 @@ static int collision_check(running_machine *machine, grchamp_state *state, bitma
 		/* draw the current player sprite into a work bitmap */
 		drawgfx_opaque( state->work_bitmap,
 			0,
-			machine->gfx[4],
+			machine.gfx[4],
 			state->cpu0_out[4]&0xf,
 			1, /* color */
 			0,0,
@@ -185,9 +185,9 @@ static void draw_fog(grchamp_state *state, bitmap_t *bitmap, const rectangle *cl
 	}
 }
 
-static void draw_sprites(running_machine *machine, grchamp_state *state, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, grchamp_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	const gfx_element *gfx = machine->gfx[5];
+	const gfx_element *gfx = machine.gfx[5];
 	int bank = (state->cpu0_out[0] & 0x20) ? 0x40 : 0x00;
 	const UINT8 *source = state->spriteram + 0x40;
 	const UINT8 *finish = source + 0x40;
@@ -211,7 +211,7 @@ static void draw_sprites(running_machine *machine, grchamp_state *state, bitmap_
 #endif
 
 
-static void draw_objects(running_machine *machine, grchamp_state *state, int y, UINT8 *objdata)
+static void draw_objects(running_machine &machine, grchamp_state *state, int y, UINT8 *objdata)
 {
 /*
     CPU 5/7:
@@ -248,7 +248,7 @@ static void draw_objects(running_machine *machine, grchamp_state *state, int y, 
 
 
 */
-	const UINT8 *prom = machine->region("proms")->base() + 0x20;
+	const UINT8 *prom = machine.region("proms")->base() + 0x20;
 	const gfx_element *gfx;
 	int change = (state->cpu0_out[0] & 0x20) << 3;
 	int num;
@@ -257,7 +257,7 @@ static void draw_objects(running_machine *machine, grchamp_state *state, int y, 
 	memset(objdata, 0, 256);
 
 	/* now draw the sprites; this is done during HBLANK */
-	gfx = machine->gfx[4];
+	gfx = machine.gfx[4];
 	for (num = 0; num < 16; num++)
 	{
 		/*
@@ -309,7 +309,7 @@ static void draw_objects(running_machine *machine, grchamp_state *state, int y, 
 	}
 
 	/* finally draw the text characters; this is done as we read out the object buffers */
-	gfx = machine->gfx[0];
+	gfx = machine.gfx[0];
 	for (num = 0; num < 32; num++)
 	{
 		/*
@@ -366,10 +366,10 @@ SCREEN_UPDATE( grchamp )
 		MAKE_RGB(RGB_MAX,RGB_MAX,RGB_MAX)
 	};
 
-	grchamp_state *state = screen->machine->driver_data<grchamp_state>();
-	const UINT8 *amedata = screen->machine->region("gfx5")->base();
-	const UINT8 *headdata = screen->machine->region("gfx6")->base();
-	const UINT8 *pldata = screen->machine->region("gfx7")->base();
+	grchamp_state *state = screen->machine().driver_data<grchamp_state>();
+	const UINT8 *amedata = screen->machine().region("gfx5")->base();
+	const UINT8 *headdata = screen->machine().region("gfx6")->base();
+	const UINT8 *pldata = screen->machine().region("gfx7")->base();
 	bitmap_t *lpixmap = tilemap_get_pixmap(state->left_tilemap);
 	bitmap_t *rpixmap = tilemap_get_pixmap(state->right_tilemap);
 	bitmap_t *cpixmap = tilemap_get_pixmap(state->center_tilemap);
@@ -409,7 +409,7 @@ SCREEN_UPDATE( grchamp )
 		UINT8 objdata[256];
 
 		/* draw the objects for this scanline */
-		draw_objects(screen->machine, state, y, objdata);
+		draw_objects(screen->machine(), state, y, objdata);
 
 		/* iterate over columns */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)

@@ -217,7 +217,7 @@ legacy_device_base::legacy_device_base(running_machine &_machine, const device_c
 {
 	int tokenbytes = m_config.get_legacy_config_int(DEVINFO_INT_TOKEN_BYTES);
 	if (tokenbytes != 0)
-		m_token = auto_alloc_array_clear(machine, UINT8, tokenbytes);
+		m_token = auto_alloc_array_clear(m_machine, UINT8, tokenbytes);
 }
 
 

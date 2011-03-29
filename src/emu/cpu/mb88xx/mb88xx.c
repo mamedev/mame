@@ -149,7 +149,7 @@ static CPU_INIT( mb88 )
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 
-	cpustate->serial = device->machine->scheduler().timer_alloc(FUNC(serial_timer), (void *)device);
+	cpustate->serial = device->machine().scheduler().timer_alloc(FUNC(serial_timer), (void *)device);
 
 	device->save_item(NAME(cpustate->PC));
 	device->save_item(NAME(cpustate->PA));

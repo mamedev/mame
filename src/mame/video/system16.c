@@ -30,9 +30,9 @@
 #include "video/segaic16.h"
 
 
-static void setup_system16_bootleg_spritebanking( running_machine* machine )
+static void setup_system16_bootleg_spritebanking( running_machine& machine )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	if (state->spritebank_type == 1)
 	{
@@ -112,11 +112,11 @@ static const int resistances_sh[6] = {3900, 2000, 1000, 1000/2, 1000/4, 470};
 #ifdef UNUSED_CODE
 WRITE16_HANDLER( sys16_paletteram_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	UINT16 newword;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	newword = space->machine->generic.paletteram.u16[offset];
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	newword = space->machine().generic.paletteram.u16[offset];
 
 	/*  sBGR BBBB GGGG RRRR */
 	/*  x000 4321 4321 4321 */
@@ -153,16 +153,16 @@ WRITE16_HANDLER( sys16_paletteram_w )
 		//gh = combine_6_weights(state->weights[1][1], g0, g1, g2, g3, g4, 1);
 		//bh = combine_6_weights(state->weights[1][2], b0, b1, b2, b3, b4, 1);
 
-		palette_set_color(space->machine, offset, MAKE_RGB(r, g, b) );
+		palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b) );
 
-		palette_set_color(space->machine, offset + space->machine->total_colors()/2, MAKE_RGB(rs,gs,bs));
+		palette_set_color(space->machine(), offset + space->machine().total_colors()/2, MAKE_RGB(rs,gs,bs));
 	}
 }
 #endif
 
-static void update_page( running_machine *machine )
+static void update_page( running_machine &machine )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	int all_dirty = 0;
 	int i, offset;
 
@@ -238,7 +238,7 @@ static void update_page( running_machine *machine )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	const UINT16 *source = 64 * 32 * state->bg_page[tile_index / (64 * 32)] + state->tileram;
 	int data = source[tile_index%(64*32)];
 	int tile_number = (data & 0xfff) + 0x1000 * ((data & state->tilebank_switch) ? state->tile_bank1 : state->tile_bank0);
@@ -252,7 +252,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	const UINT16 *source = 64 * 32 * state->fg_page[tile_index / (64 * 32)] + state->tileram;
 	int data = source[tile_index % (64 * 32)];
 	int tile_number = (data & 0xfff) + 0x1000 * ((data & state->tilebank_switch) ? state->tile_bank1 : state->tile_bank0);
@@ -266,7 +266,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	const UINT16 *source = 64 * 32 * state->bg2_page[tile_index / (64 * 32)] + state->tileram;
 	int data = source[tile_index % (64 * 32)];
 	int tile_number = (data & 0xfff) + 0x1000 * ((data & 0x1000) ? state->tile_bank1 : state->tile_bank0);
@@ -280,7 +280,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 static TILE_GET_INFO( get_fg2_tile_info )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	const UINT16 *source = 64 * 32 * state->fg2_page[tile_index / (64 * 32)] + state->tileram;
 	int data = source[tile_index % (64 * 32)];
 	int tile_number = (data & 0xfff) + 0x1000 * ((data & 0x1000) ? state->tile_bank1 : state->tile_bank0);
@@ -294,7 +294,7 @@ static TILE_GET_INFO( get_fg2_tile_info )
 
 WRITE16_HANDLER( sys16_tileram_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	UINT16 oldword = state->tileram[offset];
 
 	COMBINE_DATA(&state->tileram[offset]);
@@ -333,7 +333,7 @@ WRITE16_HANDLER( sys16_tileram_w )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	const UINT16 *source = state->textram;
 	int tile_number = source[tile_index];
 	int pri = tile_number >> 8;
@@ -363,7 +363,7 @@ static TILE_GET_INFO( get_text_tile_info )
 
 WRITE16_HANDLER( sys16_textram_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	COMBINE_DATA(&state->textram[offset]);
 	tilemap_mark_tile_dirty(state->text_layer, offset);
@@ -373,7 +373,7 @@ WRITE16_HANDLER( sys16_textram_w )
 
 VIDEO_START( system16 )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	/* Normal colors */
 	compute_resistor_weights(0, 255, -1.0,
@@ -442,7 +442,7 @@ VIDEO_START( system16 )
 
 VIDEO_START( system18old )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	VIDEO_START_CALL(system16);
 
@@ -499,7 +499,7 @@ VIDEO_START( system18old )
 
 static TILE_GET_INFO( get_s16a_bootleg_tile_infotxt )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	int data, tile_number;
 
 	data = state->textram[tile_index];
@@ -514,7 +514,7 @@ static TILE_GET_INFO( get_s16a_bootleg_tile_infotxt )
 
 static TILE_GET_INFO( get_s16a_bootleg_tile_info0 )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	int data, tile_number;
 
 	data = state->bg0_tileram[tile_index];
@@ -530,7 +530,7 @@ static TILE_GET_INFO( get_s16a_bootleg_tile_info0 )
 
 static TILE_GET_INFO( get_s16a_bootleg_tile_info1 )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	int data, tile_number;
 
 	data = state->bg1_tileram[tile_index];
@@ -545,31 +545,31 @@ static TILE_GET_INFO( get_s16a_bootleg_tile_info1 )
 
 WRITE16_HANDLER( s16a_bootleg_bgscrolly_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	state->bg_scrolly = data;
 }
 
 WRITE16_HANDLER( s16a_bootleg_bgscrollx_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	state->bg_scrollx = data;
 }
 
 WRITE16_HANDLER( s16a_bootleg_fgscrolly_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	state->fg_scrolly = data;
 }
 
 WRITE16_HANDLER( s16a_bootleg_fgscrollx_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	state->fg_scrollx = data;
 }
 
 WRITE16_HANDLER( s16a_bootleg_tilemapselect_w )
 {
-	segas1x_bootleg_state *state = space->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	COMBINE_DATA(&state->tilemapselect);
 	//printf("system16 bootleg tilemapselect %04x\n", state->tilemapselect);
@@ -578,7 +578,7 @@ WRITE16_HANDLER( s16a_bootleg_tilemapselect_w )
 
 VIDEO_START( s16a_bootleg )
 {
-	segas1x_bootleg_state *state = machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	/* Normal colors */
 	compute_resistor_weights(0, 255, -1.0,
@@ -631,7 +631,7 @@ VIDEO_START( s16a_bootleg_passsht )
 // Passing Shot (2 player), Shinobi (Datsu), Wonderboy 3
 SCREEN_UPDATE( s16a_bootleg )
 {
-	segas1x_bootleg_state *state = screen->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = screen->machine().driver_data<segas1x_bootleg_state>();
 
 	// passing shot
 	int offset_txtx = 192;
@@ -641,7 +641,7 @@ SCREEN_UPDATE( s16a_bootleg )
 	int offset_bg0x = 187;
 	int offset_bg0y = 0;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	// I can't bring myself to care about dirty tile marking on something which runs at a bazillion % speed anyway, clean code is better
 	tilemap_mark_all_tiles_dirty(state->bg_tilemaps[0]);
@@ -689,7 +689,7 @@ SCREEN_UPDATE( s16a_bootleg )
 /* The Passing Shot 4 Player bootleg has weird scroll registers (different offsets, ^0x7 xor) */
 SCREEN_UPDATE( s16a_bootleg_passht4b )
 {
-	segas1x_bootleg_state *state = screen->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = screen->machine().driver_data<segas1x_bootleg_state>();
 
 	// passing shot
 	int offset_txtx = 192;
@@ -699,7 +699,7 @@ SCREEN_UPDATE( s16a_bootleg_passht4b )
 	int offset_bg0x = 5;
 	int offset_bg0y = 32;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	// I can't bring myself to care about dirty tile marking on something which runs at a bazillion % speed anyway, clean code is better
 	tilemap_mark_all_tiles_dirty(state->bg_tilemaps[0]);
@@ -732,7 +732,7 @@ SCREEN_UPDATE( s16a_bootleg_passht4b )
 
 SCREEN_UPDATE( system16 )
 {
-	segas1x_bootleg_state *state = screen->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = screen->machine().driver_data<segas1x_bootleg_state>();
 
 	if (!state->refreshenable)
 	{
@@ -740,9 +740,9 @@ SCREEN_UPDATE( system16 )
 		return 0;
 	}
 
-	update_page(screen->machine);
+	update_page(screen->machine());
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	tilemap_set_scrollx(state->background, 0, -320 - state->bg_scrollx);
 	tilemap_set_scrolly(state->background, 0, -256 + state->bg_scrolly + state->back_yscroll);
@@ -768,7 +768,7 @@ SCREEN_UPDATE( system16 )
 
 	tilemap_draw(bitmap, cliprect, state->text_layer, 0, 0xf);
 
-	//draw_sprites(screen->machine, bitmap, cliprect,0);
+	//draw_sprites(screen->machine(), bitmap, cliprect,0);
 
 	/* draw the sprites */
 	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
@@ -778,17 +778,17 @@ SCREEN_UPDATE( system16 )
 
 SCREEN_UPDATE( system18old )
 {
-	segas1x_bootleg_state *state = screen->machine->driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = screen->machine().driver_data<segas1x_bootleg_state>();
 
 	if (!state->refreshenable)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 		return 0;
 	}
 
-	update_page(screen->machine);
+	update_page(screen->machine());
 
-	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
+	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
 
 	bitmap_fill(bitmap,cliprect,0);
 

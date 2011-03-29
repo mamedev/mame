@@ -172,10 +172,10 @@ DISCRETE_SOUND_END
 
 WRITE8_HANDLER( circus_clown_z_w )
 {
-	circus_state *state = space->machine->driver_data<circus_state>();
+	circus_state *state = space->machine().driver_data<circus_state>();
 
 	state->clown_z = (data & 0x0f);
-	*(space->machine->region("maincpu")->base() + 0x8000) = data; logerror("Z:%02x\n",data); //DEBUG
+	*(space->machine().region("maincpu")->base() + 0x8000) = data; logerror("Z:%02x\n",data); //DEBUG
 
 	/* Bits 4-6 enable/disable trigger different events */
 	switch (state->game_id)
@@ -275,5 +275,5 @@ WRITE8_HANDLER( circus_clown_z_w )
 	}
 
 	/* Bit 7 enables amplifier (0 = on) */
-	space->machine->sound().system_mute(data & 0x80);
+	space->machine().sound().system_mute(data & 0x80);
 }

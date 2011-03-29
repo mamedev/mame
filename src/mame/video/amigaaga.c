@@ -34,9 +34,9 @@ To do:
  *
  *************************************/
 
-void amiga_aga_palette_write(running_machine *machine, int color_reg, UINT16 data)
+void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 data)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	pen_t *aga_palette = state->aga_palette;
 	int r,g,b;
 	int cr,cg,cb;
@@ -73,7 +73,7 @@ void amiga_aga_palette_write(running_machine *machine, int color_reg, UINT16 dat
 
 VIDEO_START( amiga_aga )
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 
 	VIDEO_START_CALL( amiga );
 
@@ -400,9 +400,9 @@ INLINE void fetch_bitplane_data(amiga_state *state, int plane)
 	}
 }
 
-void amiga_aga_diwhigh_written(running_machine *machine, int written)
+void amiga_aga_diwhigh_written(running_machine &machine, int written)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 
 	state->aga_diwhigh_written = written;
 }
@@ -444,9 +444,9 @@ INLINE int update_ham(amiga_state *state, int newpix)
  *
  *************************************/
 
-void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline)
+void amiga_aga_render_scanline(running_machine &machine, bitmap_t *bitmap, int scanline)
 {
-	amiga_state *state = machine->driver_data<amiga_state>();
+	amiga_state *state = machine.driver_data<amiga_state>();
 	UINT16 save_color0 = CUSTOM_REG(REG_COLOR00);
 	int ddf_start_pixel = 0, ddf_stop_pixel = 0;
 	int hires = 0, dualpf = 0, lace = 0, ham = 0;
@@ -804,7 +804,7 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 	}
 
 #if 0
-	if ( machine->primary_screen->frame_number() % 16 == 0 && scanline == 250 )
+	if ( machine.primary_screen->frame_number() % 16 == 0 && scanline == 250 )
 	{
 		const char *m_lores = "LORES";
 		const char *m_hires = "HIRES";
@@ -842,7 +842,7 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 	CUSTOM_REG(REG_COLOR00) = save_color0;
 
 #if GUESS_COPPER_OFFSET
-	if (machine->primary_screen->frame_number() % 64 == 0 && scanline == 0)
+	if (machine.primary_screen->frame_number() % 64 == 0 && scanline == 0)
 	{
 		if (input_code_pressed(machine, KEYCODE_Q))
 			popmessage("%d", wait_offset -= 1);
@@ -866,7 +866,7 @@ SCREEN_UPDATE( amiga_aga )
 
 	/* render each scanline in the visible region */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		amiga_aga_render_scanline(screen->machine, bitmap, y);
+		amiga_aga_render_scanline(screen->machine(), bitmap, y);
 
 	return 0;
 }

@@ -109,7 +109,7 @@ static WRITE8_HANDLER(controls_w)
 {
     if(!data)
     {
-        pachifev_state *state = space->machine->driver_data<pachifev_state>();
+        pachifev_state *state = space->machine().driver_data<pachifev_state>();
 
         /*end of input read*/
         state->power=0;
@@ -124,7 +124,7 @@ static WRITE8_HANDLER(controls_w)
 
 static READ8_HANDLER(controls_r)
 {
-    pachifev_state *state = space->machine->driver_data<pachifev_state>();
+    pachifev_state *state = space->machine().driver_data<pachifev_state>();
     int output_bit=(state->power < state->max_power)?0:1;
     ++state->power;
     return output_bit;
@@ -250,7 +250,7 @@ INPUT_PORTS_END
 
 static void pf_adpcm_int(device_t *device)
 {
-	pachifev_state *state = device->machine->driver_data<pachifev_state>();
+	pachifev_state *state = device->machine().driver_data<pachifev_state>();
 
     if (state->adpcm_pos >= 0x4000 || state->adpcm_idle)
     {
@@ -260,7 +260,7 @@ static void pf_adpcm_int(device_t *device)
     }
     else
     {
-        UINT8 *ROM = device->machine->region("adpcm")->base();
+        UINT8 *ROM = device->machine().region("adpcm")->base();
 
         state->adpcm_data = ((state->trigger ? (ROM[state->adpcm_pos] & 0x0f) : (ROM[state->adpcm_pos] & 0xf0)>>4) );
         msm5205_data_w(device,state->adpcm_data & 0xf);
@@ -284,7 +284,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_RESET( pachifev )
 {
-    pachifev_state *state = machine->driver_data<pachifev_state>();
+    pachifev_state *state = machine.driver_data<pachifev_state>();
 
     state->power=0;
     state->max_power=0;
@@ -300,11 +300,11 @@ static MACHINE_RESET( pachifev )
 
 static INTERRUPT_GEN( pachifev_vblank_irq )
 {
-    TMS9928A_interrupt(device->machine);
+    TMS9928A_interrupt(device->machine());
 
     {
 		static const char *const inname[2] = { "PLUNGER_P1", "PLUNGER_P2" };
-        pachifev_state *state = device->machine->driver_data<pachifev_state>();
+        pachifev_state *state = device->machine().driver_data<pachifev_state>();
 
 		/* I wish I had found a better way to handle cocktail inputs, but I can't find a way to access internal RAM */
 		/* (bit 5 of 0xf0aa : 0 = player 1 and 1 = player 2 - bit 6 of 0xf0aa : 0 = upright and 1 = cocktail). */
@@ -312,10 +312,10 @@ static INTERRUPT_GEN( pachifev_vblank_irq )
 		address_space *ramspace = device->memory().space(AS_PROGRAM);
 		UINT8 player = 0;
 
-		if ((ramspace->read_byte(0xe00f) == 0x01) && ((input_port_read(device->machine, "DSW1") & 0x08) == 0x00))
+		if ((ramspace->read_byte(0xe00f) == 0x01) && ((input_port_read(device->machine(), "DSW1") & 0x08) == 0x00))
 			player = 1;
 
-        int current_power=input_port_read(device->machine, inname[player]) & 0x3f;
+        int current_power=input_port_read(device->machine(), inname[player]) & 0x3f;
         if(current_power != state->previous_power)
         {
             popmessage    ("%d%%", (current_power * 100) / 0x3f);
@@ -345,7 +345,7 @@ static MACHINE_START( pachifev)
     /* configure VDP */
     TMS9928A_configure(&tms9928a_interface);
     {
-        pachifev_state *state = machine->driver_data<pachifev_state>();
+        pachifev_state *state = machine.driver_data<pachifev_state>();
 
         state->save_item(NAME(state->power));
         state->save_item(NAME(state->max_power));

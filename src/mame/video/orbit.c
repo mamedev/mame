@@ -9,7 +9,7 @@ Atari Orbit video emulation
 
 WRITE8_HANDLER( orbit_playfield_w )
 {
-	orbit_state *state = space->machine->driver_data<orbit_state>();
+	orbit_state *state = space->machine().driver_data<orbit_state>();
 	state->playfield_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -17,7 +17,7 @@ WRITE8_HANDLER( orbit_playfield_w )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	orbit_state *state = machine->driver_data<orbit_state>();
+	orbit_state *state = machine.driver_data<orbit_state>();
 	UINT8 code = state->playfield_ram[tile_index];
 	int flags = 0;
 
@@ -32,14 +32,14 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( orbit )
 {
-	orbit_state *state = machine->driver_data<orbit_state>();
+	orbit_state *state = machine.driver_data<orbit_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 16, 32, 30);
 }
 
 
-static void draw_sprites( running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t* bitmap, const rectangle* cliprect )
 {
-	orbit_state *state = machine->driver_data<orbit_state>();
+	orbit_state *state = machine.driver_data<orbit_state>();
 	const UINT8* p = state->sprite_ram;
 
 	int i;
@@ -73,7 +73,7 @@ static void draw_sprites( running_machine *machine, bitmap_t* bitmap, const rect
 		hpos <<= 1;
 		vpos <<= 1;
 
-		drawgfxzoom_transpen(bitmap, cliprect, machine->gfx[layout], code, 0, flip_x, flip_y,
+		drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[layout], code, 0, flip_x, flip_y,
 			hpos, vpos, zoom_x, zoom_y, 0);
 	}
 }
@@ -81,12 +81,12 @@ static void draw_sprites( running_machine *machine, bitmap_t* bitmap, const rect
 
 SCREEN_UPDATE( orbit )
 {
-	orbit_state *state = screen->machine->driver_data<orbit_state>();
+	orbit_state *state = screen->machine().driver_data<orbit_state>();
 
-	state->flip_screen = input_port_read(screen->machine, "DSW2") & 8;
+	state->flip_screen = input_port_read(screen->machine(), "DSW2") & 8;
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

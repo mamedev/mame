@@ -15,7 +15,7 @@ static UINT16 namcos2_68k_roz_ctrl[0x8];
 static tilemap_t *tilemap_roz;
 
 static void
-TilemapCB( running_machine *machine, UINT16 code, int *tile, int *mask )
+TilemapCB( running_machine &machine, UINT16 code, int *tile, int *mask )
 {
 	*mask = code;
 
@@ -314,9 +314,9 @@ WRITE16_HANDLER( namcos2_68k_roz_ram_w )
 {
 	COMBINE_DATA(&namcos2_68k_roz_ram[offset]);
 	tilemap_mark_tile_dirty(tilemap_roz,offset);
-//      if( input_code_pressed(space->machine, KEYCODE_Q) )
+//      if( input_code_pressed(space->machine(), KEYCODE_Q) )
 //      {
-//          debugger_break(space->machine);
+//          debugger_break(space->machine());
 //      }
 }
 
@@ -373,7 +373,7 @@ WRITE16_HANDLER( namcos2_68k_video_palette_w )
 			/*case 0x180a:*/ case 0x180b:
 				if (data^namcos2_68k_palette_ram[offset]) {
 					namcos2_68k_palette_ram[offset] = data;
-					namcos2_adjust_posirq_timer(space->machine,namcos2_GetPosIrqScanline(space->machine));
+					namcos2_adjust_posirq_timer(space->machine(),namcos2_GetPosIrqScanline(space->machine()));
 				}
 				break;
 
@@ -391,13 +391,13 @@ WRITE16_HANDLER( namcos2_68k_video_palette_w )
 
 
 int
-namcos2_GetPosIrqScanline( running_machine *machine )
+namcos2_GetPosIrqScanline( running_machine &machine )
 {
 	return (GetPaletteRegister(5) - 32) & 0xff;
 } /* namcos2_GetPosIrqScanline */
 
 static void
-UpdatePalette( running_machine *machine )
+UpdatePalette( running_machine &machine )
 {
 	int bank;
 	for( bank=0; bank<0x20; bank++ )
@@ -419,13 +419,13 @@ UpdatePalette( running_machine *machine )
 /**************************************************************************/
 
 static void
-DrawSpriteInit( running_machine *machine )
+DrawSpriteInit( running_machine &machine )
 {
 	int i;
 	/* set table for sprite color == 0x0f */
 	for( i = 0; i<16*256; i++ )
 	{
-		machine->shadow_table[i] = i+0x2000;
+		machine.shadow_table[i] = i+0x2000;
 	}
 }
 
@@ -443,7 +443,7 @@ READ16_HANDLER( namcos2_sprite_ram_r )
 
 VIDEO_START( namcos2 )
 {
-	namco_tilemap_init(machine,2,machine->region("gfx4")->base(),TilemapCB);
+	namco_tilemap_init(machine,2,machine.region("gfx4")->base(),TilemapCB);
 	tilemap_roz = tilemap_create(machine, get_tile_info_roz,tilemap_scan_rows,8,8,256,256);
 	tilemap_set_transparent_pen(tilemap_roz,0xff);
 	DrawSpriteInit(machine);
@@ -465,8 +465,8 @@ SCREEN_UPDATE( namcos2_default )
 	rectangle clip;
 	int pri;
 
-	UpdatePalette(screen->machine);
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
+	UpdatePalette(screen->machine());
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine()));
 	ApplyClip( &clip, cliprect );
 
 	/* HACK: enable ROZ layer only if it has priority > 0 */
@@ -482,7 +482,7 @@ SCREEN_UPDATE( namcos2_default )
 			{
 				DrawROZ(bitmap,&clip);
 			}
-			namcos2_draw_sprites(screen->machine, bitmap, &clip, pri/2, namcos2_gfx_ctrl );
+			namcos2_draw_sprites(screen->machine(), bitmap, &clip, pri/2, namcos2_gfx_ctrl );
 		}
 	}
 	return 0;
@@ -492,7 +492,7 @@ SCREEN_UPDATE( namcos2_default )
 
 VIDEO_START( finallap )
 {
-	namco_tilemap_init(machine,2,machine->region("gfx4")->base(),TilemapCB);
+	namco_tilemap_init(machine,2,machine.region("gfx4")->base(),TilemapCB);
 	DrawSpriteInit(machine);
 	namco_road_init(machine, 3);
 }
@@ -502,8 +502,8 @@ SCREEN_UPDATE( finallap )
 	rectangle clip;
 	int pri;
 
-	UpdatePalette(screen->machine);
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
+	UpdatePalette(screen->machine());
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine()));
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )
@@ -512,8 +512,8 @@ SCREEN_UPDATE( finallap )
 		{
 			namco_tilemap_draw( bitmap, &clip, pri/2 );
 		}
-		namco_road_draw(screen->machine, bitmap,&clip,pri );
-		namcos2_draw_sprites(screen->machine, bitmap,&clip,pri,namcos2_gfx_ctrl );
+		namco_road_draw(screen->machine(), bitmap,&clip,pri );
+		namcos2_draw_sprites(screen->machine(), bitmap,&clip,pri,namcos2_gfx_ctrl );
 	}
 	return 0;
 }
@@ -522,7 +522,7 @@ SCREEN_UPDATE( finallap )
 
 VIDEO_START( luckywld )
 {
-	namco_tilemap_init(machine,2,machine->region("gfx4")->base(),TilemapCB);
+	namco_tilemap_init(machine,2,machine.region("gfx4")->base(),TilemapCB);
 	namco_obj_init( machine, 0, 0x0, NULL );
 	if( namcos2_gametype==NAMCOS2_LUCKY_AND_WILD )
 	{
@@ -539,8 +539,8 @@ SCREEN_UPDATE( luckywld )
 	rectangle clip;
 	int pri;
 
-	UpdatePalette(screen->machine);
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
+	UpdatePalette(screen->machine());
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine()));
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )
@@ -549,12 +549,12 @@ SCREEN_UPDATE( luckywld )
 		{
 			namco_tilemap_draw( bitmap, &clip, pri/2 );
 		}
-		namco_road_draw(screen->machine, bitmap,&clip,pri );
+		namco_road_draw(screen->machine(), bitmap,&clip,pri );
 		if( namcos2_gametype==NAMCOS2_LUCKY_AND_WILD )
 		{
 			namco_roz_draw( bitmap, &clip, pri );
 		}
-		namco_obj_draw(screen->machine, bitmap, &clip, pri );
+		namco_obj_draw(screen->machine(), bitmap, &clip, pri );
 	}
 	return 0;
 }
@@ -563,7 +563,7 @@ SCREEN_UPDATE( luckywld )
 
 VIDEO_START( sgunner )
 {
-	namco_tilemap_init(machine,2,machine->region("gfx4")->base(),TilemapCB);
+	namco_tilemap_init(machine,2,machine.region("gfx4")->base(),TilemapCB);
 	namco_obj_init( machine, 0, 0x0, NULL );
 }
 
@@ -572,14 +572,14 @@ SCREEN_UPDATE( sgunner )
 	rectangle clip;
 	int pri;
 
-	UpdatePalette(screen->machine);
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
+	UpdatePalette(screen->machine());
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine()));
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<8; pri++ )
 	{
 		namco_tilemap_draw( bitmap, &clip, pri );
-		namco_obj_draw(screen->machine, bitmap, &clip, pri );
+		namco_obj_draw(screen->machine(), bitmap, &clip, pri );
 	}
 	return 0;
 }
@@ -589,7 +589,7 @@ SCREEN_UPDATE( sgunner )
 
 VIDEO_START( metlhawk )
 {
-	namco_tilemap_init(machine,2,machine->region("gfx4")->base(),TilemapCB);
+	namco_tilemap_init(machine,2,machine.region("gfx4")->base(),TilemapCB);
 	namco_roz_init( machine, 1, "gfx5" );
 }
 
@@ -598,8 +598,8 @@ SCREEN_UPDATE( metlhawk )
 	rectangle clip;
 	int pri;
 
-	UpdatePalette(screen->machine);
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
+	UpdatePalette(screen->machine());
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine()));
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )
@@ -609,7 +609,7 @@ SCREEN_UPDATE( metlhawk )
 			namco_tilemap_draw( bitmap, &clip, pri/2 );
 		}
 		namco_roz_draw( bitmap, &clip, pri );
-		namcos2_draw_sprites_metalhawk(screen->machine, bitmap,&clip,pri );
+		namcos2_draw_sprites_metalhawk(screen->machine(), bitmap,&clip,pri );
 	}
 	return 0;
 }

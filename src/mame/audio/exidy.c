@@ -132,7 +132,7 @@ INLINE exidy_sound_state *get_safe_token(device_t *device)
 static WRITE_LINE_DEVICE_HANDLER( update_irq_state )
 {
 	exidy_sound_state *sndstate = get_safe_token(device);
-	cputag_set_input_line(device->machine, "audiocpu", M6502_IRQ_LINE, (pia6821_get_irq_b(sndstate->pia1) | sndstate->riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", M6502_IRQ_LINE, (pia6821_get_irq_b(sndstate->pia1) | sndstate->riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -401,8 +401,8 @@ static DEVICE_START( common_sh_start )
 	state->sh6840_clocks_per_sample = (int)((double)SH6840_CLOCK / (double)sample_rate * (double)(1 << 24));
 
 	/* allocate the stream */
-	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, sample_rate, NULL, exidy_stream_update);
-	state->maincpu = device->machine->device("maincpu");
+	state->stream = device->machine().sound().stream_alloc(*device, 0, 1, sample_rate, NULL, exidy_stream_update);
+	state->maincpu = device->machine().device("maincpu");
 
 	sh6840_register_state_globals(device);
 }
@@ -491,11 +491,11 @@ static WRITE8_DEVICE_HANDLER( r6532_porta_w )
 {
 	exidy_sound_state *state = get_safe_token(device);
 	if (state->cvsd != NULL)
-		cputag_set_input_line(device->machine, "cvsdcpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(device->machine(), "cvsdcpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	if (state->tms != NULL)
 	{
-		logerror("(%f)%s:TMS5220 data write = %02X\n", device->machine->time().as_double(), device->machine->describe_context(), riot6532_porta_out_get(state->riot));
+		logerror("(%f)%s:TMS5220 data write = %02X\n", device->machine().time().as_double(), device->machine().describe_context(), riot6532_porta_out_get(state->riot));
 		tms5220_data_w(state->tms, 0, data);
 	}
 }
@@ -505,7 +505,7 @@ static READ8_DEVICE_HANDLER( r6532_porta_r )
 	exidy_sound_state *state = get_safe_token(device);
 	if (state->tms != NULL)
 	{
-		logerror("(%f)%s:TMS5220 status read = %02X\n", device->machine->time().as_double(), device->machine->describe_context(), tms5220_status_r(state->tms, 0));
+		logerror("(%f)%s:TMS5220 status read = %02X\n", device->machine().time().as_double(), device->machine().describe_context(), tms5220_status_r(state->tms, 0));
 		return tms5220_status_r(state->tms, 0);
 	}
 	else
@@ -802,18 +802,18 @@ static const pia6821_interface venture_pia1_intf =
 static DEVICE_START( venture_common_sh_start )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 
 	DEVICE_START_CALL(common_sh_start);
 
-	state->riot = machine->device("riot");
+	state->riot = machine.device("riot");
 
 	state->has_sh8253  = TRUE;
 	state->tms = NULL;
-	state->pia1 = device->machine->device("pia1");
+	state->pia1 = device->machine().device("pia1");
 
 	/* determine which sound hardware is installed */
-	state->cvsd = device->machine->device("cvsd");
+	state->cvsd = device->machine().device("cvsd");
 
 	/* 8253 */
 	state->freq_to_step = (double)(1 << 24) / (double)SH8253_CLOCK;
@@ -836,8 +836,8 @@ static DEVICE_RESET( venture_sound )
 	DEVICE_RESET_CALL(common_sh_reset);
 
 	/* PIA */
-	devtag_reset(device->machine, "pia0");
-	devtag_reset(device->machine, "pia1");
+	devtag_reset(device->machine(), "pia0");
+	devtag_reset(device->machine(), "pia1");
 
 	/* 6532 */
 	state->riot->reset();
@@ -1008,7 +1008,7 @@ WRITE8_DEVICE_HANDLER( victory_sound_command_w )
 
 	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", cpu_get_previouspc(state->maincpu), data);
 
-	device->machine->scheduler().synchronize(FUNC(delayed_command_w), data, state->pia1);
+	device->machine().scheduler().synchronize(FUNC(delayed_command_w), data, state->pia1);
 }
 
 
@@ -1016,7 +1016,7 @@ static WRITE8_DEVICE_HANDLER( victory_sound_irq_clear_w )
 {
 	exidy_sound_state *state = get_safe_token(device);
 
-	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound IRQ clear = %02X\n", device->machine->describe_context(), data);
+	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound IRQ clear = %02X\n", device->machine().describe_context(), data);
 
 	if (!data) pia6821_ca1_w(state->pia1, 1);
 }
@@ -1026,7 +1026,7 @@ static WRITE8_DEVICE_HANDLER( victory_main_ack_w )
 {
 	exidy_sound_state *state = get_safe_token(device);
 
-	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound Main ACK W = %02X\n", device->machine->describe_context(), data);
+	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound Main ACK W = %02X\n", device->machine().describe_context(), data);
 
 	if (state->victory_sound_response_ack_clk && !data)
 		pia6821_cb1_w(state->pia1, 1);
@@ -1060,7 +1060,7 @@ static DEVICE_START( victory_sound )
 	device->save_item(NAME(state->victory_sound_response_ack_clk));
 
 	DEVICE_START_CALL(venture_common_sh_start);
-	state->tms = device->machine->device("tms");
+	state->tms = device->machine().device("tms");
 }
 
 

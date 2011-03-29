@@ -34,7 +34,7 @@ void Processor::RenderSpans(int start, int end, int tilenum, bool flip)
 
 	for(int i = start; i <= end; i++)
 	{
-		m_span[i].SetMachine(m_machine);
+		m_span[i].SetMachine(*m_machine);
 		switch(m_other_modes.cycle_type)
 		{
 			case CYCLE_TYPE_1: m_span[i].Draw1Cycle(i, tilenum, flip); break;
@@ -67,11 +67,11 @@ void Span::Dump()
 	printf("\n");
 }
 
-void Span::SetMachine(running_machine *machine)
+void Span::SetMachine(running_machine &machine)
 {
-	_n64_state *state = machine->driver_data<_n64_state>();
+	_n64_state *state = machine.driver_data<_n64_state>();
 
-	m_machine = machine;
+	m_machine = &machine;
 	m_rdp = &state->m_rdp;
 	m_other_modes = m_rdp->GetOtherModes();
 	m_misc_state = m_rdp->GetMiscState();

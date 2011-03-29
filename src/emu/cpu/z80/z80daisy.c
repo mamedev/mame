@@ -95,7 +95,7 @@ void z80_daisy_chain::init(device_t *cpudevice, const z80_daisy_config *daisy)
 			fatalerror("Device '%s' does not implement the z80daisy interface!", daisy->devname);
 
 		// append to the end
-		*tailptr = auto_alloc(cpudevice->machine, daisy_entry(target));
+		*tailptr = auto_alloc(cpudevice->machine(), daisy_entry(target));
 		tailptr = &(*tailptr)->m_next;
 	}
 }

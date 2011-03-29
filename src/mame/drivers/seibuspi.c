@@ -743,7 +743,7 @@ Notes:
 
 static UINT8 z80_fifoout_pop(address_space *space)
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	UINT8 r;
 	if (state->fifoout_wpos == state->fifoout_rpos)
 	{
@@ -765,7 +765,7 @@ static UINT8 z80_fifoout_pop(address_space *space)
 
 static void z80_fifoout_push(address_space *space, UINT8 data)
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	state->fifoout_data[state->fifoout_wpos++] = data;
 	if (state->fifoout_wpos == FIFO_SIZE)
 	{
@@ -781,7 +781,7 @@ static void z80_fifoout_push(address_space *space, UINT8 data)
 
 static UINT8 z80_fifoin_pop(address_space *space)
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	UINT8 r;
 	if (state->fifoin_wpos == state->fifoin_rpos)
 	{
@@ -803,7 +803,7 @@ static UINT8 z80_fifoin_pop(address_space *space)
 
 static void z80_fifoin_push(address_space *space, UINT8 data)
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	state->fifoin_data[state->fifoin_wpos++] = data;
 	if(state->fifoin_wpos == FIFO_SIZE)
 	{
@@ -819,7 +819,7 @@ static void z80_fifoin_push(address_space *space, UINT8 data)
 
 static READ32_HANDLER( sb_coin_r )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	UINT8 r = state->sb_coin_latch;
 
 	state->sb_coin_latch = 0;
@@ -828,7 +828,7 @@ static READ32_HANDLER( sb_coin_r )
 
 static WRITE8_HANDLER( sb_coin_w )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	if (data)
 		state->sb_coin_latch = 0xa0 | data;
 	else
@@ -851,7 +851,7 @@ static WRITE32_HANDLER( sound_fifo_w )
 
 static READ32_HANDLER( sound_fifo_status_r )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	UINT32 r = 0;
 	if (state->fifoout_read_request)
 	{
@@ -862,7 +862,7 @@ static READ32_HANDLER( sound_fifo_status_r )
 
 static READ32_HANDLER( spi_int_r )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0,CLEAR_LINE );
+	cputag_set_input_line(space->machine(), "maincpu", 0,CLEAR_LINE );
 	return 0xffffffff;
 }
 
@@ -873,11 +873,11 @@ static READ32_HANDLER( spi_unknown_r )
 
 static WRITE32_DEVICE_HANDLER( eeprom_w )
 {
-	okim6295_device *oki2 = device->machine->device<okim6295_device>("oki2");
+	okim6295_device *oki2 = device->machine().device<okim6295_device>("oki2");
 
 	// tile banks
 	if( ACCESSING_BITS_16_23 ) {
-		rf2_set_layer_banks(device->machine, data >> 16);
+		rf2_set_layer_banks(device->machine(), data >> 16);
 		eeprom_write_bit(device, (data & 0x800000) ? 1 : 0);
 		eeprom_set_clock_line(device, (data & 0x400000) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom_set_cs_line(device, (data & 0x200000) ? CLEAR_LINE : ASSERT_LINE);
@@ -890,7 +890,7 @@ static WRITE32_DEVICE_HANDLER( eeprom_w )
 
 static WRITE32_HANDLER( z80_prg_fifo_w )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	if( ACCESSING_BITS_0_7 ) {
 		if (state->z80_prg_fifo_pos<0x40000) state->z80_rom[state->z80_prg_fifo_pos] = data & 0xff;
 		state->z80_prg_fifo_pos++;
@@ -899,19 +899,19 @@ static WRITE32_HANDLER( z80_prg_fifo_w )
 
 static WRITE32_HANDLER( z80_enable_w )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	// tile banks
 	if( ACCESSING_BITS_16_23 ) {
-		rf2_set_layer_banks(space->machine, data >> 16);
+		rf2_set_layer_banks(space->machine(), data >> 16);
 	}
 
 logerror("z80 data = %08x mask = %08x\n",data,mem_mask);
 	if( ACCESSING_BITS_0_7 ) {
 		if( data & 0x1 ) {
 			state->z80_prg_fifo_pos = 0;
-			cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, CLEAR_LINE );
+			cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE );
 		} else {
-			cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE );
+			cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE );
 		}
 	}
 }
@@ -920,7 +920,7 @@ static READ32_HANDLER( spi_controls1_r )
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		return input_port_read(space->machine, "INPUTS");
+		return input_port_read(space->machine(), "INPUTS");
 	}
 	return 0xffffffff;
 }
@@ -929,28 +929,28 @@ static READ32_HANDLER( spi_controls2_r )
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		return input_port_read(space->machine, "SYSTEM");
+		return input_port_read(space->machine(), "SYSTEM");
 	}
 	return 0xffffffff;
 }
 
 static CUSTOM_INPUT( ejsakura_keyboard_r )
 {
-	seibuspi_state *state = field->port->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = field->port->machine().driver_data<seibuspi_state>();
 	switch(state->ejsakura_input_port)
 	{
 		case 0x01:
-			return input_port_read(field->port->machine, "INPUT01");
+			return input_port_read(field->port->machine(), "INPUT01");
 		case 0x02:
-			return input_port_read(field->port->machine, "INPUT02");
+			return input_port_read(field->port->machine(), "INPUT02");
 		case 0x04:
-			return input_port_read(field->port->machine, "INPUT04");
+			return input_port_read(field->port->machine(), "INPUT04");
 		case 0x08:
-			return input_port_read(field->port->machine, "INPUT08");
+			return input_port_read(field->port->machine(), "INPUT08");
 		case 0x10:
-			return input_port_read(field->port->machine, "INPUT10");
+			return input_port_read(field->port->machine(), "INPUT10");
 		default:
-			return input_port_read(field->port->machine, "SYSTEM");
+			return input_port_read(field->port->machine(), "SYSTEM");
 	}
 	return 0xffffffff;
 }
@@ -970,7 +970,7 @@ static WRITE8_HANDLER( z80_soundfifo_w )
 
 static READ8_HANDLER( z80_soundfifo_status_r )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	UINT8 r = 0;
 	if (state->fifoin_read_request)
 	{
@@ -981,28 +981,28 @@ static READ8_HANDLER( z80_soundfifo_status_r )
 
 static WRITE8_HANDLER( z80_bank_w )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	if ((data & 7) != state->z80_lastbank)
 	{
 		state->z80_lastbank = (data & 7);
-		memory_set_bankptr(space->machine, "bank4", state->z80_rom + (0x8000 * state->z80_lastbank));
+		memory_set_bankptr(space->machine(), "bank4", state->z80_rom + (0x8000 * state->z80_lastbank));
 	}
 }
 
 static READ8_HANDLER( z80_jp1_r )
 {
-	return input_port_read(space->machine, "JP1");
+	return input_port_read(space->machine(), "JP1");
 }
 
 static READ8_HANDLER( z80_coin_r )
 {
-	return input_port_read(space->machine, "COIN");
+	return input_port_read(space->machine(), "COIN");
 }
 
 static READ32_HANDLER( soundrom_r )
 {
-	UINT8 *sound = (UINT8*)space->machine->region("user2")->base();
-	UINT16 *sound16 = (UINT16*)space->machine->region("user2")->base();
+	UINT8 *sound = (UINT8*)space->machine().region("user2")->base();
+	UINT16 *sound16 = (UINT16*)space->machine().region("user2")->base();
 
 	if (mem_mask == 0x000000ff)
 	{
@@ -1076,7 +1076,7 @@ ADDRESS_MAP_END
 
 static READ8_DEVICE_HANDLER( flashrom_read )
 {
-	seibuspi_state *state = device->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = device->machine().driver_data<seibuspi_state>();
 	logerror("Flash Read: %08X\n", offset);
 	if( offset < 0x100000 )
 	{
@@ -1091,7 +1091,7 @@ static READ8_DEVICE_HANDLER( flashrom_read )
 
 static WRITE8_DEVICE_HANDLER( flashrom_write )
 {
-	seibuspi_state *state = device->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = device->machine().driver_data<seibuspi_state>();
 	logerror("Flash Write: %08X, %02X\n", offset, data);
 	if( offset < 0x100000 )
 	{
@@ -1106,9 +1106,9 @@ static WRITE8_DEVICE_HANDLER( flashrom_write )
 static void irqhandler(device_t *device, int state)
 {
 	if (state)
-		cputag_set_input_line_and_vector(device->machine, "soundcpu", 0, ASSERT_LINE, 0xd7);	// IRQ is RST10
+		cputag_set_input_line_and_vector(device->machine(), "soundcpu", 0, ASSERT_LINE, 0xd7);	// IRQ is RST10
 	else
-		cputag_set_input_line(device->machine, "soundcpu", 0, CLEAR_LINE);
+		cputag_set_input_line(device->machine(), "soundcpu", 0, CLEAR_LINE);
 }
 
 static WRITE32_DEVICE_HANDLER(sys386f2_eeprom_w)
@@ -1152,7 +1152,7 @@ ADDRESS_MAP_END
 
 static WRITE32_HANDLER(input_select_w)
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	state->ejsakura_input_port = data;
 }
 
@@ -1295,7 +1295,7 @@ INPUT_PORTS_END
 static CUSTOM_INPUT( ejanhs_encode )
 {
 	static const UINT8 encoding[] = { 0x02, 0x10, 0x03, 0x18, 0x04, 0x20, 0x05, 0x28, 0x06, 0x30, 0x07 };
-	input_port_value state = input_port_read(field->port->machine, (const char *)param);
+	input_port_value state = input_port_read(field->port->machine(), (const char *)param);
 	int bit;
 
 	for (bit = 0; bit < ARRAY_LENGTH(encoding); bit++)
@@ -1810,25 +1810,25 @@ static IRQ_CALLBACK(spi_irq_callback)
 
 static MACHINE_START( spi )
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	state->z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
 }
 
 static MACHINE_RESET( spi )
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int i;
-	UINT8 *sound = machine->region("ymf")->base();
+	UINT8 *sound = machine.region("ymf")->base();
 
-	UINT8 *rombase = machine->region("user1")->base();
+	UINT8 *rombase = machine.region("user1")->base();
 	UINT8 flash_data = rombase[0x1ffffc];
 
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE );
-	device_set_irq_callback(machine->device("maincpu"), spi_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), spi_irq_callback);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00000680, 0x00000683, FUNC(sound_fifo_r));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00000688, 0x0000068b, FUNC(z80_prg_fifo_w));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0000068c, 0x0000068f, FUNC(z80_enable_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00000680, 0x00000683, FUNC(sound_fifo_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00000688, 0x0000068b, FUNC(z80_prg_fifo_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0000068c, 0x0000068f, FUNC(z80_enable_w));
 
 	memory_set_bankptr(machine, "bank4", state->z80_rom);
 	memory_set_bankptr(machine, "bank5", state->z80_rom);
@@ -1897,24 +1897,24 @@ MACHINE_CONFIG_END
 
 static MACHINE_START( sxx2f )
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	state->z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
 }
 
 static MACHINE_RESET( sxx2f )
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
-	UINT8 *rom = machine->region("soundcpu")->base();
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
+	UINT8 *rom = machine.region("soundcpu")->base();
 
 	memory_set_bankptr(machine, "bank4", state->z80_rom);
 	memory_set_bankptr(machine, "bank5", state->z80_rom);
 
 	memcpy(state->z80_rom, rom, 0x40000);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*machine->device("eeprom"), 0x0000068c, 0x0000068f, FUNC(eeprom_w));
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00000680, 0x00000683, FUNC(sb_coin_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*machine.device("eeprom"), 0x0000068c, 0x0000068f, FUNC(eeprom_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00000680, 0x00000683, FUNC(sb_coin_r));
 
-	device_set_irq_callback(machine->device("maincpu"), spi_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), spi_irq_callback);
 
 	state->sb_coin_latch = 0;
 }
@@ -1953,21 +1953,21 @@ MACHINE_CONFIG_END
 
 static READ32_HANDLER ( senkyu_speedup_r )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	if (cpu_get_pc(space->cpu)==0x00305bb2) device_spin_until_interrupt(space->cpu); // idle
 	return state->spimainram[(0x0018cb4-0x800)/4];
 }
 
 static READ32_HANDLER( senkyua_speedup_r )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	if (cpu_get_pc(space->cpu)== 0x30582e) device_spin_until_interrupt(space->cpu); // idle
 	return state->spimainram[(0x0018c9c-0x800)/4];
 }
 
 static READ32_HANDLER ( batlball_speedup_r )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 //  printf("cpu_get_pc(space->cpu) %06x\n", cpu_get_pc(space->cpu));
 
 	/* batlbalu */
@@ -1981,7 +1981,7 @@ static READ32_HANDLER ( batlball_speedup_r )
 
 static READ32_HANDLER ( rdft_speedup_r )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	/* rdft */
 	if (cpu_get_pc(space->cpu)==0x0203f0a) device_spin_until_interrupt(space->cpu); // idle
 
@@ -2004,7 +2004,7 @@ static READ32_HANDLER ( rdft_speedup_r )
 
 static READ32_HANDLER ( viprp1_speedup_r )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	/* viprp1 */
 	if (cpu_get_pc(space->cpu)==0x0202769) device_spin_until_interrupt(space->cpu); // idle
 
@@ -2021,7 +2021,7 @@ static READ32_HANDLER ( viprp1_speedup_r )
 
 static READ32_HANDLER ( viprp1o_speedup_r )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	/* viperp1o */
 	if (cpu_get_pc(space->cpu)==0x0201f99) device_spin_until_interrupt(space->cpu); // idle
 //  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
@@ -2032,7 +2032,7 @@ static READ32_HANDLER ( viprp1o_speedup_r )
 // causes input problems?
 READ32_HANDLER ( ejanhs_speedup_r )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 // mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
  if (cpu_get_pc(space->cpu)==0x03032c7) device_spin_until_interrupt(space->cpu); // idle
  return state->spimainram[(0x002d224-0x800)/4];
@@ -2041,7 +2041,7 @@ READ32_HANDLER ( ejanhs_speedup_r )
 
 static READ32_HANDLER ( rf2_speedup_r )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 
 	/* rdft22kc */
 	if (cpu_get_pc(space->cpu)==0x0203926) device_spin_until_interrupt(space->cpu); // idle
@@ -2062,7 +2062,7 @@ static READ32_HANDLER ( rf2_speedup_r )
 
 static READ32_HANDLER ( rfjet_speedup_r )
 {
-	seibuspi_state *state = space->machine->driver_data<seibuspi_state>();
+	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	/* rfjet, rfjetu, rfjeta */
 	if (cpu_get_pc(space->cpu)==0x0206082) device_spin_until_interrupt(space->cpu); // idle
 
@@ -2073,7 +2073,7 @@ static READ32_HANDLER ( rfjet_speedup_r )
 		device_spin_until_interrupt(space->cpu); // idle
 		// Hack to enter test mode
 		r = state->spimainram[(0x002894c-0x800)/4] & (~0x400);
-		return r | (((input_port_read(space->machine, "SYSTEM") ^ 0xff)<<8) & 0x400);
+		return r | (((input_port_read(space->machine(), "SYSTEM") ^ 0xff)<<8) & 0x400);
 	}
 
 	/* rfjetj */
@@ -2085,41 +2085,41 @@ static READ32_HANDLER ( rfjet_speedup_r )
 	return state->spimainram[(0x002894c-0x800)/4];
 }
 
-static void init_spi(running_machine *machine)
+static void init_spi(running_machine &machine)
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
-	state->flash[0] = machine->device<intel_e28f008sa_device>("flash0");
-	state->flash[1] = machine->device<intel_e28f008sa_device>("flash1");
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
+	state->flash[0] = machine.device<intel_e28f008sa_device>("flash0");
+	state->flash[1] = machine.device<intel_e28f008sa_device>("flash1");
 
-	seibuspi_text_decrypt(machine->region("gfx1")->base());
-	seibuspi_bg_decrypt(machine->region("gfx2")->base(), machine->region("gfx2")->bytes());
-	seibuspi_sprite_decrypt(machine->region("gfx3")->base(), 0x400000);
+	seibuspi_text_decrypt(machine.region("gfx1")->base());
+	seibuspi_bg_decrypt(machine.region("gfx2")->base(), machine.region("gfx2")->bytes());
+	seibuspi_sprite_decrypt(machine.region("gfx3")->base(), 0x400000);
 }
 
 static DRIVER_INIT( rdft )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00298d0, 0x00298d3, FUNC(rdft_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00298d0, 0x00298d3, FUNC(rdft_speedup_r) );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( senkyu )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0018cb4, 0x0018cb7, FUNC(senkyu_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0018cb4, 0x0018cb7, FUNC(senkyu_speedup_r) );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( senkyua )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0018c9c, 0x0018c9f, FUNC(senkyua_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0018c9c, 0x0018c9f, FUNC(senkyua_speedup_r) );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( batlball )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0018db4, 0x0018db7, FUNC(batlball_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0018db4, 0x0018db7, FUNC(batlball_speedup_r) );
 
 	init_spi(machine);
 }
@@ -2127,39 +2127,39 @@ static DRIVER_INIT( batlball )
 static DRIVER_INIT( ejanhs )
 {
 //  idle skip doesn't work properly?
-//  machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x002d224, 0x002d227, FUNC(ejanhs_speedup_r) );
+//  machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x002d224, 0x002d227, FUNC(ejanhs_speedup_r) );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( viprp1 )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x001e2e0, 0x001e2e3, FUNC(viprp1_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x001e2e0, 0x001e2e3, FUNC(viprp1_speedup_r) );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( viprp1o )
 {
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x001d49c, 0x001d49f, FUNC(viprp1o_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x001d49c, 0x001d49f, FUNC(viprp1o_speedup_r) );
 
 	init_spi(machine);
 }
 
 
 
-static void init_rf2(running_machine *machine)
+static void init_rf2(running_machine &machine)
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
-	state->flash[0] = machine->device<intel_e28f008sa_device>("flash0");
-	state->flash[1] = machine->device<intel_e28f008sa_device>("flash1");
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
+	state->flash[0] = machine.device<intel_e28f008sa_device>("flash0");
+	state->flash[1] = machine.device<intel_e28f008sa_device>("flash1");
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0282AC, 0x0282AF, FUNC(rf2_speedup_r) );
-	seibuspi_rise10_text_decrypt(machine->region("gfx1")->base());
-	seibuspi_rise10_bg_decrypt(machine->region("gfx2")->base(), machine->region("gfx2")->bytes());
-	seibuspi_rise10_sprite_decrypt(machine->region("gfx3")->base(), 0x600000);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0282AC, 0x0282AF, FUNC(rf2_speedup_r) );
+	seibuspi_rise10_text_decrypt(machine.region("gfx1")->base());
+	seibuspi_rise10_bg_decrypt(machine.region("gfx2")->base(), machine.region("gfx2")->bytes());
+	seibuspi_rise10_sprite_decrypt(machine.region("gfx3")->base(), 0x600000);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x560, 0x563, FUNC(sprite_dma_start_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x560, 0x563, FUNC(sprite_dma_start_w));
 }
 
 static DRIVER_INIT( rdft2 )
@@ -2173,18 +2173,18 @@ static DRIVER_INIT( rdft2us )
 }
 
 
-static void init_rfjet(running_machine *machine)
+static void init_rfjet(running_machine &machine)
 {
-	seibuspi_state *state = machine->driver_data<seibuspi_state>();
-	state->flash[0] = machine->device<intel_e28f008sa_device>("flash0");
-	state->flash[1] = machine->device<intel_e28f008sa_device>("flash1");
+	seibuspi_state *state = machine.driver_data<seibuspi_state>();
+	state->flash[0] = machine.device<intel_e28f008sa_device>("flash0");
+	state->flash[1] = machine.device<intel_e28f008sa_device>("flash1");
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x002894c, 0x002894f, FUNC(rfjet_speedup_r) );
-	seibuspi_rise11_text_decrypt(machine->region("gfx1")->base());
-	seibuspi_rise11_bg_decrypt(machine->region("gfx2")->base(), machine->region("gfx2")->bytes());
-	seibuspi_rise11_sprite_decrypt_rfjet(machine->region("gfx3")->base(), 0x800000);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x002894c, 0x002894f, FUNC(rfjet_speedup_r) );
+	seibuspi_rise11_text_decrypt(machine.region("gfx1")->base());
+	seibuspi_rise11_bg_decrypt(machine.region("gfx2")->base(), machine.region("gfx2")->bytes());
+	seibuspi_rise11_sprite_decrypt_rfjet(machine.region("gfx3")->base(), 0x800000);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x560, 0x563, FUNC(sprite_dma_start_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x560, 0x563, FUNC(sprite_dma_start_w));
 }
 
 static DRIVER_INIT( rfjet )
@@ -2206,7 +2206,7 @@ static DRIVER_INIT( rfjet2k )
 
 static MACHINE_RESET( seibu386 )
 {
-	device_set_irq_callback(machine->device("maincpu"), spi_irq_callback);
+	device_set_irq_callback(machine.device("maincpu"), spi_irq_callback);
 }
 
 static MACHINE_CONFIG_START( seibu386, seibuspi_state )
@@ -2247,11 +2247,11 @@ MACHINE_CONFIG_END
 static DRIVER_INIT( sys386f2 )
 {
 	int i, j;
-	UINT16 *src = (UINT16 *)machine->region("gfx3")->base();
+	UINT16 *src = (UINT16 *)machine.region("gfx3")->base();
 	UINT16 tmp[0x40 / 2], Offset;
 
 	// sprite_reorder() only
-	for(i = 0; i < machine->region("gfx3")->bytes() / 0x40; i++)
+	for(i = 0; i < machine.region("gfx3")->bytes() / 0x40; i++)
 	{
 		memcpy(tmp, src, 0x40);
 

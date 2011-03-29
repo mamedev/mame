@@ -46,7 +46,7 @@ public:
 
 static VIDEO_START( wcvol95 )
 {
-	deco156_state *state = machine->driver_data<deco156_state>();
+	deco156_state *state = machine.driver_data<deco156_state>();
 	state->spriteram = auto_alloc_array(machine, UINT16, 0x2000/2);
 
 	/* and register the allocated ram so that save states still work */
@@ -59,17 +59,17 @@ static VIDEO_START( wcvol95 )
 static SCREEN_UPDATE( wcvol95 )
 {
 	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(screen->machine, 1);
+	flip_screen_set_no_update(screen->machine(), 1);
 
-	deco156_state *state = screen->machine->driver_data<deco156_state>();
+	deco156_state *state = screen->machine().driver_data<deco156_state>();
 
-	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
+	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
 	bitmap_fill(bitmap, NULL, 0);
 
 	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
 
 	deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram, 0x800);
+	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram, 0x800);
 	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -78,11 +78,11 @@ static SCREEN_UPDATE( wcvol95 )
 
 static WRITE32_HANDLER(hvysmsh_eeprom_w)
 {
-	deco156_state *state = space->machine->driver_data<deco156_state>();
+	deco156_state *state = space->machine().driver_data<deco156_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->oki2->set_bank_base(0x40000 * (data & 0x7));
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 	}
 }
 
@@ -94,8 +94,8 @@ static WRITE32_DEVICE_HANDLER( hvysmsh_oki_0_bank_w )
 
 static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
 {
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
-	palette_set_color_rgb(space->machine,offset,pal5bit(space->machine->generic.paletteram.u32[offset] >> 0),pal5bit(space->machine->generic.paletteram.u32[offset] >> 5),pal5bit(space->machine->generic.paletteram.u32[offset] >> 10));
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	palette_set_color_rgb(space->machine(),offset,pal5bit(space->machine().generic.paletteram.u32[offset] >> 0),pal5bit(space->machine().generic.paletteram.u32[offset] >> 5),pal5bit(space->machine().generic.paletteram.u32[offset] >> 10));
 }
 
 /* This is the same as deco32_nonbuffered_palette_w in video/deco32.c */
@@ -103,21 +103,21 @@ static WRITE32_HANDLER( deco156_nonbuffered_palette_w )
 {
 	int r,g,b;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
 
-	b = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
-	g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
-	r = (space->machine->generic.paletteram.u32[offset] >> 0) & 0xff;
+	b = (space->machine().generic.paletteram.u32[offset] >>16) & 0xff;
+	g = (space->machine().generic.paletteram.u32[offset] >> 8) & 0xff;
+	r = (space->machine().generic.paletteram.u32[offset] >> 0) & 0xff;
 
-	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
 }
 
-static READ32_HANDLER( wcvol95_pf1_rowscroll_r ) { deco156_state *state = space->machine->driver_data<deco156_state>(); return state->pf1_rowscroll[offset] ^ 0xffff0000; }
-static READ32_HANDLER( wcvol95_pf2_rowscroll_r ) { deco156_state *state = space->machine->driver_data<deco156_state>();	return state->pf2_rowscroll[offset] ^ 0xffff0000; }
-static READ32_HANDLER( wcvol95_spriteram_r )     { deco156_state *state = space->machine->driver_data<deco156_state>(); return state->spriteram[offset] ^ 0xffff0000; }
-static WRITE32_HANDLER( wcvol95_pf1_rowscroll_w ) { deco156_state *state = space->machine->driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf1_rowscroll[offset]); }
-static WRITE32_HANDLER( wcvol95_pf2_rowscroll_w ) { deco156_state *state = space->machine->driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf2_rowscroll[offset]); }
-static WRITE32_HANDLER( wcvol95_spriteram_w )    { deco156_state *state = space->machine->driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff;	COMBINE_DATA(&state->spriteram[offset]); }
+static READ32_HANDLER( wcvol95_pf1_rowscroll_r ) { deco156_state *state = space->machine().driver_data<deco156_state>(); return state->pf1_rowscroll[offset] ^ 0xffff0000; }
+static READ32_HANDLER( wcvol95_pf2_rowscroll_r ) { deco156_state *state = space->machine().driver_data<deco156_state>();	return state->pf2_rowscroll[offset] ^ 0xffff0000; }
+static READ32_HANDLER( wcvol95_spriteram_r )     { deco156_state *state = space->machine().driver_data<deco156_state>(); return state->spriteram[offset] ^ 0xffff0000; }
+static WRITE32_HANDLER( wcvol95_pf1_rowscroll_w ) { deco156_state *state = space->machine().driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf1_rowscroll[offset]); }
+static WRITE32_HANDLER( wcvol95_pf2_rowscroll_w ) { deco156_state *state = space->machine().driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf2_rowscroll[offset]); }
+static WRITE32_HANDLER( wcvol95_spriteram_w )    { deco156_state *state = space->machine().driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff;	COMBINE_DATA(&state->spriteram[offset]); }
 
 
 static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32 )
@@ -606,10 +606,10 @@ ROM_END
 
 /**********************************************************************************/
 
-static void descramble_sound( running_machine *machine, const char *tag )
+static void descramble_sound( running_machine &machine, const char *tag )
 {
-	UINT8 *rom = machine->region(tag)->base();
-	int length = machine->region(tag)->bytes();
+	UINT8 *rom = machine.region(tag)->base();
+	int length = machine.region(tag)->bytes();
 	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
 	UINT32 x;
 

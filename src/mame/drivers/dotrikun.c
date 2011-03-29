@@ -46,7 +46,7 @@ public:
 
 static WRITE8_HANDLER( dotrikun_color_w )
 {
-	dotrikun_state *state = space->machine->driver_data<dotrikun_state>();
+	dotrikun_state *state = space->machine().driver_data<dotrikun_state>();
 	/*
     x--- ---- screen color swap?
     ---- -x-- B
@@ -55,13 +55,13 @@ static WRITE8_HANDLER( dotrikun_color_w )
     */
 
 	state->color = data;
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 }
 
 
 static SCREEN_UPDATE( dotrikun )
 {
-	dotrikun_state *state = screen->machine->driver_data<dotrikun_state>();
+	dotrikun_state *state = screen->machine().driver_data<dotrikun_state>();
 	int x,y,i;
 
 	pen_t back_pen = MAKE_RGB(pal1bit(state->color >> 3), pal1bit(state->color >> 4), pal1bit(state->color >> 5));
@@ -135,13 +135,13 @@ INPUT_PORTS_END
 
 static MACHINE_START( dotrikun )
 {
-	dotrikun_state *state = machine->driver_data<dotrikun_state>();
+	dotrikun_state *state = machine.driver_data<dotrikun_state>();
 	state->save_item(NAME(state->color));
 }
 
 static MACHINE_RESET( dotrikun )
 {
-	dotrikun_state *state = machine->driver_data<dotrikun_state>();
+	dotrikun_state *state = machine.driver_data<dotrikun_state>();
 
 	state->color = 0;
 }

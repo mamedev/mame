@@ -89,38 +89,38 @@ static WRITE32_HANDLER( paletteram32_w )
 {
 	int r,g,b;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
-	data = space->machine->generic.paletteram.u32[offset];
+	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	data = space->machine().generic.paletteram.u32[offset];
 
 	r = (data >>  0) & 0xff;
 	g = (data >>  8) & 0xff;
 	b = (data >> 16) & 0xff;
 
-	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
 }
 
 
 //---------
 
-static void sndram_set_bank(running_machine *machine)
+static void sndram_set_bank(running_machine &machine)
 {
-	djmain_state *state = machine->driver_data<djmain_state>();
-	state->sndram = machine->region("shared")->base() + 0x80000 * state->sndram_bank;
+	djmain_state *state = machine.driver_data<djmain_state>();
+	state->sndram = machine.region("shared")->base() + 0x80000 * state->sndram_bank;
 }
 
 static WRITE32_HANDLER( sndram_bank_w )
 {
-	djmain_state *state = space->machine->driver_data<djmain_state>();
+	djmain_state *state = space->machine().driver_data<djmain_state>();
 	if (ACCESSING_BITS_16_31)
 	{
 		state->sndram_bank = (data >> 16) & 0x1f;
-		sndram_set_bank(space->machine);
+		sndram_set_bank(space->machine());
 	}
 }
 
 static READ32_HANDLER( sndram_r )
 {
-	djmain_state *state = space->machine->driver_data<djmain_state>();
+	djmain_state *state = space->machine().driver_data<djmain_state>();
 	UINT32 data = 0;
 
 	if (ACCESSING_BITS_24_31)
@@ -140,7 +140,7 @@ static READ32_HANDLER( sndram_r )
 
 static WRITE32_HANDLER( sndram_w )
 {
-	djmain_state *state = space->machine->driver_data<djmain_state>();
+	djmain_state *state = space->machine().driver_data<djmain_state>();
 	if (ACCESSING_BITS_24_31)
 		state->sndram[offset * 4] = data >> 24;
 
@@ -162,9 +162,9 @@ static READ16_HANDLER( dual539_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_BITS_0_7)
-		ret |= k054539_r(space->machine->device("konami2"), offset);
+		ret |= k054539_r(space->machine().device("konami2"), offset);
 	if (ACCESSING_BITS_8_15)
-		ret |= k054539_r(space->machine->device("konami1"), offset)<<8;
+		ret |= k054539_r(space->machine().device("konami1"), offset)<<8;
 
 	return ret;
 }
@@ -172,9 +172,9 @@ static READ16_HANDLER( dual539_r )
 static WRITE16_HANDLER( dual539_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k054539_w(space->machine->device("konami2"), offset, data);
+		k054539_w(space->machine().device("konami2"), offset, data);
 	if (ACCESSING_BITS_8_15)
-		k054539_w(space->machine->device("konami1"), offset, data>>8);
+		k054539_w(space->machine().device("konami1"), offset, data>>8);
 }
 
 
@@ -182,7 +182,7 @@ static WRITE16_HANDLER( dual539_w )
 
 static READ32_HANDLER( obj_ctrl_r )
 {
-	djmain_state *state = space->machine->driver_data<djmain_state>();
+	djmain_state *state = space->machine().driver_data<djmain_state>();
 	// read state->obj_regs[0x0c/4]: unknown
 	// read state->obj_regs[0x24/4]: unknown
 
@@ -191,7 +191,7 @@ static READ32_HANDLER( obj_ctrl_r )
 
 static WRITE32_HANDLER( obj_ctrl_w )
 {
-	djmain_state *state = space->machine->driver_data<djmain_state>();
+	djmain_state *state = space->machine().driver_data<djmain_state>();
 	// write state->obj_regs[0x28/4]: bank for rom readthrough
 
 	COMBINE_DATA(&state->obj_regs[offset]);
@@ -199,8 +199,8 @@ static WRITE32_HANDLER( obj_ctrl_w )
 
 static READ32_HANDLER( obj_rom_r )
 {
-	djmain_state *state = space->machine->driver_data<djmain_state>();
-	UINT8 *mem8 = space->machine->region("gfx1")->base();
+	djmain_state *state = space->machine().driver_data<djmain_state>();
+	UINT8 *mem8 = space->machine().region("gfx1")->base();
 	int bank = state->obj_regs[0x28/4] >> 16;
 
 	offset += bank * 0x200;
@@ -220,7 +220,7 @@ static READ32_HANDLER( obj_rom_r )
 
 static WRITE32_HANDLER( v_ctrl_w )
 {
-	djmain_state *state = space->machine->driver_data<djmain_state>();
+	djmain_state *state = space->machine().driver_data<djmain_state>();
 	if (ACCESSING_BITS_16_31)
 	{
 		data >>= 16;
@@ -230,16 +230,16 @@ static WRITE32_HANDLER( v_ctrl_w )
 		if (state->pending_vb_int && !DISABLE_VB_INT)
 		{
 			state->pending_vb_int = 0;
-			cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_4, HOLD_LINE);
+			cputag_set_input_line(space->machine(), "maincpu", M68K_IRQ_4, HOLD_LINE);
 		}
 	}
 }
 
 static READ32_HANDLER( v_rom_r )
 {
-	djmain_state *state = space->machine->driver_data<djmain_state>();
-	device_t *k056832 = space->machine->device("k056832");
-	UINT8 *mem8 = space->machine->region("gfx2")->base();
+	djmain_state *state = space->machine().driver_data<djmain_state>();
+	device_t *k056832 = space->machine().device("k056832");
+	UINT8 *mem8 = space->machine().region("gfx2")->base();
 	int bank = k056832_word_r(k056832, 0x34/2, 0xffff);
 
 	offset *= 2;
@@ -261,18 +261,18 @@ static READ32_HANDLER( v_rom_r )
 static READ8_HANDLER( inp1_r )
 {
 	static const char *const portnames[] = { "DSW3", "BTN3", "BTN2", "BTN1" };
-	return input_port_read(space->machine, portnames[ offset & 0x03 ]);
+	return input_port_read(space->machine(), portnames[ offset & 0x03 ]);
 }
 
 static READ8_HANDLER( inp2_r )
 {
 	static const char *const portnames[] = { "DSW1", "DSW2", "UNK2", "UNK1" };
-	return input_port_read(space->machine, portnames[ offset & 0x03 ]);
+	return input_port_read(space->machine(), portnames[ offset & 0x03 ]);
 }
 
 static READ32_HANDLER( turntable_r )
 {
-	djmain_state *state = space->machine->driver_data<djmain_state>();
+	djmain_state *state = space->machine().driver_data<djmain_state>();
 	UINT32 result = 0;
 	static const char *const ttnames[] = { "TT1", "TT2" };
 
@@ -281,7 +281,7 @@ static READ32_HANDLER( turntable_r )
 		UINT8 pos;
 		int delta;
 
-		pos = input_port_read_safe(space->machine, ttnames[state->turntable_select], 0);
+		pos = input_port_read_safe(space->machine(), ttnames[state->turntable_select], 0);
 		delta = pos - state->turntable_last_pos[state->turntable_select];
 		if (delta < -128)
 			delta += 256;
@@ -299,7 +299,7 @@ static READ32_HANDLER( turntable_r )
 
 static WRITE32_HANDLER( turntable_select_w )
 {
-	djmain_state *state = space->machine->driver_data<djmain_state>();
+	djmain_state *state = space->machine().driver_data<djmain_state>();
 	if (ACCESSING_BITS_16_23)
 		state->turntable_select = (data >> 19) & 1;
 }
@@ -392,9 +392,9 @@ static WRITE32_HANDLER( light_ctrl_2_w )
 	{
 		output_set_value("left-ssr",       !!(data & 0x08000000));	// SSR
 		output_set_value("right-ssr",      !!(data & 0x08000000));	// SSR
-		set_led_status(space->machine, 0, data & 0x00010000);			// 1P START
-		set_led_status(space->machine, 1, data & 0x00020000);			// 2P START
-		set_led_status(space->machine, 2, data & 0x00040000);			// EFFECT
+		set_led_status(space->machine(), 0, data & 0x00010000);			// 1P START
+		set_led_status(space->machine(), 1, data & 0x00020000);			// 2P START
+		set_led_status(space->machine(), 2, data & 0x00040000);			// EFFECT
 	}
 }
 
@@ -428,7 +428,7 @@ static WRITE32_HANDLER( unknownc02000_w )
 
 static INTERRUPT_GEN( vb_interrupt )
 {
-	djmain_state *state = device->machine->driver_data<djmain_state>();
+	djmain_state *state = device->machine().driver_data<djmain_state>();
 	state->pending_vb_int = 0;
 
 	if (DISABLE_VB_INT)
@@ -447,12 +447,12 @@ static void ide_interrupt(device_t *device, int state)
 	if (state != CLEAR_LINE)
 	{
 		//logerror("IDE interrupt asserted\n");
-		cputag_set_input_line(device->machine, "maincpu", M68K_IRQ_1, HOLD_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_1, HOLD_LINE);
 	}
 	else
 	{
 		//logerror("IDE interrupt cleared\n");
-		cputag_set_input_line(device->machine, "maincpu", M68K_IRQ_1, CLEAR_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_1, CLEAR_LINE);
 	}
 }
 
@@ -1432,8 +1432,8 @@ static STATE_POSTLOAD( djmain_postload )
 
 static MACHINE_START( djmain )
 {
-	djmain_state *state = machine->driver_data<djmain_state>();
-	device_t *ide = machine->device("ide");
+	djmain_state *state = machine.driver_data<djmain_state>();
+	device_t *ide = machine.device("ide");
 
 	if (ide != NULL && state->ide_master_password != NULL)
 		ide_set_master_password(ide, state->ide_master_password);
@@ -1445,13 +1445,13 @@ static MACHINE_START( djmain )
 	state_save_register_global(machine, state->v_ctrl);
 	state_save_register_global_array(machine, state->obj_regs);
 
-	machine->state().register_postload(djmain_postload, NULL);
+	machine.state().register_postload(djmain_postload, NULL);
 }
 
 
 static MACHINE_RESET( djmain )
 {
-	djmain_state *state = machine->driver_data<djmain_state>();
+	djmain_state *state = machine.driver_data<djmain_state>();
 	/* reset sound ram bank */
 	state->sndram_bank = 0;
 	sndram_set_bank(machine);
@@ -2036,7 +2036,7 @@ ROM_END
 
 static DRIVER_INIT( beatmania )
 {
-	djmain_state *state = machine->driver_data<djmain_state>();
+	djmain_state *state = machine.driver_data<djmain_state>();
 	state->ide_master_password = NULL;
 	state->ide_user_password = NULL;
 }
@@ -2052,7 +2052,7 @@ static const UINT8 beatmania_master_password[2 + 32] =
 
 static DRIVER_INIT( hmcompmx )
 {
-	djmain_state *state = machine->driver_data<djmain_state>();
+	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 hmcompmx_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2070,7 +2070,7 @@ static DRIVER_INIT( hmcompmx )
 
 static DRIVER_INIT( bm4thmix )
 {
-	djmain_state *state = machine->driver_data<djmain_state>();
+	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bm4thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2087,7 +2087,7 @@ static DRIVER_INIT( bm4thmix )
 
 static DRIVER_INIT( bm5thmix )
 {
-	djmain_state *state = machine->driver_data<djmain_state>();
+	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bm5thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2105,7 +2105,7 @@ static DRIVER_INIT( bm5thmix )
 
 static DRIVER_INIT( bmclubmx )
 {
-	djmain_state *state = machine->driver_data<djmain_state>();
+	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bmclubmx_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2124,7 +2124,7 @@ static DRIVER_INIT( bmclubmx )
 
 static DRIVER_INIT( bmcompm2 )
 {
-	djmain_state *state = machine->driver_data<djmain_state>();
+	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bmcompm2_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2142,7 +2142,7 @@ static DRIVER_INIT( bmcompm2 )
 
 static DRIVER_INIT( hmcompm2 )
 {
-	djmain_state *state = machine->driver_data<djmain_state>();
+	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 hmcompm2_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2160,7 +2160,7 @@ static DRIVER_INIT( hmcompm2 )
 
 static DRIVER_INIT( bmdct )
 {
-	djmain_state *state = machine->driver_data<djmain_state>();
+	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bmdct_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2178,7 +2178,7 @@ static DRIVER_INIT( bmdct )
 
 static DRIVER_INIT( bmcorerm )
 {
-	djmain_state *state = machine->driver_data<djmain_state>();
+	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bmcorerm_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2196,7 +2196,7 @@ static DRIVER_INIT( bmcorerm )
 
 static DRIVER_INIT( bm6thmix )
 {
-	djmain_state *state = machine->driver_data<djmain_state>();
+	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bm6thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2214,7 +2214,7 @@ static DRIVER_INIT( bm6thmix )
 
 static DRIVER_INIT( bm7thmix )
 {
-	djmain_state *state = machine->driver_data<djmain_state>();
+	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bm7thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2232,7 +2232,7 @@ static DRIVER_INIT( bm7thmix )
 
 static DRIVER_INIT( bmfinal )
 {
-	djmain_state *state = machine->driver_data<djmain_state>();
+	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bmfinal_user_password[2 + 32] =
 	{
 		0x00, 0x00,

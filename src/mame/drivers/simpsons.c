@@ -108,13 +108,13 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( z80_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank2", data & 7);
+	memory_set_bank(space->machine(), "bank2", data & 7);
 }
 
 #if 0
-static void sound_nmi_callback( running_machine *machine, int param )
+static void sound_nmi_callback( running_machine &machine, int param )
 {
-	simpsons_state *state = machine->driver_data<simpsons_state>();
+	simpsons_state *state = machine.driver_data<simpsons_state>();
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, (state->nmi_enabled) ? CLEAR_LINE : ASSERT_LINE );
 	state->nmi_enabled = 0;
 }
@@ -122,15 +122,15 @@ static void sound_nmi_callback( running_machine *machine, int param )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	simpsons_state *state = machine->driver_data<simpsons_state>();
+	simpsons_state *state = machine.driver_data<simpsons_state>();
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( z80_arm_nmi_w )
 {
-	simpsons_state *state = space->machine->driver_data<simpsons_state>();
+	simpsons_state *state = space->machine().driver_data<simpsons_state>();
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
-	space->machine->scheduler().timer_set(attotime::from_usec(25), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
+	space->machine().scheduler().timer_set(attotime::from_usec(25), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 
 static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8 )
@@ -227,9 +227,9 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static void simpsons_objdma( running_machine *machine )
+static void simpsons_objdma( running_machine &machine )
 {
-	simpsons_state *state = machine->driver_data<simpsons_state>();
+	simpsons_state *state = machine.driver_data<simpsons_state>();
 	int counter, num_inactive;
 	UINT16 *src, *dst;
 
@@ -255,7 +255,7 @@ static void simpsons_objdma( running_machine *machine )
 
 static TIMER_CALLBACK( dmaend_callback )
 {
-	simpsons_state *state = machine->driver_data<simpsons_state>();
+	simpsons_state *state = machine.driver_data<simpsons_state>();
 	if (state->firq_enabled)
 		device_set_input_line(state->maincpu, KONAMI_FIRQ_LINE, HOLD_LINE);
 }
@@ -263,13 +263,13 @@ static TIMER_CALLBACK( dmaend_callback )
 
 static INTERRUPT_GEN( simpsons_irq )
 {
-	simpsons_state *state = device->machine->driver_data<simpsons_state>();
+	simpsons_state *state = device->machine().driver_data<simpsons_state>();
 
 	if (k053246_is_irq_enabled(state->k053246))
 	{
-		simpsons_objdma(device->machine);
+		simpsons_objdma(device->machine());
 		// 32+256us delay at 8MHz dotclock; artificially shortened since actual V-blank length is unknown
-		device->machine->scheduler().timer_set(attotime::from_usec(30), FUNC(dmaend_callback));
+		device->machine().scheduler().timer_set(attotime::from_usec(30), FUNC(dmaend_callback));
 	}
 
 	if (k052109_is_irq_enabled(state->k052109))

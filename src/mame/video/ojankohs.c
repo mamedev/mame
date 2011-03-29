@@ -22,7 +22,7 @@ PALETTE_INIT( ojankoy )
 	int i;
 	int bit0, bit1, bit2, bit3, bit4, r, g, b;
 
-	for (i = 0; i < machine->total_colors(); i++)
+	for (i = 0; i < machine.total_colors(); i++)
 	{
 		bit0 = BIT(color_prom[0], 2);
 		bit1 = BIT(color_prom[0], 3);
@@ -30,17 +30,17 @@ PALETTE_INIT( ojankoy )
 		bit3 = BIT(color_prom[0], 5);
 		bit4 = BIT(color_prom[0], 6);
 		r = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
-		bit0 = BIT(color_prom[machine->total_colors()], 5);
-		bit1 = BIT(color_prom[machine->total_colors()], 6);
-		bit2 = BIT(color_prom[machine->total_colors()], 7);
+		bit0 = BIT(color_prom[machine.total_colors()], 5);
+		bit1 = BIT(color_prom[machine.total_colors()], 6);
+		bit2 = BIT(color_prom[machine.total_colors()], 7);
 		bit3 = BIT(color_prom[0], 0);
 		bit4 = BIT(color_prom[0], 1);
 		g = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
-		bit0 = BIT(color_prom[machine->total_colors()], 0);
-		bit1 = BIT(color_prom[machine->total_colors()], 1);
-		bit2 = BIT(color_prom[machine->total_colors()], 2);
-		bit3 = BIT(color_prom[machine->total_colors()], 3);
-		bit4 = BIT(color_prom[machine->total_colors()], 4);
+		bit0 = BIT(color_prom[machine.total_colors()], 0);
+		bit1 = BIT(color_prom[machine.total_colors()], 1);
+		bit2 = BIT(color_prom[machine.total_colors()], 2);
+		bit3 = BIT(color_prom[machine.total_colors()], 3);
+		bit4 = BIT(color_prom[machine.total_colors()], 4);
 		b = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
@@ -50,7 +50,7 @@ PALETTE_INIT( ojankoy )
 
 WRITE8_HANDLER( ojankohs_palette_w )
 {
-	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	int r, g, b;
 
 	state->paletteram[offset] = data;
@@ -61,12 +61,12 @@ WRITE8_HANDLER( ojankohs_palette_w )
 	g = ((state->paletteram[offset + 0] & 0x03) << 3) | ((state->paletteram[offset + 1] & 0xe0) >> 5);
 	b = (state->paletteram[offset + 1] & 0x1f) >> 0;
 
-	palette_set_color_rgb(space->machine, offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(space->machine(), offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE8_HANDLER( ccasino_palette_w )
 {
-	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	int r, g, b;
 
 	/* get top 8 bits of the I/O port address */
@@ -80,12 +80,12 @@ WRITE8_HANDLER( ccasino_palette_w )
 	g = ((state->paletteram[offset + 0] & 0x03) << 3) | ((state->paletteram[offset + 1] & 0xe0) >> 5);
 	b = (state->paletteram[offset + 1] & 0x1f) >> 0;
 
-	palette_set_color_rgb(space->machine, offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(space->machine(), offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE8_HANDLER( ojankoc_palette_w )
 {
-	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	int r, g, b, color;
 
 	if (state->paletteram[offset] == data)
@@ -100,7 +100,7 @@ WRITE8_HANDLER( ojankoc_palette_w )
 	g = (color >>  5) & 0x1f;
 	b = (color >>  0) & 0x1f;
 
-	palette_set_color_rgb(space->machine, offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(space->machine(), offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 
@@ -112,21 +112,21 @@ WRITE8_HANDLER( ojankoc_palette_w )
 
 WRITE8_HANDLER( ojankohs_videoram_w )
 {
-	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap, offset);
 }
 
 WRITE8_HANDLER( ojankohs_colorram_w )
 {
-	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap, offset);
 }
 
 WRITE8_HANDLER( ojankohs_gfxreg_w )
 {
-	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 
 	if (state->gfxreg != data)
 	{
@@ -137,14 +137,14 @@ WRITE8_HANDLER( ojankohs_gfxreg_w )
 
 WRITE8_HANDLER( ojankohs_flipscreen_w )
 {
-	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 
 	if (state->flipscreen != BIT(data, 0))
 	{
 
 		state->flipscreen = BIT(data, 0);
 
-		tilemap_set_flip_all(space->machine, state->flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(space->machine(), state->flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 		if (state->flipscreen)
 		{
@@ -161,7 +161,7 @@ WRITE8_HANDLER( ojankohs_flipscreen_w )
 
 static TILE_GET_INFO( ojankohs_get_tile_info )
 {
-	ojankohs_state *state = machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 	int tile = state->videoram[tile_index] | ((state->colorram[tile_index] & 0x0f) << 8);
 	int color = (state->colorram[tile_index] & 0xe0) >> 5;
 
@@ -176,7 +176,7 @@ static TILE_GET_INFO( ojankohs_get_tile_info )
 
 static TILE_GET_INFO( ojankoy_get_tile_info )
 {
-	ojankohs_state *state = machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 	int tile = state->videoram[tile_index] | (state->videoram[tile_index + 0x1000] << 8);
 	int color = state->colorram[tile_index] & 0x3f;
 	int flipx = ((state->colorram[tile_index] & 0x40) >> 6) ? TILEMAP_FLIPX : 0;
@@ -194,7 +194,7 @@ static TILE_GET_INFO( ojankoy_get_tile_info )
 
 void ojankoc_flipscreen( address_space *space, int data )
 {
-	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	int x, y;
 	UINT8 color1, color2;
 
@@ -224,7 +224,7 @@ void ojankoc_flipscreen( address_space *space, int data )
 
 WRITE8_HANDLER( ojankoc_videoram_w )
 {
-	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	int i;
 	UINT8 x, y, xx, px, py ;
 	UINT8 color, color1, color2;
@@ -268,7 +268,7 @@ WRITE8_HANDLER( ojankoc_videoram_w )
 
 VIDEO_START( ojankohs )
 {
-	ojankohs_state *state = machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
 	state->tilemap = tilemap_create(machine, ojankohs_get_tile_info, tilemap_scan_rows,  8, 4, 64, 64);
 	state->videoram = auto_alloc_array(machine, UINT8, 0x2000);
@@ -282,7 +282,7 @@ VIDEO_START( ojankohs )
 
 VIDEO_START( ojankoy )
 {
-	ojankohs_state *state = machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
 	state->tilemap = tilemap_create(machine, ojankoy_get_tile_info, tilemap_scan_rows,  8, 4, 64, 64);
 	state->videoram = auto_alloc_array(machine, UINT8, 0x2000);
@@ -296,9 +296,9 @@ VIDEO_START( ojankoy )
 
 VIDEO_START( ojankoc )
 {
-	ojankohs_state *state = machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
-	state->tmpbitmap = machine->primary_screen->alloc_compatible_bitmap();
+	state->tmpbitmap = machine.primary_screen->alloc_compatible_bitmap();
 	state->videoram = auto_alloc_array(machine, UINT8, 0x8000);
 	state->paletteram = auto_alloc_array(machine, UINT8, 0x20);
 
@@ -316,7 +316,7 @@ VIDEO_START( ojankoc )
 
 SCREEN_UPDATE( ojankohs )
 {
-	ojankohs_state *state = screen->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = screen->machine().driver_data<ojankohs_state>();
 
 	tilemap_set_scrollx(state->tilemap, 0, state->scrollx);
 	tilemap_set_scrolly(state->tilemap, 0, state->scrolly);
@@ -327,12 +327,12 @@ SCREEN_UPDATE( ojankohs )
 
 SCREEN_UPDATE( ojankoc )
 {
-	ojankohs_state *state = screen->machine->driver_data<ojankohs_state>();
+	ojankohs_state *state = screen->machine().driver_data<ojankohs_state>();
 	int offs;
 
 	if (state->screen_refresh)
 	{
-		address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		/* redraw bitmap */
 		for (offs = 0; offs < 0x8000; offs++)

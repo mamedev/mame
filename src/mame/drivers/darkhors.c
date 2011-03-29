@@ -99,7 +99,7 @@ static SCREEN_UPDATE( darkhors );
 
 static TILE_GET_INFO( get_tile_info_0 )
 {
-	darkhors_state *state = machine->driver_data<darkhors_state>();
+	darkhors_state *state = machine.driver_data<darkhors_state>();
 	UINT16 tile		=	state->tmapram[tile_index] >> 16;
 	UINT16 color	=	state->tmapram[tile_index] & 0xffff;
 	SET_TILE_INFO(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
@@ -107,7 +107,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
-	darkhors_state *state = machine->driver_data<darkhors_state>();
+	darkhors_state *state = machine.driver_data<darkhors_state>();
 	UINT16 tile		=	state->tmapram2[tile_index] >> 16;
 	UINT16 color	=	state->tmapram2[tile_index] & 0xffff;
 	SET_TILE_INFO(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
@@ -115,20 +115,20 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 static WRITE32_HANDLER( darkhors_tmapram_w )
 {
-	darkhors_state *state = space->machine->driver_data<darkhors_state>();
+	darkhors_state *state = space->machine().driver_data<darkhors_state>();
 	COMBINE_DATA(&state->tmapram[offset]);
 	tilemap_mark_tile_dirty(state->tmap, offset);
 }
 static WRITE32_HANDLER( darkhors_tmapram2_w )
 {
-	darkhors_state *state = space->machine->driver_data<darkhors_state>();
+	darkhors_state *state = space->machine().driver_data<darkhors_state>();
 	COMBINE_DATA(&state->tmapram2[offset]);
 	tilemap_mark_tile_dirty(state->tmap2, offset);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	darkhors_state *state = machine->driver_data<darkhors_state>();
+	darkhors_state *state = machine.driver_data<darkhors_state>();
 	UINT32 *s		=	state->spriteram;
 	UINT32 *end		=	state->spriteram + 0x02000/4;
 
@@ -155,7 +155,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sy	=	-sy;
 		sy	+=	0xf8;
 
-		drawgfx_transpen(	bitmap,	cliprect, machine->gfx[0],
+		drawgfx_transpen(	bitmap,	cliprect, machine.gfx[0],
 					code/2,	color,
 					flipx,	flipy,	sx,	sy, 0);
 	}
@@ -163,7 +163,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static VIDEO_START( darkhors )
 {
-	darkhors_state *state = machine->driver_data<darkhors_state>();
+	darkhors_state *state = machine.driver_data<darkhors_state>();
 	state->tmap			=	tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 												16,16, 0x40,0x40	);
 
@@ -173,26 +173,26 @@ static VIDEO_START( darkhors )
 	tilemap_set_transparent_pen(state->tmap, 0);
 	tilemap_set_transparent_pen(state->tmap2, 0);
 
-	machine->gfx[0]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
+	machine.gfx[0]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
 }
 
 static SCREEN_UPDATE( darkhors )
 {
-	darkhors_state *state = screen->machine->driver_data<darkhors_state>();
+	darkhors_state *state = screen->machine().driver_data<darkhors_state>();
 	int layers_ctrl = -1;
 
 #if DARKHORS_DEBUG
-	if (input_code_pressed(screen->machine, KEYCODE_Z))
+	if (input_code_pressed(screen->machine(), KEYCODE_Z))
 	{
 		int mask = 0;
-		if (input_code_pressed(screen->machine, KEYCODE_Q))	mask |= 1;
-		if (input_code_pressed(screen->machine, KEYCODE_W))	mask |= 2;
-		if (input_code_pressed(screen->machine, KEYCODE_A))	mask |= 4;
+		if (input_code_pressed(screen->machine(), KEYCODE_Q))	mask |= 1;
+		if (input_code_pressed(screen->machine(), KEYCODE_W))	mask |= 2;
+		if (input_code_pressed(screen->machine(), KEYCODE_A))	mask |= 4;
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
 	tilemap_set_scrollx(state->tmap,0, (state->tmapscroll[0] >> 16) - 5);
 	tilemap_set_scrolly(state->tmap,0, (state->tmapscroll[0] & 0xffff) - 0xff );
@@ -202,7 +202,7 @@ static SCREEN_UPDATE( darkhors )
 	tilemap_set_scrolly(state->tmap2,0, (state->tmapscroll2[0] & 0xffff) - 0xff );
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, state->tmap2, 0, 0);
 
-	if (layers_ctrl & 4)	draw_sprites(screen->machine,bitmap,cliprect);
+	if (layers_ctrl & 4)	draw_sprites(screen->machine(),bitmap,cliprect);
 
 #if DARKHORS_DEBUG
 #if 0
@@ -244,7 +244,7 @@ static const eeprom_interface eeprom_intf =
 static WRITE32_DEVICE_HANDLER( darkhors_eeprom_w )
 {
 	if (data & ~0xff000000)
-		logerror("%s: Unknown EEPROM bit written %08X\n",device->machine->describe_context(),data);
+		logerror("%s: Unknown EEPROM bit written %08X\n",device->machine().describe_context(),data);
 
 	if ( ACCESSING_BITS_24_31 )
 	{
@@ -267,7 +267,7 @@ static WRITE32_HANDLER( paletteram32_xBBBBBGGGGGRRRRR_dword_w )
 
 static WRITE32_HANDLER( darkhors_input_sel_w )
 {
-	darkhors_state *state = space->machine->driver_data<darkhors_state>();
+	darkhors_state *state = space->machine().driver_data<darkhors_state>();
 	COMBINE_DATA(&state->input_sel);
 //  if (ACCESSING_BITS_16_31)    popmessage("%04X",data >> 16);
 }
@@ -290,14 +290,14 @@ static int mask_to_bit( int mask )
 
 static READ32_HANDLER( darkhors_input_sel_r )
 {
-	darkhors_state *state = space->machine->driver_data<darkhors_state>();
+	darkhors_state *state = space->machine().driver_data<darkhors_state>();
 	// from bit mask to bit number
 	int bit_p1 = mask_to_bit((state->input_sel & 0x00ff0000) >> 16);
 	int bit_p2 = mask_to_bit((state->input_sel & 0xff000000) >> 24);
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
-	return	(input_port_read(space->machine, portnames[bit_p1]) & 0x00ffffff) |
-			(input_port_read(space->machine, portnames[bit_p2]) & 0xff000000) ;
+	return	(input_port_read(space->machine(), portnames[bit_p1]) & 0x00ffffff) |
+			(input_port_read(space->machine(), portnames[bit_p2]) & 0xff000000) ;
 }
 
 static WRITE32_HANDLER( darkhors_unk1_w )
@@ -336,9 +336,9 @@ ADDRESS_MAP_END
 
 static WRITE32_HANDLER( jclub2_tileram_w )
 {
-	darkhors_state *state = space->machine->driver_data<darkhors_state>();
+	darkhors_state *state = space->machine().driver_data<darkhors_state>();
 	COMBINE_DATA(&state->jclub2_tileram[offset]);
-	gfx_element_mark_dirty(space->machine->gfx[state->jclub2_gfx_index], offset/(256/4));
+	gfx_element_mark_dirty(space->machine().gfx[state->jclub2_gfx_index], offset/(256/4));
 
 }
 
@@ -677,16 +677,16 @@ MACHINE_CONFIG_END
 
 static VIDEO_START(jclub2)
 {
-	darkhors_state *state = machine->driver_data<darkhors_state>();
+	darkhors_state *state = machine.driver_data<darkhors_state>();
 	/* find first empty slot to decode gfx */
 	for (state->jclub2_gfx_index = 0; state->jclub2_gfx_index < MAX_GFX_ELEMENTS; state->jclub2_gfx_index++)
-		if (machine->gfx[state->jclub2_gfx_index] == 0)
+		if (machine.gfx[state->jclub2_gfx_index] == 0)
 			break;
 
 	assert(state->jclub2_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[state->jclub2_gfx_index] = gfx_element_alloc(machine, &layout_16x16x8_jclub2, (UINT8 *)state->jclub2_tileram, machine->total_colors() / 16, 0);
+	machine.gfx[state->jclub2_gfx_index] = gfx_element_alloc(machine, &layout_16x16x8_jclub2, (UINT8 *)state->jclub2_tileram, machine.total_colors() / 16, 0);
 
 
 }
@@ -945,8 +945,8 @@ ROM_END
 
 static DRIVER_INIT( darkhors )
 {
-	UINT32 *rom    = (UINT32 *) machine->region("maincpu")->base();
-	UINT8  *eeprom = (UINT8 *)  machine->region("eeprom")->base();
+	UINT32 *rom    = (UINT32 *) machine.region("maincpu")->base();
+	UINT8  *eeprom = (UINT8 *)  machine.region("eeprom")->base();
 	int i;
 
 #if 1

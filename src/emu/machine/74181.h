@@ -33,7 +33,7 @@
 #define TTL74181_OUTPUT_CN4		(7)
 
 
-void TTL74181_config(running_machine *machine, int chip, void *interface);
+void TTL74181_config(running_machine &machine, int chip, void *interface);
 void TTL74181_reset(int chip);
 
 void TTL74181_write(int chip, int startline, int lines, UINT8 data);

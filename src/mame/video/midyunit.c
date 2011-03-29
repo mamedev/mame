@@ -39,13 +39,13 @@ enum
 
 static VIDEO_START( common )
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* allocate memory */
 	state->cmos_ram = auto_alloc_array(machine, UINT16, (0x2000 * 4)/2);
 	state->local_videoram = auto_alloc_array_clear(machine, UINT16, 0x80000/2);
 	state->pen_map = auto_alloc_array(machine, pen_t, 65536);
 
-	machine->device<nvram_device>("nvram")->set_base(state->cmos_ram, 0x2000 * 4);
+	machine.device<nvram_device>("nvram")->set_base(state->cmos_ram, 0x2000 * 4);
 
 	/* reset all the globals */
 	state->cmos_page = 0;
@@ -67,7 +67,7 @@ static VIDEO_START( common )
 
 VIDEO_START( midyunit_4bit )
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	int i;
 
 	VIDEO_START_CALL(common);
@@ -81,7 +81,7 @@ VIDEO_START( midyunit_4bit )
 
 VIDEO_START( midyunit_6bit )
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	int i;
 
 	VIDEO_START_CALL(common);
@@ -95,7 +95,7 @@ VIDEO_START( midyunit_6bit )
 
 VIDEO_START( mkyawdim )
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	VIDEO_START_CALL(midyunit_6bit);
 	state->yawdim_dma = 1;
 }
@@ -103,7 +103,7 @@ VIDEO_START( mkyawdim )
 
 VIDEO_START( midzunit )
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	int i;
 
 	VIDEO_START_CALL(common);
@@ -124,7 +124,7 @@ VIDEO_START( midzunit )
 
 READ16_HANDLER( midyunit_gfxrom_r )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	offset *= 2;
 	if (state->palette_mask == 0x00ff)
 		return state->gfx_rom[offset] | (state->gfx_rom[offset] << 4) |
@@ -143,7 +143,7 @@ READ16_HANDLER( midyunit_gfxrom_r )
 
 WRITE16_HANDLER( midyunit_vram_w )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	offset *= 2;
 	if (state->videobank_select)
 	{
@@ -164,7 +164,7 @@ WRITE16_HANDLER( midyunit_vram_w )
 
 READ16_HANDLER( midyunit_vram_r )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	offset *= 2;
 	if (state->videobank_select)
 		return (state->local_videoram[offset] & 0x00ff) | (state->local_videoram[offset + 1] << 8);
@@ -182,14 +182,14 @@ READ16_HANDLER( midyunit_vram_r )
 
 void midyunit_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	memcpy(shiftreg, &state->local_videoram[address >> 3], 2 * 512 * sizeof(UINT16));
 }
 
 
 void midyunit_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	memcpy(&state->local_videoram[address >> 3], shiftreg, 2 * 512 * sizeof(UINT16));
 }
 
@@ -203,7 +203,7 @@ void midyunit_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftr
 
 WRITE16_HANDLER( midyunit_control_w )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	/*
      * Narc system register
      * ------------------
@@ -241,12 +241,12 @@ WRITE16_HANDLER( midyunit_control_w )
 
 WRITE16_HANDLER( midyunit_paletteram_w )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	int newword;
 
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	newword = space->machine->generic.paletteram.u16[offset];
-	palette_set_color_rgb(space->machine, offset & state->palette_mask, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
+	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	newword = space->machine().generic.paletteram.u16[offset];
+	palette_set_color_rgb(space->machine(), offset & state->palette_mask, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
 }
 
 
@@ -257,9 +257,9 @@ WRITE16_HANDLER( midyunit_paletteram_w )
  *
  *************************************/
 
-static void dma_draw(running_machine *machine, UINT16 command)
+static void dma_draw(running_machine &machine, UINT16 command)
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	struct dma_state_t &dma_state = state->dma_state;
 	int dx = (command & 0x10) ? -1 : 1;
 	int height = dma_state.height;
@@ -371,7 +371,7 @@ static void dma_draw(running_machine *machine, UINT16 command)
 
 static TIMER_CALLBACK( dma_callback )
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	state->dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
 	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 }
@@ -386,7 +386,7 @@ static TIMER_CALLBACK( dma_callback )
 
 READ16_HANDLER( midyunit_dma_r )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	return state->dma_register[offset];
 }
 
@@ -425,7 +425,7 @@ READ16_HANDLER( midyunit_dma_r )
 
 WRITE16_HANDLER( midyunit_dma_w )
 {
-	midyunit_state *state = space->machine->driver_data<midyunit_state>();
+	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	struct dma_state_t &dma_state = state->dma_state;
 	UINT32 gfxoffset;
 	int command;
@@ -439,13 +439,13 @@ WRITE16_HANDLER( midyunit_dma_w )
 
 	/* high bit triggers action */
 	command = state->dma_register[DMA_COMMAND];
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 	if (!(command & 0x8000))
 		return;
 
 if (LOG_DMA)
 {
-	if (input_code_pressed(space->machine, KEYCODE_L))
+	if (input_code_pressed(space->machine(), KEYCODE_L))
 	{
 		logerror("----\n");
 		logerror("DMA command %04X: (xflip=%d yflip=%d)\n",
@@ -525,11 +525,11 @@ if (LOG_DMA)
 		gfxoffset += 0x02000000;
 	{
 		dma_state.offset = gfxoffset - 0x02000000;
-		dma_draw(space->machine, command);
+		dma_draw(space->machine(), command);
 	}
 
 	/* signal we're done */
-	space->machine->scheduler().timer_set(attotime::from_nsec(41 * dma_state.width * dma_state.height), FUNC(dma_callback));
+	space->machine().scheduler().timer_set(attotime::from_nsec(41 * dma_state.width * dma_state.height), FUNC(dma_callback));
 
 	g_profiler.stop();
 }
@@ -544,7 +544,7 @@ if (LOG_DMA)
 
 static TIMER_CALLBACK( autoerase_line )
 {
-	midyunit_state *state = machine->driver_data<midyunit_state>();
+	midyunit_state *state = machine.driver_data<midyunit_state>();
 	int scanline = param;
 
 	if (state->autoerase_enable && scanline >= 0 && scanline < 510)
@@ -554,7 +554,7 @@ static TIMER_CALLBACK( autoerase_line )
 
 void midyunit_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	midyunit_state *state = screen.machine->driver_data<midyunit_state>();
+	midyunit_state *state = screen.machine().driver_data<midyunit_state>();
 	UINT16 *src = &state->local_videoram[(params->rowaddr << 9) & 0x3fe00];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
 	int coladdr = params->coladdr << 1;
@@ -565,10 +565,10 @@ void midyunit_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanl
 		dest[x] = state->pen_map[src[coladdr++ & 0x1ff]];
 
 	/* handle autoerase on the previous line */
-	autoerase_line(screen.machine, NULL, params->rowaddr - 1);
+	autoerase_line(screen.machine(), NULL, params->rowaddr - 1);
 
 	/* if this is the last update of the screen, set a timer to clear out the final line */
 	/* (since we update one behind) */
 	if (scanline == screen.visible_area().max_y)
-		screen.machine->scheduler().timer_set(screen.time_until_pos(scanline + 1), FUNC(autoerase_line), params->rowaddr);
+		screen.machine().scheduler().timer_set(screen.time_until_pos(scanline + 1), FUNC(autoerase_line), params->rowaddr);
 }

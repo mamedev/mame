@@ -71,33 +71,33 @@ struct _input_seq
 /* ----- state queries ----- */
 
 /* return TRUE if the given switch sequence has been pressed */
-int input_seq_pressed(running_machine *machine, const input_seq *seq);
+int input_seq_pressed(running_machine &machine, const input_seq *seq);
 
 /* return the value of an axis sequence */
-INT32 input_seq_axis_value(running_machine *machine, const input_seq *seq, input_item_class *itemclass_ptr);
+INT32 input_seq_axis_value(running_machine &machine, const input_seq *seq, input_item_class *itemclass_ptr);
 
 
 
 /* ----- sequence polling ----- */
 
 /* begin polling for a new sequence of the given itemclass */
-void input_seq_poll_start(running_machine *machine, input_item_class itemclass, const input_seq *startseq);
+void input_seq_poll_start(running_machine &machine, input_item_class itemclass, const input_seq *startseq);
 
 /* continue polling for a sequence */
-int input_seq_poll(running_machine *machine, input_seq *finalseq);
+int input_seq_poll(running_machine &machine, input_seq *finalseq);
 
 
 
 /* ----- strings and tokenization ----- */
 
 /* generate the friendly name of an input sequence */
-astring &input_seq_name(running_machine *machine, astring &string, const input_seq *seq);
+astring &input_seq_name(running_machine &machine, astring &string, const input_seq *seq);
 
 /* convert an input sequence to tokens, returning the length */
-astring &input_seq_to_tokens(running_machine *machine, astring &string, const input_seq *seq);
+astring &input_seq_to_tokens(running_machine &machine, astring &string, const input_seq *seq);
 
 /* convert a set of tokens back to an input sequence */
-int input_seq_from_tokens(running_machine *machine, const char *string, input_seq *seq);
+int input_seq_from_tokens(running_machine &machine, const char *string, input_seq *seq);
 
 
 

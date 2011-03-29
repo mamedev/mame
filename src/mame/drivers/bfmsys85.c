@@ -106,13 +106,13 @@ public:
 
 static READ_LINE_DEVICE_HANDLER( sys85_data_r )
 {
-	bfmsys85_state *state = device->machine->driver_data<bfmsys85_state>();
+	bfmsys85_state *state = device->machine().driver_data<bfmsys85_state>();
 	return state->sys85_data_line_r;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( sys85_data_w )
 {
-	bfmsys85_state *drvstate = device->machine->driver_data<bfmsys85_state>();
+	bfmsys85_state *drvstate = device->machine().driver_data<bfmsys85_state>();
 	drvstate->sys85_data_line_t = state;
 }
 
@@ -131,7 +131,7 @@ static ACIA6850_INTERFACE( m6809_acia_if )
 
 static MACHINE_RESET( bfm_sys85 )
 {
-	bfmsys85_state *state = machine->driver_data<bfmsys85_state>();
+	bfmsys85_state *state = machine.driver_data<bfmsys85_state>();
 	state->vfd_latch         = 0;
 	state->mmtr_latch        = 0;
 	state->triac_latch       = 0;
@@ -168,7 +168,7 @@ static WRITE8_HANDLER( watchdog_w )
 
 static INTERRUPT_GEN( timer_irq )
 {
-	bfmsys85_state *state = device->machine->driver_data<bfmsys85_state>();
+	bfmsys85_state *state = device->machine().driver_data<bfmsys85_state>();
 	if ( state->is_timer_enabled )
 	{
 		state->irq_status = 0x01 |0x02; //0xff;
@@ -180,7 +180,7 @@ static INTERRUPT_GEN( timer_irq )
 
 static READ8_HANDLER( irqlatch_r )
 {
-	bfmsys85_state *state = space->machine->driver_data<bfmsys85_state>();
+	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
 	int result = state->irq_status | 0x02;
 
 	state->irq_status = 0;
@@ -192,7 +192,7 @@ static READ8_HANDLER( irqlatch_r )
 
 static WRITE8_HANDLER( reel12_w )
 {
-	bfmsys85_state *state = space->machine->driver_data<bfmsys85_state>();
+	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
 	if ( stepper_update(0, (data>>4)&0x0f) ) state->reel_changed |= 0x01;
 	if ( stepper_update(1, data&0x0f   ) ) state->reel_changed |= 0x02;
 
@@ -208,7 +208,7 @@ static WRITE8_HANDLER( reel12_w )
 
 static WRITE8_HANDLER( reel34_w )
 {
-	bfmsys85_state *state = space->machine->driver_data<bfmsys85_state>();
+	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
 	if ( stepper_update(2, (data>>4)&0x0f) ) state->reel_changed |= 0x04;
 	if ( stepper_update(3, data&0x0f   ) ) state->reel_changed |= 0x08;
 
@@ -226,7 +226,7 @@ static WRITE8_HANDLER( reel34_w )
 
 static WRITE8_HANDLER( mmtr_w )
 {
-	bfmsys85_state *state = space->machine->driver_data<bfmsys85_state>();
+	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
 	int i;
 	int  changed = state->mmtr_latch ^ data;
 
@@ -235,20 +235,20 @@ static WRITE8_HANDLER( mmtr_w )
 	for (i=0; i<8; i++)
 	if ( changed & (1 << i) )	MechMtr_update(i, data & (1 << i) );
 
-	if ( data ) generic_pulse_irq_line(space->machine->device("maincpu"), M6809_FIRQ_LINE);
+	if ( data ) generic_pulse_irq_line(space->machine().device("maincpu"), M6809_FIRQ_LINE);
 }
 ///////////////////////////////////////////////////////////////////////////
 
 static READ8_HANDLER( mmtr_r )
 {
-	bfmsys85_state *state = space->machine->driver_data<bfmsys85_state>();
+	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
 	return state->mmtr_latch;
 }
 ///////////////////////////////////////////////////////////////////////////
 
 static WRITE8_HANDLER( vfd_w )
 {
-	bfmsys85_state *state = space->machine->driver_data<bfmsys85_state>();
+	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
 	int changed = state->vfd_latch ^ data;
 
 	state->vfd_latch = data;
@@ -305,7 +305,7 @@ static const UINT8 BFM_strcnv85[] =
 
 static WRITE8_HANDLER( mux_ctrl_w )
 {
-	bfmsys85_state *state = space->machine->driver_data<bfmsys85_state>();
+	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
 	switch ( data & 0xF0 )
 	{
 		case 0x10:
@@ -348,7 +348,7 @@ static READ8_HANDLER( mux_ctrl_r )
 
 static WRITE8_HANDLER( mux_data_w )
 {
-	bfmsys85_state *state = space->machine->driver_data<bfmsys85_state>();
+	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
 	int pattern = 0x01, i,
 	off = state->mux_output_strobe<<4;
 
@@ -370,7 +370,7 @@ static WRITE8_HANDLER( mux_data_w )
 
 static READ8_HANDLER( mux_data_r )
 {
-	bfmsys85_state *state = space->machine->driver_data<bfmsys85_state>();
+	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
 	return state->mux_input;
 }
 
@@ -386,7 +386,7 @@ static WRITE8_HANDLER( mux_enable_w )
 
 static WRITE8_HANDLER( triac_w )
 {
-	bfmsys85_state *state = space->machine->driver_data<bfmsys85_state>();
+	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
 	state->triac_latch = data;
 }
 
@@ -394,7 +394,7 @@ static WRITE8_HANDLER( triac_w )
 
 static READ8_HANDLER( triac_r )
 {
-	bfmsys85_state *state = space->machine->driver_data<bfmsys85_state>();
+	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
 	return state->triac_latch;
 }
 

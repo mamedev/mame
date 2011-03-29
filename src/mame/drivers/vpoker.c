@@ -125,15 +125,15 @@ public:
 
 static VIDEO_START( vpoker )
 {
-	vpoker_state *state = machine->driver_data<vpoker_state>();
+	vpoker_state *state = machine.driver_data<vpoker_state>();
 	state->videoram = auto_alloc_array(machine, UINT8, 0x200);
 }
 
 static SCREEN_UPDATE( vpoker )
 {
-	vpoker_state *state = screen->machine->driver_data<vpoker_state>();
+	vpoker_state *state = screen->machine().driver_data<vpoker_state>();
 	UINT8 *videoram = state->videoram;
-	const gfx_element *gfx = screen->machine->gfx[0];
+	const gfx_element *gfx = screen->machine().gfx[0];
 	int count = 0x0000;
 
 	int y,x;
@@ -156,14 +156,14 @@ static SCREEN_UPDATE( vpoker )
 static READ8_HANDLER( blitter_r )
 {
 	if(offset == 6)
-		return input_port_read(space->machine, "IN0");
+		return input_port_read(space->machine(), "IN0");
 
 	return 0;
 }
 
 static WRITE8_HANDLER( blitter_w )
 {
-	vpoker_state *state = space->machine->driver_data<vpoker_state>();
+	vpoker_state *state = space->machine().driver_data<vpoker_state>();
 	UINT8 *videoram = state->videoram;
 
 	state->blit_ram[offset] = data;
@@ -637,7 +637,7 @@ static PALETTE_INIT( vpoker )
 
 static WRITE_LINE_DEVICE_HANDLER( ptm_irq )
 {
-	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface ptm_intf =

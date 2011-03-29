@@ -110,12 +110,12 @@ static const int channel_bits[4] =
 /* function prototypes */
 static STREAM_UPDATE( channel_update );
 static void m6844_finished(int ch);
-static void play_cvsd(running_machine *machine, int ch);
+static void play_cvsd(running_machine &machine, int ch);
 static void stop_cvsd(int ch);
 
 static void reset_sound_cache(void);
 static INT16 *add_to_sound_cache(UINT8 *input, int address, int length, int bits, int frequency);
-static INT16 *find_or_add_to_sound_cache(running_machine *machine, int address, int length, int bits, int frequency);
+static INT16 *find_or_add_to_sound_cache(running_machine &machine, int address, int length, int bits, int frequency);
 
 static void decode_and_filter_cvsd(UINT8 *data, int bytes, int maskbits, int frequency, INT16 *dest);
 static void fir_filter(INT32 *input, INT16 *output, int count);
@@ -130,7 +130,7 @@ static void fir_filter(INT32 *input, INT16 *output, int count);
 
 static DEVICE_START( exidy440_sound )
 {
-	running_machine *machine = device->machine;
+	running_machine &machine = device->machine();
 	int i, length;
 
 	/* reset the system */
@@ -159,10 +159,10 @@ static DEVICE_START( exidy440_sound )
 	channel_frequency[3] = device->clock()/2;
 
 	/* get stream channels */
-	stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock(), NULL, channel_update);
+	stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock(), NULL, channel_update);
 
 	/* allocate the sample cache */
-	length = machine->region("cvsd")->bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
+	length = machine.region("cvsd")->bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
 	sound_cache = (sound_cache_entry *)auto_alloc_array(machine, UINT8, length);
 
 	/* determine the hard end of the cache and reset */
@@ -336,14 +336,14 @@ static STREAM_UPDATE( channel_update )
 static READ8_HANDLER( sound_command_r )
 {
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
-	cputag_set_input_line(space->machine, "audiocpu", 1, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 1, CLEAR_LINE);
 	sound_command_ack = 1;
 
 	return sound_command;
 }
 
 
-void exidy440_sound_command(running_machine *machine, UINT8 param)
+void exidy440_sound_command(running_machine &machine, UINT8 param)
 {
 	sound_command = param;
 	sound_command_ack = 0;
@@ -386,7 +386,7 @@ static WRITE8_HANDLER( sound_volume_w )
 
 static WRITE8_HANDLER( sound_interrupt_clear_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
 }
 
 
@@ -584,7 +584,7 @@ static WRITE8_HANDLER( m6844_w )
 					m6844_channel[i].start_counter = m6844_channel[i].counter;
 
 					/* generate and play the sample */
-					play_cvsd(space->machine, i);
+					play_cvsd(space->machine(), i);
 				}
 
 				/* if we're going inactive... */
@@ -655,7 +655,7 @@ static INT16 *add_to_sound_cache(UINT8 *input, int address, int length, int bits
 }
 
 
-static INT16 *find_or_add_to_sound_cache(running_machine *machine, int address, int length, int bits, int frequency)
+static INT16 *find_or_add_to_sound_cache(running_machine &machine, int address, int length, int bits, int frequency)
 {
 	sound_cache_entry *current;
 
@@ -663,7 +663,7 @@ static INT16 *find_or_add_to_sound_cache(running_machine *machine, int address, 
 		if (current->address == address && current->length == length && current->bits == bits && current->frequency == frequency)
 			return current->data;
 
-	return add_to_sound_cache(&machine->region("cvsd")->base()[address], address, length, bits, frequency);
+	return add_to_sound_cache(&machine.region("cvsd")->base()[address], address, length, bits, frequency);
 }
 
 
@@ -674,7 +674,7 @@ static INT16 *find_or_add_to_sound_cache(running_machine *machine, int address, 
  *
  *************************************/
 
-static void play_cvsd(running_machine *machine, int ch)
+static void play_cvsd(running_machine &machine, int ch)
 {
 	sound_channel_data *channel = &sound_channel[ch];
 	int address = m6844_channel[ch].address;

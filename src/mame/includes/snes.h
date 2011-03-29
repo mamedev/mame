@@ -398,8 +398,8 @@ struct snes_superscope
 	int offscreen;
 };
 
-typedef void (*snes_io_read)(running_machine *machine);
-typedef UINT8 (*snes_oldjoy_read)(running_machine *machine);
+typedef void (*snes_io_read)(running_machine &machine);
+typedef UINT8 (*snes_oldjoy_read)(running_machine &machine);
 
 class snes_state : public driver_device
 {
@@ -669,7 +669,7 @@ extern struct snes_cart_info snes_cart;
 
 extern struct SNES_PPU_STRUCT snes_ppu;
 
-extern void snes_latch_counters(running_machine *machine);
+extern void snes_latch_counters(running_machine &machine);
 
 extern VIDEO_START( snes );
 extern SCREEN_UPDATE( snes );

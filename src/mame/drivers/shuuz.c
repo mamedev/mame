@@ -30,9 +30,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	shuuz_state *state = machine->driver_data<shuuz_state>();
+	shuuz_state *state = machine.driver_data<shuuz_state>();
 	cputag_set_input_line(machine, "maincpu", 4, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -46,13 +46,13 @@ static void update_interrupts(running_machine *machine)
 
 static READ16_HANDLER( shuuz_atarivc_r )
 {
-	return atarivc_r(*space->machine->primary_screen, offset);
+	return atarivc_r(*space->machine().primary_screen, offset);
 }
 
 
 static WRITE16_HANDLER( shuuz_atarivc_w )
 {
-	atarivc_w(*space->machine->primary_screen, offset, data, mem_mask);
+	atarivc_w(*space->machine().primary_screen, offset, data, mem_mask);
 }
 
 
@@ -71,11 +71,11 @@ static MACHINE_START( shuuz )
 
 static MACHINE_RESET( shuuz )
 {
-	shuuz_state *state = machine->driver_data<shuuz_state>();
+	shuuz_state *state = machine.driver_data<shuuz_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarivc_reset(*machine->primary_screen, state->atarivc_eof_data, 1);
+	atarivc_reset(*machine.primary_screen, state->atarivc_eof_data, 1);
 }
 
 
@@ -93,15 +93,15 @@ static WRITE16_HANDLER( latch_w )
 
 static READ16_HANDLER( leta_r )
 {
-	shuuz_state *state = space->machine->driver_data<shuuz_state>();
+	shuuz_state *state = space->machine().driver_data<shuuz_state>();
 	/* trackball -- rotated 45 degrees? */
 	int which = offset & 1;
 
 	/* when reading the even ports, do a real analog port update */
 	if (which == 0)
 	{
-		int dx = (INT8)input_port_read(space->machine, "TRACKX");
-		int dy = (INT8)input_port_read(space->machine, "TRACKY");
+		int dx = (INT8)input_port_read(space->machine(), "TRACKX");
+		int dy = (INT8)input_port_read(space->machine(), "TRACKY");
 
 		state->cur[0] = dx + dy;
 		state->cur[1] = dx - dy;
@@ -121,9 +121,9 @@ static READ16_HANDLER( leta_r )
 
 static READ16_HANDLER( special_port0_r )
 {
-	int result = input_port_read(space->machine, "SYSTEM");
+	int result = input_port_read(space->machine(), "SYSTEM");
 
-	if ((result & 0x0800) && atarigen_get_hblank(*space->machine->primary_screen))
+	if ((result & 0x0800) && atarigen_get_hblank(*space->machine().primary_screen))
 		result &= ~0x0800;
 
 	return result;

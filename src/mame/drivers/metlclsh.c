@@ -47,13 +47,13 @@ metlclsh:
 
 static WRITE8_HANDLER( metlclsh_cause_irq )
 {
-	metlclsh_state *state = space->machine->driver_data<metlclsh_state>();
+	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
 	device_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_nmi )
 {
-	metlclsh_state *state = space->machine->driver_data<metlclsh_state>();
+	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
 	device_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
@@ -86,25 +86,25 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( metlclsh_cause_nmi2 )
 {
-	metlclsh_state *state = space->machine->driver_data<metlclsh_state>();
+	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
 	device_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_irq2 )
 {
-	metlclsh_state *state = space->machine->driver_data<metlclsh_state>();
+	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
 	device_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_nmi2 )
 {
-	metlclsh_state *state = space->machine->driver_data<metlclsh_state>();
+	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
 	device_set_input_line(state->subcpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_flipscreen_w )
 {
-	flip_screen_set(space->machine, data & 1);
+	flip_screen_set(space->machine(), data & 1);
 }
 
 static ADDRESS_MAP_START( metlclsh_slave_map, AS_PROGRAM, 8 )
@@ -255,7 +255,7 @@ GFXDECODE_END
 
 static void metlclsh_irqhandler(device_t *device, int linestate)
 {
-	metlclsh_state *state = device->machine->driver_data<metlclsh_state>();
+	metlclsh_state *state = device->machine().driver_data<metlclsh_state>();
 	device_set_input_line(state->maincpu, M6809_IRQ_LINE, linestate);
 }
 
@@ -269,16 +269,16 @@ static INTERRUPT_GEN( metlclsh_interrupt2 )
 	if (cpu_getiloops(device) == 0)
 		return;
 	/* generate NMI on coin insertion */
-	if ((~input_port_read(device->machine, "IN2") & 0xc0) || (~input_port_read(device->machine, "DSW") & 0x40))
+	if ((~input_port_read(device->machine(), "IN2") & 0xc0) || (~input_port_read(device->machine(), "DSW") & 0x40))
 		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static MACHINE_START( metlclsh )
 {
-	metlclsh_state *state = machine->driver_data<metlclsh_state>();
+	metlclsh_state *state = machine.driver_data<metlclsh_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->subcpu = machine->device("sub");
+	state->maincpu = machine.device("maincpu");
+	state->subcpu = machine.device("sub");
 
 	state->save_item(NAME(state->write_mask));
 	state->save_item(NAME(state->gfxbank));
@@ -286,7 +286,7 @@ static MACHINE_START( metlclsh )
 
 static MACHINE_RESET( metlclsh )
 {
-	metlclsh_state *state = machine->driver_data<metlclsh_state>();
+	metlclsh_state *state = machine.driver_data<metlclsh_state>();
 
 	flip_screen_set(machine, 0);
 

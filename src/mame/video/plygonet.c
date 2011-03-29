@@ -15,7 +15,7 @@
 
 static TILE_GET_INFO( ttl_get_tile_info )
 {
-	polygonet_state *state = machine->driver_data<polygonet_state>();
+	polygonet_state *state = machine.driver_data<polygonet_state>();
 	int attr, code;
 
 	code = state->ttl_vram[tile_index]&0xfff;
@@ -27,7 +27,7 @@ static TILE_GET_INFO( ttl_get_tile_info )
 
 static TILE_GET_INFO( roz_get_tile_info )
 {
-	polygonet_state *state = machine->driver_data<polygonet_state>();
+	polygonet_state *state = machine.driver_data<polygonet_state>();
 	int attr, code;
 
 	attr = (state->roz_vram[tile_index] >> 12) + 16;	/* roz base palette is palette 16 */
@@ -38,7 +38,7 @@ static TILE_GET_INFO( roz_get_tile_info )
 
 READ32_HANDLER( polygonet_ttl_ram_r )
 {
-	polygonet_state *state = space->machine->driver_data<polygonet_state>();
+	polygonet_state *state = space->machine().driver_data<polygonet_state>();
 	UINT32 *vram = (UINT32 *)state->ttl_vram;
 
 	return vram[offset];
@@ -46,7 +46,7 @@ READ32_HANDLER( polygonet_ttl_ram_r )
 
 WRITE32_HANDLER( polygonet_ttl_ram_w )
 {
-	polygonet_state *state = space->machine->driver_data<polygonet_state>();
+	polygonet_state *state = space->machine().driver_data<polygonet_state>();
 	UINT32 *vram = (UINT32 *)state->ttl_vram;
 
 	COMBINE_DATA(&vram[offset]);
@@ -57,7 +57,7 @@ WRITE32_HANDLER( polygonet_ttl_ram_w )
 
 READ32_HANDLER( polygonet_roz_ram_r )
 {
-	polygonet_state *state = space->machine->driver_data<polygonet_state>();
+	polygonet_state *state = space->machine().driver_data<polygonet_state>();
 	UINT32 *vram = (UINT32 *)state->roz_vram;
 
 	return vram[offset];
@@ -65,7 +65,7 @@ READ32_HANDLER( polygonet_roz_ram_r )
 
 WRITE32_HANDLER( polygonet_roz_ram_w )
 {
-	polygonet_state *state = space->machine->driver_data<polygonet_state>();
+	polygonet_state *state = space->machine().driver_data<polygonet_state>();
 	UINT32 *vram = (UINT32 *)state->roz_vram;
 
 	COMBINE_DATA(&vram[offset]);
@@ -86,7 +86,7 @@ static TILEMAP_MAPPER( plygonet_scan_cols )
 
 VIDEO_START( polygonet )
 {
-	polygonet_state *state = machine->driver_data<polygonet_state>();
+	polygonet_state *state = machine.driver_data<polygonet_state>();
 	static const gfx_layout charlayout =
 	{
 		8, 8,	/* 8x8 */
@@ -100,13 +100,13 @@ VIDEO_START( polygonet )
 
 	/* find first empty slot to decode gfx */
 	for (state->ttl_gfx_index = 0; state->ttl_gfx_index < MAX_GFX_ELEMENTS; state->ttl_gfx_index++)
-		if (machine->gfx[state->ttl_gfx_index] == 0)
+		if (machine.gfx[state->ttl_gfx_index] == 0)
 			break;
 
 	assert(state->ttl_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* decode the ttl layer's gfx */
-	machine->gfx[state->ttl_gfx_index] = gfx_element_alloc(machine, &charlayout, machine->region("gfx1")->base(), machine->total_colors() / 16, 0);
+	machine.gfx[state->ttl_gfx_index] = gfx_element_alloc(machine, &charlayout, machine.region("gfx1")->base(), machine.total_colors() / 16, 0);
 
 	/* create the tilemap */
 	state->ttl_tilemap = tilemap_create(machine, ttl_get_tile_info, plygonet_scan,  8, 8, 64, 32);
@@ -125,10 +125,10 @@ VIDEO_START( polygonet )
 
 SCREEN_UPDATE( polygonet )
 {
-	polygonet_state *state = screen->machine->driver_data<polygonet_state>();
-	device_t *k053936 = screen->machine->device("k053936");
-	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	polygonet_state *state = screen->machine().driver_data<polygonet_state>();
+	device_t *k053936 = screen->machine().device("k053936");
+	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	k053936_zoom_draw(k053936, bitmap, cliprect, state->roz_tilemap, 0, 0, 0);
 

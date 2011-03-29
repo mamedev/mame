@@ -107,10 +107,10 @@ INLINE int adjust_xy(segag80v_state *state, int rawx, int rawy, int *outx, int *
 }
 
 
-static void sega_generate_vector_list(running_machine *machine)
+static void sega_generate_vector_list(running_machine &machine)
 {
-	segag80v_state *state = machine->driver_data<segag80v_state>();
-	UINT8 *sintable = machine->region("proms")->base();
+	segag80v_state *state = machine.driver_data<segag80v_state>();
+	UINT8 *sintable = machine.region("proms")->base();
 	double total_time = 1.0 / (double)IRQ_CLOCK;
 	UINT16 symaddr = 0;
 	UINT8 *vectorram = state->vectorram;
@@ -325,11 +325,11 @@ static void sega_generate_vector_list(running_machine *machine)
 
 VIDEO_START( segag80v )
 {
-	segag80v_state *state = machine->driver_data<segag80v_state>();
+	segag80v_state *state = machine.driver_data<segag80v_state>();
 	assert_always(state->vectorram_size != 0, "vectorram==0");
 
-	state->min_x =machine->primary_screen->visible_area().min_x;
-	state->min_y =machine->primary_screen->visible_area().min_y;
+	state->min_x =machine.primary_screen->visible_area().min_x;
+	state->min_y =machine.primary_screen->visible_area().min_y;
 
 	VIDEO_START_CALL(vector);
 }
@@ -337,7 +337,7 @@ VIDEO_START( segag80v )
 
 SCREEN_UPDATE( segag80v )
 {
-	sega_generate_vector_list(screen->machine);
+	sega_generate_vector_list(screen->machine());
 	SCREEN_UPDATE_CALL(vector);
 	return 0;
 }

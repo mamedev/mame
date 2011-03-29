@@ -487,7 +487,7 @@ done:
     if (m_err!=0) {
 		if (!m_init_phase)
 		{
-			if (machine->phase() == MACHINE_PHASE_RUNNING)
+			if (m_machine.phase() == MACHINE_PHASE_RUNNING)
 				popmessage("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path, error());
 			else
 				mame_printf_error("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
@@ -496,13 +496,13 @@ done:
 	}
 	else {
 		/* do we need to reset the CPU? only schedule it if load/create is successful */
-		if (device().machine->time() > attotime::zero && m_image_config.is_reset_on_load())
-			device().machine->schedule_hard_reset();
+		if (device().machine().time() > attotime::zero && m_image_config.is_reset_on_load())
+			device().machine().schedule_hard_reset();
 		else
 		{
 			if (!m_init_phase)
 			{
-				if (machine->phase() == MACHINE_PHASE_RUNNING)
+				if (m_machine.phase() == MACHINE_PHASE_RUNNING)
 					popmessage("Image '%s' was successfully %s.", path, is_create ? "created" : "loaded");
 				else
 					mame_printf_info("Image '%s' was successfully %s.\n", path, is_create ? "created" : "loaded");

@@ -178,12 +178,12 @@ device_config *tms32032_device_config::static_alloc_device_config(const machine_
 
 device_t *tms32031_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, tms32031_device(machine, *this));
+	return auto_alloc(machine, tms32031_device(machine, *this));
 }
 
 device_t *tms32032_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, tms32032_device(machine, *this));
+	return auto_alloc(machine, tms32032_device(machine, *this));
 }
 
 
@@ -854,7 +854,7 @@ void tms3203x_device::execute_run()
 		{
 			// watch for out-of-range stack pointers
 			if (IREG(TMR_SP) & 0xff000000)
-				debugger_break(&m_machine);
+				debugger_break(m_machine);
 			if ((IREG(TMR_ST) & RMFLAG) && m_pc == IREG(TMR_RE) + 1)
 			{
 				if ((INT32)--IREG(TMR_RC) >= 0)

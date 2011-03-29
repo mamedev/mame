@@ -33,9 +33,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+static void update_interrupts(running_machine &machine)
 {
-	atarigx2_state *state = machine->driver_data<atarigx2_state>();
+	atarigx2_state *state = machine.driver_data<atarigx2_state>();
 	cputag_set_input_line(machine, "maincpu", 4, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 5, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -49,11 +49,11 @@ static MACHINE_START( atarigx2 )
 
 static MACHINE_RESET( atarigx2 )
 {
-	atarigx2_state *state = machine->driver_data<atarigx2_state>();
+	atarigx2_state *state = machine.driver_data<atarigx2_state>();
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarigen_scanline_timer_reset(*machine->primary_screen, atarigx2_scanline_update, 8);
+	atarigen_scanline_timer_reset(*machine.primary_screen, atarigx2_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -67,8 +67,8 @@ static MACHINE_RESET( atarigx2 )
 
 static READ32_HANDLER( special_port2_r )
 {
-	atarigx2_state *state = space->machine->driver_data<atarigx2_state>();
-	int temp = input_port_read(space->machine, "SERVICE");
+	atarigx2_state *state = space->machine().driver_data<atarigx2_state>();
+	int temp = input_port_read(space->machine(), "SERVICE");
 	if (state->cpu_to_sound_ready) temp ^= 0x0020;
 	if (state->sound_to_cpu_ready) temp ^= 0x0010;
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
@@ -78,7 +78,7 @@ static READ32_HANDLER( special_port2_r )
 
 static READ32_HANDLER( special_port3_r )
 {
-	int temp = input_port_read(space->machine, "SPECIAL");
+	int temp = input_port_read(space->machine(), "SPECIAL");
 	return (temp << 16) | temp;
 }
 
@@ -90,9 +90,9 @@ static READ32_HANDLER( a2d_data_r )
 	switch (offset)
 	{
 		case 0:
-			return (input_port_read(space->machine, "A2D0") << 24) | (input_port_read(space->machine, "A2D1") << 8);
+			return (input_port_read(space->machine(), "A2D0") << 24) | (input_port_read(space->machine(), "A2D1") << 8);
 		case 1:
-			return (input_port_read(space->machine, "A2D2") << 24) | (input_port_read(space->machine, "A2D3") << 8);
+			return (input_port_read(space->machine(), "A2D2") << 24) | (input_port_read(space->machine(), "A2D3") << 8);
 	}
 
 	return 0;
@@ -117,7 +117,7 @@ static WRITE32_HANDLER( latch_w )
 	/* upper byte */
 	if (ACCESSING_BITS_24_31)
 	{
-		atarigx2_state *state = space->machine->driver_data<atarigx2_state>();
+		atarigx2_state *state = space->machine().driver_data<atarigx2_state>();
 
 		/* bits 13-11 are the MO control bits */
 		atarirle_control_w(state->rle, (data >> 27) & 7);
@@ -125,13 +125,13 @@ static WRITE32_HANDLER( latch_w )
 
 	/* lower byte */
 	if (ACCESSING_BITS_16_23)
-		cputag_set_input_line(space->machine, "jsa", INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "jsa", INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 static WRITE32_HANDLER( mo_command_w )
 {
-	atarigx2_state *state = space->machine->driver_data<atarigx2_state>();
+	atarigx2_state *state = space->machine().driver_data<atarigx2_state>();
 	COMBINE_DATA(state->mo_command);
 	if (ACCESSING_BITS_0_15)
 		atarirle_command_w(state->rle, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
@@ -148,7 +148,7 @@ static WRITE32_HANDLER( mo_command_w )
 
 static WRITE32_HANDLER( atarigx2_protection_w )
 {
-	atarigx2_state *state = space->machine->driver_data<atarigx2_state>();
+	atarigx2_state *state = space->machine().driver_data<atarigx2_state>();
 	{
 		int pc = cpu_get_previouspc(space->cpu);
 //      if (pc == 0x11cbe || pc == 0x11c30)
@@ -1105,7 +1105,7 @@ static READ32_HANDLER( atarigx2_protection_r )
 		{ 0xffffffff, 0xffff }
 	};
 
-	atarigx2_state *state = space->machine->driver_data<atarigx2_state>();
+	atarigx2_state *state = space->machine().driver_data<atarigx2_state>();
 	UINT32 result = state->protection_base[offset];
 
 	if (offset == 0x300)
@@ -1128,7 +1128,7 @@ static READ32_HANDLER( atarigx2_protection_r )
 		if (lookup_table[i][0] == 0xffffffff)
 		{
 			if (state->last_write_offset*2 >= 0x700 && state->last_write_offset*2 < 0x720)
-				result = space->machine->rand() << 16;
+				result = space->machine().rand() << 16;
 			else
 				result = 0xffff << 16;
 			logerror("%06X:Unhandled protection R@%04X = %04X\n", cpu_get_previouspc(space->cpu), offset, result);
@@ -2194,7 +2194,7 @@ ROM_END
 
 static DRIVER_INIT( spclords )
 {
-	atarigx2_state *state = machine->driver_data<atarigx2_state>();
+	atarigx2_state *state = machine.driver_data<atarigx2_state>();
 
 	atarijsa_init(machine, "SERVICE", 0x0040);
 
@@ -2204,7 +2204,7 @@ static DRIVER_INIT( spclords )
 
 static DRIVER_INIT( motofren )
 {
-	atarigx2_state *state = machine->driver_data<atarigx2_state>();
+	atarigx2_state *state = machine.driver_data<atarigx2_state>();
 
 	atarijsa_init(machine, "SERVICE", 0x0040);
 
@@ -2240,13 +2240,13 @@ static READ32_HANDLER( rrreveng_prot_r )
 
 static DRIVER_INIT( rrreveng )
 {
-	atarigx2_state *state = machine->driver_data<atarigx2_state>();
+	atarigx2_state *state = machine.driver_data<atarigx2_state>();
 
 	atarijsa_init(machine, "SERVICE", 0x0040);
 
 	state->playfield_base = 0x000;
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xca0fc0, 0xca0fc3, FUNC(rrreveng_prot_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xca0fc0, 0xca0fc3, FUNC(rrreveng_prot_r));
 }
 
 

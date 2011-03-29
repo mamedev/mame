@@ -129,9 +129,9 @@ const char mame_disclaimer[] =
     given machine is valid
 -------------------------------------------------*/
 
-int mame_is_valid_machine(running_machine *machine)
+int mame_is_valid_machine(running_machine &machine)
 {
-	return (machine != NULL && machine == global_machine);
+	return (&machine == global_machine);
 }
 
 

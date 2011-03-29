@@ -35,7 +35,7 @@ public:
 
 /*----------- defined in drivers/exidy440.c -----------*/
 
-void exidy440_bank_select(running_machine *machine, UINT8 bank);
+void exidy440_bank_select(running_machine &machine, UINT8 bank);
 
 
 /*----------- defined in video/exidy440.c -----------*/

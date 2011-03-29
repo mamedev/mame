@@ -120,6 +120,8 @@ struct _gfx_layout
 class gfx_element
 {
 public:
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
 	UINT16			width;				/* current pixel width of each element (changeble with source clipping) */
 	UINT16			height;				/* current pixel height of each element (changeble with source clipping) */
 	UINT16			startx;				/* current source clip X offset */
@@ -144,7 +146,7 @@ public:
 	UINT8 *			dirty;				/* dirty array for detecting tiles that need decoding */
 	UINT32			dirtyseq;			/* sequence number; incremented each time a tile is dirtied */
 
-	running_machine *machine;			/* pointer to the owning machine */
+	running_machine *m_machine;			/* pointer to the owning machine */
 	gfx_layout		layout;				/* copy of the original layout */
 };
 
@@ -170,10 +172,10 @@ struct gfx_decode_entry
 /* ----- graphics elements ----- */
 
 /* allocate memory for the graphics elements referenced by a machine */
-void gfx_init(running_machine *machine);
+void gfx_init(running_machine &machine);
 
 /* allocate a gfx_element structure based on a given layout */
-gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base);
+gfx_element *gfx_element_alloc(running_machine &machine, const gfx_layout *gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base);
 
 /* update a single code in a gfx_element */
 void gfx_element_decode(const gfx_element *gfx, UINT32 code);
@@ -182,7 +184,7 @@ void gfx_element_decode(const gfx_element *gfx, UINT32 code);
 void gfx_element_free(gfx_element *gfx);
 
 /* create a temporary one-off gfx_element */
-void gfx_element_build_temporary(gfx_element *gfx, running_machine *machine, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 color_base, UINT32 color_granularity, UINT32 flags);
+void gfx_element_build_temporary(gfx_element *gfx, running_machine &machine, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 color_base, UINT32 color_granularity, UINT32 flags);
 
 
 

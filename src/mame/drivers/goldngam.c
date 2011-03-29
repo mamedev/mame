@@ -258,7 +258,7 @@ static VIDEO_START( goldngam )
 
 static SCREEN_UPDATE( goldngam )
 {
-	goldngam_state *state = screen->machine->driver_data<goldngam_state>();
+	goldngam_state *state = screen->machine().driver_data<goldngam_state>();
 
 	int x, y;
 
@@ -291,7 +291,7 @@ static PALETTE_INIT( goldngam )
 
 static READ16_HANDLER(unk_r)
 {
-    int test1 = (space->machine->rand() & 0xae00);
+    int test1 = (space->machine().rand() & 0xae00);
 //  popmessage("VAL = %02x", test1);
 
 	return test1;

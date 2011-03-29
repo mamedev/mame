@@ -345,14 +345,14 @@ Notes:
 #define CPS3_TRANSPARENCY_PEN_INDEX 2
 #define CPS3_TRANSPARENCY_PEN_INDEX_BLEND 3
 
-static void copy_from_nvram(running_machine *machine);
+static void copy_from_nvram(running_machine &machine);
 
 INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		int transparency,int transparent_color,
 		int scalex, int scaley,bitmap_t *pri_buffer,UINT32 pri_mask)
 {
-	cps3_state *state = gfx->machine->driver_data<cps3_state>();
+	cps3_state *state = gfx->machine().driver_data<cps3_state>();
 	rectangle myclip;
 
 //  UINT8 al;
@@ -549,7 +549,7 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_
 											if (c&0x02) dest[x] |= 0x4000;
 											if (c&0x04) dest[x] |= 0x8000;
 											if (c&0x08) dest[x] |= 0x10000;
-											if (c&0xf0) dest[x] |= gfx->machine->rand(); // ?? not used?
+											if (c&0xf0) dest[x] |= gfx->machine().rand(); // ?? not used?
 										}
 										else
 										{
@@ -616,13 +616,13 @@ static UINT32 cps3_mask(UINT32 address, UINT32 key1, UINT32 key2)
 	return val | (val << 16);
 }
 
-static void cps3_decrypt_bios(running_machine *machine)
+static void cps3_decrypt_bios(running_machine &machine)
 {
-	cps3_state *state = machine->driver_data<cps3_state>();
+	cps3_state *state = machine.driver_data<cps3_state>();
 	int i;
-	UINT32 *coderegion = (UINT32*)machine->region("user1")->base();
+	UINT32 *coderegion = (UINT32*)machine.region("user1")->base();
 
-	state->decrypted_bios = (UINT32*)machine->region("user1")->base();
+	state->decrypted_bios = (UINT32*)machine.region("user1")->base();
 
 	for (i=0;i<0x80000;i+=4)
 	{
@@ -634,7 +634,7 @@ static void cps3_decrypt_bios(running_machine *machine)
 	/* Dump to file */
 	{
 		FILE *fp;
-		const char *gamename = machine->system().name;
+		const char *gamename = machine.system().name;
 		char filename[256];
 		sprintf(filename, "%s_bios.dump", gamename);
 
@@ -649,23 +649,23 @@ static void cps3_decrypt_bios(running_machine *machine)
 }
 
 
-static void init_common(running_machine *machine, UINT32 key1, UINT32 key2, int altEncryption)
+static void init_common(running_machine &machine, UINT32 key1, UINT32 key2, int altEncryption)
 {
-	cps3_state *state = machine->driver_data<cps3_state>();
+	cps3_state *state = machine.driver_data<cps3_state>();
 
 	state->key1 = key1;
 	state->key2 = key2;
 	state->altEncryption = altEncryption;
 
 	// cache pointers to regions
-	state->user4region = machine->region("user4")->base();
-	state->user5region = machine->region("user5")->base();
+	state->user4region = machine.region("user4")->base();
+	state->user5region = machine.region("user5")->base();
 
 	if (!state->user4region) state->user4region = auto_alloc_array(machine, UINT8, USER4REGION_LENGTH);
 	if (!state->user5region) state->user5region = auto_alloc_array(machine, UINT8, USER5REGION_LENGTH);
 
 	// set strict verify
-	sh2drc_set_options(machine->device("maincpu"), SH2DRC_STRICT_VERIFY);
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_STRICT_VERIFY);
 
 	cps3_decrypt_bios(machine);
 	state->decrypted_gamerom = auto_alloc_array(machine, UINT32, 0x1000000/4);
@@ -678,17 +678,17 @@ static void init_common(running_machine *machine, UINT32 key1, UINT32 key2, int 
 
 	state->_0xc0000000_ram_decrypted = auto_alloc_array(machine, UINT32, 0x400/4);
 
-	address_space *main = machine->device<sh2_device>("maincpu")->space(AS_PROGRAM);
-	main->set_direct_update_handler(direct_update_delegate_create_static(cps3_direct_handler, *machine));
+	address_space *main = machine.device<sh2_device>("maincpu")->space(AS_PROGRAM);
+	main->set_direct_update_handler(direct_update_delegate_create_static(cps3_direct_handler, machine));
 
 	// flash roms
 	astring tempstr;
 	for (int simmnum = 0; simmnum < 7; simmnum++)
 		for (int chipnum = 0; chipnum < 8; chipnum++)
-			state->simm[simmnum][chipnum] = machine->device<fujitsu_29f016a_device>(tempstr.format("simm%d.%d", simmnum + 1, chipnum));
+			state->simm[simmnum][chipnum] = machine.device<fujitsu_29f016a_device>(tempstr.format("simm%d.%d", simmnum + 1, chipnum));
 
 	state->eeprom = auto_alloc_array(machine, UINT32, 0x400/4);
-	machine->device<nvram_device>("eeprom")->set_base(state->eeprom, 0x400);
+	machine.device<nvram_device>("eeprom")->set_base(state->eeprom, 0x400);
 }
 
 static DRIVER_INIT( jojo )    { init_common(machine, 0x02203ee3, 0x01301972, 0); }
@@ -729,9 +729,9 @@ static const gfx_layout cps3_tiles8x8_layout =
 };
 
 
-static void cps3_set_mame_colours(running_machine *machine, int colournum, UINT16 data, UINT32 fadeval)
+static void cps3_set_mame_colours(running_machine &machine, int colournum, UINT16 data, UINT32 fadeval)
 {
-	cps3_state *state = machine->driver_data<cps3_state>();
+	cps3_state *state = machine.driver_data<cps3_state>();
 	int r,g,b;
 	UINT16* dst = (UINT16*)state->colourram;
 
@@ -771,7 +771,7 @@ static void cps3_set_mame_colours(running_machine *machine, int colournum, UINT1
 
 static VIDEO_START(cps3)
 {
-	cps3_state *state = machine->driver_data<cps3_state>();
+	cps3_state *state = machine.driver_data<cps3_state>();
 	state->ss_ram       = auto_alloc_array(machine, UINT32, 0x10000/4);
 	memset(state->ss_ram, 0x00, 0x10000);
 	state_save_register_global_pointer(machine, state->ss_ram, 0x10000/4);
@@ -781,13 +781,13 @@ static VIDEO_START(cps3)
 	state_save_register_global_pointer(machine, state->char_ram, 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[0] = gfx_element_alloc(machine, &cps3_tiles8x8_layout, (UINT8 *)state->ss_ram, machine->total_colors() / 16, 0);
+	machine.gfx[0] = gfx_element_alloc(machine, &cps3_tiles8x8_layout, (UINT8 *)state->ss_ram, machine.total_colors() / 16, 0);
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[1] = gfx_element_alloc(machine, &cps3_tiles16x16_layout, (UINT8 *)state->char_ram, machine->total_colors() / 64, 0);
-	machine->gfx[1]->color_granularity = 64;
+	machine.gfx[1] = gfx_element_alloc(machine, &cps3_tiles16x16_layout, (UINT8 *)state->char_ram, machine.total_colors() / 64, 0);
+	machine.gfx[1]->color_granularity = 64;
 
 	//decode_charram();
 
@@ -798,7 +798,7 @@ static VIDEO_START(cps3)
 
 	// the renderbuffer can be twice the size of the screen, this allows us to handle framebuffer zoom values
 	// between 0x00 and 0x80 (0x40 is normal, 0x80 would be 'view twice as much', 0x20 is 'view half as much')
-	state->renderbuffer_bitmap = auto_bitmap_alloc(machine,512*2,224*2,machine->primary_screen->format());
+	state->renderbuffer_bitmap = auto_bitmap_alloc(machine,512*2,224*2,machine.primary_screen->format());
 
 	state->renderbuffer_clip.min_x = 0;
 	state->renderbuffer_clip.max_x = state->screenwidth-1;
@@ -811,9 +811,9 @@ static VIDEO_START(cps3)
 
 // the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
 
-static void cps3_draw_tilemapsprite_line(running_machine *machine, int tmnum, int drawline, bitmap_t *bitmap, const rectangle *cliprect )
+static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, int drawline, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	cps3_state *state = machine->driver_data<cps3_state>();
+	cps3_state *state = machine.driver_data<cps3_state>();
 	UINT32* tmapregs[4] = { state->tilemap20_regs_base, state->tilemap30_regs_base, state->tilemap40_regs_base, state->tilemap50_regs_base };
 	UINT32* regs;
 	int line;
@@ -886,17 +886,17 @@ static void cps3_draw_tilemapsprite_line(running_machine *machine, int tmnum, in
 			yflip  = (dat & 0x00000800)>>11;
 			xflip  = (dat & 0x00001000)>>12;
 
-			if (!bpp) machine->gfx[1]->color_granularity=256;
-			else machine->gfx[1]->color_granularity=64;
+			if (!bpp) machine.gfx[1]->color_granularity=256;
+			else machine.gfx[1]->color_granularity=64;
 
-			cps3_drawgfxzoom(bitmap,&clip,machine->gfx[1],tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
+			cps3_drawgfxzoom(bitmap,&clip,machine.gfx[1],tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
 		}
 	}
 }
 
 static SCREEN_UPDATE(cps3)
 {
-	cps3_state *state = screen->machine->driver_data<cps3_state>();
+	cps3_state *state = screen->machine().driver_data<cps3_state>();
 	int y,x, count;
 	attoseconds_t period = screen->frame_period().attoseconds;
 	rectangle visarea = screen->visible_area();
@@ -1046,7 +1046,7 @@ static SCREEN_UPDATE(cps3)
 					{
 						for (uu=0;uu<1023;uu++)
 						{
-							cps3_draw_tilemapsprite_line(screen->machine, tilemapnum, uu, state->renderbuffer_bitmap, &state->renderbuffer_clip );
+							cps3_draw_tilemapsprite_line(screen->machine(), tilemapnum, uu, state->renderbuffer_bitmap, &state->renderbuffer_clip );
 						}
 					}
 					bg_drawn[tilemapnum] = 1;
@@ -1104,7 +1104,7 @@ static SCREEN_UPDATE(cps3)
 
 								if (current_ypos&0x200) current_ypos-=0x400;
 
-								//if ( (whichbpp) && (machine->primary_screen->frame_number() & 1)) continue;
+								//if ( (whichbpp) && (machine.primary_screen->frame_number() & 1)) continue;
 
 								/* use the palette value from the main list or the sublists? */
 								if (whichpal)
@@ -1119,13 +1119,13 @@ static SCREEN_UPDATE(cps3)
 								/* use the bpp value from the main list or the sublists? */
 								if (whichbpp)
 								{
-									if (!global_bpp) screen->machine->gfx[1]->color_granularity=256;
-									else screen->machine->gfx[1]->color_granularity=64;
+									if (!global_bpp) screen->machine().gfx[1]->color_granularity=256;
+									else screen->machine().gfx[1]->color_granularity=64;
 								}
 								else
 								{
-									if (!bpp) screen->machine->gfx[1]->color_granularity=256;
-									else screen->machine->gfx[1]->color_granularity=64;
+									if (!bpp) screen->machine().gfx[1]->color_granularity=256;
+									else screen->machine().gfx[1]->color_granularity=64;
 								}
 
 								{
@@ -1133,11 +1133,11 @@ static SCREEN_UPDATE(cps3)
 
 									if (global_alpha || alpha)
 									{
-										cps3_drawgfxzoom(state->renderbuffer_bitmap,&state->renderbuffer_clip,screen->machine->gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(state->renderbuffer_bitmap,&state->renderbuffer_clip,screen->machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
 									}
 									else
 									{
-										cps3_drawgfxzoom(state->renderbuffer_bitmap,&state->renderbuffer_clip,screen->machine->gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(state->renderbuffer_bitmap,&state->renderbuffer_clip,screen->machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
 									}
 									count++;
 								}
@@ -1203,7 +1203,7 @@ static SCREEN_UPDATE(cps3)
 				pal += state->ss_pal_base << 5;
 				tile+=0x200;
 
-				cps3_drawgfxzoom(bitmap, cliprect, screen->machine->gfx[0],tile,pal,flipx,flipy,x*8,y*8,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,NULL,0);
+				cps3_drawgfxzoom(bitmap, cliprect, screen->machine().gfx[0],tile,pal,flipx,flipy,x*8,y*8,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,NULL,0);
 				count++;
 			}
 		}
@@ -1213,7 +1213,7 @@ static SCREEN_UPDATE(cps3)
 
 static READ32_HANDLER( cps3_ssram_r )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	if (offset>0x8000/4)
 		return LITTLE_ENDIANIZE_INT32(state->ss_ram[offset]);
 	else
@@ -1222,13 +1222,13 @@ static READ32_HANDLER( cps3_ssram_r )
 
 static WRITE32_HANDLER( cps3_ssram_w )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	if (offset>0x8000/4)
 	{
 		// we only want to endian-flip the character data, the tilemap info is fine
 		data = LITTLE_ENDIANIZE_INT32(data);
 		mem_mask = LITTLE_ENDIANIZE_INT32(mem_mask);
-		gfx_element_mark_dirty(space->machine->gfx[0], offset/16);
+		gfx_element_mark_dirty(space->machine().gfx[0], offset/16);
 	}
 
 	COMBINE_DATA(&state->ss_ram[offset]);
@@ -1236,7 +1236,7 @@ static WRITE32_HANDLER( cps3_ssram_w )
 
 static WRITE32_HANDLER( cps3_0xc0000000_ram_w )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	COMBINE_DATA( &state->_0xc0000000_ram[offset] );
 	// store a decrypted copy
 	state->_0xc0000000_ram_decrypted[offset] = state->_0xc0000000_ram[offset]^cps3_mask(offset*4+0xc0000000, state->key1, state->key2);
@@ -1252,7 +1252,7 @@ DIRECT_UPDATE_HANDLER( cps3_direct_handler )
 	/* BIOS ROM */
 	if (address < 0x80000)
 	{
-		direct.explicit_configure(0x00000, 0x7ffff, 0x7ffff, *direct.space().m_machine.region("user1"));
+		direct.explicit_configure(0x00000, 0x7ffff, 0x7ffff, *direct.space().machine().region("user1"));
 		return ~0;
 	}
 	/* RAM */
@@ -1282,7 +1282,7 @@ DIRECT_UPDATE_HANDLER( cps3_direct_handler )
 
 static WRITE32_HANDLER( cram_bank_w )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		// this seems to be related to accesses to the 0x04100000 region
@@ -1312,7 +1312,7 @@ static WRITE32_HANDLER( cram_bank_w )
 
 static READ32_HANDLER( cram_data_r )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	UINT32 fulloffset = (((state->cram_bank&0x7)*0x100000)/4) + offset;
 
 	return LITTLE_ENDIANIZE_INT32(state->char_ram[fulloffset]);
@@ -1320,19 +1320,19 @@ static READ32_HANDLER( cram_data_r )
 
 static WRITE32_HANDLER( cram_data_w )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	UINT32 fulloffset = (((state->cram_bank&0x7)*0x100000)/4) + offset;
 	mem_mask = LITTLE_ENDIANIZE_INT32(mem_mask);
 	data = LITTLE_ENDIANIZE_INT32(data);
 	COMBINE_DATA(&state->char_ram[fulloffset]);
-	gfx_element_mark_dirty(space->machine->gfx[1], fulloffset/0x40);
+	gfx_element_mark_dirty(space->machine().gfx[1], fulloffset/0x40);
 }
 
 /* FLASH ROM ACCESS */
 
 static READ32_HANDLER( cps3_gfxflash_r )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	UINT32 result = 0;
 	if (state->cram_gfxflash_bank&1) offset += 0x200000/4;
 
@@ -1371,7 +1371,7 @@ static READ32_HANDLER( cps3_gfxflash_r )
 
 static WRITE32_HANDLER( cps3_gfxflash_w )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	int command;
 	if (state->cram_gfxflash_bank&1) offset += 0x200000/4;
 
@@ -1430,7 +1430,7 @@ static WRITE32_HANDLER( cps3_gfxflash_w )
 
 static UINT32 cps3_flashmain_r(address_space *space, int which, UINT32 offset, UINT32 mem_mask)
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	UINT32 result = 0;
 
 	if (state->simm[which][0] == NULL || state->simm[which][1] == NULL || state->simm[which][2] == NULL || state->simm[which][3] == NULL)
@@ -1466,7 +1466,7 @@ static UINT32 cps3_flashmain_r(address_space *space, int which, UINT32 offset, U
 
 static READ32_HANDLER( cps3_flash1_r )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	UINT32 retvalue = cps3_flashmain_r(space, 0, offset,mem_mask);
 
 	if (state->altEncryption) return retvalue;
@@ -1477,7 +1477,7 @@ static READ32_HANDLER( cps3_flash1_r )
 
 static READ32_HANDLER( cps3_flash2_r )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	UINT32 retvalue = cps3_flashmain_r(space, 1, offset,mem_mask);
 
 	if (state->altEncryption) return retvalue;
@@ -1486,9 +1486,9 @@ static READ32_HANDLER( cps3_flash2_r )
 	return retvalue;
 }
 
-static void cps3_flashmain_w(running_machine *machine, int which, UINT32 offset, UINT32 data, UINT32 mem_mask)
+static void cps3_flashmain_w(running_machine &machine, int which, UINT32 offset, UINT32 data, UINT32 mem_mask)
 {
-	cps3_state *state = machine->driver_data<cps3_state>();
+	cps3_state *state = machine.driver_data<cps3_state>();
 	int command;
 
 	if (state->simm[which][0] == NULL || state->simm[which][1] == NULL || state->simm[which][2] == NULL || state->simm[which][3] == NULL)
@@ -1549,17 +1549,17 @@ static void cps3_flashmain_w(running_machine *machine, int which, UINT32 offset,
 
 static WRITE32_HANDLER( cps3_flash1_w )
 {
-	cps3_flashmain_w(space->machine,0,offset,data,mem_mask);
+	cps3_flashmain_w(space->machine(),0,offset,data,mem_mask);
 }
 
 static WRITE32_HANDLER( cps3_flash2_w )
 {
-	cps3_flashmain_w(space->machine,1,offset,data,mem_mask);
+	cps3_flashmain_w(space->machine(),1,offset,data,mem_mask);
 }
 
 static WRITE32_HANDLER( cram_gfxflash_bank_w )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	if (ACCESSING_BITS_24_31)
 	{
 		//printf("cram_gfxflash_bank_w MSB32 %08x\n",data);
@@ -1640,7 +1640,7 @@ static READ32_HANDLER( cps3_40C0004_r )
 
 static READ32_HANDLER( cps3_eeprom_r )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	int addr = offset*4;
 
 	if (addr>=0x100 && addr<=0x17f)
@@ -1670,7 +1670,7 @@ static READ32_HANDLER( cps3_eeprom_r )
 
 static WRITE32_HANDLER( cps3_eeprom_w )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	int addr = offset*4;
 
 	if (addr>=0x080 && addr<=0x0ff)
@@ -1723,7 +1723,7 @@ static WRITE32_HANDLER( cps3_cdrom_w )
 
 static WRITE32_HANDLER( cps3_ss_bank_base_w )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	// might be scroll registers or something else..
 	// used to display bank with 'insert coin' on during sfiii2 attract intro
 	COMBINE_DATA(&state->ss_bank_base);
@@ -1733,7 +1733,7 @@ static WRITE32_HANDLER( cps3_ss_bank_base_w )
 
 static WRITE32_HANDLER( cps3_ss_pal_base_w )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	 if(DEBUG_PRINTF) printf ("cps3_ss_pal_base_w %08x %08x\n", data, mem_mask);
 
 	if(ACCESSING_BITS_24_31)
@@ -1754,7 +1754,7 @@ static WRITE32_HANDLER( cps3_ss_pal_base_w )
 
 static WRITE32_HANDLER( cps3_palettedma_w )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	if (offset==0)
 	{
 		COMBINE_DATA(&state->paldma_source);
@@ -1790,11 +1790,11 @@ static WRITE32_HANDLER( cps3_palettedma_w )
 
 					//if (state->paldma_fade!=0) printf("%08x\n",state->paldma_fade);
 
-					cps3_set_mame_colours(space->machine, (state->paldma_dest+i)^1, coldata, state->paldma_fade);
+					cps3_set_mame_colours(space->machine(), (state->paldma_dest+i)^1, coldata, state->paldma_fade);
 				}
 
 
-				cputag_set_input_line(space->machine, "maincpu", 10, ASSERT_LINE);
+				cputag_set_input_line(space->machine(), "maincpu", 10, ASSERT_LINE);
 
 
 			}
@@ -1809,9 +1809,9 @@ static WRITE32_HANDLER( cps3_palettedma_w )
 
 
 
-static UINT32 process_byte( running_machine *machine, UINT8 real_byte, UINT32 destination, int max_length )
+static UINT32 process_byte( running_machine &machine, UINT8 real_byte, UINT32 destination, int max_length )
 {
-	cps3_state *state = machine->driver_data<cps3_state>();
+	cps3_state *state = machine.driver_data<cps3_state>();
 	UINT8* dest       = (UINT8*)state->char_ram;
 
 	//printf("process byte for destination %08x\n", destination);
@@ -1830,7 +1830,7 @@ static UINT32 process_byte( running_machine *machine, UINT8 real_byte, UINT32 de
 		while (state->rle_length)
 		{
 			dest[((destination+tranfercount)&0x7fffff)^3] = (state->last_normal_byte&0x3f);
-			gfx_element_mark_dirty(machine->gfx[1], ((destination+tranfercount)&0x7fffff)/0x100);
+			gfx_element_mark_dirty(machine.gfx[1], ((destination+tranfercount)&0x7fffff)/0x100);
 			//printf("RLE WRite Byte %08x, %02x\n", destination+tranfercount, real_byte);
 
 			tranfercount++;
@@ -1849,14 +1849,14 @@ static UINT32 process_byte( running_machine *machine, UINT8 real_byte, UINT32 de
 		//printf("Write Normal Data\n");
 		dest[(destination&0x7fffff)^3] = real_byte;
 		state->last_normal_byte = real_byte;
-		gfx_element_mark_dirty(machine->gfx[1], (destination&0x7fffff)/0x100);
+		gfx_element_mark_dirty(machine.gfx[1], (destination&0x7fffff)/0x100);
 		return 1;
 	}
 }
 
-static void cps3_do_char_dma( running_machine *machine, UINT32 real_source, UINT32 real_destination, UINT32 real_length )
+static void cps3_do_char_dma( running_machine &machine, UINT32 real_source, UINT32 real_destination, UINT32 real_length )
 {
-	cps3_state *state = machine->driver_data<cps3_state>();
+	cps3_state *state = machine.driver_data<cps3_state>();
 	UINT8* sourcedata = (UINT8*)state->user5region;
 	int length_remaining;
 
@@ -1906,9 +1906,9 @@ static void cps3_do_char_dma( running_machine *machine, UINT32 real_source, UINT
 	}
 }
 
-static UINT32 ProcessByte8(running_machine *machine,UINT8 b,UINT32 dst_offset)
+static UINT32 ProcessByte8(running_machine &machine,UINT8 b,UINT32 dst_offset)
 {
-	cps3_state *state = machine->driver_data<cps3_state>();
+	cps3_state *state = machine.driver_data<cps3_state>();
 	UINT8* destRAM = (UINT8*)state->char_ram;
 	int l=0;
 
@@ -1920,7 +1920,7 @@ static UINT32 ProcessByte8(running_machine *machine,UINT8 b,UINT32 dst_offset)
 		for(i=0;i<rle;++i)
 		{
 			destRAM[(dst_offset&0x7fffff)^3] = state->lastb;
-			gfx_element_mark_dirty(machine->gfx[1], (dst_offset&0x7fffff)/0x100);
+			gfx_element_mark_dirty(machine.gfx[1], (dst_offset&0x7fffff)/0x100);
 
 			dst_offset++;
 			++l;
@@ -1934,14 +1934,14 @@ static UINT32 ProcessByte8(running_machine *machine,UINT8 b,UINT32 dst_offset)
 		state->lastb2=state->lastb;
 		state->lastb=b;
 		destRAM[(dst_offset&0x7fffff)^3] = b;
-		gfx_element_mark_dirty(machine->gfx[1], (dst_offset&0x7fffff)/0x100);
+		gfx_element_mark_dirty(machine.gfx[1], (dst_offset&0x7fffff)/0x100);
 		return 1;
 	}
 }
 
-static void cps3_do_alt_char_dma( running_machine *machine, UINT32 src, UINT32 real_dest, UINT32 real_length )
+static void cps3_do_alt_char_dma( running_machine &machine, UINT32 src, UINT32 real_dest, UINT32 real_length )
 {
-	cps3_state *state = machine->driver_data<cps3_state>();
+	cps3_state *state = machine.driver_data<cps3_state>();
 	UINT8* px = (UINT8*)state->user5region;
 	UINT32 start = real_dest;
 	UINT32 ds = real_dest;
@@ -1981,9 +1981,9 @@ static void cps3_do_alt_char_dma( running_machine *machine, UINT32 src, UINT32 r
 	}
 }
 
-static void cps3_process_character_dma(running_machine *machine, UINT32 address)
+static void cps3_process_character_dma(running_machine &machine, UINT32 address)
 {
-	cps3_state *state = machine->driver_data<cps3_state>();
+	cps3_state *state = machine.driver_data<cps3_state>();
 	int i;
 
 	//printf("charDMA start:\n");
@@ -2036,7 +2036,7 @@ static void cps3_process_character_dma(running_machine *machine, UINT32 address)
 
 static WRITE32_HANDLER( cps3_characterdma_w )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	if(DEBUG_PRINTF) printf("chardma_w %08x %08x %08x\n", offset, data, mem_mask);
 
 	if (offset==0)
@@ -2063,7 +2063,7 @@ static WRITE32_HANDLER( cps3_characterdma_w )
 				list_address = (state->chardma_source | ((state->chardma_other&0x003f0000)));
 
 				//printf("chardma_w activated %08x %08x (address = cram %08x)\n", state->chardma_source, state->chardma_other, list_address*4 );
-				cps3_process_character_dma(space->machine, list_address);
+				cps3_process_character_dma(space->machine(), list_address);
 			}
 			else
 			{
@@ -2082,23 +2082,23 @@ static WRITE32_HANDLER( cps3_characterdma_w )
 
 static WRITE32_HANDLER( cps3_irq10_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 10, CLEAR_LINE); return;
+	cputag_set_input_line(space->machine(), "maincpu", 10, CLEAR_LINE); return;
 }
 
 static WRITE32_HANDLER( cps3_irq12_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 12, CLEAR_LINE); return;
+	cputag_set_input_line(space->machine(), "maincpu", 12, CLEAR_LINE); return;
 }
 
 static WRITE32_HANDLER( cps3_unk_vidregs_w )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	COMBINE_DATA(&state->unk_vidregs[offset]);
 }
 
 static READ32_HANDLER( cps3_colourram_r )
 {
-	cps3_state *state = space->machine->driver_data<cps3_state>();
+	cps3_state *state = space->machine().driver_data<cps3_state>();
 	UINT16* src = (UINT16*)state->colourram;
 
 	return src[offset*2+1] | (src[offset*2+0]<<16);
@@ -2106,17 +2106,17 @@ static READ32_HANDLER( cps3_colourram_r )
 
 static WRITE32_HANDLER( cps3_colourram_w )
 {
-	//cps3_state *state = space->machine->driver_data<cps3_state>();
+	//cps3_state *state = space->machine().driver_data<cps3_state>();
 //  COMBINE_DATA(&state->colourram[offset]);
 
 	if (ACCESSING_BITS_24_31)
 	{
-		cps3_set_mame_colours(space->machine, offset*2, (data & 0xffff0000) >> 16, 0);
+		cps3_set_mame_colours(space->machine(), offset*2, (data & 0xffff0000) >> 16, 0);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-		cps3_set_mame_colours(space->machine, offset*2+1, (data & 0x0000ffff) >> 0, 0);
+		cps3_set_mame_colours(space->machine(), offset*2+1, (data & 0x0000ffff) >> 0, 0);
 	}
 }
 
@@ -2266,12 +2266,12 @@ static void cps3_exit(running_machine &machine)
 static MACHINE_START( cps3 )
 {
 	wd33c93_init(machine, &scsi_intf);
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, cps3_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, cps3_exit);
 }
 
 static MACHINE_RESET( cps3 )
 {
-	cps3_state *state = machine->driver_data<cps3_state>();
+	cps3_state *state = machine.driver_data<cps3_state>();
 	state->current_table_address = -1;
 
 	// copy data from flashroms back into user regions + decrypt into regions we execute/draw from.
@@ -2281,9 +2281,9 @@ static MACHINE_RESET( cps3 )
 
 
 // make a copy in the regions we execute code / draw gfx from
-static void copy_from_nvram(running_machine *machine)
+static void copy_from_nvram(running_machine &machine)
 {
-	cps3_state *state = machine->driver_data<cps3_state>();
+	cps3_state *state = machine.driver_data<cps3_state>();
 	UINT32* romdata = (UINT32*)state->user4region;
 	UINT32* romdata2 = (UINT32*)state->decrypted_gamerom;
 	int i;
@@ -2353,7 +2353,7 @@ static void copy_from_nvram(running_machine *machine)
 	/*
     {
         FILE *fp;
-        const char *gamename = machine->system().name;
+        const char *gamename = machine.system().name;
         char filename[256];
         sprintf(filename, "%s_bios.dump", gamename);
 
@@ -2371,7 +2371,7 @@ static void copy_from_nvram(running_machine *machine)
 
 static int cps3_dma_callback(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size)
 {
-	cps3_state *state = device->machine->driver_data<cps3_state>();
+	cps3_state *state = device->machine().driver_data<cps3_state>();
 	/*
       on the actual CPS3 hardware the SH2 DMA bypasses the encryption.
 
@@ -2408,7 +2408,7 @@ static int cps3_dma_callback(device_t *device, UINT32 src, UINT32 dst, UINT32 da
 	}
 	else
 	{
-		//printf("%s :src %08x, dst %08x, returning %08x\n", machine->describe_context(), src, dst, data);
+		//printf("%s :src %08x, dst %08x, returning %08x\n", machine.describe_context(), src, dst, data);
 	}
 
 	/* I doubt this is endian safe.. needs checking / fixing */
@@ -3095,7 +3095,7 @@ ROM_END
 
     DEVELOPMENT VERSION add 0x70 mask!
 
-    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
+    UINT32 *rom =  (UINT32*)machine.region ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region hack (clear jpn)
 
     rom[0x1fec8/4]^=0x00000004; // region
@@ -3120,7 +3120,7 @@ ROM_END
 
     DEVELOPMENT VERSION add 0x70 mask!
 
-    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
+    UINT32 *rom =  (UINT32*)machine.region ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region (clear jpn)
     rom[0x1fec8/4]^=0x00000002; // region
     rom[0x1fec8/4]^=0x00000070; // DEV mode
@@ -3141,7 +3141,7 @@ ROM_END
     OCEANIA 7
     ASIA NCD 8
 
-    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
+    UINT32 *rom =  (UINT32*)machine.region ( "user1" )->base();
     rom[0x1fed8/4]^=0x00000001; // clear region to 0 (invalid)
     rom[0x1fed8/4]^=0x00000008; // region 8 - ASIA NO CD - doesn't actually skip the CD
                                 // test on startup, only during game, must be another flag
@@ -3166,7 +3166,7 @@ ROM_END
 
     // bios rom also lists korea, but game rom does not.
 
-    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
+    UINT32 *rom =  (UINT32*)machine.region ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region (clear region)
     rom[0x1fec8/4]^=0x00000008; // region
     rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test
@@ -3188,7 +3188,7 @@ ROM_END
     OCEANIA 7
     ASIA 8
 
-    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
+    UINT32 *rom =  (UINT32*)machine.region ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region (clear region)
     rom[0x1fec8/4]^=0x00000008; // region
     rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test
@@ -3210,7 +3210,7 @@ ROM_END
     BRAZIL 6
     OCEANIA 7
 
-    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
+    UINT32 *rom =  (UINT32*)machine.region ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000004; // region (clear region)
     rom[0x1fec8/4]^=0x00000001; // region
     rom[0x1fecc/4]^=0x01000000; // nocd

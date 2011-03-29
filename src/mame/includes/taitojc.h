@@ -63,8 +63,8 @@ READ32_HANDLER(taitojc_tile_r);
 WRITE32_HANDLER(taitojc_tile_w);
 READ32_HANDLER(taitojc_char_r);
 WRITE32_HANDLER(taitojc_char_w);
-void taitojc_clear_frame(running_machine *machine);
-void taitojc_render_polygons(running_machine *machine, UINT16 *polygon_fifo, int length);
+void taitojc_clear_frame(running_machine &machine);
+void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int length);
 
 VIDEO_START(taitojc);
 SCREEN_UPDATE(taitojc);

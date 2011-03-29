@@ -418,7 +418,7 @@ INLINE void CYCLES_RM(i386_state *cpustate,int modrm, int r, int m)
 	}
 }
 
-static void build_cycle_table(running_machine *machine)
+static void build_cycle_table(running_machine &machine)
 {
 	int i, j;
 	for (j=0; j < X86_NUM_CPUS; j++)
@@ -534,7 +534,7 @@ static CPU_INIT( i386 )
 	static const int regs32[8] = {EAX,ECX,EDX,EBX,ESP,EBP,ESI,EDI};
 	i386_state *cpustate = get_safe_token(device);
 
-	build_cycle_table(device->machine);
+	build_cycle_table(device->machine());
 
 	for( i=0; i < 256; i++ ) {
 		int c=0;
@@ -614,7 +614,7 @@ static CPU_INIT( i386 )
 	device->save_item(NAME(cpustate->ldtr.flags));
 	device->save_item(NAME(cpustate->irq_state));
 	device->save_item(NAME(cpustate->performed_intersegment_jump));
-	device->machine->state().register_postload(i386_postload, (void *)device);
+	device->machine().state().register_postload(i386_postload, (void *)device);
 }
 
 static void build_opcode_table(i386_state *cpustate, UINT32 features)

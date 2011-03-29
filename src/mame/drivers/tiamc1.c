@@ -120,14 +120,14 @@
 
 static MACHINE_RESET( tiamc1 )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	tiamc1_bankswitch_w(space, 0, 0);
 }
 
 static WRITE8_HANDLER( tiamc1_control_w )
 {
-	coin_lockout_w(space->machine, 0, ~data & 0x02);
-	coin_counter_w(space->machine, 0, data & 0x04);
+	coin_lockout_w(space->machine(), 0, ~data & 0x02);
+	coin_counter_w(space->machine(), 0, data & 0x04);
 }
 
 

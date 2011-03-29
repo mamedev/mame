@@ -53,7 +53,7 @@ static READ8_HANDLER( adc_r );
 
 static WRITE16_HANDLER( adrst_w )
 {
-	lockon_state *state = space->machine->driver_data<lockon_state>();
+	lockon_state *state = space->machine().driver_data<lockon_state>();
 	state->ctrl_reg = data & 0xff;
 
 	/* Bus mastering for shared access */
@@ -64,14 +64,14 @@ static WRITE16_HANDLER( adrst_w )
 
 static READ16_HANDLER( main_gnd_r )
 {
-	lockon_state *state = space->machine->driver_data<lockon_state>();
+	lockon_state *state = space->machine().driver_data<lockon_state>();
 	address_space *gndspace = state->ground->memory().space(AS_PROGRAM);
 	return gndspace->read_word(V30_GND_ADDR | offset * 2);
 }
 
 static WRITE16_HANDLER( main_gnd_w )
 {
-	lockon_state *state = space->machine->driver_data<lockon_state>();
+	lockon_state *state = space->machine().driver_data<lockon_state>();
 	address_space *gndspace = state->ground->memory().space(AS_PROGRAM);
 
 	if (ACCESSING_BITS_0_7)
@@ -82,14 +82,14 @@ static WRITE16_HANDLER( main_gnd_w )
 
 static READ16_HANDLER( main_obj_r )
 {
-	lockon_state *state = space->machine->driver_data<lockon_state>();
+	lockon_state *state = space->machine().driver_data<lockon_state>();
 	address_space *objspace = state->object->memory().space(AS_PROGRAM);
 	return objspace->read_word(V30_OBJ_ADDR | offset * 2);
 }
 
 static WRITE16_HANDLER( main_obj_w )
 {
-	lockon_state *state = space->machine->driver_data<lockon_state>();
+	lockon_state *state = space->machine().driver_data<lockon_state>();
 	address_space *objspace = state->object->memory().space(AS_PROGRAM);
 
 	if (ACCESSING_BITS_0_7)
@@ -100,7 +100,7 @@ static WRITE16_HANDLER( main_obj_w )
 
 static WRITE16_HANDLER( tst_w )
 {
-	lockon_state *state = space->machine->driver_data<lockon_state>();
+	lockon_state *state = space->machine().driver_data<lockon_state>();
 
 	if (offset < 0x800)
 	{
@@ -121,28 +121,28 @@ static WRITE16_HANDLER( tst_w )
 
 static READ16_HANDLER( main_z80_r )
 {
-	lockon_state *state = space->machine->driver_data<lockon_state>();
+	lockon_state *state = space->machine().driver_data<lockon_state>();
 	address_space *sndspace = state->audiocpu->memory().space(AS_PROGRAM);
 	return 0xff00 | sndspace->read_byte(offset);
 }
 
 static WRITE16_HANDLER( main_z80_w )
 {
-	lockon_state *state = space->machine->driver_data<lockon_state>();
+	lockon_state *state = space->machine().driver_data<lockon_state>();
 	address_space *sndspace = state->audiocpu->memory().space(AS_PROGRAM);
 	sndspace->write_byte(offset, data);
 }
 
 static WRITE16_HANDLER( inten_w )
 {
-	lockon_state *state = space->machine->driver_data<lockon_state>();
+	lockon_state *state = space->machine().driver_data<lockon_state>();
 	state->main_inten = 1;
 }
 
 static WRITE16_HANDLER( emres_w )
 {
-	lockon_state *state = space->machine->driver_data<lockon_state>();
-	watchdog_reset(space->machine);
+	lockon_state *state = space->machine().driver_data<lockon_state>();
+	watchdog_reset(space->machine());
 	state->main_inten = 0;
 }
 
@@ -342,10 +342,10 @@ static READ8_HANDLER( adc_r )
 {
 	switch (offset)
 	{
-		case 0:  return input_port_read(space->machine, "ADC_BANK");
-		case 1:  return input_port_read(space->machine, "ADC_PITCH");
-		case 2:  return input_port_read(space->machine, "ADC_MISSILE");
-		case 3:  return input_port_read(space->machine, "ADC_HOVER");
+		case 0:  return input_port_read(space->machine(), "ADC_BANK");
+		case 1:  return input_port_read(space->machine(), "ADC_PITCH");
+		case 2:  return input_port_read(space->machine(), "ADC_MISSILE");
+		case 3:  return input_port_read(space->machine(), "ADC_HOVER");
 		default: return 0;
 	}
 }
@@ -392,7 +392,7 @@ static WRITE8_HANDLER( sound_vol )
 #define LO_RI		100000.0
 #define LO_RP		100000.0
 
-	lockon_state *state = space->machine->driver_data<lockon_state>();
+	lockon_state *state = space->machine().driver_data<lockon_state>();
 
 	static const double gains[16] =
 	{
@@ -428,18 +428,18 @@ static WRITE8_HANDLER( sound_vol )
 
 static void ym2203_irq(device_t *device, int irq)
 {
-	lockon_state *state = device->machine->driver_data<lockon_state>();
+	lockon_state *state = device->machine().driver_data<lockon_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static WRITE8_DEVICE_HANDLER( ym2203_out_b )
 {
-	coin_counter_w(device->machine, 0, data & 0x80);
-	coin_counter_w(device->machine, 1, data & 0x40);
-	coin_counter_w(device->machine, 2, data & 0x20);
+	coin_counter_w(device->machine(), 0, data & 0x80);
+	coin_counter_w(device->machine(), 1, data & 0x40);
+	coin_counter_w(device->machine(), 2, data & 0x20);
 
 	/* 'Lock-On' lamp */
-	set_led_status(device->machine, 1, !(data & 0x10));
+	set_led_status(device->machine(), 1, !(data & 0x10));
 }
 
 static const ym2203_interface ym2203_config =
@@ -464,18 +464,18 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( lockon )
 {
-	lockon_state *state = machine->driver_data<lockon_state>();
+	lockon_state *state = machine.driver_data<lockon_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->ground = machine->device("ground");
-	state->object = machine->device("object");
-	state->f2203_1l = machine->device("f2203.1l");
-	state->f2203_2l = machine->device("f2203.2l");
-	state->f2203_3l = machine->device("f2203.3l");
-	state->f2203_1r = machine->device("f2203.1r");
-	state->f2203_2r = machine->device("f2203.2r");
-	state->f2203_3r = machine->device("f2203.3r");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->ground = machine.device("ground");
+	state->object = machine.device("object");
+	state->f2203_1l = machine.device("f2203.1l");
+	state->f2203_2l = machine.device("f2203.2l");
+	state->f2203_3l = machine.device("f2203.3l");
+	state->f2203_1r = machine.device("f2203.1r");
+	state->f2203_2r = machine.device("f2203.2r");
+	state->f2203_3r = machine.device("f2203.3r");
 
 	state->save_item(NAME(state->ground_ctrl));
 	state->save_item(NAME(state->scroll_h));
@@ -497,7 +497,7 @@ static MACHINE_START( lockon )
 
 static MACHINE_RESET( lockon )
 {
-	lockon_state *state = machine->driver_data<lockon_state>();
+	lockon_state *state = machine.driver_data<lockon_state>();
 
 	state->ground_ctrl = 0;
 	state->scroll_h = 0;

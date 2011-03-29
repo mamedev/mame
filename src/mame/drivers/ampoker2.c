@@ -588,7 +588,7 @@ static WRITE8_HANDLER( ampoker2_watchdog_reset_w )
 
 	if (((data >> 3) & 0x01) == 0)		/* check for refresh value (0x08) */
 	{
-		watchdog_reset(space->machine);
+		watchdog_reset(space->machine());
 //      popmessage("%02x", data);
 	}
 	else
@@ -1406,8 +1406,8 @@ ROM_END
 static DRIVER_INIT( rabbitpk )
 {
 
-	UINT8 *rom = machine->region("maincpu")->base();
-	int size = machine->region("maincpu")->bytes();
+	UINT8 *rom = machine.region("maincpu")->base();
+	int size = machine.region("maincpu")->bytes();
 	int start = 0;
 	int i;
 
@@ -1458,7 +1458,7 @@ static DRIVER_INIT( piccolop )
 
 */
 
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	/* NOP'ing the mortal jump... */
 	rom[0x154b] = 0x00;

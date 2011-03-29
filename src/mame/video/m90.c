@@ -30,9 +30,9 @@
 #include "includes/m90.h"
 
 
-INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,int page_mask)
+INLINE void get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,int layer,int page_mask)
 {
-	m90_state *state = machine->driver_data<m90_state>();
+	m90_state *state = machine.driver_data<m90_state>();
 	int tile,color;
 	tile_index = 2*tile_index + ((state->video_control_data[5+layer] & page_mask) * 0x2000);
 
@@ -46,9 +46,9 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 			tileinfo->category = (color & 0x30) ? 1 : 0;
 }
 
-INLINE void bomblord_get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer)
+INLINE void bomblord_get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,int layer)
 {
-	m90_state *state = machine->driver_data<m90_state>();
+	m90_state *state = machine.driver_data<m90_state>();
 	int tile,color;
 	tile_index = 2*tile_index + (layer * 0x2000);
 
@@ -62,9 +62,9 @@ INLINE void bomblord_get_tile_info(running_machine *machine,tile_data *tileinfo,
 			tileinfo->category = (color & 0x30) ? 1 : 0;
 }
 
-INLINE void dynablsb_get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer)
+INLINE void dynablsb_get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,int layer)
 {
-	m90_state *state = machine->driver_data<m90_state>();
+	m90_state *state = machine.driver_data<m90_state>();
 	int tile,color;
 	tile_index = 2*tile_index + (layer * 0x2000);
 
@@ -95,7 +95,7 @@ static TILE_GET_INFO( dynablsb_get_pf2w_tile_info ) { dynablsb_get_tile_info(mac
 
 VIDEO_START( m90 )
 {
-	m90_state *state = machine->driver_data<m90_state>();
+	m90_state *state = machine.driver_data<m90_state>();
 	state->pf1_layer =      tilemap_create(machine, get_pf1_tile_info, tilemap_scan_rows,8,8,64,64);
 	state->pf1_wide_layer = tilemap_create(machine, get_pf1w_tile_info,tilemap_scan_rows,8,8,128,64);
 	state->pf2_layer =      tilemap_create(machine, get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
@@ -109,7 +109,7 @@ VIDEO_START( m90 )
 
 VIDEO_START( bomblord )
 {
-	m90_state *state = machine->driver_data<m90_state>();
+	m90_state *state = machine.driver_data<m90_state>();
 	state->pf1_layer =      tilemap_create(machine, bomblord_get_pf1_tile_info, tilemap_scan_rows,8,8,64,64);
 	state->pf1_wide_layer = tilemap_create(machine, bomblord_get_pf1w_tile_info,tilemap_scan_rows,8,8,128,64);
 	state->pf2_layer =      tilemap_create(machine, bomblord_get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
@@ -125,7 +125,7 @@ VIDEO_START( bomblord )
 
 VIDEO_START( dynablsb )
 {
-	m90_state *state = machine->driver_data<m90_state>();
+	m90_state *state = machine.driver_data<m90_state>();
 	state->pf1_layer =      tilemap_create(machine, dynablsb_get_pf1_tile_info, tilemap_scan_rows,8,8,64,64);
 	state->pf1_wide_layer = tilemap_create(machine, dynablsb_get_pf1w_tile_info,tilemap_scan_rows,8,8,128,64);
 	state->pf2_layer =      tilemap_create(machine, dynablsb_get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
@@ -137,9 +137,9 @@ VIDEO_START( dynablsb )
 	state_save_register_global_array(machine, state->video_control_data);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	m90_state *state = machine->driver_data<m90_state>();
+	m90_state *state = machine.driver_data<m90_state>();
 	UINT16 *spriteram = state->video_data + 0xee00/2;;
 	int offs;
 
@@ -165,35 +165,35 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		for (i = 0;i < y_multi;i++)
 
 			if (state->video_control_data[7] & 0x01)
-				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+				pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
 					fx,fy,
 					x,y+i*16,
-					machine->priority_bitmap,
+					machine.priority_bitmap,
 					(colour & 0x08) ? 0x00 : 0x02,0);
 			else if (state->video_control_data[7] & 0x02)
-				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+				pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
 					fx,fy,
 					x,y+i*16,
-					machine->priority_bitmap,
+					machine.priority_bitmap,
 					((colour & 0x0c)==0x0c) ? 0x00 : 0x02,0);
 			else
-				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+				pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
 					fx,fy,
 					x,y+i*16,
-					machine->priority_bitmap,
+					machine.priority_bitmap,
 					0x02,0);
 	}
 }
 
-static void bomblord_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void bomblord_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	m90_state *state = machine->driver_data<m90_state>();
+	m90_state *state = machine.driver_data<m90_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	int offs = 0, last_sprite = 0;
 	int x,y,sprite,colour,fx,fy;
@@ -221,19 +221,19 @@ static void bomblord_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		fx = (spriteram16[offs+3] >> 8) & 0x02;
 		fy = (spriteram16[offs+2] >> 8) & 0x80;
 
-		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 				sprite,
 				colour,
 				fx,fy,
 				x,y,
-				machine->priority_bitmap,
+				machine.priority_bitmap,
 				(colour & 0x08) ? 0x00 : 0x02,0);
 	}
 }
 
-static void dynablsb_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void dynablsb_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	m90_state *state = machine->driver_data<m90_state>();
+	m90_state *state = machine.driver_data<m90_state>();
 	UINT16 *spriteram16 = state->spriteram;
 	int offs = 0, last_sprite = 0;
 	int x,y,sprite,colour,fx,fy;
@@ -260,19 +260,19 @@ static void dynablsb_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		fx = (spriteram16[offs+3] >> 8) & 0x02;
 		fy = (spriteram16[offs+2] >> 8) & 0x80;
 
-		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 				sprite,
 				colour,
 				fx,fy,
 				x,y,
-				machine->priority_bitmap,
+				machine.priority_bitmap,
 				(colour & 0x08) ? 0x00 : 0x02,0);
 	}
 }
 
 WRITE16_HANDLER( m90_video_control_w )
 {
-	m90_state *state = space->machine->driver_data<m90_state>();
+	m90_state *state = space->machine().driver_data<m90_state>();
 	COMBINE_DATA(&state->video_control_data[offset]);
 }
 
@@ -286,7 +286,7 @@ static void markdirty(tilemap_t *tmap,int page,offs_t offset)
 
 WRITE16_HANDLER( m90_video_w )
 {
-	m90_state *state = space->machine->driver_data<m90_state>();
+	m90_state *state = space->machine().driver_data<m90_state>();
 	COMBINE_DATA(&state->video_data[offset]);
 
 	markdirty(state->pf1_layer,     state->video_control_data[5] & 0x3,offset);
@@ -297,7 +297,7 @@ WRITE16_HANDLER( m90_video_w )
 
 SCREEN_UPDATE( m90 )
 {
-	m90_state *state = screen->machine->driver_data<m90_state>();
+	m90_state *state = screen->machine().driver_data<m90_state>();
 	int pf1_base = state->video_control_data[5] & 0x3;
 	int pf2_base = state->video_control_data[6] & 0x3;
 	int i,pf1_enable,pf2_enable, video_enable;
@@ -361,7 +361,7 @@ SCREEN_UPDATE( m90 )
 		tilemap_set_scrollx( state->pf2_wide_layer,0, state->video_control_data[3]+256-2 );
 	}
 
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
 
 	if (video_enable)
 	{
@@ -452,10 +452,10 @@ SCREEN_UPDATE( m90 )
 			}
 		}
 
-		draw_sprites(screen->machine,bitmap,cliprect);
+		draw_sprites(screen->machine(),bitmap,cliprect);
 
 	} else {
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 	}
 
 	return 0;
@@ -463,10 +463,10 @@ SCREEN_UPDATE( m90 )
 
 SCREEN_UPDATE( bomblord )
 {
-	m90_state *state = screen->machine->driver_data<m90_state>();
+	m90_state *state = screen->machine().driver_data<m90_state>();
 	int i;
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
 	/* Setup scrolling */
 	if (state->video_control_data[6]&0x20) {
@@ -509,16 +509,16 @@ SCREEN_UPDATE( bomblord )
 		tilemap_draw(bitmap,cliprect,state->pf1_layer,1,1);
 	}
 
-	bomblord_draw_sprites(screen->machine,bitmap,cliprect);
+	bomblord_draw_sprites(screen->machine(),bitmap,cliprect);
 
 	return 0;
 }
 
 SCREEN_UPDATE( dynablsb )
 {
-	m90_state *state = screen->machine->driver_data<m90_state>();
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	m90_state *state = screen->machine().driver_data<m90_state>();
+	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
 	if (!(state->video_data[0xf008/2] & 0x4000)) {
 		tilemap_mark_all_tiles_dirty(state->pf1_wide_layer);
@@ -552,7 +552,7 @@ SCREEN_UPDATE( dynablsb )
 		tilemap_draw(bitmap,cliprect,state->pf2_layer,1,1);
 	}
 
-	dynablsb_draw_sprites(screen->machine,bitmap,cliprect);
+	dynablsb_draw_sprites(screen->machine(),bitmap,cliprect);
 
 	return 0;
 }

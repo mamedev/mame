@@ -124,7 +124,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( dallas_share_r )
 {
-	wrally_state *state = space->machine->driver_data<wrally_state>();
+	wrally_state *state = space->machine().driver_data<wrally_state>();
 	UINT8 *shareram = (UINT8 *)state->shareram;
 
 	return shareram[BYTE_XOR_LE(offset) ^ 1];
@@ -132,7 +132,7 @@ static READ8_HANDLER( dallas_share_r )
 
 static WRITE8_HANDLER( dallas_share_w )
 {
-	wrally_state *state = space->machine->driver_data<wrally_state>();
+	wrally_state *state = space->machine().driver_data<wrally_state>();
 	UINT8 *shareram = (UINT8 *)state->shareram;
 
 	shareram[BYTE_XOR_LE(offset) ^ 1] = data;

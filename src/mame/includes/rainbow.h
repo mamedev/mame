@@ -37,7 +37,7 @@ public:
 
 /*----------- defined in machine/rainbow.c -----------*/
 
-void rainbow_cchip_init(running_machine *machine, int version);
+void rainbow_cchip_init(running_machine &machine, int version);
 READ16_HANDLER( rainbow_cchip_ctrl_r );
 READ16_HANDLER( rainbow_cchip_ram_r );
 WRITE16_HANDLER( rainbow_cchip_ctrl_w );

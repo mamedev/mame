@@ -56,43 +56,43 @@ public:
 
 static WRITE8_HANDLER( background_w )
 {
-	dacholer_state *state = space->machine->driver_data<dacholer_state>();
+	dacholer_state *state = space->machine().driver_data<dacholer_state>();
 	state->bgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( foreground_w )
 {
-	dacholer_state *state = space->machine->driver_data<dacholer_state>();
+	dacholer_state *state = space->machine().driver_data<dacholer_state>();
 	state->fgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( bg_bank_w )
 {
-	dacholer_state *state = space->machine->driver_data<dacholer_state>();
+	dacholer_state *state = space->machine().driver_data<dacholer_state>();
 	if ((data & 3) != state->bg_bank)
 	{
 		state->bg_bank = data & 3;
 		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 	}
 
-	flip_screen_set(space->machine, data & 0xc); // probably one bit for flipx and one for flipy
+	flip_screen_set(space->machine(), data & 0xc); // probably one bit for flipx and one for flipy
 
 }
 
 static WRITE8_HANDLER( coins_w )
 {
-	coin_counter_w(space->machine, 0, data & 1);
-	coin_counter_w(space->machine, 1, data & 2);
+	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(space->machine(), 1, data & 2);
 
-	set_led_status(space->machine, 0, data & 4);
-	set_led_status(space->machine, 1, data & 8);
+	set_led_status(space->machine(), 0, data & 4);
+	set_led_status(space->machine(), 1, data & 8);
 }
 
 static WRITE8_HANDLER(snd_w)
 {
-	dacholer_state *state = space->machine->driver_data<dacholer_state>();
+	dacholer_state *state = space->machine().driver_data<dacholer_state>();
 	soundlatch_w(space, offset, data);
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -128,32 +128,32 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( adpcm_w )
 {
-	dacholer_state *state = space->machine->driver_data<dacholer_state>();
+	dacholer_state *state = space->machine().driver_data<dacholer_state>();
 	state->msm_data = data;
 	state->msm_toggle = 0;
 }
 
 static WRITE8_HANDLER( snd_ack_w )
 {
-	dacholer_state *state = space->machine->driver_data<dacholer_state>();
+	dacholer_state *state = space->machine().driver_data<dacholer_state>();
 	state->snd_ack = data;
 }
 
 static CUSTOM_INPUT( snd_ack_r )
 {
-	dacholer_state *state = field->port->machine->driver_data<dacholer_state>();
+	dacholer_state *state = field->port->machine().driver_data<dacholer_state>();
 	return state->snd_ack;		//guess ...
 }
 
 static WRITE8_HANDLER( snd_irq_w )
 {
-	dacholer_state *state = space->machine->driver_data<dacholer_state>();
+	dacholer_state *state = space->machine().driver_data<dacholer_state>();
 	state->snd_interrupt_enable = data;
 }
 
 static WRITE8_HANDLER( music_irq_w )
 {
-	dacholer_state *state = space->machine->driver_data<dacholer_state>();
+	dacholer_state *state = space->machine().driver_data<dacholer_state>();
 	state->music_interrupt_enable = data;
 }
 
@@ -311,28 +311,28 @@ INPUT_PORTS_END
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	dacholer_state *state = machine->driver_data<dacholer_state>();
+	dacholer_state *state = machine.driver_data<dacholer_state>();
 	SET_TILE_INFO(1, state->bgvideoram[tile_index] + state->bg_bank * 0x100, 0, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	dacholer_state *state = machine->driver_data<dacholer_state>();
+	dacholer_state *state = machine.driver_data<dacholer_state>();
 	SET_TILE_INFO(0, state->fgvideoram[tile_index], 0, 0);
 }
 
 static VIDEO_START( dacholer )
 {
-	dacholer_state *state = machine->driver_data<dacholer_state>();
+	dacholer_state *state = machine.driver_data<dacholer_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	dacholer_state *state = machine->driver_data<dacholer_state>();
+	dacholer_state *state = machine.driver_data<dacholer_state>();
 	int offs, code, attr, sx, sy, flipx, flipy;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -354,7 +354,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[2],
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[2],
 				code,
 				0,
 				flipx,flipy,
@@ -364,10 +364,10 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static SCREEN_UPDATE(dacholer)
 {
-	dacholer_state *state = screen->machine->driver_data<dacholer_state>();
+	dacholer_state *state = screen->machine().driver_data<dacholer_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -403,7 +403,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( sound_irq )
 {
-	dacholer_state *state = device->machine->driver_data<dacholer_state>();
+	dacholer_state *state = device->machine().driver_data<dacholer_state>();
 	if (state->music_interrupt_enable == 1)
 	{
 		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x30);
@@ -412,7 +412,7 @@ static INTERRUPT_GEN( sound_irq )
 
 static void adpcm_int( device_t *device )
 {
-	dacholer_state *state = device->machine->driver_data<dacholer_state>();
+	dacholer_state *state = device->machine().driver_data<dacholer_state>();
 	if (state->snd_interrupt_enable == 1 || (state->snd_interrupt_enable == 0 && state->msm_toggle == 1))
 	{
 		msm5205_data_w(device, state->msm_data >> 4);
@@ -435,9 +435,9 @@ static const msm5205_interface msm_interface =
 
 static MACHINE_START( dacholer )
 {
-	dacholer_state *state = machine->driver_data<dacholer_state>();
+	dacholer_state *state = machine.driver_data<dacholer_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->bg_bank));
 	state->save_item(NAME(state->msm_data));
@@ -449,7 +449,7 @@ static MACHINE_START( dacholer )
 
 static MACHINE_RESET( dacholer )
 {
-	dacholer_state *state = machine->driver_data<dacholer_state>();
+	dacholer_state *state = machine.driver_data<dacholer_state>();
 
 	state->msm_data = 0;
 	state->msm_toggle = 0;
@@ -474,7 +474,7 @@ static PALETTE_INIT( dacholer )
 			2, resistances_b,  weights_b,  0, 0,
 			0, 0, 0, 0, 0);
 
-	for (i = 0;i < machine->total_colors(); i++)
+	for (i = 0;i < machine.total_colors(); i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;

@@ -97,11 +97,11 @@ TODO:
 
 static SCREEN_EOF( champbas )
 {
-	champbas_state *state = machine->driver_data<champbas_state>();
+	champbas_state *state = machine.driver_data<champbas_state>();
 	state->watchdog_count++;
 
 	if (state->watchdog_count == 0x10)
-		machine->schedule_soft_reset();
+		machine.schedule_soft_reset();
 }
 
 
@@ -113,20 +113,20 @@ static SCREEN_EOF( champbas )
 
 static WRITE8_HANDLER( champbas_watchdog_reset_w )
 {
-	champbas_state *state = space->machine->driver_data<champbas_state>();
+	champbas_state *state = space->machine().driver_data<champbas_state>();
 	state->watchdog_count = 0;
 }
 
 static CUSTOM_INPUT( champbas_watchdog_bit2 )
 {
-	champbas_state *state = field->port->machine->driver_data<champbas_state>();
+	champbas_state *state = field->port->machine().driver_data<champbas_state>();
 	return BIT(state->watchdog_count, 2);
 }
 
 
 static WRITE8_HANDLER( irq_enable_w )
 {
-	champbas_state *state = space->machine->driver_data<champbas_state>();
+	champbas_state *state = space->machine().driver_data<champbas_state>();
 	int bit = data & 1;
 
 	cpu_interrupt_enable(state->maincpu, bit);
@@ -136,7 +136,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 static TIMER_CALLBACK( exctsccr_fm_callback )
 {
-	champbas_state *state = machine->driver_data<champbas_state>();
+	champbas_state *state = machine.driver_data<champbas_state>();
 	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
@@ -161,7 +161,7 @@ static WRITE8_HANDLER( champbas_mcu_switch_w )
 
 static WRITE8_HANDLER( champbas_mcu_halt_w )
 {
-	champbas_state *state = space->machine->driver_data<champbas_state>();
+	champbas_state *state = space->machine().driver_data<champbas_state>();
 
 	// MCU not present/not used in champbas
 	if (state->mcu == NULL)
@@ -566,10 +566,10 @@ GFXDECODE_END
 
 static MACHINE_START( champbas )
 {
-	champbas_state *state = machine->driver_data<champbas_state>();
+	champbas_state *state = machine.driver_data<champbas_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->mcu = machine->device(CPUTAG_MCU);
+	state->maincpu = machine.device("maincpu");
+	state->mcu = machine.device(CPUTAG_MCU);
 
 	state->save_item(NAME(state->watchdog_count));
 	state->save_item(NAME(state->palette_bank));
@@ -578,11 +578,11 @@ static MACHINE_START( champbas )
 
 static MACHINE_START( exctsccr )
 {
-	champbas_state *state = machine->driver_data<champbas_state>();
-	state->audiocpu = machine->device("audiocpu");
+	champbas_state *state = machine.driver_data<champbas_state>();
+	state->audiocpu = machine.device("audiocpu");
 
 	// FIXME
-	machine->scheduler().timer_pulse(attotime::from_hz(75), FUNC(exctsccr_fm_callback)); /* updates fm */
+	machine.scheduler().timer_pulse(attotime::from_hz(75), FUNC(exctsccr_fm_callback)); /* updates fm */
 
 	MACHINE_START_CALL(champbas);
 }
@@ -590,7 +590,7 @@ static MACHINE_START( exctsccr )
 
 static MACHINE_RESET( champbas )
 {
-	champbas_state *state = machine->driver_data<champbas_state>();
+	champbas_state *state = machine.driver_data<champbas_state>();
 
 	state->palette_bank = 0;
 	state->gfx_bank = 0;	// talbot has only 1 bank
@@ -1173,9 +1173,9 @@ ROM_END
 static DRIVER_INIT(champbas)
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
-	UINT8 *rom1 = machine->region("gfx1")->base();
-	UINT8 *rom2 = machine->region("gfx2")->base();
-	int len = machine->region("gfx1")->bytes();
+	UINT8 *rom1 = machine.region("gfx1")->base();
+	UINT8 *rom2 = machine.region("gfx2")->base();
+	int len = machine.region("gfx1")->bytes();
 	int i;
 
 	for (i = 0; i < len/2; ++i)
@@ -1190,8 +1190,8 @@ static DRIVER_INIT(champbas)
 static DRIVER_INIT( exctsccr )
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
-	UINT8 *rom1 = machine->region("gfx1")->base();
-	UINT8 *rom2 = machine->region("gfx2")->base();
+	UINT8 *rom1 = machine.region("gfx1")->base();
+	UINT8 *rom2 = machine.region("gfx2")->base();
 	int i;
 
 	// planes 0,1

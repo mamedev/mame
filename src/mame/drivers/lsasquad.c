@@ -155,12 +155,12 @@ Notes:
 static WRITE8_HANDLER( lsasquad_bankswitch_w )
 {
 	/* bits 0-2 select ROM bank */
-	memory_set_bank(space->machine, "bank1", data & 0x07);
+	memory_set_bank(space->machine(), "bank1", data & 0x07);
 
 	/* bit 3 is zeroed on startup, maybe reset sound CPU */
 
 	/* bit 4 flips screen */
-	flip_screen_set(space->machine, data & 0x10);
+	flip_screen_set(space->machine(), data & 0x10);
 
 	/* other bits unknown */
 }
@@ -540,7 +540,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	lsasquad_state *state = device->machine->driver_data<lsasquad_state>();
+	lsasquad_state *state = device->machine().driver_data<lsasquad_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -566,14 +566,14 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( lsasquad )
 {
-	lsasquad_state *state = machine->driver_data<lsasquad_state>();
-	UINT8 *ROM = machine->region("maincpu")->base();
+	lsasquad_state *state = machine.driver_data<lsasquad_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x2000);
 
-	state->maincpu = machine->device("maincpu");
-	state->audiocpu = machine->device("audiocpu");
-	state->mcu = machine->device("mcu");
+	state->maincpu = machine.device("maincpu");
+	state->audiocpu = machine.device("audiocpu");
+	state->mcu = machine.device("mcu");
 
 	state->save_item(NAME(state->port_a_in));
 	state->save_item(NAME(state->port_a_out));
@@ -595,7 +595,7 @@ static MACHINE_START( lsasquad )
 
 static MACHINE_RESET( lsasquad )
 {
-	lsasquad_state *state = machine->driver_data<lsasquad_state>();
+	lsasquad_state *state = machine.driver_data<lsasquad_state>();
 
 	state->sound_pending = 0;
 	state->sound_nmi_enable = 0;

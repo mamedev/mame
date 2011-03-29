@@ -50,7 +50,7 @@ PALETTE_INIT( megazone )
 			2, &resistances_b[0],  bweights, 1000, 0);
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x20);
+	machine.colortable = colortable_alloc(machine, 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -75,7 +75,7 @@ PALETTE_INIT( megazone )
 		bit1 = BIT(color_prom[i], 7);
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -85,27 +85,27 @@ PALETTE_INIT( megazone )
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 
 	/* characters */
 	for (i = 0x100; i < 0x200; i++)
 	{
 		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 }
 
 WRITE8_HANDLER( megazone_flipscreen_w )
 {
-	megazone_state *state = space->machine->driver_data<megazone_state>();
+	megazone_state *state = space->machine().driver_data<megazone_state>();
 	state->flipscreen = data & 1;
 }
 
 VIDEO_START( megazone )
 {
-	megazone_state *state = machine->driver_data<megazone_state>();
-	state->tmpbitmap = auto_bitmap_alloc(machine, 256, 256, machine->primary_screen->format());
+	megazone_state *state = machine.driver_data<megazone_state>();
+	state->tmpbitmap = auto_bitmap_alloc(machine, 256, 256, machine.primary_screen->format());
 
 	state->save_item(NAME(*state->tmpbitmap));
 }
@@ -113,7 +113,7 @@ VIDEO_START( megazone )
 
 SCREEN_UPDATE( megazone )
 {
-	megazone_state *state = screen->machine->driver_data<megazone_state>();
+	megazone_state *state = screen->machine().driver_data<megazone_state>();
 	int offs;
 	int x, y;
 
@@ -135,7 +135,7 @@ SCREEN_UPDATE( megazone )
 			flipy = !flipy;
 		}
 
-		drawgfx_opaque(state->tmpbitmap, 0, screen->machine->gfx[1],
+		drawgfx_opaque(state->tmpbitmap, 0, screen->machine().gfx[1],
 				((int)state->videoram[offs]) + ((state->colorram[offs] & (1 << 7) ? 256 : 0) ),
 				(state->colorram[offs] & 0x0f) + 0x10,
 				flipx,flipy,
@@ -182,12 +182,12 @@ SCREEN_UPDATE( megazone )
 			else
 				sx = sx + 32;
 
-			drawgfx_transmask(bitmap,cliprect,screen->machine->gfx[0],
+			drawgfx_transmask(bitmap,cliprect,screen->machine().gfx[0],
 					spriteram[offs + 2],
 					color,
 					flipx,flipy,
 					sx,sy,
-					colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[0], color, 0));
+					colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[0], color, 0));
 		}
 	}
 
@@ -215,7 +215,7 @@ SCREEN_UPDATE( megazone )
 
 
 
-			drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[1],
+			drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[1],
 					((int)state->videoram2[offs]) + ((state->colorram2[offs] & (1 << 7) ? 256 : 0) ),
 					(state->colorram2[offs] & 0x0f) + 0x10,
 					flipx,flipy,

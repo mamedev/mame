@@ -28,7 +28,7 @@ static int scsidev_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 			return 0;
 
 		default:
-			logerror( "%s: SCSIDEV unknown command %02x\n", scsiInstance->machine->describe_context(), command[ 0 ] );
+			logerror( "%s: SCSIDEV unknown command %02x\n", scsiInstance->machine().describe_context(), command[ 0 ] );
 			return 0;
 	}
 }
@@ -43,7 +43,7 @@ static void scsidev_read_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 	switch( command[ 0 ] )
 	{
 		default:
-			logerror( "%s: SCSIDEV unknown read %02x\n", scsiInstance->machine->describe_context(), command[ 0 ] );
+			logerror( "%s: SCSIDEV unknown read %02x\n", scsiInstance->machine().describe_context(), command[ 0 ] );
 			break;
 	}
 }
@@ -58,7 +58,7 @@ static void scsidev_write_data( SCSIInstance *scsiInstance, UINT8 *data, int dat
 	switch( command[ 0 ] )
 	{
 		default:
-			logerror( "%s: SCSIDEV unknown write %02x\n", scsiInstance->machine->describe_context(), command[ 0 ] );
+			logerror( "%s: SCSIDEV unknown write %02x\n", scsiInstance->machine().describe_context(), command[ 0 ] );
 			break;
 	}
 }
@@ -100,7 +100,7 @@ static int scsidev_get_command( SCSIInstance *scsiInstance, void **command )
 
 static void scsidev_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
-	running_machine *machine = scsiInstance->machine;
+	running_machine &machine = scsiInstance->machine();
 	SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
 
 	state_save_register_item_array( machine, "scsidev", diskregion, 0, our_this->command );
@@ -141,12 +141,12 @@ static int scsidev_dispatch( int operation, void *file, INT64 intparm, void *ptr
 
 		case SCSIOP_ALLOC_INSTANCE:
 			params = (SCSIAllocInstanceParams *)ptrparm;
-			params->instance = SCSIMalloc( params->machine, (const SCSIClass *)file );
+			params->instance = SCSIMalloc( params->machine(), (const SCSIClass *)file );
 			scsidev_alloc_instance( params->instance, params->diskregion );
 			return 0;
 
 		case SCSIOP_DELETE_INSTANCE:
-			auto_free( ((SCSIInstance *)file)->machine, file );
+			auto_free( ((SCSIInstance *)file)->machine(), file );
 			return 0;
 	}
 	return 0;

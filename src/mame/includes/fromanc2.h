@@ -68,7 +68,7 @@ WRITE16_HANDLER( fromancr_gfxreg_0_w );
 WRITE16_HANDLER( fromancr_gfxreg_1_w );
 WRITE16_HANDLER( fromanc2_gfxbank_0_w );
 WRITE16_HANDLER( fromanc2_gfxbank_1_w );
-void fromancr_gfxbank_w(running_machine *machine, int data);
+void fromancr_gfxbank_w(running_machine &machine, int data);
 WRITE16_HANDLER( fromanc4_gfxreg_0_w );
 WRITE16_HANDLER( fromanc4_gfxreg_1_w );
 WRITE16_HANDLER( fromanc4_gfxreg_2_w );

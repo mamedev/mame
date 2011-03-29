@@ -325,18 +325,18 @@ struct _amiga_machine_interface
 {
 	UINT32 chip_ram_mask;
 
-	UINT16 (*joy0dat_r)(running_machine *machine);
-	UINT16 (*joy1dat_r)(running_machine *machine);
-	void (*potgo_w)(running_machine *machine, UINT16 data);
+	UINT16 (*joy0dat_r)(running_machine &machine);
+	UINT16 (*joy1dat_r)(running_machine &machine);
+	void (*potgo_w)(running_machine &machine, UINT16 data);
 
-	UINT16 (*dskbytr_r)(running_machine *machine);
-	void (*dsklen_w)(running_machine *machine, UINT16 data);
+	UINT16 (*dskbytr_r)(running_machine &machine);
+	void (*dsklen_w)(running_machine &machine, UINT16 data);
 
-	void (*serdat_w)(running_machine *machine, UINT16 data);
+	void (*serdat_w)(running_machine &machine, UINT16 data);
 
-	void (*scanline0_callback)(running_machine *machine);
-	void (*reset_callback)(running_machine *machine);
-	void (*nmi_callback)(running_machine *machine);
+	void (*scanline0_callback)(running_machine &machine);
+	void (*reset_callback)(running_machine &machine);
+	void (*nmi_callback)(running_machine &machine);
 
 	UINT32 flags;
 };
@@ -358,10 +358,10 @@ struct _amiga_autoconfig_device
 	UINT16		mfr_number;			/* manufacturers number */
 	UINT32		serial_number;		/* serial number */
 	UINT16		rom_vector;			/* ROM vector offset */
-	UINT8		(*int_control_r)(running_machine *machine); /* interrupt control read */
-	void		(*int_control_w)(running_machine *machine, UINT8 data); /* interrupt control write */
-	void		(*install)(running_machine *machine, offs_t base); /* memory installation */
-	void		(*uninstall)(running_machine *machine, offs_t base); /* memory uninstallation */
+	UINT8		(*int_control_r)(running_machine &machine); /* interrupt control read */
+	void		(*int_control_w)(running_machine &machine, UINT8 data); /* interrupt control write */
+	void		(*install)(running_machine &machine, offs_t base); /* memory installation */
+	void		(*uninstall)(running_machine &machine, offs_t base); /* memory uninstallation */
 };
 
 typedef struct _autoconfig_device autoconfig_device;
@@ -438,7 +438,7 @@ extern const char *const amiga_custom_names[0x100];
 
 void amiga_chip_ram_w8(amiga_state *state, offs_t offset, UINT8 data);
 
-void amiga_machine_config(running_machine *machine, const amiga_machine_interface *intf);
+void amiga_machine_config(running_machine &machine, const amiga_machine_interface *intf);
 
 MACHINE_RESET( amiga );
 
@@ -450,17 +450,17 @@ WRITE16_HANDLER( amiga_cia_w );
 READ16_HANDLER( amiga_custom_r );
 WRITE16_HANDLER( amiga_custom_w );
 
-void amiga_serial_in_w(running_machine *machine, UINT16 data);
-attotime amiga_get_serial_char_period(running_machine *machine);
+void amiga_serial_in_w(running_machine &machine, UINT16 data);
+attotime amiga_get_serial_char_period(running_machine &machine);
 
-void amiga_add_autoconfig(running_machine *machine, const amiga_autoconfig_device *device);
+void amiga_add_autoconfig(running_machine &machine, const amiga_autoconfig_device *device);
 READ16_HANDLER( amiga_autoconfig_r );
 WRITE16_HANDLER( amiga_autoconfig_w );
 
 void amiga_cia_0_irq(device_t *device, int state);
 void amiga_cia_1_irq(device_t *device, int state);
 
-const amiga_machine_interface *amiga_get_interface(running_machine *machine);
+const amiga_machine_interface *amiga_get_interface(running_machine &machine);
 
 
 /*----------- defined in audio/amiga.c -----------*/
@@ -479,22 +479,22 @@ PALETTE_INIT( amiga );
 VIDEO_START( amiga );
 SCREEN_UPDATE( amiga );
 
-void amiga_copper_setpc(running_machine *machine, UINT32 pc);
-int amiga_copper_execute_next(running_machine *machine, int xpos);
+void amiga_copper_setpc(running_machine &machine, UINT32 pc);
+int amiga_copper_execute_next(running_machine &machine, int xpos);
 
 UINT32 amiga_gethvpos(screen_device &screen);
-void amiga_set_genlock_color(running_machine *machine, UINT16 color);
-void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline);
-void amiga_sprite_dma_reset(running_machine *machine, int which);
-void amiga_sprite_enable_comparitor(running_machine *machine, int which, int enable);
+void amiga_set_genlock_color(running_machine &machine, UINT16 color);
+void amiga_render_scanline(running_machine &machine, bitmap_t *bitmap, int scanline);
+void amiga_sprite_dma_reset(running_machine &machine, int which);
+void amiga_sprite_enable_comparitor(running_machine &machine, int which, int enable);
 
 /*----------- defined in video/amigaaga.c -----------*/
 
 VIDEO_START( amiga_aga );
 SCREEN_UPDATE( amiga_aga );
 
-void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline);
-void amiga_aga_palette_write(running_machine *machine, int color_reg, UINT16 data);
-void amiga_aga_diwhigh_written(running_machine *machine, int written);
+void amiga_aga_render_scanline(running_machine &machine, bitmap_t *bitmap, int scanline);
+void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 data);
+void amiga_aga_diwhigh_written(running_machine &machine, int written);
 
 #endif /* __AMIGA_H__ */

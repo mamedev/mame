@@ -72,24 +72,24 @@ K1000233A
 
 static INTERRUPT_GEN( pitnrun_nmi_source )
 {
-	pitnrun_state *state = device->machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = device->machine().driver_data<pitnrun_state>();
 	if(state->nmi) device_set_input_line(device,INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
         state->nmi = data & 1;
 }
 
 static WRITE8_HANDLER(pitnrun_hflip_w)
 {
-	flip_screen_x_set(space->machine, data);
+	flip_screen_x_set(space->machine(), data);
 }
 
 static WRITE8_HANDLER(pitnrun_vflip_w)
 {
-	flip_screen_y_set(space->machine, data);
+	flip_screen_y_set(space->machine(), data);
 }
 
 static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8 )

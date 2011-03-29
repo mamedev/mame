@@ -33,7 +33,7 @@ static VIDEO_START(poker72)
 
 static SCREEN_UPDATE(poker72)
 {
-	poker72_state *state = screen->machine->driver_data<poker72_state>();
+	poker72_state *state = screen->machine().driver_data<poker72_state>();
 	int x,y,count;
 
 	count = 0;
@@ -49,7 +49,7 @@ static SCREEN_UPDATE(poker72)
 
 			tile|= state->tile_bank << 12;
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,color,fx,fy,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tile,color,fx,fy,x*8,y*8);
 
 			count+=2;
 		}
@@ -60,7 +60,7 @@ static SCREEN_UPDATE(poker72)
 
 static WRITE8_HANDLER( poker72_paletteram_w )
 {
-	poker72_state *state = space->machine->driver_data<poker72_state>();
+	poker72_state *state = space->machine().driver_data<poker72_state>();
 	int r,g,b;
 	state->pal[offset] = data;
 
@@ -68,27 +68,27 @@ static WRITE8_HANDLER( poker72_paletteram_w )
 	g = state->pal[(offset & 0x3ff)+0x400] & 0x3f;
 	b = state->pal[(offset & 0x3ff)+0x800] & 0x3f;
 
-	palette_set_color_rgb( space->machine, offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
+	palette_set_color_rgb( space->machine(), offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
 static WRITE8_HANDLER( output_w )
 {
-	UINT8 *ROM = space->machine->region("maincpu")->base();
+	UINT8 *ROM = space->machine().region("maincpu")->base();
 
 	printf("%02x\n",data);
 
 /*  if((data & 0xc) == 0xc)
-        memory_set_bankptr(space->machine, "bank1", &ROM[0x10000]);
+        memory_set_bankptr(space->machine(), "bank1", &ROM[0x10000]);
     else*/
 	if(data & 8)
-		memory_set_bankptr(space->machine, "bank1", &ROM[0x08000]);
+		memory_set_bankptr(space->machine(), "bank1", &ROM[0x08000]);
 	else
-		memory_set_bankptr(space->machine, "bank1", &ROM[0x00000]);
+		memory_set_bankptr(space->machine(), "bank1", &ROM[0x00000]);
 }
 
 static WRITE8_HANDLER( tile_bank_w )
 {
-	poker72_state *state = space->machine->driver_data<poker72_state>();
+	poker72_state *state = space->machine().driver_data<poker72_state>();
 	state->tile_bank = (data & 4) >> 2;
 }
 
@@ -336,7 +336,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_RESET( poker72 )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_set_bankptr(machine, "bank1", &ROM[0]);
 }
@@ -391,7 +391,7 @@ ROM_END
 
 static DRIVER_INIT( poker72 )
 {
-	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *rom = machine.region("maincpu")->base();
 
 	rom[0x4a9] = 0x28;
 }

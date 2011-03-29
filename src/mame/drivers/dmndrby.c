@@ -76,7 +76,7 @@ public:
 static WRITE8_HANDLER( dderby_sound_w )
 {
 	soundlatch_w(space,0,data);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 
@@ -84,14 +84,14 @@ static READ8_HANDLER( input_r )
 {
 	switch(offset & 7)
 	{
-		case 0: return input_port_read(space->machine, "IN0");
-		case 1: return input_port_read(space->machine, "IN1");
-		case 2: return input_port_read(space->machine, "IN2");
-		case 3: return input_port_read(space->machine, "IN3");
-		case 4: return input_port_read(space->machine, "IN4");
-		case 5: return input_port_read(space->machine, "IN5");
-		case 6: return input_port_read(space->machine, "IN6");
-		case 7: return input_port_read(space->machine, "IN7");
+		case 0: return input_port_read(space->machine(), "IN0");
+		case 1: return input_port_read(space->machine(), "IN1");
+		case 2: return input_port_read(space->machine(), "IN2");
+		case 3: return input_port_read(space->machine(), "IN3");
+		case 4: return input_port_read(space->machine(), "IN4");
+		case 5: return input_port_read(space->machine(), "IN5");
+		case 6: return input_port_read(space->machine(), "IN6");
+		case 7: return input_port_read(space->machine(), "IN7");
 	}
 
 	return 0xff;
@@ -99,7 +99,7 @@ static READ8_HANDLER( input_r )
 
 static WRITE8_HANDLER( output_w )
 {
-	dmndrby_state *state = space->machine->driver_data<dmndrby_state>();
+	dmndrby_state *state = space->machine().driver_data<dmndrby_state>();
 	/*
     ---- x--- refill meter [4]
     ---- x--- token out meter [5]
@@ -313,7 +313,7 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_dmndrby_tile_info )
 {
-	dmndrby_state *state = machine->driver_data<dmndrby_state>();
+	dmndrby_state *state = machine.driver_data<dmndrby_state>();
 	int code = state->racetrack_tilemap_rom[tile_index];
 	int attr = state->racetrack_tilemap_rom[tile_index+0x2000];
 
@@ -331,8 +331,8 @@ static TILE_GET_INFO( get_dmndrby_tile_info )
 
 static VIDEO_START(dderby)
 {
-	dmndrby_state *state = machine->driver_data<dmndrby_state>();
-	state->racetrack_tilemap_rom = machine->region("user1")->base();
+	dmndrby_state *state = machine.driver_data<dmndrby_state>();
+	state->racetrack_tilemap_rom = machine.region("user1")->base();
 	state->racetrack_tilemap = tilemap_create(machine,get_dmndrby_tile_info,tilemap_scan_rows,16,16, 16, 512);
 	tilemap_mark_all_tiles_dirty(state->racetrack_tilemap);
 
@@ -340,14 +340,14 @@ static VIDEO_START(dderby)
 
 static SCREEN_UPDATE(dderby)
 {
-	dmndrby_state *state = screen->machine->driver_data<dmndrby_state>();
+	dmndrby_state *state = screen->machine().driver_data<dmndrby_state>();
 	int x,y,count;
 	int off,scrolly;
-	const gfx_element *gfx = screen->machine->gfx[0];
-	const gfx_element *sprites = screen->machine->gfx[1];
-	const gfx_element *track = screen->machine->gfx[2];
+	const gfx_element *gfx = screen->machine().gfx[0];
+	const gfx_element *sprites = screen->machine().gfx[1];
+	const gfx_element *track = screen->machine().gfx[2];
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 
 /* Draw racetrack
@@ -450,7 +450,7 @@ static PALETTE_INIT( dmnderby )
 			2, &resistances_b[0],  bweights, 470, 0);
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x20);
+	machine.colortable = colortable_alloc(machine, 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -475,29 +475,29 @@ static PALETTE_INIT( dmnderby )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
-	color_prom = machine->region("proms2")->base();
+	color_prom = machine.region("proms2")->base();
 
 	/* normal tiles use colors 0-15 */
 	for (i = 0x000; i < 0x300; i++)
 	{
 		UINT8 ctabentry = color_prom[i];
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
 	}
 }
 
 /*Main Z80 is IM 0,HW-latched irqs. */
 static INTERRUPT_GEN( dderby_irq )
 {
-	cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE, 0xd7); /* RST 10h */
+	cputag_set_input_line_and_vector(device->machine(), "maincpu", 0, HOLD_LINE, 0xd7); /* RST 10h */
 }
 
 static INTERRUPT_GEN( dderby_timer_irq )
 {
-	cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE, 0xcf); /* RST 08h */
+	cputag_set_input_line_and_vector(device->machine(), "maincpu", 0, HOLD_LINE, 0xcf); /* RST 08h */
 }
 
 static MACHINE_CONFIG_START( dderby, dmndrby_state )

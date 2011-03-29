@@ -4,7 +4,7 @@
 
 /***************************************************************************/
 
-INLINE void actual_get_fg_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum )
+INLINE void actual_get_fg_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, UINT16 *ram, int gfxnum )
 {
 	UINT16 code = (ram[tile_index + 0x2000] & 0x7ff);
 	UINT16 attr = ram[tile_index];
@@ -18,7 +18,7 @@ INLINE void actual_get_fg_tile_info( running_machine *machine, tile_data *tilein
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	darius_state *state = machine->driver_data<darius_state>();
+	darius_state *state = machine.driver_data<darius_state>();
 	actual_get_fg_tile_info(machine, tileinfo, tile_index, state->fg_ram, 2);
 }
 
@@ -26,7 +26,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( darius )
 {
-	darius_state *state = machine->driver_data<darius_state>();
+	darius_state *state = machine.driver_data<darius_state>();
 
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,128,64);
 
@@ -37,7 +37,7 @@ VIDEO_START( darius )
 
 WRITE16_HANDLER( darius_fg_layer_w )
 {
-	darius_state *state = space->machine->driver_data<darius_state>();
+	darius_state *state = space->machine().driver_data<darius_state>();
 
 	COMBINE_DATA(&state->fg_ram[offset]);
 	if (offset < 0x4000)
@@ -46,9 +46,9 @@ WRITE16_HANDLER( darius_fg_layer_w )
 
 /***************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int primask, int x_offs, int y_offs )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int primask, int x_offs, int y_offs )
 {
-	darius_state *state = machine->driver_data<darius_state>();
+	darius_state *state = machine.driver_data<darius_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs, curx, cury;
 	UINT16 code, data, sx, sy;
@@ -82,7 +82,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			if (curx > 900) curx -= 1024;
 			if (cury > 400) cury -= 512;
 
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 					code, color,
 					flipx, flipy,
 					curx, cury, 0);
@@ -94,7 +94,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( darius )
 {
-	darius_state *state = screen->machine->driver_data<darius_state>();
+	darius_state *state = screen->machine().driver_data<darius_state>();
 	int xoffs = 0;
 
 	if (screen == state->lscreen)
@@ -110,12 +110,12 @@ SCREEN_UPDATE( darius )
 	pc080sn_tilemap_draw_offset(state->pc080sn, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0, -xoffs, 0);
 
 	/* Sprites can be under/over the layer below text layer */
-	draw_sprites(screen->machine, bitmap, cliprect, 0, xoffs, -8); // draw sprites with priority 0 which are under the mid layer
+	draw_sprites(screen->machine(), bitmap, cliprect, 0, xoffs, -8); // draw sprites with priority 0 which are under the mid layer
 
 	// draw middle layer
 	pc080sn_tilemap_draw_offset(state->pc080sn, bitmap, cliprect, 1, 0, 0, -xoffs, 0);
 
-	draw_sprites(screen->machine, bitmap, cliprect, 1, xoffs, -8); // draw sprites with priority 1 which are over the mid layer
+	draw_sprites(screen->machine(), bitmap, cliprect, 1, xoffs, -8); // draw sprites with priority 1 which are over the mid layer
 
 	/* top(text) layer is in fixed position */
 	tilemap_set_scrollx(state->fg_tilemap, 0, 0 + xoffs);

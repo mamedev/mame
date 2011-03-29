@@ -699,7 +699,7 @@ GFXDECODE_END
 // handler called by the 2203 emulator when the internal timers cause an IRQ
 static void irqhandler(device_t *device, int irq)
 {
-	bublbobl_state *state = device->machine->driver_data<bublbobl_state>();
+	bublbobl_state *state = device->machine().driver_data<bublbobl_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -723,12 +723,12 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( common )
 {
-	bublbobl_state *state = machine->driver_data<bublbobl_state>();
+	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->mcu = machine->device("mcu");
-	state->audiocpu = machine->device("audiocpu");
-	state->slave = machine->device("slave");
+	state->maincpu = machine.device("maincpu");
+	state->mcu = machine.device("mcu");
+	state->audiocpu = machine.device("audiocpu");
+	state->slave = machine.device("slave");
 
 	state->save_item(NAME(state->sound_nmi_enable));
 	state->save_item(NAME(state->pending_nmi));
@@ -738,7 +738,7 @@ static MACHINE_START( common )
 
 static MACHINE_RESET( common )
 {
-	bublbobl_state *state = machine->driver_data<bublbobl_state>();
+	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
 	state->sound_nmi_enable = 0;
 	state->pending_nmi = 0;
@@ -748,7 +748,7 @@ static MACHINE_RESET( common )
 
 static MACHINE_START( tokio )
 {
-	bublbobl_state *state = machine->driver_data<bublbobl_state>();
+	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
 	MACHINE_START_CALL(common);
 
@@ -757,7 +757,7 @@ static MACHINE_START( tokio )
 
 static MACHINE_RESET( tokio )
 {
-	bublbobl_state *state = machine->driver_data<bublbobl_state>();
+	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
 	MACHINE_RESET_CALL(common);
 
@@ -806,7 +806,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_START( bublbobl )
 {
-	bublbobl_state *state = machine->driver_data<bublbobl_state>();
+	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
 	MACHINE_START_CALL(common);
 
@@ -826,7 +826,7 @@ static MACHINE_START( bublbobl )
 
 static MACHINE_RESET( bublbobl )
 {
-	bublbobl_state *state = machine->driver_data<bublbobl_state>();
+	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
 	MACHINE_RESET_CALL(common);
 
@@ -890,7 +890,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_START( boblbobl )
 {
-	bublbobl_state *state = machine->driver_data<bublbobl_state>();
+	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
 	MACHINE_START_CALL(common);
 
@@ -900,7 +900,7 @@ static MACHINE_START( boblbobl )
 
 static MACHINE_RESET( boblbobl )
 {
-	bublbobl_state *state = machine->driver_data<bublbobl_state>();
+	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
 	MACHINE_RESET_CALL(common);
 
@@ -923,7 +923,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_START( bub68705 )
 {
-	bublbobl_state *state = machine->driver_data<bublbobl_state>();
+	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
 	MACHINE_START_CALL(common);
 
@@ -939,7 +939,7 @@ static MACHINE_START( bub68705 )
 
 static MACHINE_RESET( bub68705 )
 {
-	bublbobl_state *state = machine->driver_data<bublbobl_state>();
+	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
 	MACHINE_RESET_CALL(common);
 
@@ -1525,15 +1525,15 @@ ROM_END
  *
  *************************************/
 
-static void configure_banks( running_machine* machine )
+static void configure_banks( running_machine& machine )
 {
-	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 }
 
 static DRIVER_INIT( bublbobl )
 {
-	bublbobl_state *state = machine->driver_data<bublbobl_state>();
+	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
 	configure_banks(machine);
 
@@ -1543,7 +1543,7 @@ static DRIVER_INIT( bublbobl )
 
 static DRIVER_INIT( tokio )
 {
-	bublbobl_state *state = machine->driver_data<bublbobl_state>();
+	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 	configure_banks(machine);
 
 	/* preemptively enable video, the bit is not mapped for this game and */
@@ -1555,14 +1555,14 @@ static DRIVER_INIT( tokiob )
 {
 	DRIVER_INIT_CALL(tokio);
 
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfe00, 0xfe00, FUNC(tokiob_mcu_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfe00, 0xfe00, FUNC(tokiob_mcu_r) );
 }
 
 static DRIVER_INIT( dland )
 {
 	// rearrange gfx to original format
 	int i;
-	UINT8* src = machine->region("gfx1")->base();
+	UINT8* src = machine.region("gfx1")->base();
 	for (i = 0; i < 0x40000; i++)
 		src[i] = BITSWAP8(src[i],7,6,5,4,0,1,2,3);
 

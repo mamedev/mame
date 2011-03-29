@@ -14,7 +14,7 @@
 
 MACHINE_RESET( pitnrun )
 {
-	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	state->zaccept = 1;
 	state->zready = 0;
 	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
@@ -22,20 +22,20 @@ MACHINE_RESET( pitnrun )
 
 static TIMER_CALLBACK( pitnrun_mcu_real_data_r )
 {
-	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	state->zaccept = 1;
 }
 
 READ8_HANDLER( pitnrun_mcu_data_r )
 {
-	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
-	space->machine->scheduler().synchronize(FUNC(pitnrun_mcu_real_data_r));
+	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
+	space->machine().scheduler().synchronize(FUNC(pitnrun_mcu_real_data_r));
 	return state->toz80;
 }
 
 static TIMER_CALLBACK( pitnrun_mcu_real_data_w )
 {
-	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	state->zready = 1;
 	cputag_set_input_line(machine, "mcu", 0, ASSERT_LINE);
 	state->fromz80 = param;
@@ -43,13 +43,13 @@ static TIMER_CALLBACK( pitnrun_mcu_real_data_w )
 
 WRITE8_HANDLER( pitnrun_mcu_data_w )
 {
-	space->machine->scheduler().synchronize(FUNC(pitnrun_mcu_real_data_w), data);
-	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
+	space->machine().scheduler().synchronize(FUNC(pitnrun_mcu_real_data_w), data);
+	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
 }
 
 READ8_HANDLER( pitnrun_mcu_status_r )
 {
-	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
 	/* mcu synchronization */
 	/* bit 0 = the 68705 has read data from the Z80 */
 	/* bit 1 = the 68705 has written data for the Z80 */
@@ -59,13 +59,13 @@ READ8_HANDLER( pitnrun_mcu_status_r )
 
 READ8_HANDLER( pitnrun_68705_portA_r )
 {
-	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
 	return state->portA_in;
 }
 
 WRITE8_HANDLER( pitnrun_68705_portA_w )
 {
-	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
 	state->portA_out = data;
 }
 
@@ -97,32 +97,32 @@ READ8_HANDLER( pitnrun_68705_portB_r )
 
 static TIMER_CALLBACK( pitnrun_mcu_data_real_r )
 {
-	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	state->zready = 0;
 }
 
 static TIMER_CALLBACK( pitnrun_mcu_status_real_w )
 {
-	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	state->toz80 = param;
 	state->zaccept = 0;
 }
 
 WRITE8_HANDLER( pitnrun_68705_portB_w )
 {
-	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
-	address_space *cpu0space = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
+	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
+	address_space *cpu0space = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	if (~data & 0x02)
 	{
 		/* 68705 is going to read data from the Z80 */
-		space->machine->scheduler().synchronize(FUNC(pitnrun_mcu_data_real_r));
-		cputag_set_input_line(space->machine, "mcu",0,CLEAR_LINE);
+		space->machine().scheduler().synchronize(FUNC(pitnrun_mcu_data_real_r));
+		cputag_set_input_line(space->machine(), "mcu",0,CLEAR_LINE);
 		state->portA_in = state->fromz80;
 	}
 	if (~data & 0x04)
 	{
 		/* 68705 is writing data for the Z80 */
-		space->machine->scheduler().synchronize(FUNC(pitnrun_mcu_status_real_w), state->portA_out);
+		space->machine().scheduler().synchronize(FUNC(pitnrun_mcu_status_real_w), state->portA_out);
 	}
 	if (~data & 0x10)
 	{
@@ -154,6 +154,6 @@ WRITE8_HANDLER( pitnrun_68705_portB_w )
 
 READ8_HANDLER( pitnrun_68705_portC_r )
 {
-	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
 	return (state->zready << 0) | (state->zaccept << 1);
 }

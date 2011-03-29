@@ -115,7 +115,7 @@ xxxx ---- basic color?
 
 static TILE_GET_INFO( get_sc0_tile_info )
 {
-	kingdrby_state *state = machine->driver_data<kingdrby_state>();
+	kingdrby_state *state = machine.driver_data<kingdrby_state>();
 	int tile = state->vram[tile_index] | state->attr[tile_index]<<8;
 	int color = (state->attr[tile_index] & 0x06)>>1;
 
@@ -130,7 +130,7 @@ static TILE_GET_INFO( get_sc0_tile_info )
 
 static TILE_GET_INFO( get_sc1_tile_info )
 {
-	kingdrby_state *state = machine->driver_data<kingdrby_state>();
+	kingdrby_state *state = machine.driver_data<kingdrby_state>();
 	int tile = state->vram[tile_index] | state->attr[tile_index]<<8;
 	int color = (state->attr[tile_index] & 0x06)>>1;
 
@@ -150,7 +150,7 @@ static TILE_GET_INFO( get_sc1_tile_info )
 
 static VIDEO_START(kingdrby)
 {
-	kingdrby_state *state = machine->driver_data<kingdrby_state>();
+	kingdrby_state *state = machine.driver_data<kingdrby_state>();
 	state->sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,24);
 	state->sc1_tilemap = tilemap_create(machine, get_sc1_tile_info,tilemap_scan_rows,8,8,32,24);
 	state->sc0w_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,32);
@@ -158,9 +158,9 @@ static VIDEO_START(kingdrby)
 	tilemap_set_transparent_pen(state->sc1_tilemap,0);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	kingdrby_state *state = machine->driver_data<kingdrby_state>();
+	kingdrby_state *state = machine.driver_data<kingdrby_state>();
 	UINT8 *spriteram = state->spriteram;
 	int count = 0;
 
@@ -192,20 +192,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			for(dy=0;dy<h;dy++)
 				for(dx=0;dx<w;dx++)
-					drawgfx_transpen(bitmap,cliprect,machine->gfx[0],spr_offs++,colour,1,0,((x+16*w)-(dx+1)*16),(y+dy*16),0);
+					drawgfx_transpen(bitmap,cliprect,machine.gfx[0],spr_offs++,colour,1,0,((x+16*w)-(dx+1)*16),(y+dy*16),0);
 		}
 		else
 		{
 			for(dy=0;dy<h;dy++)
 				for(dx=0;dx<w;dx++)
-					drawgfx_transpen(bitmap,cliprect,machine->gfx[0],spr_offs++,colour,0,0,(x+dx*16),(y+dy*16),0);
+					drawgfx_transpen(bitmap,cliprect,machine.gfx[0],spr_offs++,colour,0,0,(x+dx*16),(y+dy*16),0);
 		}
 	}
 }
 
 static SCREEN_UPDATE(kingdrby)
 {
-	kingdrby_state *state = screen->machine->driver_data<kingdrby_state>();
+	kingdrby_state *state = screen->machine().driver_data<kingdrby_state>();
 	const rectangle &visarea = screen->visible_area();
 	rectangle clip;
 	tilemap_set_scrollx( state->sc0_tilemap,0, state->vram[0x342]);
@@ -222,7 +222,7 @@ static SCREEN_UPDATE(kingdrby)
 
 	/*TILEMAP_DRAW_CATEGORY + TILEMAP_DRAW_OPAQUE doesn't suit well?*/
 	tilemap_draw(bitmap,cliprect,state->sc0_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	draw_sprites(screen->machine(),bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->sc1_tilemap,TILEMAP_DRAW_CATEGORY(1),0);
 	tilemap_draw(bitmap,&clip,state->sc0w_tilemap,0,0);
 
@@ -231,7 +231,7 @@ static SCREEN_UPDATE(kingdrby)
 
 static WRITE8_HANDLER( sc0_vram_w )
 {
-	kingdrby_state *state = space->machine->driver_data<kingdrby_state>();
+	kingdrby_state *state = space->machine().driver_data<kingdrby_state>();
 	state->vram[offset] = data;
 	tilemap_mark_tile_dirty(state->sc0_tilemap,offset);
 	tilemap_mark_tile_dirty(state->sc0w_tilemap,offset);
@@ -240,7 +240,7 @@ static WRITE8_HANDLER( sc0_vram_w )
 
 static WRITE8_HANDLER( sc0_attr_w )
 {
-	kingdrby_state *state = space->machine->driver_data<kingdrby_state>();
+	kingdrby_state *state = space->machine().driver_data<kingdrby_state>();
 	state->attr[offset] = data;
 	tilemap_mark_tile_dirty(state->sc0_tilemap,offset);
 	tilemap_mark_tile_dirty(state->sc0w_tilemap,offset);
@@ -257,13 +257,13 @@ static WRITE8_HANDLER( sc0_attr_w )
 
 static READ8_DEVICE_HANDLER( hopper_io_r )
 {
-	kingdrby_state *state = device->machine->driver_data<kingdrby_state>();
-	return (input_port_read(device->machine,"HPIO") & 0x3f) | state->p1_hopper | state->p2_hopper;
+	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
+	return (input_port_read(device->machine(),"HPIO") & 0x3f) | state->p1_hopper | state->p2_hopper;
 }
 
 static WRITE8_DEVICE_HANDLER( hopper_io_w )
 {
-	kingdrby_state *state = device->machine->driver_data<kingdrby_state>();
+	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
 	state->p1_hopper = (data & 0x8)<<3;
 	state->p2_hopper = (data & 0x4)<<5;
 //  printf("%02x\n",data);
@@ -271,8 +271,8 @@ static WRITE8_DEVICE_HANDLER( hopper_io_w )
 
 static WRITE8_DEVICE_HANDLER( sound_cmd_w )
 {
-	kingdrby_state *state = device->machine->driver_data<kingdrby_state>();
-	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
+	cputag_set_input_line(device->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	state->sound_cmd = data;
 	/* soundlatch is unneeded since we are already using perfect interleave. */
 	// soundlatch_w(space,0, data);
@@ -282,18 +282,18 @@ static WRITE8_DEVICE_HANDLER( sound_cmd_w )
 /* No idea about what's this (if it's really a mux etc.)*/
 static WRITE8_DEVICE_HANDLER( outport2_w )
 {
-	kingdrby_state *state = device->machine->driver_data<kingdrby_state>();
+	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
 //  popmessage("PPI1 port C(upper) out: %02X", data);
 	state->mux_data = data & 0x80;
 }
 
 static READ8_DEVICE_HANDLER( input_mux_r )
 {
-	kingdrby_state *state = device->machine->driver_data<kingdrby_state>();
+	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
 	if(state->mux_data & 0x80)
-		return input_port_read(device->machine,"MUX0");
+		return input_port_read(device->machine(),"MUX0");
 	else
-		return input_port_read(device->machine,"MUX1");
+		return input_port_read(device->machine(),"MUX1");
 }
 
 static READ8_DEVICE_HANDLER( key_matrix_r )
@@ -301,8 +301,8 @@ static READ8_DEVICE_HANDLER( key_matrix_r )
 	UINT16 p1_val,p2_val;
 	UINT8 p1_res,p2_res;
 
-	p1_val = input_port_read(device->machine,"KEY_1P");
-	p2_val = input_port_read(device->machine,"KEY_2P");
+	p1_val = input_port_read(device->machine(),"KEY_1P");
+	p2_val = input_port_read(device->machine(),"KEY_2P");
 
 	p1_res = 0;
 	p2_res = 0;
@@ -350,7 +350,7 @@ static READ8_DEVICE_HANDLER( key_matrix_r )
 
 static READ8_DEVICE_HANDLER( sound_cmd_r )
 {
-	kingdrby_state *state = device->machine->driver_data<kingdrby_state>();
+	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
 	return state->sound_cmd;
 }
 
@@ -964,8 +964,8 @@ static PALETTE_INIT(kingdrby)
 
 static PALETTE_INIT(kingdrbb)
 {
-	UINT8 *raw_prom = machine->region("raw_prom")->base();
-	UINT8 *prom = machine->region("proms")->base();
+	UINT8 *raw_prom = machine.region("raw_prom")->base();
+	UINT8 *prom = machine.region("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 

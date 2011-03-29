@@ -17,7 +17,7 @@
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	batman_state *state = machine->driver_data<batman_state>();
+	batman_state *state = machine.driver_data<batman_state>();
 	UINT16 data = state->alpha[tile_index];
 	int code = ((data & 0x400) ? (state->alpha_tile_bank * 0x400) : 0) + (data & 0x3ff);
 	int color = (data >> 11) & 0x0f;
@@ -28,7 +28,7 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	batman_state *state = machine->driver_data<batman_state>();
+	batman_state *state = machine.driver_data<batman_state>();
 	UINT16 data1 = state->playfield[tile_index];
 	UINT16 data2 = state->playfield_upper[tile_index] & 0xff;
 	int code = data1 & 0x7fff;
@@ -40,7 +40,7 @@ static TILE_GET_INFO( get_playfield_tile_info )
 
 static TILE_GET_INFO( get_playfield2_tile_info )
 {
-	batman_state *state = machine->driver_data<batman_state>();
+	batman_state *state = machine.driver_data<batman_state>();
 	UINT16 data1 = state->playfield2[tile_index];
 	UINT16 data2 = state->playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x7fff;
@@ -95,7 +95,7 @@ VIDEO_START( batman )
 		0,					/* resulting value to indicate "special" */
 		NULL				/* callback routine for special entries */
 	};
-	batman_state *state = machine->driver_data<batman_state>();
+	batman_state *state = machine.driver_data<batman_state>();
 
 	/* initialize the playfield */
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
@@ -122,7 +122,7 @@ VIDEO_START( batman )
 
 void batman_scanline_update(screen_device &screen, int scanline)
 {
-	batman_state *state = screen.machine->driver_data<batman_state>();
+	batman_state *state = screen.machine().driver_data<batman_state>();
 
 	/* update the scanline parameters */
 	if (scanline <= screen.visible_area().max_y && state->atarivc_state.rowscroll_enable)
@@ -195,8 +195,8 @@ void batman_scanline_update(screen_device &screen, int scanline)
 
 SCREEN_UPDATE( batman )
 {
-	batman_state *state = screen->machine->driver_data<batman_state>();
-	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
+	batman_state *state = screen->machine().driver_data<batman_state>();
+	bitmap_t *priority_bitmap = screen->machine().priority_bitmap;
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

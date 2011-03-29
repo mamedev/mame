@@ -2726,9 +2726,9 @@ static CPU_INIT( t90 )
 	// Timers
 
 	for (i = 0; i < 4; i++)
-		cpustate->timer[i] = device->machine->scheduler().timer_alloc(FUNC(t90_timer_callback), cpustate);
+		cpustate->timer[i] = device->machine().scheduler().timer_alloc(FUNC(t90_timer_callback), cpustate);
 
-	cpustate->timer[4] = device->machine->scheduler().timer_alloc(FUNC(t90_timer4_callback), cpustate);
+	cpustate->timer[4] = device->machine().scheduler().timer_alloc(FUNC(t90_timer4_callback), cpustate);
 }
 
 static ADDRESS_MAP_START(tmp90840_mem, AS_PROGRAM, 8)

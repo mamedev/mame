@@ -182,7 +182,7 @@ void Processor::VideoUpdate16(bitmap_t *bitmap)
 				/*
                 if (gamma_dither)
                 {
-                    dith = screen->machine->rand() & 0x3f;
+                    dith = screen->machine().rand() & 0x3f;
                 }
                 if (gamma)
                 {
@@ -1733,15 +1733,15 @@ void N64::RDP::Processor::Dasm(char *buffer)
 
 /*****************************************************************************/
 
-N64::RDP::Triangle::Triangle(running_machine *machine, bool shade, bool texture, bool zbuffer, bool rect, bool flip)
+N64::RDP::Triangle::Triangle(running_machine &machine, bool shade, bool texture, bool zbuffer, bool rect, bool flip)
 {
 	InitFromData(machine, shade, texture, zbuffer, rect, flip);
 }
 
-void N64::RDP::Triangle::InitFromData(running_machine *machine, bool shade, bool texture, bool zbuffer, bool rect, bool flip)
+void N64::RDP::Triangle::InitFromData(running_machine &machine, bool shade, bool texture, bool zbuffer, bool rect, bool flip)
 {
-	m_machine = machine;
-	m_rdp = &(machine->driver_data<_n64_state>())->m_rdp;
+	m_machine = &machine;
+	m_rdp = &(machine.driver_data<_n64_state>())->m_rdp;
 	m_cmd_data = rect ? m_rdp->GetTempRectData() : m_rdp->GetCommandData();
 	m_misc_state = m_rdp->GetMiscState();
 	m_shade = shade;
@@ -2261,7 +2261,7 @@ void N64::RDP::Triangle::Draw()
 
 void N64::RDP::Processor::Triangle(bool shade, bool texture, bool zbuffer)
 {
-	N64::RDP::Triangle tri(m_machine, shade, texture, zbuffer, false, false);
+	N64::RDP::Triangle tri(*m_machine, shade, texture, zbuffer, false, false);
 	tri.Draw();
 }
 
@@ -2361,7 +2361,7 @@ void N64::RDP::Processor::CmdTexRect(UINT32 w1, UINT32 w2)
 	ewdata[39] = 0;//dwdy frac
 	memset(&ewdata[40], 0, 4 * sizeof(UINT32));//depth
 
-	N64::RDP::Triangle tri(m_machine, true, true, false, true, false);
+	N64::RDP::Triangle tri(*m_machine, true, true, false, true, false);
 	tri.Draw();
 }
 
@@ -2421,7 +2421,7 @@ void N64::RDP::Processor::CmdTexRectFlip(UINT32 w1, UINT32 w2)
 	ewdata[39] = 0;//dwdy frac
 	memset(&ewdata[40], 0, 4 * sizeof(UINT32));//depth
 
-	N64::RDP::Triangle tri(m_machine, true, true, false, true, false);
+	N64::RDP::Triangle tri(*m_machine, true, true, false, true, false);
 	tri.Draw();
 }
 
@@ -2442,7 +2442,7 @@ void N64::RDP::Processor::CmdSyncTile(UINT32 w1, UINT32 w2)
 
 void N64::RDP::Processor::CmdSyncFull(UINT32 w1, UINT32 w2)
 {
-	dp_full_sync(m_machine);
+	dp_full_sync(*m_machine);
 }
 
 void N64::RDP::Processor::CmdSetKeyGB(UINT32 w1, UINT32 w2)
@@ -2931,7 +2931,7 @@ void N64::RDP::Processor::CmdFillRect(UINT32 w1, UINT32 w2)
 	ewdata[7] = 0;//dxmdy, dxmdy frac
 	memset(&ewdata[8], 0, 36 * sizeof(UINT32));//shade, texture, depth
 
-	N64::RDP::Triangle tri(m_machine, false, false, false, true, false);
+	N64::RDP::Triangle tri(*m_machine, false, false, false, true, false);
 	tri.Draw();
 }
 
@@ -3245,7 +3245,7 @@ void N64::RDP::Processor::ProcessList()
 
 VIDEO_START(n64)
 {
-	_n64_state *state = machine->driver_data<_n64_state>();
+	_n64_state *state = machine.driver_data<_n64_state>();
 
 	state->m_rdp.SetMachine(machine);
 	state->m_rdp.InitInternalState();
@@ -3269,7 +3269,7 @@ VIDEO_START(n64)
 
 SCREEN_UPDATE(n64)
 {
-	_n64_state *state = screen->machine->driver_data<_n64_state>();
+	_n64_state *state = screen->machine().driver_data<_n64_state>();
 
     int height = state->m_rdp.GetMiscState()->m_fb_height;
 	//UINT16 *frame_buffer = (UINT16*)&rdram[(n64_vi_origin & 0xffffff) >> 2];

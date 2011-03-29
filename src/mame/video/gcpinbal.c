@@ -7,7 +7,7 @@
 
 static TILE_GET_INFO( get_bg0_tile_info )
 {
-	gcpinbal_state *state = machine->driver_data<gcpinbal_state>();
+	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
 	UINT16 tilenum = state->tilemapram[0 + tile_index * 2];
 	UINT16 attr    = state->tilemapram[1 + tile_index * 2];
 
@@ -20,7 +20,7 @@ static TILE_GET_INFO( get_bg0_tile_info )
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	gcpinbal_state *state = machine->driver_data<gcpinbal_state>();
+	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
 	UINT16 tilenum = state->tilemapram[0x800 + tile_index * 2];
 	UINT16 attr    = state->tilemapram[0x801 + tile_index * 2];
 
@@ -33,7 +33,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	gcpinbal_state *state = machine->driver_data<gcpinbal_state>();
+	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
 	UINT16 tilenum = state->tilemapram[0x1000 + tile_index];
 
 	SET_TILE_INFO(
@@ -43,9 +43,9 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0);
 }
 
-static void gcpinbal_core_vh_start( running_machine *machine )
+static void gcpinbal_core_vh_start( running_machine &machine )
 {
-	gcpinbal_state *state = machine->driver_data<gcpinbal_state>();
+	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
 	int xoffs = 0;
 	int yoffs = 0;
 
@@ -78,13 +78,13 @@ VIDEO_START( gcpinbal )
 
 READ16_HANDLER( gcpinbal_tilemaps_word_r )
 {
-	gcpinbal_state *state = space->machine->driver_data<gcpinbal_state>();
+	gcpinbal_state *state = space->machine().driver_data<gcpinbal_state>();
 	return state->tilemapram[offset];
 }
 
 WRITE16_HANDLER( gcpinbal_tilemaps_word_w )
 {
-	gcpinbal_state *state = space->machine->driver_data<gcpinbal_state>();
+	gcpinbal_state *state = space->machine().driver_data<gcpinbal_state>();
 	COMBINE_DATA(&state->tilemapram[offset]);
 
 	if (offset < 0x800)	/* BG0 */
@@ -169,9 +169,9 @@ WRITE16_HANDLER( gcpinbal_ctrl_word_w )
 
 ****************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
 {
-	gcpinbal_state *state = machine->driver_data<gcpinbal_state>();
+	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs, chain_pos;
 	int x, y, curx, cury;
@@ -209,12 +209,12 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 			for (chain_pos = chain; chain_pos >= 0; chain_pos--)
 			{
-				pdrawgfx_transpen(bitmap, cliprect,machine->gfx[0],
+				pdrawgfx_transpen(bitmap, cliprect,machine.gfx[0],
 						code,
 						col,
 						flipx, flipy,
 						curx,cury,
-						machine->priority_bitmap,
+						machine.priority_bitmap,
 						priority ? 0xfc : 0xf0,0);
 
 				code++;
@@ -250,25 +250,25 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( gcpinbal )
 {
-	gcpinbal_state *state = screen->machine->driver_data<gcpinbal_state>();
+	gcpinbal_state *state = screen->machine().driver_data<gcpinbal_state>();
 	int i;
 	UINT16 tile_sets = 0;
 	UINT8 layer[3];
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed_once(screen->machine, KEYCODE_V))
+	if (input_code_pressed_once(screen->machine(), KEYCODE_V))
 	{
 		state->dislayer[0] ^= 1;
 		popmessage("bg0: %01x", state->dislayer[0]);
 	}
 
-	if (input_code_pressed_once(screen->machine, KEYCODE_B))
+	if (input_code_pressed_once(screen->machine(), KEYCODE_B))
 	{
 		state->dislayer[1] ^= 1;
 		popmessage("bg1: %01x", state->dislayer[1]);
 	}
 
-	if (input_code_pressed_once(screen->machine, KEYCODE_N))
+	if (input_code_pressed_once(screen->machine(), KEYCODE_N))
 	{
 		state->dislayer[2] ^= 1;
 		popmessage("fg: %01x", state->dislayer[2]);
@@ -292,7 +292,7 @@ SCREEN_UPDATE( gcpinbal )
 		tilemap_set_scrolly(state->tilemap[i], 0, state->scrolly[i]);
 	}
 
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 	layer[0] = 0;
@@ -316,7 +316,7 @@ SCREEN_UPDATE( gcpinbal )
 	tilemap_draw(bitmap, cliprect, state->tilemap[layer[2]], 0, 4);
 
 
-	draw_sprites(screen->machine, bitmap, cliprect, 16);
+	draw_sprites(screen->machine(), bitmap, cliprect, 16);
 
 #if 0
 	{

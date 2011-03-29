@@ -41,25 +41,25 @@ dip: 6.7 7.7
 
 static READ8_HANDLER( shared1_r )
 {
-	wiping_state *state = space->machine->driver_data<wiping_state>();
+	wiping_state *state = space->machine().driver_data<wiping_state>();
 	return state->sharedram1[offset];
 }
 
 static READ8_HANDLER( shared2_r )
 {
-	wiping_state *state = space->machine->driver_data<wiping_state>();
+	wiping_state *state = space->machine().driver_data<wiping_state>();
 	return state->sharedram2[offset];
 }
 
 static WRITE8_HANDLER( shared1_w )
 {
-	wiping_state *state = space->machine->driver_data<wiping_state>();
+	wiping_state *state = space->machine().driver_data<wiping_state>();
 	state->sharedram1[offset] = data;
 }
 
 static WRITE8_HANDLER( shared2_w )
 {
-	wiping_state *state = space->machine->driver_data<wiping_state>();
+	wiping_state *state = space->machine().driver_data<wiping_state>();
 	state->sharedram2[offset] = data;
 }
 
@@ -72,7 +72,7 @@ static READ8_HANDLER( ports_r )
 
 	res = 0;
 	for (i = 0; i < 8; i++)
-		res |= ((input_port_read(space->machine, portnames[i]) >> offset) & 1) << i;
+		res |= ((input_port_read(space->machine(), portnames[i]) >> offset) & 1) << i;
 
 	return res;
 }
@@ -80,9 +80,9 @@ static READ8_HANDLER( ports_r )
 static WRITE8_HANDLER( subcpu_reset_w )
 {
 	if (data & 1)
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

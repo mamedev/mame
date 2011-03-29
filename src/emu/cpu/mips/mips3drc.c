@@ -396,7 +396,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, legacy_cpu_device *de
 	int regnum;
 
 	/* allocate enough space for the cache and the core */
-	cache = auto_alloc(device->machine, drc_cache(CACHE_SIZE + sizeof(*mips3)));
+	cache = auto_alloc(device->machine(), drc_cache(CACHE_SIZE + sizeof(*mips3)));
 	if (cache == NULL)
 		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(*mips3)));
 
@@ -419,7 +419,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, legacy_cpu_device *de
 		flags |= DRCUML_OPTION_LOG_UML;
 	if (LOG_NATIVE)
 		flags |= DRCUML_OPTION_LOG_NATIVE;
-	mips3->impstate->drcuml = auto_alloc(device->machine, drcuml_state(*device, *cache, flags, 8, 32, 2));
+	mips3->impstate->drcuml = auto_alloc(device->machine(), drcuml_state(*device, *cache, flags, 8, 32, 2));
 
 	/* add symbols for our stuff */
 	mips3->impstate->drcuml->symbol_add(&mips3->pc, sizeof(mips3->pc), "pc");
@@ -465,7 +465,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, legacy_cpu_device *de
 	mips3->impstate->drcuml->symbol_add(&mips3->impstate->fpmode, sizeof(mips3->impstate->fpmode), "fpmode");
 
 	/* initialize the front-end helper */
-	mips3->impstate->drcfe = auto_alloc(device->machine, mips3_frontend(*mips3, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
+	mips3->impstate->drcfe = auto_alloc(device->machine(), mips3_frontend(*mips3, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
 
 	/* allocate memory for cache-local state and initialize it */
 	memcpy(mips3->impstate->fpmode, fpmode_source, sizeof(fpmode_source));
@@ -562,9 +562,9 @@ static CPU_EXIT( mips3 )
 	mips3com_exit(mips3);
 
 	/* clean up the DRC */
-	auto_free(device->machine, mips3->impstate->drcfe);
-	auto_free(device->machine, mips3->impstate->drcuml);
-	auto_free(device->machine, mips3->impstate->cache);
+	auto_free(device->machine(), mips3->impstate->drcfe);
+	auto_free(device->machine(), mips3->impstate->drcuml);
+	auto_free(device->machine(), mips3->impstate->cache);
 }
 
 
@@ -1275,7 +1275,7 @@ static void static_generate_memory_accessor(mips3_state *mips3, int mode, int si
 	UML_JMPc(block, COND_Z, tlbmiss = label++);										// jmp     tlbmiss,z
 	UML_ROLINS(block, I0, I3, 0, 0xfffff000);					// rolins  i0,i3,0,0xfffff000
 
-	if ((mips3->device->machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if ((mips3->device->machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
 		for (ramnum = 0; ramnum < MIPS3_MAX_FASTRAM; ramnum++)
 			if (mips3->impstate->fastram[ramnum].base != NULL && (!iswrite || !mips3->impstate->fastram[ramnum].readonly))
 			{
@@ -1612,7 +1612,7 @@ static void generate_sequence_instruction(mips3_state *mips3, drcuml_block *bloc
 	}
 
 	/* if we are debugging, call the debugger */
-	if ((mips3->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((mips3->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		UML_MOV(block, mem(&mips3->pc), desc->pc);								// mov     [pc],desc->pc
 		save_fast_iregs(mips3, block);

@@ -74,13 +74,13 @@ static STREAM_UPDATE( engine_sound_update )
 	}
 
 	/* determine the effective clock rate */
-	clock = (device->machine->device("maincpu")->unscaled_clock() / 16) * ((state->sample_msb + 1) * 64 + state->sample_lsb + 1) / (64*64);
+	clock = (device->machine().device("maincpu")->unscaled_clock() / 16) * ((state->sample_msb + 1) * 64 + state->sample_lsb + 1) / (64*64);
 	step = (clock << 12) / OUTPUT_RATE;
 
 	/* determine the volume */
 	slot = (state->sample_msb >> 3) & 7;
 	volume = volume_table[slot];
-	base = &device->machine->region("engine")->base()[slot * 0x800];
+	base = &device->machine().region("engine")->base()[slot * 0x800];
 
 	/* fill in the sample */
 	while (samples--)
@@ -113,7 +113,7 @@ static STREAM_UPDATE( engine_sound_update )
 static DEVICE_START( polepos_sound )
 {
 	polepos_sound_state *state = get_safe_token(device);
-	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, NULL, engine_sound_update);
+	state->stream = device->machine().sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, NULL, engine_sound_update);
 	state->sample_msb = state->sample_lsb = 0;
 	state->sample_enable = 0;
 

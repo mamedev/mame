@@ -228,7 +228,7 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 /* Read/Write Handlers */
 static READ8_HANDLER( devram_r )
 {
-	airbustr_state *state = space->machine->driver_data<airbustr_state>();
+	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 
 	// There's an MCU here, possibly
 	switch (offset)
@@ -254,7 +254,7 @@ static READ8_HANDLER( devram_r )
 		/* Reading eff4, F0 times must yield at most 80-1 consecutive
            equal values */
 		case 0xff4:
-			return space->machine->rand();
+			return space->machine().rand();
 
 		default:
 			return state->devram[offset];
@@ -263,22 +263,22 @@ static READ8_HANDLER( devram_r )
 
 static WRITE8_HANDLER( master_nmi_trigger_w )
 {
-	airbustr_state *state = space->machine->driver_data<airbustr_state>();
+	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 	device_set_input_line(state->slave, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( master_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank1", data & 0x07);
+	memory_set_bank(space->machine(), "bank1", data & 0x07);
 }
 
 static WRITE8_HANDLER( slave_bankswitch_w )
 {
-	airbustr_state *state = space->machine->driver_data<airbustr_state>();
+	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 
-	memory_set_bank(space->machine, "bank2", data & 0x07);
+	memory_set_bank(space->machine(), "bank2", data & 0x07);
 
-	flip_screen_set(space->machine, data & 0x10);
+	flip_screen_set(space->machine(), data & 0x10);
 
 	// used at the end of levels, after defeating the boss, to leave trails
 	pandora_set_clear_bitmap(state->pandora, data & 0x20);
@@ -286,12 +286,12 @@ static WRITE8_HANDLER( slave_bankswitch_w )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bank(space->machine, "bank3", data & 0x07);
+	memory_set_bank(space->machine(), "bank3", data & 0x07);
 }
 
 static READ8_HANDLER( soundcommand_status_r )
 {
-	airbustr_state *state = space->machine->driver_data<airbustr_state>();
+	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 
 	// bits: 2 <-> ?    1 <-> soundlatch full   0 <-> soundlatch2 empty
 	return 4 + state->soundlatch_status * 2 + (1 - state->soundlatch2_status);
@@ -299,21 +299,21 @@ static READ8_HANDLER( soundcommand_status_r )
 
 static READ8_HANDLER( soundcommand_r )
 {
-	airbustr_state *state = space->machine->driver_data<airbustr_state>();
+	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 	state->soundlatch_status = 0;	// soundlatch has been read
 	return soundlatch_r(space, 0);
 }
 
 static READ8_HANDLER( soundcommand2_r )
 {
-	airbustr_state *state = space->machine->driver_data<airbustr_state>();
+	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 	state->soundlatch2_status = 0;	// soundlatch2 has been read
 	return soundlatch2_r(space, 0);
 }
 
 static WRITE8_HANDLER( soundcommand_w )
 {
-	airbustr_state *state = space->machine->driver_data<airbustr_state>();
+	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 	soundlatch_w(space, 0, data);
 	state->soundlatch_status = 1;	// soundlatch has been written
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
@@ -321,14 +321,14 @@ static WRITE8_HANDLER( soundcommand_w )
 
 static WRITE8_HANDLER( soundcommand2_w )
 {
-	airbustr_state *state = space->machine->driver_data<airbustr_state>();
+	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 	soundlatch2_w(space, 0, data);
 	state->soundlatch2_status = 1;	// soundlatch2 has been written
 }
 
 static WRITE8_HANDLER( airbustr_paletteram_w )
 {
-	airbustr_state *state = space->machine->driver_data<airbustr_state>();
+	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 	int val;
 
 	/*  ! byte 1 ! ! byte 0 !   */
@@ -338,15 +338,15 @@ static WRITE8_HANDLER( airbustr_paletteram_w )
 	state->paletteram[offset] = data;
 	val = (state->paletteram[offset | 1] << 8) | state->paletteram[offset & ~1];
 
-	palette_set_color_rgb(space->machine, offset / 2, pal5bit(val >> 5), pal5bit(val >> 10), pal5bit(val >> 0));
+	palette_set_color_rgb(space->machine(), offset / 2, pal5bit(val >> 5), pal5bit(val >> 10), pal5bit(val >> 0));
 }
 
 static WRITE8_HANDLER( airbustr_coin_counter_w )
 {
-	coin_counter_w(space->machine, 0, data & 1);
-	coin_counter_w(space->machine, 1, data & 2);
-	coin_lockout_w(space->machine, 0, ~data & 4);
-	coin_lockout_w(space->machine, 1, ~data & 8);
+	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(space->machine(), 1, data & 2);
+	coin_lockout_w(space->machine(), 0, ~data & 4);
+	coin_lockout_w(space->machine(), 1, ~data & 8);
 }
 
 /* Memory Maps */
@@ -559,14 +559,14 @@ static const ym2203_interface ym2203_config =
 
 static INTERRUPT_GEN( master_interrupt )
 {
-	airbustr_state *state = device->machine->driver_data<airbustr_state>();
+	airbustr_state *state = device->machine().driver_data<airbustr_state>();
 	state->master_addr ^= 0x02;
 	device_set_input_line_and_vector(device, 0, HOLD_LINE, state->master_addr);
 }
 
 static INTERRUPT_GEN( slave_interrupt )
 {
-	airbustr_state *state = device->machine->driver_data<airbustr_state>();
+	airbustr_state *state = device->machine().driver_data<airbustr_state>();
 	state->slave_addr ^= 0x02;
 	device_set_input_line_and_vector(device, 0, HOLD_LINE, state->slave_addr);
 }
@@ -575,10 +575,10 @@ static INTERRUPT_GEN( slave_interrupt )
 
 static MACHINE_START( airbustr )
 {
-	airbustr_state *state = machine->driver_data<airbustr_state>();
-	UINT8 *MASTER = machine->region("master")->base();
-	UINT8 *SLAVE = machine->region("slave")->base();
-	UINT8 *AUDIO = machine->region("audiocpu")->base();
+	airbustr_state *state = machine.driver_data<airbustr_state>();
+	UINT8 *MASTER = machine.region("master")->base();
+	UINT8 *SLAVE = machine.region("slave")->base();
+	UINT8 *AUDIO = machine.region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 3, &MASTER[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank1", 3, 5, &MASTER[0x10000], 0x4000);
@@ -587,10 +587,10 @@ static MACHINE_START( airbustr )
 	memory_configure_bank(machine, "bank3", 0, 3, &AUDIO[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank3", 3, 5, &AUDIO[0x10000], 0x4000);
 
-	state->master = machine->device("master");
-	state->slave = machine->device("slave");
-	state->audiocpu = machine->device("audiocpu");
-	state->pandora = machine->device("pandora");
+	state->master = machine.device("master");
+	state->slave = machine.device("slave");
+	state->audiocpu = machine.device("audiocpu");
+	state->pandora = machine.device("pandora");
 
 	state->save_item(NAME(state->soundlatch_status));
 	state->save_item(NAME(state->soundlatch2_status));
@@ -605,7 +605,7 @@ static MACHINE_START( airbustr )
 
 static MACHINE_RESET( airbustr )
 {
-	airbustr_state *state = machine->driver_data<airbustr_state>();
+	airbustr_state *state = machine.driver_data<airbustr_state>();
 
 	state->soundlatch_status = state->soundlatch2_status = 0;
 	state->master_addr = 0xff;
@@ -798,7 +798,7 @@ ROM_END
 
 static DRIVER_INIT( airbustr )
 {
-	machine->device("master")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe000, 0xefff, FUNC(devram_r)); // protection device lives here
+	machine.device("master")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe000, 0xefff, FUNC(devram_r)); // protection device lives here
 }
 
 

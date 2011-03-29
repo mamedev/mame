@@ -362,14 +362,14 @@ ROM_END
 
 static DRIVER_INIT(stlforce)
 {
-	stlforce_state *state = machine->driver_data<stlforce_state>();
+	stlforce_state *state = machine.driver_data<stlforce_state>();
 
 	state->sprxoffs = 0;
 }
 
 static DRIVER_INIT(twinbrat)
 {
-	stlforce_state *state = machine->driver_data<stlforce_state>();
+	stlforce_state *state = machine.driver_data<stlforce_state>();
 
 	state->sprxoffs = 9;
 }

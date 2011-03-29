@@ -35,8 +35,8 @@ struct memory_mapper_chip
 	UINT8	regs[0x20];
 	device_t *cpu;
 	const segaic16_memory_map_entry *map;
-	void	(*sound_w)(running_machine *, UINT8);
-	UINT8	(*sound_r)(running_machine *);
+	void	(*sound_w)(running_machine &, UINT8);
+	UINT8	(*sound_r)(running_machine &);
 };
 
 
@@ -55,7 +55,7 @@ static struct memory_mapper_chip memory_mapper;
  *
  *************************************/
 
-static void update_memory_mapping(running_machine *machine, struct memory_mapper_chip *chip, int decrypt);
+static void update_memory_mapping(running_machine &machine, struct memory_mapper_chip *chip, int decrypt);
 
 
 /*************************************
@@ -96,7 +96,7 @@ READ16_HANDLER( segaic16_open_bus_r )
  *
  *************************************/
 
-void segaic16_memory_mapper_init(device_t *cpu, const segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(running_machine *, UINT8), UINT8 (*sound_r_callback)(running_machine *))
+void segaic16_memory_mapper_init(device_t *cpu, const segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(running_machine &, UINT8), UINT8 (*sound_r_callback)(running_machine &))
 {
 	struct memory_mapper_chip *chip = &memory_mapper;
 
@@ -108,12 +108,12 @@ void segaic16_memory_mapper_init(device_t *cpu, const segaic16_memory_map_entry 
 	chip->sound_r = sound_r_callback;
 
 	/* create the initial regions */
-	update_memory_mapping(cpu->machine, chip, 0);
+	update_memory_mapping(cpu->machine(), chip, 0);
 
-	state_save_register_item_array(cpu->machine, "segaic16_mapper", NULL, 0, chip->regs);
+	state_save_register_item_array(cpu->machine(), "segaic16_mapper", NULL, 0, chip->regs);
 }
 
-void segaic16_memory_mapper_reset(running_machine *machine)
+void segaic16_memory_mapper_reset(running_machine &machine)
 {
 	struct memory_mapper_chip *chip = &memory_mapper;
 
@@ -123,7 +123,7 @@ void segaic16_memory_mapper_reset(running_machine *machine)
 }
 
 
-void segaic16_memory_mapper_config(running_machine *machine, const UINT8 *map_data)
+void segaic16_memory_mapper_config(running_machine &machine, const UINT8 *map_data)
 {
 	struct memory_mapper_chip *chip = &memory_mapper;
 
@@ -133,7 +133,7 @@ void segaic16_memory_mapper_config(running_machine *machine, const UINT8 *map_da
 }
 
 
-void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decrypted)
+void segaic16_memory_mapper_set_decrypted(running_machine &machine, UINT8 *decrypted)
 {
 	struct memory_mapper_chip *chip = &memory_mapper;
 	offs_t romsize = chip->cpu->region()->bytes();
@@ -193,7 +193,7 @@ static void memory_mapper_w(address_space *space, struct memory_mapper_chip *chi
 
 		case 0x03:
 			if (chip->sound_w)
-				(*chip->sound_w)(space->machine, data);
+				(*chip->sound_w)(space->machine(), data);
 			break;
 
 		case 0x04:
@@ -244,7 +244,7 @@ static void memory_mapper_w(address_space *space, struct memory_mapper_chip *chi
 		case 0x1c:	case 0x1d:
 		case 0x1e:	case 0x1f:
 			if (oldval != data)
-				update_memory_mapping(space->machine, chip, 1);
+				update_memory_mapping(space->machine(), chip, 1);
 			break;
 
 		default:
@@ -281,7 +281,7 @@ static UINT16 memory_mapper_r(struct memory_mapper_chip *chip, offs_t offset, UI
 		case 0x03:
 			/* this returns data that the sound CPU writes */
 			if (chip->sound_r)
-				return (*chip->sound_r)(chip->cpu->machine);
+				return (*chip->sound_r)(chip->cpu->machine());
 			return 0xff;
 
 		default:
@@ -292,7 +292,7 @@ static UINT16 memory_mapper_r(struct memory_mapper_chip *chip, offs_t offset, UI
 }
 
 
-static void update_memory_mapping(running_machine *machine, struct memory_mapper_chip *chip, int decrypt)
+static void update_memory_mapping(running_machine &machine, struct memory_mapper_chip *chip, int decrypt)
 {
 	int rgnum;
 	address_space *space = chip->cpu->memory().space(AS_PROGRAM);
@@ -725,7 +725,7 @@ static void timer_interrupt_ack( device_t *device )
 	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
 
 	if (ic_315_5250->timer_ack)
-		(*ic_315_5250->timer_ack)(device->machine);
+		(*ic_315_5250->timer_ack)(device->machine());
 }
 
 
@@ -775,7 +775,7 @@ WRITE16_DEVICE_HANDLER ( segaic16_compare_timer_w )
 		case 0xf:
 			COMBINE_DATA(&ic_315_5250->regs[11]);
 			if (ic_315_5250->sound_w)
-				(*ic_315_5250->sound_w)(device->machine, ic_315_5250->regs[11]);
+				(*ic_315_5250->sound_w)(device->machine(), ic_315_5250->regs[11]);
 			break;
 	}
 }

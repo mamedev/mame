@@ -57,42 +57,42 @@ INLINE int swap_bits_5_6(int data)
 
 static WRITE8_HANDLER( ram_w )
 {
-	decocass_state *state = space->machine->driver_data<decocass_state>();
+	decocass_state *state = space->machine().driver_data<decocass_state>();
 	state->decrypted[0x0000 + offset] = swap_bits_5_6(data);
 	state->rambase[0x0000 + offset] = data;
 }
 
 static WRITE8_HANDLER( charram_w )
 {
-	decocass_state *state = space->machine->driver_data<decocass_state>();
+	decocass_state *state = space->machine().driver_data<decocass_state>();
 	state->decrypted[0x6000 + offset] = swap_bits_5_6(data);
 	decocass_charram_w(space, offset, data);
 }
 
 static WRITE8_HANDLER( fgvideoram_w )
 {
-	decocass_state *state = space->machine->driver_data<decocass_state>();
+	decocass_state *state = space->machine().driver_data<decocass_state>();
 	state->decrypted[0xc000 + offset] = swap_bits_5_6(data);
 	decocass_fgvideoram_w(space, offset, data);
 }
 
 static WRITE8_HANDLER( fgcolorram_w )
 {
-	decocass_state *state = space->machine->driver_data<decocass_state>();
+	decocass_state *state = space->machine().driver_data<decocass_state>();
 	state->decrypted[0xc400 + offset] = swap_bits_5_6(data);
 	decocass_colorram_w(space, offset, data);
 }
 
 static WRITE8_HANDLER( tileram_w )
 {
-	decocass_state *state = space->machine->driver_data<decocass_state>();
+	decocass_state *state = space->machine().driver_data<decocass_state>();
 	state->decrypted[0xd000 + offset] = swap_bits_5_6(data);
 	decocass_tileram_w(space, offset, data);
 }
 
 static WRITE8_HANDLER( objectram_w )
 {
-	decocass_state *state = space->machine->driver_data<decocass_state>();
+	decocass_state *state = space->machine().driver_data<decocass_state>();
 	state->decrypted[0xd800 + offset] = swap_bits_5_6(data);
 	decocass_objectram_w(space, offset, data);
 }
@@ -102,14 +102,14 @@ static WRITE8_HANDLER( mirrorcolorram_w ) { offset = ((offset >> 5) & 0x1f) | ((
 
 static READ8_HANDLER( mirrorvideoram_r )
 {
-	decocass_state *state = space->machine->driver_data<decocass_state>();
+	decocass_state *state = space->machine().driver_data<decocass_state>();
 	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
 	return state->fgvideoram[offset];
 }
 
 static READ8_HANDLER( mirrorcolorram_r )
 {
-	decocass_state *state = space->machine->driver_data<decocass_state>();
+	decocass_state *state = space->machine().driver_data<decocass_state>();
 	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
 	return state->colorram[offset];
 }
@@ -601,28 +601,28 @@ static PALETTE_INIT( decocass )
 {
 	int i;
 
-	machine->colortable = colortable_alloc(machine, 32);
+	machine.colortable = colortable_alloc(machine, 32);
 
 	/* set up 32 colors 1:1 pens */
 	for (i = 0; i < 32; i++)
-		colortable_entry_set_value(machine->colortable, i, i);
+		colortable_entry_set_value(machine.colortable, i, i);
 
 	/* setup straight/flipped colors for background tiles (D7 of color_center_bot ?) */
 	for (i = 0; i < 8; i++)
 	{
-		colortable_entry_set_value(machine->colortable, 32+i, 3*8+i);
-		colortable_entry_set_value(machine->colortable, 40+i, 3*8+((i << 1) & 0x04) + ((i >> 1) & 0x02) + (i & 0x01));
+		colortable_entry_set_value(machine.colortable, 32+i, 3*8+i);
+		colortable_entry_set_value(machine.colortable, 40+i, 3*8+((i << 1) & 0x04) + ((i >> 1) & 0x02) + (i & 0x01));
 	}
 
 	/* setup 4 colors for 1bpp object */
-	colortable_entry_set_value(machine->colortable, 48+0*2+0, 0);
-	colortable_entry_set_value(machine->colortable, 48+0*2+1, 25);	/* testtape red from 4th palette section? */
-	colortable_entry_set_value(machine->colortable, 48+1*2+0, 0);
-	colortable_entry_set_value(machine->colortable, 48+1*2+1, 28);	/* testtape blue from 4th palette section? */
-	colortable_entry_set_value(machine->colortable, 48+2*2+0, 0);
-	colortable_entry_set_value(machine->colortable, 48+2*2+1, 26);	/* testtape green from 4th palette section? */
-	colortable_entry_set_value(machine->colortable, 48+3*2+0, 0);
-	colortable_entry_set_value(machine->colortable, 48+3*2+1, 23);	/* ???? */
+	colortable_entry_set_value(machine.colortable, 48+0*2+0, 0);
+	colortable_entry_set_value(machine.colortable, 48+0*2+1, 25);	/* testtape red from 4th palette section? */
+	colortable_entry_set_value(machine.colortable, 48+1*2+0, 0);
+	colortable_entry_set_value(machine.colortable, 48+1*2+1, 28);	/* testtape blue from 4th palette section? */
+	colortable_entry_set_value(machine.colortable, 48+2*2+0, 0);
+	colortable_entry_set_value(machine.colortable, 48+2*2+1, 26);	/* testtape green from 4th palette section? */
+	colortable_entry_set_value(machine.colortable, 48+3*2+0, 0);
+	colortable_entry_set_value(machine.colortable, 48+3*2+1, 23);	/* ???? */
 }
 
 
@@ -1323,9 +1323,9 @@ ROM_END
 
 static DRIVER_INIT( decocass )
 {
-	decocass_state *state = machine->driver_data<decocass_state>();
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine->region("maincpu")->base();
+	decocass_state *state = machine.driver_data<decocass_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine.region("maincpu")->base();
 	int A;
 
 	/* allocate memory and mark all RAM regions with their decrypted pointers */
@@ -1348,9 +1348,9 @@ static DRIVER_INIT( decocass )
 
 static DRIVER_INIT( decocrom )
 {
-	decocass_state *state = machine->driver_data<decocass_state>();
-	int romlength = machine->region("user3")->bytes();
-	UINT8 *rom = machine->region("user3")->base();
+	decocass_state *state = machine.driver_data<decocass_state>();
+	int romlength = machine.region("user3")->bytes();
+	UINT8 *rom = machine.region("user3")->base();
 	int i;
 
 	state->decrypted2 = auto_alloc_array(machine, UINT8, romlength);
@@ -1363,16 +1363,16 @@ static DRIVER_INIT( decocrom )
 		state->decrypted2[i] = swap_bits_5_6(rom[i]);
 
 	/* convert charram to a banked ROM */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0xafff, "bank1");
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x6000, 0xafff, FUNC(decocass_de0091_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0xafff, "bank1");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x6000, 0xafff, FUNC(decocass_de0091_w));
 	memory_configure_bank(machine, "bank1", 0, 1, state->charram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user3")->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user3")->base(), 0);
 	memory_configure_bank_decrypted(machine, "bank1", 0, 1, &state->decrypted[0x6000], 0);
 	memory_configure_bank_decrypted(machine, "bank1", 1, 1, state->decrypted2, 0);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* install the bank selector */
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe900, 0xe900, FUNC(decocass_e900_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe900, 0xe900, FUNC(decocass_e900_w));
 
 	state->save_pointer(NAME(state->decrypted2), romlength);
 }

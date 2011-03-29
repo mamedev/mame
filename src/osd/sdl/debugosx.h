@@ -117,7 +117,7 @@ typedef float CGFloat;
 
 + (NSFont *)defaultFont;
 
-- (id)initWithFrame:(NSRect)f type:(debug_view_type)t machine:(running_machine *)m;
+- (id)initWithFrame:(NSRect)f type:(debug_view_type)t machine:(running_machine &)m;
 
 - (void)update;
 
@@ -136,7 +136,7 @@ typedef float CGFloat;
 {
 }
 
-- (id)initWithFrame:(NSRect)f machine:(running_machine *)m;
+- (id)initWithFrame:(NSRect)f machine:(running_machine &)m;
 
 - (NSSize)maximumFrameSize;
 
@@ -164,7 +164,7 @@ typedef float CGFloat;
 	BOOL	useConsole;
 }
 
-- (id)initWithFrame:(NSRect)f machine:(running_machine *)m useConsole:(BOOL)uc;
+- (id)initWithFrame:(NSRect)f machine:(running_machine &)m useConsole:(BOOL)uc;
 
 - (NSSize)maximumFrameSize;
 
@@ -192,7 +192,7 @@ typedef float CGFloat;
 {
 }
 
-- (id)initWithFrame:(NSRect)f machine:(running_machine *)m;
+- (id)initWithFrame:(NSRect)f machine:(running_machine &)m;
 
 - (NSSize)maximumFrameSize;
 
@@ -208,7 +208,7 @@ typedef float CGFloat;
 {
 }
 
-- (id)initWithFrame:(NSRect)f machine:(running_machine *)m;
+- (id)initWithFrame:(NSRect)f machine:(running_machine &)m;
 
 @end
 
@@ -217,7 +217,7 @@ typedef float CGFloat;
 {
 }
 
-- (id)initWithFrame:(NSRect)f machine:(running_machine *)m;
+- (id)initWithFrame:(NSRect)f machine:(running_machine &)m;
 
 @end
 
@@ -231,7 +231,7 @@ typedef float CGFloat;
 + (void)addCommonActionItems:(NSMenu *)menu;
 + (NSPopUpButton *)newActionButtonWithFrame:(NSRect)frame;
 
-- (id)initWithMachine:(running_machine *)m title:(NSString *)t;
+- (id)initWithMachine:(running_machine &)m title:(NSString *)t;
 
 - (void)activate;
 
@@ -267,7 +267,7 @@ typedef float CGFloat;
 	NSTextField				*commandField;
 }
 
-- (id)initWithMachine:(running_machine *)m;
+- (id)initWithMachine:(running_machine &)m;
 
 - (void)setCPU:(device_t *)device;
 
@@ -299,7 +299,7 @@ typedef float CGFloat;
 
 + (void)cascadeWindow:(NSWindow *)window;
 
-- (id)initWithMachine:(running_machine *)m title:(NSString *)t console:(MAMEDebugConsole *)c;
+- (id)initWithMachine:(running_machine &)m title:(NSString *)t console:(MAMEDebugConsole *)c;
 
 - (IBAction)debugNewMemoryWindow:(id)sender;
 - (IBAction)debugNewDisassemblyWindow:(id)sender;
@@ -318,7 +318,7 @@ typedef float CGFloat;
 	NSTextField				*expressionField;
 }
 
-- (id)initWithMachine:(running_machine *)m title:(NSString *)t console:(MAMEDebugConsole *)c;
+- (id)initWithMachine:(running_machine &)m title:(NSString *)t console:(MAMEDebugConsole *)c;
 
 - (id <MAMEDebugViewExpressionSupport>)documentView;
 
@@ -334,7 +334,7 @@ typedef float CGFloat;
 	MAMEMemoryView	*memoryView;
 }
 
-- (id)initWithMachine:(running_machine *)m console:(MAMEDebugConsole *)c;
+- (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;
 
 - (IBAction)changeSubview:(id)sender;
 
@@ -346,7 +346,7 @@ typedef float CGFloat;
 	MAMEDisassemblyView	*dasmView;
 }
 
-- (id)initWithMachine:(running_machine *)m console:(MAMEDebugConsole *)c;
+- (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;
 
 - (IBAction)changeSubview:(id)sender;
 
@@ -358,7 +358,7 @@ typedef float CGFloat;
 	MAMEErrorLogView	*logView;
 }
 
-- (id)initWithMachine:(running_machine *)m console:(MAMEDebugConsole *)c;
+- (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;
 
 @end
 
@@ -370,7 +370,7 @@ typedef float CGFloat;
 //  PROTOTYPES
 //============================================================
 
-void debugwin_update_during_game(running_machine *machine);
+void debugwin_update_during_game(running_machine &machine);
 
 
 #endif // __SDL_DEBUGOSX__

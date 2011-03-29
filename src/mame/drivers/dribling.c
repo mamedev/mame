@@ -40,7 +40,7 @@
 
 static INTERRUPT_GEN( dribling_irq_gen )
 {
-	dribling_state *state = device->machine->driver_data<dribling_state>();
+	dribling_state *state = device->machine().driver_data<dribling_state>();
 	if (state->di)
 		device_set_input_line(device, 0, ASSERT_LINE);
 }
@@ -55,7 +55,7 @@ static INTERRUPT_GEN( dribling_irq_gen )
 
 static READ8_DEVICE_HANDLER( dsr_r )
 {
-	dribling_state *state = device->machine->driver_data<dribling_state>();
+	dribling_state *state = device->machine().driver_data<dribling_state>();
 
 	/* return DSR0-7 */
 	return (state->ds << state->sh) | (state->dr >> (8 - state->sh));
@@ -64,15 +64,15 @@ static READ8_DEVICE_HANDLER( dsr_r )
 
 static READ8_DEVICE_HANDLER( input_mux0_r )
 {
-	dribling_state *state = device->machine->driver_data<dribling_state>();
+	dribling_state *state = device->machine().driver_data<dribling_state>();
 
 	/* low value in the given bit selects */
 	if (!(state->input_mux & 0x01))
-		return input_port_read(device->machine, "MUX0");
+		return input_port_read(device->machine(), "MUX0");
 	else if (!(state->input_mux & 0x02))
-		return input_port_read(device->machine, "MUX1");
+		return input_port_read(device->machine(), "MUX1");
 	else if (!(state->input_mux & 0x04))
-		return input_port_read(device->machine, "MUX2");
+		return input_port_read(device->machine(), "MUX2");
 	return 0xff;
 }
 
@@ -86,7 +86,7 @@ static READ8_DEVICE_HANDLER( input_mux0_r )
 
 static WRITE8_DEVICE_HANDLER( misc_w )
 {
-	dribling_state *state = device->machine->driver_data<dribling_state>();
+	dribling_state *state = device->machine().driver_data<dribling_state>();
 
 	/* bit 7 = di */
 	state->di = (data >> 7) & 1;
@@ -105,7 +105,7 @@ static WRITE8_DEVICE_HANDLER( misc_w )
 	/* bit 1 = (10) = PC1 */
 	/* bit 0 = (32) = PC0 */
 	state->input_mux = data & 7;
-	logerror("%s:misc_w(%02X)\n", device->machine->describe_context(), data);
+	logerror("%s:misc_w(%02X)\n", device->machine().describe_context(), data);
 }
 
 
@@ -119,24 +119,24 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 	/* bit 2 = folla a */
 	/* bit 1 = folla m */
 	/* bit 0 = folla b */
-	logerror("%s:sound_w(%02X)\n", device->machine->describe_context(), data);
+	logerror("%s:sound_w(%02X)\n", device->machine().describe_context(), data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( pb_w )
 {
 	/* write PB0-7 */
-	logerror("%s:pb_w(%02X)\n", device->machine->describe_context(), data);
+	logerror("%s:pb_w(%02X)\n", device->machine().describe_context(), data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( shr_w )
 {
-	dribling_state *state = device->machine->driver_data<dribling_state>();
+	dribling_state *state = device->machine().driver_data<dribling_state>();
 
 	/* bit 3 = watchdog */
 	if (data & 0x08)
-		watchdog_reset(device->machine);
+		watchdog_reset(device->machine());
 
 	/* bit 2-0 = SH0-2 */
 	state->sh = data & 0x07;
@@ -152,7 +152,7 @@ static WRITE8_DEVICE_HANDLER( shr_w )
 
 static READ8_HANDLER( ioread )
 {
-	dribling_state *state = space->machine->driver_data<dribling_state>();
+	dribling_state *state = space->machine().driver_data<dribling_state>();
 
 	if (offset & 0x08)
 		return ppi8255_r(state->ppi_0, offset & 3);
@@ -164,7 +164,7 @@ static READ8_HANDLER( ioread )
 
 static WRITE8_HANDLER( iowrite )
 {
-	dribling_state *state = space->machine->driver_data<dribling_state>();
+	dribling_state *state = space->machine().driver_data<dribling_state>();
 
 	if (offset & 0x08)
 		ppi8255_w(state->ppi_0, offset & 3, data);
@@ -285,11 +285,11 @@ INPUT_PORTS_END
 
 static MACHINE_START( dribling )
 {
-	dribling_state *state = machine->driver_data<dribling_state>();
+	dribling_state *state = machine.driver_data<dribling_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->ppi_0 = machine->device("ppi8255_0");
-	state->ppi_1 = machine->device("ppi8255_1");
+	state->maincpu = machine.device("maincpu");
+	state->ppi_0 = machine.device("ppi8255_0");
+	state->ppi_1 = machine.device("ppi8255_1");
 
 	state->save_item(NAME(state->abca));
 	state->save_item(NAME(state->di));
@@ -301,7 +301,7 @@ static MACHINE_START( dribling )
 
 static MACHINE_RESET( dribling )
 {
-	dribling_state *state = machine->driver_data<dribling_state>();
+	dribling_state *state = machine.driver_data<dribling_state>();
 
 	state->abca = 0;
 	state->di = 0;

@@ -27,11 +27,11 @@ struct _TTL74181_state
 static TTL74181_state chips[TTL74181_MAX_CHIPS];
 
 
-void TTL74181_config(running_machine *machine, int which, void *intf)
+void TTL74181_config(running_machine &machine, int which, void *intf)
 {
 	TTL74181_state *c;
 
-	assert_always(machine->phase() == MACHINE_PHASE_INIT, "Can only call at init time!");
+	assert_always(machine.phase() == MACHINE_PHASE_INIT, "Can only call at init time!");
 	assert_always(intf == 0, "Interface must be NULL");
 	assert_always((which >= 0) && (which < TTL74181_MAX_CHIPS), "Exceeded maximum number of 74181 chips");
 

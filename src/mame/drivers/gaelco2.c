@@ -209,10 +209,10 @@ ROM_END
                                 BANG
   ============================================================================*/
 
-static READ16_HANDLER(p1_gun_x) {return (input_port_read(space->machine, "LIGHT0_X") * 320 / 0x100) + 1;}
-static READ16_HANDLER(p1_gun_y) {return (input_port_read(space->machine, "LIGHT0_Y") * 240 / 0x100) - 4;}
-static READ16_HANDLER(p2_gun_x) {return (input_port_read(space->machine, "LIGHT1_X") * 320 / 0x100) + 1;}
-static READ16_HANDLER(p2_gun_y) {return (input_port_read(space->machine, "LIGHT1_Y") * 240 / 0x100) - 4;}
+static READ16_HANDLER(p1_gun_x) {return (input_port_read(space->machine(), "LIGHT0_X") * 320 / 0x100) + 1;}
+static READ16_HANDLER(p1_gun_y) {return (input_port_read(space->machine(), "LIGHT0_Y") * 240 / 0x100) - 4;}
+static READ16_HANDLER(p2_gun_x) {return (input_port_read(space->machine(), "LIGHT1_X") * 320 / 0x100) + 1;}
+static READ16_HANDLER(p2_gun_y) {return (input_port_read(space->machine(), "LIGHT1_Y") * 240 / 0x100) - 4;}
 
 static ADDRESS_MAP_START( bang_map, AS_PROGRAM, 16 )
     AM_RANGE(0x000000, 0x0fffff) AM_ROM																			/* ROM */

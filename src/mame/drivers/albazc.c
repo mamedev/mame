@@ -51,9 +51,9 @@ static VIDEO_START( hanaroku )
 {
 }
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	albazc_state *state = machine->driver_data<albazc_state>();
+	albazc_state *state = machine.driver_data<albazc_state>();
 	int i;
 
 	for (i = 511; i >= 0; i--)
@@ -72,7 +72,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[0], code, color, flipx, flipy,
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[0], code, color, flipx, flipy,
 			sx, sy, 0);
 	}
 }
@@ -80,7 +80,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 static SCREEN_UPDATE(hanaroku)
 {
 	bitmap_fill(bitmap, cliprect, 0x1f0);	// ???
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -99,11 +99,11 @@ static WRITE8_HANDLER( hanaroku_out_0_w )
          7      meter5 (start)
     */
 
-	coin_counter_w(space->machine, 0, data & 0x01);
-	coin_counter_w(space->machine, 1, data & 0x02);
-	coin_counter_w(space->machine, 2, data & 0x04);
-	coin_counter_w(space->machine, 3, data & 0x08);
-	coin_counter_w(space->machine, 4, data & 0x80);
+	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(space->machine(), 2, data & 0x04);
+	coin_counter_w(space->machine(), 3, data & 0x08);
+	coin_counter_w(space->machine(), 4, data & 0x80);
 }
 
 static WRITE8_HANDLER( hanaroku_out_1_w )
@@ -129,7 +129,7 @@ static WRITE8_HANDLER( hanaroku_out_2_w )
 
 static WRITE8_HANDLER( albazc_vregs_w )
 {
-	albazc_state *state = space->machine->driver_data<albazc_state>();
+	albazc_state *state = space->machine().driver_data<albazc_state>();
 
 	#ifdef UNUSED_FUNCTION
 	{
@@ -142,7 +142,7 @@ static WRITE8_HANDLER( albazc_vregs_w )
 	if(offset == 0)
 	{
 		/* core bug with this? */
-		//flip_screen_set(space->machine, (data & 0x40) >> 6);
+		//flip_screen_set(space->machine(), (data & 0x40) >> 6);
 		state->flip_bit = (data & 0x40) >> 6;
 	}
 }

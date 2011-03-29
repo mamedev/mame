@@ -48,14 +48,14 @@
 #ifdef UNUSED_FUNCTION
 READ8_HANDLER( skyfox_vregs_r )	// for debug
 {
-	skyfox_state *state = space->machine->driver_data<skyfox_state>();
+	skyfox_state *state = space->machine().driver_data<skyfox_state>();
 	return state->vreg[offset];
 }
 #endif
 
 WRITE8_HANDLER( skyfox_vregs_w )
 {
-	skyfox_state *state = space->machine->driver_data<skyfox_state>();
+	skyfox_state *state = space->machine().driver_data<skyfox_state>();
 
 	state->vreg[offset] = data;
 
@@ -159,13 +159,13 @@ Offset:         Value:
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	skyfox_state *state = machine->driver_data<skyfox_state>();
+	skyfox_state *state = machine.driver_data<skyfox_state>();
 	int offs;
 
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
+	int width = machine.primary_screen->width();
+	int height = machine.primary_screen->height();
 
 	/* The 32x32 tiles in the 80-ff range are bankswitched */
 	int shift =(state->bg_ctrl & 0x80) ? (4 - 1) : 4;
@@ -195,7 +195,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 #define DRAW_SPRITE(DX,DY,CODE) \
 		drawgfx_transpen(bitmap,\
-				cliprect,machine->gfx[0], \
+				cliprect,machine.gfx[0], \
 				(CODE), \
 				0, \
 				flipx,flipy, \
@@ -238,10 +238,10 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 ***************************************************************************/
 
-static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	skyfox_state *state = machine->driver_data<skyfox_state>();
-	UINT8 *RAM = machine->region("gfx2")->base();
+	skyfox_state *state = machine.driver_data<skyfox_state>();
+	UINT8 *RAM = machine.region("gfx2")->base();
 	int x, y, i;
 
 	/* The foreground stars (sprites) move at twice this speed when
@@ -284,7 +284,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 SCREEN_UPDATE( skyfox )
 {
 	bitmap_fill(bitmap, cliprect, 255);	// the bg is black
-	draw_background(screen->machine, bitmap, cliprect);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_background(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

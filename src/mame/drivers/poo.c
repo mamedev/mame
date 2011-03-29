@@ -65,10 +65,10 @@ static VIDEO_START(unclepoo)
 
 static SCREEN_UPDATE(unclepoo)
 {
-	poo_state *state = screen->machine->driver_data<poo_state>();
+	poo_state *state = screen->machine().driver_data<poo_state>();
 	int y,x;
 	int count;
-	const gfx_element *gfx = screen->machine->gfx[0];
+	const gfx_element *gfx = screen->machine().gfx[0];
 
 	count = 0;
 
@@ -108,7 +108,7 @@ static SCREEN_UPDATE(unclepoo)
 
 static READ8_HANDLER( unk_inp_r )
 {
-	return 0x00;//space->machine->rand();
+	return 0x00;//space->machine().rand();
 }
 
 #if 0
@@ -120,7 +120,7 @@ static READ8_HANDLER( unk_inp2_r )
 
 static READ8_HANDLER( unk_inp3_r )
 {
-	return space->machine->rand();
+	return space->machine().rand();
 }
 #endif
 
@@ -136,12 +136,12 @@ static WRITE8_HANDLER( unk_w )
 static WRITE8_HANDLER( sound_cmd_w )
 {
 	soundlatch_w(space, 0, (data & 0xff));
-	cputag_set_input_line(space->machine, "subcpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine(), "subcpu", 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( poo_vregs_w )
 {
-	poo_state *state = space->machine->driver_data<poo_state>();
+	poo_state *state = space->machine().driver_data<poo_state>();
 	// bit 2 used, unknown purpose
 	state->vram_colbank = data & 0x18;
 }

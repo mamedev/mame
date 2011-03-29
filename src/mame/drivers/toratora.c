@@ -67,7 +67,7 @@ static WRITE_LINE_DEVICE_HANDLER( cb2_u3_w )
 
 static SCREEN_UPDATE( toratora )
 {
-	toratora_state *state = screen->machine->driver_data<toratora_state>();
+	toratora_state *state = screen->machine().driver_data<toratora_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->videoram_size; offs++)
@@ -100,7 +100,7 @@ static SCREEN_UPDATE( toratora )
 
 static WRITE8_HANDLER( clear_tv_w )
 {
-	toratora_state *state = space->machine->driver_data<toratora_state>();
+	toratora_state *state = space->machine().driver_data<toratora_state>();
 	state->clear_tv = 1;
 }
 
@@ -114,9 +114,9 @@ static WRITE8_HANDLER( clear_tv_w )
 static WRITE8_DEVICE_HANDLER( port_b_u1_w )
 {
 	if (pia6821_get_port_b_z_mask(device) & 0x20)
-		coin_counter_w(device->machine, 0, 1);
+		coin_counter_w(device->machine(), 0, 1);
 	else
-		coin_counter_w(device->machine, 0, data & 0x20);
+		coin_counter_w(device->machine(), 0, data & 0x20);
 }
 
 
@@ -128,7 +128,7 @@ static WRITE8_DEVICE_HANDLER( port_b_u1_w )
 
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 {
-	toratora_state *toratora = device->machine->driver_data<toratora_state>();
+	toratora_state *toratora = device->machine().driver_data<toratora_state>();
 	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 
 	logerror("GEN IRQ: %x\n", combined_state);
@@ -138,32 +138,32 @@ static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 
 static INTERRUPT_GEN( toratora_timer )
 {
-	toratora_state *state = device->machine->driver_data<toratora_state>();
+	toratora_state *state = device->machine().driver_data<toratora_state>();
 	state->timer++;	/* timer counting at 16 Hz */
 
 	/* also, when the timer overflows (16 seconds) watchdog would kick in */
 	if (state->timer & 0x100)
 		popmessage("watchdog!");
 
-	if (state->last != (input_port_read(device->machine, "INPUT") & 0x0f))
+	if (state->last != (input_port_read(device->machine(), "INPUT") & 0x0f))
 	{
-		state->last = input_port_read(device->machine, "INPUT") & 0x0f;
+		state->last = input_port_read(device->machine(), "INPUT") & 0x0f;
 		generic_pulse_irq_line(device, 0);
 	}
-	pia6821_set_input_a(state->pia_u1, input_port_read(device->machine, "INPUT") & 0x0f, 0);
-	pia6821_ca1_w(state->pia_u1, input_port_read(device->machine, "INPUT") & 0x10);
-	pia6821_ca2_w(state->pia_u1, input_port_read(device->machine, "INPUT") & 0x20);
+	pia6821_set_input_a(state->pia_u1, input_port_read(device->machine(), "INPUT") & 0x0f, 0);
+	pia6821_ca1_w(state->pia_u1, input_port_read(device->machine(), "INPUT") & 0x10);
+	pia6821_ca2_w(state->pia_u1, input_port_read(device->machine(), "INPUT") & 0x20);
 }
 
 static READ8_HANDLER( timer_r )
 {
-	toratora_state *state = space->machine->driver_data<toratora_state>();
+	toratora_state *state = space->machine().driver_data<toratora_state>();
 	return state->timer;
 }
 
 static WRITE8_HANDLER( clear_timer_w )
 {
-	toratora_state *state = space->machine->driver_data<toratora_state>();
+	toratora_state *state = space->machine().driver_data<toratora_state>();
 	state->timer = 0;
 }
 
@@ -373,12 +373,12 @@ INPUT_PORTS_END
 
 static MACHINE_START( toratora )
 {
-	toratora_state *state = machine->driver_data<toratora_state>();
+	toratora_state *state = machine.driver_data<toratora_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->pia_u1 = machine->device("pia_u1");
-	state->pia_u2 = machine->device("pia_u2");
-	state->pia_u3 = machine->device("pia_u3");
+	state->maincpu = machine.device("maincpu");
+	state->pia_u1 = machine.device("pia_u1");
+	state->pia_u2 = machine.device("pia_u2");
+	state->pia_u3 = machine.device("pia_u3");
 
 	state->save_item(NAME(state->timer));
 	state->save_item(NAME(state->last));
@@ -387,7 +387,7 @@ static MACHINE_START( toratora )
 
 static MACHINE_RESET( toratora )
 {
-	toratora_state *state = machine->driver_data<toratora_state>();
+	toratora_state *state = machine.driver_data<toratora_state>();
 
 	state->timer = 0xff;
 	state->last = 0;

@@ -72,17 +72,17 @@ device_config *upd96050_device_config::static_alloc_device_config(const machine_
 
 device_t *necdsp_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, necdsp_device(machine, *this));
+	return auto_alloc(machine, necdsp_device(machine, *this));
 }
 
 device_t *upd7725_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, upd7725_device(machine, *this));
+	return auto_alloc(machine, upd7725_device(machine, *this));
 }
 
 device_t *upd96050_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, upd96050_device(machine, *this));
+	return auto_alloc(machine, upd96050_device(machine, *this));
 }
 
 //-------------------------------------------------

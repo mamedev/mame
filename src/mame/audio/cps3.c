@@ -40,7 +40,7 @@ static STREAM_UPDATE( cps3_stream_update )
 
 	// the actual 'user5' region only exists on the nocd sets, on the others it's allocated in the initialization.
 	// it's a shared gfx/sound region, so can't be allocated as part of the sound device.
-	state->base = (INT8*)device->machine->driver_data<cps3_state>()->user5region;
+	state->base = (INT8*)device->machine().driver_data<cps3_state>()->user5region;
 
 	/* Clear the buffers */
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
@@ -114,7 +114,7 @@ static DEVICE_START( cps3_sound )
 	cps3_sound_state *state = get_safe_token(device);
 
 	/* Allocate the stream */
-	state->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock() / 384, NULL, cps3_stream_update);
+	state->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock() / 384, NULL, cps3_stream_update);
 }
 
 DEVICE_GET_INFO( cps3_sound )

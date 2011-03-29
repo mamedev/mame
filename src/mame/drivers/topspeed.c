@@ -245,35 +245,35 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 static READ16_HANDLER( sharedram_r )
 {
-	topspeed_state *state = space->machine->driver_data<topspeed_state>();
+	topspeed_state *state = space->machine().driver_data<topspeed_state>();
 	return state->sharedram[offset];
 }
 
 static WRITE16_HANDLER( sharedram_w )
 {
-	topspeed_state *state = space->machine->driver_data<topspeed_state>();
+	topspeed_state *state = space->machine().driver_data<topspeed_state>();
 	COMBINE_DATA(&state->sharedram[offset]);
 }
 
-static void parse_control( running_machine *machine )	/* assumes Z80 sandwiched between 68Ks */
+static void parse_control( running_machine &machine )	/* assumes Z80 sandwiched between 68Ks */
 {
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	topspeed_state *state = machine->driver_data<topspeed_state>();
+	topspeed_state *state = machine.driver_data<topspeed_state>();
 	device_set_input_line(state->subcpu, INPUT_LINE_RESET, (state->cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( cpua_ctrl_w )
 {
-	topspeed_state *state = space->machine->driver_data<topspeed_state>();
+	topspeed_state *state = space->machine().driver_data<topspeed_state>();
 
 	if ((data & 0xff00) && ((data & 0xff) == 0))
 		data = data >> 8;	/* for Wgp */
 
 	state->cpua_ctrl = data;
 
-	parse_control(space->machine);
+	parse_control(space->machine());
 
 	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(space->cpu), data);
 }
@@ -287,7 +287,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 
 static TIMER_CALLBACK( topspeed_interrupt6  )
 {
-	topspeed_state *state = machine->driver_data<topspeed_state>();
+	topspeed_state *state = machine.driver_data<topspeed_state>();
 	device_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
@@ -295,7 +295,7 @@ static TIMER_CALLBACK( topspeed_interrupt6  )
 
 static TIMER_CALLBACK( topspeed_cpub_interrupt6 )
 {
-	topspeed_state *state = machine->driver_data<topspeed_state>();
+	topspeed_state *state = machine.driver_data<topspeed_state>();
 	device_set_input_line(state->subcpu, 6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }
 
@@ -303,14 +303,14 @@ static TIMER_CALLBACK( topspeed_cpub_interrupt6 )
 static INTERRUPT_GEN( topspeed_interrupt )
 {
 	/* Unsure how many int6's per frame */
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(topspeed_interrupt6));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(topspeed_interrupt6));
 	device_set_input_line(device, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( topspeed_cpub_interrupt )
 {
 	/* Unsure how many int6's per frame */
-	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(topspeed_cpub_interrupt6));
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(topspeed_cpub_interrupt6));
 	device_set_input_line(device, 5, HOLD_LINE);
 }
 
@@ -325,11 +325,11 @@ static INTERRUPT_GEN( topspeed_cpub_interrupt )
 
 static READ8_HANDLER( topspeed_input_bypass_r )
 {
-	topspeed_state *state = space->machine->driver_data<topspeed_state>();
+	topspeed_state *state = space->machine().driver_data<topspeed_state>();
 	UINT8 port = tc0220ioc_port_r(state->tc0220ioc, 0);	/* read port number */
 	int steer = 0;
-	int analogue_steer = input_port_read_safe(space->machine, STEER_PORT_TAG, 0x00);
-	int fake = input_port_read_safe(space->machine, FAKE_PORT_TAG, 0x00);
+	int analogue_steer = input_port_read_safe(space->machine(), STEER_PORT_TAG, 0x00);
+	int fake = input_port_read_safe(space->machine(), FAKE_PORT_TAG, 0x00);
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
@@ -371,7 +371,7 @@ static READ16_HANDLER( topspeed_motor_r )
 	switch (offset)
 	{
 		case 0x0:
-			return (space->machine->rand() & 0xff);	/* motor status ?? */
+			return (space->machine().rand() & 0xff);	/* motor status ?? */
 
 		case 0x101:
 			return 0x55;	/* motor cpu status ? */
@@ -393,22 +393,22 @@ static WRITE16_HANDLER( topspeed_motor_w )
                         SOUND
 *****************************************************/
 
-static void reset_sound_region( running_machine *machine )
+static void reset_sound_region( running_machine &machine )
 {
-	topspeed_state *state = machine->driver_data<topspeed_state>();
+	topspeed_state *state = machine.driver_data<topspeed_state>();
 	memory_set_bank(machine,  "bank10", state->banknum);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched between 68Ks */
 {
-	topspeed_state *state = device->machine->driver_data<topspeed_state>();
+	topspeed_state *state = device->machine().driver_data<topspeed_state>();
 	state->banknum = data & 7;
-	reset_sound_region(device->machine);
+	reset_sound_region(device->machine());
 }
 
 static void topspeed_msm5205_vck( device_t *device )
 {
-	topspeed_state *state = device->machine->driver_data<topspeed_state>();
+	topspeed_state *state = device->machine().driver_data<topspeed_state>();
 	if (state->adpcm_data != -1)
 	{
 		msm5205_data_w(device, state->adpcm_data & 0x0f);
@@ -416,7 +416,7 @@ static void topspeed_msm5205_vck( device_t *device )
 	}
 	else
 	{
-		state->adpcm_data = device->machine->region("adpcm")->base()[state->adpcm_pos];
+		state->adpcm_data = device->machine().region("adpcm")->base()[state->adpcm_pos];
 		state->adpcm_pos = (state->adpcm_pos + 1) & 0x1ffff;
 		msm5205_data_w(device, state->adpcm_data >> 4);
 	}
@@ -424,14 +424,14 @@ static void topspeed_msm5205_vck( device_t *device )
 
 static WRITE8_DEVICE_HANDLER( topspeed_msm5205_address_w )
 {
-	topspeed_state *state = device->machine->driver_data<topspeed_state>();
+	topspeed_state *state = device->machine().driver_data<topspeed_state>();
 	state->adpcm_pos = (state->adpcm_pos & 0x00ff) | (data << 8);
 	msm5205_reset_w(device, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( topspeed_msm5205_stop_w )
 {
-	topspeed_state *state = device->machine->driver_data<topspeed_state>();
+	topspeed_state *state = device->machine().driver_data<topspeed_state>();
 	msm5205_reset_w(device, 1);
 	state->adpcm_pos &= 0xff00;
 }
@@ -619,7 +619,7 @@ GFXDECODE_END
 
 static void irq_handler( device_t *device, int irq )	/* assumes Z80 sandwiched between 68Ks */
 {
-	topspeed_state *state = device->machine->driver_data<topspeed_state>();
+	topspeed_state *state = device->machine().driver_data<topspeed_state>();
 	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -648,26 +648,26 @@ static STATE_POSTLOAD( topspeed_postload )
 
 static MACHINE_START( topspeed )
 {
-	topspeed_state *state = machine->driver_data<topspeed_state>();
+	topspeed_state *state = machine.driver_data<topspeed_state>();
 
-	memory_configure_bank(machine, "bank10", 0, 4, machine->region("audiocpu")->base() + 0xc000, 0x4000);
+	memory_configure_bank(machine, "bank10", 0, 4, machine.region("audiocpu")->base() + 0xc000, 0x4000);
 
-	state->maincpu = machine->device("maincpu");
-	state->subcpu = machine->device("sub");
-	state->audiocpu = machine->device("audiocpu");
-	state->tc0220ioc = machine->device("tc0220ioc");
-	state->pc080sn_1 = machine->device("pc080sn_1");
-	state->pc080sn_2 = machine->device("pc080sn_2");
+	state->maincpu = machine.device("maincpu");
+	state->subcpu = machine.device("sub");
+	state->audiocpu = machine.device("audiocpu");
+	state->tc0220ioc = machine.device("tc0220ioc");
+	state->pc080sn_1 = machine.device("pc080sn_1");
+	state->pc080sn_2 = machine.device("pc080sn_2");
 
 	state->save_item(NAME(state->cpua_ctrl));
 	state->save_item(NAME(state->ioc220_port));
 	state->save_item(NAME(state->banknum));
-	machine->state().register_postload(topspeed_postload, NULL);
+	machine.state().register_postload(topspeed_postload, NULL);
 }
 
 static MACHINE_RESET( topspeed )
 {
-	topspeed_state *state = machine->driver_data<topspeed_state>();
+	topspeed_state *state = machine.driver_data<topspeed_state>();
 
 	state->cpua_ctrl = 0xff;
 	state->ioc220_port = 0;

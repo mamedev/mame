@@ -1298,7 +1298,7 @@ static CPU_INIT( tms99xx )
 	cpustate->io = device->space(AS_IO);
 
 #if (TMS99XX_MODEL == TMS9995_ID)
-	cpustate->timer = device->machine->scheduler().timer_alloc(FUNC(decrementer_callback), cpustate);
+	cpustate->timer = device->machine().scheduler().timer_alloc(FUNC(decrementer_callback), cpustate);
 #endif
 
 	cpustate->idle_callback = param ? param->idle_callback : NULL;
@@ -1815,7 +1815,7 @@ static void tms99xx_set_irq_line(tms99xx_state *cpustate, int irqline, int state
 					{	/* decrement, then interrupt if reach 0 */
 						if ((-- cpustate->decrementer_count) == 0)
 						{
-							decrementer_callback(cpustate->device->machine, cpustate, 0);
+							decrementer_callback(cpustate->device->machine(), cpustate, 0);
 							cpustate->decrementer_count = cpustate->decrementer_interval;	/* reload */
 						}
 					}

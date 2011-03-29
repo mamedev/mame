@@ -38,7 +38,7 @@ public:
 
 static SCREEN_UPDATE( destroyr )
 {
-	destroyr_state *state = screen->machine->driver_data<destroyr_state>();
+	destroyr_state *state = screen->machine().driver_data<destroyr_state>();
 	int i, j;
 
 	bitmap_fill(bitmap, cliprect, 0);
@@ -64,7 +64,7 @@ static SCREEN_UPDATE( destroyr )
 				continue;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2], num, 0, flipx, 0, horz, 16 * i, 0);
+		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[2], num, 0, flipx, 0, horz, 16 * i, 0);
 	}
 
 	/* draw alpha numerics */
@@ -74,7 +74,7 @@ static SCREEN_UPDATE( destroyr )
 		{
 			int num = state->alpha_num_ram[32 * i + j];
 
-			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], num, 0, 0, 0, 8 * j, 8 * i, 0);
+			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], num, 0, 0, 0, 8 * j, 8 * i, 0);
 		}
 	}
 
@@ -85,13 +85,13 @@ static SCREEN_UPDATE( destroyr )
 		int horz = 256 - state->minor_obj_ram[i + 2];
 		int vert = 256 - state->minor_obj_ram[i + 4];
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], num, 0, 0, 0, horz, vert, 0);
+		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1], num, 0, 0, 0, horz, vert, 0);
 	}
 
 	/* draw waves */
 	for (i = 0; i < 4; i++)
 	{
-		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[3], state->wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
+		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[3], state->wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
 	}
 
 	/* draw cursor */
@@ -105,7 +105,7 @@ static SCREEN_UPDATE( destroyr )
 
 static TIMER_CALLBACK( destroyr_dial_callback )
 {
-	destroyr_state *state = machine->driver_data<destroyr_state>();
+	destroyr_state *state = machine.driver_data<destroyr_state>();
 	int dial = param;
 
 	/* Analog inputs come from the player's depth control potentiometer.
@@ -126,21 +126,21 @@ static TIMER_CALLBACK( destroyr_dial_callback )
 
 static TIMER_CALLBACK( destroyr_frame_callback )
 {
-	destroyr_state *state = machine->driver_data<destroyr_state>();
+	destroyr_state *state = machine.driver_data<destroyr_state>();
 	state->potsense[0] = 0;
 	state->potsense[1] = 0;
 
 	/* PCB supports two dials, but cab has only got one */
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(input_port_read(machine, "PADDLE")), FUNC(destroyr_dial_callback));
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(destroyr_frame_callback));
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(input_port_read(machine, "PADDLE")), FUNC(destroyr_dial_callback));
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(destroyr_frame_callback));
 }
 
 
 static MACHINE_RESET( destroyr )
 {
-	destroyr_state *state = machine->driver_data<destroyr_state>();
+	destroyr_state *state = machine.driver_data<destroyr_state>();
 
-	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(destroyr_frame_callback));
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(destroyr_frame_callback));
 
 	state->cursor = 0;
 	state->wavemod = 0;
@@ -156,7 +156,7 @@ static MACHINE_RESET( destroyr )
 
 static WRITE8_HANDLER( destroyr_misc_w )
 {
-	destroyr_state *state = space->machine->driver_data<destroyr_state>();
+	destroyr_state *state = space->machine().driver_data<destroyr_state>();
 
 	/* bits 0 to 2 connect to the sound circuits */
 	state->attract = data & 0x01;
@@ -166,14 +166,14 @@ static WRITE8_HANDLER( destroyr_misc_w )
 	state->wavemod = data & 0x10;
 	state->potmask[1] = data & 0x20;
 
-	coin_lockout_w(space->machine, 0, !state->attract);
-	coin_lockout_w(space->machine, 1, !state->attract);
+	coin_lockout_w(space->machine(), 0, !state->attract);
+	coin_lockout_w(space->machine(), 1, !state->attract);
 }
 
 
 static WRITE8_HANDLER( destroyr_cursor_load_w )
 {
-	destroyr_state *state = space->machine->driver_data<destroyr_state>();
+	destroyr_state *state = space->machine().driver_data<destroyr_state>();
 	state->cursor = data;
 	watchdog_reset_w(space, offset, data);
 }
@@ -181,7 +181,7 @@ static WRITE8_HANDLER( destroyr_cursor_load_w )
 
 static WRITE8_HANDLER( destroyr_interrupt_ack_w )
 {
-	destroyr_state *state = space->machine->driver_data<destroyr_state>();
+	destroyr_state *state = space->machine().driver_data<destroyr_state>();
 	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
@@ -193,10 +193,10 @@ static WRITE8_HANDLER( destroyr_output_w )
 	else switch (offset & 7)
 	{
 	case 0:
-		set_led_status(space->machine, 0, data & 1);
+		set_led_status(space->machine(), 0, data & 1);
 		break;
 	case 1:
-		set_led_status(space->machine, 1, data & 1); /* no second LED present on cab */
+		set_led_status(space->machine(), 1, data & 1); /* no second LED present on cab */
 		break;
 	case 2:
 		/* bit 0 => songate */
@@ -222,16 +222,16 @@ static WRITE8_HANDLER( destroyr_output_w )
 
 static READ8_HANDLER( destroyr_input_r )
 {
-	destroyr_state *state = space->machine->driver_data<destroyr_state>();
+	destroyr_state *state = space->machine().driver_data<destroyr_state>();
 
 	if (offset & 1)
 	{
-		return input_port_read(space->machine, "IN1");
+		return input_port_read(space->machine(), "IN1");
 	}
 
 	else
 	{
-		UINT8 ret = input_port_read(space->machine, "IN0");
+		UINT8 ret = input_port_read(space->machine(), "IN0");
 
 		if (state->potsense[0] && state->potmask[0])
 			ret |= 4;
@@ -245,7 +245,7 @@ static READ8_HANDLER( destroyr_input_r )
 
 static READ8_HANDLER( destroyr_scanline_r )
 {
-	return space->machine->primary_screen->vpos();
+	return space->machine().primary_screen->vpos();
 }
 
 
@@ -422,9 +422,9 @@ static PALETTE_INIT( destroyr )
 
 static MACHINE_START( destroyr )
 {
-	destroyr_state *state = machine->driver_data<destroyr_state>();
+	destroyr_state *state = machine.driver_data<destroyr_state>();
 
-	state->maincpu = machine->device("maincpu");
+	state->maincpu = machine.device("maincpu");
 
 	state->save_item(NAME(state->cursor));
 	state->save_item(NAME(state->wavemod));

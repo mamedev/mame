@@ -226,9 +226,9 @@ static INTERRUPT_GEN( commando_interrupt )
 
 static MACHINE_START( commando )
 {
-	commando_state *state = machine->driver_data<commando_state>();
+	commando_state *state = machine.driver_data<commando_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->scroll_x));
 	state->save_item(NAME(state->scroll_y));
@@ -236,7 +236,7 @@ static MACHINE_START( commando )
 
 static MACHINE_RESET( commando )
 {
-	commando_state *state = machine->driver_data<commando_state>();
+	commando_state *state = machine.driver_data<commando_state>();
 
 	state->scroll_x[0] = 0;
 	state->scroll_x[1] = 0;
@@ -518,8 +518,8 @@ ROM_END
 
 static DRIVER_INIT( commando )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine->region("maincpu")->base();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine.region("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0xc000);
 	int A;
 
@@ -538,8 +538,8 @@ static DRIVER_INIT( commando )
 
 static DRIVER_INIT( spaceinv )
 {
-	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine->region("maincpu")->base();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine.region("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0xc000);
 	int A;
 

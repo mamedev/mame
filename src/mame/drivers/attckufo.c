@@ -99,8 +99,8 @@ static READ8_HANDLER(attckufo_io_r)
 {
 	switch(offset)
 	{
-		case 0: return input_port_read(space->machine, "DSW");
-		case 2: return input_port_read(space->machine, "INPUT");
+		case 0: return input_port_read(space->machine(), "DSW");
+		case 2: return input_port_read(space->machine(), "INPUT");
 	}
 	return 0xff;
 }
@@ -156,26 +156,26 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( attckufo_raster_interrupt )
 {
-	attckufo_state *state = device->machine->driver_data<attckufo_state>();
+	attckufo_state *state = device->machine().driver_data<attckufo_state>();
 	mos6560_raster_interrupt_gen(state->mos6560);
 }
 
 static SCREEN_UPDATE( attckufo )
 {
-	attckufo_state *state = screen->machine->driver_data<attckufo_state>();
+	attckufo_state *state = screen->machine().driver_data<attckufo_state>();
 	mos6560_video_update(state->mos6560, bitmap, cliprect);
 	return 0;
 }
 
-static int attckufo_dma_read( running_machine *machine, int offset )
+static int attckufo_dma_read( running_machine &machine, int offset )
 {
-	attckufo_state *state = machine->driver_data<attckufo_state>();
+	attckufo_state *state = machine.driver_data<attckufo_state>();
 	return state->maincpu->space(AS_PROGRAM)->read_byte(offset);
 }
 
-static int attckufo_dma_read_color( running_machine *machine, int offset )
+static int attckufo_dma_read_color( running_machine &machine, int offset )
 {
-	attckufo_state *state = machine->driver_data<attckufo_state>();
+	attckufo_state *state = machine.driver_data<attckufo_state>();
 	return state->maincpu->space(AS_PROGRAM)->read_byte(offset + 0x400);
 }
 

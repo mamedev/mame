@@ -48,7 +48,7 @@ enum {
 WRITE16_HANDLER( karnov_playfield_swap_w );
 WRITE16_HANDLER( karnov_videoram_w );
 
-void karnov_flipscreen_w(running_machine *machine, int data);
+void karnov_flipscreen_w(running_machine &machine, int data);
 
 PALETTE_INIT( karnov );
 VIDEO_START( karnov );

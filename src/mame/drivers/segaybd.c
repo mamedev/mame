@@ -61,9 +61,9 @@ static UINT16 pdrift_bank;
  *
  *************************************/
 
-static void yboard_generic_init( running_machine *machine )
+static void yboard_generic_init( running_machine &machine )
 {
-	segas1x_state *state = machine->driver_data<segas1x_state>();
+	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	/* reset globals */
 	state->vblank_irq_state = 0;
@@ -81,9 +81,9 @@ static void yboard_generic_init( running_machine *machine )
  *
  *************************************/
 
-static void update_main_irqs(running_machine *machine)
+static void update_main_irqs(running_machine &machine)
 {
-	segas1x_state *state = machine->driver_data<segas1x_state>();
+	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	device_set_input_line(state->maincpu, 2, state->timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	device_set_input_line(state->subx, 2, state->timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
@@ -96,7 +96,7 @@ static void update_main_irqs(running_machine *machine)
 	device_set_input_line(state->suby, 6, state->timer_irq_state && state->vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	if (state->timer_irq_state || state->vblank_irq_state)
-		machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
+		machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 }
 
 
@@ -136,7 +136,7 @@ static void update_main_irqs(running_machine *machine)
 
 static TIMER_DEVICE_CALLBACK( scanline_callback )
 {
-	segas1x_state *state = timer.machine->driver_data<segas1x_state>();
+	segas1x_state *state = timer.machine().driver_data<segas1x_state>();
 	int scanline = param;
 
 	/* on scanline 'irq2_scanline' generate an IRQ2 */
@@ -168,10 +168,10 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 	}
 
 	/* update IRQs on the main CPU */
-	update_main_irqs(timer.machine);
+	update_main_irqs(timer.machine());
 
 	/* come back at the next appropriate scanline */
-	timer.adjust(timer.machine->primary_screen->time_until_pos(scanline), scanline);
+	timer.adjust(timer.machine().primary_screen->time_until_pos(scanline), scanline);
 
 #if TWEAK_IRQ2_SCANLINE
 	if (scanline == 223)
@@ -179,10 +179,10 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 		int old = state->irq2_scanline;
 
 		/* Q = -10 scanlines, W = -1 scanline, E = +1 scanline, R = +10 scanlines */
-		if (input_code_pressed(timer->machine, KEYCODE_Q)) { while (input_code_pressed(timer->machine, KEYCODE_Q)) ; state->irq2_scanline -= 10; }
-		if (input_code_pressed(timer->machine, KEYCODE_W)) { while (input_code_pressed(timer->machine, KEYCODE_W)) ; state->irq2_scanline -= 1; }
-		if (input_code_pressed(timer->machine, KEYCODE_E)) { while (input_code_pressed(timer->machine, KEYCODE_E)) ; state->irq2_scanline += 1; }
-		if (input_code_pressed(timer->machine, KEYCODE_R)) { while (input_code_pressed(timer->machine, KEYCODE_R)) ; state->irq2_scanline += 10; }
+		if (input_code_pressed(timer->machine(), KEYCODE_Q)) { while (input_code_pressed(timer->machine(), KEYCODE_Q)) ; state->irq2_scanline -= 10; }
+		if (input_code_pressed(timer->machine(), KEYCODE_W)) { while (input_code_pressed(timer->machine(), KEYCODE_W)) ; state->irq2_scanline -= 1; }
+		if (input_code_pressed(timer->machine(), KEYCODE_E)) { while (input_code_pressed(timer->machine(), KEYCODE_E)) ; state->irq2_scanline += 1; }
+		if (input_code_pressed(timer->machine(), KEYCODE_R)) { while (input_code_pressed(timer->machine(), KEYCODE_R)) ; state->irq2_scanline += 10; }
 		if (old != state->irq2_scanline)
 			popmessage("scanline = %d", state->irq2_scanline);
 	}
@@ -192,12 +192,12 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 
 static MACHINE_START( yboard )
 {
-	segas1x_state *state = machine->driver_data<segas1x_state>();
+	segas1x_state *state = machine.driver_data<segas1x_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->soundcpu = machine->device("soundcpu");
-	state->subx = machine->device("subx");
-	state->suby = machine->device("suby");
+	state->maincpu = machine.device("maincpu");
+	state->soundcpu = machine.device("soundcpu");
+	state->subx = machine.device("subx");
+	state->suby = machine.device("suby");
 
 	state->save_item(NAME(state->vblank_irq_state));
 	state->save_item(NAME(state->timer_irq_state));
@@ -209,11 +209,11 @@ static MACHINE_START( yboard )
 
 static MACHINE_RESET( yboard )
 {
-	segas1x_state *state = machine->driver_data<segas1x_state>();
+	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	state->irq2_scanline = 170;
 
-	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(223), 223);
+	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(223), 223);
 }
 
 
@@ -226,7 +226,7 @@ static MACHINE_RESET( yboard )
 
 static void sound_cpu_irq(device_t *device, int state)
 {
-	segas1x_state *driver = device->machine->driver_data<segas1x_state>();
+	segas1x_state *driver = device->machine().driver_data<segas1x_state>();
 
 	device_set_input_line(driver->soundcpu, 0, state);
 }
@@ -234,7 +234,7 @@ static void sound_cpu_irq(device_t *device, int state)
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	segas1x_state *state = machine->driver_data<segas1x_state>();
+	segas1x_state *state = machine.driver_data<segas1x_state>();
 	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 
 	soundlatch_w(space, 0, param);
@@ -245,13 +245,13 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 static WRITE16_HANDLER( sound_data_w )
 {
 	if (ACCESSING_BITS_0_7)
-		space->machine->scheduler().synchronize(FUNC(delayed_sound_data_w), data & 0xff);
+		space->machine().scheduler().synchronize(FUNC(delayed_sound_data_w), data & 0xff);
 }
 
 
 static READ8_HANDLER( sound_data_r )
 {
-	segas1x_state *state = space->machine->driver_data<segas1x_state>();
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space, offset);
 }
@@ -266,7 +266,7 @@ static READ8_HANDLER( sound_data_r )
 
 static READ16_HANDLER( io_chip_r )
 {
-	segas1x_state *state = space->machine->driver_data<segas1x_state>();
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	static const char *const portnames[] = { "P1", "GENERAL", "PORTC", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" };
 	offset &= 0x1f/2;
 
@@ -286,7 +286,7 @@ static READ16_HANDLER( io_chip_r )
 				return state->misc_io_data[offset];
 
 			/* otherwise, return an input port */
-			return input_port_read(space->machine, portnames[offset]);
+			return input_port_read(space->machine(), portnames[offset]);
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -314,7 +314,7 @@ static READ16_HANDLER( io_chip_r )
 
 static WRITE16_HANDLER( io_chip_w )
 {
-	segas1x_state *state = space->machine->driver_data<segas1x_state>();
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	UINT8 old;
 
 	/* generic implementation */
@@ -352,7 +352,7 @@ static WRITE16_HANDLER( io_chip_w )
                 D2 = YRES
                 D1-D0 = ADC0-1
         */
-			segaic16_set_display_enable(space->machine, data & 0x80);
+			segaic16_set_display_enable(space->machine(), data & 0x80);
 			if (((old ^ data) & 0x20) && !(data & 0x20))
 				watchdog_reset_w(space, 0, 0);
 			device_set_input_line(state->soundcpu, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
@@ -368,7 +368,7 @@ static WRITE16_HANDLER( io_chip_w )
 
 			/* D7 = /MUTE */
 			/* D6-D0 = FLT31-25 */
-			space->machine->sound().system_enable(data & 0x80);
+			space->machine().sound().system_enable(data & 0x80);
 			break;
 
 		/* CNT register */
@@ -386,7 +386,7 @@ static WRITE16_HANDLER( io_chip_w )
 
 static READ16_HANDLER( analog_r )
 {
-	segas1x_state *state = space->machine->driver_data<segas1x_state>();
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	int result = 0xff;
 	if (ACCESSING_BITS_0_7)
 	{
@@ -399,10 +399,10 @@ static READ16_HANDLER( analog_r )
 
 static WRITE16_HANDLER( analog_w )
 {
-	segas1x_state *state = space->machine->driver_data<segas1x_state>();
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6" };
 	int selected = ((offset & 3) == 3) ? (3 + (state->misc_io_data[0x08/2] & 3)) : (offset & 3);
-	int value = input_port_read_safe(space->machine, ports[selected], 0xff);
+	int value = input_port_read_safe(space->machine(), ports[selected], 0xff);
 
 	state->analog_data[offset & 3] = value;
 }

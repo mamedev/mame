@@ -669,8 +669,8 @@ static CPU_INIT( z8 )
 	cpustate->io = device->space(AS_IO);
 
 	/* allocate timers */
-	cpustate->t0_timer = device->machine->scheduler().timer_alloc(FUNC(t0_tick), cpustate);
-	cpustate->t1_timer = device->machine->scheduler().timer_alloc(FUNC(t1_tick), cpustate);
+	cpustate->t0_timer = device->machine().scheduler().timer_alloc(FUNC(t0_tick), cpustate);
+	cpustate->t1_timer = device->machine().scheduler().timer_alloc(FUNC(t1_tick), cpustate);
 
 	/* register for state saving */
 	device->save_item(NAME(cpustate->pc));

@@ -106,7 +106,7 @@ static WRITE16_HANDLER( yunsun16_sound_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		int bank = data & 3;
-		UINT8 *dst	= space->machine->region("oki")->base();
+		UINT8 *dst	= space->machine().region("oki")->base();
 		UINT8 *src	= dst + 0x80000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 	}
@@ -139,7 +139,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( magicbub_sound_command_w )
 {
-	yunsun16_state *state = space->machine->driver_data<yunsun16_state>();
+	yunsun16_state *state = space->machine().driver_data<yunsun16_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 /*
@@ -157,7 +157,7 @@ number 0 on each voice. That sample is 00000-00000.
 static DRIVER_INIT( magicbub )
 {
 //  remove_mem_write16_handler (0, 0x800180, 0x800181 );
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x800188, 0x800189, FUNC(magicbub_sound_command_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x800188, 0x800189, FUNC(magicbub_sound_command_w));
 }
 
 /***************************************************************************
@@ -557,9 +557,9 @@ GFXDECODE_END
 
 static MACHINE_START( yunsun16 )
 {
-	yunsun16_state *state = machine->driver_data<yunsun16_state>();
+	yunsun16_state *state = machine.driver_data<yunsun16_state>();
 
-	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->sprites_scrolldx));
 	state->save_item(NAME(state->sprites_scrolldy));
@@ -567,7 +567,7 @@ static MACHINE_START( yunsun16 )
 
 static MACHINE_RESET( yunsun16 )
 {
-	yunsun16_state *state = machine->driver_data<yunsun16_state>();
+	yunsun16_state *state = machine.driver_data<yunsun16_state>();
 
 	state->sprites_scrolldx = -0x40;
 	state->sprites_scrolldy = -0x0f;
@@ -579,7 +579,7 @@ static MACHINE_RESET( yunsun16 )
 
 static void soundirq(device_t *device, int state)
 {
-	yunsun16_state *yunsun16 = device->machine->driver_data<yunsun16_state>();
+	yunsun16_state *yunsun16 = device->machine().driver_data<yunsun16_state>();
 	device_set_input_line(yunsun16->audiocpu, 0, state);
 }
 

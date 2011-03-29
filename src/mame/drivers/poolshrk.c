@@ -14,8 +14,8 @@ Atari Poolshark Driver
 
 static DRIVER_INIT( poolshrk )
 {
-	UINT8* pSprite = machine->region("gfx1")->base();
-	UINT8* pOffset = machine->region("proms")->base();
+	UINT8* pSprite = machine.region("gfx1")->base();
+	UINT8* pOffset = machine.region("proms")->base();
 
 	int i;
 	int j;
@@ -47,7 +47,7 @@ static DRIVER_INIT( poolshrk )
 
 static WRITE8_HANDLER( poolshrk_da_latch_w )
 {
-	poolshrk_state *state = space->machine->driver_data<poolshrk_state>();
+	poolshrk_state *state = space->machine().driver_data<poolshrk_state>();
 	state->da_latch = data & 15;
 }
 
@@ -55,9 +55,9 @@ static WRITE8_HANDLER( poolshrk_da_latch_w )
 static WRITE8_HANDLER( poolshrk_led_w )
 {
 	if (offset & 2)
-		set_led_status(space->machine, 0, offset & 1);
+		set_led_status(space->machine(), 0, offset & 1);
 	if (offset & 4)
-		set_led_status(space->machine, 1, offset & 1);
+		set_led_status(space->machine(), 1, offset & 1);
 }
 
 
@@ -72,12 +72,12 @@ static WRITE8_HANDLER( poolshrk_watchdog_w )
 
 static READ8_HANDLER( poolshrk_input_r )
 {
-	poolshrk_state *state = space->machine->driver_data<poolshrk_state>();
+	poolshrk_state *state = space->machine().driver_data<poolshrk_state>();
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
-	UINT8 val = input_port_read(space->machine, portnames[offset & 3]);
+	UINT8 val = input_port_read(space->machine(), portnames[offset & 3]);
 
-	int x = input_port_read(space->machine, (offset & 1) ? "AN1" : "AN0");
-	int y = input_port_read(space->machine, (offset & 1) ? "AN3" : "AN2");
+	int x = input_port_read(space->machine(), (offset & 1) ? "AN1" : "AN0");
+	int y = input_port_read(space->machine(), (offset & 1) ? "AN3" : "AN2");
 
 	if (x >= state->da_latch) val |= 8;
 	if (y >= state->da_latch) val |= 4;
@@ -93,7 +93,7 @@ static READ8_HANDLER( poolshrk_input_r )
 
 static READ8_HANDLER( poolshrk_irq_reset_r )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 
 	return 0;
 }

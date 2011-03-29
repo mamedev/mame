@@ -54,8 +54,8 @@ D000      Paddle Position and Interrupt Reset (where applicable)
 static READ8_HANDLER( circus_paddle_r )
 {
 	// also clears irq
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
-	return input_port_read(space->machine, "PADDLE");
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	return input_port_read(space->machine(), "PADDLE");
 }
 
 static ADDRESS_MAP_START( circus_map, AS_PROGRAM, 8 )
@@ -264,11 +264,11 @@ GFXDECODE_END
 ***************************************************************************/
 static MACHINE_START( circus )
 {
-	circus_state *state = machine->driver_data<circus_state>();
+	circus_state *state = machine.driver_data<circus_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->samples = machine->device("samples");
-	state->discrete = machine->device("discrete");
+	state->maincpu = machine.device("maincpu");
+	state->samples = machine.device("samples");
+	state->discrete = machine.device("discrete");
 
 	state->save_item(NAME(state->clown_x));
 	state->save_item(NAME(state->clown_y));
@@ -277,7 +277,7 @@ static MACHINE_START( circus )
 
 static MACHINE_RESET( circus )
 {
-	circus_state *state = machine->driver_data<circus_state>();
+	circus_state *state = machine.driver_data<circus_state>();
 
 	state->clown_x = 0;
 	state->clown_y = 0;
@@ -573,23 +573,23 @@ ROM_END
 
 static DRIVER_INIT( circus )
 {
-	circus_state *state = machine->driver_data<circus_state>();
+	circus_state *state = machine.driver_data<circus_state>();
 	state->game_id = 1;
 }
 
 static DRIVER_INIT( robotbwl )
 {
-	circus_state *state = machine->driver_data<circus_state>();
+	circus_state *state = machine.driver_data<circus_state>();
 	state->game_id = 2;
 }
 static DRIVER_INIT( crash )
 {
-	circus_state *state = machine->driver_data<circus_state>();
+	circus_state *state = machine.driver_data<circus_state>();
 	state->game_id = 3;
 }
 static DRIVER_INIT( ripcord )
 {
-	circus_state *state = machine->driver_data<circus_state>();
+	circus_state *state = machine.driver_data<circus_state>();
 	state->game_id = 4;
 }
 

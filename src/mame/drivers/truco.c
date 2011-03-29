@@ -85,7 +85,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( truco )
 {
-	truco_state *state = machine->driver_data<truco_state>();
+	truco_state *state = machine.driver_data<truco_state>();
 	int a;
 
 	/* Setup the data on the battery backed RAM */
@@ -116,10 +116,10 @@ static MACHINE_RESET( truco )
 
 static INTERRUPT_GEN( truco_interrupt )
 {
-	truco_state *state = device->machine->driver_data<truco_state>();
+	truco_state *state = device->machine().driver_data<truco_state>();
 	/* coinup */
 
-	if ( input_port_read(device->machine,  "COIN") & 1 )
+	if ( input_port_read(device->machine(),  "COIN") & 1 )
 	{
 		if ( state->trigger == 0 )
 		{

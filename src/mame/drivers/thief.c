@@ -36,7 +36,7 @@ Credits:
 static INTERRUPT_GEN( thief_interrupt )
 {
 	/* SLAM switch causes an NMI if it's pressed */
-	if( (input_port_read(device->machine, "P2") & 0x10) == 0 )
+	if( (input_port_read(device->machine(), "P2") & 0x10) == 0 )
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	else
 		device_set_input_line(device, 0, HOLD_LINE);
@@ -95,7 +95,7 @@ static void tape_set_motor( device_t *samples, int bOn )
 
 static WRITE8_HANDLER( thief_input_select_w )
 {
-	thief_state *state = space->machine->driver_data<thief_state>();
+	thief_state *state = space->machine().driver_data<thief_state>();
 	state->input_select = data;
 }
 
@@ -140,13 +140,13 @@ static WRITE8_DEVICE_HANDLER( tape_control_w )
 
 static READ8_HANDLER( thief_io_r )
 {
-	thief_state *state = space->machine->driver_data<thief_state>();
+	thief_state *state = space->machine().driver_data<thief_state>();
 	switch( state->input_select )
 	{
-		case 0x01: return input_port_read(space->machine, "DSW1");
-		case 0x02: return input_port_read(space->machine, "DSW2");
-		case 0x04: return input_port_read(space->machine, "P1");
-		case 0x08: return input_port_read(space->machine, "P2");
+		case 0x01: return input_port_read(space->machine(), "DSW1");
+		case 0x02: return input_port_read(space->machine(), "DSW2");
+		case 0x04: return input_port_read(space->machine(), "P1");
+		case 0x08: return input_port_read(space->machine(), "P2");
 	}
 	return 0x00;
 }
@@ -644,8 +644,8 @@ ROM_END
 
 static DRIVER_INIT( thief )
 {
-	UINT8 *dest = machine->region( "maincpu" )->base();
-	const UINT8 *source = machine->region( "cpu1" )->base();
+	UINT8 *dest = machine.region( "maincpu" )->base();
+	const UINT8 *source = machine.region( "cpu1" )->base();
 
 	/* C8 is mapped (banked) in CPU1's address space; it contains Z80 code */
 	memcpy( &dest[0xe010], &source[0x290], 0x20 );

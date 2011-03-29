@@ -112,7 +112,7 @@ static void update_namco_waveform(namco_sound *chip, int offset, UINT8 data)
 
 
 /* build the decoded waveform table */
-static void build_decoded_waveform(running_machine *machine, namco_sound *chip, UINT8 *rgnbase)
+static void build_decoded_waveform(running_machine &machine, namco_sound *chip, UINT8 *rgnbase)
 {
 	INT16 *p;
 	int size;
@@ -369,7 +369,7 @@ static DEVICE_START( namco )
 	chip->last_channel = chip->channel_list + chip->num_voices;
 	chip->stereo = intf->stereo;
 
-	chip->soundregs = auto_alloc_array_clear(device->machine, UINT8, 0x400);
+	chip->soundregs = auto_alloc_array_clear(device->machine(), UINT8, 0x400);
 
 	/* adjust internal clock */
 	chip->namco_clock = device->clock();
@@ -384,13 +384,13 @@ static DEVICE_START( namco )
 	logerror("Namco: freq fractional bits = %d: internal freq = %d, output freq = %d\n", chip->f_fracbits, chip->namco_clock, chip->sample_rate);
 
 	/* build the waveform table */
-	build_decoded_waveform(device->machine, chip, *device->region());
+	build_decoded_waveform(device->machine(), chip, *device->region());
 
 	/* get stream channels */
 	if (intf->stereo)
-		chip->stream = device->machine->sound().stream_alloc(*device, 0, 2, chip->sample_rate, chip, namco_update_stereo);
+		chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, chip->sample_rate, chip, namco_update_stereo);
 	else
-		chip->stream = device->machine->sound().stream_alloc(*device, 0, 1, chip->sample_rate, chip, namco_update_mono);
+		chip->stream = device->machine().sound().stream_alloc(*device, 0, 1, chip->sample_rate, chip, namco_update_mono);
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	chip->sound_enable = 1;
