@@ -181,7 +181,14 @@ int cli_execute(cli_options &options, osd_interface &osd, int argc, char **argv)
 		// parse the command line, adding any system-specific options
 		astring option_errors;
 		if (!options.parse_command_line(argc, argv, option_errors))
+		{
+			// if we failed, check for no command and a system name first; in that case error on the name
+			if (strlen(options.command()) == 0 && options.system() == NULL && strlen(options.system_name()) > 0)
+				throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "Unknown system '%s'", options.system_name());
+			
+			// otherwise, error on the options
 			throw emu_fatalerror(MAMERR_INVALID_CONFIG, "%s", option_errors.trimspace().cstr());
+		}
 		if (option_errors)
 			printf("Error in command line:\n%s\n", option_errors.trimspace().cstr());
 
