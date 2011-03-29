@@ -175,12 +175,15 @@ private:
 
 	struct cache_entry
 	{
-		cache_entry(FPTR address, const char *symbol) : m_next(NULL), m_address(address), m_name(symbol) { }
+		cache_entry(FPTR address, const char *symbol) : 
+			m_next(NULL), m_address(address), m_name(symbol) { }
+		cache_entry *next() const { return m_next; }
+		
 		cache_entry *	m_next;
 		FPTR			m_address;
 		astring			m_name;
 	};
-	cache_entry *	m_cache;
+	simple_list<cache_entry> m_cache;
 
 	astring			m_mapfile;
 	astring			m_symfile;
@@ -1210,8 +1213,7 @@ bool stack_walker::unwind()
 //-------------------------------------------------
 
 symbol_manager::symbol_manager(const char *argv0)
-	: m_cache(NULL),
-	  m_mapfile(argv0),
+	: m_mapfile(argv0),
 	  m_symfile(argv0),
 	  m_process(GetCurrentProcess()),
 	  m_last_base(0),
@@ -1247,13 +1249,6 @@ symbol_manager::symbol_manager(const char *argv0)
 
 symbol_manager::~symbol_manager()
 {
-	// clean up the cache
-	while (m_cache != NULL)
-	{
-		cache_entry *entry = m_cache;
-		m_cache = entry->m_next;
-		global_free(entry);
-	}
 }
 
 
@@ -1273,7 +1268,7 @@ const char *symbol_manager::symbol_for_address(FPTR address)
 	if (!query_system_for_address(address))
 	{
 		// if that fails, scan the cache if we have one
-		if (m_cache != NULL)
+		if (m_cache.first() != NULL)
 			scan_cache_for_address(address);
 
 		// or else try to open a sym/map file and find it there
@@ -1351,7 +1346,6 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 	FPTR best_addr = 0;
 
 	// parse the file, looking for valid entries
-	cache_entry **tailptr = &m_cache;
 	astring symbol;
 	char line[1024];
 	while (fgets(line, sizeof(line) - 1, srcfile))
@@ -1372,10 +1366,7 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 
 			// also create a cache entry if we can
 			if (create_cache)
-			{
-				*tailptr = global_alloc(cache_entry(addr, symbol));
-				tailptr = &(*tailptr)->m_next;
-			}
+				m_cache.append(*global_alloc(cache_entry(addr, symbol)));
 		}
 	}
 
@@ -1400,7 +1391,7 @@ void symbol_manager::scan_cache_for_address(FPTR address)
 	FPTR best_addr = 0;
 
 	// walk the cache, looking for valid entries
-	for (cache_entry *entry = m_cache; entry != NULL; entry = entry->m_next)
+	for (cache_entry *entry = m_cache.first(); entry != NULL; entry = entry->next())
 
 		// if this is the best one so far, remember it
 		if (entry->m_address <= address && entry->m_address > best_addr)
