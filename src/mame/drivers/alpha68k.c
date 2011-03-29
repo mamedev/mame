@@ -211,14 +211,14 @@ static WRITE16_HANDLER( tnextspc_coin_counters_w )
 
 static WRITE16_HANDLER( tnextspc_unknown_w )
 {
-	logerror("tnextspc_unknown_w : PC = %04x - offset = %04x - data = %04x\n", cpu_get_pc(space->cpu), offset, data);
+	logerror("tnextspc_unknown_w : PC = %04x - offset = %04x - data = %04x\n", cpu_get_pc(&space->device()), offset, data);
 	if (offset == 0)
 		alpha68k_flipscreen_w(space->machine(), data & 0x100);
 }
 
 static WRITE16_HANDLER( alpha_microcontroller_w )
 {
-	logerror("%04x:  Alpha write trigger at %04x (%04x)\n", cpu_get_pc(space->cpu), offset, data);
+	logerror("%04x:  Alpha write trigger at %04x (%04x)\n", cpu_get_pc(&space->device()), offset, data);
 	/* 0x44 = coin clear signal to microcontroller? */
 	if (offset == 0x2d && ACCESSING_BITS_0_7)
 		alpha68k_flipscreen_w(space->machine(), data & 1);
@@ -412,7 +412,7 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
 		break;
 	}
 
-	logerror("%04x:  Alpha read trigger at %04x\n", cpu_get_pc(space->cpu), offset);
+	logerror("%04x:  Alpha read trigger at %04x\n", cpu_get_pc(&space->device()), offset);
 
 	return 0; /* Values returned don't matter */
 }
@@ -507,7 +507,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 			break;
 	}
 
-	logerror("%04x:  Alpha read trigger at %04x\n", cpu_get_pc(space->cpu), offset);
+	logerror("%04x:  Alpha read trigger at %04x\n", cpu_get_pc(&space->device()), offset);
 
 	return 0; /* Values returned don't matter */
 }
@@ -653,7 +653,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 			break;
 	}
 
-	logerror("%04x:  Alpha read trigger at %04x\n", cpu_get_pc(space->cpu), offset);
+	logerror("%04x:  Alpha read trigger at %04x\n", cpu_get_pc(&space->device()), offset);
 
 	return 0; /* Values returned don't matter */
 }

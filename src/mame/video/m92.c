@@ -81,7 +81,7 @@ WRITE16_HANDLER( m92_spritecontrol_w )
            word can be copied per clock.*/
 		space->machine().scheduler().timer_set(attotime::from_hz(26666000) * 0x400, FUNC(spritebuffer_callback));
 	}
-//  logerror("%04x: m92_spritecontrol_w %08x %08x\n",cpu_get_pc(space->cpu),offset,data);
+//  logerror("%04x: m92_spritecontrol_w %08x %08x\n",cpu_get_pc(&space->device()),offset,data);
 }
 
 WRITE16_HANDLER( m92_videocontrol_w )
@@ -105,7 +105,7 @@ WRITE16_HANDLER( m92_videocontrol_w )
 		/* Access to upper palette bank */
 		state->palette_bank = (data >> 1) & 1;
 	}
-//  logerror("%04x: m92_videocontrol_w %d = %02x\n",cpu_get_pc(space->cpu),offset,data);
+//  logerror("%04x: m92_videocontrol_w %d = %02x\n",cpu_get_pc(&space->device()),offset,data);
 }
 
 READ16_HANDLER( m92_paletteram_r )

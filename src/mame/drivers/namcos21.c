@@ -381,20 +381,20 @@ static READ16_HANDLER(dspcuskey_r)
 	UINT16 result = 0;
 	if( namcos2_gametype == NAMCOS21_SOLVALOU )
 	{
-		switch( cpu_get_pc(space->cpu) )
+		switch( cpu_get_pc(&space->device()) )
 		{
 		case 0x805e: result = 0x0000; break;
 		case 0x805f: result = 0xfeba; break;
 		case 0x8067: result = 0xffff; break;
 		case 0x806e: result = 0x0145; break;
 		default:
-			logerror( "unk cuskey_r; pc=0x%x\n", cpu_get_pc(space->cpu) );
+			logerror( "unk cuskey_r; pc=0x%x\n", cpu_get_pc(&space->device()) );
 			break;
 		}
 	}
 	else if( namcos2_gametype == NAMCOS21_CYBERSLED )
 	{
-		switch( cpu_get_pc(space->cpu) )
+		switch( cpu_get_pc(&space->device()) )
 		{
 		case 0x8061: result = 0xfe95; break;
 		case 0x8069: result = 0xffff; break;
@@ -405,7 +405,7 @@ static READ16_HANDLER(dspcuskey_r)
 	}
 	else if( namcos2_gametype == NAMCOS21_AIRCOMBAT )
 	{
-		switch( cpu_get_pc(space->cpu) )
+		switch( cpu_get_pc(&space->device()) )
 		{
 		case 0x8062: result = 0xfeb9; break;
 		case 0x806a: result = 0xffff; break;
@@ -613,9 +613,9 @@ static WRITE16_HANDLER( dspram16_w )
 		}
 		else if (namcos2_gametype == NAMCOS21_SOLVALOU &&
 					offset == 0x103 &&
-					space->cpu == space->machine().device("maincpu"))
+					&space->device() == space->machine().device("maincpu"))
 		{ /* hack; synchronization for solvalou */
-			device_yield(space->cpu);
+			device_yield(&space->device());
 		}
 	}
 } /* dspram16_w */
@@ -919,7 +919,7 @@ static WRITE16_HANDLER(slave_port3_w)
 
 static WRITE16_HANDLER( slave_XF_output_w )
 {
-	if (ENABLE_LOGGING) logerror( "0x%x:slaveXF(%d)\n", cpu_get_pc(space->cpu), data );
+	if (ENABLE_LOGGING) logerror( "0x%x:slaveXF(%d)\n", cpu_get_pc(&space->device()), data );
 } /* slave_XF_output_w */
 
 static READ16_HANDLER( slave_portf_r )
@@ -973,8 +973,8 @@ static WRITE16_HANDLER( pointram_control_w )
 	/* pointram_control&0x20 : bank for depthcue data */
 /*
     logerror( "dsp_control_w:'%s':%x[%x]:=%04x ",
-            space->cpu->tag,
-            cpu_get_pc(space->cpu),
+            space->device().tag,
+            cpu_get_pc(&space->device()),
             offset,
             pointram_control );
 
@@ -1160,7 +1160,7 @@ static WRITE16_HANDLER( winrun_dspcomram_w )
 
 static READ16_HANDLER( winrun_cuskey_r )
 {
-	int pc = cpu_get_pc(space->cpu);
+	int pc = cpu_get_pc(&space->device());
 	switch( pc )
 	{
 	case 0x0064: /* winrun91 */

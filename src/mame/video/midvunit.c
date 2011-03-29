@@ -371,7 +371,7 @@ WRITE32_HANDLER( midvunit_dma_queue_w )
 {
 	midvunit_state *state = space->machine().driver_data<midvunit_state>();
 	if (LOG_DMA && input_code_pressed(space->machine(), KEYCODE_L))
-		logerror("%06X:queue(%X) = %08X\n", cpu_get_pc(space->cpu), state->dma_data_index, data);
+		logerror("%06X:queue(%X) = %08X\n", cpu_get_pc(&space->device()), state->dma_data_index, data);
 	if (state->dma_data_index < 16)
 		state->dma_data[state->dma_data_index++] = data;
 }
@@ -390,7 +390,7 @@ READ32_HANDLER( midvunit_dma_trigger_r )
 	if (offset)
 	{
 		if (LOG_DMA && input_code_pressed(space->machine(), KEYCODE_L))
-			logerror("%06X:trigger\n", cpu_get_pc(space->cpu));
+			logerror("%06X:trigger\n", cpu_get_pc(&space->device()));
 		process_dma_queue(space->machine());
 		state->dma_data_index = 0;
 	}

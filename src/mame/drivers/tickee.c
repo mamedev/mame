@@ -285,7 +285,7 @@ static WRITE16_HANDLER( tickee_control_w )
 	}
 
 	if (olddata != state->control[offset])
-		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", cpu_get_pc(space->cpu), offset, state->control[offset], olddata);
+		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", cpu_get_pc(&space->device()), offset, state->control[offset], olddata);
 }
 
 

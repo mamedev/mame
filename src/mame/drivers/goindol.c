@@ -56,7 +56,7 @@ static WRITE8_HANDLER( prot_fc44_w )
 {
 	goindol_state *state = space->machine().driver_data<goindol_state>();
 
-	logerror("%04x: prot_fc44_w(%02x)\n", cpu_get_pc(space->cpu), data);
+	logerror("%04x: prot_fc44_w(%02x)\n", cpu_get_pc(&space->device()), data);
 	state->ram[0x0419] = 0x5b;
 	state->ram[0x041a] = 0x3f;
 	state->ram[0x041b] = 0x6d;
@@ -66,7 +66,7 @@ static WRITE8_HANDLER( prot_fd99_w )
 {
 	goindol_state *state = space->machine().driver_data<goindol_state>();
 
-	logerror("%04x: prot_fd99_w(%02x)\n", cpu_get_pc(space->cpu), data);
+	logerror("%04x: prot_fd99_w(%02x)\n", cpu_get_pc(&space->device()), data);
 	state->ram[0x0421] = 0x3f;
 }
 
@@ -74,7 +74,7 @@ static WRITE8_HANDLER( prot_fc66_w )
 {
 	goindol_state *state = space->machine().driver_data<goindol_state>();
 
-	logerror("%04x: prot_fc66_w(%02x)\n", cpu_get_pc(space->cpu), data);
+	logerror("%04x: prot_fc66_w(%02x)\n", cpu_get_pc(&space->device()), data);
 	state->ram[0x0423] = 0x06;
 }
 
@@ -82,7 +82,7 @@ static WRITE8_HANDLER( prot_fcb0_w )
 {
 	goindol_state *state = space->machine().driver_data<goindol_state>();
 
-	logerror("%04x: prot_fcb0_w(%02x)\n", cpu_get_pc(space->cpu), data);
+	logerror("%04x: prot_fcb0_w(%02x)\n", cpu_get_pc(&space->device()), data);
 	state->ram[0x0425] = 0x06;
 }
 

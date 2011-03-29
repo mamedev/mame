@@ -195,7 +195,7 @@ static WRITE16_HANDLER( dec0_control_w )
 			break;
 
 		case 0xa: /* Mix Psel(?). */
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space->device()),data,0x30c010+(offset<<1));
 			break;
 
 		case 0xc: /* Cblk - coin blockout.  Seems to be unused by the games */
@@ -203,11 +203,11 @@ static WRITE16_HANDLER( dec0_control_w )
 
 		case 0xe: /* Reset Intel 8751? - not sure, all the games write here at startup */
 			dec0_i8751_reset(space->machine());
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space->device()),data,0x30c010+(offset<<1));
 			break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space->device()),data,0x30c010+(offset<<1));
 			break;
 	}
 }
@@ -233,7 +233,7 @@ static WRITE16_HANDLER( automat_control_w )
 			break;
 
 		case 0xa: /* Mix Psel(?). */
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space->device()),data,0x30c010+(offset<<1));
 			break;
 
 		case 0xc: /* Cblk - coin blockout.  Seems to be unused by the games */
@@ -241,7 +241,7 @@ static WRITE16_HANDLER( automat_control_w )
 #endif
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space->device()),data,0x30c010+(offset<<1));
 			break;
 	}
 }
@@ -353,7 +353,7 @@ READ16_HANDLER( slyspy_protection_r )
 		case 6:		return 0x2;
 	}
 
-	logerror("%04x, Unknown protection read at 30c000 %d\n", cpu_get_pc(space->cpu), offset);
+	logerror("%04x, Unknown protection read at 30c000 %d\n", cpu_get_pc(&space->device()), offset);
 	return 0;
 }
 

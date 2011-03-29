@@ -1340,7 +1340,7 @@ static void execute_wpset(running_machine &machine, int ref, int params, const c
 	}
 
 	/* param 4 is the condition */
-	parsed_expression condition(&space->cpu->debug()->symtable());
+	parsed_expression condition(&space->device().debug()->symtable());
 	if (!debug_command_parameter_expression(machine, param[3], condition))
 		return;
 
@@ -1349,7 +1349,7 @@ static void execute_wpset(running_machine &machine, int ref, int params, const c
 		return;
 
 	/* set the watchpoint */
-	wpnum = space->cpu->debug()->watchpoint_set(*space, type, address, length, (condition.is_empty()) ? NULL : condition.original_string(), action);
+	wpnum = space->device().debug()->watchpoint_set(*space, type, address, length, (condition.is_empty()) ? NULL : condition.original_string(), action);
 	debug_console_printf(machine, "Watchpoint %X set\n", wpnum);
 }
 
@@ -2257,7 +2257,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 		return;
 
 	/* determine the width of the bytes */
-	cpu_device *cpudevice = downcast<cpu_device *>(space->cpu);
+	cpu_device *cpudevice = downcast<cpu_device *>(&space->device());
 	minbytes = cpudevice->min_opcode_bytes();
 	maxbytes = cpudevice->max_opcode_bytes();
 	byteswidth = 0;
@@ -2302,7 +2302,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 			}
 
 			/* disassemble the result */
-			i += numbytes = space->cpu->debug()->disassemble(disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+			i += numbytes = space->device().debug()->disassemble(disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 
 		/* print the bytes */
@@ -2321,7 +2321,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 		sprintf(&output[outdex], "%s", disasm);
 
 		/* attempt to add the comment */
-		comment = space->cpu->debug()->comment_text(tempaddr);
+		comment = space->device().debug()->comment_text(tempaddr);
 		if (comment != NULL)
 		{
 			/* somewhat arbitrary guess as to how long most disassembly lines will be [column 60] */
@@ -2448,7 +2448,7 @@ static void execute_history(running_machine &machine, int ref, int params, const
 	if (count > device_debug::HISTORY_SIZE)
 		count = device_debug::HISTORY_SIZE;
 
-	device_debug *debug = space->cpu->debug();
+	device_debug *debug = space->device().debug();
 
 	/* loop over lines */
 	int maxbytes = debug->max_opcode_bytes();

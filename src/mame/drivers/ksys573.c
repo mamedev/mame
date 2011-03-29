@@ -739,7 +739,7 @@ static READ32_HANDLER( atapi_r )
 			break;
 		}
 
-//      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, cpu_get_pc(space->cpu));
+//      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, cpu_get_pc(&space->device()));
 
 		data <<= shift;
 	}
@@ -843,7 +843,7 @@ static WRITE32_HANDLER( atapi_w )
 
 					case 0x45: // PLAY
 						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
-						state->atapi_timer->adjust( downcast<cpu_device *>(space->cpu)->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ) );
+						state->atapi_timer->adjust( downcast<cpu_device *>(&space->device())->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ) );
 						break;
 				}
 
@@ -899,11 +899,11 @@ static WRITE32_HANDLER( atapi_w )
 		}
 
 		atapi_regs[reg] = data;
-//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, cpu_get_pc(space->cpu));
+//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, cpu_get_pc(&space->device()));
 
 		if (reg == ATAPI_REG_CMDSTATUS)
 		{
-//          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, cpu_get_pc(space->cpu));
+//          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, cpu_get_pc(&space->device()));
 
 			switch (data)
 			{
@@ -1140,7 +1140,7 @@ static READ32_HANDLER( flash_r )
 
 	if( state->flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", cpu_get_pc(space->cpu), offset, mem_mask, state->control );
+		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", cpu_get_pc(&space->device()), offset, mem_mask, state->control );
 		data = 0xffffffff;
 	}
 	else
@@ -1179,7 +1179,7 @@ static WRITE32_HANDLER( flash_w )
 
 	if( state->flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", cpu_get_pc(space->cpu), offset, mem_mask, data, state->control );
+		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", cpu_get_pc(&space->device()), offset, mem_mask, data, state->control );
 	}
 	else
 	{
@@ -1934,7 +1934,7 @@ static READ32_HANDLER( gx894pwbba_r )
 	}
 
 	verboselog( space->machine(), 2, "gx894pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
-//  printf( "%08x: gx894pwbba_r( %08x, %08x ) %08x\n", cpu_get_pc(space->cpu), offset, mem_mask, data );
+//  printf( "%08x: gx894pwbba_r( %08x, %08x ) %08x\n", cpu_get_pc(&space->device()), offset, mem_mask, data );
 	return data;
 }
 

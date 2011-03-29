@@ -174,18 +174,18 @@ static WRITE8_HANDLER(port_w)
 
 static WRITE8_HANDLER(port0_w)
 {
-//  printf("P0 %x = %x\n",cpu_get_pc(space->cpu),data);
+//  printf("P0 %x = %x\n",cpu_get_pc(&space->device()),data);
 }
 
 static WRITE8_HANDLER(port1_w)
 {
-//  printf("P1 %x = %x\n",cpu_get_pc(space->cpu),data);
+//  printf("P1 %x = %x\n",cpu_get_pc(&space->device()),data);
 }
 
 static WRITE8_HANDLER(port2_w)
 {
 	monzagp_state *state = space->machine().driver_data<monzagp_state>();
-//  printf("P2 %x = %x\n",cpu_get_pc(space->cpu),data);
+//  printf("P2 %x = %x\n",cpu_get_pc(&space->device()),data);
 	state->coordy=data;
 }
 

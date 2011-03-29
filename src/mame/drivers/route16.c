@@ -111,7 +111,7 @@ static WRITE8_HANDLER( route16_sharedram_w )
 	if (offset >= 0x0313 && offset <= 0x0319 && data == 0xff)
 	{
 		// Let the other CPU run
-		device_yield(space->cpu);
+		device_yield(&space->device());
 	}
 }
 
@@ -950,9 +950,9 @@ ROM_END
 
 static READ8_HANDLER( routex_prot_read )
 {
-	if (cpu_get_pc(space->cpu) == 0x2f) return 0xfb;
+	if (cpu_get_pc(&space->device()) == 0x2f) return 0xfb;
 
-	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", space->cpu->tag(), cpu_get_pc(space->cpu));
+	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", space->device().tag(), cpu_get_pc(&space->device()));
 	return 0x00;
 
 }

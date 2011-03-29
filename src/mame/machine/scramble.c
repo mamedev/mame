@@ -90,16 +90,16 @@ static READ8_HANDLER( mariner_protection_2_r )
 
 READ8_HANDLER( triplep_pip_r )
 {
-	logerror("PC %04x: triplep read port 2\n",cpu_get_pc(space->cpu));
-	if (cpu_get_pc(space->cpu) == 0x015a) return 0xff;
-	else if (cpu_get_pc(space->cpu) == 0x0886) return 0x05;
+	logerror("PC %04x: triplep read port 2\n",cpu_get_pc(&space->device()));
+	if (cpu_get_pc(&space->device()) == 0x015a) return 0xff;
+	else if (cpu_get_pc(&space->device()) == 0x0886) return 0x05;
 	else return 0;
 }
 
 READ8_HANDLER( triplep_pap_r )
 {
-	logerror("PC %04x: triplep read port 3\n",cpu_get_pc(space->cpu));
-	if (cpu_get_pc(space->cpu) == 0x015d) return 0x04;
+	logerror("PC %04x: triplep read port 3\n",cpu_get_pc(&space->device()));
+	if (cpu_get_pc(&space->device()) == 0x015d) return 0x04;
 	else return 0;
 }
 

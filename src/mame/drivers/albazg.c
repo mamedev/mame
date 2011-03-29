@@ -149,14 +149,14 @@ static WRITE8_HANDLER( yumefuda_cram_w )
 static READ8_HANDLER( custom_ram_r )
 {
 	albazg_state *state = space->machine().driver_data<albazg_state>();
-//  logerror("Custom RAM read at %02x PC = %x\n", offset + 0xaf80, cpu_get_pc(space->cpu));
+//  logerror("Custom RAM read at %02x PC = %x\n", offset + 0xaf80, cpu_get_pc(&space->device()));
 	return state->cus_ram[offset];// ^ 0x55;
 }
 
 static WRITE8_HANDLER( custom_ram_w )
 {
 	albazg_state *state = space->machine().driver_data<albazg_state>();
-//  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, cpu_get_pc(space->cpu));
+//  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, cpu_get_pc(&space->device()));
 	if(state->prot_lock)
 		state->cus_ram[offset] = data;
 }
@@ -165,7 +165,7 @@ static WRITE8_HANDLER( custom_ram_w )
 static WRITE8_HANDLER( prot_lock_w )
 {
 	albazg_state *state = space->machine().driver_data<albazg_state>();
-//  logerror("PC %04x Prot lock value written %02x\n", cpu_get_pc(space->cpu), data);
+//  logerror("PC %04x Prot lock value written %02x\n", cpu_get_pc(&space->device()), data);
 	state->prot_lock = data;
 }
 

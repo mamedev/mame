@@ -198,7 +198,7 @@ static READ32_HANDLER( dsp_host_interface_r )
 	if (mem_mask == 0x0000ff00)	{ value <<= 8;  }
 	if (mem_mask == 0xff000000) { value <<= 24; }
 
-	logerror("Dsp HI Read (host-side) %08x (HI %04x) = %08x (@%x)\n", mem_mask, hi_addr, value, cpu_get_pc(space->cpu));
+	logerror("Dsp HI Read (host-side) %08x (HI %04x) = %08x (@%x)\n", mem_mask, hi_addr, value, cpu_get_pc(&space->device()));
 
 	return value;
 }
@@ -213,13 +213,13 @@ static WRITE32_HANDLER( shared_ram_write )
 	{
 		logerror("68k WRITING %04x to shared ram %x (@%x)\n", (state->shared_ram[offset] & 0xffff0000) >> 16,
 															   0xc000 + (offset<<1),
-															   cpu_get_pc(space->cpu));
+															   cpu_get_pc(&space->device()));
 	}
 	else if (mem_mask == 0x0000ffff)
 	{
 		logerror("68k WRITING %04x to shared ram %x (@%x)\n", (state->shared_ram[offset] & 0x0000ffff),
 															   0xc000 +((offset<<1)+1),
-															   cpu_get_pc(space->cpu));
+															   cpu_get_pc(&space->device()));
 	}
 	else
 	{
@@ -228,7 +228,7 @@ static WRITE32_HANDLER( shared_ram_write )
 																				  0xc000 + (offset<<1),
 																				  0xc000 +((offset<<1)+1),
 																				  mem_mask,
-																				  cpu_get_pc(space->cpu));
+																				  cpu_get_pc(&space->device()));
 	}
 
 	/* write to the current dsp56k word */
@@ -396,8 +396,8 @@ static UINT8 dsp56k_bank_num(device_t* cpu, UINT8 bank_group)
 static READ16_HANDLER( dsp56k_ram_bank00_read )
 {
 	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT8 en_group = dsp56k_bank_group(space->cpu);
-	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(&space->device());
+	UINT8 bank_num = dsp56k_bank_num(&space->device(), en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank00_size * 8) + (bank_num * dsp56k_bank00_size);
 
 	return state->dsp56k_bank00_ram[driver_bank_offset + offset];
@@ -406,8 +406,8 @@ static READ16_HANDLER( dsp56k_ram_bank00_read )
 static WRITE16_HANDLER( dsp56k_ram_bank00_write )
 {
 	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT8 en_group = dsp56k_bank_group(space->cpu);
-	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(&space->device());
+	UINT8 bank_num = dsp56k_bank_num(&space->device(), en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank00_size * 8) + (bank_num * dsp56k_bank00_size);
 
 	COMBINE_DATA(&state->dsp56k_bank00_ram[driver_bank_offset + offset]);
@@ -417,8 +417,8 @@ static WRITE16_HANDLER( dsp56k_ram_bank00_write )
 static READ16_HANDLER( dsp56k_ram_bank01_read )
 {
 	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT8 en_group = dsp56k_bank_group(space->cpu);
-	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(&space->device());
+	UINT8 bank_num = dsp56k_bank_num(&space->device(), en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank01_size * 8) + (bank_num * dsp56k_bank01_size);
 
 	return state->dsp56k_bank01_ram[driver_bank_offset + offset];
@@ -427,8 +427,8 @@ static READ16_HANDLER( dsp56k_ram_bank01_read )
 static WRITE16_HANDLER( dsp56k_ram_bank01_write )
 {
 	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT8 en_group = dsp56k_bank_group(space->cpu);
-	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(&space->device());
+	UINT8 bank_num = dsp56k_bank_num(&space->device(), en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank01_size * 8) + (bank_num * dsp56k_bank01_size);
 
 	COMBINE_DATA(&state->dsp56k_bank01_ram[driver_bank_offset + offset]);
@@ -441,8 +441,8 @@ static WRITE16_HANDLER( dsp56k_ram_bank01_write )
 static READ16_HANDLER( dsp56k_ram_bank02_read )
 {
 	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT8 en_group = dsp56k_bank_group(space->cpu);
-	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(&space->device());
+	UINT8 bank_num = dsp56k_bank_num(&space->device(), en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank02_size * 8) + (bank_num * dsp56k_bank02_size);
 
 	return state->dsp56k_bank02_ram[driver_bank_offset + offset];
@@ -451,8 +451,8 @@ static READ16_HANDLER( dsp56k_ram_bank02_read )
 static WRITE16_HANDLER( dsp56k_ram_bank02_write )
 {
 	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT8 en_group = dsp56k_bank_group(space->cpu);
-	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(&space->device());
+	UINT8 bank_num = dsp56k_bank_num(&space->device(), en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank02_size * 8) + (bank_num * dsp56k_bank02_size);
 
 	COMBINE_DATA(&state->dsp56k_bank02_ram[driver_bank_offset + offset]);
@@ -462,8 +462,8 @@ static WRITE16_HANDLER( dsp56k_ram_bank02_write )
 static READ16_HANDLER( dsp56k_shared_ram_read )
 {
 	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT8 en_group = dsp56k_bank_group(space->cpu);
-	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(&space->device());
+	UINT8 bank_num = dsp56k_bank_num(&space->device(), en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_shared_ram_16_size * 8) + (bank_num * dsp56k_shared_ram_16_size);
 
 	return state->dsp56k_shared_ram_16[driver_bank_offset + offset];
@@ -472,8 +472,8 @@ static READ16_HANDLER( dsp56k_shared_ram_read )
 static WRITE16_HANDLER( dsp56k_shared_ram_write )
 {
 	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT8 en_group = dsp56k_bank_group(space->cpu);
-	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(&space->device());
+	UINT8 bank_num = dsp56k_bank_num(&space->device(), en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_shared_ram_16_size * 8) + (bank_num * dsp56k_shared_ram_16_size);
 
 	COMBINE_DATA(&state->dsp56k_shared_ram_16[driver_bank_offset + offset]);
@@ -492,8 +492,8 @@ static WRITE16_HANDLER( dsp56k_shared_ram_write )
 static READ16_HANDLER( dsp56k_ram_bank04_read )
 {
 	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT8 en_group = dsp56k_bank_group(space->cpu);
-	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(&space->device());
+	UINT8 bank_num = dsp56k_bank_num(&space->device(), en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank04_size * 8) + (bank_num * dsp56k_bank04_size);
 
 	return state->dsp56k_bank04_ram[driver_bank_offset + offset];
@@ -502,8 +502,8 @@ static READ16_HANDLER( dsp56k_ram_bank04_read )
 static WRITE16_HANDLER( dsp56k_ram_bank04_write )
 {
 	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT8 en_group = dsp56k_bank_group(space->cpu);
-	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(&space->device());
+	UINT8 bank_num = dsp56k_bank_num(&space->device(), en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank04_size * 8) + (bank_num * dsp56k_bank04_size);
 
 	COMBINE_DATA(&state->dsp56k_bank04_ram[driver_bank_offset + offset]);

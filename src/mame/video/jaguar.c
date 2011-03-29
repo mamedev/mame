@@ -616,7 +616,7 @@ READ32_HANDLER( jaguar_blitter_r )
 			return blitter_status & 3;
 
 		default:
-			logerror("%08X:Blitter read register @ F022%02X\n", cpu_get_previouspc(space->cpu), offset * 4);
+			logerror("%08X:Blitter read register @ F022%02X\n", cpu_get_previouspc(&space->device()), offset * 4);
 			return 0;
 	}
 }
@@ -633,7 +633,7 @@ WRITE32_HANDLER( jaguar_blitter_w )
 	}
 
 	if (LOG_BLITTER_WRITE)
-	logerror("%08X:Blitter write register @ F022%02X = %08X\n", cpu_get_previouspc(space->cpu), offset * 4, data);
+	logerror("%08X:Blitter write register @ F022%02X = %08X\n", cpu_get_previouspc(&space->device()), offset * 4, data);
 }
 
 
@@ -647,7 +647,7 @@ WRITE32_HANDLER( jaguar_blitter_w )
 READ16_HANDLER( jaguar_tom_regs_r )
 {
 	if (offset != INT1 && offset != INT2 && offset != HC && offset != VC)
-		logerror("%08X:TOM read register @ F00%03X\n", cpu_get_previouspc(space->cpu), offset * 2);
+		logerror("%08X:TOM read register @ F00%03X\n", cpu_get_previouspc(&space->device()), offset * 2);
 
 	switch (offset)
 	{
@@ -770,7 +770,7 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 	}
 
 	if (offset != INT2 && offset != VI && offset != INT1)
-		logerror("%08X:TOM write register @ F00%03X = %04X\n", cpu_get_previouspc(space->cpu), offset * 2, data);
+		logerror("%08X:TOM write register @ F00%03X = %04X\n", cpu_get_previouspc(&space->device()), offset * 2, data);
 }
 
 

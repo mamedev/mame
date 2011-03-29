@@ -278,7 +278,7 @@ static READ8_HANDLER( cvs_input_r )
 	case 0x04:  ret = input_port_read(space->machine(), "IN3"); break;
 	case 0x06:  ret = input_port_read(space->machine(), "DSW3"); break;
 	case 0x07:  ret = input_port_read(space->machine(), "DSW2"); break;
-	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", cpu_get_pc(space->cpu), offset & 0x0f); break;
+	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", cpu_get_pc(&space->device()), offset & 0x0f); break;
 	}
 
 	return ret;
@@ -389,14 +389,14 @@ static WRITE8_HANDLER( cvs_speech_rom_address_lo_w )
 
 	/* assuming that d0-d2 are cleared here */
 	state->speech_rom_bit_address = (state->speech_rom_bit_address & 0xf800) | (data << 3);
-	LOG(("%04x : CVS: Speech Lo %02x Address = %04x\n", cpu_get_pc(space->cpu), data, state->speech_rom_bit_address >> 3));
+	LOG(("%04x : CVS: Speech Lo %02x Address = %04x\n", cpu_get_pc(&space->device()), data, state->speech_rom_bit_address >> 3));
 }
 
 static WRITE8_HANDLER( cvs_speech_rom_address_hi_w )
 {
 	cvs_state *state = space->machine().driver_data<cvs_state>();
 	state->speech_rom_bit_address = (state->speech_rom_bit_address & 0x07ff) | (data << 11);
-	LOG(("%04x : CVS: Speech Hi %02x Address = %04x\n", cpu_get_pc(space->cpu), data, state->speech_rom_bit_address >> 3));
+	LOG(("%04x : CVS: Speech Hi %02x Address = %04x\n", cpu_get_pc(&space->device()), data, state->speech_rom_bit_address >> 3));
 }
 
 

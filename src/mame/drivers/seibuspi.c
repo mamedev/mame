@@ -747,7 +747,7 @@ static UINT8 z80_fifoout_pop(address_space *space)
 	UINT8 r;
 	if (state->fifoout_wpos == state->fifoout_rpos)
 	{
-		logerror("Sound FIFOOUT underflow at %08X\n", cpu_get_pc(space->cpu));
+		logerror("Sound FIFOOUT underflow at %08X\n", cpu_get_pc(&space->device()));
 	}
 	r = state->fifoout_data[state->fifoout_rpos++];
 	if(state->fifoout_rpos == FIFO_SIZE)
@@ -773,7 +773,7 @@ static void z80_fifoout_push(address_space *space, UINT8 data)
 	}
 	if(state->fifoout_wpos == state->fifoout_rpos)
 	{
-		fatalerror("Sound FIFOOUT overflow at %08X", cpu_get_pc(space->cpu));
+		fatalerror("Sound FIFOOUT overflow at %08X", cpu_get_pc(&space->device()));
 	}
 
 	state->fifoout_read_request = 1;
@@ -785,7 +785,7 @@ static UINT8 z80_fifoin_pop(address_space *space)
 	UINT8 r;
 	if (state->fifoin_wpos == state->fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN underflow at %08X", cpu_get_pc(space->cpu));
+		fatalerror("Sound FIFOIN underflow at %08X", cpu_get_pc(&space->device()));
 	}
 	r = state->fifoin_data[state->fifoin_rpos++];
 	if(state->fifoin_rpos == FIFO_SIZE)
@@ -811,7 +811,7 @@ static void z80_fifoin_push(address_space *space, UINT8 data)
 	}
 	if(state->fifoin_wpos == state->fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN overflow at %08X", cpu_get_pc(space->cpu));
+		fatalerror("Sound FIFOIN overflow at %08X", cpu_get_pc(&space->device()));
 	}
 
 	state->fifoin_read_request = 1;
@@ -1954,27 +1954,27 @@ MACHINE_CONFIG_END
 static READ32_HANDLER ( senkyu_speedup_r )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	if (cpu_get_pc(space->cpu)==0x00305bb2) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x00305bb2) device_spin_until_interrupt(&space->device()); // idle
 	return state->spimainram[(0x0018cb4-0x800)/4];
 }
 
 static READ32_HANDLER( senkyua_speedup_r )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	if (cpu_get_pc(space->cpu)== 0x30582e) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())== 0x30582e) device_spin_until_interrupt(&space->device()); // idle
 	return state->spimainram[(0x0018c9c-0x800)/4];
 }
 
 static READ32_HANDLER ( batlball_speedup_r )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-//  printf("cpu_get_pc(space->cpu) %06x\n", cpu_get_pc(space->cpu));
+//  printf("cpu_get_pc(&space->device()) %06x\n", cpu_get_pc(&space->device()));
 
 	/* batlbalu */
-	if (cpu_get_pc(space->cpu)==0x00305996) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x00305996) device_spin_until_interrupt(&space->device()); // idle
 
 	/* batlball */
-	if (cpu_get_pc(space->cpu)==0x003058aa) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x003058aa) device_spin_until_interrupt(&space->device()); // idle
 
 	return state->spimainram[(0x0018db4-0x800)/4];
 }
@@ -1983,21 +1983,21 @@ static READ32_HANDLER ( rdft_speedup_r )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	/* rdft */
-	if (cpu_get_pc(space->cpu)==0x0203f0a) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x0203f0a) device_spin_until_interrupt(&space->device()); // idle
 
 	/* rdftau */
-	if (cpu_get_pc(space->cpu)==0x0203f16) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x0203f16) device_spin_until_interrupt(&space->device()); // idle
 
 	/* rdftj */
-	if (cpu_get_pc(space->cpu)==0x0203f22) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x0203f22) device_spin_until_interrupt(&space->device()); // idle
 
 	/* rdftdi */
-	if (cpu_get_pc(space->cpu)==0x0203f46) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x0203f46) device_spin_until_interrupt(&space->device()); // idle
 
 	/* rdftu */
-	if (cpu_get_pc(space->cpu)==0x0203f3a) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x0203f3a) device_spin_until_interrupt(&space->device()); // idle
 
-//  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
+//  mame_printf_debug("%08x\n",cpu_get_pc(&space->device()));
 
 	return state->spimainram[(0x00298d0-0x800)/4];
 }
@@ -2006,15 +2006,15 @@ static READ32_HANDLER ( viprp1_speedup_r )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	/* viprp1 */
-	if (cpu_get_pc(space->cpu)==0x0202769) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x0202769) device_spin_until_interrupt(&space->device()); // idle
 
 	/* viprp1s */
-	if (cpu_get_pc(space->cpu)==0x02027e9) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x02027e9) device_spin_until_interrupt(&space->device()); // idle
 
 	/* viprp1ot */
-	if (cpu_get_pc(space->cpu)==0x02026bd) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x02026bd) device_spin_until_interrupt(&space->device()); // idle
 
-//  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
+//  mame_printf_debug("%08x\n",cpu_get_pc(&space->device()));
 
 	return state->spimainram[(0x001e2e0-0x800)/4];
 }
@@ -2023,8 +2023,8 @@ static READ32_HANDLER ( viprp1o_speedup_r )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	/* viperp1o */
-	if (cpu_get_pc(space->cpu)==0x0201f99) device_spin_until_interrupt(space->cpu); // idle
-//  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
+	if (cpu_get_pc(&space->device())==0x0201f99) device_spin_until_interrupt(&space->device()); // idle
+//  mame_printf_debug("%08x\n",cpu_get_pc(&space->device()));
 	return state->spimainram[(0x001d49c-0x800)/4];
 }
 
@@ -2033,8 +2033,8 @@ static READ32_HANDLER ( viprp1o_speedup_r )
 READ32_HANDLER ( ejanhs_speedup_r )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-// mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
- if (cpu_get_pc(space->cpu)==0x03032c7) device_spin_until_interrupt(space->cpu); // idle
+// mame_printf_debug("%08x\n",cpu_get_pc(&space->device()));
+ if (cpu_get_pc(&space->device())==0x03032c7) device_spin_until_interrupt(&space->device()); // idle
  return state->spimainram[(0x002d224-0x800)/4];
 }
 #endif
@@ -2044,18 +2044,18 @@ static READ32_HANDLER ( rf2_speedup_r )
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 
 	/* rdft22kc */
-	if (cpu_get_pc(space->cpu)==0x0203926) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x0203926) device_spin_until_interrupt(&space->device()); // idle
 
 	/* rdft2, rdft2j */
-	if (cpu_get_pc(space->cpu)==0x0204372) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x0204372) device_spin_until_interrupt(&space->device()); // idle
 
 	/* rdft2us */
-	if (cpu_get_pc(space->cpu)==0x020420e) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x020420e) device_spin_until_interrupt(&space->device()); // idle
 
 	/* rdft2a */
-	if (cpu_get_pc(space->cpu)==0x0204366) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x0204366) device_spin_until_interrupt(&space->device()); // idle
 
-//  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
+//  mame_printf_debug("%08x\n",cpu_get_pc(&space->device()));
 
 	return state->spimainram[(0x0282AC-0x800)/4];
 }
@@ -2064,22 +2064,22 @@ static READ32_HANDLER ( rfjet_speedup_r )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	/* rfjet, rfjetu, rfjeta */
-	if (cpu_get_pc(space->cpu)==0x0206082) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x0206082) device_spin_until_interrupt(&space->device()); // idle
 
 	/* rfjetus */
-	if (cpu_get_pc(space->cpu)==0x0205b39)
+	if (cpu_get_pc(&space->device())==0x0205b39)
 	{
 		UINT32 r;
-		device_spin_until_interrupt(space->cpu); // idle
+		device_spin_until_interrupt(&space->device()); // idle
 		// Hack to enter test mode
 		r = state->spimainram[(0x002894c-0x800)/4] & (~0x400);
 		return r | (((input_port_read(space->machine(), "SYSTEM") ^ 0xff)<<8) & 0x400);
 	}
 
 	/* rfjetj */
-	if (cpu_get_pc(space->cpu)==0x0205f2e) device_spin_until_interrupt(space->cpu); // idle
+	if (cpu_get_pc(&space->device())==0x0205f2e) device_spin_until_interrupt(&space->device()); // idle
 
-//  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
+//  mame_printf_debug("%08x\n",cpu_get_pc(&space->device()));
 
 
 	return state->spimainram[(0x002894c-0x800)/4];

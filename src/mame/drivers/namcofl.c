@@ -268,7 +268,7 @@ static WRITE16_HANDLER( mcu_shared_w )
 	// C75 BIOS has a very short window on the CPU sync signal, so immediately let the i960 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
 	{
-		device_yield(space->cpu);
+		device_yield(&space->device());
 	}
 }
 

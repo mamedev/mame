@@ -150,9 +150,9 @@ static WRITE32_HANDLER( atarigx2_protection_w )
 {
 	atarigx2_state *state = space->machine().driver_data<atarigx2_state>();
 	{
-		int pc = cpu_get_previouspc(space->cpu);
+		int pc = cpu_get_previouspc(&space->device());
 //      if (pc == 0x11cbe || pc == 0x11c30)
-//          logerror("%06X:Protection W@%04X = %04X  (result to %06X)\n", pc, offset, data, cpu_get_reg(space->cpu, M68K_A2));
+//          logerror("%06X:Protection W@%04X = %04X  (result to %06X)\n", pc, offset, data, cpu_get_reg(&space->device(), M68K_A2));
 //      else
 		if (ACCESSING_BITS_16_31)
 			logerror("%06X:Protection W@%04X = %04X\n", pc, offset * 4, data >> 16);
@@ -1131,14 +1131,14 @@ static READ32_HANDLER( atarigx2_protection_r )
 				result = space->machine().rand() << 16;
 			else
 				result = 0xffff << 16;
-			logerror("%06X:Unhandled protection R@%04X = %04X\n", cpu_get_previouspc(space->cpu), offset, result);
+			logerror("%06X:Unhandled protection R@%04X = %04X\n", cpu_get_previouspc(&space->device()), offset, result);
 		}
 	}
 
 	if (ACCESSING_BITS_16_31)
-		logerror("%06X:Protection R@%04X = %04X\n", cpu_get_previouspc(space->cpu), offset * 4, result >> 16);
+		logerror("%06X:Protection R@%04X = %04X\n", cpu_get_previouspc(&space->device()), offset * 4, result >> 16);
 	else
-		logerror("%06X:Protection R@%04X = %04X\n", cpu_get_previouspc(space->cpu), offset * 4 + 2, result);
+		logerror("%06X:Protection R@%04X = %04X\n", cpu_get_previouspc(&space->device()), offset * 4 + 2, result);
 	return result;
 }
 

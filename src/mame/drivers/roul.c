@@ -115,7 +115,7 @@ bit 7 -> blitter ready
 bit 6 -> ??? (after unknown blitter command : [80][80][08][02])
 */
 //  return 0x80; // blitter ready
-//  logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(space->cpu));
+//  logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(&space->device()));
 	return space->machine().rand() & 0x00c0;
 }
 

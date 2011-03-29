@@ -55,7 +55,7 @@ static WRITE16_HANDLER( drgnmst_snd_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		state->snd_command = (data & 0xff);
-		device_yield(space->cpu);
+		device_yield(&space->device());
 	}
 }
 

@@ -1167,7 +1167,7 @@ ROM_END
 static READ32_HANDLER( coolridr_hack1_r )
 {
 	coolridr_state *state = space->machine().driver_data<coolridr_state>();
-	offs_t pc = downcast<cpu_device *>(space->cpu)->pc();
+	offs_t pc = downcast<cpu_device *>(&space->device())->pc();
 	if(pc == 0x6012374 || pc == 0x6012392)
 		return 0;
 
@@ -1178,7 +1178,7 @@ static READ32_HANDLER( coolridr_hack1_r )
 static READ32_HANDLER( coolridr_hack2_r )
 {
 	coolridr_state *state = space->machine().driver_data<coolridr_state>();
-	offs_t pc = downcast<cpu_device *>(space->cpu)->pc();
+	offs_t pc = downcast<cpu_device *>(&space->device())->pc();
 	if(pc == 0x6002cba || pc == 0x6002d42)
 		return 0;
 

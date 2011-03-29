@@ -72,7 +72,7 @@ static WRITE16_HANDLER( esd16_sound_command_w )
 	{
 		soundlatch_w(space, 0, data & 0xff);
 		device_set_input_line(state->audio_cpu, 0, ASSERT_LINE);		// Generate an IRQ
-		device_spin_until_time(space->cpu, attotime::from_usec(50));	// Allow the other CPU to reply
+		device_spin_until_time(&space->device(), attotime::from_usec(50));	// Allow the other CPU to reply
 	}
 }
 
@@ -122,7 +122,7 @@ static READ16_HANDLER( esd_eeprom_r )
 		return ((eeprom_read_bit(state->eeprom) & 0x01) << 15);
 	}
 
-//  logerror("(0x%06x) unk EEPROM read: %04x\n", cpu_get_pc(space->cpu), mem_mask);
+//  logerror("(0x%06x) unk EEPROM read: %04x\n", cpu_get_pc(&space->device()), mem_mask);
 	return 0;
 }
 
@@ -131,7 +131,7 @@ static WRITE16_HANDLER( esd_eeprom_w )
 	if (ACCESSING_BITS_8_15)
 		input_port_write(space->machine(), "EEPROMOUT", data, 0xffff);
 
-//  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", cpu_get_pc(space->cpu), data, mem_mask);
+//  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", cpu_get_pc(&space->device()), data, mem_mask);
 }
 
 static ADDRESS_MAP_START( hedpanic_map, AS_PROGRAM, 16 )
@@ -228,7 +228,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( esd16_sound_rombank_w )
 {
 	int bank = data & 0xf;
-	if (data != bank)	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(space->cpu), data);
+	if (data != bank)	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(&space->device()), data);
 	if (bank >= 3)	bank += 1;
 	memory_set_bank(space->machine(), "bank1", bank);
 }

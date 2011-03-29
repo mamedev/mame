@@ -47,7 +47,7 @@ static READ16_HANDLER( zerozone_input_r )
 			return input_port_read(space->machine(), "DSWA");
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(space->cpu), 0x800000 + offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(&space->device()), 0x800000 + offset);
 	return 0x00;
 }
 

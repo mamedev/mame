@@ -467,7 +467,7 @@ static READ32_HANDLER( hng64_com_r )
 {
 	hng64_state *state = space->machine().driver_data<hng64_state>();
 
-	logerror("com read  (PC=%08x): %08x %08x = %08x\n", cpu_get_pc(space->cpu), (offset*4)+0xc0000000, mem_mask, state->com_ram[offset]);
+	logerror("com read  (PC=%08x): %08x %08x = %08x\n", cpu_get_pc(&space->device()), (offset*4)+0xc0000000, mem_mask, state->com_ram[offset]);
 	return state->com_ram[offset];
 }
 
@@ -475,7 +475,7 @@ static WRITE32_HANDLER( hng64_com_w )
 {
 	hng64_state *state = space->machine().driver_data<hng64_state>();
 
-	logerror("com write (PC=%08x): %08x %08x = %08x\n", cpu_get_pc(space->cpu), (offset*4)+0xc0000000, mem_mask, data);
+	logerror("com write (PC=%08x): %08x %08x = %08x\n", cpu_get_pc(&space->device()), (offset*4)+0xc0000000, mem_mask, data);
 	COMBINE_DATA(&state->com_ram[offset]);
 }
 
@@ -483,7 +483,7 @@ static WRITE32_HANDLER( hng64_com_share_w )
 {
 	hng64_state *state = space->machine().driver_data<hng64_state>();
 
-	logerror("commw  (PC=%08x): %08x %08x %08x\n", cpu_get_pc(space->cpu), data, (offset*4)+0xc0001000, mem_mask);
+	logerror("commw  (PC=%08x): %08x %08x %08x\n", cpu_get_pc(&space->device()), data, (offset*4)+0xc0001000, mem_mask);
 
 	if (offset == 0x0) COMBINE_DATA(&state->com_shared_a);
 	if (offset == 0x1) COMBINE_DATA(&state->com_shared_b);
@@ -491,7 +491,7 @@ static WRITE32_HANDLER( hng64_com_share_w )
 
 static READ32_HANDLER( hng64_com_share_r )
 {
-	logerror("commr  (PC=%08x): %08x %08x\n", cpu_get_pc(space->cpu), (offset*4)+0xc0001000, mem_mask);
+	logerror("commr  (PC=%08x): %08x %08x\n", cpu_get_pc(&space->device()), (offset*4)+0xc0001000, mem_mask);
 
 	//if(offset == 0x0) return state->com_shared_a;
 	//if(offset == 0x1) return state->com_shared_b;
@@ -525,7 +525,7 @@ static READ32_HANDLER( hng64_sysregs_r )
 
 #if 0
 	if((offset*4) != 0x1084)
-		printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu), offset*4);
+		printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(&space->device()), offset*4);
 #endif
 
 	switch(offset*4)
@@ -602,7 +602,7 @@ static WRITE32_HANDLER( hng64_sysregs_w )
 
 #if 0
 	if(((offset*4) & 0x1200) == 0x1200)
-		printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, state->sysregs[offset], cpu_get_pc(space->cpu));
+		printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, state->sysregs[offset], cpu_get_pc(&space->device()));
 #endif
 
 	switch(offset*4)
@@ -611,7 +611,7 @@ static WRITE32_HANDLER( hng64_sysregs_w )
 
 		case 0x1084: //MIPS->MCU latch port
 			state->mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
-			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, state->sysregs[offset], cpu_get_pc(space->cpu));
+			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, state->sysregs[offset], cpu_get_pc(&space->device()));
 			break;
 		case 0x111c: /*irq ack */ break;
 		case 0x1204: state->dma_start = state->sysregs[offset]; break;
@@ -621,7 +621,7 @@ static WRITE32_HANDLER( hng64_sysregs_w )
 			hng64_do_dma(space);
 			break;
 		//default:
-			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, state->sysregs[offset], cpu_get_pc(space->cpu));
+			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, state->sysregs[offset], cpu_get_pc(&space->device()));
 	}
 }
 
@@ -754,7 +754,7 @@ static READ32_HANDLER( hng64_dualport_r )
 {
 	hng64_state *state = space->machine().driver_data<hng64_state>();
 
-	//printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+	//printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(&space->device()));
 
 	/*
     command table:
@@ -793,7 +793,7 @@ static WRITE32_HANDLER( hng64_dualport_w )
 {
 	hng64_state *state = space->machine().driver_data<hng64_state>();
 
-	//printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+	//printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(&space->device()));
 	COMBINE_DATA (&state->dualport[offset]);
 }
 
@@ -870,8 +870,8 @@ static WRITE32_HANDLER( dl_w )
 #if 0
 static READ32_HANDLER( dl_r )
 {
-	//mame_printf_debug("dl R (%08x) : %x %x\n", cpu_get_pc(space->cpu), offset, hng64_dl[offset]);
-	//usrintf_showmessage("dl R (%08x) : %x %x", cpu_get_pc(space->cpu), offset, hng64_dl[offset]);
+	//mame_printf_debug("dl R (%08x) : %x %x\n", cpu_get_pc(&space->device()), offset, hng64_dl[offset]);
+	//usrintf_showmessage("dl R (%08x) : %x %x", cpu_get_pc(&space->device()), offset, hng64_dl[offset]);
 	return hng64_dl[offset];
 }
 #endif

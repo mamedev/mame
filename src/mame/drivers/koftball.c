@@ -127,7 +127,7 @@ static READ16_HANDLER(prot_r)
 		case 0x8000: return 0x0f0f;
 	}
 
-	logerror("unk prot r %x %x\n",state->prot_data,	cpu_get_previouspc(space->cpu));
+	logerror("unk prot r %x %x\n",state->prot_data,	cpu_get_previouspc(&space->device()));
 	return space->machine().rand();
 }
 

@@ -560,7 +560,7 @@ static WRITE8_HANDLER( mcu_io_w )
 
 		default:
 			logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
-					 cpu_get_pc(space->cpu), state->mcu_control, offset, data);
+					 cpu_get_pc(&space->device()), state->mcu_control, offset, data);
 			break;
 	}
 }
@@ -582,7 +582,7 @@ static READ8_HANDLER( mcu_io_r )
 
 		default:
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",
-					 cpu_get_pc(space->cpu), state->mcu_control, offset);
+					 cpu_get_pc(&space->device()), state->mcu_control, offset);
 			return 0xff;
 	}
 }
@@ -631,7 +631,7 @@ static WRITE8_HANDLER( nob_mcu_control_p2_w )
 
 	/* bit 2 is toggled once near the end of an IRQ */
 	if (((state->mcu_control ^ data) & 0x04) && !(data & 0x04))
-		device_set_input_line(space->cpu, MCS51_INT0_LINE, CLEAR_LINE);
+		device_set_input_line(&space->device(), MCS51_INT0_LINE, CLEAR_LINE);
 
 	/* bit 3 is toggled once at the start of an IRQ, and again at the end */
 	if (((state->mcu_control ^ data) & 0x08) && !(data & 0x08))
@@ -677,27 +677,27 @@ static READ8_HANDLER( nob_mcu_status_r )
 
 static READ8_HANDLER( nobb_inport1c_r )
 {
-//  logerror("IN  $1c : pc = %04x - data = 0x80\n",cpu_get_pc(space->cpu));
+//  logerror("IN  $1c : pc = %04x - data = 0x80\n",cpu_get_pc(&space->device()));
 	return(0x80);	// infinite loop (at 0x0fb3) until bit 7 is set
 }
 
 static READ8_HANDLER( nobb_inport22_r )
 {
-//  logerror("IN  $22 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),nobb_inport17_step);
+//  logerror("IN  $22 : pc = %04x - data = %02x\n",cpu_get_pc(&space->device()),nobb_inport17_step);
 	return(0);//nobb_inport17_step);
 }
 
 static READ8_HANDLER( nobb_inport23_r )
 {
 	system1_state *state = space->machine().driver_data<system1_state>();
-//  logerror("IN  $23 : pc = %04x - step = %02x\n",cpu_get_pc(space->cpu),state->nobb_inport23_step);
+//  logerror("IN  $23 : pc = %04x - step = %02x\n",cpu_get_pc(&space->device()),state->nobb_inport23_step);
 	return(state->nobb_inport23_step);
 }
 
 static WRITE8_HANDLER( nobb_outport24_w )
 {
 	system1_state *state = space->machine().driver_data<system1_state>();
-//  logerror("OUT $24 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),data);
+//  logerror("OUT $24 : pc = %04x - data = %02x\n",cpu_get_pc(&space->device()),data);
 	state->nobb_inport23_step = data;
 }
 
@@ -4603,7 +4603,7 @@ static DRIVER_INIT( myherok )
 static READ8_HANDLER( nob_start_r )
 {
 	/* in reality, it's likely some M1-dependent behavior */
-	return (cpu_get_pc(space->cpu) <= 0x0003) ? 0x80 : space->machine().region("maincpu")->base()[1];
+	return (cpu_get_pc(&space->device()) <= 0x0003) ? 0x80 : space->machine().region("maincpu")->base()[1];
 }
 
 static DRIVER_INIT( nob )

@@ -491,7 +491,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 	/* if CLEAR is held low, we must make sure the interrupt signal is clear */
 	if (!irq_enabled)
-		device_set_input_line(space->cpu, irq_line, CLEAR_LINE);
+		device_set_input_line(&space->device(), irq_line, CLEAR_LINE);
 }
 
 /*************************************
@@ -1200,7 +1200,7 @@ static READ8_HANDLER( jumpbug_protection_r )
 		case 0x0235:  return 0x02;
 		case 0x0311:  return 0xff;  /* not checked */
 	}
-	logerror("Unknown protection read. Offset: %04X  PC=%04X\n",0xb000+offset,cpu_get_pc(space->cpu));
+	logerror("Unknown protection read. Offset: %04X  PC=%04X\n",0xb000+offset,cpu_get_pc(&space->device()));
 	return 0xff;
 }
 
@@ -1227,7 +1227,7 @@ static TIMER_DEVICE_CALLBACK( checkmaj_irq0_gen )
 
 static READ8_HANDLER( checkmaj_protection_r )
 {
-	switch (cpu_get_pc(space->cpu))
+	switch (cpu_get_pc(&space->device()))
 	{
 		case 0x0f15:  return 0xf5;
 		case 0x0f8f:  return 0x7c;
@@ -1236,7 +1236,7 @@ static READ8_HANDLER( checkmaj_protection_r )
 		case 0x10f1:  return 0xaa;
 		case 0x1402:  return 0xaa;
 		default:
-			logerror("Unknown protection read. PC=%04X\n",cpu_get_pc(space->cpu));
+			logerror("Unknown protection read. PC=%04X\n",cpu_get_pc(&space->device()));
 	}
 
 	return 0;

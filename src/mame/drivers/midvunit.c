@@ -255,13 +255,13 @@ static READ32_HANDLER( tms32031_control_r )
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
 		INT32 result = (state->timer[which]->time_elapsed() * state->timer_rate).as_double();
-//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, result);
+//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", cpu_get_pc(&space->device()), offset, result);
 		return result;
 	}
 
 	/* log anything else except the memory control register */
 	if (offset != 0x64)
-		logerror("%06X:tms32031_control_r(%02X)\n", cpu_get_pc(space->cpu), offset);
+		logerror("%06X:tms32031_control_r(%02X)\n", cpu_get_pc(&space->device()), offset);
 
 	return state->tms32031_control[offset];
 }
@@ -280,7 +280,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 	else if (offset == 0x20 || offset == 0x30)
 	{
 		int which = (offset >> 4) & 1;
-//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, data);
+//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(&space->device()), offset, data);
 		if (data & 0x40)
 			state->timer[which]->reset();
 
@@ -291,7 +291,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 			state->timer_rate = 10000000.;
 	}
 	else
-		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, data);
+		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(&space->device()), offset, data);
 }
 
 
@@ -415,7 +415,7 @@ static READ32_HANDLER( midvplus_misc_r )
 	}
 
 	if (offset != 0 && offset != 3)
-		logerror("%06X:midvplus_misc_r(%d) = %08X\n", cpu_get_pc(space->cpu), offset, result);
+		logerror("%06X:midvplus_misc_r(%d) = %08X\n", cpu_get_pc(&space->device()), offset, result);
 	return result;
 }
 
@@ -445,7 +445,7 @@ static WRITE32_HANDLER( midvplus_misc_w )
 	}
 
 	if (logit)
-		logerror("%06X:midvplus_misc_w(%d) = %08X\n", cpu_get_pc(space->cpu), offset, data);
+		logerror("%06X:midvplus_misc_w(%d) = %08X\n", cpu_get_pc(&space->device()), offset, data);
 }
 
 
@@ -1588,7 +1588,7 @@ ROM_END
 static READ32_HANDLER( generic_speedup_r )
 {
 	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	device_eat_cycles(space->cpu, 100);
+	device_eat_cycles(&space->device(), 100);
 	return state->generic_speedup[offset];
 }
 

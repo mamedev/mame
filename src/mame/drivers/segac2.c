@@ -480,7 +480,7 @@ static WRITE16_HANDLER( control_w )
 static READ16_HANDLER( prot_r )
 {
 	segac2_state *state = space->machine().driver_data<segac2_state>();
-	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", cpu_get_previouspc(space->cpu), state->prot_func ? state->prot_read_buf : 0xff);
+	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", cpu_get_previouspc(&space->device()), state->prot_func ? state->prot_read_buf : 0xff);
 	return state->prot_read_buf | 0xf0;
 }
 
@@ -506,7 +506,7 @@ static WRITE16_HANDLER( prot_w )
 	/* determine the value to return, should a read occur */
 	if (state->prot_func)
 		state->prot_read_buf = state->prot_func(table_index);
-	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", cpu_get_previouspc(space->cpu), data & 0x0f, state->prot_read_buf);
+	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", cpu_get_previouspc(&space->device()), data & 0x0f, state->prot_read_buf);
 
 	/* if the palette changed, force an update */
 	if (new_sp_palbase != state->sp_palbase || new_bg_palbase != state->bg_palbase)

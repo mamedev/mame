@@ -1364,13 +1364,13 @@ static READ32_HANDLER( cpld_r )
 {
 	_39in1_state *state = space->machine().driver_data<_39in1_state>();
 
-	//if (cpu_get_pc(space->cpu) != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, cpu_get_pc(space->cpu), state);
+	//if (cpu_get_pc(&space->device()) != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, cpu_get_pc(&space->device()), state);
 
-	if (cpu_get_pc(space->cpu) == 0x3f04)
+	if (cpu_get_pc(&space->device()) == 0x3f04)
 	{
 		return 0xf0;	  // any non-zero value works here
 	}
-	else if (cpu_get_pc(space->cpu) == 0xe3af4)
+	else if (cpu_get_pc(&space->device()) == 0xe3af4)
 	{
 		return input_port_read(space->machine(), "MCUIPT");
 	}
@@ -1426,11 +1426,11 @@ static WRITE32_HANDLER( cpld_w )
 		state->seed = data<<16;
 	}
 
-	if (cpu_get_pc(space->cpu) == 0x280c)
+	if (cpu_get_pc(&space->device()) == 0x280c)
 	{
 		state->state = 1;
 	}
-	if (cpu_get_pc(space->cpu) == 0x2874)
+	if (cpu_get_pc(&space->device()) == 0x2874)
 	{
 		state->state = 2;
 		state->magic = space->read_byte(0xa02d4ff0);
@@ -1441,7 +1441,7 @@ static WRITE32_HANDLER( cpld_w )
 #if 0
 	else
 	{
-		printf("%08x: CPLD_W: %08x = %08x & %08x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+		printf("%08x: CPLD_W: %08x = %08x & %08x\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 	}
 #endif
 }

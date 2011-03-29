@@ -273,7 +273,7 @@ static WRITE32_HANDLER( irq_ack32_w )
 	else if (ACCESSING_BITS_0_7)
 		gaelco_serial_tr_w(space->machine().device("serial"), 0, data & 0x01);
 	else
-		logerror("%06X:irq_ack_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+		logerror("%06X:irq_ack_w(%02X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 }
 
 
@@ -364,7 +364,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 static WRITE16_HANDLER( sound_data_w )
 {
 	if (LOG)
-		logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+		logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
 		space->machine().scheduler().synchronize(FUNC(delayed_sound_w), data & 0xff);
 }
@@ -384,7 +384,7 @@ static READ16_HANDLER( sound_status_r )
 {
 	gaelco3d_state *state = space->machine().driver_data<gaelco3d_state>();
 	if (LOG)
-		logerror("%06X:sound_status_r(%02X) = %02X\n", cpu_get_pc(space->cpu), offset, state->sound_status);
+		logerror("%06X:sound_status_r(%02X) = %02X\n", cpu_get_pc(&space->device()), offset, state->sound_status);
 	if (ACCESSING_BITS_0_7)
 		return state->sound_status;
 	return 0xffff;
@@ -432,7 +432,7 @@ static WRITE16_HANDLER( analog_port_clock_w )
 	else
 	{
 		if (LOG)
-			logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+			logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 	}
 }
 
@@ -454,7 +454,7 @@ static WRITE16_HANDLER( analog_port_latch_w )
 	else
 	{
 		if (LOG)
-			logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+			logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 	}
 
 }
@@ -470,7 +470,7 @@ static WRITE16_HANDLER( analog_port_latch_w )
 static READ32_HANDLER( tms_m68k_ram_r )
 {
 	gaelco3d_state *state = space->machine().driver_data<gaelco3d_state>();
-//  logerror("%06X:tms_m68k_ram_r(%04X) = %08X\n", cpu_get_pc(space->cpu), offset, !(offset & 1) ? ((INT32)state->m68k_ram_base[offset/2] >> 16) : (int)(INT16)state->m68k_ram_base[offset/2]);
+//  logerror("%06X:tms_m68k_ram_r(%04X) = %08X\n", cpu_get_pc(&space->device()), offset, !(offset & 1) ? ((INT32)state->m68k_ram_base[offset/2] >> 16) : (int)(INT16)state->m68k_ram_base[offset/2]);
 	return (INT32)(INT16)state->m68k_ram_base[offset ^ state->tms_offset_xor];
 }
 
@@ -502,7 +502,7 @@ static WRITE16_HANDLER( tms_reset_w )
 	/* this is set to 0 while data is uploaded, then set to $ffff after it is done */
 	/* it does not ever appear to be touched after that */
 	if (LOG)
-		logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+		logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 		cputag_set_input_line(space->machine(), "tms", INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -512,7 +512,7 @@ static WRITE16_HANDLER( tms_irq_w )
 	/* this is written twice, 0,1, in quick succession */
 	/* done after uploading, and after modifying the comm area */
 	if (LOG)
-		logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+		logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
 		cputag_set_input_line(space->machine(), "tms", 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -521,7 +521,7 @@ static WRITE16_HANDLER( tms_irq_w )
 static WRITE16_HANDLER( tms_control3_w )
 {
 	if (LOG)
-		logerror("%06X:tms_control3_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+		logerror("%06X:tms_control3_w(%02X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 }
 
 
@@ -530,7 +530,7 @@ static WRITE16_HANDLER( tms_comm_w )
 	gaelco3d_state *state = space->machine().driver_data<gaelco3d_state>();
 	COMBINE_DATA(&state->tms_comm_base[offset ^ state->tms_offset_xor]);
 	if (LOG)
-		logerror("%06X:tms_comm_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset*2, data, mem_mask);
+		logerror("%06X:tms_comm_w(%02X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset*2, data, mem_mask);
 }
 
 
@@ -735,27 +735,27 @@ static WRITE32_HANDLER( radikalb_lamp_w )
 {
 	/* arbitrary data written */
 	if (ACCESSING_BITS_0_7)
-		logerror("%06X:unknown_127_w = %02X\n", cpu_get_pc(space->cpu), data & 0xff);
+		logerror("%06X:unknown_127_w = %02X\n", cpu_get_pc(&space->device()), data & 0xff);
 	else
-		logerror("%06X:unknown_127_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+		logerror("%06X:unknown_127_w(%02X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknown_137_w )
 {
 	/* only written $00 or $ff */
 	if (ACCESSING_BITS_0_7)
-		logerror("%06X:unknown_137_w = %02X\n", cpu_get_pc(space->cpu), data & 0xff);
+		logerror("%06X:unknown_137_w = %02X\n", cpu_get_pc(&space->device()), data & 0xff);
 	else
-		logerror("%06X:unknown_137_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+		logerror("%06X:unknown_137_w(%02X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknown_13a_w )
 {
 	/* only written $0000 or $0001 */
 	if (ACCESSING_BITS_0_15)
-		logerror("%06X:unknown_13a_w = %04X\n", cpu_get_pc(space->cpu), data & 0xffff);
+		logerror("%06X:unknown_13a_w = %04X\n", cpu_get_pc(&space->device()), data & 0xffff);
 	else
-		logerror("%06X:unknown_13a_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+		logerror("%06X:unknown_13a_w(%02X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 }
 
 

@@ -65,7 +65,7 @@ static WRITE8_HANDLER( fantland_nmi_enable_w )
 	state->nmi_enable = data;
 
 	if ((state->nmi_enable != 0) && (state->nmi_enable != 8))
-		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", cpu_get_pc(space->cpu), data);
+		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", cpu_get_pc(&space->device()), data);
 }
 
 static WRITE16_HANDLER( fantland_nmi_enable_16_w )
@@ -176,7 +176,7 @@ static WRITE8_HANDLER( borntofi_nmi_enable_w )
 	// data & 0x31 changes when lightgun fires
 
 	if ((state->nmi_enable != 0) && (state->nmi_enable != 8))
-		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", cpu_get_pc(space->cpu), data);
+		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", cpu_get_pc(&space->device()), data);
 
 //  popmessage("%02X", data);
 }
@@ -354,7 +354,7 @@ static WRITE8_HANDLER( borntofi_msm5205_w )
 		{
 			case 0x00:		borntofi_adpcm_stop(msm, voice); break;
 			case 0x03:		borntofi_adpcm_start(msm, voice); break;
-			default:		logerror("CPU #0 PC = %04X: adpcm reg %d <- %02x\n", cpu_get_pc(space->cpu), reg, data);
+			default:		logerror("CPU #0 PC = %04X: adpcm reg %d <- %02x\n", cpu_get_pc(&space->device()), reg, data);
 		}
 	}
 	else

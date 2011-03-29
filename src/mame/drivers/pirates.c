@@ -123,7 +123,7 @@ static WRITE16_HANDLER( pirates_out_w )
 		/* bit 7 used (function unknown) */
 	}
 
-//  logerror("%06x: out_w %04x\n",cpu_get_pc(space->cpu),data);
+//  logerror("%06x: out_w %04x\n",cpu_get_pc(&space->device()),data);
 }
 
 static CUSTOM_INPUT( prot_r )

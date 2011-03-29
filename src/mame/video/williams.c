@@ -543,11 +543,11 @@ WRITE8_HANDLER( williams_blitter_w )
 	/* based on the number of memory accesses needed to do the blit, compute how long the blit will take */
 	/* this is just a guess */
 	estimated_clocks_at_4MHz = 20 + 2 * accesses;
-	device_adjust_icount(space->cpu, -((estimated_clocks_at_4MHz + 3) / 4));
+	device_adjust_icount(&space->device(), -((estimated_clocks_at_4MHz + 3) / 4));
 
 	/* Log blits */
 	logerror("%04X:Blit @ %3d : %02X%02X -> %02X%02X, %3dx%3d, mask=%02X, flags=%02X, icount=%d, win=%d\n",
-			cpu_get_pc(space->cpu), space->machine().primary_screen->vpos(),
+			cpu_get_pc(&space->device()), space->machine().primary_screen->vpos(),
 			state->blitterram[2], state->blitterram[3],
 			state->blitterram[4], state->blitterram[5],
 			state->blitterram[6], state->blitterram[7],

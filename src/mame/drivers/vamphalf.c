@@ -1598,7 +1598,7 @@ ROM_END
 
 static int irq_active(address_space *space)
 {
-	UINT32 FCR = cpu_get_reg(space->cpu, 27);
+	UINT32 FCR = cpu_get_reg(&space->device(), 27);
 	if( !(FCR&(1<<29)) ) // int 2 (irq 4)
 		return 1;
 	else
@@ -1608,12 +1608,12 @@ static int irq_active(address_space *space)
 static READ16_HANDLER( vamphalf_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	if(cpu_get_pc(space->cpu) == 0x82de)
+	if(cpu_get_pc(&space->device()) == 0x82de)
 	{
 		if(irq_active(space))
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 		else
-			device_eat_cycles(space->cpu, 50);
+			device_eat_cycles(&space->device(), 50);
 	}
 
 	return state->wram[(0x4a840/2)+offset];
@@ -1622,12 +1622,12 @@ static READ16_HANDLER( vamphalf_speedup_r )
 static READ16_HANDLER( vamphafk_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	if(cpu_get_pc(space->cpu) == 0x82de)
+	if(cpu_get_pc(&space->device()) == 0x82de)
 	{
 		if(irq_active(space))
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 		else
-			device_eat_cycles(space->cpu, 50);
+			device_eat_cycles(&space->device(), 50);
 	}
 
 	return state->wram[(0x4a6d0/2)+offset];
@@ -1636,12 +1636,12 @@ static READ16_HANDLER( vamphafk_speedup_r )
 static READ16_HANDLER( misncrft_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	if(cpu_get_pc(space->cpu) == 0xecc8)
+	if(cpu_get_pc(&space->device()) == 0xecc8)
 	{
 		if(irq_active(space))
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 		else
-			device_eat_cycles(space->cpu, 50);
+			device_eat_cycles(&space->device(), 50);
 	}
 
 	return state->wram[(0x72eb4/2)+offset];
@@ -1650,12 +1650,12 @@ static READ16_HANDLER( misncrft_speedup_r )
 static READ16_HANDLER( coolmini_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	if(cpu_get_pc(space->cpu) == 0x75f7a)
+	if(cpu_get_pc(&space->device()) == 0x75f7a)
 	{
 		if(irq_active(space))
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 		else
-			device_eat_cycles(space->cpu, 50);
+			device_eat_cycles(&space->device(), 50);
 	}
 
 	return state->wram[(0xd2e80/2)+offset];
@@ -1664,12 +1664,12 @@ static READ16_HANDLER( coolmini_speedup_r )
 static READ16_HANDLER( suplup_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	if(cpu_get_pc(space->cpu) == 0xaf18a )
+	if(cpu_get_pc(&space->device()) == 0xaf18a )
 	{
 		if(irq_active(space))
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 		else
-			device_eat_cycles(space->cpu, 50);
+			device_eat_cycles(&space->device(), 50);
 	}
 
 	return state->wram[(0x11605c/2)+offset];
@@ -1678,12 +1678,12 @@ static READ16_HANDLER( suplup_speedup_r )
 static READ16_HANDLER( luplup_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	if(cpu_get_pc(space->cpu) == 0xaefac )
+	if(cpu_get_pc(&space->device()) == 0xaefac )
 	{
 		if(irq_active(space))
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 		else
-			device_eat_cycles(space->cpu, 50);
+			device_eat_cycles(&space->device(), 50);
 	}
 
 	return state->wram[(0x115e84/2)+offset];
@@ -1692,12 +1692,12 @@ static READ16_HANDLER( luplup_speedup_r )
 static READ16_HANDLER( luplup29_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	if(cpu_get_pc(space->cpu) == 0xae6c0 )
+	if(cpu_get_pc(&space->device()) == 0xae6c0 )
 	{
 		if(irq_active(space))
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 		else
-			device_eat_cycles(space->cpu, 50);
+			device_eat_cycles(&space->device(), 50);
 	}
 
 	return state->wram[(0x113f08/2)+offset];
@@ -1706,12 +1706,12 @@ static READ16_HANDLER( luplup29_speedup_r )
 static READ16_HANDLER( puzlbang_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	if(cpu_get_pc(space->cpu) == 0xae6d2 )
+	if(cpu_get_pc(&space->device()) == 0xae6d2 )
 	{
 		if(irq_active(space))
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 		else
-			device_eat_cycles(space->cpu, 50);
+			device_eat_cycles(&space->device(), 50);
 	}
 
 	return state->wram[(0x113ecc/2)+offset];
@@ -1720,12 +1720,12 @@ static READ16_HANDLER( puzlbang_speedup_r )
 static READ32_HANDLER( wyvernwg_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	if(cpu_get_pc(space->cpu) == 0x10758 )
+	if(cpu_get_pc(&space->device()) == 0x10758 )
 	{
 		if(irq_active(space))
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 		else
-			device_eat_cycles(space->cpu, 50);
+			device_eat_cycles(&space->device(), 50);
 	}
 
 	return state->wram32[0x00b56fc/4];
@@ -1734,12 +1734,12 @@ static READ32_HANDLER( wyvernwg_speedup_r )
 static READ32_HANDLER( finalgdr_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	if(cpu_get_pc(space->cpu) == 0x1c212)
+	if(cpu_get_pc(&space->device()) == 0x1c212)
 	{
 		if(irq_active(space))
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 		else
-			device_eat_cycles(space->cpu, 50);
+			device_eat_cycles(&space->device(), 50);
 	}
 
 	return state->wram32[0x005e874/4];
@@ -1748,13 +1748,13 @@ static READ32_HANDLER( finalgdr_speedup_r )
 static READ32_HANDLER( mrkicker_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	UINT32 pc = cpu_get_pc(space->cpu);
+	UINT32 pc = cpu_get_pc(&space->device());
 	if(pc == 0x469de || pc == 0x46a36)
 	{
 //      if(irq_active(space))
-//          device_spin_until_interrupt(space->cpu);
+//          device_spin_until_interrupt(&space->device());
 //      else
-			device_eat_cycles(space->cpu, 50);
+			device_eat_cycles(&space->device(), 50);
 	}
 
 	return state->wram32[0x00701a4/4];
@@ -1764,12 +1764,12 @@ static READ32_HANDLER( mrkicker_speedup_r )
 static READ16_HANDLER( dquizgo2_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	if(cpu_get_pc(space->cpu) == 0xaa622)
+	if(cpu_get_pc(&space->device()) == 0xaa622)
 	{
 		if(irq_active(space))
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 		else
-			device_eat_cycles(space->cpu, 50);
+			device_eat_cycles(&space->device(), 50);
 	}
 
 	return state->wram[(0xcde70/2)+offset];
@@ -1778,13 +1778,13 @@ static READ16_HANDLER( dquizgo2_speedup_r )
 static READ32_HANDLER( aoh_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	if(cpu_get_pc(space->cpu) == 0xb994 )
+	if(cpu_get_pc(&space->device()) == 0xb994 )
 	{
-		device_eat_cycles(space->cpu, 500);
+		device_eat_cycles(&space->device(), 500);
 	}
-	else if (cpu_get_pc(space->cpu) == 0xba40 )
+	else if (cpu_get_pc(&space->device()) == 0xba40 )
 	{
-		device_eat_cycles(space->cpu, 500);
+		device_eat_cycles(&space->device(), 500);
 	}
 
 
@@ -1794,12 +1794,12 @@ static READ32_HANDLER( aoh_speedup_r )
 static READ16_HANDLER( jmpbreak_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	if(cpu_get_pc(space->cpu) == 0x983c)
+	if(cpu_get_pc(&space->device()) == 0x983c)
 	{
 		if(irq_active(space))
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 		else
-			device_eat_cycles(space->cpu, 50);
+			device_eat_cycles(&space->device(), 50);
 	}
 
 	return state->wram[(0x00906fc / 2)+offset];
@@ -1808,12 +1808,12 @@ static READ16_HANDLER( jmpbreak_speedup_r )
 static READ16_HANDLER( mrdig_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	if(cpu_get_pc(space->cpu) == 0x1710)
+	if(cpu_get_pc(&space->device()) == 0x1710)
 	{
 		if(irq_active(space))
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 		else
-			device_eat_cycles(space->cpu, 50);
+			device_eat_cycles(&space->device(), 50);
 	}
 
 	return state->wram[(0x00a99c / 2)+offset];

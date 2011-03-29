@@ -895,7 +895,7 @@ READ32_HANDLER( midway_ioasic_r )
 			if (ioasic.has_dcs)
 			{
 				result |= ((dcs_control_r() >> 4) ^ 0x40) & 0x00c0;
-				result |= ioasic_fifo_status_r(space->cpu) & 0x0038;
+				result |= ioasic_fifo_status_r(&space->device()) & 0x0038;
 				result |= dcs_data2_r() & 0xff00;
 			}
 			else if (ioasic.has_cage)
@@ -932,7 +932,7 @@ READ32_HANDLER( midway_ioasic_r )
 	}
 
 	if (LOG_IOASIC && offset != IOASIC_SOUNDSTAT && offset != IOASIC_SOUNDIN)
-		logerror("%06X:ioasic_r(%d) = %08X\n", cpu_get_pc(space->cpu), offset, result);
+		logerror("%06X:ioasic_r(%d) = %08X\n", cpu_get_pc(&space->device()), offset, result);
 
 	return result;
 }
@@ -957,7 +957,7 @@ WRITE32_HANDLER( midway_ioasic_w )
 	newreg = ioasic.reg[offset];
 
 	if (LOG_IOASIC && offset != IOASIC_SOUNDOUT)
-		logerror("%06X:ioasic_w(%d) = %08X\n", cpu_get_pc(space->cpu), offset, data);
+		logerror("%06X:ioasic_w(%d) = %08X\n", cpu_get_pc(&space->device()), offset, data);
 
 	switch (offset)
 	{

@@ -424,7 +424,7 @@ static READ32_HANDLER( misc_control_r )
 static WRITE32_HANDLER( misc_control_w )
 {
 	cojag_state *state = space->machine().driver_data<cojag_state>();
-	logerror("%08X:misc_control_w(%02X)\n", cpu_get_previouspc(space->cpu), data);
+	logerror("%08X:misc_control_w(%02X)\n", cpu_get_previouspc(&space->device()), data);
 
 	/*  D7    = board reset (low)
         D6    = audio must & reset (high)
@@ -509,7 +509,7 @@ static READ32_HANDLER( jaguar_wave_rom_r )
 
 static WRITE32_HANDLER( latch_w )
 {
-	logerror("%08X:latch_w(%X)\n", cpu_get_previouspc(space->cpu), data);
+	logerror("%08X:latch_w(%X)\n", cpu_get_previouspc(&space->device()), data);
 
 	/* adjust banking */
 	if (space->machine().region("user2")->base())
@@ -556,7 +556,7 @@ static WRITE32_HANDLER( eeprom_data_w )
 			state->m_nvram[offset] = data & 0xff000000;
 	}
 //  else
-//      logerror("%08X:error writing to disabled EEPROM\n", cpu_get_previouspc(space->cpu));
+//      logerror("%08X:error writing to disabled EEPROM\n", cpu_get_previouspc(&space->device()));
 	state->eeprom_enable = 0;
 }
 
@@ -604,7 +604,7 @@ static WRITE32_HANDLER( gpu_jump_w )
 	cojag_state *state = space->machine().driver_data<cojag_state>();
 	/* update the data in memory */
 	COMBINE_DATA(state->gpu_jump_address);
-	logerror("%08X:GPU jump address = %08X\n", cpu_get_previouspc(space->cpu), *state->gpu_jump_address);
+	logerror("%08X:GPU jump address = %08X\n", cpu_get_previouspc(&space->device()), *state->gpu_jump_address);
 
 	/* if the GPU is suspended, release it now */
 	jaguar_gpu_resume(space->machine());
@@ -620,7 +620,7 @@ static READ32_HANDLER( gpu_jump_r )
 	cojag_state *state = space->machine().driver_data<cojag_state>();
 	/* if the current GPU command is just pointing back to the spin loop, and */
 	/* we're reading it from the spin loop, we can optimize */
-	if (*state->gpu_jump_address == state->gpu_spin_pc && cpu_get_previouspc(space->cpu) == state->gpu_spin_pc)
+	if (*state->gpu_jump_address == state->gpu_spin_pc && cpu_get_previouspc(&space->device()) == state->gpu_spin_pc)
 	{
 #if ENABLE_SPEEDUP_HACKS
 		/* spin if we're allowed */
@@ -668,7 +668,7 @@ static READ32_HANDLER( cojagr3k_main_speedup_r )
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
 		if (state->main_speedup_hits++ > 5)
 		{
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 			state->main_speedup_hits = 0;
 		}
 	}
@@ -710,7 +710,7 @@ static READ32_HANDLER( main_gpu_wait_r )
 {
 	cojag_state *state = space->machine().driver_data<cojag_state>();
 	if (state->gpu_command_pending)
-		device_spin_until_interrupt(space->cpu);
+		device_spin_until_interrupt(&space->device());
 	return *state->main_gpu_wait;
 }
 
@@ -747,7 +747,7 @@ static WRITE32_HANDLER( area51_main_speedup_w )
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
 		if (state->main_speedup_hits++ > 5)
 		{
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 			state->main_speedup_hits = 0;
 		}
 	}
@@ -782,7 +782,7 @@ static WRITE32_HANDLER( area51mx_main_speedup_w )
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
 		if (state->main_speedup_hits++ > 10)
 		{
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 			state->main_speedup_hits = 0;
 		}
 	}

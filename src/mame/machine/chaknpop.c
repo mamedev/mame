@@ -68,21 +68,21 @@ static void mcu_update_seed( running_machine &machine, UINT8 data )
 READ8_HANDLER( chaknpop_mcu_port_a_r )
 {
 	chaknpop_state *state = space->machine().driver_data<chaknpop_state>();
-	//logerror("%04x: MCU port_a read\n", cpu_get_pc(space->cpu));
+	//logerror("%04x: MCU port_a read\n", cpu_get_pc(&space->device()));
 	return state->mcu_result;
 }
 
 
 READ8_HANDLER( chaknpop_mcu_port_b_r )
 {
-	//logerror("%04x: MCU port_b read\n", cpu_get_pc(space->cpu));
+	//logerror("%04x: MCU port_b read\n", cpu_get_pc(&space->device()));
 
 	return 0xff;
 }
 
 READ8_HANDLER( chaknpop_mcu_port_c_r )
 {
-	//logerror("%04x: MCU port_c read\n", cpu_get_pc(space->cpu));
+	//logerror("%04x: MCU port_c read\n", cpu_get_pc(&space->device()));
 	return 0x00;
 }
 
@@ -103,7 +103,7 @@ WRITE8_HANDLER( chaknpop_mcu_port_a_w )
 
 		mcu_update_seed(space->machine(), state->mcu_result);
 
-		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(space->cpu), mcu_command, state->mcu_result);
+		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(&space->device()), mcu_command, state->mcu_result);
 	}
 	else if (mcu_command >= 0x28 && mcu_command <= 0x2a)
 	{
@@ -114,7 +114,7 @@ WRITE8_HANDLER( chaknpop_mcu_port_a_w )
 
 		mcu_update_seed(space->machine(), state->mcu_result);
 
-		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(space->cpu), mcu_command, state->mcu_result);
+		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(&space->device()), mcu_command, state->mcu_result);
 	}
 	else if (mcu_command < 0x80)
 	{
@@ -124,24 +124,24 @@ WRITE8_HANDLER( chaknpop_mcu_port_a_w )
 		{
 			state->mcu_select = mcu_command - 0x40;
 
-			logerror("%04x: MCU select 0x%02x\n", cpu_get_pc(space->cpu), state->mcu_select);
+			logerror("%04x: MCU select 0x%02x\n", cpu_get_pc(&space->device()), state->mcu_select);
 		}
 	}
 	else if (mcu_command == 0x9c|| mcu_command == 0xde)
 	{
 		mcu_update_seed(space->machine(), data);
 
-		logerror("%04x: MCU command 0x%02x\n", cpu_get_pc(space->cpu), mcu_command);
+		logerror("%04x: MCU command 0x%02x\n", cpu_get_pc(&space->device()), mcu_command);
 	}
 }
 
 WRITE8_HANDLER( chaknpop_mcu_port_b_w )
 {
-	//logerror("%04x: MCU port_b write 0x%02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: MCU port_b write 0x%02x\n", cpu_get_pc(&space->device()), data);
 }
 
 WRITE8_HANDLER( chaknpop_mcu_port_c_w )
 {
-	//logerror("%04x: MCU port_c write 0x%02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: MCU port_c write 0x%02x\n", cpu_get_pc(&space->device()), data);
 }
 

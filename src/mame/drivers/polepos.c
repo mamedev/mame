@@ -261,7 +261,7 @@ static READ16_HANDLER( polepos2_ic25_r )
 		state->last_result = (INT8)state->last_signed * (UINT8)state->last_unsigned;
 	}
 
-//  logerror("%04X: read IC25 @ %04X = %02X\n", cpu_get_pc(space->cpu), offset, result);
+//  logerror("%04X: read IC25 @ %04X = %02X\n", cpu_get_pc(&space->device()), offset, result);
 
 	return result | (result << 8);
 }
@@ -342,9 +342,9 @@ static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 {
 	data &= 1;
 
-	cpu_interrupt_enable(space->cpu,data);
+	cpu_interrupt_enable(&space->device(),data);
 	if (!data)
-		device_set_input_line(space->cpu, 0, CLEAR_LINE);
+		device_set_input_line(&space->device(), 0, CLEAR_LINE);
 }
 
 

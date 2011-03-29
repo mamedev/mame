@@ -276,14 +276,14 @@ static TIMER_CALLBACK( m92_scanline_interrupt )
 static READ16_HANDLER( m92_eeprom_r )
 {
 	UINT8 *RAM = space->machine().region("user1")->base();
-//  logerror("%05x: EEPROM RE %04x\n",cpu_get_pc(space->cpu),offset);
+//  logerror("%05x: EEPROM RE %04x\n",cpu_get_pc(&space->device()),offset);
 	return RAM[offset] | 0xff00;
 }
 
 static WRITE16_HANDLER( m92_eeprom_w )
 {
 	UINT8 *RAM = space->machine().region("user1")->base();
-//  logerror("%05x: EEPROM WR %04x\n",cpu_get_pc(space->cpu),offset);
+//  logerror("%05x: EEPROM WR %04x\n",cpu_get_pc(&space->device()),offset);
 	if (ACCESSING_BITS_0_7)
 		RAM[offset] = data;
 }
@@ -355,7 +355,7 @@ static WRITE16_HANDLER( m92_soundlatch_w )
 static READ16_HANDLER( m92_sound_status_r )
 {
 	m92_state *state = space->machine().driver_data<m92_state>();
-//logerror("%06x: read sound status\n",cpu_get_pc(space->cpu));
+//logerror("%06x: read sound status\n",cpu_get_pc(&space->device()));
 	return state->sound_status;
 }
 

@@ -178,10 +178,10 @@ static PALETTE_INIT( jokrwild )
 
 static READ8_HANDLER( rng_r )
 {
-	if(cpu_get_pc(space->cpu) == 0xab32)
+	if(cpu_get_pc(&space->device()) == 0xab32)
 		return (offset == 0) ? 0x9e : 0x27;
 
-	if(cpu_get_pc(space->cpu) == 0xab3a)
+	if(cpu_get_pc(&space->device()) == 0xab3a)
 		return (offset == 2) ? 0x49 : 0x92;
 
 	return space->machine().rand() & 0xff;

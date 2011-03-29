@@ -136,7 +136,7 @@ static const ins8250_interface pcat_nit_com0_interface =
 static WRITE8_HANDLER(pcat_nit_rombank_w)
 {
 	pcat_nit_state *state = space->machine().driver_data<pcat_nit_state>();
-	logerror( "rom bank #%02x at PC=%08X\n", data, cpu_get_pc(space->cpu) );
+	logerror( "rom bank #%02x at PC=%08X\n", data, cpu_get_pc(&space->device()) );
 	if ( data & 0x40 )
 	{
 		// rom bank

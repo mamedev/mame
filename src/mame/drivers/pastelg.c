@@ -57,7 +57,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( pastelg_irq_ack_r )
 {
-	device_set_input_line(space->cpu, 0, CLEAR_LINE);
+	device_set_input_line(&space->device(), 0, CLEAR_LINE);
 	return 0;
 }
 

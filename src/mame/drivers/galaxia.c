@@ -101,7 +101,7 @@ static SCREEN_UPDATE( galaxia )
 static WRITE8_HANDLER(galaxia_video_w)
 {
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (cpu_get_reg(&space->device(), S2650_FO))
 	{
 		state->video[offset]=data;
 	}

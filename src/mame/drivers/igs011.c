@@ -134,10 +134,10 @@ static WRITE16_HANDLER( igs011_priority_w )
 	igs011_state *state = space->machine().driver_data<igs011_state>();
 	COMBINE_DATA(&state->priority);
 
-//  logerror("%06x: priority = %02x\n", cpu_get_pc(space->cpu), state->priority);
+//  logerror("%06x: priority = %02x\n", cpu_get_pc(&space->device()), state->priority);
 
 	if (data & ~0x7)
-		logerror("%06x: warning, unknown bits written to priority = %02x\n", cpu_get_pc(space->cpu), state->priority);
+		logerror("%06x: warning, unknown bits written to priority = %02x\n", cpu_get_pc(&space->device()), state->priority);
 }
 
 
@@ -367,7 +367,7 @@ static WRITE16_HANDLER( igs011_blit_flags_w )
 	COMBINE_DATA(&blitter.flags);
 
 #if LOG_BLITTER
-	logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", cpu_get_pc(space->cpu),
+	logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", cpu_get_pc(&space->device()),
 					blitter.x,blitter.y,blitter.w,blitter.h,blitter.gfx_hi,blitter.gfx_lo,blitter.depth,blitter.pen,blitter.flags);
 #endif
 
@@ -1329,7 +1329,7 @@ static WRITE16_HANDLER( drgnwrld_igs003_w )
 				coin_counter_w(space->machine(), 0,data & 2);
 
 			if (data & ~0x2)
-				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(space->cpu), data);
+				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(&space->device()), data);
 
 			break;
 
@@ -1342,7 +1342,7 @@ static WRITE16_HANDLER( drgnwrld_igs003_w )
 
 		default:
 //          popmessage("igs003 %x <- %04x",state->igs003_reg[0],data);
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(space->cpu), state->igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space->device()), state->igs003_reg[0], data);
 	}
 }
 static READ16_HANDLER( drgnwrld_igs003_r )
@@ -1377,7 +1377,7 @@ static READ16_HANDLER( drgnwrld_igs003_r )
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(space->cpu), state->igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space->device()), state->igs003_reg[0]);
 	}
 
 	return 0;
@@ -1398,7 +1398,7 @@ static WRITE16_HANDLER( lhb_inputs_w )
 	}
 
 	if ( state->igs_input_sel & (~0xff) )
-		logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(space->cpu), state->igs_input_sel);
+		logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(&space->device()), state->igs_input_sel);
 
 //  popmessage("sel2 %02x",state->igs_input_sel&~0x1f);
 }
@@ -1416,7 +1416,7 @@ static READ16_HANDLER( lhb_inputs_r )
 			if (~state->igs_input_sel & 0x08)	return input_port_read(space->machine(), "KEY3");
 			if (~state->igs_input_sel & 0x10)	return input_port_read(space->machine(), "KEY4");
 
-			logerror("%06x: warning, reading with igs_input_sel = %02x\n", cpu_get_pc(space->cpu), state->igs_input_sel);
+			logerror("%06x: warning, reading with igs_input_sel = %02x\n", cpu_get_pc(&space->device()), state->igs_input_sel);
 			break;
 	}
 	return 0;
@@ -1445,7 +1445,7 @@ static WRITE16_HANDLER( lhb2_igs003_w )
 			}
 
 			if ( state->igs_input_sel & ~0x7f )
-				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(space->cpu), state->igs_input_sel);
+				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(&space->device()), state->igs_input_sel);
 
 //          popmessage("sel2 %02x",state->igs_input_sel&~0x1f);
 			break;
@@ -1460,13 +1460,13 @@ static WRITE16_HANDLER( lhb2_igs003_w )
 			}
 
 			if ( state->lhb2_pen_hi & ~0xf )
-				logerror("%06x: warning, unknown bits written in lhb2_pen_hi = %02x\n", cpu_get_pc(space->cpu), state->lhb2_pen_hi);
+				logerror("%06x: warning, unknown bits written in lhb2_pen_hi = %02x\n", cpu_get_pc(&space->device()), state->lhb2_pen_hi);
 
 //          popmessage("oki %02x",state->lhb2_pen_hi & 0x08);
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(space->cpu), state->igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space->device()), state->igs003_reg[0], data);
 	}
 }
 static READ16_HANDLER( lhb2_igs003_r )
@@ -1482,7 +1482,7 @@ static READ16_HANDLER( lhb2_igs003_r )
 			if (~state->igs_input_sel & 0x10)	return input_port_read(space->machine(), "KEY4");
 			/* fall through */
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(space->cpu), state->igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space->device()), state->igs003_reg[0]);
 			break;
 
 //      case 0x03:
@@ -1542,13 +1542,13 @@ static WRITE16_HANDLER( wlcc_igs003_w )
 			}
 
 			if (data & ~0x33)
-				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(space->cpu), data);
+				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(&space->device()), data);
 
 //          popmessage("coin %02x",data);
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(space->cpu), state->igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space->device()), state->igs003_reg[0], data);
 	}
 }
 static READ16_HANDLER( wlcc_igs003_r )
@@ -1581,7 +1581,7 @@ static READ16_HANDLER( wlcc_igs003_r )
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(space->cpu), state->igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space->device()), state->igs003_reg[0]);
 	}
 
 	return 0;
@@ -1610,13 +1610,13 @@ static WRITE16_HANDLER( xymg_igs003_w )
 			}
 
 			if ( state->igs_input_sel & 0x40 )
-				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(space->cpu), state->igs_input_sel);
+				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(&space->device()), state->igs_input_sel);
 
 //          popmessage("sel2 %02x",state->igs_input_sel&~0x1f);
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(space->cpu), state->igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space->device()), state->igs003_reg[0], data);
 	}
 }
 static READ16_HANDLER( xymg_igs003_r )
@@ -1657,7 +1657,7 @@ static READ16_HANDLER( xymg_igs003_r )
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(space->cpu), state->igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space->device()), state->igs003_reg[0]);
 			break;
 	}
 
@@ -1684,13 +1684,13 @@ static WRITE16_HANDLER( vbowl_igs003_w )
 			}
 
 			if (data & ~0x3)
-				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(space->cpu), data);
+				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(&space->device()), data);
 
 			break;
 
 		default:
 //          popmessage("igs003 %x <- %04x",state->igs003_reg[0],data);
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(space->cpu), state->igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space->device()), state->igs003_reg[0], data);
 	}
 }
 static READ16_HANDLER( vbowl_igs003_r )
@@ -1727,7 +1727,7 @@ static READ16_HANDLER( vbowl_igs003_r )
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(space->cpu), state->igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space->device()), state->igs003_reg[0]);
 	}
 
 	return 0;
@@ -2403,7 +2403,7 @@ static WRITE16_HANDLER( vbowl_pen_hi_w )
 	}
 
 	if (data & ~0x7)
-		logerror("%06x: warning, unknown bits written to pen_hi = %04x\n", cpu_get_pc(space->cpu), state->priority);
+		logerror("%06x: warning, unknown bits written to pen_hi = %04x\n", cpu_get_pc(&space->device()), state->priority);
 }
 
 static WRITE16_HANDLER( vbowl_link_0_w )	{ }

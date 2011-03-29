@@ -1001,7 +1001,7 @@ static DRIVER_INIT( gladiatr )
 static READ8_HANDLER(f6a3_r)
 {
 	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
-	if(cpu_get_previouspc(space->cpu)==0x8e)
+	if(cpu_get_previouspc(&space->device())==0x8e)
 		state->m_nvram[0x6a3]=1;
 
 	return state->m_nvram[0x6a3];

@@ -557,7 +557,7 @@ static void cyclemb_8741_w(address_space *space, int num, int offset, int data)
 {
 	if(offset == 1) //command port
 	{
-		printf("%02x CMD PC=%04x\n",data,cpu_get_pc(space->cpu));
+		printf("%02x CMD PC=%04x\n",data,cpu_get_pc(&space->device()));
 		switch(data)
 		{
 			case 0:
@@ -590,7 +590,7 @@ static void cyclemb_8741_w(address_space *space, int num, int offset, int data)
 	}
 	else //data port
 	{
-		printf("%02x DATA PC=%04x\n",data,cpu_get_pc(space->cpu));
+		printf("%02x DATA PC=%04x\n",data,cpu_get_pc(&space->device()));
 		cyclemb_mcu.txd = data;
 	}
 }
@@ -599,19 +599,19 @@ static INT8 cyclemb_8741_r(address_space *space,int num,int offset)
 {
 	if(offset == 1) //status port
 	{
-		printf("STATUS PC=%04x\n",cpu_get_pc(space->cpu));
+		printf("STATUS PC=%04x\n",cpu_get_pc(&space->device()));
 
 		return 1;
 	}
 	else //data port
 	{
-		printf("READ PC=%04x\n",cpu_get_pc(space->cpu));
+		printf("READ PC=%04x\n",cpu_get_pc(&space->device()));
 		if(cyclemb_mcu.rst)
 		{
 			/* FIXME: mame rands are supposedly parity checks or signals that the i8741 sends to the main z80 for telling him what kind of input
                       this specific packet contains. DSW3 surely contains something else too... */
 			/* FIXME: remove cpu_get_pc hack */
-			switch(cpu_get_pc(space->cpu))
+			switch(cpu_get_pc(&space->device()))
 			{
 				case 0x760: cyclemb_mcu.rxd = ((input_port_read(space->machine(),"DSW1") & 0x1f) << 2); break;
 				case 0x35c:

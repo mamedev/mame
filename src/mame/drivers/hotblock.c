@@ -88,8 +88,8 @@ static READ8_HANDLER( hotblock_port4_r )
 
 static WRITE8_HANDLER( hotblock_port4_w )
 {
-//  mame_printf_debug("port4_w: pc = %06x : data %04x\n", cpu_get_pc(space->cpu), data);
-//  popmessage("port4_w: pc = %06x : data %04x", cpu_get_pc(space->cpu), data);
+//  mame_printf_debug("port4_w: pc = %06x : data %04x\n", cpu_get_pc(&space->device()), data);
+//  popmessage("port4_w: pc = %06x : data %04x", cpu_get_pc(&space->device()), data);
 	hotblock_state *state = space->machine().driver_data<hotblock_state>();
 	state->port4 = data;
 }
@@ -98,7 +98,7 @@ static WRITE8_HANDLER( hotblock_port4_w )
 
 static WRITE8_HANDLER( hotblock_port0_w )
 {
-//  popmessage("port4_w: pc = %06x : data %04x", cpu_get_pc(space->cpu), data);
+//  popmessage("port4_w: pc = %06x : data %04x", cpu_get_pc(&space->device()), data);
 	hotblock_state *state = space->machine().driver_data<hotblock_state>();
 	state->port0 = data;
 }

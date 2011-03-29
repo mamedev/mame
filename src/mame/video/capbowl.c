@@ -110,7 +110,7 @@ WRITE8_HANDLER( bowlrama_blitter_w )
 			break;
 
 		default:
-			logerror("PC=%04X Write to unsupported blitter address %02X Data=%02X\n", cpu_get_pc(space->cpu), offset, data);
+			logerror("PC=%04X Write to unsupported blitter address %02X Data=%02X\n", cpu_get_pc(&space->device()), offset, data);
 			break;
 	}
 }
@@ -142,7 +142,7 @@ READ8_HANDLER( bowlrama_blitter_r )
 			break;
 
 		default:
-			logerror("PC=%04X Read from unsupported blitter address %02X\n", cpu_get_pc(space->cpu), offset);
+			logerror("PC=%04X Read from unsupported blitter address %02X\n", cpu_get_pc(&space->device()), offset);
 			break;
 	}
 

@@ -273,7 +273,7 @@ WRITE8_HANDLER( mcr_ipu_laserdisk_w )
 	/* bit 1 enables (1) LD left channel audio */
 	/* bit 0 enables (1) LD video if PIX SW == 1 */
 	if (data != 0)
-		logerror("%04X:mcr_ipu_laserdisk_w(%d) = %02X\n", cpu_get_pc(space->cpu), offset, data);
+		logerror("%04X:mcr_ipu_laserdisk_w(%d) = %02X\n", cpu_get_pc(&space->device()), offset, data);
 }
 
 

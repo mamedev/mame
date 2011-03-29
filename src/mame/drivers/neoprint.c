@@ -115,8 +115,8 @@ SCREEN_UPDATE(nprsp)
 
 static READ16_HANDLER( neoprint_calendar_r )
 {
-	//if(cpu_get_pc(space->cpu) != 0x4b38 )//&& cpu_get_pc(space->cpu) != 0x5f86 && cpu_get_pc(space->cpu) != 0x5f90)
-	//  printf("%08x\n",cpu_get_pc(space->cpu));
+	//if(cpu_get_pc(&space->device()) != 0x4b38 )//&& cpu_get_pc(&space->device()) != 0x5f86 && cpu_get_pc(&space->device()) != 0x5f90)
+	//  printf("%08x\n",cpu_get_pc(&space->device()));
 
 	return (upd4990a_databit_r(space->machine().device("upd4990a"), 0) << 15);
 }
@@ -136,8 +136,8 @@ static READ8_HANDLER( neoprint_unk_r )
 
 	state->vblank = (space->machine().primary_screen->frame_number() & 0x1) ? 0x10 : 0x00;
 
-	//if(cpu_get_pc(space->cpu) != 0x1504 && cpu_get_pc(space->cpu) != 0x5f86 && cpu_get_pc(space->cpu) != 0x5f90)
-	//  printf("%08x\n",cpu_get_pc(space->cpu));
+	//if(cpu_get_pc(&space->device()) != 0x1504 && cpu_get_pc(&space->device()) != 0x5f86 && cpu_get_pc(&space->device()) != 0x5f90)
+	//  printf("%08x\n",cpu_get_pc(&space->device()));
 
 	return state->vblank| 4 | 3;
 }
@@ -171,7 +171,7 @@ static WRITE16_HANDLER( audio_command_w )
 		/* boost the interleave to let the audio CPU read the command */
 		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 
-		//if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", cpu_get_pc(space->cpu), data, mem_mask);
+		//if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", cpu_get_pc(&space->device()), data, mem_mask);
 	}
 }
 
@@ -180,7 +180,7 @@ static READ8_HANDLER( audio_command_r )
 {
 	UINT8 ret = soundlatch_r(space, 0);
 
-	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", cpu_get_pc(space->cpu), ret);
+	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", cpu_get_pc(&space->device()), ret);
 
 	/* this is a guess */
 	audio_cpu_clear_nmi_w(space, 0, 0);
@@ -195,7 +195,7 @@ static WRITE8_HANDLER( audio_result_w )
 	neoprint_state *state = space->machine().driver_data<neoprint_state>();
 	//neogeo_state *state = space->machine().driver_data<neogeo_state>();
 
-	//if (LOG_CPU_COMM && (state->audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", cpu_get_pc(space->cpu), data);
+	//if (LOG_CPU_COMM && (state->audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", cpu_get_pc(&space->device()), data);
 
 	state->audio_result = data;
 }

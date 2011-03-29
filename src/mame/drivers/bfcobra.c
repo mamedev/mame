@@ -714,7 +714,7 @@ static void RunBlit(address_space *space)
 	} while (blitter.command  & CMD_RUN);
 
 	/* Burn Z80 cycles while blitter is in operation */
-	device_spin_until_time(space->cpu,  attotime::from_nsec( (1000000000 / Z80_XTAL)*cycles_used * 2 ) );
+	device_spin_until_time(&space->device(),  attotime::from_nsec( (1000000000 / Z80_XTAL)*cycles_used * 2 ) );
 }
 
 
@@ -754,7 +754,7 @@ static READ8_HANDLER( ramdac_r )
 		}
 		default:
 		{
-			mame_printf_debug("Unhandled RAMDAC read (PC:%.4x)\n", cpu_get_previouspc(space->cpu));
+			mame_printf_debug("Unhandled RAMDAC read (PC:%.4x)\n", cpu_get_previouspc(&space->device()));
 		}
 	}
 
@@ -907,7 +907,7 @@ static READ8_HANDLER( chipset_r )
 		}
 		default:
 		{
-			mame_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, cpu_get_previouspc(space->cpu));
+			mame_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, cpu_get_previouspc(&space->device()));
 		}
 	}
 
@@ -924,7 +924,7 @@ static WRITE8_HANDLER( chipset_w )
 		case 0x03:
 		{
 			if (data > 0x3f)
-				popmessage("%x: Unusual bank access (%x)\n", cpu_get_previouspc(space->cpu), data);
+				popmessage("%x: Unusual bank access (%x)\n", cpu_get_previouspc(&space->device()), data);
 
 			data &= 0x3f;
 			state->bank_data[offset] = data;
@@ -998,7 +998,7 @@ static WRITE8_HANDLER( chipset_w )
 		}
 		default:
 		{
-			mame_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, cpu_get_previouspc(space->cpu));
+			mame_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, cpu_get_previouspc(&space->device()));
 		}
 	}
 }
@@ -1398,7 +1398,7 @@ static WRITE8_HANDLER( meter_w )
 		if (changed & (1 << i))
 		{
 			MechMtr_update(i, data & (1 << i) );
-			generic_pulse_irq_line(space->cpu, M6809_FIRQ_LINE);
+			generic_pulse_irq_line(&space->device(), M6809_FIRQ_LINE);
 		}
 	}
 }

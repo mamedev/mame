@@ -67,7 +67,7 @@ static WRITE16_HANDLER( roldf_sh_irqtrigger_w )
 	}
 
 	// give the z80 time to see it
-	device_spin_until_time(space->cpu, attotime::from_usec(40));
+	device_spin_until_time(&space->device(), attotime::from_usec(40));
 }
 
 static WRITE16_HANDLER( splash_coin_w )

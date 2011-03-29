@@ -69,7 +69,7 @@ static READ32_HANDLER( f3_control_r )
 	if (offset < 6)
 		return input_port_read(space->machine(), iptnames[offset]);
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", cpu_get_pc(space->cpu), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", cpu_get_pc(&space->device()), offset);
 	return 0xffffffff;
 }
 
@@ -111,7 +111,7 @@ static WRITE32_HANDLER( f3_control_w )
 			}
 			return;
 	}
-	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",cpu_get_pc(space->cpu),offset,data);
+	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",cpu_get_pc(&space->device()),offset,data);
 }
 
 static WRITE32_HANDLER( f3_sound_reset_0_w )

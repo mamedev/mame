@@ -181,7 +181,7 @@ static WRITE16_DEVICE_HANDLER( astrocorp_sound_bank_w )
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * ((data >> 8) & 1));
-//      logerror("CPU #0 PC %06X: OKI bank %08X\n", cpu_get_pc(space->cpu), data);
+//      logerror("CPU #0 PC %06X: OKI bank %08X\n", cpu_get_pc(&space->device()), data);
 	}
 }
 
@@ -191,7 +191,7 @@ static WRITE16_DEVICE_HANDLER( skilldrp_sound_bank_w )
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * (data & 1));
-//      logerror("CPU #0 PC %06X: OKI bank %08X\n", cpu_get_pc(space->cpu), data);
+//      logerror("CPU #0 PC %06X: OKI bank %08X\n", cpu_get_pc(&space->device()), data);
 	}
 }
 
@@ -263,7 +263,7 @@ static WRITE16_HANDLER( astrocorp_screen_enable_w )
 	COMBINE_DATA(&state->screen_enable);
 //  popmessage("%04X",data);
 	if (state->screen_enable & (~1))
-		logerror("CPU #0 PC %06X: screen enable = %04X\n", cpu_get_pc(space->cpu), state->screen_enable);
+		logerror("CPU #0 PC %06X: screen enable = %04X\n", cpu_get_pc(&space->device()), state->screen_enable);
 }
 
 static READ16_HANDLER( astrocorp_unk_r )

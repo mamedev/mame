@@ -447,7 +447,7 @@ static void dma_exec(running_machine &machine)
 
 READ8_HANDLER( lsi53c810_reg_r )
 {
-	logerror("53c810: read reg %d:0x%x (PC=%x)\n", offset, offset, cpu_get_pc(space->cpu));
+	logerror("53c810: read reg %d:0x%x (PC=%x)\n", offset, offset, cpu_get_pc(&space->device()));
 	switch(offset)
 	{
 		case 0x00:		/* SCNTL0 */
@@ -530,7 +530,7 @@ READ8_HANDLER( lsi53c810_reg_r )
 
 WRITE8_HANDLER( lsi53c810_reg_w )
 {
-	logerror("53c810: %02x to reg %d:0x%x (PC=%x)\n", data, offset, offset, cpu_get_pc(space->cpu));
+	logerror("53c810: %02x to reg %d:0x%x (PC=%x)\n", data, offset, offset, cpu_get_pc(&space->device()));
 	switch(offset)
 	{
 		case 0x00:		/* SCNTL0 */

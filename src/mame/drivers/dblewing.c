@@ -161,7 +161,7 @@ static READ16_HANDLER ( dblewing_prot_r )
 		case 0x532: return state->_580_data;
 	}
 
-//  printf("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(space->cpu), offset * 2, mem_mask);
+//  printf("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(&space->device()), offset * 2, mem_mask);
 
 	if ((offset*2) == 0x0f8) return 0; // state->_080_data;
 	if ((offset*2) == 0x104) return 0;
@@ -173,7 +173,7 @@ static READ16_HANDLER ( dblewing_prot_r )
 	if ((offset*2) == 0x54a) return 0; // 3rd player 2nd boss
 	if ((offset*2) == 0x786) return 0;
 
-	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(space->cpu), offset * 2, mem_mask);
+	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(&space->device()), offset * 2, mem_mask);
 
 	return 0;//space->machine().rand();
 }
@@ -183,7 +183,7 @@ static WRITE16_HANDLER( dblewing_prot_w )
 	dblewing_state *state = space->machine().driver_data<dblewing_state>();
 
 //  if (offset * 2 != 0x380)
-//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(space->cpu), offset * 2, mem_mask, data);
+//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(&space->device()), offset * 2, mem_mask, data);
 
 	switch (offset * 2)
 	{
@@ -285,7 +285,7 @@ static WRITE16_HANDLER( dblewing_prot_w )
 			return;  // p2 inputs select screen  OK
 	}
 
-//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(space->cpu), offset * 2, mem_mask, data);
+//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(&space->device()), offset * 2, mem_mask, data);
 
 	if ((offset * 2) == 0x008) { state->_008_data = data; return; }
 	if ((offset * 2) == 0x080) { state->_080_data = data; return; } // p3 3rd boss?

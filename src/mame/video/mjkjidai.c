@@ -53,7 +53,7 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 	mjkjidai_state *state = space->machine().driver_data<mjkjidai_state>();
 	UINT8 *rom = space->machine().region("maincpu")->base();
 
-//  logerror("%04x: port c0 = %02x\n",cpu_get_pc(space->cpu),data);
+//  logerror("%04x: port c0 = %02x\n",cpu_get_pc(&space->device()),data);
 
 	/* bit 0 = NMI enable */
 	interrupt_enable_w(space,0,data & 1);

@@ -372,7 +372,7 @@ static READ32_HANDLER( disp_ctrl_r )
 
 #if SPEEDUP_HACKS
 			// wait for vblank speedup
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 #endif
 			break;
 	}
@@ -549,7 +549,7 @@ static READ32_HANDLER( parallel_port_r )
 	{
 		UINT8 nibble = state->parallel_latched;//(input_port_read_safe(space->machine(), state->portnames[state->parallel_pointer / 3], 0) >> (4 * (state->parallel_pointer % 3))) & 15;
 		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
-		logerror("%08X:parallel_port_r()\n", cpu_get_pc(space->cpu));
+		logerror("%08X:parallel_port_r()\n", cpu_get_pc(&space->device()));
 #if 0
 		if (state->controls_data == 0x18)
 		{
@@ -599,7 +599,7 @@ static WRITE32_HANDLER( parallel_port_w )
                 7x..ff = advance pointer
         */
 
-		logerror("%08X:", cpu_get_pc(space->cpu));
+		logerror("%08X:", cpu_get_pc(&space->device()));
 
 		state->parallel_latched = (input_port_read_safe(space->machine(), portnames[state->parallel_pointer / 3], 0) >> (4 * (state->parallel_pointer % 3))) & 15;
 		//parallel_pointer++;
@@ -1205,10 +1205,10 @@ INLINE UINT32 generic_speedup(address_space *space, int idx)
 {
 	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
-	if (cpu_get_pc(space->cpu) == state->speedup_table[idx].pc)
+	if (cpu_get_pc(&space->device()) == state->speedup_table[idx].pc)
 	{
 		state->speedup_hits[idx]++;
-		device_spin_until_interrupt(space->cpu);
+		device_spin_until_interrupt(&space->device());
 	}
 	return state->main_ram[state->speedup_table[idx].offset/4];
 }

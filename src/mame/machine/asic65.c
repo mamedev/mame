@@ -211,7 +211,7 @@ WRITE16_HANDLER( asic65_data_w )
 	else
 	{
 		int command = (data < MAX_COMMANDS) ? command_map[asic65.type][data] : OP_UNKNOWN;
-		if (asic65.log) fprintf(asic65.log, "\n(%06X)%c%04X:", cpu_get_previouspc(space->cpu), (command == OP_UNKNOWN) ? '*' : ' ', data);
+		if (asic65.log) fprintf(asic65.log, "\n(%06X)%c%04X:", cpu_get_previouspc(&space->device()), (command == OP_UNKNOWN) ? '*' : ' ', data);
 
 		/* set the command number and reset the parameter/result indices */
 		asic65.command = data;
@@ -501,7 +501,7 @@ static READ16_HANDLER( asic65_stat_r )
 static READ16_HANDLER( asci65_get_bio )
 {
 	if (!asic65.tfull)
-		device_spin_until_interrupt(space->cpu);
+		device_spin_until_interrupt(&space->device());
 	return asic65.tfull ? CLEAR_LINE : ASSERT_LINE;
 }
 

@@ -53,7 +53,7 @@ static WRITE8_HANDLER( yunsung8_bankswitch_w )
 	memory_set_bank(space->machine(), "bank1", data & 0x07);
 
 	if (data & ~0x37)
-		logerror("CPU #0 - PC %04X: Bank %02X\n", cpu_get_pc(space->cpu), data);
+		logerror("CPU #0 - PC %04X: Bank %02X\n", cpu_get_pc(&space->device()), data);
 }
 
 /*

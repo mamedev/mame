@@ -298,7 +298,7 @@ wpset 60cf888,4,r
 static READ32_HANDLER( astrass_hack_r )
 {
 	/*PC reads at 0x60011ba if -debug is active?*/
-	if(cpu_get_pc(space->cpu)==0x60011b8 || cpu_get_pc(space->cpu) == 0x60011ba) return 0x00000000;
+	if(cpu_get_pc(&space->device())==0x60011b8 || cpu_get_pc(&space->device()) == 0x60011ba) return 0x00000000;
 
 	return stv_workram_h[0x000770/4];
 }

@@ -66,7 +66,7 @@ static READ16_HANDLER( fromanc2_keymatrix_r )
 	case 0x04:	ret = input_port_read(space->machine(), "KEY2"); break;
 	case 0x08:	ret = input_port_read(space->machine(), "KEY3"); break;
 	default:	ret = 0xffff;
-			logerror("PC:%08X unknown %02X\n", cpu_get_pc(space->cpu), state->portselect);
+			logerror("PC:%08X unknown %02X\n", cpu_get_pc(&space->device()), state->portselect);
 			break;
 	}
 

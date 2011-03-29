@@ -122,7 +122,7 @@ READ32_MEMBER( beathead_state::hsync_ram_r )
 {
 	/* offset 0 is probably write-only */
 	if (offset == 0)
-		logerror("%08X:Unexpected HSYNC RAM read at offset 0\n", cpu_get_previouspc(space.cpu));
+		logerror("%08X:Unexpected HSYNC RAM read at offset 0\n", cpu_get_previouspc(&space.device()));
 
 	/* offset 1 reads the data */
 	else

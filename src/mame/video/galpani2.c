@@ -34,7 +34,7 @@ READ16_HANDLER( galpani2_bg8_regs_##_n_##_r ) \
 	{ \
 		case 0x16:	return space->machine().rand() & 1; \
 		default: \
-			logerror("CPU #0 PC %06X : Warning, bg8 #%d screen reg %04X read\n",cpu_get_pc(space->cpu),_n_,offset*2); \
+			logerror("CPU #0 PC %06X : Warning, bg8 #%d screen reg %04X read\n",cpu_get_pc(&space->device()),_n_,offset*2); \
 	} \
 	return state->bg8_regs_##_n_[offset]; \
 }

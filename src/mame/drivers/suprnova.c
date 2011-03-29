@@ -646,11 +646,11 @@ static WRITE32_HANDLER( skns_io_w )
                 cputag_set_input_line(space->machine(), "maincpu",0xf,CLEAR_LINE);*/
 
 			/* idle skip for vblokbrk/sarukani, i can't find a better place to put it :-( but i think it works ok unless its making the game too fast */
-			if (cpu_get_pc(space->cpu)==0x04013B42)
+			if (cpu_get_pc(&space->device())==0x04013B42)
 			{
 				if (!strcmp(space->machine().system().name,"vblokbrk") ||
 					!strcmp(space->machine().system().name,"sarukani"))
-					device_spin_until_interrupt(space->cpu);
+					device_spin_until_interrupt(&space->device());
 			}
 
 		}
@@ -844,7 +844,7 @@ MACHINE_CONFIG_END
 static READ32_HANDLER( bios_skip_r )
 {
 #if BIOS_SKIP
-	if ((cpu_get_pc(space->cpu)==0x6f8) || (cpu_get_pc(space->cpu)==0x6fa)) space->write_byte(0x06000029,1);
+	if ((cpu_get_pc(&space->device())==0x6f8) || (cpu_get_pc(&space->device())==0x6fa)) space->write_byte(0x06000029,1);
 #endif
 	return skns_main_ram[0x00028/4];
 }
@@ -861,35 +861,35 @@ static READ32_HANDLER( gutsn_speedup_r )
     04022072: CMP/EQ  R2,R3
     04022074: BT      $0402206C
 */
-	if (cpu_get_pc(space->cpu)==0x402206e)
+	if (cpu_get_pc(&space->device())==0x402206e)
 	{
 		if(skns_main_ram[0x00078/4] == skns_main_ram[0x0c780/4])
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 	}
 	return skns_main_ram[0x0c780/4];
 }
 
 static READ32_HANDLER( cyvern_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x402ebd2) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x402ebd2) device_spin_until_interrupt(&space->device());
 	return skns_main_ram[0x4d3c8/4];
 }
 
 static READ32_HANDLER( puzzloopj_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x401dca0) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x401dca0) device_spin_until_interrupt(&space->device());
 	return skns_main_ram[0x86714/4];
 }
 
 static READ32_HANDLER( puzzloopa_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x401d9d4) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x401d9d4) device_spin_until_interrupt(&space->device());
 	return skns_main_ram[0x85bcc/4];
 }
 
 static READ32_HANDLER( puzzloopu_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x401dab0) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x401dab0) device_spin_until_interrupt(&space->device());
 	return skns_main_ram[0x85cec/4];
 }
 
@@ -902,61 +902,61 @@ static READ32_HANDLER( puzzloop_speedup_r )
     0401DA18: BF      $0401DA26
     0401DA26: BRA     $0401DA12
 */
-	if (cpu_get_pc(space->cpu)==0x401da14) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x401da14) device_spin_until_interrupt(&space->device());
 	return skns_main_ram[0x81d38/4];
 }
 
 static READ32_HANDLER( senknow_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x4017dce) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x4017dce) device_spin_until_interrupt(&space->device());
 	return skns_main_ram[0x0000dc/4];
 }
 
 static READ32_HANDLER( teljan_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x401ba32) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x401ba32) device_spin_until_interrupt(&space->device());
 	return skns_main_ram[0x002fb4/4];
 }
 
 static READ32_HANDLER( jjparads_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x4015e84) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x4015e84) device_spin_until_interrupt(&space->device());
 	return skns_main_ram[0x000994/4];
 }
 
 static READ32_HANDLER( jjparad2_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x401620a) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x401620a) device_spin_until_interrupt(&space->device());
 	return skns_main_ram[0x000984/4];
 }
 
 static READ32_HANDLER( ryouran_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x40182ce) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x40182ce) device_spin_until_interrupt(&space->device());
 	return skns_main_ram[0x000a14/4];
 }
 
 static READ32_HANDLER( galpans2_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x4049ae2) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x4049ae2) device_spin_until_interrupt(&space->device());
 	return skns_main_ram[0x0fb6bc/4];
 }
 
 static READ32_HANDLER( panicstr_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x404e68a) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x404e68a) device_spin_until_interrupt(&space->device());
 	return skns_main_ram[0x0f19e4/4];
 }
 
 static READ32_HANDLER( sengekis_speedup_r ) // 60006ee  600308e
 {
-	if (cpu_get_pc(space->cpu)==0x60006ec) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x60006ec) device_spin_until_interrupt(&space->device());
 	return skns_main_ram[0xb74bc/4];
 }
 
 static READ32_HANDLER( sengekij_speedup_r ) // 60006ee  600308e
 {
-	if (cpu_get_pc(space->cpu)==0x60006ec) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x60006ec) device_spin_until_interrupt(&space->device());
 	return skns_main_ram[0xb7380/4];
 }
 

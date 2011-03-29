@@ -178,7 +178,7 @@ static offs_t decrypt_offset(address_space *space, offs_t offset)
 	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
-	offs_t pc = cpu_get_previouspc(space->cpu);
+	offs_t pc = cpu_get_previouspc(&space->device());
 	if ((UINT16)pc == 0xffff || space->read_byte(pc) != 0x32)
 		return offset;
 

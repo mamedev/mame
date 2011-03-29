@@ -162,7 +162,7 @@ ADDRESS_MAP_END
 static READ8_HANDLER( rumba_mcu_r )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
-	//printf("PC=%04x R %02x\n",cpu_get_pc(space->cpu),state->mcu_cmd);
+	//printf("PC=%04x R %02x\n",cpu_get_pc(&space->device()),state->mcu_cmd);
 
 	if((state->mcu_cmd & 0xf0) == 0x00) // end packet cmd, value returned is meaningless (probably used for main <-> mcu comms syncronization)
 		return 0;
@@ -205,7 +205,7 @@ static READ8_HANDLER( rumba_mcu_r )
 			return 0;
 		}
 		//case 0x42: return 0x06;
-		//default:  printf("PC=%04x R %02x\n",cpu_get_pc(space->cpu),state->mcu_cmd); break;
+		//default:  printf("PC=%04x R %02x\n",cpu_get_pc(&space->device()),state->mcu_cmd); break;
 	}
 
 	return 0;
@@ -274,7 +274,7 @@ static WRITE8_HANDLER( rumba_mcu_w )
                 */
 
 				state->mcu_bb_res = data;
-				//printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),state->mcu_cmd,data);
+				//printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(&space->device()),state->mcu_cmd,data);
 				break;
 			}
 			case 0xb4: // when the bird touches the top / bottom / left / right of the screen, for correct repositioning

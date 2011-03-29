@@ -1026,16 +1026,16 @@ DRIVER_INIT( bnglngby )
 
 static WRITE8_HANDLER( vsdual_vrom_banking )
 {
-	device_t *other_cpu = (space->cpu == space->machine().device("maincpu")) ? space->machine().device("sub") : space->machine().device("maincpu");
+	device_t *other_cpu = (&space->device() == space->machine().device("maincpu")) ? space->machine().device("sub") : space->machine().device("maincpu");
 
 	/* switch vrom */
-	(space->cpu == space->machine().device("maincpu")) ? memory_set_bank(space->machine(), "bank2", BIT(data, 2)) : memory_set_bank(space->machine(), "bank3", BIT(data, 2));
+	(&space->device() == space->machine().device("maincpu")) ? memory_set_bank(space->machine(), "bank2", BIT(data, 2)) : memory_set_bank(space->machine(), "bank3", BIT(data, 2));
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
 	device_set_input_line(other_cpu, 0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* move along */
-	if (space->cpu == space->machine().device("maincpu"))
+	if (&space->device() == space->machine().device("maincpu"))
 		vsnes_in0_w(space, offset, data);
 	else
 		vsnes_in0_1_w(space, offset, data);

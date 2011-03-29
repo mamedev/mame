@@ -208,7 +208,7 @@ static WRITE8_HANDLER( gaplus_freset_w )
 	device_t *io56xx = space->machine().device("56xx");
 	int bit = !BIT(offset, 11);
 
-	logerror("%04x: freset %d\n",cpu_get_pc(space->cpu), bit);
+	logerror("%04x: freset %d\n",cpu_get_pc(&space->device()), bit);
 
 	namcoio_set_reset_line(io58xx, bit ? CLEAR_LINE : ASSERT_LINE);
 	namcoio_set_reset_line(io56xx, bit ? CLEAR_LINE : ASSERT_LINE);

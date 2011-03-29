@@ -210,7 +210,7 @@ static void unlock_shared_ram(address_space *space)
     }
     else
     {
-        logerror("Sub cpu active! @%x\n",cpu_get_pc(space->cpu));
+        logerror("Sub cpu active! @%x\n",cpu_get_pc(&space->device()));
     }
 }
 

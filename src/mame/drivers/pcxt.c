@@ -317,7 +317,7 @@ static SCREEN_UPDATE( tetriskr )
 
 static READ8_HANDLER( vga_regs_r )
 {
-	logerror("(PC=%05x) Warning: VGA reg port read\n",cpu_get_pc(space->cpu));
+	logerror("(PC=%05x) Warning: VGA reg port read\n",cpu_get_pc(&space->device()));
 	return 0xff;
 }
 
@@ -337,7 +337,7 @@ static WRITE8_HANDLER( vga_regs_w )
 			//logerror("write %02x to video register [%02x]",data,state->video_index);
 		}
 		else
-			logerror("(PC=%05x) Warning: Undefined VGA reg port write (I=%02x D=%02x)\n",cpu_get_pc(space->cpu),state->video_index,data);
+			logerror("(PC=%05x) Warning: Undefined VGA reg port write (I=%02x D=%02x)\n",cpu_get_pc(&space->device()),state->video_index,data);
 	}
 }
 
@@ -355,7 +355,7 @@ static WRITE8_HANDLER( vga_vram_w )
 static READ8_HANDLER( disk_iobank_r )
 {
 	pcxt_state *state = space->machine().driver_data<pcxt_state>();
-	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,cpu_get_pc(space->cpu));
+	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,cpu_get_pc(&space->device()));
 	//if(offset == 0) return input_port_read(space->machine(), "DSW");
 	if(offset == 1) return input_port_read(space->machine(), "IN1");
 
@@ -542,7 +542,7 @@ static READ8_HANDLER( fdc765_status_r )
 {
 	pcxt_state *state = space->machine().driver_data<pcxt_state>();
 	UINT8 tmp;
-//  popmessage("Read FDC status @ PC=%05x",cpu_get_pc(space->cpu));
+//  popmessage("Read FDC status @ PC=%05x",cpu_get_pc(&space->device()));
 	tmp = state->status | 0x80;
 	state->clr_status++;
 	if(state->clr_status == 0x10)

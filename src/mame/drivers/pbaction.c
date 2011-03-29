@@ -463,7 +463,7 @@ static READ8_HANDLER( pbactio3_prot_kludge_r )
 	pbaction_state *state = space->machine().driver_data<pbaction_state>();
 
 	/* on startup, the game expect this location to NOT act as RAM */
-	if (cpu_get_pc(space->cpu) == 0xab80)
+	if (cpu_get_pc(&space->device()) == 0xab80)
 		return 0;
 
 	return state->work_ram[0];

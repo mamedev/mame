@@ -135,7 +135,7 @@ static WRITE32_HANDLER( cmos_w )
 	if (bitlatch[2] && !cmos_protected)
 		COMBINE_DATA(&state->m_nvram[offset]);
 	else
-		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", cpu_get_pc(space->cpu), bitlatch[2], cmos_protected);
+		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", cpu_get_pc(&space->device()), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;
 }
 
@@ -190,7 +190,7 @@ static WRITE32_HANDLER( zpram_w )
 	if (bitlatch[2])
 		COMBINE_DATA(&state->m_nvram[offset]);
 	else
-		logerror("%06X:zpram_w with bitlatch[2] = %d\n", cpu_get_pc(space->cpu), bitlatch[2]);
+		logerror("%06X:zpram_w with bitlatch[2] = %d\n", cpu_get_pc(&space->device()), bitlatch[2]);
 }
 
 
@@ -231,7 +231,7 @@ static READ32_HANDLER( bitlatches_r )
 
 		/* unknown purpose */
 		default:
-			logerror("%06X:bitlatches_r(%X)\n", cpu_get_pc(space->cpu), offset);
+			logerror("%06X:bitlatches_r(%X)\n", cpu_get_pc(&space->device()), offset);
 			break;
 	}
 	return ~0;
@@ -248,19 +248,19 @@ static WRITE32_HANDLER( bitlatches_w )
 		/* unknown purpose */
 		default:
 			if (oldval ^ data)
-				logerror("%06X:bitlatches_w(%X) = %X\n", cpu_get_pc(space->cpu), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X\n", cpu_get_pc(&space->device()), offset, data);
 			break;
 
 		/* unknown purpose; crusnexo toggles this between 0 and 1 every 20 frames; thegrid writes 1 */
 		case 0:
 			if (data != 0 && data != 1)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(space->cpu), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space->device()), offset, data);
 			break;
 
 		/* unknown purpose; mk4/invasn write 1 here at initialization; crusnexo/thegrid write 3 */
 		case 1:
 			if (data != 1 && data != 3)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(space->cpu), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space->device()), offset, data);
 			break;
 
 		/* CMOS/ZPRAM extra enable latch; only low bit is used */
@@ -270,7 +270,7 @@ static WRITE32_HANDLER( bitlatches_w )
 		/* unknown purpose; invasn writes 2 here at startup */
 		case 4:
 			if (data != 2)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(space->cpu), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space->device()), offset, data);
 			break;
 
 		/* ROM bank selection on Zeus 2 */
@@ -281,19 +281,19 @@ static WRITE32_HANDLER( bitlatches_w )
 		/* unknown purpose; crusnexo/thegrid write 1 at startup */
 		case 7:
 			if (data != 1)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(space->cpu), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space->device()), offset, data);
 			break;
 
 		/* unknown purpose; crusnexo writes 4 at startup; thegrid writes 6 */
 		case 8:
 			if (data != 4 && data != 6)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(space->cpu), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space->device()), offset, data);
 			break;
 
 		/* unknown purpose; thegrid writes 1 at startup */
 		case 9:
 			if (data != 1)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(space->cpu), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space->device()), offset, data);
 			break;
 	}
 }
@@ -359,7 +359,7 @@ static WRITE32_HANDLER( crusnexo_leds_w )
 
 static READ32_HANDLER( linkram_r )
 {
-	logerror("%06X:unknown_8a000_r(%02X)\n", cpu_get_pc(space->cpu), offset);
+	logerror("%06X:unknown_8a000_r(%02X)\n", cpu_get_pc(&space->device()), offset);
 	if (offset == 0)
 		return 0x30313042;
 	else if (offset == 0x3c)
@@ -369,7 +369,7 @@ static READ32_HANDLER( linkram_r )
 
 static WRITE32_HANDLER( linkram_w )
 {
-	logerror("%06X:unknown_8a000_w(%02X) = %08X\n", cpu_get_pc(space->cpu),  offset, data);
+	logerror("%06X:unknown_8a000_w(%02X) = %08X\n", cpu_get_pc(&space->device()),  offset, data);
 	COMBINE_DATA(&linkram[offset]);
 }
 
@@ -394,7 +394,7 @@ static READ32_HANDLER( tms32031_control_r )
 
 	/* log anything else except the memory control register */
 	if (offset != 0x64)
-		logerror("%06X:tms32031_control_r(%02X)\n", cpu_get_pc(space->cpu), offset);
+		logerror("%06X:tms32031_control_r(%02X)\n", cpu_get_pc(&space->device()), offset);
 
 	return tms32031_control[offset];
 }
@@ -416,7 +416,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 			timer[which]->adjust(attotime::never);
 	}
 	else
-		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, data);
+		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(&space->device()), offset, data);
 }
 
 
@@ -467,7 +467,7 @@ static READ32_HANDLER( analog_r )
 {
 	static const char * const tags[] = { "ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3" };
 	if (offset < 8 || offset > 11)
-		logerror("%06X:analog_r(%X)\n", cpu_get_pc(space->cpu), offset);
+		logerror("%06X:analog_r(%X)\n", cpu_get_pc(&space->device()), offset);
 	return input_port_read(space->machine(), tags[offset & 3]);
 }
 

@@ -59,7 +59,7 @@ static WRITE8_HANDLER( gbusters_1f98_w )
 	/* other bits unused/unknown */
 	if (data & 0xfe)
 	{
-		//logerror("%04x: (1f98) write %02x\n",cpu_get_pc(space->cpu), data);
+		//logerror("%04x: (1f98) write %02x\n",cpu_get_pc(&space->device()), data);
 		//popmessage("$1f98 = %02x", data);
 	}
 }
@@ -88,13 +88,13 @@ static WRITE8_HANDLER( gbusters_coin_counter_w )
 		sprintf(baf, "ccnt = %02x", data);
 		popmessage(baf);
 #endif
-		logerror("%04x: (ccount) write %02x\n", cpu_get_pc(space->cpu), data);
+		logerror("%04x: (ccount) write %02x\n", cpu_get_pc(&space->device()), data);
 	}
 }
 
 static WRITE8_HANDLER( gbusters_unknown_w )
 {
-	logerror("%04x: write %02x to 0x1f9c\n",cpu_get_pc(space->cpu), data);
+	logerror("%04x: write %02x to 0x1f9c\n",cpu_get_pc(&space->device()), data);
 
 {
 char baf[40];

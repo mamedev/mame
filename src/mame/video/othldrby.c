@@ -125,7 +125,7 @@ WRITE16_HANDLER( othldrby_vreg_w )
 	if (state->vreg_addr < OTHLDRBY_VREG_SIZE)
 		state->vreg[state->vreg_addr++] = data;
 	else
-		popmessage("%06x: VREG OUT OF BOUNDS %04x", cpu_get_pc(space->cpu), state->vreg_addr);
+		popmessage("%06x: VREG OUT OF BOUNDS %04x", cpu_get_pc(&space->device()), state->vreg_addr);
 }
 
 

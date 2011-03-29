@@ -42,7 +42,7 @@ WRITE8_HANDLER( lsasquad_sound_command_w )
 	state->sound_pending |= 0x01;
 	state->sound_cmd = data;
 
-	//logerror("%04x: sound cmd %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: sound cmd %02x\n", cpu_get_pc(&space->device()), data);
 	space->machine().scheduler().synchronize(FUNC(nmi_callback), data);
 }
 
@@ -50,7 +50,7 @@ READ8_HANDLER( lsasquad_sh_sound_command_r )
 {
 	lsasquad_state *state = space->machine().driver_data<lsasquad_state>();
 	state->sound_pending &= ~0x01;
-	//logerror("%04x: read sound cmd %02x\n", cpu_get_pc(space->cpu), state->sound_cmd);
+	//logerror("%04x: read sound cmd %02x\n", cpu_get_pc(&space->device()), state->sound_cmd);
 	return state->sound_cmd;
 }
 
@@ -58,7 +58,7 @@ WRITE8_HANDLER( lsasquad_sh_result_w )
 {
 	lsasquad_state *state = space->machine().driver_data<lsasquad_state>();
 	state->sound_pending |= 0x02;
-	//logerror("%04x: sound res %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: sound res %02x\n", cpu_get_pc(&space->device()), data);
 	state->sound_result = data;
 }
 
@@ -66,7 +66,7 @@ READ8_HANDLER( lsasquad_sound_result_r )
 {
 	lsasquad_state *state = space->machine().driver_data<lsasquad_state>();
 	state->sound_pending &= ~0x02;
-	//logerror("%04x: read sound res %02x\n", cpu_get_pc(space->cpu), state->sound_result);
+	//logerror("%04x: read sound res %02x\n", cpu_get_pc(&space->device()), state->sound_result);
 	return state->sound_result;
 }
 
@@ -85,7 +85,7 @@ READ8_HANDLER( daikaiju_sh_sound_command_r )
 	lsasquad_state *state = space->machine().driver_data<lsasquad_state>();
 	state->sound_pending &= ~0x01;
 	state->sound_pending |= 0x02;
-	//logerror("%04x: read sound cmd %02x\n", cpu_get_pc(space->cpu), state->sound_cmd);
+	//logerror("%04x: read sound cmd %02x\n", cpu_get_pc(&space->device()), state->sound_cmd);
 	return state->sound_cmd;
 }
 
@@ -111,7 +111,7 @@ READ8_HANDLER( lsasquad_68705_port_a_r )
 {
 	lsasquad_state *state = space->machine().driver_data<lsasquad_state>();
 
-	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(space->cpu), state->port_a_in);
+	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(&space->device()), state->port_a_in);
 	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
 }
 
@@ -119,7 +119,7 @@ WRITE8_HANDLER( lsasquad_68705_port_a_w )
 {
 	lsasquad_state *state = space->machine().driver_data<lsasquad_state>();
 
-	//logerror("%04x: 68705 port A write %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: 68705 port A write %02x\n", cpu_get_pc(&space->device()), data);
 	state->port_a_out = data;
 }
 
@@ -150,7 +150,7 @@ WRITE8_HANDLER( lsasquad_68705_port_b_w )
 {
 	lsasquad_state *state = space->machine().driver_data<lsasquad_state>();
 
-	//logerror("%04x: 68705 port B write %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: 68705 port B write %02x\n", cpu_get_pc(&space->device()), data);
 
 	if ((state->ddr_b & 0x02) && (~data & 0x02) && (state->port_b_out & 0x02))
 	{
@@ -181,7 +181,7 @@ WRITE8_HANDLER( lsasquad_mcu_w )
 {
 	lsasquad_state *state = space->machine().driver_data<lsasquad_state>();
 
-	//logerror("%04x: mcu_w %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: mcu_w %02x\n", cpu_get_pc(&space->device()), data);
 	state->from_main = data;
 	state->main_sent = 1;
 	device_set_input_line(state->mcu, 0, ASSERT_LINE);
@@ -191,7 +191,7 @@ READ8_HANDLER( lsasquad_mcu_r )
 {
 	lsasquad_state *state = space->machine().driver_data<lsasquad_state>();
 
-	//logerror("%04x: mcu_r %02x\n", cpu_get_pc(space->cpu), state->from_mcu);
+	//logerror("%04x: mcu_r %02x\n", cpu_get_pc(&space->device()), state->from_mcu);
 	state->mcu_sent = 0;
 	return state->from_mcu;
 }
@@ -203,7 +203,7 @@ READ8_HANDLER( lsasquad_mcu_status_r )
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 0, mcu has sent data to the main cpu */
-	//logerror("%04x: mcu_status_r\n",cpu_get_pc(space->cpu));
+	//logerror("%04x: mcu_status_r\n",cpu_get_pc(&space->device()));
 	if (!state->main_sent)
 		res |= 0x01;
 	if (!state->mcu_sent)
@@ -219,7 +219,7 @@ READ8_HANDLER( daikaiju_mcu_status_r )
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 0, mcu has sent data to the main cpu */
-	//logerror("%04x: mcu_status_r\n",cpu_get_pc(space->cpu));
+	//logerror("%04x: mcu_status_r\n",cpu_get_pc(&space->device()));
 	if (!state->main_sent)
 		res |= 0x01;
 	if (!state->mcu_sent)

@@ -27,11 +27,11 @@ UINT16 actel_id;
 
 static READ64_HANDLER( naomi_bios_idle_skip_r )
 {
-	if (cpu_get_pc(space->cpu)==0xc04173c)
-		device_spin_until_time(space->cpu, attotime::from_usec(500));
-		//device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0xc04173c)
+		device_spin_until_time(&space->device(), attotime::from_usec(500));
+		//device_spin_until_interrupt(&space->device());
 //  else
-//      printf("%08x\n", cpu_get_pc(space->cpu));
+//      printf("%08x\n", cpu_get_pc(&space->device()));
 
 	return naomi_ram64[0x2ad238/8];
 }
@@ -197,8 +197,8 @@ DRIVER_INIT(naomi_mp)
 
 static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
 {
-	if (cpu_get_pc(space->cpu)==0x0c0c9adc)
-		device_spin_until_time(space->cpu, attotime::from_usec(500));
+	if (cpu_get_pc(&space->device())==0x0c0c9adc)
+		device_spin_until_time(&space->device(), attotime::from_usec(500));
 
 	return naomi_ram64[0x1aae18/8];
 }
@@ -211,8 +211,8 @@ DRIVER_INIT( ggxxsla )
 
 static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
 {
-	if (cpu_get_pc(space->cpu)==0xc0b5c3c) // or 0xc0bab0c
-		device_spin_until_time(space->cpu, attotime::from_usec(500));
+	if (cpu_get_pc(&space->device())==0xc0b5c3c) // or 0xc0bab0c
+		device_spin_until_time(&space->device(), attotime::from_usec(500));
 
 	return naomi_ram64[0x1837b8/8];
 }
@@ -226,10 +226,10 @@ DRIVER_INIT( ggxx )
 
 static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
 {
-	if (cpu_get_pc(space->cpu)==0xc0b84bc) // or 0xc0bab0c
-		device_spin_until_time(space->cpu, attotime::from_usec(500));
+	if (cpu_get_pc(&space->device())==0xc0b84bc) // or 0xc0bab0c
+		device_spin_until_time(&space->device(), attotime::from_usec(500));
 
-	//printf("%08x\n", cpu_get_pc(space->cpu));
+	//printf("%08x\n", cpu_get_pc(&space->device()));
 
 	return naomi_ram64[0x18d6c8/8];
 }
@@ -243,8 +243,8 @@ DRIVER_INIT( ggxxrl )
 /* at least speeds up the annoying copyright screens ;-) */
 static READ64_HANDLER( naomigd_sfz3ugd_idle_skip_r )
 {
-	if (cpu_get_pc(space->cpu)==0xc36a2dc)
-		device_spin_until_time(space->cpu, attotime::from_usec(500));
+	if (cpu_get_pc(&space->device())==0xc36a2dc)
+		device_spin_until_time(&space->device(), attotime::from_usec(500));
 
 	return naomi_ram64[0x5dc900/8];
 }

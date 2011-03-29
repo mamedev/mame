@@ -153,7 +153,7 @@ static READ32_HANDLER( backfire_control2_r )
 {
 	backfire_state *state = space->machine().driver_data<backfire_state>();
 
-//  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(space->cpu), offset << 1, mem_mask);
+//  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(&space->device()), offset << 1, mem_mask);
 	return (eeprom_read_bit(state->eeprom) << 24) | input_port_read(space->machine(), "IN1") | (input_port_read(space->machine(), "IN1") << 16);
 }
 
@@ -162,7 +162,7 @@ static READ32_HANDLER(backfire_control3_r)
 {
 	backfire_state *state = space->machine().driver_data<backfire_state>();
 
-//  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(space->cpu), offset << 1, mem_mask);
+//  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(&space->device()), offset << 1, mem_mask);
 	return (eeprom_read_bit(state->eeprom) << 24) | input_port_read(space->machine(), "IN2") | (input_port_read(space->machine(), "IN2") << 16);
 }
 #endif
@@ -669,10 +669,10 @@ static READ32_HANDLER( backfire_speedup_r )
 {
 	backfire_state *state = space->machine().driver_data<backfire_state>();
 
-	//mame_printf_debug( "%08x\n",cpu_get_pc(space->cpu));
+	//mame_printf_debug( "%08x\n",cpu_get_pc(&space->device()));
 
-	if (cpu_get_pc(space->cpu )== 0xce44)  device_spin_until_time(space->cpu, attotime::from_usec(400)); // backfire
-	if (cpu_get_pc(space->cpu) == 0xcee4)  device_spin_until_time(space->cpu, attotime::from_usec(400)); // backfirea
+	if (cpu_get_pc(&space->device() )== 0xce44)  device_spin_until_time(&space->device(), attotime::from_usec(400)); // backfire
+	if (cpu_get_pc(&space->device()) == 0xcee4)  device_spin_until_time(&space->device(), attotime::from_usec(400)); // backfirea
 
 	return state->mainram[0x18/4];
 }

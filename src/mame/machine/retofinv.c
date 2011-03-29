@@ -13,14 +13,14 @@
 READ8_HANDLER( retofinv_68705_portA_r )
 {
 	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-//logerror("%04x: 68705 port A read %02x\n",cpu_get_pc(space->cpu),state->portA_in);
+//logerror("%04x: 68705 port A read %02x\n",cpu_get_pc(&space->device()),state->portA_in);
 	return (state->portA_out & state->ddrA) | (state->portA_in & ~state->ddrA);
 }
 
 WRITE8_HANDLER( retofinv_68705_portA_w )
 {
 	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-//logerror("%04x: 68705 port A write %02x\n",cpu_get_pc(space->cpu),data);
+//logerror("%04x: 68705 port A write %02x\n",cpu_get_pc(&space->device()),data);
 	state->portA_out = data;
 }
 
@@ -51,7 +51,7 @@ READ8_HANDLER( retofinv_68705_portB_r )
 WRITE8_HANDLER( retofinv_68705_portB_w )
 {
 	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-//logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(space->cpu),data);
+//logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(&space->device()),data);
 
 	if ((state->ddrB & 0x02) && (~data & 0x02) && (state->portB_out & 0x02))
 	{
@@ -93,14 +93,14 @@ READ8_HANDLER( retofinv_68705_portC_r )
 	state->portC_in = 0;
 	if (state->main_sent) state->portC_in |= 0x01;
 	if (!state->mcu_sent) state->portC_in |= 0x02;
-//logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(space->cpu),state->portC_in);
+//logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(&space->device()),state->portC_in);
 	return (state->portC_out & state->ddrC) | (state->portC_in & ~state->ddrC);
 }
 
 WRITE8_HANDLER( retofinv_68705_portC_w )
 {
 	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-logerror("%04x: 68705 port C write %02x\n",cpu_get_pc(space->cpu),data);
+logerror("%04x: 68705 port C write %02x\n",cpu_get_pc(&space->device()),data);
 	state->portC_out = data;
 }
 
@@ -114,7 +114,7 @@ WRITE8_HANDLER( retofinv_68705_ddrC_w )
 WRITE8_HANDLER( retofinv_mcu_w )
 {
 	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-logerror("%04x: mcu_w %02x\n",cpu_get_pc(space->cpu),data);
+logerror("%04x: mcu_w %02x\n",cpu_get_pc(&space->device()),data);
 	state->from_main = data;
 	state->main_sent = 1;
 	cputag_set_input_line(space->machine(), "68705", 0, ASSERT_LINE);
@@ -123,7 +123,7 @@ logerror("%04x: mcu_w %02x\n",cpu_get_pc(space->cpu),data);
 READ8_HANDLER( retofinv_mcu_r )
 {
 	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-logerror("%04x: mcu_r %02x\n",cpu_get_pc(space->cpu),state->from_mcu);
+logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space->device()),state->from_mcu);
 	state->mcu_sent = 0;
 	return state->from_mcu;
 }
@@ -135,7 +135,7 @@ READ8_HANDLER( retofinv_mcu_status_r )
 
 	/* bit 4 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 5 = when 1, mcu has sent data to the main cpu */
-//logerror("%04x: mcu_status_r\n",cpu_get_pc(space->cpu));
+//logerror("%04x: mcu_status_r\n",cpu_get_pc(&space->device()));
 	if (!state->main_sent) res |= 0x10;
 	if (state->mcu_sent) res |= 0x20;
 

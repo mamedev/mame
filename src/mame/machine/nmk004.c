@@ -1056,7 +1056,7 @@ WRITE16_HANDLER( NMK004_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//logerror("%06x: NMK004_w %02x\n",cpu_get_pc(space->cpu),data);
+//logerror("%06x: NMK004_w %02x\n",cpu_get_pc(&space->device()),data);
 		NMK004_state.from_main = data & 0xff;
 	}
 }
@@ -1066,7 +1066,7 @@ READ16_HANDLER( NMK004_r )
 //static int last;
 	int res = NMK004_state.to_main;
 
-//if (res != last) logerror("%06x: NMK004_r %02x\n",cpu_get_pc(space->cpu),res);
+//if (res != last) logerror("%06x: NMK004_r %02x\n",cpu_get_pc(&space->device()),res);
 //last = res;
 
 	return res;

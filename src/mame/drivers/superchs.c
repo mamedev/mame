@@ -445,8 +445,8 @@ ROM_END
 static READ32_HANDLER( main_cycle_r )
 {
 	superchs_state *state = space->machine().driver_data<superchs_state>();
-	if (cpu_get_pc(space->cpu)==0x702)
-		device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x702)
+		device_spin_until_interrupt(&space->device());
 
 	return state->ram[0];
 }
@@ -454,8 +454,8 @@ static READ32_HANDLER( main_cycle_r )
 static READ16_HANDLER( sub_cycle_r )
 {
 	superchs_state *state = space->machine().driver_data<superchs_state>();
-	if (cpu_get_pc(space->cpu)==0x454)
-		device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x454)
+		device_spin_until_interrupt(&space->device());
 
 	return state->ram[2]&0xffff;
 }

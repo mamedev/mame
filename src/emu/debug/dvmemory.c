@@ -73,9 +73,9 @@ const debug_view_memory::memory_view_pos debug_view_memory::s_memory_pos_table[9
 //-------------------------------------------------
 
 debug_view_memory_source::debug_view_memory_source(const char *name, address_space &space)
-	: debug_view_source(name, space.cpu),
+	: debug_view_source(name, &space.device()),
 	  m_space(&space),
-	  m_memintf(dynamic_cast<device_memory_interface *>(space.cpu)),
+	  m_memintf(dynamic_cast<device_memory_interface *>(&space.device())),
 	  m_base(NULL),
 	  m_length(0),
 	  m_offsetxor(0),
@@ -213,7 +213,7 @@ void debug_view_memory::view_notify(debug_view_notification type)
 		m_chunks_per_row = m_bytes_per_chunk * m_chunks_per_row / source.m_prefsize;
 		m_bytes_per_chunk = source.m_prefsize;
 		if (source.m_space != NULL)
-			m_expression.set_context(&source.m_space->cpu->debug()->symtable());
+			m_expression.set_context(&source.m_space->device().debug()->symtable());
 		else
 			m_expression.set_context(NULL);
 	}

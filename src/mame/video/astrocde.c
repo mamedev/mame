@@ -883,7 +883,7 @@ static void execute_blit(address_space *space)
 	} while (pattern_height-- != 0);
 
 	/* count cycles we ran the bus */
-	device_adjust_icount(space->cpu, -cycles);
+	device_adjust_icount(&space->device(), -cycles);
 }
 
 
@@ -918,7 +918,7 @@ WRITE8_HANDLER( astrocade_pattern_board_w )
 
 		case 6:		/* height of blit and initiator */
 			pattern_height = data;
-			execute_blit(space->cpu->memory().space(AS_PROGRAM));
+			execute_blit(space->device().memory().space(AS_PROGRAM));
 			break;
 	}
 }

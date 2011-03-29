@@ -95,7 +95,7 @@ READ16_HANDLER(galpanib_calc_r) /* Simulation of the CALC1 MCU */
 			return (space->machine().rand() & 0xffff);
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(space->cpu),offset<<1);
+			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(&space->device()),offset<<1);
 	}
 
 	return 0;
@@ -118,7 +118,7 @@ WRITE16_HANDLER(galpanib_calc_w)
 		case 0x12/2: hit.mult_b = data; break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",cpu_get_pc(space->cpu),offset<<1);
+			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",cpu_get_pc(&space->device()),offset<<1);
 	}
 }
 
@@ -152,7 +152,7 @@ WRITE16_HANDLER(bloodwar_calc_w)
 		case 0x38/2: break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",cpu_get_pc(space->cpu),offset<<1);
+			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",cpu_get_pc(&space->device()),offset<<1);
 	}
 }
 
@@ -256,7 +256,7 @@ READ16_HANDLER(bloodwar_calc_r)
 		case 0x32/2: return hit.y2s;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(space->cpu),offset<<1);
+			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(&space->device()),offset<<1);
 	}
 
 	return 0;
@@ -457,7 +457,7 @@ static WRITE16_HANDLER(shogwarr_calc_w)
 					shogwarr_hit.mode=data;break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x [ %06x] = %06x\n",cpu_get_pc(space->cpu),offset<<1, idx, data);
+			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x [ %06x] = %06x\n",cpu_get_pc(&space->device()),offset<<1, idx, data);
 	}
 
 	shogwarr_recalc_collisions();
@@ -509,7 +509,7 @@ static READ16_HANDLER(shogwarr_calc_r)
 		case 0x88: return shogwarr_hit.z1toz2;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x [ %06x]\n",cpu_get_pc(space->cpu),offset<<1, idx);
+			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x [ %06x]\n",cpu_get_pc(&space->device()),offset<<1, idx);
 	}
 
 	return 0;
@@ -2428,7 +2428,7 @@ TOYBOX_MCU_COM_W(3)
 */
 READ16_HANDLER( toybox_mcu_status_r )
 {
-	logerror("CPU %s (PC=%06X) : read MCU status\n", space->cpu->tag(), cpu_get_previouspc(space->cpu));
+	logerror("CPU %s (PC=%06X) : read MCU status\n", space->device().tag(), cpu_get_previouspc(&space->device()));
 	return 0; // most games test bit 0 for failure
 }
 

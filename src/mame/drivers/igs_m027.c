@@ -57,7 +57,7 @@ static WRITE32_HANDLER( igs_cg_videoram_w )
 	igs_m027_state *state = space->machine().driver_data<igs_m027_state>();
 	COMBINE_DATA(&state->igs_cg_videoram[offset]);
 	//if(data!=0)
-	logerror("PC(%08X) CG @%x = %x!\n",cpu_get_pc(space->cpu),offset ,state->igs_cg_videoram[offset]);
+	logerror("PC(%08X) CG @%x = %x!\n",cpu_get_pc(&space->device()),offset ,state->igs_cg_videoram[offset]);
 
 
 

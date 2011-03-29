@@ -372,7 +372,7 @@ static int8 apu_dpcm(nesapu_state *info, dpcm_t *chan)
 					if (chan->regs[0] & 0x80) /* IRQ Generator */
 					{
 						chan->irq_occurred = TRUE;
-						n2a03_irq(info->APU.dpcm.memory->cpu);
+						n2a03_irq(&info->APU.dpcm.memory->device());
 					}
 					break;
 				}

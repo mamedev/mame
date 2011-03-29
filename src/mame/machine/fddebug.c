@@ -1041,7 +1041,7 @@ static void execute_fdpc(running_machine &machine, int ref, int params, const ch
 static void execute_fdsearch(running_machine &machine, int ref, int params, const char **param)
 {
 	address_space *space = debug_cpu_get_visible_cpu(machine)->memory().space(AS_PROGRAM);
-	int pc = cpu_get_pc(space->cpu);
+	int pc = cpu_get_pc(&space->device());
 	int length, first = TRUE;
 	UINT8 instrdata[2];
 	UINT16 decoded;
@@ -1079,8 +1079,8 @@ static void execute_fdsearch(running_machine &machine, int ref, int params, cons
 			}
 
 			/* set this as our current PC and run the instruction hook */
-			cpu_set_reg(space->cpu, STATE_GENPC, pc);
-			if (instruction_hook(*space->cpu, pc))
+			cpu_set_reg(&space->device(), STATE_GENPC, pc);
+			if (instruction_hook(space->device(), pc))
 				break;
 		}
 		keystatus[pc/2] |= SEARCH_MASK;

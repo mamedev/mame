@@ -148,7 +148,7 @@ static WRITE16_HANDLER( sync_w )
 
 	state->sync_data[offset] = newword;
 	if ((oldword & 0xff00) != (newword & 0xff00))
-		device_yield(space->cpu);
+		device_yield(&space->device());
 }
 
 

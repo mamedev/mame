@@ -208,7 +208,7 @@ static WRITE8_DEVICE_HANDLER( nmi_w )
 
 static READ8_HANDLER( catchall )
 {
-	int pc = cpu_get_pc(space->cpu);
+	int pc = cpu_get_pc(&space->device());
 
 	if (pc != 0x3c74 && pc != 0x0364 && pc != 0x036d)	/* weed out spurious blit reads */
 		logerror("%04x: unmapped memory read from %04x\n",pc,offset);

@@ -70,7 +70,7 @@ WRITE8_HANDLER( ccasino_palette_w )
 	int r, g, b;
 
 	/* get top 8 bits of the I/O port address */
-	offset = (offset << 8) | (cpu_get_reg(space->cpu, Z80_BC) >> 8);
+	offset = (offset << 8) | (cpu_get_reg(&space->device(), Z80_BC) >> 8);
 
 	state->paletteram[offset] = data;
 

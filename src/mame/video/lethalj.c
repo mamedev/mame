@@ -64,7 +64,7 @@ READ16_HANDLER( lethalj_gun_r )
 			result = state->guny + 4;
 			break;
 	}
-/*  logerror("%08X:lethalj_gun_r(%d) = %04X\n", cpu_get_pc(space->cpu), offset, result); */
+/*  logerror("%08X:lethalj_gun_r(%d) = %04X\n", cpu_get_pc(&space->device()), offset, result); */
 	return result;
 }
 

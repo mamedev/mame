@@ -194,12 +194,12 @@ static WRITE8_HANDLER( trvmadns_tileram_w )
 	trvmadns_state *state = space->machine().driver_data<trvmadns_state>();
 	if(offset==0)
 	{
-		if(cpu_get_previouspc(space->cpu)==0x29e9)// || cpu_get_previouspc(space->cpu)==0x1b3f) //29f5
+		if(cpu_get_previouspc(&space->device())==0x29e9)// || cpu_get_previouspc(&space->device())==0x1b3f) //29f5
 		{
 			cputag_set_input_line(space->machine(), "maincpu", 0, HOLD_LINE);
 		}
 //      else
-//          logerror("%x \n", cpu_get_previouspc(space->cpu));
+//          logerror("%x \n", cpu_get_previouspc(&space->device()));
 
 	}
 

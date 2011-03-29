@@ -192,7 +192,7 @@ static WRITE32_HANDLER( coin_w )
 static READ32_HANDLER( vblank_r )
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
-	device_eat_cycles(space->cpu, 100);
+	device_eat_cycles(&space->device(), 100);
 	return input_port_read(space->machine(), "VBLANK");
 }
 

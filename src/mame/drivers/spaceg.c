@@ -250,8 +250,8 @@ static WRITE8_HANDLER( zvideoram_w )
 			break;
 
 		default:
-			logerror("mode = %02x pc = %04x\n", *state->io9401, cpu_get_pc(space->cpu));
-			popmessage("mode = %02x pc = %04x\n", *state->io9401, cpu_get_pc(space->cpu));
+			logerror("mode = %02x pc = %04x\n", *state->io9401, cpu_get_pc(&space->device()));
+			popmessage("mode = %02x pc = %04x\n", *state->io9401, cpu_get_pc(&space->device()));
 			return;
 	}
 

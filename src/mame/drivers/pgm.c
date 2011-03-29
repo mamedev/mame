@@ -340,7 +340,7 @@ static READ32_HANDLER( arm7_latch_arm_r )
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (PGMARM7LOGERROR)
-		logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", state->kov2_latchdata_68k_w, mem_mask, cpu_get_pc(space->cpu));
+		logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", state->kov2_latchdata_68k_w, mem_mask, cpu_get_pc(&space->device()));
 	return state->kov2_latchdata_68k_w;
 }
 
@@ -349,7 +349,7 @@ static WRITE32_HANDLER( arm7_latch_arm_w )
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (PGMARM7LOGERROR)
-		logerror("ARM7: Latch write: %08x (%08x) (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
+		logerror("ARM7: Latch write: %08x (%08x) (%06x)\n", data, mem_mask, cpu_get_pc(&space->device()));
 
 	COMBINE_DATA(&state->kov2_latchdata_arm_w);
 }
@@ -359,7 +359,7 @@ static READ32_HANDLER( arm7_shareram_r )
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (PGMARM7LOGERROR)
-		logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) (%06x)\n", offset << 2, state->arm7_shareram[offset], mem_mask, cpu_get_pc(space->cpu));
+		logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) (%06x)\n", offset << 2, state->arm7_shareram[offset], mem_mask, cpu_get_pc(&space->device()));
 	return state->arm7_shareram[offset];
 }
 
@@ -368,7 +368,7 @@ static WRITE32_HANDLER( arm7_shareram_w )
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (PGMARM7LOGERROR)
-		logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) (%06x)\n", offset << 2, data, mem_mask, cpu_get_pc(space->cpu));
+		logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) (%06x)\n", offset << 2, data, mem_mask, cpu_get_pc(&space->device()));
 	COMBINE_DATA(&state->arm7_shareram[offset]);
 }
 
@@ -377,7 +377,7 @@ static READ16_HANDLER( arm7_latch_68k_r )
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (PGMARM7LOGERROR)
-		logerror("M68K: Latch read: %04x (%04x) (%06x)\n", state->kov2_latchdata_arm_w & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu));
+		logerror("M68K: Latch read: %04x (%04x) (%06x)\n", state->kov2_latchdata_arm_w & 0x0000ffff, mem_mask, cpu_get_pc(&space->device()));
 	return state->kov2_latchdata_arm_w;
 }
 
@@ -386,12 +386,12 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (PGMARM7LOGERROR)
-		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu));
+		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(&space->device()));
 	COMBINE_DATA(&state->kov2_latchdata_68k_w);
 
 	generic_pulse_irq_line(state->prot, ARM7_FIRQ_LINE);
 	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
-	device_spin_until_time(space->cpu, state->prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
+	device_spin_until_time(&space->device(), state->prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
 }
 
 static READ16_HANDLER( arm7_ram_r )
@@ -400,7 +400,7 @@ static READ16_HANDLER( arm7_ram_r )
 	UINT16 *share16 = (UINT16 *)state->arm7_shareram;
 
 	if (PGMARM7LOGERROR)
-		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(space->cpu));
+		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(&space->device()));
 	return share16[BYTE_XOR_LE(offset)];
 }
 
@@ -410,14 +410,14 @@ static WRITE16_HANDLER( arm7_ram_w )
 	UINT16 *share16 = (UINT16 *)state->arm7_shareram;
 
 	if (PGMARM7LOGERROR)
-		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(space->cpu));
+		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(&space->device()));
 	COMBINE_DATA(&share16[BYTE_XOR_LE(offset)]);
 }
 
 static WRITE16_HANDLER ( z80_ram_w )
 {
 	pgm_state *state = space->machine().driver_data<pgm_state>();
-	int pc = cpu_get_pc(space->cpu);
+	int pc = cpu_get_pc(&space->device());
 
 	if (ACCESSING_BITS_8_15)
 		state->z80_mainram[offset * 2] = data >> 8;
@@ -426,7 +426,7 @@ static WRITE16_HANDLER ( z80_ram_w )
 
 	if (pc != 0xf12 && pc != 0xde2 && pc != 0x100c50 && pc != 0x100b20)
 		if (PGMLOGERROR)
-			logerror("Z80: write %04x, %04x @ %04x (%06x)\n", offset * 2, data, mem_mask, cpu_get_pc(space->cpu));
+			logerror("Z80: write %04x, %04x @ %04x (%06x)\n", offset * 2, data, mem_mask, cpu_get_pc(&space->device()));
 }
 
 static WRITE16_HANDLER ( z80_reset_w )
@@ -434,7 +434,7 @@ static WRITE16_HANDLER ( z80_reset_w )
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (PGMLOGERROR)
-		logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
+		logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(&space->device()));
 
 	if (data == 0x5050)
 	{
@@ -460,7 +460,7 @@ static WRITE16_HANDLER ( z80_reset_w )
 static WRITE16_HANDLER ( z80_ctrl_w )
 {
 	if (PGMLOGERROR)
-		logerror("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
+		logerror("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(&space->device()));
 }
 
 static WRITE16_HANDLER ( m68k_l1_w )
@@ -470,7 +470,7 @@ static WRITE16_HANDLER ( m68k_l1_w )
 	if(ACCESSING_BITS_0_7)
 	{
 		if (PGMLOGERROR)
-			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, cpu_get_pc(space->cpu));
+			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, cpu_get_pc(&space->device()));
 		soundlatch_w(space, 0, data);
 		device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE );
 	}
@@ -479,7 +479,7 @@ static WRITE16_HANDLER ( m68k_l1_w )
 static WRITE8_HANDLER( z80_l3_w )
 {
 	if (PGMLOGERROR)
-		logerror("SL 3 z80.w %02x (%04x)\n", data, cpu_get_pc(space->cpu));
+		logerror("SL 3 z80.w %02x (%04x)\n", data, cpu_get_pc(&space->device()));
 	soundlatch3_w(space, 0, data);
 }
 
@@ -813,7 +813,7 @@ static READ16_HANDLER( kovsh_arm7_ram_r )
 	UINT16 *share16 = (UINT16 *)state->arm7_shareram;
 
 	if (PGMARM7LOGERROR)
-		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(space->cpu));
+		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(&space->device()));
 	return share16[BYTE_XOR_LE(offset << 1)];
 }
 
@@ -823,7 +823,7 @@ static WRITE16_HANDLER( kovsh_arm7_ram_w )
 	UINT16 *share16 = (UINT16 *)state->arm7_shareram;
 
 	if (PGMARM7LOGERROR)
-		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(space->cpu));
+		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(&space->device()));
 	COMBINE_DATA(&share16[BYTE_XOR_LE(offset << 1)]);
 }
 
@@ -931,14 +931,14 @@ static WRITE16_HANDLER( svg_68k_nmi_w )
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 	generic_pulse_irq_line(state->prot, ARM7_FIRQ_LINE);
 	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
-	device_spin_until_time(space->cpu, state->prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
+	device_spin_until_time(&space->device(), state->prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
 }
 
 static WRITE16_HANDLER( svg_latch_68k_w )
 {
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 	if (PGMARM7LOGERROR)
-		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu));
+		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(&space->device()));
 	COMBINE_DATA(&state->kov2_latchdata_68k_w);
 }
 
@@ -4656,7 +4656,7 @@ static int ddp2_asic27_0xd10000 = 0;
 // ARM comms latch
 static WRITE16_HANDLER ( ddp2_asic27_0xd10000_w )
 {
-	//int pc = cpu_get_pc(space->cpu);
+	//int pc = cpu_get_pc(&space->device());
 
 	//logerror("%06x: ddp2_asic27_0xd10000_w %04x, %04x\n", pc, offset*2,data);
 
@@ -4666,7 +4666,7 @@ static WRITE16_HANDLER ( ddp2_asic27_0xd10000_w )
 // ARM comms latch
 static READ16_HANDLER ( ddp2_asic27_0xd10000_r )
 {
-	//int pc = cpu_get_pc(space->cpu);
+	//int pc = cpu_get_pc(&space->device());
 
 	//logerror("%06x: d100000_prot_r %04x, %04x\n", pc, offset*2,ddp2_asic27_0xd10000);
 
@@ -4678,7 +4678,7 @@ static READ16_HANDLER ( ddp2_asic27_0xd10000_r )
 // Shared with ARM
 static READ16_HANDLER(ddp2_protram_r)
 {
-	//int pc = cpu_get_pc(space->cpu);
+	//int pc = cpu_get_pc(&space->device());
 
 	//logerror("%06x prot_r %04x, %04x\n", pc, offset*2,ddp2_protram[offset]);
 
@@ -4692,7 +4692,7 @@ static READ16_HANDLER(ddp2_protram_r)
 // Shared with ARM
 static WRITE16_HANDLER(ddp2_protram_w)
 {
-	//int pc = cpu_get_pc(space->cpu);
+	//int pc = cpu_get_pc(&space->device());
 
 	//logerror("%06x: prot_w %04x, %02x\n", pc, offset*2,data);
 
@@ -5021,7 +5021,7 @@ static WRITE16_HANDLER( killbld_igs025_prot_w )
 		state->kb_cmd = data;
 	else //offset==2
 	{
-		logerror("%06X: ASIC25 W CMD %X  VAL %X\n", cpu_get_pc(space->cpu), state->kb_cmd, data);
+		logerror("%06X: ASIC25 W CMD %X  VAL %X\n", cpu_get_pc(&space->device()), state->kb_cmd, data);
 		if (state->kb_cmd == 0)
 			state->kb_reg = data;
 		else if (state->kb_cmd == 2)
@@ -5077,7 +5077,7 @@ static READ16_HANDLER( killbld_igs025_prot_r )
 
 		}
 	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", cpu_get_pc(space->cpu), state->kb_cmd, res);
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", cpu_get_pc(&space->device()), state->kb_cmd, res);
 	return res;
 }
 
@@ -5199,7 +5199,7 @@ static WRITE16_HANDLER( drgw3_igs025_prot_w )
 		state->kb_cmd=data;
 	else //offset==2
 	{
-		printf("%06X: ASIC25 W CMD %X  VAL %X\n",cpu_get_pc(space->cpu),state->kb_cmd,data);
+		printf("%06X: ASIC25 W CMD %X  VAL %X\n",cpu_get_pc(&space->device()),state->kb_cmd,data);
 		if(state->kb_cmd==0)
 			reg=data;
 		else if(state->kb_cmd==3)	//??????????
@@ -5256,7 +5256,7 @@ static READ16_HANDLER( drgw3_igs025_prot_r )
 
 		}
 	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n",cpu_get_pc(space->cpu),state->kb_cmd,res);
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n",cpu_get_pc(&space->device()),state->kb_cmd,res);
 	return res;
 }
 
@@ -5459,7 +5459,7 @@ static READ16_HANDLER( olds_r )
 
 		}
 	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", cpu_get_pc(space->cpu), state->kb_cmd, res);
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", cpu_get_pc(&space->device()), state->kb_cmd, res);
 	return res;
 }
 
@@ -5470,7 +5470,7 @@ static WRITE16_HANDLER( olds_w )
 		state->kb_cmd = data;
 	else //offset==2
 	{
-		logerror("%06X: ASIC25 W CMD %X  VAL %X\n",cpu_get_pc(space->cpu), state->kb_cmd, data);
+		logerror("%06X: ASIC25 W CMD %X  VAL %X\n",cpu_get_pc(&space->device()), state->kb_cmd, data);
 		if (state->kb_cmd == 0)
 			state->kb_reg = data;
 		else if(state->kb_cmd == 2)	//a bitswap=
@@ -5519,7 +5519,7 @@ static WRITE16_HANDLER( olds_w )
 
 static READ16_HANDLER( olds_prot_swap_r )
 {
-	if (cpu_get_pc(space->cpu) < 0x100000)		//bios
+	if (cpu_get_pc(&space->device()) < 0x100000)		//bios
 		return pgm_mainram[0x178f4 / 2];
 	else						//game
 		return pgm_mainram[0x178d8 / 2];
@@ -5722,7 +5722,7 @@ static WRITE16_HANDLER( ddp3_asic_w )
 		switch (state->ddp3lastcommand)
 		{
 			default:
-				printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
+				printf("%06x command %02x | %04x\n", cpu_get_pc(&space->device()), state->ddp3lastcommand, state->value0);
 				state->valueresponse = 0x880000;
 				break;
 
@@ -5734,21 +5734,21 @@ static WRITE16_HANDLER( ddp3_asic_w )
 				break;
 
 			case 0x67: // set high bits
-		//      printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
+		//      printf("%06x command %02x | %04x\n", cpu_get_pc(&space->device()), state->ddp3lastcommand, state->value0);
 				state->valueresponse = 0x880000;
 				state->ddp3internal_slot = (state->value0 & 0xff00)>>8;
 				state->ddp3slots[state->ddp3internal_slot] = (state->value0 & 0x00ff) << 16;
 				break;
 
 			case 0xe5: // set low bits for operation?
-			//  printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
+			//  printf("%06x command %02x | %04x\n", cpu_get_pc(&space->device()), state->ddp3lastcommand, state->value0);
 				state->valueresponse = 0x880000;
 				state->ddp3slots[state->ddp3internal_slot] |= (state->value0 & 0xffff);
 				break;
 
 
 			case 0x8e: // read back result of operations
-		//      printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
+		//      printf("%06x command %02x | %04x\n", cpu_get_pc(&space->device()), state->ddp3lastcommand, state->value0);
 				state->valueresponse = state->ddp3slots[state->value0&0xff];
 				break;
 

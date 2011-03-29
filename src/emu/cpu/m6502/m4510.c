@@ -185,12 +185,12 @@ INLINE int m4510_cpu_readop_arg(m4510_Regs *cpustate)
 
 static UINT8 default_rdmem_id(address_space *space, offs_t address)
 {
-	m4510_Regs *cpustate = get_safe_token(space->cpu);
+	m4510_Regs *cpustate = get_safe_token(&space->device());
 	return space->read_byte(M4510_MEM(address));
 }
 static void default_wrmem_id(address_space *space, offs_t address, UINT8 data)
 {
-	m4510_Regs *cpustate = get_safe_token(space->cpu);
+	m4510_Regs *cpustate = get_safe_token(&space->device());
 	space->write_byte(M4510_MEM(address), data);
 }
 
@@ -358,7 +358,7 @@ UINT8 m4510_get_port(legacy_cpu_device *device)
 static READ8_HANDLER( m4510_read_0000 )
 {
 	UINT8 result = 0x00;
-	m4510_Regs *cpustate = get_safe_token(space->cpu);
+	m4510_Regs *cpustate = get_safe_token(&space->device());
 
 	switch(offset)
 	{
@@ -376,7 +376,7 @@ static READ8_HANDLER( m4510_read_0000 )
 
 static WRITE8_HANDLER( m4510_write_0000 )
 {
-	m4510_Regs *cpustate = get_safe_token(space->cpu);
+	m4510_Regs *cpustate = get_safe_token(&space->device());
 
 	switch(offset)
 	{
@@ -389,7 +389,7 @@ static WRITE8_HANDLER( m4510_write_0000 )
 	}
 
 	if (cpustate->port_write)
-		cpustate->port_write(cpustate->device, 0, m4510_get_port(downcast<legacy_cpu_device *>(space->cpu)));
+		cpustate->port_write(cpustate->device, 0, m4510_get_port(downcast<legacy_cpu_device *>(&space->device())));
 }
 
 static ADDRESS_MAP_START(m4510_mem, AS_PROGRAM, 8)

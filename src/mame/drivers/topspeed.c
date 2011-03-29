@@ -275,7 +275,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 
 	parse_control(space->machine());
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(space->cpu), data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space->device()), data);
 }
 
 
@@ -377,7 +377,7 @@ static READ16_HANDLER( topspeed_motor_r )
 			return 0x55;	/* motor cpu status ? */
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read from motor cpu %03x\n", cpu_get_pc(space->cpu), offset);
+			logerror("CPU #0 PC %06x: warning - read from motor cpu %03x\n", cpu_get_pc(&space->device()), offset);
 			return 0;
 	}
 }
@@ -385,7 +385,7 @@ static READ16_HANDLER( topspeed_motor_r )
 static WRITE16_HANDLER( topspeed_motor_w )
 {
 	/* Writes $900000-25 and $900200-219 */
-	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n", cpu_get_pc(space->cpu), data, offset);
+	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n", cpu_get_pc(&space->device()), data, offset);
 }
 
 

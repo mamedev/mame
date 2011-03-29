@@ -1119,7 +1119,7 @@ static READ16_HANDLER(s23_c417_r)
 	case 0: return 0x8e | (space->machine().primary_screen->vblank() ? 0x0000 : 0x8000);
 	case 1: return c417_adr;
 	case 4:
-		//      logerror("c417_r %04x = %04x (%08x, %08x)\n", c417_adr, c417_ram[c417_adr], cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+		//      logerror("c417_r %04x = %04x (%08x, %08x)\n", c417_adr, c417_ram[c417_adr], cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 		return c417_ram[c417_adr];
 	case 5:
 		if(c417_pointrom_adr >= ptrom_limit)
@@ -1132,7 +1132,7 @@ static READ16_HANDLER(s23_c417_r)
 
 	}
 
-	logerror("c417_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	logerror("c417_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 	return 0;
 }
 
@@ -1152,7 +1152,7 @@ static WRITE16_HANDLER(s23_c417_w)
 		c417_pointrom_adr = 0;
 		break;
     case 4:
-		//        logerror("c417_w %04x = %04x (%08x, %08x)\n", c417_adr, data, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+		//        logerror("c417_w %04x = %04x (%08x, %08x)\n", c417_adr, data, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
         COMBINE_DATA(c417_ram + c417_adr);
         break;
     case 7:
@@ -1160,14 +1160,14 @@ static WRITE16_HANDLER(s23_c417_w)
     	cputag_set_input_line(space->machine(), "maincpu", MIPS3_IRQ2, CLEAR_LINE);
     	break;
     default:
-        logerror("c417_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+        logerror("c417_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
         break;
     }
 }
 
 static READ16_HANDLER(s23_c412_ram_r)
 {
-	//  logerror("c412_ram_r %06x (%08x, %08x)\n", offset, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	//  logerror("c412_ram_r %06x (%08x, %08x)\n", offset, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 	if(offset < 0x100000)
 		return c412_sdram_a[offset & 0xfffff];
 	else if(offset < 0x200000)
@@ -1182,7 +1182,7 @@ static READ16_HANDLER(s23_c412_ram_r)
 
 static WRITE16_HANDLER(s23_c412_ram_w)
 {
-	//  logerror("c412_ram_w %06x = %04x (%08x, %08x)\n", offset, data, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	//  logerror("c412_ram_w %06x = %04x (%08x, %08x)\n", offset, data, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 	if(offset < 0x100000)
 		COMBINE_DATA(c412_sdram_a + (offset & 0xfffff));
 	else if(offset < 0x200000)
@@ -1204,7 +1204,7 @@ static READ16_HANDLER(s23_c412_r)
 	case 10: return s23_c412_ram_r(space, c412_adr, mem_mask);
 	}
 
-	logerror("c412_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	logerror("c412_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 	return 0;
 }
 
@@ -1215,14 +1215,14 @@ static WRITE16_HANDLER(s23_c412_w)
 	case 9: c412_adr = ((data & mem_mask) << 16) | (c412_adr & (0xffffffff ^ (mem_mask << 16))); break;
 	case 10: s23_c412_ram_w(space, c412_adr, data, mem_mask); c412_adr += 2; break;
     default:
-        logerror("c412_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+        logerror("c412_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
         break;
     }
 }
 
 static READ16_HANDLER(s23_c421_ram_r)
 {
-	//  logerror("c421_ram_r %06x (%08x, %08x)\n", offset, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	//  logerror("c421_ram_r %06x (%08x, %08x)\n", offset, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 	if(offset < 0x40000)
 		return c421_dram_a[offset & 0x3ffff];
 	else if(offset < 0x80000)
@@ -1235,7 +1235,7 @@ static READ16_HANDLER(s23_c421_ram_r)
 
 static WRITE16_HANDLER(s23_c421_ram_w)
 {
-	//  logerror("c421_ram_w %06x = %04x (%08x, %08x)\n", offset, data, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	//  logerror("c421_ram_w %06x = %04x (%08x, %08x)\n", offset, data, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 	if(offset < 0x40000)
 		COMBINE_DATA(c421_dram_a + (offset & 0x3ffff));
 	else if(offset < 0x80000)
@@ -1252,7 +1252,7 @@ static READ16_HANDLER(s23_c421_r)
 	case 3: return c421_adr;
 	}
 
-	logerror("c421_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	logerror("c421_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 	return 0;
 }
 
@@ -1263,7 +1263,7 @@ static WRITE16_HANDLER(s23_c421_w)
 	case 2: c421_adr = ((data & mem_mask) << 16) | (c421_adr & (0xffffffff ^ (mem_mask << 16))); break;
 	case 3: c421_adr = (data & mem_mask) | (c421_adr & (0xffffffff ^ mem_mask)); break;
     default:
-        logerror("c421_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+        logerror("c421_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
         break;
     }
 }
@@ -1294,17 +1294,17 @@ static WRITE16_HANDLER(s23_ctl_w)
 	case 5:
 		if(ctl_vbl_active) {
 			ctl_vbl_active = false;
-			device_set_input_line(space->cpu, MIPS3_IRQ0, CLEAR_LINE);
+			device_set_input_line(&space->device(), MIPS3_IRQ0, CLEAR_LINE);
 		}
 		break;
 
 	case 6:	// gmen wars spams this heavily with 0 prior to starting the GMEN board test
 		if (data != 0)
-			logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+			logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 		break;
 
 	default:
-		logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+		logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 	}
 }
 
@@ -1319,7 +1319,7 @@ static READ16_HANDLER(s23_ctl_r)
 		return res;
 	}
 	}
-	logerror("ctl_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	logerror("ctl_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 	return 0xffff;
 }
 
@@ -1359,7 +1359,7 @@ static WRITE16_HANDLER(s23_c361_w)
 		break;
 
 	default:
-		logerror("c361_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+		logerror("c361_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 	}
 }
 
@@ -1369,7 +1369,7 @@ static READ16_HANDLER(s23_c361_r)
 	case 5: return space->machine().primary_screen->vpos()*2 | (space->machine().primary_screen->vblank() ? 1 : 0);
 	case 6: return space->machine().primary_screen->vblank();
 	}
-	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 	return 0xffff;
 }
 
@@ -1793,7 +1793,7 @@ static READ32_HANDLER( p3d_r )
 	case 0xa: return 1; // Busy flag
 	}
 
-	logerror("p3d_r %02x @ %08x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	logerror("p3d_r %02x @ %08x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 	return 0;
 }
 
@@ -1811,7 +1811,7 @@ static WRITE32_HANDLER( p3d_w)
 		c361_timer->adjust(attotime::never);
 		return;
 	}
-	logerror("p3d_w %02x, %08x @ %08x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	logerror("p3d_w %02x, %08x @ %08x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 }
 
 static void render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, poly_vertex &pv)

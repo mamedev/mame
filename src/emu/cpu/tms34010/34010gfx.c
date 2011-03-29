@@ -213,7 +213,7 @@ static UINT16 memory_r(address_space *space, offs_t offset)
 
 static void shiftreg_w(address_space *space, offs_t offset,UINT16 data)
 {
-	tms34010_state *tms = get_safe_token(space->cpu);
+	tms34010_state *tms = get_safe_token(&space->device());
 	if (tms->config->from_shiftreg)
 		(*tms->config->from_shiftreg)(space, (UINT32)(offset << 3) & ~15, &tms->shiftreg[0]);
 	else
@@ -222,7 +222,7 @@ static void shiftreg_w(address_space *space, offs_t offset,UINT16 data)
 
 static UINT16 shiftreg_r(address_space *space, offs_t offset)
 {
-	tms34010_state *tms = get_safe_token(space->cpu);
+	tms34010_state *tms = get_safe_token(&space->device());
 	if (tms->config->to_shiftreg)
 		(*tms->config->to_shiftreg)(space, (UINT32)(offset << 3) & ~15, &tms->shiftreg[0]);
 	else
@@ -232,7 +232,7 @@ static UINT16 shiftreg_r(address_space *space, offs_t offset)
 
 static UINT16 dummy_shiftreg_r(address_space *space, offs_t offset)
 {
-	tms34010_state *tms = get_safe_token(space->cpu);
+	tms34010_state *tms = get_safe_token(&space->device());
 	return tms->shiftreg[0];
 }
 

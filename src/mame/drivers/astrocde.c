@@ -425,7 +425,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 	int bank = (data >> 5) & 3;
 
 	/* this is accessed from I/O space but modifies program space, so we normalize here */
-	space = space->cpu->memory().space(AS_PROGRAM);
+	space = space->device().memory().space(AS_PROGRAM);
 
 	/* remember the banking bits for save state support */
 	profpac_bank = data;

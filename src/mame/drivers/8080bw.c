@@ -1730,12 +1730,12 @@ INPUT_PORTS_END
 
 static READ8_HANDLER(indianbt_r)
 {
-	switch(cpu_get_pc(space->cpu))
+	switch(cpu_get_pc(&space->device()))
 	{
 		case 0x5fed:	return 0x10;
 		case 0x5ffc:	return 0;
 	}
-	logerror("unknown port 0 read @ %x\n",cpu_get_pc(space->cpu));
+	logerror("unknown port 0 read @ %x\n",cpu_get_pc(&space->device()));
 	return space->machine().rand();
 }
 

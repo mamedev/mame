@@ -242,7 +242,7 @@ WRITE16_HANDLER( wrally2_adc_clk )
 		}
 	}
 	else
-		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 }
 
 
@@ -259,7 +259,7 @@ WRITE16_HANDLER( wrally2_adc_cs )
 		}
 	}
 	else
-		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 }
 
 /***************************************************************************
@@ -304,7 +304,7 @@ WRITE16_DEVICE_HANDLER( gaelco2_eeprom_data_w )
 
 READ16_HANDLER( snowboar_protection_r )
 {
-	logerror("%06x: protection read from %04x\n", cpu_get_pc(space->cpu), offset*2);
+	logerror("%06x: protection read from %04x\n", cpu_get_pc(&space->device()), offset*2);
 	return 0x0000;
 }
 
@@ -312,6 +312,6 @@ WRITE16_HANDLER( snowboar_protection_w )
 {
 	gaelco2_state *state = space->machine().driver_data<gaelco2_state>();
 	COMBINE_DATA(&state->snowboar_protection[offset]);
-	logerror("%06x: protection write %04x to %04x\n", cpu_get_pc(space->cpu), data, offset*2);
+	logerror("%06x: protection write %04x to %04x\n", cpu_get_pc(&space->device()), data, offset*2);
 
 }

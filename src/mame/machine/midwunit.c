@@ -60,7 +60,7 @@ WRITE16_HANDLER( midwunit_cmos_w )
 	}
 	else
 	{
-		logerror("%08X:Unexpected CMOS W @ %05X\n", cpu_get_pc(space->cpu), offset);
+		logerror("%08X:Unexpected CMOS W @ %05X\n", cpu_get_pc(&space->device()), offset);
 		popmessage("Bad CMOS write");
 	}
 }
@@ -94,7 +94,7 @@ WRITE16_HANDLER( midwunit_io_w )
 	switch (offset)
 	{
 		case 1:
-			logerror("%08X:Control W @ %05X = %04X\n", cpu_get_pc(space->cpu), offset, data);
+			logerror("%08X:Control W @ %05X = %04X\n", cpu_get_pc(&space->device()), offset, data);
 
 			/* bit 4 reset sound CPU */
 			dcs_reset_w(newword & 0x10);
@@ -110,7 +110,7 @@ WRITE16_HANDLER( midwunit_io_w )
 			break;
 
 		default:
-			logerror("%08X:Unknown I/O write to %d = %04X\n", cpu_get_pc(space->cpu), offset, data);
+			logerror("%08X:Unknown I/O write to %d = %04X\n", cpu_get_pc(&space->device()), offset, data);
 			break;
 	}
 	state->iodata[offset] = newword;
@@ -144,7 +144,7 @@ READ16_HANDLER( midwunit_io_r )
 			return (midway_serial_pic_status_r() << 12) | midwunit_sound_state_r(space,0,0xffff);
 
 		default:
-			logerror("%08X:Unknown I/O read from %d\n", cpu_get_pc(space->cpu), offset);
+			logerror("%08X:Unknown I/O read from %d\n", cpu_get_pc(&space->device()), offset);
 			break;
 	}
 	return ~0;
@@ -222,7 +222,7 @@ static WRITE16_HANDLER( umk3_palette_hack_w )
         without significantly impacting the rest of the system.
     */
 	COMBINE_DATA(&state->umk3_palette[offset]);
-	device_adjust_icount(space->cpu, -100);
+	device_adjust_icount(&space->device(), -100);
 /*  printf("in=%04X%04X  out=%04X%04X\n", state->umk3_palette[3], state->umk3_palette[2], state->umk3_palette[1], state->umk3_palette[0]); */
 }
 
@@ -416,7 +416,7 @@ WRITE16_HANDLER( midwunit_security_w )
 
 READ16_HANDLER( midwunit_sound_r )
 {
-	logerror("%08X:Sound read\n", cpu_get_pc(space->cpu));
+	logerror("%08X:Sound read\n", cpu_get_pc(&space->device()));
 
 	return dcs_data_r() & 0xff;
 }
@@ -433,14 +433,14 @@ WRITE16_HANDLER( midwunit_sound_w )
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", cpu_get_pc(space->cpu), data);
+		logerror("%08X:Unexpected write to sound (hi) = %04X\n", cpu_get_pc(&space->device()), data);
 		return;
 	}
 
 	/* call through based on the sound type */
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("%08X:Sound write = %04X\n", cpu_get_pc(space->cpu), data);
+		logerror("%08X:Sound write = %04X\n", cpu_get_pc(&space->device()), data);
 		dcs_data_w(data & 0xff);
 	}
 }

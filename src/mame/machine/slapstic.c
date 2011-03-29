@@ -876,15 +876,15 @@ static int alt2_kludge(address_space *space, offs_t offset)
 	if (access_68k)
 	{
 		/* first verify that the prefetched PC matches the first alternate */
-		if (MATCHES_MASK_VALUE(cpu_get_pc(space->cpu) >> 1, slapstic.alt1))
+		if (MATCHES_MASK_VALUE(cpu_get_pc(&space->device()) >> 1, slapstic.alt1))
 		{
 			/* now look for a move.w (An),(An) or cmpm.w (An)+,(An)+ */
-			UINT16 opcode = space->direct().read_decrypted_word(cpu_get_previouspc(space->cpu) & 0xffffff);
+			UINT16 opcode = space->direct().read_decrypted_word(cpu_get_previouspc(&space->device()) & 0xffffff);
 			if ((opcode & 0xf1f8) == 0x3090 || (opcode & 0xf1f8) == 0xb148)
 			{
 				/* fetch the value of the register for the second operand, and see */
 				/* if it matches the third alternate */
-				UINT32 regval = cpu_get_reg(space->cpu, M68K_A0 + ((opcode >> 9) & 7)) >> 1;
+				UINT32 regval = cpu_get_reg(&space->device(), M68K_A0 + ((opcode >> 9) & 7)) >> 1;
 				if (MATCHES_MASK_VALUE(regval, slapstic.alt3))
 				{
 					alt_bank = (regval >> slapstic.altshift) & 3;

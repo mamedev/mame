@@ -442,7 +442,7 @@ static WRITE8_HANDLER( decoder_display_port_w )
         Display is 6-bit
         Decoder is 4-bit
     */
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
+	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
 	ldplayer_data *player = ld->player;
 
 	/* writes to offset 0 select the target for reads/writes of actual data */
@@ -469,7 +469,7 @@ static WRITE8_HANDLER( decoder_display_port_w )
 
 static READ8_HANDLER( decoder_display_port_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
+	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
 	ldplayer_data *player = ld->player;
 	UINT8 result = 0;
 
@@ -494,7 +494,7 @@ static READ8_HANDLER( decoder_display_port_r )
 
 static READ8_HANDLER( controller_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
+	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
 
 	/* note that this is a cheesy implementation; the real thing relies on exquisite timing */
 	UINT8 result = ld->player->command ^ 0xff;
@@ -509,9 +509,9 @@ static READ8_HANDLER( controller_r )
 
 static WRITE8_HANDLER( controller_w )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
+	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
 	if (LOG_STATUS_CHANGES && data != ld->player->status)
-		printf("%04X:CONTROLLER.W=%02X\n", cpu_get_pc(space->cpu), data);
+		printf("%04X:CONTROLLER.W=%02X\n", cpu_get_pc(&space->device()), data);
 	ld->player->status = data;
 }
 

@@ -472,7 +472,7 @@ static WRITE16_DEVICE_HANDLER( bloodwar_oki_0_bank_w )
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * (data & 0xf) );
-//      logerror("CPU #0 PC %06X : OKI0  bank %08X\n",cpu_get_pc(space->cpu),data);
+//      logerror("CPU #0 PC %06X : OKI0  bank %08X\n",cpu_get_pc(&space->device()),data);
 	}
 }
 
@@ -482,7 +482,7 @@ static WRITE16_DEVICE_HANDLER( bloodwar_oki_1_bank_w )
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * data );
-//      logerror("CPU #0 PC %06X : OKI1  bank %08X\n",cpu_get_pc(space->cpu),data);
+//      logerror("CPU #0 PC %06X : OKI1  bank %08X\n",cpu_get_pc(&space->device()),data);
 	}
 }
 
@@ -621,7 +621,7 @@ static WRITE16_DEVICE_HANDLER( gtmr_oki_0_bank_w )
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base( 0x40000 * (data & 0xF) );
-//      logerror("CPU #0 PC %06X : OKI0 bank %08X\n",cpu_get_pc(space->cpu),data);
+//      logerror("CPU #0 PC %06X : OKI0 bank %08X\n",cpu_get_pc(&space->device()),data);
 	}
 }
 
@@ -631,7 +631,7 @@ static WRITE16_DEVICE_HANDLER( gtmr_oki_1_bank_w )
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base( 0x40000 * (data & 0x1) );
-//      logerror("CPU #0 PC %06X : OKI1 bank %08X\n",cpu_get_pc(space->cpu),data);
+//      logerror("CPU #0 PC %06X : OKI1 bank %08X\n",cpu_get_pc(&space->device()),data);
 	}
 }
 
@@ -701,7 +701,7 @@ static READ16_HANDLER( gtmr2_wheel_r )
 		case 0x0800:	// 360' Wheel
 			return	(input_port_read(space->machine(), "WHEEL2") << 8);
 		default:
-			logerror("gtmr2_wheel_r : read at %06x with joystick\n", cpu_get_pc(space->cpu));
+			logerror("gtmr2_wheel_r : read at %06x with joystick\n", cpu_get_pc(&space->device()));
 			return	(~0);
 	}
 }

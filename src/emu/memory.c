@@ -1790,8 +1790,7 @@ static STATE_POSTLOAD( bank_reattach )
 //-------------------------------------------------
 
 address_space::address_space(device_memory_interface &memory, address_spacenum spacenum, bool large)
-	: cpu(&memory.device()),
-	  m_next(NULL),
+	: m_next(NULL),
 	  m_config(*memory.space_config(spacenum)),
 	  m_device(memory.device()),
 	  m_machine(memory.device().machine()),

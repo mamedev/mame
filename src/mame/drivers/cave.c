@@ -227,7 +227,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 //  state->sound_flag2 = 1;
 	soundlatch_word_w(space, offset, data, mem_mask);
 	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-	device_spin_until_time(space->cpu, attotime::from_usec(50));	// Allow the other cpu to reply
+	device_spin_until_time(&space->device(), attotime::from_usec(50));	// Allow the other cpu to reply
 }
 
 /* Sound CPU: read the low 8 bits of the 16 bit sound latch */
@@ -259,7 +259,7 @@ static READ16_HANDLER( soundlatch_ack_r )
 	}
 	else
 	{
-		logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n", cpu_get_pc(space->cpu));
+		logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n", cpu_get_pc(&space->device()));
 		return 0xff;
 	}
 }
@@ -273,7 +273,7 @@ static WRITE8_HANDLER( soundlatch_ack_w )
 	if (state->soundbuf_len < 32)
 		state->soundbuf_len++;
 	else
-		logerror("CPU #1 - PC %04X: Sound Buffer 2 Overflow Error\n", cpu_get_pc(space->cpu));
+		logerror("CPU #1 - PC %04X: Sound Buffer 2 Overflow Error\n", cpu_get_pc(&space->device()));
 }
 
 
@@ -1053,7 +1053,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( hotdogst_rombank_w )
 {
 	if (data & ~0x0f)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(space->cpu), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space->device()), data);
 
 	memory_set_bank(space->machine(), "bank2", data & 0x0f);
 }
@@ -1090,7 +1090,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( mazinger_rombank_w )
 {
 	if (data & ~0x07)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(space->cpu), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space->device()), data);
 
 	memory_set_bank(space->machine(), "bank2", data & 0x07);
 }
@@ -1121,7 +1121,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( metmqstr_rombank_w )
 {
 	if (data & ~0x0f)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(space->cpu), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space->device()), data);
 
 	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 }
@@ -1169,7 +1169,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( pwrinst2_rombank_w )
 {
 	if (data & ~0x07)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(space->cpu), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space->device()), data);
 
 	memory_set_bank(space->machine(), "bank1", data & 0x07);
 }
@@ -1213,7 +1213,7 @@ static WRITE8_HANDLER( mirror_ram_w )
 static WRITE8_HANDLER( sailormn_rombank_w )
 {
 	if (data & ~0x1f)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(space->cpu), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space->device()), data);
 
 	memory_set_bank(space->machine(), "bank1", data & 0x1f);
 }

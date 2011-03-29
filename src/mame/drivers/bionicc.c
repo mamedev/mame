@@ -75,7 +75,7 @@ static WRITE16_HANDLER( hacked_controls_w )
 {
 	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
-	logerror("%06x: hacked_controls_w %04x %02x\n", cpu_get_pc(space->cpu), offset, data);
+	logerror("%06x: hacked_controls_w %04x %02x\n", cpu_get_pc(&space->device()), offset, data);
 	COMBINE_DATA(&state->inp[offset]);
 }
 
@@ -83,7 +83,7 @@ static READ16_HANDLER( hacked_controls_r )
 {
 	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
-	logerror("%06x: hacked_controls_r %04x %04x\n", cpu_get_pc(space->cpu), offset, state->inp[offset]);
+	logerror("%06x: hacked_controls_r %04x %04x\n", cpu_get_pc(&space->device()), offset, state->inp[offset]);
 	return state->inp[offset];
 }
 

@@ -87,7 +87,7 @@ static READ16_HANDLER( zwackery_6840_r )
 	/* It expects D1 to end up between 0 and 5; in order to */
 	/* make this happen, we must assume that reads from the */
 	/* 6840 take 14 additional cycles                       */
-	device_adjust_icount(space->cpu, -14);
+	device_adjust_icount(&space->device(), -14);
 	return mcr68_6840_upper_r(space,offset,0xffff);
 }
 
@@ -235,7 +235,7 @@ static WRITE16_HANDLER( pigskin_protection_w )
 		state->protection_data[3] = state->protection_data[4];
 		state->protection_data[4] = data & 0xff;
 
-		logerror("%06X:protection_w=%02X\n", cpu_get_previouspc(space->cpu), data & 0xff);
+		logerror("%06X:protection_w=%02X\n", cpu_get_previouspc(&space->device()), data & 0xff);
 	}
 }
 

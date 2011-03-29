@@ -127,7 +127,7 @@ static WRITE16_HANDLER( playmark_snd_command_w )
 	{
 		state->snd_command = (data & 0xff);
 		state->snd_flag = 1;
-		device_yield(space->cpu);
+		device_yield(&space->device());
 	}
 }
 
@@ -139,12 +139,12 @@ static READ8_HANDLER( playmark_snd_command_r )
 	if ((state->oki_control & 0x38) == 0x30)
 	{
 		data = state->snd_command;
-		// logerror("PC$%03x PortB reading %02x from the 68K\n", cpu_get_previouspc(space->cpu), data);
+		// logerror("PC$%03x PortB reading %02x from the 68K\n", cpu_get_previouspc(&space->device()), data);
 	}
 	else if ((state->oki_control & 0x38) == 0x28)
 	{
 		data = (state->oki->read(*space, 0) & 0x0f);
-		// logerror("PC$%03x PortB reading %02x from the OKI status port\n", cpu_get_previouspc(space->cpu), data);
+		// logerror("PC$%03x PortB reading %02x from the OKI status port\n", cpu_get_previouspc(&space->device()), data);
 	}
 
 	return data;
@@ -207,7 +207,7 @@ static WRITE8_HANDLER( playmark_snd_control_w )
 
 	if ((data & 0x38) == 0x18)
 	{
-		// logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",cpu_get_previouspc(space->cpu),playmark_oki_command,playmark_oki_control,playmark_snd_command);
+		// logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",cpu_get_previouspc(&space->device()),playmark_oki_command,playmark_oki_control,playmark_snd_command);
 		okim6295_device *oki = space->machine().device<okim6295_device>("oki");
 		oki->write(*space, 0, state->oki_command);
 	}

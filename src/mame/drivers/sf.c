@@ -147,7 +147,7 @@ static WRITE16_HANDLER( protection_w )
 		}
 	default:
 		{
-			logerror("Write protection at %06x (%04x)\n", cpu_get_pc(space->cpu), data & 0xffff);
+			logerror("Write protection at %06x (%04x)\n", cpu_get_pc(&space->device()), data & 0xffff);
 			logerror("*** Unknown protection %d\n", space->read_byte(0xffc684));
 			break;
 		}

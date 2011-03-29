@@ -176,7 +176,7 @@ static WRITE32_HANDLER( groundfx_adc_w )
 {
 	/* One interrupt per input port (4 per frame, though only 2 used).
         1000 cycle delay is arbitrary */
-	space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(1000), FUNC(groundfx_interrupt5));
+	space->machine().scheduler().timer_set(downcast<cpu_device *>(&space->device())->cycles_to_attotime(1000), FUNC(groundfx_interrupt5));
 }
 
 static WRITE32_HANDLER( rotate_control_w )	/* only a guess that it's rotation */
@@ -442,7 +442,7 @@ ROM_END
 static READ32_HANDLER( irq_speedup_r_groundfx )
 {
 	groundfx_state *state = space->machine().driver_data<groundfx_state>();
-	cpu_device *cpu = downcast<cpu_device *>(space->cpu);
+	cpu_device *cpu = downcast<cpu_device *>(&space->device());
 	int ptr;
 	offs_t sp = cpu->sp();
 	if ((sp&2)==0) ptr=state->ram[(sp&0x1ffff)/4];

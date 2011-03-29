@@ -625,7 +625,7 @@ int s;
 
 WRITE32_HANDLER( sh4_internal_w )
 {
-	sh4_state *sh4 = get_safe_token(space->cpu);
+	sh4_state *sh4 = get_safe_token(&space->device());
 	int a;
 	UINT32 old = sh4->m[offset];
 	COMBINE_DATA(sh4->m+offset);
@@ -937,7 +937,7 @@ WRITE32_HANDLER( sh4_internal_w )
 
 READ32_HANDLER( sh4_internal_r )
 {
-	sh4_state *sh4 = get_safe_token(space->cpu);
+	sh4_state *sh4 = get_safe_token(&space->device());
 	//  logerror("sh4_internal_r:  Read %08x (%x) @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, mem_mask);
 	switch( offset )
 	{
@@ -1330,7 +1330,7 @@ UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address)
 
 READ64_HANDLER( sh4_tlb_r )
 {
-	sh4_state *sh4 = get_safe_token(space->cpu);
+	sh4_state *sh4 = get_safe_token(&space->device());
 
 	int offs = offset*8;
 
@@ -1348,7 +1348,7 @@ READ64_HANDLER( sh4_tlb_r )
 
 WRITE64_HANDLER( sh4_tlb_w )
 {
-	sh4_state *sh4 = get_safe_token(space->cpu);
+	sh4_state *sh4 = get_safe_token(&space->device());
 
 	int offs = offset*8;
 

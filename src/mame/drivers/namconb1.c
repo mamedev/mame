@@ -745,7 +745,7 @@ static READ32_HANDLER( custom_key_r )
 		break; /* no protection? */
 	}
 
-	logerror( "custom_key_r(%d); pc=%08x\n", offset, cpu_get_pc(space->cpu) );
+	logerror( "custom_key_r(%d); pc=%08x\n", offset, cpu_get_pc(&space->device()) );
 	return 0;
 } /* custom_key_r */
 
@@ -913,7 +913,7 @@ static WRITE16_HANDLER( nbmcu_shared_w )
 	// C74 BIOS has a very short window on the CPU sync signal, so immediately let the '020 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
 	{
-		device_spin_until_time(space->cpu, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(300));	// was 300
+		device_spin_until_time(&space->device(), downcast<cpu_device *>(&space->device())->cycles_to_attotime(300));	// was 300
 	}
 }
 

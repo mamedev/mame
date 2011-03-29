@@ -243,7 +243,7 @@ static WRITE8_HANDLER( dunhuang_horiz_clear_w )
 {
 	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
 	int i;
-//  logerror("%06x: horiz clear, y = %02x, data = %02d\n", cpu_get_pc(space->cpu), state->clear_y,data);
+//  logerror("%06x: horiz clear, y = %02x, data = %02d\n", cpu_get_pc(&space->device()), state->clear_y,data);
 	for (i = 0; i < 0x40; i++)
 	{
 		int addr = state->clear_y * 0x40 + i;
@@ -260,7 +260,7 @@ static WRITE8_HANDLER( dunhuang_vert_clear_w )
 {
 	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
 	int i;
-//  logerror("%06x: vert clear, x = %02x, y = %02x, data = %02x\n", cpu_get_pc(space->cpu), state->pos_x,state->pos_y,data);
+//  logerror("%06x: vert clear, x = %02x, y = %02x, data = %02x\n", cpu_get_pc(&space->device()), state->pos_x,state->pos_y,data);
 	for (i = 0; i < 0x08; i++)
 	{
 		int addr = (state->pos_x & 0x3f) + (i & 0x07) * 0x40;
@@ -326,7 +326,7 @@ static WRITE8_HANDLER( dunhuang_block_h_w )
 	int i,j, addr;
 	UINT8 *tile_addr;
 
-//  logerror("%06x: block dst %x, src %x, xy %x %x, wh %x %x, clr %x\n", cpu_get_pc(space->cpu), state->block_dest, (state->block_addr_hi << 8) + state->block_addr_lo, state->block_x,state->block_y,state->block_w+1,state->block_h+1,state->block_c);
+//  logerror("%06x: block dst %x, src %x, xy %x %x, wh %x %x, clr %x\n", cpu_get_pc(&space->device()), state->block_dest, (state->block_addr_hi << 8) + state->block_addr_lo, state->block_x,state->block_y,state->block_w+1,state->block_h+1,state->block_c);
 
 	state->block_h = data;
 
@@ -365,7 +365,7 @@ static WRITE8_HANDLER( dunhuang_block_h_w )
 			break;
 
 		default:
-			popmessage("%06x: block dst=%x", cpu_get_pc(space->cpu), state->block_dest);
+			popmessage("%06x: block dst=%x", cpu_get_pc(&space->device()), state->block_dest);
 	}
 }
 

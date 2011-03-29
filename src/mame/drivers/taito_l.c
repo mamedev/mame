@@ -378,7 +378,7 @@ static WRITE8_HANDLER( rombankswitch_w )
 			logerror("New rom size : %x\n", (state->high + 1) * 0x2000);
 		}
 
-		//logerror("robs %d, %02x (%04x)\n", offset, data, cpu_get_pc(space->cpu));
+		//logerror("robs %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space->device()));
 		state->cur_rombank = data;
 		memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base() + 0x10000 + 0x2000 * state->cur_rombank);
 	}
@@ -398,7 +398,7 @@ static WRITE8_HANDLER( rombank2switch_w )
 			logerror("New rom2 size : %x\n", (state->high2 + 1) * 0x4000);
 		}
 
-		//logerror("robs2 %02x (%04x)\n", data, cpu_get_pc(space->cpu));
+		//logerror("robs2 %02x (%04x)\n", data, cpu_get_pc(&space->device()));
 
 		state->cur_rombank2 = data;
 		memory_set_bankptr(space->machine(), "bank6", space->machine().region("slave")->base() + 0x10000 + 0x4000 * state->cur_rombank2);
@@ -424,7 +424,7 @@ static WRITE8_HANDLER( rambankswitch_w )
 	if (state->cur_rambank[offset] != data)
 	{
 		state->cur_rambank[offset] = data;
-//logerror("rabs %d, %02x (%04x)\n", offset, data, cpu_get_pc(space->cpu));
+//logerror("rabs %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space->device()));
 		if (data >= 0x14 && data <= 0x1f)
 		{
 			data -= 0x14;
@@ -438,7 +438,7 @@ static WRITE8_HANDLER( rambankswitch_w )
 		}
 		else
 		{
-			logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, cpu_get_pc(space->cpu));
+			logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space->device()));
 			state->current_notifier[offset] = 0;
 			state->current_base[offset] = state->empty_ram;
 		}
@@ -515,8 +515,8 @@ static WRITE8_HANDLER( mcu_data_w )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
 	state->last_data = data;
-	state->last_data_adr = cpu_get_pc(space->cpu);
-//  logerror("mcu write %02x (%04x)\n", data, cpu_get_pc(space->cpu));
+	state->last_data_adr = cpu_get_pc(&space->device());
+//  logerror("mcu write %02x (%04x)\n", data, cpu_get_pc(&space->device()));
 	switch (data)
 	{
 	case 0x43:
@@ -528,14 +528,14 @@ static WRITE8_HANDLER( mcu_data_w )
 
 static WRITE8_HANDLER( mcu_control_w )
 {
-//  logerror("mcu control %02x (%04x)\n", data, cpu_get_pc(space->cpu));
+//  logerror("mcu control %02x (%04x)\n", data, cpu_get_pc(&space->device()));
 }
 
 static READ8_HANDLER( mcu_data_r )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
 
-//  logerror("mcu read (%04x) [%02x, %04x]\n", cpu_get_pc(space->cpu), last_data, last_data_adr);
+//  logerror("mcu read (%04x) [%02x, %04x]\n", cpu_get_pc(&space->device()), last_data, last_data_adr);
 	if (state->mcu_pos == state->mcu_reply_len)
 		return 0;
 
@@ -544,14 +544,14 @@ static READ8_HANDLER( mcu_data_r )
 
 static READ8_HANDLER( mcu_control_r )
 {
-//  logerror("mcu control read (%04x)\n", cpu_get_pc(space->cpu));
+//  logerror("mcu control read (%04x)\n", cpu_get_pc(&space->device()));
 	return 0x1;
 }
 
 #if 0
 static WRITE8_HANDLER( sound_w )
 {
-	logerror("Sound_w %02x (%04x)\n", data, cpu_get_pc(space->cpu));
+	logerror("Sound_w %02x (%04x)\n", data, cpu_get_pc(&space->device()));
 }
 #endif
 
@@ -584,7 +584,7 @@ static READ8_HANDLER( mux_r )
 	case 7:
 		return input_port_read(space->machine(), "IN2");
 	default:
-		logerror("Mux read from unknown port %d (%04x)\n", state->mux_ctrl, cpu_get_pc(space->cpu));
+		logerror("Mux read from unknown port %d (%04x)\n", state->mux_ctrl, cpu_get_pc(&space->device()));
 		return 0xff;
 	}
 }
@@ -599,7 +599,7 @@ static WRITE8_HANDLER( mux_w )
 		control2_w(space, 0, data);
 		break;
 	default:
-		logerror("Mux write to unknown port %d, %02x (%04x)\n", state->mux_ctrl, data, cpu_get_pc(space->cpu));
+		logerror("Mux write to unknown port %d, %02x (%04x)\n", state->mux_ctrl, data, cpu_get_pc(&space->device()));
 	}
 }
 
@@ -1956,7 +1956,7 @@ static WRITE8_DEVICE_HANDLER( portA_w )
 		state->cur_bank = data & 0x03;
 		bankaddress = 0x10000 + (state->cur_bank - 1) * 0x4000;
 		memory_set_bankptr(device->machine(), "bank7", &RAM[bankaddress]);
-		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", state->cur_bank, cpu_get_pc(space->cpu) );
+		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", state->cur_bank, cpu_get_pc(&space->device()) );
 	}
 }
 

@@ -453,7 +453,7 @@ bool debug_comment_load(running_machine &machine)
 int debug_cpu_translate(address_space *space, int intention, offs_t *address)
 {
 	device_memory_interface *memory;
-	if (space->cpu->interface(memory))
+	if (space->device().interface(memory))
 		return memory->translate(space->spacenum(), intention, *address);
 	return true;
 }
@@ -486,7 +486,7 @@ UINT8 debug_read_byte(address_space *_space, offs_t address, int apply_translati
 		result = 0xff;
 
 	/* if there is a custom read handler, and it returns true, use that value */
-	else if (space->cpu->memory().read(space->spacenum(), address, 1, custom))
+	else if (space->device().memory().read(space->spacenum(), address, 1, custom))
 		result = custom;
 
 	/* otherwise, call the byte reading function for the translated address */
@@ -539,7 +539,7 @@ UINT16 debug_read_word(address_space *_space, offs_t address, int apply_translat
 			result = 0xffff;
 
 		/* if there is a custom read handler, and it returns true, use that value */
-		else if (space->cpu->memory().read(space->spacenum(), address, 2, custom))
+		else if (space->device().memory().read(space->spacenum(), address, 2, custom))
 			result = custom;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -594,7 +594,7 @@ UINT32 debug_read_dword(address_space *_space, offs_t address, int apply_transla
 			result = 0xffffffff;
 
 		/* if there is a custom read handler, and it returns true, use that value */
-		else if (space->cpu->memory().read(space->spacenum(), address, 4, custom))
+		else if (space->device().memory().read(space->spacenum(), address, 4, custom))
 			result = custom;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -649,7 +649,7 @@ UINT64 debug_read_qword(address_space *_space, offs_t address, int apply_transla
 			result = ~(UINT64)0;
 
 		/* if there is a custom read handler, and it returns true, use that value */
-		else if (space->cpu->memory().read(space->spacenum(), address, 8, custom))
+		else if (space->device().memory().read(space->spacenum(), address, 8, custom))
 			result = custom;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -704,7 +704,7 @@ void debug_write_byte(address_space *_space, offs_t address, UINT8 data, int app
 		;
 
 	/* if there is a custom write handler, and it returns true, use that */
-	else if (space->cpu->memory().write(space->spacenum(), address, 1, data))
+	else if (space->device().memory().write(space->spacenum(), address, 1, data))
 		;
 
 	/* otherwise, call the byte reading function for the translated address */
@@ -756,7 +756,7 @@ void debug_write_word(address_space *_space, offs_t address, UINT16 data, int ap
 			;
 
 		/* if there is a custom write handler, and it returns true, use that */
-		else if (space->cpu->memory().write(space->spacenum(), address, 2, data))
+		else if (space->device().memory().write(space->spacenum(), address, 2, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -809,7 +809,7 @@ void debug_write_dword(address_space *_space, offs_t address, UINT32 data, int a
 			;
 
 		/* if there is a custom write handler, and it returns true, use that */
-		else if (space->cpu->memory().write(space->spacenum(), address, 4, data))
+		else if (space->device().memory().write(space->spacenum(), address, 4, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -862,7 +862,7 @@ void debug_write_qword(address_space *_space, offs_t address, UINT64 data, int a
 			;
 
 		/* if there is a custom write handler, and it returns true, use that */
-		else if (space->cpu->memory().write(space->spacenum(), address, 8, data))
+		else if (space->device().memory().write(space->spacenum(), address, 8, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -910,7 +910,7 @@ UINT64 debug_read_opcode(address_space *_space, offs_t address, int size, int ar
 	/* return early if we got the result directly */
 	space->set_debugger_access(global->debugger_access = true);
 	device_memory_interface *memory;
-	if (space->cpu->interface(memory) && memory->readop(address, size, result2))
+	if (space->device().interface(memory) && memory->readop(address, size, result2))
 	{
 		space->set_debugger_access(global->debugger_access = false);
 		return result2;
@@ -2962,7 +2962,7 @@ void device_debug::watchpoint_check(address_space &space, int type, offs_t addre
 				{
 					"0bytes", "byte", "word", "3bytes", "dword", "5bytes", "6bytes", "7bytes", "qword"
 				};
-				offs_t pc = (space.cpu->debug()->m_state != NULL) ? space.cpu->debug()->m_state->pc() : 0;
+				offs_t pc = (space.device().debug()->m_state != NULL) ? space.device().debug()->m_state->pc() : 0;
 				astring buffer;
 
 				if (type & WATCHPOINT_WRITE)
@@ -2976,7 +2976,7 @@ void device_debug::watchpoint_check(address_space &space, int type, offs_t addre
 				else
 					buffer.printf("Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->m_index, sizes[size], space.byte_to_address(address), pc);
 				debug_console_printf(space.machine(), "%s\n", buffer.cstr());
-				space.cpu->debug()->compute_debug_flags();
+				space.device().debug()->compute_debug_flags();
 			}
 			break;
 		}

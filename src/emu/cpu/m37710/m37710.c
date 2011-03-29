@@ -527,7 +527,7 @@ static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 da
 
 static READ16_HANDLER( m37710_internal_word_r )
 {
-	m37710i_cpu_struct *cpustate = get_safe_token(space->cpu);
+	m37710i_cpu_struct *cpustate = get_safe_token(&space->device());
 
 	if (mem_mask == 0xffff)
 	{
@@ -547,7 +547,7 @@ static READ16_HANDLER( m37710_internal_word_r )
 
 static WRITE16_HANDLER( m37710_internal_word_w )
 {
-	m37710i_cpu_struct *cpustate = get_safe_token(space->cpu);
+	m37710i_cpu_struct *cpustate = get_safe_token(&space->device());
 
 	if (mem_mask == 0xffff)
 	{

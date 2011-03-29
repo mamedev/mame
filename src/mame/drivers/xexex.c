@@ -168,9 +168,9 @@ static READ16_HANDLER( xexex_waitskip_r )
 {
 	xexex_state *state = space->machine().driver_data<xexex_state>();
 
-	if (cpu_get_pc(space->cpu) == 0x1158)
+	if (cpu_get_pc(&space->device()) == 0x1158)
 	{
-		device_spin_until_trigger(space->cpu, state->resume_trigger);
+		device_spin_until_trigger(&space->device(), state->resume_trigger);
 		state->suspension_active = 1;
 	}
 

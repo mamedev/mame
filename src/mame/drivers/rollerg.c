@@ -24,7 +24,7 @@ static KONAMI_SETLINES_CALLBACK( rollerg_banking );
 static WRITE8_HANDLER( rollerg_0010_w )
 {
 	rollerg_state *state = space->machine().driver_data<rollerg_state>();
-	logerror("%04x: write %02x to 0010\n",cpu_get_pc(space->cpu), data);
+	logerror("%04x: write %02x to 0010\n",cpu_get_pc(&space->device()), data);
 
 	/* bits 0/1 are coin counters */
 	coin_counter_w(space->machine(), 0, data & 0x01);

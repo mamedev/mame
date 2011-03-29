@@ -72,7 +72,7 @@ WRITE8_HANDLER( docastle_shared1_w )
 				data, (UINT32)state->maincpu->total_cycles());
 
 		/* freeze execution of the master CPU until the slave has used the shared memory */
-		device_spin_until_trigger(space->cpu, 500);
+		device_spin_until_trigger(&space->device(), 500);
 	}
 }
 

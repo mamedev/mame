@@ -113,7 +113,7 @@ static WRITE8_HANDLER( mainevt_sh_bankswitch_w )
 	mainevt_state *state = space->machine().driver_data<mainevt_state>();
 	int bank_A, bank_B;
 
-//logerror("CPU #1 PC: %04x bank switch = %02x\n",cpu_get_pc(space->cpu),data);
+//logerror("CPU #1 PC: %04x bank switch = %02x\n",cpu_get_pc(&space->device()),data);
 
 	/* bits 0-3 select the 007232 banks */
 	bank_A = (data & 0x3);
@@ -128,7 +128,7 @@ static WRITE8_DEVICE_HANDLER( dv_sh_bankswitch_w )
 {
 	int bank_A, bank_B;
 
-//logerror("CPU #1 PC: %04x bank switch = %02x\n",cpu_get_pc(space->cpu),data);
+//logerror("CPU #1 PC: %04x bank switch = %02x\n",cpu_get_pc(&space->device()),data);
 
 	/* bits 0-3 select the 007232 banks */
 	bank_A = (data & 0x3);

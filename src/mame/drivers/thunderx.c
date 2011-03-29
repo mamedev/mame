@@ -65,12 +65,12 @@ static READ8_HANDLER( thunderx_bankedram_r )
 	{
 		if (state->pmcbank)
 		{
-//          logerror("%04x read pmcram %04x\n",cpu_get_pc(space->cpu),offset);
+//          logerror("%04x read pmcram %04x\n",cpu_get_pc(&space->device()),offset);
 			return state->pmcram[offset];
 		}
 		else
 		{
-			logerror("%04x read pmc internal ram %04x\n",cpu_get_pc(space->cpu),offset);
+			logerror("%04x read pmc internal ram %04x\n",cpu_get_pc(&space->device()),offset);
 			return 0;
 		}
 	}
@@ -88,11 +88,11 @@ static WRITE8_HANDLER( thunderx_bankedram_w )
 	{
 		if (state->pmcbank)
 		{
-			logerror("%04x pmcram %04x = %02x\n",cpu_get_pc(space->cpu),offset,data);
+			logerror("%04x pmcram %04x = %02x\n",cpu_get_pc(&space->device()),offset,data);
 			state->pmcram[offset] = data;
 		}
 		else
-			logerror("%04x pmc internal ram %04x = %02x\n",cpu_get_pc(space->cpu),offset,data);
+			logerror("%04x pmc internal ram %04x = %02x\n",cpu_get_pc(&space->device()),offset,data);
 	}
 	else
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
@@ -299,7 +299,7 @@ static WRITE8_HANDLER( thunderx_1f98_w )
 {
 	thunderx_state *state = space->machine().driver_data<thunderx_state>();
 
-	// logerror("%04x: 1f98_w %02x\n", cpu_get_pc(space->cpu),data);
+	// logerror("%04x: 1f98_w %02x\n", cpu_get_pc(&space->device()),data);
 
 	/* bit 0 = enable char ROM reading through the video RAM */
 	k052109_set_rmrd_line(state->k052109, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
@@ -313,7 +313,7 @@ static WRITE8_HANDLER( thunderx_1f98_w )
 		calculate_collisions(space->machine());
 
 		/* 100 cycle delay is arbitrary */
-		space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(100), FUNC(thunderx_firq_callback));
+		space->machine().scheduler().timer_set(downcast<cpu_device *>(&space->device())->cycles_to_attotime(100), FUNC(thunderx_firq_callback));
 	}
 
 	state->_1f98_data = data;
@@ -325,7 +325,7 @@ static WRITE8_HANDLER( scontra_bankswitch_w )
 	UINT8 *RAM = space->machine().region("maincpu")->base();
 	int offs;
 
-//logerror("%04x: bank switch %02x\n",cpu_get_pc(space->cpu),data);
+//logerror("%04x: bank switch %02x\n",cpu_get_pc(&space->device()),data);
 
 	/* bits 0-3 ROM bank */
 	offs = 0x10000 + (data & 0x0f)*0x2000;
@@ -345,7 +345,7 @@ static WRITE8_HANDLER( scontra_bankswitch_w )
 static WRITE8_HANDLER( thunderx_videobank_w )
 {
 	thunderx_state *state = space->machine().driver_data<thunderx_state>();
-	//logerror("%04x: select video ram bank %02x\n",cpu_get_pc(space->cpu),data);
+	//logerror("%04x: select video ram bank %02x\n",cpu_get_pc(&space->device()),data);
 	/* 0x01 = work RAM at 4000-5fff */
 	/* 0x00 = palette at 5800-5fff */
 	/* 0x10 = unknown RAM at 5800-5fff */

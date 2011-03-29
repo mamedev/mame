@@ -75,7 +75,7 @@ static void handle_coins(running_machine &machine, int coin)
 static READ8_HANDLER ( xyonix_io_r )
 {
 	xyonix_state *state = space->machine().driver_data<xyonix_state>();
-	int regPC = cpu_get_pc(space->cpu);
+	int regPC = cpu_get_pc(&space->device());
 
 	if (regPC == 0x27ba)
 		return 0x88;
@@ -128,7 +128,7 @@ static WRITE8_HANDLER ( xyonix_io_w )
 {
 	xyonix_state *state = space->machine().driver_data<xyonix_state>();
 
-	//logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, cpu_get_pc(space->cpu));
+	//logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, cpu_get_pc(&space->device()));
 	state->e0_data = data;
 }
 

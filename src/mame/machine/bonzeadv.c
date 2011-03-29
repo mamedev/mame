@@ -384,8 +384,8 @@ WRITE16_HANDLER( bonzeadv_cchip_ram_w )
 {
 	asuka_state *state = space->machine().driver_data<asuka_state>();
 
-//  if (cpu_get_pc(space->cpu)!=0xa028)
-//  logerror("%08x:  write %04x %04x cchip\n", cpu_get_pc(space->cpu), offset, data);
+//  if (cpu_get_pc(&space->device())!=0xa028)
+//  logerror("%08x:  write %04x %04x cchip\n", cpu_get_pc(&space->device()), offset, data);
 
 	if (state->current_bank == 0)
 	{
@@ -440,7 +440,7 @@ READ16_HANDLER( bonzeadv_cchip_ram_r )
 {
 	asuka_state *state = space->machine().driver_data<asuka_state>();
 
-//  logerror("%08x:  read %04x cchip\n", cpu_get_pc(space->cpu), offset);
+//  logerror("%08x:  read %04x cchip\n", cpu_get_pc(&space->device()), offset);
 
 	if (state->current_bank == 0)
 	{

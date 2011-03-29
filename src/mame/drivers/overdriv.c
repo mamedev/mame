@@ -62,7 +62,7 @@ static const eeprom_interface eeprom_intf =
 
 static WRITE16_HANDLER( eeprom_w )
 {
-//logerror("%06x: write %04x to eeprom_w\n",cpu_get_pc(space->cpu),data);
+//logerror("%06x: write %04x to eeprom_w\n",cpu_get_pc(&space->device()),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
@@ -105,7 +105,7 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 		coin_counter_w(space->machine(), 0, data & 0x10);
 		coin_counter_w(space->machine(), 1, data & 0x20);
 
-//logerror("%06x: write %04x to cpuA_ctrl_w\n",cpu_get_pc(space->cpu),data);
+//logerror("%06x: write %04x to cpuA_ctrl_w\n",cpu_get_pc(&space->device()),data);
 	}
 }
 

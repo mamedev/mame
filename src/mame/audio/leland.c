@@ -556,7 +556,7 @@ static DEVICE_START( common_sh_start )
 	}
 
 	/* create timers here so they stick around */
-	state->i80186.cpu = dmaspace->cpu;
+	state->i80186.cpu = &dmaspace->device();
 	state->i80186.timer[0].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int), device);
 	state->i80186.timer[1].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int), device);
 	state->i80186.timer[2].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int), device);

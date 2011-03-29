@@ -479,7 +479,7 @@ static READ8_HANDLER( hardhead_ip_r )
 		case 2:	return input_port_read(space->machine(), "DSW1");
 		case 3:	return input_port_read(space->machine(), "DSW2");
 		default:
-			logerror("CPU #0 - PC %04X: Unknown IP read: %02X\n", cpu_get_pc(space->cpu), *state->hardhead_ip);
+			logerror("CPU #0 - PC %04X: Unknown IP read: %02X\n", cpu_get_pc(&space->device()), *state->hardhead_ip);
 			return 0xff;
 	}
 }
@@ -493,7 +493,7 @@ static WRITE8_HANDLER( hardhead_bankswitch_w )
 {
 	int bank = data & 0x0f;
 
-	if (data & ~0xef)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0xef)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(&space->device()),data);
 	memory_set_bank(space->machine(), "bank1", bank);
 }
 
@@ -549,7 +549,7 @@ static WRITE8_HANDLER( rranger_bankswitch_w )
 	int bank = data & 0x07;
 	if ((~data & 0x10) && (bank >= 4))	bank += 4;
 
-	if (data & ~0xf7)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0xf7)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(&space->device()),data);
 
 	memory_set_bank(space->machine(), "bank1", bank);
 
@@ -621,7 +621,7 @@ static WRITE8_HANDLER( brickzn_palettebank_w )
 	suna8_state *state = space->machine().driver_data<suna8_state>();
 
 	state->palettebank = (data >> 1) & 1;
-	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown palettebank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown palettebank bits: %02X\n",cpu_get_pc(&space->device()),data);
 
 	/* Also used as soundlatch - depending on c0c0? */
 	soundlatch_w(space,0,data);
@@ -637,7 +637,7 @@ static WRITE8_HANDLER( brickzn_spritebank_w )
 	suna8_state *state = space->machine().driver_data<suna8_state>();
 
 	state->spritebank = (data >> 1) & 1;
-	if (data & ~0x03)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x03)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space->device()),data);
 	flip_screen_set(space->machine(),  data & 0x01 );
 }
 
@@ -657,7 +657,7 @@ static WRITE8_HANDLER( brickzn_rombank_w )
 	suna8_state *state = space->machine().driver_data<suna8_state>();
 	int bank = data & 0x0f;
 
-	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(&space->device()),data);
 
 	memory_set_bank(space->machine(), "bank1", bank);
 	state->rombank = data;
@@ -693,7 +693,7 @@ static WRITE8_HANDLER( hardhea2_nmi_w )
 	suna8_state *state = space->machine().driver_data<suna8_state>();
 
 	state->nmi_enable = data & 0x01;
-//  if (data & ~0x01)   logerror("CPU #0 - PC %04X: unknown nmi bits: %02X\n",cpu_get_pc(space->cpu),data);
+//  if (data & ~0x01)   logerror("CPU #0 - PC %04X: unknown nmi bits: %02X\n",cpu_get_pc(&space->device()),data);
 }
 
 /*
@@ -703,7 +703,7 @@ static WRITE8_HANDLER( hardhea2_nmi_w )
 static WRITE8_HANDLER( hardhea2_flipscreen_w )
 {
 	flip_screen_set(space->machine(), data & 0x01);
-	if (data & ~0x01)	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x01)	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(&space->device()),data);
 }
 
 static WRITE8_HANDLER( hardhea2_leds_w )
@@ -711,7 +711,7 @@ static WRITE8_HANDLER( hardhea2_leds_w )
 	set_led_status(space->machine(), 0, data & 0x01);
 	set_led_status(space->machine(), 1, data & 0x02);
 	coin_counter_w(space->machine(), 0, data & 0x04);
-	if (data & ~0x07)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x07)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(&space->device()),data);
 }
 
 /*
@@ -724,7 +724,7 @@ static WRITE8_HANDLER( hardhea2_spritebank_w )
 	suna8_state *state = space->machine().driver_data<suna8_state>();
 
 	state->spritebank = (data >> 1) & 1;
-	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space->device()),data);
 }
 
 /*
@@ -736,7 +736,7 @@ static WRITE8_HANDLER( hardhea2_rombank_w )
 	suna8_state *state = space->machine().driver_data<suna8_state>();
 	int bank = data & 0x0f;
 
-	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(&space->device()),data);
 
 	memory_set_bank(space->machine(), "bank1", bank);
 
@@ -817,7 +817,7 @@ static WRITE8_HANDLER( starfigh_spritebank_latch_w )
 	suna8_state *state = space->machine().driver_data<suna8_state>();
 
 	state->spritebank_latch = (data >> 2) & 1;
-	if (data & ~0x04)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x04)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space->device()),data);
 }
 
 static WRITE8_HANDLER( starfigh_spritebank_w )
@@ -883,7 +883,7 @@ static WRITE8_HANDLER( sparkman_cmd_prot_w )
 		case 0x81: state->trash_prot = 1; break;
 		case 0x99: state->trash_prot = 1; break;
 		case 0x54: state->spritebank = 1; break;
-		default: logerror("CPU #0 - PC %04X: unknown protection command: %02X\n",cpu_get_pc(space->cpu),data);
+		default: logerror("CPU #0 - PC %04X: unknown protection command: %02X\n",cpu_get_pc(&space->device()),data);
 	}
 }
 
@@ -902,14 +902,14 @@ static WRITE8_HANDLER( suna8_wram_w )
 static WRITE8_HANDLER( sparkman_flipscreen_w )
 {
 	flip_screen_set(space->machine(), data & 0x01);
-	//if (data & ~0x01)     logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x01)     logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(&space->device()),data);
 }
 
 static WRITE8_HANDLER( sparkman_leds_w )
 {
 	set_led_status(space->machine(), 0, data & 0x01);
 	set_led_status(space->machine(), 1, data & 0x02);
-	//if (data & ~0x03) logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x03) logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(&space->device()),data);
 }
 
 static WRITE8_HANDLER( sparkman_coin_counter_w )
@@ -930,7 +930,7 @@ static WRITE8_HANDLER( sparkman_spritebank_w )
 		state->spritebank = 0;
 	else
 		state->spritebank = (data) & 1;
-	//if (data & ~0x02)     logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x02)     logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space->device()),data);
 }
 
 /*
@@ -942,7 +942,7 @@ static WRITE8_HANDLER( sparkman_rombank_w )
 	suna8_state *state = space->machine().driver_data<suna8_state>();
 	int bank = data & 0x0f;
 
-	//if (data & ~0x0f)     logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x0f)     logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(&space->device()),data);
 
 	memory_set_bank(space->machine(), "bank1", bank);
 	state->rombank = data;

@@ -691,14 +691,14 @@ static WRITE16_HANDLER( loffire_sync0_w )
 
 static READ16_HANDLER( smgp_excs_r )
 {
-	logerror("%06X:smgp_excs_r(%04X)\n", cpu_get_pc(space->cpu), offset*2);
+	logerror("%06X:smgp_excs_r(%04X)\n", cpu_get_pc(&space->device()), offset*2);
 	return 0xffff;
 }
 
 
 static WRITE16_HANDLER( smgp_excs_w )
 {
-	logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", cpu_get_pc(space->cpu), offset*2, data, mem_mask);
+	logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", cpu_get_pc(&space->device()), offset*2, data, mem_mask);
 }
 
 

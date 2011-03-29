@@ -598,12 +598,12 @@ static WRITE32_HANDLER(shared_psx_w)
 	if (mem_mask == 0xff)
 	{
 		state->spu_shared[offset*2] = data;
-//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, offset*2, mem_mask, cpu_get_pc(space->cpu));
+//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, offset*2, mem_mask, cpu_get_pc(&space->device()));
 	}
 	else if (mem_mask == 0xff0000)
 	{
 		state->spu_shared[(offset*2)+1] = data;
-//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, (offset*2)+1, mem_mask, cpu_get_pc(space->cpu));
+//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, (offset*2)+1, mem_mask, cpu_get_pc(&space->device()));
 	}
 	else
 	{
@@ -618,7 +618,7 @@ static READ32_HANDLER(shared_psx_r)
 
 	result = state->spu_shared[offset*2] | state->spu_shared[(offset*2)+1]<<16;
 
-//  printf("shared_psx_r: @ %x (%x %x), mask %x = %x (PC=%x)\n", offset, offset*2, (offset*2)+1, mem_mask, result, cpu_get_pc(space->cpu));
+//  printf("shared_psx_r: @ %x (%x %x), mask %x = %x (PC=%x)\n", offset, offset*2, (offset*2)+1, mem_mask, result, cpu_get_pc(&space->device()));
 
 	result = 0;	// HACK to prevent the games from freezing while we sort out the rest of the 68k's boot sequence
 
@@ -716,19 +716,19 @@ static WRITE16_HANDLER( twinkle_spu_ctrl_w )
 
 	if ((!(data & 0x0080)) && (state->spu_ctrl & 0x0080))
 	{
-		device_set_input_line(space->cpu, M68K_IRQ_1, CLEAR_LINE);
+		device_set_input_line(&space->device(), M68K_IRQ_1, CLEAR_LINE);
 	}
 	else if ((!(data & 0x0100)) && (state->spu_ctrl & 0x0100))
 	{
-		device_set_input_line(space->cpu, M68K_IRQ_2, CLEAR_LINE);
+		device_set_input_line(&space->device(), M68K_IRQ_2, CLEAR_LINE);
 	}
 	else if ((!(data & 0x0200)) && (state->spu_ctrl & 0x0200))
 	{
-		device_set_input_line(space->cpu, M68K_IRQ_4, CLEAR_LINE);
+		device_set_input_line(&space->device(), M68K_IRQ_4, CLEAR_LINE);
 	}
 	else if ((!(data & 0x0400)) && (state->spu_ctrl & 0x0400))
 	{
-		device_set_input_line(space->cpu, M68K_IRQ_6, CLEAR_LINE);
+		device_set_input_line(&space->device(), M68K_IRQ_6, CLEAR_LINE);
 	}
 
 	state->spu_ctrl = data;

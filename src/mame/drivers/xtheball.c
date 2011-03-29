@@ -123,7 +123,7 @@ static WRITE16_HANDLER( bit_controls_w )
 	{
 		if (bitvals[offset] != (data & 1))
 		{
-			logerror("%08x:bit_controls_w(%x,%d)\n", cpu_get_pc(space->cpu), offset, data & 1);
+			logerror("%08x:bit_controls_w(%x,%d)\n", cpu_get_pc(&space->device()), offset, data & 1);
 
 			switch (offset)
 			{

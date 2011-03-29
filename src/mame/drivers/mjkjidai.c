@@ -118,7 +118,7 @@ static READ8_HANDLER( keyboard_r )
 	int res = 0x3f,i;
 	static const char *const keynames[] = { "PL2_1", "PL2_2", "PL2_3", "PL2_4", "PL2_5", "PL2_6", "PL1_1", "PL1_2", "PL1_3", "PL1_4", "PL1_5", "PL1_6" };
 
-//  logerror("%04x: keyboard_r\n", cpu_get_pc(space->cpu));
+//  logerror("%04x: keyboard_r\n", cpu_get_pc(&space->device()));
 
 	for (i = 0; i < 12; i++)
 	{
@@ -144,7 +144,7 @@ static WRITE8_HANDLER( keyboard_select_w )
 {
 	mjkjidai_state *state = space->machine().driver_data<mjkjidai_state>();
 
-//  logerror("%04x: keyboard_select %d = %02x\n",cpu_get_pc(space->cpu),offset,data);
+//  logerror("%04x: keyboard_select %d = %02x\n",cpu_get_pc(&space->device()),offset,data);
 
 	switch (offset)
 	{

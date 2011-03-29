@@ -358,7 +358,7 @@ static READ16_HANDLER( qsound_rom_r )
 		return rom[offset] | 0xff00;
 	else
 	{
-		popmessage("%06x: read sound ROM byte %04x", cpu_get_pc(space->cpu), offset);
+		popmessage("%06x: read sound ROM byte %04x", cpu_get_pc(&space->device()), offset);
 		return 0;
 	}
 }

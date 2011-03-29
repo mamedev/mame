@@ -1156,7 +1156,7 @@ static const char *const ioreg_name[] =
 
 WRITE16_HANDLER( tms34010_io_register_w )
 {
-	tms34010_state *tms = get_safe_token(space->cpu);
+	tms34010_state *tms = get_safe_token(&space->device());
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1185,7 +1185,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 			break;
 
 		case REG_PMASK:
-			if (data) logerror("Plane masking not supported. PC=%08X\n", cpu_get_pc(space->cpu));
+			if (data) logerror("Plane masking not supported. PC=%08X\n", cpu_get_pc(&space->device()));
 			break;
 
 		case REG_DPYCTL:
@@ -1225,12 +1225,12 @@ WRITE16_HANDLER( tms34010_io_register_w )
 			if (!(oldreg & 0x0080) && (newreg & 0x0080))
 			{
 				if (tms->config->output_int)
-					(*tms->config->output_int)(space->cpu, 1);
+					(*tms->config->output_int)(&space->device(), 1);
 			}
 			else if ((oldreg & 0x0080) && !(newreg & 0x0080))
 			{
 				if (tms->config->output_int)
-					(*tms->config->output_int)(space->cpu, 0);
+					(*tms->config->output_int)(&space->device(), 0);
 			}
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
@@ -1299,7 +1299,7 @@ static const char *const ioreg020_name[] =
 
 WRITE16_HANDLER( tms34020_io_register_w )
 {
-	tms34010_state *tms = get_safe_token(space->cpu);
+	tms34010_state *tms = get_safe_token(&space->device());
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1336,7 +1336,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 		case REG020_PMASKL:
 		case REG020_PMASKH:
-			if (data) logerror("Plane masking not supported. PC=%08X\n", cpu_get_pc(space->cpu));
+			if (data) logerror("Plane masking not supported. PC=%08X\n", cpu_get_pc(&space->device()));
 			break;
 
 		case REG020_DPYCTL:
@@ -1376,12 +1376,12 @@ WRITE16_HANDLER( tms34020_io_register_w )
 			if (!(oldreg & 0x0080) && (newreg & 0x0080))
 			{
 				if (tms->config->output_int)
-					(*tms->config->output_int)(space->cpu, 1);
+					(*tms->config->output_int)(&space->device(), 1);
 			}
 			else if ((oldreg & 0x0080) && !(newreg & 0x0080))
 			{
 				if (tms->config->output_int)
-					(*tms->config->output_int)(space->cpu, 0);
+					(*tms->config->output_int)(&space->device(), 0);
 			}
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
@@ -1462,7 +1462,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 READ16_HANDLER( tms34010_io_register_r )
 {
-	tms34010_state *tms = get_safe_token(space->cpu);
+	tms34010_state *tms = get_safe_token(&space->device());
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)
@@ -1505,7 +1505,7 @@ READ16_HANDLER( tms34010_io_register_r )
 
 READ16_HANDLER( tms34020_io_register_r )
 {
-	tms34010_state *tms = get_safe_token(space->cpu);
+	tms34010_state *tms = get_safe_token(&space->device());
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)

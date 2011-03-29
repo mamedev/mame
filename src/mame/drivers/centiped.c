@@ -616,7 +616,7 @@ static WRITE8_HANDLER( mazeinv_input_select_w )
 
 static READ8_HANDLER( bullsdrt_data_port_r )
 {
-	switch (cpu_get_pc(space->cpu))
+	switch (cpu_get_pc(&space->device()))
 	{
 		case 0x0033:
 		case 0x6b19:

@@ -397,7 +397,7 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
 /* Send sound data to the sound cpu and cause an nmi */
 static READ8_HANDLER( drivfrcg_port0_r )
 {
-	switch (cpu_get_pc(space->cpu))
+	switch (cpu_get_pc(&space->device()))
 	{
 		case 0x002e:
 		case 0x0297:
@@ -889,7 +889,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( hexpoola_data_port_r )
 {
-	switch (cpu_get_pc(space->cpu))
+	switch (cpu_get_pc(&space->device()))
 	{
 		case 0x0022:
 			return 0;

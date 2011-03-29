@@ -322,7 +322,7 @@ static READ32_HANDLER ( macrossp_soundstatus_r )
 {
 	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
-	//  logerror("%08x read soundstatus\n", cpu_get_pc(space->cpu));
+	//  logerror("%08x read soundstatus\n", cpu_get_pc(&space->device()));
 
 	/* bit 1 is sound status */
 	/* bit 0 unknown - it is expected to toggle, vblank? */
@@ -338,12 +338,12 @@ static WRITE32_HANDLER( macrossp_soundcmd_w )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		//logerror("%08x write soundcmd %08x (%08x)\n",cpu_get_pc(space->cpu),data,mem_mask);
+		//logerror("%08x write soundcmd %08x (%08x)\n",cpu_get_pc(&space->device()),data,mem_mask);
 		soundlatch_word_w(space, 0, data >> 16, 0xffff);
 		state->sndpending = 1;
 		device_set_input_line(state->audiocpu, 2, HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
-		device_spin_until_time(space->cpu, attotime::from_usec(50));
+		device_spin_until_time(&space->device(), attotime::from_usec(50));
 	}
 }
 
@@ -351,7 +351,7 @@ static READ16_HANDLER( macrossp_soundcmd_r )
 {
 	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
-	//  logerror("%06x read soundcmd\n",cpu_get_pc(space->cpu));
+	//  logerror("%06x read soundcmd\n",cpu_get_pc(&space->device()));
 	state->sndpending = 0;
 	return soundlatch_word_r(space, offset, mem_mask);
 }
@@ -777,7 +777,7 @@ PC :00018110 018110: beq     18104
 	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
 	COMBINE_DATA(&state->mainram[0x10158 / 4]);
-	if (cpu_get_pc(space->cpu) == 0x001810A) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device()) == 0x001810A) device_spin_until_interrupt(&space->device());
 }
 
 #ifdef UNUSED_FUNCTION
@@ -786,7 +786,7 @@ static WRITE32_HANDLER( quizmoon_speedup_w )
 	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
 	COMBINE_DATA(&state->mainram[0x00020 / 4]);
-	if (cpu_get_pc(space->cpu) == 0x1cc) device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device()) == 0x1cc) device_spin_until_interrupt(&space->device());
 }
 #endif
 

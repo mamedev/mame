@@ -201,7 +201,7 @@ static READ16_HANDLER(tomcat_320bio_r)
 static READ16_HANDLER(dsp_BIO_r)
 {
 	tomcat_state *state = space->machine().driver_data<tomcat_state>();
-	if ( cpu_get_pc(space->cpu) == 0x0001 )
+	if ( cpu_get_pc(&space->device()) == 0x0001 )
 	{
 		if ( state->dsp_idle == 0 )
 		{
@@ -210,7 +210,7 @@ static READ16_HANDLER(dsp_BIO_r)
 		}
 		return !state->dsp_BIO;
 	}
-	else if ( cpu_get_pc(space->cpu) == 0x0003 )
+	else if ( cpu_get_pc(&space->device()) == 0x0003 )
 	{
 		if ( state->dsp_BIO == 1 )
 		{

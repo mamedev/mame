@@ -857,7 +857,7 @@ static WRITE8_HANDLER( WSYNC_w )
 
 	if (cycles % 76)
 	{
-		device_adjust_icount(space->cpu, cycles % 76 - 76);
+		device_adjust_icount(&space->device(), cycles % 76 - 76);
 	}
 }
 

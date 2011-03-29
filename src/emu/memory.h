@@ -575,10 +575,6 @@ private:
 	memory_bank &bank_find_or_allocate(const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite);
 	address_map_entry *block_assign_intersecting(offs_t bytestart, offs_t byteend, UINT8 *base);
 
-public:
-	// public state (eventually will go away)
-	device_t *				cpu;				// kept for backwards compatibility
-
 protected:
 	// private state
 	address_space *			m_next;				// next address space in the global list

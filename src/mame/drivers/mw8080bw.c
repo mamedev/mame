@@ -2204,7 +2204,7 @@ static WRITE8_HANDLER( spcenctr_io_w )
 		state->spcenctr_trench_width = data;			/*  -  -  -  -  -  1  1  1 */
 
 	else
-		logerror("%04x:  Unmapped I/O port write to %02x = %02x\n", cpu_get_pc(space->cpu), offset, data);
+		logerror("%04x:  Unmapped I/O port write to %02x = %02x\n", cpu_get_pc(&space->device()), offset, data);
 }
 
 

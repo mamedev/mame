@@ -77,7 +77,7 @@ static WRITE16_HANDLER( pushman_68705_w )
 	if (offset == 1)
 	{
 		device_set_input_line(state->mcu, M68705_IRQ_LINE, HOLD_LINE);
-		device_spin(space->cpu);
+		device_spin(&space->device());
 		state->new_latch = 0;
 	}
 }

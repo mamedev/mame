@@ -110,7 +110,7 @@ WRITE8_HANDLER( alleymas_joystick_kludge )
 	leland_state *state = space->machine().driver_data<leland_state>();
 	/* catch the case where they clear this memory location at PC $1827 and change */
 	/* the value written to be a 1 */
-	if (cpu_get_previouspc(space->cpu) == 0x1827)
+	if (cpu_get_previouspc(&space->device()) == 0x1827)
 		*state->alleymas_kludge_mem = 1;
 	else
 		*state->alleymas_kludge_mem = data;
@@ -476,7 +476,7 @@ WRITE8_HANDLER( leland_master_alt_bankswitch_w )
 	/* update any bankswitching */
 	if (LOG_BANKSWITCHING_M)
 		if ((state->alternate_bank ^ data) & 0x0f)
-			logerror("%04X:alternate_bank = %02X\n", cpu_get_pc(space->cpu), data & 0x0f);
+			logerror("%04X:alternate_bank = %02X\n", cpu_get_pc(&space->device()), data & 0x0f);
 	state->alternate_bank = data & 15;
 	(*state->update_master_bank)(space->machine());
 
@@ -859,11 +859,11 @@ WRITE8_HANDLER( leland_battery_ram_w )
 	leland_state *state = space->machine().driver_data<leland_state>();
 	if (state->battery_ram_enable)
 	{
-		if (LOG_BATTERY_RAM) logerror("%04X:BatteryW@%04X=%02X\n", cpu_get_pc(space->cpu), offset, data);
+		if (LOG_BATTERY_RAM) logerror("%04X:BatteryW@%04X=%02X\n", cpu_get_pc(&space->device()), offset, data);
 		state->battery_ram[offset] = data;
 	}
 	else
-		logerror("%04X:BatteryW@%04X (invalid!)\n", cpu_get_pc(space->cpu), offset);
+		logerror("%04X:BatteryW@%04X (invalid!)\n", cpu_get_pc(&space->device()), offset);
 }
 
 
@@ -872,13 +872,13 @@ WRITE8_HANDLER( ataxx_battery_ram_w )
 	leland_state *state = space->machine().driver_data<leland_state>();
 	if (state->battery_ram_enable)
 	{
-		if (LOG_BATTERY_RAM) logerror("%04X:BatteryW@%04X=%02X\n", cpu_get_pc(space->cpu), offset, data);
+		if (LOG_BATTERY_RAM) logerror("%04X:BatteryW@%04X=%02X\n", cpu_get_pc(&space->device()), offset, data);
 		state->battery_ram[offset] = data;
 	}
 	else if ((state->master_bank & 0x30) == 0x20)
 		state->ataxx_qram[((state->master_bank & 0xc0) << 8) + offset] = data;
 	else
-		logerror("%04X:BatteryW@%04X (invalid!)\n", cpu_get_pc(space->cpu), offset);
+		logerror("%04X:BatteryW@%04X (invalid!)\n", cpu_get_pc(&space->device()), offset);
 }
 
 
@@ -1075,7 +1075,7 @@ WRITE8_HANDLER( leland_master_analog_key_w )
 			/* update top board banking for some games */
 			if (LOG_BANKSWITCHING_M)
 				if ((state->top_board_bank ^ data) & 0xc0)
-					logerror("%04X:top_board_bank = %02X\n", cpu_get_pc(space->cpu), data & 0xc0);
+					logerror("%04X:top_board_bank = %02X\n", cpu_get_pc(&space->device()), data & 0xc0);
 			state->top_board_bank = data & 0xc0;
 			(*state->update_master_bank)(space->machine());
 			break;
@@ -1126,7 +1126,7 @@ READ8_HANDLER( leland_master_input_r )
 
 		case 0x11:	/* /GIN1 */
 			result = input_port_read(space->machine(), "IN3");
-			if (LOG_EEPROM) logerror("%04X:EE read\n", cpu_get_pc(space->cpu));
+			if (LOG_EEPROM) logerror("%04X:EE read\n", cpu_get_pc(&space->device()));
 			break;
 
 		default:
@@ -1151,7 +1151,7 @@ WRITE8_HANDLER( leland_master_output_w )
 			cputag_set_input_line(space->machine(), "slave", 0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
 			eeprom = space->machine().device("eeprom");
-			if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", cpu_get_pc(space->cpu),
+			if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", cpu_get_pc(&space->device()),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
 			eeprom_write_bit     (eeprom, (data & 0x10) >> 4);
 			eeprom_set_clock_line(eeprom, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
@@ -1216,7 +1216,7 @@ WRITE8_HANDLER( ataxx_master_output_w )
 		case 0x04:	/* /MBNK */
 			if (LOG_BANKSWITCHING_M)
 				if ((state->master_bank ^ data) & 0xff)
-					logerror("%04X:master_bank = %02X\n", cpu_get_pc(space->cpu), data & 0xff);
+					logerror("%04X:master_bank = %02X\n", cpu_get_pc(&space->device()), data & 0xff);
 			state->master_bank = data;
 			ataxx_bankswitch(space->machine());
 			break;
@@ -1272,22 +1272,22 @@ WRITE8_HANDLER( ataxx_paletteram_and_misc_w )
 	else if (offset == 0x7fc)
 	{
 		state->xrom1_addr = (state->xrom1_addr & 0xff00) | (data & 0x00ff);
-		if (LOG_XROM) logerror("%04X:XROM1 address low write = %02X (addr=%04X)\n", cpu_get_pc(space->cpu), data, state->xrom1_addr);
+		if (LOG_XROM) logerror("%04X:XROM1 address low write = %02X (addr=%04X)\n", cpu_get_pc(&space->device()), data, state->xrom1_addr);
 	}
 	else if (offset == 0x7fd)
 	{
 		state->xrom1_addr = (state->xrom1_addr & 0x00ff) | ((data << 8) & 0xff00);
-		if (LOG_XROM) logerror("%04X:XROM1 address high write = %02X (addr=%04X)\n", cpu_get_pc(space->cpu), data, state->xrom1_addr);
+		if (LOG_XROM) logerror("%04X:XROM1 address high write = %02X (addr=%04X)\n", cpu_get_pc(&space->device()), data, state->xrom1_addr);
 	}
 	else if (offset == 0x7fe)
 	{
 		state->xrom2_addr = (state->xrom2_addr & 0xff00) | (data & 0x00ff);
-		if (LOG_XROM) logerror("%04X:XROM2 address low write = %02X (addr=%04X)\n", cpu_get_pc(space->cpu), data, state->xrom2_addr);
+		if (LOG_XROM) logerror("%04X:XROM2 address low write = %02X (addr=%04X)\n", cpu_get_pc(&space->device()), data, state->xrom2_addr);
 	}
 	else if (offset == 0x7ff)
 	{
 		state->xrom2_addr = (state->xrom2_addr & 0x00ff) | ((data << 8) & 0xff00);
-		if (LOG_XROM) logerror("%04X:XROM2 address high write = %02X (addr=%04X)\n", cpu_get_pc(space->cpu), data, state->xrom2_addr);
+		if (LOG_XROM) logerror("%04X:XROM2 address high write = %02X (addr=%04X)\n", cpu_get_pc(&space->device()), data, state->xrom2_addr);
 	}
 	else
 		state->extra_tram[offset] = data;
@@ -1302,13 +1302,13 @@ READ8_HANDLER( ataxx_paletteram_and_misc_r )
 	else if (offset == 0x7fc || offset == 0x7fd)
 	{
 		int result = state->xrom_base[0x00000 | state->xrom1_addr | ((offset & 1) << 16)];
-		if (LOG_XROM) logerror("%04X:XROM1 read(%d) = %02X (addr=%04X)\n", cpu_get_pc(space->cpu), offset - 0x7fc, result, state->xrom1_addr);
+		if (LOG_XROM) logerror("%04X:XROM1 read(%d) = %02X (addr=%04X)\n", cpu_get_pc(&space->device()), offset - 0x7fc, result, state->xrom1_addr);
 		return result;
 	}
 	else if (offset == 0x7fe || offset == 0x7ff)
 	{
 		int result = state->xrom_base[0x20000 | state->xrom2_addr | ((offset & 1) << 16)];
-		if (LOG_XROM) logerror("%04X:XROM2 read(%d) = %02X (addr=%04X)\n", cpu_get_pc(space->cpu), offset - 0x7fc, result, state->xrom2_addr);
+		if (LOG_XROM) logerror("%04X:XROM2 read(%d) = %02X (addr=%04X)\n", cpu_get_pc(&space->device()), offset - 0x7fc, result, state->xrom2_addr);
 		return result;
 	}
 	else
@@ -1363,12 +1363,12 @@ WRITE8_HANDLER( leland_slave_small_banksw_w )
 
 	if (bankaddress >= state->slave_length)
 	{
-		logerror("%04X:Slave bank %02X out of range!", cpu_get_pc(space->cpu), data & 1);
+		logerror("%04X:Slave bank %02X out of range!", cpu_get_pc(&space->device()), data & 1);
 		bankaddress = 0x10000;
 	}
 	memory_set_bankptr(space->machine(), "bank3", &state->slave_base[bankaddress]);
 
-	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", cpu_get_pc(space->cpu), data & 1, bankaddress);
+	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", cpu_get_pc(&space->device()), data & 1, bankaddress);
 }
 
 
@@ -1379,12 +1379,12 @@ WRITE8_HANDLER( leland_slave_large_banksw_w )
 
 	if (bankaddress >= state->slave_length)
 	{
-		logerror("%04X:Slave bank %02X out of range!", cpu_get_pc(space->cpu), data & 15);
+		logerror("%04X:Slave bank %02X out of range!", cpu_get_pc(&space->device()), data & 15);
 		bankaddress = 0x10000;
 	}
 	memory_set_bankptr(space->machine(), "bank3", &state->slave_base[bankaddress]);
 
-	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", cpu_get_pc(space->cpu), data & 15, bankaddress);
+	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", cpu_get_pc(&space->device()), data & 15, bankaddress);
 }
 
 
@@ -1404,12 +1404,12 @@ WRITE8_HANDLER( ataxx_slave_banksw_w )
 
 	if (bankaddress >= state->slave_length)
 	{
-		logerror("%04X:Slave bank %02X out of range!", cpu_get_pc(space->cpu), data & 0x3f);
+		logerror("%04X:Slave bank %02X out of range!", cpu_get_pc(&space->device()), data & 0x3f);
 		bankaddress = 0x2000;
 	}
 	memory_set_bankptr(space->machine(), "bank3", &state->slave_base[bankaddress]);
 
-	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", cpu_get_pc(space->cpu), data, bankaddress);
+	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", cpu_get_pc(&space->device()), data, bankaddress);
 }
 
 

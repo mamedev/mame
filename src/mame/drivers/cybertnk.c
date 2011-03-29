@@ -186,7 +186,7 @@ public:
 };
 
 
-#define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space->cpu->tag(), cpu_get_pc(space->cpu), offset*2, data, mem_mask);
+#define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space->device().tag(), cpu_get_pc(&space->device()), offset*2, data, mem_mask);
 
 static TILE_GET_INFO( get_tx_tile_info )
 {

@@ -648,7 +648,7 @@ static WRITE8_HANDLER( s2650_data_w )
 {
     dkong_state *state = space->machine().driver_data<dkong_state>();
 #if DEBUG_PROTECTION
-    logerror("write : pc = %04x, loopback = %02x\n",cpu_get_pc(space->cpu), data);
+    logerror("write : pc = %04x, loopback = %02x\n",cpu_get_pc(&space->device()), data);
 #endif
 
     state->hunchloopback = data;
@@ -658,7 +658,7 @@ static WRITE8_HANDLER( s2650_fo_w )
 {
     dkong_state *state = space->machine().driver_data<dkong_state>();
 #if DEBUG_PROTECTION
-    logerror("write : pc = %04x, FO = %02x\n",cpu_get_pc(space->cpu), data);
+    logerror("write : pc = %04x, FO = %02x\n",cpu_get_pc(&space->device()), data);
 #endif
 
     state->main_fo = data;
@@ -671,7 +671,7 @@ static READ8_HANDLER( s2650_port0_r )
 {
     dkong_state *state = space->machine().driver_data<dkong_state>();
 #if DEBUG_PROTECTION
-    logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",cpu_get_pc(space->cpu), state->hunchloopback, state->main_fo);
+    logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",cpu_get_pc(&space->device()), state->hunchloopback, state->main_fo);
 #endif
 
     switch (state->protect_type)
@@ -688,7 +688,7 @@ static READ8_HANDLER( s2650_port0_r )
 	    	else
 	    		return state->hunchloopback--;
     }
-    fatalerror("Unhandled read from port 0 : pc = %4x\n",cpu_get_pc(space->cpu));
+    fatalerror("Unhandled read from port 0 : pc = %4x\n",cpu_get_pc(&space->device()));
 }
 
 
@@ -697,7 +697,7 @@ static READ8_HANDLER( s2650_port1_r )
     dkong_state *state = space->machine().driver_data<dkong_state>();
 
 #if DEBUG_PROTECTION
-    logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",cpu_get_pc(space->cpu), state->hunchloopback, state->main_fo);
+    logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",cpu_get_pc(&space->device()), state->hunchloopback, state->main_fo);
 #endif
 
     switch (state->protect_type)
@@ -711,7 +711,7 @@ static READ8_HANDLER( s2650_port1_r )
         	else
         		return ++state->prot_cnt;
     }
-    fatalerror("Unhandled read from port 1 : pc = %4x\n",cpu_get_pc(space->cpu));
+    fatalerror("Unhandled read from port 1 : pc = %4x\n",cpu_get_pc(&space->device()));
 }
 
 

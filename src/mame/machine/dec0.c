@@ -29,11 +29,11 @@ READ16_HANDLER( dec0_controls_r )
 			return input_port_read(space->machine(), "DSW");
 
 		case 8: /* Intel 8751 mc, Bad Dudes & Heavy Barrel only */
-			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", cpu_get_pc(space->cpu), 0x30c000+offset, state->i8751_return);
+			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", cpu_get_pc(&space->device()), 0x30c000+offset, state->i8751_return);
 			return state->i8751_return;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(space->cpu), 0x30c000+offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(&space->device()), 0x30c000+offset);
 	return ~0;
 }
 
@@ -81,7 +81,7 @@ READ16_HANDLER( midres_controls_r )
 			return 0;	/* ?? watchdog ?? */
 	}
 
-	logerror("PC %06x unknown control read at %02x\n", cpu_get_pc(space->cpu), 0x180000+offset);
+	logerror("PC %06x unknown control read at %02x\n", cpu_get_pc(&space->device()), 0x180000+offset);
 	return ~0;
 }
 
@@ -124,7 +124,7 @@ WRITE8_HANDLER( hippodrm_shared_w )
 static READ16_HANDLER( hippodrm_68000_share_r )
 {
 	dec0_state *state = space->machine().driver_data<dec0_state>();
-	if (offset==0) device_yield(space->cpu); /* A wee helper */
+	if (offset==0) device_yield(&space->device()); /* A wee helper */
 	return state->share[offset]&0xff;
 }
 
@@ -342,7 +342,7 @@ static WRITE16_HANDLER( sprite_mirror_w )
 static READ16_HANDLER( robocop_68000_share_r )
 {
 	dec0_state *state = space->machine().driver_data<dec0_state>();
-//logerror("%08x: Share read %04x\n",cpu_get_pc(space->cpu),offset);
+//logerror("%08x: Share read %04x\n",cpu_get_pc(&space->device()),offset);
 
 	return state->robocop_shared_ram[offset];
 }
@@ -350,7 +350,7 @@ static READ16_HANDLER( robocop_68000_share_r )
 static WRITE16_HANDLER( robocop_68000_share_w )
 {
 	dec0_state *state = space->machine().driver_data<dec0_state>();
-//  logerror("%08x: Share write %04x %04x\n",cpu_get_pc(space->cpu),offset,data);
+//  logerror("%08x: Share write %04x %04x\n",cpu_get_pc(&space->device()),offset,data);
 
 	state->robocop_shared_ram[offset]=data&0xff;
 

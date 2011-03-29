@@ -299,7 +299,7 @@ static WRITE16_HANDLER(ac_txscroll_w)
 static READ16_HANDLER(ac_devices_r)
 {
 	acommand_state *state = space->machine().driver_data<acommand_state>();
-	logerror("(PC=%06x) read at %04x\n",cpu_get_pc(space->cpu),offset*2);
+	logerror("(PC=%06x) read at %04x\n",cpu_get_pc(&space->device()),offset*2);
 
 	switch(offset)
 	{

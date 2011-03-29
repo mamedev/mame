@@ -357,12 +357,12 @@ static WRITE8_HANDLER( namcos1_sub_firq_w )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	device_set_input_line(space->cpu, 0, CLEAR_LINE);
+	device_set_input_line(&space->device(), 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( firq_ack_w )
 {
-	device_set_input_line(space->cpu, M6809_FIRQ_LINE, CLEAR_LINE);
+	device_set_input_line(&space->device(), M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 

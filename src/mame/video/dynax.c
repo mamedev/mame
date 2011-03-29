@@ -259,7 +259,7 @@ WRITE8_HANDLER( dynax_flipscreen_w )
 	dynax_state *state = space->machine().driver_data<dynax_state>();
 	state->flipscreen = data & 1;
 	if (data & ~1)
-		logerror("CPU#0 PC %06X: Warning, flip screen <- %02X\n", cpu_get_pc(space->cpu), data);
+		logerror("CPU#0 PC %06X: Warning, flip screen <- %02X\n", cpu_get_pc(&space->device()), data);
 	LOG(("F=%02X ", data));
 }
 

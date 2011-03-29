@@ -117,7 +117,7 @@ static WRITE8_HANDLER( switch_input_select_w )
 
 static WRITE8_HANDLER( unknown_w )
 {
-	logerror("%04X:unknown_w = %02X\n", cpu_get_pc(space->cpu), data);
+	logerror("%04X:unknown_w = %02X\n", cpu_get_pc(&space->device()), data);
 }
 
 

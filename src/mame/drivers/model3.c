@@ -1417,7 +1417,7 @@ static WRITE64_HANDLER( model3_ctrl_w )
 						}
 						break;
 					default:
-						//mame_printf_debug("Lightgun: Unknown command %02X at %08X\n", (UINT32)(data >> 24), cpu_get_pc(space->cpu));
+						//mame_printf_debug("Lightgun: Unknown command %02X at %08X\n", (UINT32)(data >> 24), cpu_get_pc(&space->device()));
 						break;
 				}
 			}
@@ -1445,7 +1445,7 @@ static WRITE64_HANDLER( model3_ctrl_w )
 static READ64_HANDLER( model3_sys_r )
 {
 	model3_state *state = space->machine().driver_data<model3_state>();
-//  printf("model3_sys_r: mask %llx @ %x (PC %x)\n", mem_mask, offset, cpu_get_pc(space->cpu));
+//  printf("model3_sys_r: mask %llx @ %x (PC %x)\n", mem_mask, offset, cpu_get_pc(&space->device()));
 
 	switch (offset)
 	{
@@ -1470,7 +1470,7 @@ static READ64_HANDLER( model3_sys_r )
 			else logerror("m3_sys: Unk sys_r @ 0x10: mask = %x\n", (UINT32)mem_mask);
 			break;
 		case 0x18/8:
-//          printf("read irq_state %x (PC %x)\n", state->irq_state, cpu_get_pc(space->cpu));
+//          printf("read irq_state %x (PC %x)\n", state->irq_state, cpu_get_pc(&space->device()));
 			return (UINT64)state->irq_state<<56 | 0xff000000;
 			break;
 	}
@@ -1607,7 +1607,7 @@ static WRITE64_HANDLER(model3_sound_w)
 		scsp_midi_in(space->machine().device("scsp1"), 0, (data>>56)&0xff, 0);
 
 		// give the 68k time to notice
-		device_spin_until_time(space->cpu, attotime::from_usec(40));
+		device_spin_until_time(&space->device(), attotime::from_usec(40));
 	}
 }
 
@@ -1616,7 +1616,7 @@ static WRITE64_HANDLER(model3_sound_w)
 static READ64_HANDLER(network_r)
 {
 	model3_state *state = space->machine().driver_data<model3_state>();
-	mame_printf_debug("network_r: %02X at %08X\n", offset, cpu_get_pc(space->cpu));
+	mame_printf_debug("network_r: %02X at %08X\n", offset, cpu_get_pc(&space->device()));
 	return state->network_ram[offset];
 }
 
@@ -1624,7 +1624,7 @@ static WRITE64_HANDLER(network_w)
 {
 	model3_state *state = space->machine().driver_data<model3_state>();
 	COMBINE_DATA(state->network_ram + offset);
-	mame_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), cpu_get_pc(space->cpu));
+	mame_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), cpu_get_pc(&space->device()));
 }
 
 

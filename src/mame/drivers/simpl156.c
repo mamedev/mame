@@ -1066,8 +1066,8 @@ static DRIVER_INIT( simpl156 )
 static READ32_HANDLER( joemacr_speedup_r )
 {
 	simpl156_state *state = space->machine().driver_data<simpl156_state>();
-	if (cpu_get_pc(space->cpu) == 0x284)
-		device_spin_until_time(space->cpu, attotime::from_usec(400));
+	if (cpu_get_pc(&space->device()) == 0x284)
+		device_spin_until_time(&space->device(), attotime::from_usec(400));
 	return state->systemram[0x18/4];
 }
 
@@ -1081,8 +1081,8 @@ static DRIVER_INIT( joemacr )
 static READ32_HANDLER( chainrec_speedup_r )
 {
 	simpl156_state *state = space->machine().driver_data<simpl156_state>();
-	if (cpu_get_pc(space->cpu) == 0x2d4)
-		device_spin_until_time(space->cpu, attotime::from_usec(400));
+	if (cpu_get_pc(&space->device()) == 0x2d4)
+		device_spin_until_time(&space->device(), attotime::from_usec(400));
 	return state->systemram[0x18/4];
 }
 
@@ -1095,8 +1095,8 @@ static DRIVER_INIT( chainrec )
 static READ32_HANDLER( prtytime_speedup_r )
 {
 	simpl156_state *state = space->machine().driver_data<simpl156_state>();
-	if (cpu_get_pc(space->cpu) == 0x4f0)
-		device_spin_until_time(space->cpu, attotime::from_usec(400));
+	if (cpu_get_pc(&space->device()) == 0x4f0)
+		device_spin_until_time(&space->device(), attotime::from_usec(400));
 	return state->systemram[0xae0/4];
 }
 
@@ -1110,8 +1110,8 @@ static DRIVER_INIT( prtytime )
 static READ32_HANDLER( charlien_speedup_r )
 {
 	simpl156_state *state = space->machine().driver_data<simpl156_state>();
-	if (cpu_get_pc(space->cpu) == 0xc8c8)
-		device_spin_until_time(space->cpu, attotime::from_usec(400));
+	if (cpu_get_pc(&space->device()) == 0xc8c8)
+		device_spin_until_time(&space->device(), attotime::from_usec(400));
 	return state->systemram[0x10/4];
 }
 
@@ -1124,8 +1124,8 @@ static DRIVER_INIT( charlien )
 static READ32_HANDLER( osman_speedup_r )
 {
 	simpl156_state *state = space->machine().driver_data<simpl156_state>();
-	if (cpu_get_pc(space->cpu) == 0x5974)
-		device_spin_until_time(space->cpu, attotime::from_usec(400));
+	if (cpu_get_pc(&space->device()) == 0x5974)
+		device_spin_until_time(&space->device(), attotime::from_usec(400));
 	return state->systemram[0x10/4];
 }
 

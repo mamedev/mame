@@ -1011,8 +1011,8 @@ PC  :00001B48: BT      $00001B3C
 */
 	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
 
-	if (cpu_get_pc(space->cpu) == 0x00001b3e)
-		device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device()) == 0x00001b3e)
+		device_spin_until_interrupt(&space->device());
 
 	return state->ram[0x000020 / 4];
 }
@@ -1030,8 +1030,8 @@ PC  :00001B54: BT      $00001B48
 */
 	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
 
-	if (cpu_get_pc(space->cpu) == 0x00001b4a)
-		device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device()) == 0x00001b4a)
+		device_spin_until_interrupt(&space->device());
 
 	return state->ram[0x000020 / 4];
 }
@@ -1049,8 +1049,8 @@ PC  :000029F8: BT      $000029EC
 */
 	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
 
-	if (cpu_get_pc(space->cpu) == 0x000029ee)
-		device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device()) == 0x000029ee)
+		device_spin_until_interrupt(&space->device());
 
 	return state->ram[0x00001c / 4];
 }

@@ -78,20 +78,20 @@ static TIMER_CALLBACK( namco_54xx_latch_callback )
 
 static READ8_HANDLER( namco_54xx_K_r )
 {
-	namco_54xx_state *state = get_safe_token(space->cpu->owner());
+	namco_54xx_state *state = get_safe_token(space->device().owner());
 	return state->latched_cmd >> 4;
 }
 
 static READ8_HANDLER( namco_54xx_R0_r )
 {
-	namco_54xx_state *state = get_safe_token(space->cpu->owner());
+	namco_54xx_state *state = get_safe_token(space->device().owner());
 	return state->latched_cmd & 0x0f;
 }
 
 
 static WRITE8_HANDLER( namco_54xx_O_w )
 {
-	namco_54xx_state *state = get_safe_token(space->cpu->owner());
+	namco_54xx_state *state = get_safe_token(space->device().owner());
 	UINT8 out = (data & 0x0f);
 	if (data & 0x10)
 		discrete_sound_w(state->discrete, NAMCO_54XX_1_DATA(state->basenode), out);
@@ -101,7 +101,7 @@ static WRITE8_HANDLER( namco_54xx_O_w )
 
 static WRITE8_HANDLER( namco_54xx_R1_w )
 {
-	namco_54xx_state *state = get_safe_token(space->cpu->owner());
+	namco_54xx_state *state = get_safe_token(space->device().owner());
 	UINT8 out = (data & 0x0f);
 
 	discrete_sound_w(state->discrete, NAMCO_54XX_2_DATA(state->basenode), out);

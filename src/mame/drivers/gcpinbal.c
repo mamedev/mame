@@ -97,7 +97,7 @@ static READ16_HANDLER( ioc_r )
 
 	}
 
-//logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(space->cpu),offset);
+//logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(&space->device()),offset);
 
 	return state->ioc_ram[offset];
 }
@@ -189,7 +189,7 @@ static WRITE16_HANDLER( ioc_w )
 			break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", cpu_get_pc(space->cpu), offset, data);
+			logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", cpu_get_pc(&space->device()), offset, data);
 			break;
 	}
 

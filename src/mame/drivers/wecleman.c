@@ -345,7 +345,7 @@ static WRITE16_HANDLER( irqctrl_w )
 	wecleman_state *state = space->machine().driver_data<wecleman_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		// logerror("CPU #0 - PC = %06X - $140005 <- %02X (old value: %02X)\n",cpu_get_pc(space->cpu), data&0xFF, old_data&0xFF);
+		// logerror("CPU #0 - PC = %06X - $140005 <- %02X (old value: %02X)\n",cpu_get_pc(&space->device()), data&0xFF, old_data&0xFF);
 
 		// Bit 0 : SUBINT
 		if ( (state->irqctrl & 1) && (!(data & 1)) )	// 1->0 transition

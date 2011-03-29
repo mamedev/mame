@@ -125,7 +125,7 @@ static WRITE16_HANDLER( control_w )
 		oki->set_bank_base((((data >> 4) & 1) * 0x40000) % oki->region()->bytes());
 	}
 
-	logerror("%06X:control_w(%d) = %04X\n", cpu_get_pc(space->cpu), offset, data);
+	logerror("%06X:control_w(%d) = %04X\n", cpu_get_pc(&space->device()), offset, data);
 }
 
 
@@ -147,7 +147,7 @@ static READ16_HANDLER( ultennis_hack_r )
 {
 	artmagic_state *state = space->machine().driver_data<artmagic_state>();
 	/* IRQ5 points to: jsr (a5); rte */
-	UINT32 pc = cpu_get_pc(space->cpu);
+	UINT32 pc = cpu_get_pc(&space->device());
 	if (pc == 0x18c2 || pc == 0x18e4)
 	{
 		state->hack_irq = 1;

@@ -127,7 +127,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 		break;
 
 		default:
-			logerror( "pc %04x: protection_command %02x\n", cpu_get_pc(space->cpu),state->protection_command);
+			logerror( "pc %04x: protection_command %02x\n", cpu_get_pc(&space->device()),state->protection_command);
 	}
 }
 
@@ -147,7 +147,7 @@ static READ8_HANDLER( thedeep_protection_r )
 static WRITE8_HANDLER( thedeep_e100_w )
 {
 	if (data != 1)
-		logerror("pc %04x: e100 = %02x\n", cpu_get_pc(space->cpu),data);
+		logerror("pc %04x: e100 = %02x\n", cpu_get_pc(&space->device()),data);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )

@@ -177,7 +177,7 @@ static WRITE8_DEVICE_HANDLER( exerion_portb_w )
 static READ8_HANDLER( exerion_protection_r )
 {
 	exerion_state *state = space->machine().driver_data<exerion_state>();
-	if (cpu_get_pc(space->cpu) == 0x4143)
+	if (cpu_get_pc(&space->device()) == 0x4143)
 		return space->machine().region("maincpu")->base()[0x33c0 + (state->main_ram[0xd] << 2) + offset];
 	else
 		return state->main_ram[0x8 + offset];

@@ -495,7 +495,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 			{
 				vpage=LAYER_BG;
 /*
-                printf("bg -> %d %d   %d %d  %d %d @ %x\n",dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0,cpu_get_pc(space->cpu));
+                printf("bg -> %d %d   %d %d  %d %d @ %x\n",dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0,cpu_get_pc(&space->device()));
 
                 for(int i=0;i<16;++i)
                 {

@@ -189,7 +189,7 @@ static READ16_HANDLER( hangon_io_r )
 		}
 	}
 
-	logerror("%06X:hangon_io_r - unknown read access to address %04X\n", cpu_get_pc(space->cpu), offset * 2);
+	logerror("%06X:hangon_io_r - unknown read access to address %04X\n", cpu_get_pc(&space->device()), offset * 2);
 	return segaic16_open_bus_r(space, 0, mem_mask);
 }
 
@@ -215,7 +215,7 @@ static WRITE16_HANDLER( hangon_io_w )
 				return;
 		}
 
-	logerror("%06X:hangon_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(space->cpu), offset * 2, data, mem_mask);
+	logerror("%06X:hangon_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(&space->device()), offset * 2, data, mem_mask);
 }
 
 
@@ -245,7 +245,7 @@ static READ16_HANDLER( sharrier_io_r )
 		}
 	}
 
-	logerror("%06X:sharrier_io_r - unknown read access to address %04X\n", cpu_get_pc(space->cpu), offset * 2);
+	logerror("%06X:sharrier_io_r - unknown read access to address %04X\n", cpu_get_pc(&space->device()), offset * 2);
 	return segaic16_open_bus_r(space, 0, mem_mask);
 }
 
@@ -271,7 +271,7 @@ static WRITE16_HANDLER( sharrier_io_w )
 				return;
 		}
 
-	logerror("%06X:sharrier_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(space->cpu), offset * 2, data, mem_mask);
+	logerror("%06X:sharrier_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(&space->device()), offset * 2, data, mem_mask);
 }
 
 

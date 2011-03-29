@@ -65,7 +65,7 @@ static READ16_HANDLER( realbrk_dsw_r )
 							((input_port_read(space->machine(), "SW3") & 0x0300) << 4) |
 							((input_port_read(space->machine(), "SW4") & 0x0300) << 6) ;
 
-	logerror("CPU #0 PC %06X: read with unknown dsw_select = %02x\n",cpu_get_pc(space->cpu),state->dsw_select[0]);
+	logerror("CPU #0 PC %06X: read with unknown dsw_select = %02x\n",cpu_get_pc(&space->device()),state->dsw_select[0]);
 	return 0xffff;
 }
 
@@ -127,7 +127,7 @@ static READ16_HANDLER( backup_ram_r )
 	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
             unemulated tmp68301 feature?*/
-	if(cpu_get_previouspc(space->cpu) == 0x02c08e)
+	if(cpu_get_previouspc(&space->device()) == 0x02c08e)
 		return 0xffff;
 	else
 		return state->backup_ram[offset];
@@ -139,7 +139,7 @@ static READ16_HANDLER( backup_ram_dx_r )
 	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
             unemulated tmp68301 feature?*/
-	if(cpu_get_previouspc(space->cpu) == 0x02f046)
+	if(cpu_get_previouspc(&space->device()) == 0x02f046)
 		return 0xffff;
 	else
 		return state->backup_ram[offset];

@@ -222,7 +222,7 @@ static WRITE32_HANDLER( ms32_sound_w )
 	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
-	device_spin_until_time(space->cpu, attotime::from_usec(40));
+	device_spin_until_time(&space->device(), attotime::from_usec(40));
 }
 
 static READ32_HANDLER( ms32_sound_r )

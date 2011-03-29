@@ -915,7 +915,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 static WRITE8_HANDLER( ppu2c0x_palette_write )
 {
-	ppu2c0x_state *ppu2c0x = get_token(space->cpu);
+	ppu2c0x_state *ppu2c0x = get_token(&space->device());
 	int color_base = ppu2c0x->color_base;
 	int color_emphasis = (ppu2c0x->regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
 
@@ -947,7 +947,7 @@ static WRITE8_HANDLER( ppu2c0x_palette_write )
 
 static READ8_HANDLER( ppu2c0x_palette_read )
 {
-	ppu2c0x_state *ppu2c0x = get_token(space->cpu);
+	ppu2c0x_state *ppu2c0x = get_token(&space->device());
 	{
 		if (ppu2c0x->regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
 			return (ppu2c0x->palette_ram[offset & 0x1f] & 0x30);
@@ -1197,7 +1197,7 @@ void ppu2c0x_spriteram_dma( address_space *space, device_t *device, const UINT8 
 	}
 
 	// should last 513 CPU cycles.
-	device_adjust_icount(space->cpu, -513);
+	device_adjust_icount(&space->device(), -513);
 }
 
 /*************************************

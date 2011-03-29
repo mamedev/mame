@@ -639,7 +639,7 @@ void cpu_interrupt_enable(device_t *device, int enabled)
 
 WRITE8_HANDLER( interrupt_enable_w )
 {
-	cpu_interrupt_enable(space->cpu, data);
+	cpu_interrupt_enable(&space->device(), data);
 }
 
 
@@ -650,7 +650,7 @@ WRITE8_HANDLER( interrupt_enable_w )
 
 READ8_HANDLER( interrupt_enable_r )
 {
-	return interrupt_enabled(space->cpu);
+	return interrupt_enabled(&space->device());
 }
 
 

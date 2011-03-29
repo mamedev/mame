@@ -95,8 +95,8 @@ static READ8_HANDLER( keyboard_r )
 	rmhaihai_state *state = space->machine().driver_data<rmhaihai_state>();
 	static const char *const keynames[] = { "KEY0", "KEY1" };
 
-	logerror("%04x: keyboard_r\n",cpu_get_pc(space->cpu));
-	switch(cpu_get_pc(space->cpu))
+	logerror("%04x: keyboard_r\n",cpu_get_pc(&space->device()));
+	switch(cpu_get_pc(&space->device()))
 	{
 		/* read keyboard */
 		case 0x0aba:	// rmhaihai, rmhaisei
@@ -144,7 +144,7 @@ static READ8_HANDLER( keyboard_r )
 static WRITE8_HANDLER( keyboard_w )
 {
 	rmhaihai_state *state = space->machine().driver_data<rmhaihai_state>();
-logerror("%04x: keyboard_w %02x\n",cpu_get_pc(space->cpu),data);
+logerror("%04x: keyboard_w %02x\n",cpu_get_pc(&space->device()),data);
 	state->keyboard_cmd = data;
 }
 

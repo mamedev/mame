@@ -1661,7 +1661,7 @@ static WRITE16_HANDLER( upload_code_to_slave_dsp_w )
 		else
 		{
 			logerror( "%08x: master port#7: 0x%04x\n",
-				cpu_get_previouspc(space->cpu), data );
+				cpu_get_previouspc(&space->device()), data );
 		}
 		break;
 
@@ -2158,7 +2158,7 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 				if(offs<4 || offs>=8)
 				{
 					mame_printf_debug( "%08x: sys[0x%02x] := 0x%02x\n",
-						cpu_get_previouspc(space->cpu),
+						cpu_get_previouspc(&space->device()),
 						offs,
 						dat>>24 );
 				}
@@ -2249,7 +2249,7 @@ static INTERRUPT_GEN( namcos22s_interrupt )
 
 static READ32_HANDLER( namcos22_keycus_r )
 {
-//  printf("Hit keycus mask %x PC=%x\n", mem_mask, cpu_get_pc(space->cpu));
+//  printf("Hit keycus mask %x PC=%x\n", mem_mask, cpu_get_pc(&space->device()));
 
 	switch( namcos22_gametype )
 	{
@@ -2430,7 +2430,7 @@ static WRITE32_HANDLER( alpinesa_prot_w )
 	}
 #else
 	int i;
-	unsigned sptr = downcast<cpu_device *>(space->cpu)->sp();
+	unsigned sptr = downcast<cpu_device *>(&space->device())->sp();
 	mAlpineSurferProtData = 0;
 	for(i=0;i<4;i++)
 	{
@@ -5740,9 +5740,9 @@ static UINT16 su_82;
 // for MCU BIOS v1.41
 static READ16_HANDLER( mcu141_speedup_r )
 {
-	if ((cpu_get_pc(space->cpu) == 0xc12d) && (!(su_82 & 0xff00)))
+	if ((cpu_get_pc(&space->device()) == 0xc12d) && (!(su_82 & 0xff00)))
 	{
-		device_spin_until_interrupt(space->cpu);
+		device_spin_until_interrupt(&space->device());
 	}
 
 	return su_82;
@@ -5756,9 +5756,9 @@ static WRITE16_HANDLER( mcu_speedup_w )
 // for MCU BIOS v1.30
 static READ16_HANDLER( mcu130_speedup_r )
 {
-	if ((cpu_get_pc(space->cpu) == 0xc12a) && (!(su_82 & 0xff00)))
+	if ((cpu_get_pc(&space->device()) == 0xc12a) && (!(su_82 & 0xff00)))
 	{
-		device_spin_until_interrupt(space->cpu);
+		device_spin_until_interrupt(&space->device());
 	}
 
 	return su_82;
@@ -5767,9 +5767,9 @@ static READ16_HANDLER( mcu130_speedup_r )
 // for NSTX7702 v1.00 (C74)
 static READ16_HANDLER( mcuc74_speedup_r )
 {
-	if (((cpu_get_pc(space->cpu) == 0xc0df) || (cpu_get_pc(space->cpu) == 0xc101)) && (!(su_82 & 0xff00)))
+	if (((cpu_get_pc(&space->device()) == 0xc0df) || (cpu_get_pc(&space->device()) == 0xc101)) && (!(su_82 & 0xff00)))
 	{
-		device_spin_until_interrupt(space->cpu);
+		device_spin_until_interrupt(&space->device());
 	}
 
 	return su_82;

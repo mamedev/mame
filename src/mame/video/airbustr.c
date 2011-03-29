@@ -85,7 +85,7 @@ WRITE8_HANDLER( airbustr_scrollregs_w )
 		case 0x06:	state->bg_scrollx = data;	break;
 		case 0x08:	state->highbits   = ~data;	break;	// complemented high bits
 
-		default:	logerror("CPU #2 - port %02X written with %02X - PC = %04X\n", offset, data, cpu_get_pc(space->cpu));
+		default:	logerror("CPU #2 - port %02X written with %02X - PC = %04X\n", offset, data, cpu_get_pc(&space->device()));
 	}
 
 	tilemap_set_scrolly(state->bg_tilemap, 0, ((state->highbits << 5) & 0x100) + state->bg_scrolly);

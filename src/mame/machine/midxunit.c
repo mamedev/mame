@@ -91,8 +91,8 @@ WRITE16_HANDLER( midxunit_io_w )
 			output_set_value("Player2_Gun_LED", (~data & 0x20) >> 5 );
 			output_set_value("Player3_Gun_LED", (~data & 0x40) >> 6 );
 
-			logerror("%08X:I/O write to %d = %04X\n", cpu_get_pc(space->cpu), offset, data);
-//          logerror("%08X:Unknown I/O write to %d = %04X\n", cpu_get_pc(space->cpu), offset, data);
+			logerror("%08X:I/O write to %d = %04X\n", cpu_get_pc(&space->device()), offset, data);
+//          logerror("%08X:Unknown I/O write to %d = %04X\n", cpu_get_pc(&space->device()), offset, data);
 			break;
 	}
 	state->iodata[offset] = newword;
@@ -107,7 +107,7 @@ WRITE16_HANDLER( midxunit_unknown_w )
 		dcs_reset_w(data & 2);
 
 	if (ACCESSING_BITS_0_7 && offset % 0x40000 == 0)
-		logerror("%08X:midxunit_unknown_w @ %d = %02X\n", cpu_get_pc(space->cpu), offs, data & 0xff);
+		logerror("%08X:midxunit_unknown_w @ %d = %02X\n", cpu_get_pc(&space->device()), offs, data & 0xff);
 }
 
 
@@ -133,7 +133,7 @@ READ16_HANDLER( midxunit_io_r )
 			return input_port_read(space->machine(), portnames[offset]);
 
 		default:
-			logerror("%08X:Unknown I/O read from %d\n", cpu_get_pc(space->cpu), offset);
+			logerror("%08X:Unknown I/O read from %d\n", cpu_get_pc(&space->device()), offset);
 			break;
 	}
 	return ~0;
@@ -245,7 +245,7 @@ READ16_HANDLER( midxunit_uart_r )
 			break;
 	}
 
-/*  logerror("%08X:UART R @ %X = %02X\n", cpu_get_pc(space->cpu), offset, result);*/
+/*  logerror("%08X:UART R @ %X = %02X\n", cpu_get_pc(&space->device()), offset, result);*/
 	return result;
 }
 
@@ -282,7 +282,7 @@ WRITE16_HANDLER( midxunit_uart_w )
 			break;
 	}
 
-/*  logerror("%08X:UART W @ %X = %02X\n", cpu_get_pc(space->cpu), offset, data);*/
+/*  logerror("%08X:UART W @ %X = %02X\n", cpu_get_pc(&space->device()), offset, data);*/
 }
 
 
@@ -390,7 +390,7 @@ WRITE16_HANDLER( midxunit_security_clock_w )
 
 READ16_HANDLER( midxunit_sound_r )
 {
-	logerror("%08X:Sound read\n", cpu_get_pc(space->cpu));
+	logerror("%08X:Sound read\n", cpu_get_pc(&space->device()));
 
 	return dcs_data_r() & 0xff;
 }
@@ -407,14 +407,14 @@ WRITE16_HANDLER( midxunit_sound_w )
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", cpu_get_pc(space->cpu), data);
+		logerror("%08X:Unexpected write to sound (hi) = %04X\n", cpu_get_pc(&space->device()), data);
 		return;
 	}
 
 	/* call through based on the sound type */
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("%08X:Sound write = %04X\n", cpu_get_pc(space->cpu), data);
+		logerror("%08X:Sound write = %04X\n", cpu_get_pc(&space->device()), data);
 		dcs_data_w(data & 0xff);
 	}
 }

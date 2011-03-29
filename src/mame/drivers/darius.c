@@ -159,7 +159,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 
 	parse_control(space->machine());
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(space->cpu), data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space->device()), data);
 }
 
 static WRITE16_HANDLER( darius_watchdog_w )
@@ -197,7 +197,7 @@ static READ16_HANDLER( darius_ioc_r )
 			return input_port_read(space->machine(), "DSW");
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(space->cpu),offset);
+logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(&space->device()),offset);
 
 	return 0xff;
 }
@@ -234,7 +234,7 @@ static WRITE16_HANDLER( darius_ioc_w )
 			return;
 	}
 
-logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",cpu_get_pc(space->cpu),offset,data);
+logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",cpu_get_pc(&space->device()),offset,data);
 }
 
 
@@ -531,7 +531,7 @@ static READ8_HANDLER( adpcm_command_read )
 {
 	darius_state *state = space->machine().driver_data<darius_state>();
 
-	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, cpu_get_pc(space->cpu) ); */
+	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, cpu_get_pc(&space->device()) ); */
 	return state->adpcm_command;
 }
 
@@ -550,14 +550,14 @@ static WRITE8_HANDLER( adpcm_nmi_disable )
 	darius_state *state = space->machine().driver_data<darius_state>();
 
 	state->nmi_enable = 0;
-	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, cpu_get_pc(space->cpu) ); */
+	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, cpu_get_pc(&space->device()) ); */
 }
 
 static WRITE8_HANDLER( adpcm_nmi_enable )
 {
 	darius_state *state = space->machine().driver_data<darius_state>();
 	state->nmi_enable = 1;
-	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", cpu_get_pc(space->cpu) ); */
+	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", cpu_get_pc(&space->device()) ); */
 }
 
 static WRITE8_DEVICE_HANDLER( adpcm_data_w )

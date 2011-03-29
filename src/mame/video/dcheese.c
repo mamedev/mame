@@ -294,7 +294,7 @@ WRITE16_HANDLER( madmax_blitter_vidparam_w )
 			break;
 
 		default:
-			logerror("%06X:write to %06X = %04X & %04x\n", cpu_get_pc(space->cpu), 0x2a0000 + 2 * offset, data, mem_mask);
+			logerror("%06X:write to %06X = %04X & %04x\n", cpu_get_pc(&space->device()), 0x2a0000 + 2 * offset, data, mem_mask);
 			break;
 	}
 }
@@ -303,7 +303,7 @@ WRITE16_HANDLER( madmax_blitter_vidparam_w )
 WRITE16_HANDLER( madmax_blitter_unknown_w )
 {
 	/* written to just before the blitter command register is written */
-	logerror("%06X:write to %06X = %04X & %04X\n", cpu_get_pc(space->cpu), 0x300000 + 2 * offset, data, mem_mask);
+	logerror("%06X:write to %06X = %04X & %04X\n", cpu_get_pc(&space->device()), 0x300000 + 2 * offset, data, mem_mask);
 }
 
 
@@ -320,6 +320,6 @@ READ16_HANDLER( madmax_blitter_vidparam_r )
 		return 0xffff ^ (1 << 5);
 
 	/* log everything else */
-	logerror("%06X:read from %06X\n", cpu_get_pc(space->cpu), 0x2a0000 + 2 * offset);
+	logerror("%06X:read from %06X\n", cpu_get_pc(&space->device()), 0x2a0000 + 2 * offset);
 	return 0xffff;
 }

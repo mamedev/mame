@@ -343,7 +343,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 
 	parse_control(space->machine());
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(space->cpu), data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space->device()), data);
 }
 
 

@@ -111,7 +111,7 @@ static READ32_HANDLER(test2_r)
 {
 //  if (offset==0)
 //      return input_port_read(space->machine(), "IN0"); //0xffffffff;
-//   logerror("%08x:  Test2_r %d\n",cpu_get_pc(space->cpu),offset);
+//   logerror("%08x:  Test2_r %d\n",cpu_get_pc(&space->device()),offset);
 	return space->machine().rand(); //0xffffffff;
 }
 
@@ -123,7 +123,7 @@ static READ32_HANDLER(test3_r)
 */
 //if (offset==0)
 //  return space->machine().rand()|(space->machine().rand()<<16);
-//  logerror("%08x:  Test3_r %d\n",cpu_get_pc(space->cpu),offset);
+//  logerror("%08x:  Test3_r %d\n",cpu_get_pc(&space->device()),offset);
 	return 0xffffffff;
 }
 
@@ -155,7 +155,7 @@ static READ32_HANDLER( decomlc_vbl_r )
 {
 	deco_mlc_state *state = space->machine().driver_data<deco_mlc_state>();
 	state->vbl_i ^=0xffffffff;
-//logerror("vbl r %08x\n", cpu_get_pc(space->cpu));
+//logerror("vbl r %08x\n", cpu_get_pc(&space->device()));
 	// Todo: Vblank probably in $10
 	return state->vbl_i;
 }
@@ -243,7 +243,7 @@ static READ32_HANDLER(stadhr96_prot_146_r)
     */
 	offset<<=1;
 
-	logerror("%08x:  Read prot %04x\n", cpu_get_pc(space->cpu), offset);
+	logerror("%08x:  Read prot %04x\n", cpu_get_pc(&space->device()), offset);
 
 	if (offset==0x5c4)
 		return 0xaa55 << 16;
@@ -727,9 +727,9 @@ static READ32_HANDLER( avengrgs_speedup_r )
 {
 	deco_mlc_state *state = space->machine().driver_data<deco_mlc_state>();
 	UINT32 a=state->mlc_ram[0x89a0/4];
-	UINT32 p=cpu_get_pc(space->cpu);
+	UINT32 p=cpu_get_pc(&space->device());
 
-	if ((p==0x3234 || p==0x32dc) && (a&1)) device_spin_until_interrupt(space->cpu);
+	if ((p==0x3234 || p==0x32dc) && (a&1)) device_spin_until_interrupt(&space->device());
 
 	return a;
 }

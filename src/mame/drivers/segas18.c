@@ -363,7 +363,7 @@ static READ16_HANDLER( misc_io_r )
 	}
 	if (state->custom_io_r)
 		return state->custom_io_r(space, offset, mem_mask);
-	logerror("%06X:misc_io_r - unknown read access to address %04X\n", cpu_get_pc(space->cpu), offset * 2);
+	logerror("%06X:misc_io_r - unknown read access to address %04X\n", cpu_get_pc(&space->device()), offset * 2);
 	return segaic16_open_bus_r(space, 0, mem_mask);
 }
 
@@ -399,7 +399,7 @@ static WRITE16_HANDLER( misc_io_w )
 		state->custom_io_w(space, offset, data, mem_mask);
 		return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(space->cpu), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(&space->device()), offset * 2, data, mem_mask);
 }
 
 

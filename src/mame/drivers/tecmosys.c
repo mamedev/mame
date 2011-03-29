@@ -313,11 +313,11 @@ static WRITE16_HANDLER( unk880000_w )
 
 		case 0x22/2:
 			watchdog_reset( space->machine() );
-			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(space->cpu) );
+			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(&space->device()) );
 			break;
 
 		default:
-			logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(space->cpu) );
+			logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(&space->device()) );
 			break;
 	}
 }
@@ -327,7 +327,7 @@ static READ16_HANDLER( unk880000_r )
 	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	//UINT16 ret = state->_880000regs[offset];
 
-	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, cpu_get_pc(space->cpu), state->_880000regs[offset] );
+	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, cpu_get_pc(&space->device()), state->_880000regs[offset] );
 
 	/* this code allows scroll regs to be updated, but tkdensho at least resets perodically */
 

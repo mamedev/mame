@@ -65,7 +65,7 @@ static WRITE16_HANDLER( sshangha_protection16_w )
 	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	COMBINE_DATA(&state->prot_data[offset]);
 
-	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",cpu_get_pc(space->cpu),offset<<1,data);
+	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",cpu_get_pc(&space->device()),offset<<1,data);
 }
 
 /* Protection/IO chip 146 */
@@ -84,7 +84,7 @@ static READ16_HANDLER( sshangha_protection16_r )
 		// Protection TODO
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",cpu_get_pc(space->cpu),offset<<1);
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",cpu_get_pc(&space->device()),offset<<1);
 	return state->prot_data[offset];
 }
 

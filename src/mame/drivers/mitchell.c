@@ -121,7 +121,7 @@ static READ8_HANDLER( pang_port5_r )
         Many games require two interrupts per frame and for these bits to toggle,
         otherwise music doesn't work.
     */
-	if (cpu_getiloops(space->cpu) & 1)
+	if (cpu_getiloops(&space->device()) & 1)
 		bit |= 0x01;
 
 	return (input_port_read(space->machine(), "SYS0") & 0x7e) | bit;
@@ -284,7 +284,7 @@ static WRITE8_HANDLER( input_w )
 	{
 		case 0:
 		default:
-			logerror("PC %04x: write %02x to port 01\n", cpu_get_pc(space->cpu), data);
+			logerror("PC %04x: write %02x to port 01\n", cpu_get_pc(&space->device()), data);
 			break;
 		case 1:
 			mahjong_input_select_w(space, offset, data);

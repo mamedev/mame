@@ -625,7 +625,7 @@ READ64_HANDLER( dc_sysctrl_r )
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x41) && (reg != 0x42) && (reg != 0x23) && (reg > 2))	// filter out IRQ status reads
 	{
-		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %" I64FMT "x (PC=%x)\n", 0x5f6800+reg*4, dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, cpu_get_pc(space->cpu));
+		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %" I64FMT "x (PC=%x)\n", 0x5f6800+reg*4, dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, cpu_get_pc(&space->device()));
 	}
 	#endif
 
@@ -1315,7 +1315,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 				return;
 			}
 			g1bus_regs[SB_GDST] = dat & 1;
-//          printf("ROM board DMA to %x len %x (PC %x)\n", g1bus_regs[SB_GDSTAR], g1bus_regs[SB_GDLEN], cpu_get_pc(space->cpu));
+//          printf("ROM board DMA to %x len %x (PC %x)\n", g1bus_regs[SB_GDSTAR], g1bus_regs[SB_GDLEN], cpu_get_pc(&space->device()));
 			ROM = (UINT8 *)naomibd_get_memory(space->machine().device("rom_board"));
 			dmaoffset = naomibd_get_dmaoffset(space->machine().device("rom_board"));
 			ddtdata.destination=g1bus_regs[SB_GDSTAR];		// destination address
@@ -1448,7 +1448,7 @@ READ64_HANDLER( pvr_ctrl_r )
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	#if DEBUG_PVRCTRL
-	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f7c00+reg*4, pvrctrl_regs[reg], offset, reg, mem_mask, cpu_get_pc(space->cpu));
+	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f7c00+reg*4, pvrctrl_regs[reg], offset, reg, mem_mask, cpu_get_pc(&space->device()));
 	#endif
 
 	return (UINT64)pvrctrl_regs[reg] << shift;

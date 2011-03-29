@@ -56,7 +56,7 @@ static READ16_HANDLER(io_r)
 	{
 		case 0: retval = input_port_read(space->machine(), "IN0") & (clear_hack ? 0xf7ff : 0xffff); break;
 		case 1: retval = input_port_read(space->machine(), "IN1") & (clear_hack ? 0xfff7 : 0xffff); break;
-		default: logerror("IO R %x %x = %x @ %x\n", offset, mem_mask, retval, cpu_get_pc(space->cpu));
+		default: logerror("IO R %x %x = %x @ %x\n", offset, mem_mask, retval, cpu_get_pc(&space->device()));
 	}
 	return retval;
 }

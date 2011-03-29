@@ -778,7 +778,7 @@ READ32_DEVICE_HANDLER( amiga_akiko32_r )
 
 	if ( LOG_AKIKO && offset < (0x30/4) )
 	{
-		logerror( "Reading AKIKO reg %0x [%s] at PC=%06x\n", offset, get_akiko_reg_name(offset), cpu_get_pc(space->cpu) );
+		logerror( "Reading AKIKO reg %0x [%s] at PC=%06x\n", offset, get_akiko_reg_name(offset), cpu_get_pc(&space->device()) );
 	}
 
 	switch( offset )
@@ -841,7 +841,7 @@ WRITE32_DEVICE_HANDLER( amiga_akiko32_w )
 
 	if ( LOG_AKIKO && offset < (0x30/4) )
 	{
-		logerror( "Writing AKIKO reg %0x [%s] with %08x at PC=%06x\n", offset, get_akiko_reg_name(offset), data, cpu_get_pc(space->cpu) );
+		logerror( "Writing AKIKO reg %0x [%s] with %08x at PC=%06x\n", offset, get_akiko_reg_name(offset), data, cpu_get_pc(&space->device()) );
 	}
 
 	switch( offset )

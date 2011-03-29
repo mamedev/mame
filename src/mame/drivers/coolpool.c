@@ -220,7 +220,7 @@ static TIMER_DEVICE_CALLBACK( amerdart_audio_int_gen )
 
 static WRITE16_HANDLER( amerdart_misc_w )
 {
-	logerror("%08x:IOP_system_w %04x\n",cpu_get_pc(space->cpu),data);
+	logerror("%08x:IOP_system_w %04x\n",cpu_get_pc(&space->device()),data);
 
 	coin_counter_w(space->machine(), 0, ~data & 0x0001);
 	coin_counter_w(space->machine(), 1, ~data & 0x0002);
@@ -243,7 +243,7 @@ static READ16_HANDLER( amerdart_dsp_bio_line_r )
 	if (state->same_cmd_count >= 5)
 	{
 		state->same_cmd_count = 5;
-		device_spin(space->cpu);
+		device_spin(&space->device());
 	}
 	state->old_cmd = state->cmd_pending;
 
@@ -254,7 +254,7 @@ static READ16_HANDLER( amerdart_iop_r )
 {
 	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
-//  logerror("%08x:IOP read %04x\n",cpu_get_pc(space->cpu),state->iop_answer);
+//  logerror("%08x:IOP read %04x\n",cpu_get_pc(&space->device()),state->iop_answer);
 	cputag_set_input_line(space->machine(), "maincpu", 1, CLEAR_LINE);
 
 	return state->iop_answer;
@@ -264,7 +264,7 @@ static WRITE16_HANDLER( amerdart_iop_w )
 {
 	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
-//  logerror("%08x:IOP write %04x\n", cpu_get_pc(space->cpu), data);
+//  logerror("%08x:IOP write %04x\n", cpu_get_pc(&space->device()), data);
 	COMBINE_DATA(&state->iop_cmd);
 	state->cmd_pending = 1;
 }
@@ -273,7 +273,7 @@ static READ16_HANDLER( amerdart_dsp_cmd_r )
 {
 	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
-//  logerror("%08x:DSP cmd_r %04x\n", cpu_get_pc(space->cpu), state->iop_cmd);
+//  logerror("%08x:DSP cmd_r %04x\n", cpu_get_pc(&space->device()), state->iop_cmd);
 	state->cmd_pending = 0;
 	return state->iop_cmd;
 }
@@ -282,7 +282,7 @@ static WRITE16_HANDLER( amerdart_dsp_answer_w )
 {
 	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
-//  logerror("%08x:DSP answer %04x\n", cpu_get_pc(space->cpu), data);
+//  logerror("%08x:DSP answer %04x\n", cpu_get_pc(&space->device()), data);
 	state->iop_answer = data;
 	cputag_set_input_line(space->machine(), "maincpu", 1, ASSERT_LINE);
 }
@@ -431,7 +431,7 @@ static READ16_HANDLER( amerdart_trackball_r )
 	state->result = (state->result & 0x0fff) | (amerdart_trackball_direction(space, 2, ((state->result >> 12) & 0xf)) << 12);
 
 
-//  logerror("%08X:read port 6 (X=%02X Y=%02X oldX=%02X oldY=%02X oldRes=%04X Res=%04X)\n", cpu_get_pc(space->cpu), state->newx, state->newy, state->oldx, state->oldy, state->lastresult, state->result);
+//  logerror("%08X:read port 6 (X=%02X Y=%02X oldX=%02X oldY=%02X oldRes=%04X Res=%04X)\n", cpu_get_pc(&space->device()), state->newx, state->newy, state->oldx, state->oldy, state->lastresult, state->result);
 
 	state->lastresult = state->result;
 
@@ -447,7 +447,7 @@ static READ16_HANDLER( amerdart_trackball_r )
 
 static WRITE16_HANDLER( coolpool_misc_w )
 {
-	logerror("%08x:IOP_system_w %04x\n",cpu_get_pc(space->cpu),data);
+	logerror("%08x:IOP_system_w %04x\n",cpu_get_pc(&space->device()),data);
 
 	coin_counter_w(space->machine(), 0, ~data & 0x0001);
 	coin_counter_w(space->machine(), 1, ~data & 0x0002);
@@ -479,7 +479,7 @@ static TIMER_CALLBACK( deferred_iop_w )
 
 static WRITE16_HANDLER( coolpool_iop_w )
 {
-	logerror("%08x:IOP write %04x\n", cpu_get_pc(space->cpu), data);
+	logerror("%08x:IOP write %04x\n", cpu_get_pc(&space->device()), data);
 	space->machine().scheduler().synchronize(FUNC(deferred_iop_w), data);
 }
 
@@ -488,7 +488,7 @@ static READ16_HANDLER( coolpool_iop_r )
 {
 	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
-	logerror("%08x:IOP read %04x\n",cpu_get_pc(space->cpu),state->iop_answer);
+	logerror("%08x:IOP read %04x\n",cpu_get_pc(&space->device()),state->iop_answer);
 	cputag_set_input_line(space->machine(), "maincpu", 1, CLEAR_LINE);
 
 	return state->iop_answer;
@@ -508,7 +508,7 @@ static READ16_HANDLER( dsp_cmd_r )
 	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
 	state->cmd_pending = 0;
-	logerror("%08x:IOP cmd_r %04x\n", cpu_get_pc(space->cpu), state->iop_cmd);
+	logerror("%08x:IOP cmd_r %04x\n", cpu_get_pc(&space->device()), state->iop_cmd);
 	return state->iop_cmd;
 }
 
@@ -517,7 +517,7 @@ static WRITE16_HANDLER( dsp_answer_w )
 {
 	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
-	logerror("%08x:IOP answer %04x\n", cpu_get_pc(space->cpu), data);
+	logerror("%08x:IOP answer %04x\n", cpu_get_pc(&space->device()), data);
 	state->iop_answer = data;
 	cputag_set_input_line(space->machine(), "maincpu", 1, ASSERT_LINE);
 }
@@ -639,7 +639,7 @@ static READ16_HANDLER( coolpool_input_r )
 		}
 	}
 
-//  logerror("%08X:read port 7 (X=%02X Y=%02X oldX=%02X oldY=%02X res=%04X)\n", cpu_get_pc(space->cpu),
+//  logerror("%08X:read port 7 (X=%02X Y=%02X oldX=%02X oldY=%02X res=%04X)\n", cpu_get_pc(&space->device()),
 //      state->newx[1], state->newy[1], state->oldx[1], state->oldy[1], state->result);
 	state->lastresult = state->result;
 	return state->result;

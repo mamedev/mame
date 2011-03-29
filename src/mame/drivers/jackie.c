@@ -347,7 +347,7 @@ static READ8_HANDLER( expram_r )
 	UINT8 *rom = space->machine().region("gfx3")->base();
 
 	offset += state->exp_bank * 0x8000;
-//  logerror("PC %06X: %04x = %02x\n",cpu_get_pc(space->cpu),offset,rom[offset]);
+//  logerror("PC %06X: %04x = %02x\n",cpu_get_pc(&space->device()),offset,rom[offset]);
 	return rom[offset];
 }
 

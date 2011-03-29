@@ -185,10 +185,10 @@ static UINT32 copro_fifoout_pop(address_space *space)
 	if (state->copro_fifoout_num == 0)
 	{
 		/* Reading from empty FIFO causes the i960 to enter wait state */
-		i960_stall(space->cpu);
+		i960_stall(&space->device());
 
 		/* spin the main cpu and let the TGP catch up */
-		device_spin_until_time(space->cpu, attotime::from_usec(100));
+		device_spin_until_time(&space->device(), attotime::from_usec(100));
 
 		return 0;
 	}
@@ -262,7 +262,7 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 static READ32_HANDLER( timers_r )
 {
 	model2_state *state = space->machine().driver_data<model2_state>();
-	i960_noburst(space->cpu);
+	i960_noburst(&space->device());
 
 	// if timer is running, calculate current value
 	if (state->timerrun[offset])
@@ -282,7 +282,7 @@ static WRITE32_HANDLER( timers_w )
 	model2_state *state = space->machine().driver_data<model2_state>();
 	attotime period;
 
-	i960_noburst(space->cpu);
+	i960_noburst(&space->device());
 	COMBINE_DATA(&state->timervals[offset]);
 
 	state->timerorig[offset] = state->timervals[offset];
@@ -679,7 +679,7 @@ static WRITE32_HANDLER(copro_fifo_w)
 	}
 	else
 	{
-		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
 		if (state->dsp_type == DSP_TYPE_SHARC)
 			copro_fifoin_push(space->machine().device("dsp"), data);
 		else
@@ -763,7 +763,7 @@ static WRITE32_HANDLER( geo_sharc_ctl1_w )
         {
             logerror("Boot geo, %d dwords\n", state->geocnt);
             cputag_set_input_line(space->machine(), "dsp2", INPUT_LINE_HALT, CLEAR_LINE);
-            //device_spin_until_time(space->cpu, attotime::from_usec(1000));       // Give the SHARC enough time to boot itself
+            //device_spin_until_time(&space->device(), attotime::from_usec(1000));       // Give the SHARC enough time to boot itself
         }
     }
 
@@ -794,7 +794,7 @@ static WRITE32_HANDLER(geo_sharc_fifo_w)
     }
     else
     {
-        //mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+        //mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
     }
 }
 
@@ -863,7 +863,7 @@ static READ32_HANDLER( geo_r )
 	}
 
 //  fatalerror("geo_r: %08X, %08X\n", address, mem_mask);
-	mame_printf_debug("geo_r: PC:%08x - %08X\n", cpu_get_pc(space->cpu), address);
+	mame_printf_debug("geo_r: PC:%08x - %08X\n", cpu_get_pc(&space->device()), address);
 
 	return 0;
 }
@@ -968,7 +968,7 @@ static READ32_HANDLER(desert_unk_r)
 static READ32_HANDLER(model2_irq_r)
 {
 	model2_state *state = space->machine().driver_data<model2_state>();
-	i960_noburst(space->cpu);
+	i960_noburst(&space->device());
 
 	if (offset)
 	{
@@ -981,7 +981,7 @@ static READ32_HANDLER(model2_irq_r)
 static WRITE32_HANDLER(model2_irq_w)
 {
 	model2_state *state = space->machine().driver_data<model2_state>();
-	i960_noburst(space->cpu);
+	i960_noburst(&space->device());
 
 	if (offset)
 	{
@@ -999,7 +999,7 @@ static int snd_68k_ready_r(address_space *space)
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		device_spin_until_time(space->cpu, attotime::from_usec(40));
+		device_spin_until_time(&space->device(), attotime::from_usec(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
@@ -1011,7 +1011,7 @@ static void snd_latch_to_68k_w(address_space *space, int data)
 	model2_state *state = space->machine().driver_data<model2_state>();
 	if (!snd_68k_ready_r(space))
 	{
-		device_spin_until_time(space->cpu, attotime::from_usec(40));
+		device_spin_until_time(&space->device(), attotime::from_usec(40));
 	}
 
 	state->to_68k = data;
@@ -1019,7 +1019,7 @@ static void snd_latch_to_68k_w(address_space *space, int data)
 	cputag_set_input_line(space->machine(), "audiocpu", 2, HOLD_LINE);
 
 	// give the 68k time to notice
-	device_spin_until_time(space->cpu, attotime::from_usec(40));
+	device_spin_until_time(&space->device(), attotime::from_usec(40));
 }
 
 static READ32_HANDLER( model2_serial_r )
@@ -1047,7 +1047,7 @@ static WRITE32_HANDLER( model2_serial_w )
 		scsp_midi_in(space->machine().device("scsp"), 0, data&0xff, 0);
 
 		// give the 68k time to notice
-		device_spin_until_time(space->cpu, attotime::from_usec(40));
+		device_spin_until_time(&space->device(), attotime::from_usec(40));
 	}
 }
 
@@ -1098,7 +1098,7 @@ static READ32_HANDLER( model2_prot_r )
 		else
 			return 0xfff0;
 	}
-	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, cpu_get_pc(space->cpu));
+	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, cpu_get_pc(&space->device()));
 
 	return retval;
 }
@@ -1169,7 +1169,7 @@ static WRITE32_HANDLER( model2_prot_w )
 			strcpy((char *)state->protram, "  TECMO LTD.  DEAD OR ALIVE  1996.10.22  VER. 1.00");
 		}
 	}
-	else logerror("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+	else logerror("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
 
 }
 
@@ -1930,7 +1930,7 @@ static const scsp_interface scsp_config =
 static READ32_HANDLER(copro_sharc_input_fifo_r)
 {
 	UINT32 result = 0;
-	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", cpu_get_pc(space->cpu));
+	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", cpu_get_pc(&space->device()));
 
 	copro_fifoin_pop(space->machine().device("dsp"), &result);
 	return result;
@@ -1951,7 +1951,7 @@ static READ32_HANDLER(copro_sharc_buffer_r)
 static WRITE32_HANDLER(copro_sharc_buffer_w)
 {
 	model2_state *state = space->machine().driver_data<model2_state>();
-	//mame_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, cpu_get_pc(space->cpu), data, *(float*)&data);
+	//mame_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, cpu_get_pc(&space->device()), data, *(float*)&data);
 	state->bufferram[offset & 0x7fff] = data;
 }
 

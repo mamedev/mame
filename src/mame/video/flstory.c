@@ -141,7 +141,7 @@ WRITE8_HANDLER( flstory_gfxctrl_w )
 
 	flip_screen_set(space->machine(), state->flipscreen);
 
-//popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(space->cpu), data);
+//popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(&space->device()), data);
 
 }
 
@@ -166,7 +166,7 @@ WRITE8_HANDLER( victnine_gfxctrl_w )
 		flip_screen_set(space->machine(), state->flipscreen);
 	}
 
-//popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(space->cpu), data);
+//popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(&space->device()), data);
 
 }
 

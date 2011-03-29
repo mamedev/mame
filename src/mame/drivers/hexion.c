@@ -89,7 +89,7 @@ Notes:
 
 static WRITE8_HANDLER( coincntr_w )
 {
-//logerror("%04x: coincntr_w %02x\n",cpu_get_pc(space->cpu),data);
+//logerror("%04x: coincntr_w %02x\n",cpu_get_pc(&space->device()),data);
 
 	/* bits 0/1 = coin counters */
 	coin_counter_w(space->machine(), 0,data & 0x01);

@@ -289,7 +289,7 @@ READ8_HANDLER( segag80r_video_port_r )
 	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	if (offset == 0)
 	{
-		logerror("%04X:segag80r_video_port_r(%d)\n", cpu_get_pc(space->cpu), offset);
+		logerror("%04X:segag80r_video_port_r(%d)\n", cpu_get_pc(&space->device()), offset);
 		return 0xff;
 	}
 	else
@@ -310,7 +310,7 @@ WRITE8_HANDLER( segag80r_video_port_w )
 	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	if (offset == 0)
 	{
-		logerror("%04X:segag80r_video_port_w(%d) = %02X\n", cpu_get_pc(space->cpu), offset, data);
+		logerror("%04X:segag80r_video_port_w(%d) = %02X\n", cpu_get_pc(&space->device()), offset, data);
 	}
 	else
 	{

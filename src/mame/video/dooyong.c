@@ -156,7 +156,7 @@ WRITE8_HANDLER( primella_ctrl_w )
 
 	/* bit 5 used but unknown */
 
-//  logerror("%04x: bankswitch = %02x\n",cpu_get_pc(space->cpu),data&0xe0);
+//  logerror("%04x: bankswitch = %02x\n",cpu_get_pc(&space->device()),data&0xe0);
 }
 
 WRITE8_HANDLER( paletteram_flytiger_w )

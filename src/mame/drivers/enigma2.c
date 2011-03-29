@@ -352,7 +352,7 @@ static READ8_HANDLER( dip_switch_r )
 	enigma2_state *state = space->machine().driver_data<enigma2_state>();
 	UINT8 ret = 0x00;
 
-	if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, cpu_get_pc(space->cpu), state->protection_data);
+	if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, cpu_get_pc(&space->device()), state->protection_data);
 	switch (offset)
 	{
 	case 0x01:
@@ -365,7 +365,7 @@ static READ8_HANDLER( dip_switch_r )
 		break;
 
 	case 0x02:
-		if (cpu_get_pc(space->cpu) == 0x07e5)
+		if (cpu_get_pc(&space->device()) == 0x07e5)
 			ret = 0xaa;
 		else
 			ret = 0xf4;

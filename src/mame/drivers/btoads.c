@@ -118,8 +118,8 @@ static READ8_HANDLER( sound_ready_to_send_r )
 static READ8_HANDLER( sound_data_ready_r )
 {
 	btoads_state *state = space->machine().driver_data<btoads_state>();
-	if (cpu_get_pc(space->cpu) == 0xd50 && !state->main_to_sound_ready)
-		device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device()) == 0xd50 && !state->main_to_sound_ready)
+		device_spin_until_interrupt(&space->device());
 	return state->main_to_sound_ready ? 0x00 : 0x80;
 }
 

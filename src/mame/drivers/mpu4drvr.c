@@ -904,19 +904,19 @@ static READ16_HANDLER( mpu4_vid_scn2674_r )
         */
 
 		case 0:
-			LOGSTUFF(("Read Irq Register %06x\n",cpu_get_pc(space->cpu)));
+			LOGSTUFF(("Read Irq Register %06x\n",cpu_get_pc(&space->device())));
 			return state->scn2674_irq_register;
 
 		case 1:
-			LOGSTUFF(("Read Status Register %06x\n",cpu_get_pc(space->cpu)));
+			LOGSTUFF(("Read Status Register %06x\n",cpu_get_pc(&space->device())));
 			return state->scn2674_status_register;
 
-		case 2: LOGSTUFF(("Read Screen1_l Register %06x\n",cpu_get_pc(space->cpu)));return state->scn2674_screen1_l;
-		case 3: LOGSTUFF(("Read Screen1_h Register %06x\n",cpu_get_pc(space->cpu)));return state->scn2674_screen1_h;
-		case 4: LOGSTUFF(("Read Cursor_l Register %06x\n",cpu_get_pc(space->cpu)));return state->scn2674_cursor_l;
-		case 5: LOGSTUFF(("Read Cursor_h Register %06x\n",cpu_get_pc(space->cpu)));return state->scn2674_cursor_h;
-		case 6:	LOGSTUFF(("Read Screen2_l Register %06x\n",cpu_get_pc(space->cpu)));return state->scn2674_screen2_l;
-		case 7: LOGSTUFF(("Read Screen2_h Register %06x\n",cpu_get_pc(space->cpu)));return state->scn2674_screen2_h;
+		case 2: LOGSTUFF(("Read Screen1_l Register %06x\n",cpu_get_pc(&space->device())));return state->scn2674_screen1_l;
+		case 3: LOGSTUFF(("Read Screen1_h Register %06x\n",cpu_get_pc(&space->device())));return state->scn2674_screen1_h;
+		case 4: LOGSTUFF(("Read Cursor_l Register %06x\n",cpu_get_pc(&space->device())));return state->scn2674_cursor_l;
+		case 5: LOGSTUFF(("Read Cursor_h Register %06x\n",cpu_get_pc(&space->device())));return state->scn2674_cursor_h;
+		case 6:	LOGSTUFF(("Read Screen2_l Register %06x\n",cpu_get_pc(&space->device())));return state->scn2674_screen2_l;
+		case 7: LOGSTUFF(("Read Screen2_h Register %06x\n",cpu_get_pc(&space->device())));return state->scn2674_screen2_h;
 	}
 
 	return 0xffff;
@@ -2507,10 +2507,10 @@ static WRITE16_HANDLER( characteriser16_w )
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	int x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(space->cpu),offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(&space->device()),offset,data));
 
 	if (!state->current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
 
 	for (x = state->prot_col; x < 64; x++)
 	{
@@ -2534,16 +2534,16 @@ static WRITE16_HANDLER( characteriser16_w )
 static READ16_HANDLER( characteriser16_r )
 {
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
-	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", cpu_get_previouspc(space->cpu),offset,state->current_chr_table[state->prot_col].response));
+	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", cpu_get_previouspc(&space->device()),offset,state->current_chr_table[state->prot_col].response));
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	LOG_CHR(("Characteriser read data %02X \n",state->current_chr_table[state->prot_col].response));
 
 	if (!state->current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
 
 
 	/* hack for 'invalid questions' error on time machine.. I guess it wants them to decode properly for startup check? */
-	if (cpu_get_previouspc(space->cpu)==0x283a)
+	if (cpu_get_previouspc(&space->device())==0x283a)
 	{
 		return 0x00;
 	}
@@ -2569,9 +2569,9 @@ static WRITE16_HANDLER( bwb_characteriser16_w )
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	int x;
 	int call=data &0xff;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", cpu_get_previouspc(space->cpu),offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", cpu_get_previouspc(&space->device()),offset,data));
 	if (!state->current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
 
 	if (offset == 0)//initialisation is always at 0x800
 	{
@@ -2613,7 +2613,7 @@ static READ16_HANDLER( bwb_characteriser16_r )
 {
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	if (!state->current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
 
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 

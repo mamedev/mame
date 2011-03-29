@@ -347,8 +347,8 @@ static READ32_HANDLER( kinst_control_r )
 
 		case 4:		/* $a0 */
 			result = input_port_read(space->machine(), portnames[offset]);
-			if (cpu_get_pc(space->cpu) == 0x802d428)
-				device_spin_until_interrupt(space->cpu);
+			if (cpu_get_pc(&space->device()) == 0x802d428)
+				device_spin_until_interrupt(&space->device());
 			break;
 	}
 

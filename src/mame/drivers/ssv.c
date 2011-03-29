@@ -519,7 +519,7 @@ static READ16_HANDLER( gdfs_blitram_r )
 			return 0;
 	}
 
-	logerror("CPU #0 PC: %06X - Blit reg read: %02X\n",cpu_get_pc(space->cpu),offset*2);
+	logerror("CPU #0 PC: %06X - Blit reg read: %02X\n",cpu_get_pc(&space->device()),offset*2);
 	return 0;
 }
 
@@ -535,7 +535,7 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 		case 0x8a/2:
 		{
 			if (data & ~0x43)
-				logerror("CPU #0 PC: %06X - Unknown gdfs_gfxram_bank bit written %04X\n",cpu_get_pc(space->cpu),data);
+				logerror("CPU #0 PC: %06X - Unknown gdfs_gfxram_bank bit written %04X\n",cpu_get_pc(&space->device()),data);
 
 			if (ACCESSING_BITS_0_7)
 				state->gdfs_gfxram_bank = data & 3;
@@ -574,13 +574,13 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 			}
 			else
 			{
-				logerror("CPU #0 PC: %06X - Blit out of range: src %x, dst %x, len %x\n",cpu_get_pc(space->cpu),src,dst,len);
+				logerror("CPU #0 PC: %06X - Blit out of range: src %x, dst %x, len %x\n",cpu_get_pc(&space->device()),src,dst,len);
 			}
 		}
 		break;
 
 		default:
-			logerror("CPU #0 PC: %06X - Blit reg written: %02X <- %04X\n",cpu_get_pc(space->cpu),offset*2,data);
+			logerror("CPU #0 PC: %06X - Blit reg written: %02X <- %04X\n",cpu_get_pc(&space->device()),offset*2,data);
 	}
 }
 
@@ -619,7 +619,7 @@ static READ16_HANDLER( hypreact_input_r )
 	if (input_sel & 0x0002)	return input_port_read(space->machine(), "KEY1");
 	if (input_sel & 0x0004)	return input_port_read(space->machine(), "KEY2");
 	if (input_sel & 0x0008)	return input_port_read(space->machine(), "KEY3");
-	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(space->cpu),input_sel);
+	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(&space->device()),input_sel);
 	return 0xffff;
 }
 
@@ -747,7 +747,7 @@ static READ16_HANDLER( srmp4_input_r )
 	if (input_sel & 0x0004)	return input_port_read(space->machine(), "KEY1");
 	if (input_sel & 0x0008)	return input_port_read(space->machine(), "KEY2");
 	if (input_sel & 0x0010)	return input_port_read(space->machine(), "KEY3");
-	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(space->cpu),input_sel);
+	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(&space->device()),input_sel);
 	return 0xffff;
 }
 
@@ -796,7 +796,7 @@ static READ16_HANDLER( srmp7_input_r )
 	if (input_sel & 0x0004)	return input_port_read(space->machine(), "KEY1");
 	if (input_sel & 0x0008)	return input_port_read(space->machine(), "KEY2");
 	if (input_sel & 0x0010)	return input_port_read(space->machine(), "KEY3");
-	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(space->cpu),input_sel);
+	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(&space->device()),input_sel);
 	return 0xffff;
 }
 

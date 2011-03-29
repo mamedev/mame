@@ -436,7 +436,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
 
 	parse_control(space->machine());
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n",cpu_get_pc(space->cpu),data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n",cpu_get_pc(&space->device()),data);
 }
 
 
@@ -488,7 +488,7 @@ static INTERRUPT_GEN( wgp_cpub_interrupt )
 
 static READ16_HANDLER( lan_status_r )
 {
-	logerror("CPU #2 PC %06x: warning - read lan status\n",cpu_get_pc(space->cpu));
+	logerror("CPU #2 PC %06x: warning - read lan status\n",cpu_get_pc(&space->device()));
 
 	return  (0x4 << 8);	/* CPUB expects this in code at $104d0 (Wgp) */
 }
@@ -516,7 +516,7 @@ static WRITE16_HANDLER( rotate_port_w )
 	{
 		case 0x00:
 		{
-//logerror("CPU #0 PC %06x: warning - port %04x write %04x\n",cpu_get_pc(space->cpu),port_sel,data);
+//logerror("CPU #0 PC %06x: warning - port %04x write %04x\n",cpu_get_pc(&space->device()),port_sel,data);
 
 			state->rotate_ctrl[state->port_sel] = data;
 			return;
@@ -590,7 +590,7 @@ static READ16_HANDLER( wgp_adinput_r )
 			return input_port_read_safe(space->machine(), UNKNOWN_PORT_TAG, 0x00);	/* unknown */
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",cpu_get_pc(space->cpu),offset);
+logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",cpu_get_pc(&space->device()),offset);
 
 	return 0xff;
 }
@@ -601,7 +601,7 @@ static WRITE16_HANDLER( wgp_adinput_w )
        hardware has got the next a/d conversion ready. We set a token
        delay of 10000 cycles although our inputs are always ready. */
 
-	space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(10000), FUNC(wgp_interrupt6));
+	space->machine().scheduler().timer_set(downcast<cpu_device *>(&space->device())->cycles_to_attotime(10000), FUNC(wgp_interrupt6));
 }
 
 

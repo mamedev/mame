@@ -343,7 +343,7 @@ READ16_HANDLER( namcos2_68k_key_r )
 		{
 	//  case 3: return 0x142;
 		case 4: return 0x142;
-	//  case 3: popmessage("blah %08x",cpu_get_pc(space->cpu));
+	//  case 3: popmessage("blah %08x",cpu_get_pc(&space->device()));
 		default: return space->machine().rand();
 		}
 		break;
@@ -474,19 +474,19 @@ ReadWriteC148( address_space *space, offs_t offset, UINT16 data, int bWrite )
 	UINT16 *pC148RegAlt = NULL;
 	UINT16 result = 0;
 
-	if (space->cpu == space->machine().device("maincpu"))
+	if (&space->device() == space->machine().device("maincpu"))
 	{
 		pC148Reg = namcos2_68k_master_C148;
 		altcpu = space->machine().device("slave");
 		pC148RegAlt = namcos2_68k_slave_C148;
 	}
-	else if (space->cpu == space->machine().device("slave"))
+	else if (&space->device() == space->machine().device("slave"))
 	{
 		pC148Reg = namcos2_68k_slave_C148;
 		altcpu = space->machine().device("maincpu");
 		pC148RegAlt = namcos2_68k_master_C148;
 	}
-	else if (space->cpu == space->machine().device("gpu"))
+	else if (&space->device() == space->machine().device("gpu"))
 	{
 		pC148Reg = namcos2_68k_gpu_C148;
 		altcpu = space->machine().device("maincpu");
@@ -536,26 +536,26 @@ ReadWriteC148( address_space *space, offs_t offset, UINT16 data, int bWrite )
 	/* IRQ ack */
 	case 0x1d6000: /* NAMCOS2_C148_CPUIRQ */
 		// if( bWrite ) mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-		device_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_CPUIRQ], CLEAR_LINE);
+		device_set_input_line(&space->device(), pC148Reg[NAMCOS2_C148_CPUIRQ], CLEAR_LINE);
 		break;
 
 	case 0x1d8000: /* NAMCOS2_C148_EXIRQ */
 		// if( bWrite ) mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-		device_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_EXIRQ], CLEAR_LINE);
+		device_set_input_line(&space->device(), pC148Reg[NAMCOS2_C148_EXIRQ], CLEAR_LINE);
 		break;
 
 	case 0x1da000: /* NAMCOS2_C148_POSIRQ */
 		// if( bWrite ) mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-		device_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_POSIRQ], CLEAR_LINE);
+		device_set_input_line(&space->device(), pC148Reg[NAMCOS2_C148_POSIRQ], CLEAR_LINE);
 		break;
 
 	case 0x1dc000: /* NAMCOS2_C148_SERIRQ */
 		// if( bWrite ) mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-		device_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_SERIRQ], CLEAR_LINE);
+		device_set_input_line(&space->device(), pC148Reg[NAMCOS2_C148_SERIRQ], CLEAR_LINE);
 		break;
 
 	case 0x1de000: /* NAMCOS2_C148_VBLANKIRQ */
-		device_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_VBLANKIRQ], CLEAR_LINE);
+		device_set_input_line(&space->device(), pC148Reg[NAMCOS2_C148_VBLANKIRQ], CLEAR_LINE);
 		break;
 
 
@@ -564,13 +564,13 @@ ReadWriteC148( address_space *space, offs_t offset, UINT16 data, int bWrite )
 		break;
 
 	case 0x1e2000: /* Sound CPU Reset control */
-		if (space->cpu == space->machine().device("maincpu")) /* ? */
+		if (&space->device() == space->machine().device("maincpu")) /* ? */
 		{
 			if (data & 0x01)
 			{
 				/* Resume execution */
 				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
-				device_yield(space->cpu);
+				device_yield(&space->device());
 			}
 			else
 			{
@@ -589,13 +589,13 @@ ReadWriteC148( address_space *space, offs_t offset, UINT16 data, int bWrite )
 		break;
 
 	case 0x1e4000: /* Alt 68000 & IO CPU Reset */
-		if (space->cpu == space->machine().device("maincpu")) /* ? */
+		if (&space->device() == space->machine().device("maincpu")) /* ? */
 		{
 			if (data & 0x01)
 			{ /* Resume execution */
 				ResetAllSubCPUs(space->machine(), CLEAR_LINE);
 				/* Give the new CPU an immediate slice of the action */
-				device_yield(space->cpu);
+				device_yield(&space->device());
 			}
 			else
 			{ /* Suspend execution */

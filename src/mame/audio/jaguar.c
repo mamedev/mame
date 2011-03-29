@@ -277,7 +277,7 @@ void cojag_sound_init(running_machine &machine)
 READ16_HANDLER( jaguar_jerry_regs_r )
 {
 	if (offset != JINTCTRL && offset != JINTCTRL+2)
-		logerror("%08X:jerry read register @ F10%03X\n", cpu_get_previouspc(space->cpu), offset * 2);
+		logerror("%08X:jerry read register @ F10%03X\n", cpu_get_previouspc(&space->device()), offset * 2);
 
 	switch (offset)
 	{
@@ -304,7 +304,7 @@ WRITE16_HANDLER( jaguar_jerry_regs_w )
 	}
 
 	if (offset != JINTCTRL && offset != JINTCTRL+2 && offset != ASICTRL)
-		logerror("%08X:jerry write register @ F10%03X = %04X\n", cpu_get_previouspc(space->cpu), offset * 2, data);
+		logerror("%08X:jerry write register @ F10%03X = %04X\n", cpu_get_previouspc(&space->device()), offset * 2, data);
 }
 
 
@@ -343,12 +343,12 @@ static WRITE32_HANDLER( dsp_flags_w )
 
 	/* if they were clearing the A2S interrupt, see if we are headed for the spin */
 	/* loop with R22 != 0; if we are, just start spinning again */
-	if (space->cpu == space->machine().device("audiocpu") && ACCESSING_BITS_8_15 && (data & 0x400))
+	if (&space->device() == space->machine().device("audiocpu") && ACCESSING_BITS_8_15 && (data & 0x400))
 	{
 		/* see if we're going back to the spin loop */
-		if (!(data & 0x04000) && cpu_get_reg(space->cpu, JAGUAR_R22) != 0)
+		if (!(data & 0x04000) && cpu_get_reg(&space->device(), JAGUAR_R22) != 0)
 		{
-			UINT32 r30 = cpu_get_reg(space->cpu, JAGUAR_R30) & 0xffffff;
+			UINT32 r30 = cpu_get_reg(&space->device(), JAGUAR_R30) & 0xffffff;
 			if (r30 >= 0xf1b124 && r30 <= 0xf1b126)
 				jaguar_dsp_suspend(space->machine());
 		}
@@ -405,7 +405,7 @@ TIMER_DEVICE_CALLBACK( jaguar_serial_callback )
 
 READ32_HANDLER( jaguar_serial_r )
 {
-	logerror("%08X:jaguar_serial_r(%X)\n", cpu_get_previouspc(space->cpu), offset);
+	logerror("%08X:jaguar_serial_r(%X)\n", cpu_get_previouspc(&space->device()), offset);
 	return 0;
 }
 
@@ -442,7 +442,7 @@ WRITE32_HANDLER( jaguar_serial_w )
 			break;
 
 		default:
-			logerror("%08X:jaguar_serial_w(%X,%X)\n", cpu_get_previouspc(space->cpu), offset, data);
+			logerror("%08X:jaguar_serial_w(%X,%X)\n", cpu_get_previouspc(&space->device()), offset, data);
 			break;
 	}
 }

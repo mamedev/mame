@@ -83,7 +83,7 @@ READ16_HANDLER( segaic16_open_bus_r )
 
 	/* read original encrypted memory at that address */
 	recurse = 1;
-	result = space->read_word(cpu_get_pc(space->cpu));
+	result = space->read_word(cpu_get_pc(&space->device()));
 	recurse = 0;
 	return result;
 }

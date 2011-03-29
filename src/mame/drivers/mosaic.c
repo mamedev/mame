@@ -43,7 +43,7 @@ static READ8_HANDLER( protection_r )
 	mosaic_state *state = space->machine().driver_data<mosaic_state>();
 	int res = (state->prot_val >> 8) & 0xff;
 
-	logerror("%06x: protection_r %02x\n", cpu_get_pc(space->cpu), res);
+	logerror("%06x: protection_r %02x\n", cpu_get_pc(&space->device()), res);
 
 	state->prot_val <<= 8;
 
@@ -54,7 +54,7 @@ static WRITE8_HANDLER( gfire2_protection_w )
 {
 	mosaic_state *state = space->machine().driver_data<mosaic_state>();
 
-	logerror("%06x: protection_w %02x\n", cpu_get_pc(space->cpu), data);
+	logerror("%06x: protection_w %02x\n", cpu_get_pc(&space->device()), data);
 
 	switch(data)
 	{

@@ -25,7 +25,7 @@ Notes:
 static READ8_HANDLER( strnskil_d800_r )
 {
     /* bit0: interrupt type?, bit1: CPU2 busack? */
-	if (cpu_getiloops(space->cpu) == 0)
+	if (cpu_getiloops(&space->device()) == 0)
 		return 0;
 	return 1;
 }
@@ -36,7 +36,7 @@ static READ8_HANDLER( pettanp_protection_r )
 {
 	int res;
 
-	switch (cpu_get_pc(space->cpu))
+	switch (cpu_get_pc(&space->device()))
 	{
 		case 0x6066:	res = 0xa5;	break;
 		case 0x60dc:	res = 0x20;	break;	/* bits 0-3 unknown */
@@ -47,7 +47,7 @@ static READ8_HANDLER( pettanp_protection_r )
 		default:		res = 0xff; break;
 	}
 
-	logerror("%04x: protection_r -> %02x\n",cpu_get_pc(space->cpu),res);
+	logerror("%04x: protection_r -> %02x\n",cpu_get_pc(&space->device()),res);
 	return res;
 }
 
@@ -55,7 +55,7 @@ static READ8_HANDLER( banbam_protection_r )
 {
 	int res;
 
-	switch (cpu_get_pc(space->cpu))
+	switch (cpu_get_pc(&space->device()))
 	{
 		case 0x6094:	res = 0xa5;	break;
 		case 0x6118:	res = 0x20;	break;	/* bits 0-3 unknown */
@@ -66,13 +66,13 @@ static READ8_HANDLER( banbam_protection_r )
 		default:		res = 0xff; break;
 	}
 
-	logerror("%04x: protection_r -> %02x\n",cpu_get_pc(space->cpu),res);
+	logerror("%04x: protection_r -> %02x\n",cpu_get_pc(&space->device()),res);
 	return res;
 }
 
 static WRITE8_HANDLER( protection_w )
 {
-	logerror("%04x: protection_w %02x\n",cpu_get_pc(space->cpu),data);
+	logerror("%04x: protection_w %02x\n",cpu_get_pc(&space->device()),data);
 }
 
 /****************************************************************************/

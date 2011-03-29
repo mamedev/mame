@@ -248,7 +248,7 @@ static void littlerb_recalc_address(running_machine &machine)
 static READ16_HANDLER( littlerb_vdp_r )
 {
 	littlerb_state *state = space->machine().driver_data<littlerb_state>();
-	logerror("%06x littlerb_vdp_r offs %04x mask %04x\n", cpu_get_pc(space->cpu), offset, mem_mask);
+	logerror("%06x littlerb_vdp_r offs %04x mask %04x\n", cpu_get_pc(&space->device()), offset, mem_mask);
 
 	switch (offset)
 	{
@@ -286,7 +286,7 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 			state->type2_writes = 0;
 		}
 
-		if (LOG_VDP) logerror("%06x littlerb_vdp_w offs %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+		if (LOG_VDP) logerror("%06x littlerb_vdp_w offs %04x data %04x mask %04x\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 	}
 	else
 	{
@@ -294,15 +294,15 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 		{
 			if (state->type2_writes==0)
 			{
-				if (LOG_VDP) logerror("data write started %06x %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+				if (LOG_VDP) logerror("data write started %06x %04x data %04x mask %04x\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 			}
 
 			state->type2_writes++;
-			state->lasttype2pc = cpu_get_pc(space->cpu);
+			state->lasttype2pc = cpu_get_pc(&space->device());
 		}
 		else
 		{
-			if (LOG_VDP) logerror("xxx %06x littlerb_vdp_w offs %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+			if (LOG_VDP) logerror("xxx %06x littlerb_vdp_w offs %04x data %04x mask %04x\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 		}
 	}
 

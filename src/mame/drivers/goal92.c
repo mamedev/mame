@@ -41,7 +41,7 @@ static READ16_HANDLER( goal92_inputs_r )
 			return input_port_read(space->machine(), "DSW2");
 
 		default:
-			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n", offset, mem_mask,cpu_get_pc(space->cpu));
+			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n", offset, mem_mask,cpu_get_pc(&space->device()));
 	}
 
 	return 0;

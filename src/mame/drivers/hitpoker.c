@@ -208,10 +208,10 @@ static READ8_HANDLER( hitpoker_pic_r )
 
 	if(offset == 0)
 	{
-		if(cpu_get_pc(space->cpu) == 0x3143 ||
-		   cpu_get_pc(space->cpu) == 0x314e ||
-		   cpu_get_pc(space->cpu) == 0x3164 ||
-		   cpu_get_pc(space->cpu) == 0x3179)
+		if(cpu_get_pc(&space->device()) == 0x3143 ||
+		   cpu_get_pc(&space->device()) == 0x314e ||
+		   cpu_get_pc(&space->device()) == 0x3164 ||
+		   cpu_get_pc(&space->device()) == 0x3179)
 			return state->pic_data;
 
 		return (state->pic_data & 0x7f) | (state->pic_data & 0x40 ? 0x80 : 0x00);

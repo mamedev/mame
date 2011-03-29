@@ -2205,7 +2205,7 @@ READ8_DEVICE_HANDLER( k052109_r )
 			else if (offset >= 0x3a00 && offset < 0x3c00)
 			{	/* B x scroll */	}
 //          else
-//logerror("%04x: read from unknown 052109 address %04x\n",cpu_get_pc(space->cpu),offset);
+//logerror("%04x: read from unknown 052109 address %04x\n",cpu_get_pc(&space->device()),offset);
 		}
 
 		return k052109->ram[offset];
@@ -2229,7 +2229,7 @@ READ8_DEVICE_HANDLER( k052109_r )
 		addr = (code << 5) + (offset & 0x1f);
 		addr &= device->machine().region(k052109->memory_region)->bytes() - 1;
 
-//      logerror("%04x: off = %04x sub = %02x (bnk = %x) adr = %06x\n", cpu_get_pc(space->cpu), offset, k052109->romsubbank, bank, addr);
+//      logerror("%04x: off = %04x sub = %02x (bnk = %x) adr = %06x\n", cpu_get_pc(&space->device()), offset, k052109->romsubbank, bank, addr);
 
 		return device->machine().region(k052109->memory_region)->base()[addr];
 	}
@@ -2260,13 +2260,13 @@ WRITE8_DEVICE_HANDLER( k052109_w )
 			if (k052109->scrollctrl != data)
 			{
 //popmessage("scrollcontrol = %02x", data);
-//logerror("%04x: rowscrollcontrol = %02x\n", cpu_get_pc(space->cpu), data);
+//logerror("%04x: rowscrollcontrol = %02x\n", cpu_get_pc(&space->device()), data);
 				k052109->scrollctrl = data;
 			}
 		}
 		else if (offset == 0x1d00)
 		{
-//logerror("%04x: 052109 register 1d00 = %02x\n", cpu_get_pc(space->cpu), data);
+//logerror("%04x: 052109 register 1d00 = %02x\n", cpu_get_pc(&space->device()), data);
 			/* bit 2 = irq enable */
 			/* the custom chip can also generate NMI and FIRQ, for use with a 6809 */
 			k052109->irq_enabled = data & 0x04;
@@ -2299,12 +2299,12 @@ WRITE8_DEVICE_HANDLER( k052109_w )
 		}
 		else if (offset == 0x1e00 || offset == 0x3e00) // Surprise Attack uses offset 0x3e00
 		{
-//logerror("%04x: 052109 register 1e00 = %02x\n",cpu_get_pc(space->cpu),data);
+//logerror("%04x: 052109 register 1e00 = %02x\n",cpu_get_pc(&space->device()),data);
 			k052109->romsubbank = data;
 		}
 		else if (offset == 0x1e80)
 		{
-//if ((data & 0xfe)) logerror("%04x: 052109 register 1e80 = %02x\n",cpu_get_pc(space->cpu),data);
+//if ((data & 0xfe)) logerror("%04x: 052109 register 1e80 = %02x\n",cpu_get_pc(&space->device()),data);
 			tilemap_set_flip(k052109->tilemap[0], (data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			tilemap_set_flip(k052109->tilemap[1], (data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			tilemap_set_flip(k052109->tilemap[2], (data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -2359,7 +2359,7 @@ WRITE8_DEVICE_HANDLER( k052109_w )
 			k052109->charrombank_2[3] = (data >> 4) & 0x0f;
 		}
 //      else
-//          logerror("%04x: write %02x to unknown 052109 address %04x\n",cpu_get_pc(space->cpu),data,offset);
+//          logerror("%04x: write %02x to unknown 052109 address %04x\n",cpu_get_pc(&space->device()),data,offset);
 	}
 }
 
@@ -4348,7 +4348,7 @@ READ16_DEVICE_HANDLER( k055673_GX6bpp_rom_word_r )
 		case 7:
 			return ROM[romofs + 2];
 		default:
-//          LOG(("55673_rom_word_r: Unknown read offset %x (PC=%x)\n", offset, cpu_get_pc(space->cpu)));
+//          LOG(("55673_rom_word_r: Unknown read offset %x (PC=%x)\n", offset, cpu_get_pc(&space->device())));
 			break;
 	}
 
@@ -4365,12 +4365,12 @@ READ8_DEVICE_HANDLER( k053246_r )
 		addr = (k053246->kx46_regs[6] << 17) | (k053246->kx46_regs[7] << 9) | (k053246->kx46_regs[4] << 1) | ((offset & 1) ^ 1);
 		addr &= device->machine().region(k053246->memory_region)->bytes() - 1;
 //      if (VERBOSE)
-//          popmessage("%04x: offset %02x addr %06x", cpu_get_pc(space->cpu), offset, addr);
+//          popmessage("%04x: offset %02x addr %06x", cpu_get_pc(&space->device()), offset, addr);
 		return device->machine().region(k053246->memory_region)->base()[addr];
 	}
 	else
 	{
-//      LOG(("%04x: read from unknown 053246 address %x\n", cpu_get_pc(space->cpu), offset));
+//      LOG(("%04x: read from unknown 053246 address %x\n", cpu_get_pc(&space->device()), offset));
 		return 0;
 	}
 }
@@ -5807,7 +5807,7 @@ WRITE8_DEVICE_HANDLER( k054000_w )
 {
 	k054000_state *k054000 = k054000_get_safe_token(device);
 
-	//logerror("%04x: write %02x to 054000 address %02x\n",cpu_get_pc(space->cpu),data,offset);
+	//logerror("%04x: write %02x to 054000 address %02x\n",cpu_get_pc(&space->device()),data,offset);
 	k054000->regs[offset] = data;
 }
 
@@ -5817,7 +5817,7 @@ READ8_DEVICE_HANDLER( k054000_r )
 	int Acx, Acy, Aax, Aay;
 	int Bcx, Bcy, Bax, Bay;
 
-	//logerror("%04x: read 054000 address %02x\n", cpu_get_pc(space->cpu), offset);
+	//logerror("%04x: read 054000 address %02x\n", cpu_get_pc(&space->device()), offset);
 
 	if (offset != 0x18)
 		return 0;
@@ -5917,7 +5917,7 @@ INLINE k051733_state *k051733_get_safe_token( device_t *device )
 WRITE8_DEVICE_HANDLER( k051733_w )
 {
 	k051733_state *k051733= k051733_get_safe_token(device);
-	//logerror("%04x: write %02x to 051733 address %02x\n", cpu_get_pc(space->cpu), data, offset);
+	//logerror("%04x: write %02x to 051733 address %02x\n", cpu_get_pc(&space->device()), data, offset);
 
 	k051733->ram[offset] = data;
 }
@@ -5955,7 +5955,7 @@ READ8_DEVICE_HANDLER( k051733_r )
 	int yobj2c = (k051733->ram[0x0c] << 8) | k051733->ram[0x0d];
 	int xobj2c = (k051733->ram[0x0e] << 8) | k051733->ram[0x0f];
 
-	//logerror("%04x: read 051733 address %02x\n", cpu_get_pc(space->cpu), offset);
+	//logerror("%04x: read 051733 address %02x\n", cpu_get_pc(&space->device()), offset);
 
 	switch (offset)
 	{
@@ -6410,7 +6410,7 @@ READ16_DEVICE_HANDLER( k056832_5bpp_rom_word_r )
 		return k056832_rom_read_b(device, offset * 2 + 1, 4, 5, 0)<<16;
 	else
 	{
-		//LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", cpu_get_pc(space->cpu), mem_mask));
+		//LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", cpu_get_pc(&space->device()), mem_mask));
 	}
 	return 0;
 }
@@ -6427,7 +6427,7 @@ READ32_DEVICE_HANDLER( k056832_5bpp_rom_long_r )
 		return k056832_rom_read_b(device, offset * 4 + 3, 4, 5, 1);
 	else
 	{
-		//LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", cpu_get_pc(space->cpu), mem_mask));
+		//LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", cpu_get_pc(&space->device()), mem_mask));
 	}
 	return 0;
 }
@@ -6444,7 +6444,7 @@ READ32_DEVICE_HANDLER( k056832_6bpp_rom_long_r )
 		return k056832_rom_read_b(device, offset * 4 + 3, 4, 6, 0);
 	else
 	{
-		//LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", cpu_get_pc(space->cpu), mem_mask));
+		//LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", cpu_get_pc(&space->device()), mem_mask));
 	}
 	return 0;
 }
@@ -9439,7 +9439,7 @@ READ32_DEVICE_HANDLER( k001005_r )
 			}
 
 		default:
-			//mame_printf_debug("k001005->r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
+			//mame_printf_debug("k001005->r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space->device()));
 			break;
 	}
 	return 0;
@@ -9472,7 +9472,7 @@ WRITE32_DEVICE_HANDLER( k001005_w )
 				sharc_set_flag_input(k001005->dsp, 1, ASSERT_LINE);
 			}
 
-	    //  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, cpu_get_pc(space->cpu));
+	    //  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, cpu_get_pc(&space->device()));
 			k001005->fifo[k001005->fifo_write_ptr] = data;
 			k001005->fifo_write_ptr++;
 			k001005->fifo_write_ptr &= 0x7ff;
@@ -9536,7 +9536,7 @@ WRITE32_DEVICE_HANDLER( k001005_w )
 			break;
 
 		default:
-			//mame_printf_debug("k001005->w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+			//mame_printf_debug("k001005->w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
 			break;
 	}
 
@@ -10499,7 +10499,7 @@ WRITE32_DEVICE_HANDLER( k001604_reg_w )
 
 	if (offset != 0x08 && offset != 0x09 && offset != 0x0a /*&& offset != 0x17 && offset != 0x18*/)
 	{
-		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %08X\n", chip, offset, data, mem_mask, cpu_get_pc(space->cpu));
+		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %08X\n", chip, offset, data, mem_mask, cpu_get_pc(&space->device()));
 	}
 }
 

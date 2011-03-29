@@ -152,7 +152,7 @@ static WRITE32_HANDLER( control_w )
 
 	/* log any unknown bits */
 	if (data & 0x4f1fffff)
-		logerror("%08X: control_w = %08X & %08X\n", cpu_get_previouspc(space->cpu), data, mem_mask);
+		logerror("%08X: control_w = %08X & %08X\n", cpu_get_previouspc(&space->device()), data, mem_mask);
 }
 
 
@@ -207,7 +207,7 @@ static WRITE32_HANDLER( speedup_w )
 	COMBINE_DATA(state->speedup_data);
 
 	/* see if the PC matches */
-	if ((cpu_get_previouspc(space->cpu) & 0x1fffffff) == state->speedup_pc)
+	if ((cpu_get_previouspc(&space->device()) & 0x1fffffff) == state->speedup_pc)
 	{
 		UINT64 curr_cycles = space->machine().firstcpu->total_cycles();
 
@@ -218,7 +218,7 @@ static WRITE32_HANDLER( speedup_w )
 
 			/* more than 2 in a row and we spin */
 			if (state->loop_count > 2)
-				device_spin_until_interrupt(space->cpu);
+				device_spin_until_interrupt(&space->device());
 		}
 		else
 			state->loop_count = 0;

@@ -402,7 +402,7 @@ static CPU_EXECUTE( tms )
 
 static READ16_HANDLER( cpuregs_r )
 {
-	tms32051_state *cpustate = get_safe_token(space->cpu);
+	tms32051_state *cpustate = get_safe_token(&space->device());
 
 	switch (offset)
 	{
@@ -454,7 +454,7 @@ static READ16_HANDLER( cpuregs_r )
 
 static WRITE16_HANDLER( cpuregs_w )
 {
-	tms32051_state *cpustate = get_safe_token(space->cpu);
+	tms32051_state *cpustate = get_safe_token(&space->device());
 
 	switch (offset)
 	{

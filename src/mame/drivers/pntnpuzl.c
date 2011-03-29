@@ -287,14 +287,14 @@ READ16_HANDLER ( pntnpuzl_random_r )
 static READ16_HANDLER( pntnpuzl_vid_r )
 {
 	pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
-//  logerror("read_videoram: pc = %06x : offset %04x reg %04x\n",cpu_get_pc(space->cpu),offset*2, state->bank[0]);
+//  logerror("read_videoram: pc = %06x : offset %04x reg %04x\n",cpu_get_pc(&space->device()),offset*2, state->bank[0]);
 	return state->_3a0000ram[offset+ (state->bank[0]&0x0001)*0x8000 ];
 }
 
 static WRITE16_HANDLER( pntnpuzl_vid_w )
 {
 	pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
-//  logerror("write_to_videoram: pc = %06x : offset %04x data %04x reg %04x\n",cpu_get_pc(space->cpu),offset*2, data, state->bank[0]);
+//  logerror("write_to_videoram: pc = %06x : offset %04x data %04x reg %04x\n",cpu_get_pc(&space->device()),offset*2, data, state->bank[0]);
 	COMBINE_DATA(&state->_3a0000ram[offset+ (state->bank[0]&0x0001)*0x8000 ]);
 }
 
@@ -345,7 +345,7 @@ static WRITE16_HANDLER( pntnpuzl_200000_w )
 static WRITE16_HANDLER( pntnpuzl_280018_w )
 {
 	pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
-// logerror("%04x: 280018: %04x\n",cpu_get_pc(space->cpu),data);
+// logerror("%04x: 280018: %04x\n",cpu_get_pc(&space->device()),data);
 	state->serial >>= 1;
 	if (data & 0x2000)
 		state->serial |= 0x400;

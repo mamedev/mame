@@ -47,7 +47,7 @@ void system24temp_sys16_io_set_callbacks(
 READ16_HANDLER ( system24temp_sys16_io_r )
 {
 	segas24_state *state = space->machine().driver_data<segas24_state>();
-	//  logerror("IO read %02x (%s:%x)\n", offset, space->cpu->tag(), cpu_get_pc(space->cpu));
+	//  logerror("IO read %02x (%s:%x)\n", offset, space->device().tag(), cpu_get_pc(&space->device()));
 	if(offset < 8)
 		return state->system24temp_sys16_io_io_r ? state->system24temp_sys16_io_io_r(space->machine(),offset) : 0xff;
 	else if (offset < 0x20) {
@@ -65,7 +65,7 @@ READ16_HANDLER ( system24temp_sys16_io_r )
 		case 0xf:
 			return state->system24temp_sys16_io_dir;
 		default:
-			logerror("IO control read %02x (%s:%x)\n", offset, space->cpu->tag(), cpu_get_pc(space->cpu));
+			logerror("IO control read %02x (%s:%x)\n", offset, space->device().tag(), cpu_get_pc(&space->device()));
 			return 0xff;
 		}
 	} else
@@ -84,7 +84,7 @@ WRITE16_HANDLER( system24temp_sys16_io_w )
 	if(ACCESSING_BITS_0_7) {
 		if(offset < 8) {
 			if(!(state->system24temp_sys16_io_dir & (1 << offset))) {
-				logerror("IO port write on input-only port (%d, [%02x], %02x, %s:%x)\n", offset, state->system24temp_sys16_io_dir, data & 0xff, space->cpu->tag(), cpu_get_pc(space->cpu));
+				logerror("IO port write on input-only port (%d, [%02x], %02x, %s:%x)\n", offset, state->system24temp_sys16_io_dir, data & 0xff, space->device().tag(), cpu_get_pc(&space->device()));
 				return;
 			}
 			if(state->system24temp_sys16_io_io_w)
@@ -100,7 +100,7 @@ WRITE16_HANDLER( system24temp_sys16_io_w )
 				state->system24temp_sys16_io_dir = data;
 				break;
 			default:
-				logerror("IO control write %02x, %02x (%s:%x)\n", offset, data & 0xff, space->cpu->tag(), cpu_get_pc(space->cpu));
+				logerror("IO control write %02x, %02x (%s:%x)\n", offset, data & 0xff, space->device().tag(), cpu_get_pc(&space->device()));
 			}
 		}
 	}

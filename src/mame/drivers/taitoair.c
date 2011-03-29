@@ -241,7 +241,7 @@ static WRITE16_HANDLER( system_control_w )
 
 	device_set_input_line(state->dsp, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
-	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", cpu_get_previouspc(space->cpu), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
+	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", cpu_get_previouspc(&space->device()), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
 }
 
 static READ16_HANDLER( lineram_r )
@@ -277,7 +277,7 @@ static READ16_HANDLER( dsp_HOLD_signal_r )
 	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 
 	/* HOLD signal is active low */
-	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", cpu_get_previouspc(space->cpu), state->dsp_hold_signal);
+	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", cpu_get_previouspc(&space->device()), state->dsp_hold_signal);
 
 	return state->dsp_hold_signal;
 }
@@ -285,7 +285,7 @@ static READ16_HANDLER( dsp_HOLD_signal_r )
 static WRITE16_HANDLER( dsp_HOLDA_signal_w )
 {
 	if (offset)
-		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n", cpu_get_previouspc(space->cpu), data);
+		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n", cpu_get_previouspc(&space->device()), data);
 }
 
 

@@ -784,7 +784,7 @@ static WRITE16_HANDLER( semicom_soundcmd_w )
 	{
 		soundlatch_w(space, 0, data & 0xff);
 		// needed for Super Trio which reads the sound with polling
-		// device_spin_until_time(space->cpu, attotime::from_usec(100));
+		// device_spin_until_time(&space->device(), attotime::from_usec(100));
 		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 
 	}
@@ -3424,9 +3424,9 @@ static DRIVER_INIT( fncywld )
 
 static READ16_HANDLER( bcstory_1a0_read )
 {
-	//mame_printf_debug("bcstory_io %06x\n",cpu_get_pc(space->cpu));
+	//mame_printf_debug("bcstory_io %06x\n",cpu_get_pc(&space->device()));
 
-	if (cpu_get_pc(space->cpu)==0x0560) return 0x1a0;
+	if (cpu_get_pc(&space->device())==0x0560) return 0x1a0;
 	else return input_port_read(space->machine(), "SYSTEM");
 }
 

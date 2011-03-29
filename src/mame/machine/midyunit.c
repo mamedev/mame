@@ -29,7 +29,7 @@
 WRITE16_HANDLER( midyunit_cmos_w )
 {
 	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	logerror("%08x:CMOS Write @ %05X\n", cpu_get_pc(space->cpu), offset);
+	logerror("%08x:CMOS Write @ %05X\n", cpu_get_pc(&space->device()), offset);
 	COMBINE_DATA(&state->cmos_ram[offset + state->cmos_page]);
 }
 
@@ -53,7 +53,7 @@ WRITE16_HANDLER( midyunit_cmos_enable_w )
 	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	state->cmos_w_enable = (~data >> 9) & 1;
 
-	logerror("%08x:Protection write = %04X\n", cpu_get_pc(space->cpu), data);
+	logerror("%08x:Protection write = %04X\n", cpu_get_pc(&space->device()), data);
 
 	/* only go down this path if we have a data structure */
 	if (state->prot_data)
@@ -103,7 +103,7 @@ READ16_HANDLER( midyunit_protection_r )
 {
 	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	/* return the most recently clocked value */
-	logerror("%08X:Protection read = %04X\n", cpu_get_pc(space->cpu), state->prot_result);
+	logerror("%08X:Protection read = %04X\n", cpu_get_pc(&space->device()), state->prot_result);
 	return state->prot_result;
 }
 
@@ -193,7 +193,7 @@ static WRITE16_HANDLER( term2_sound_w )
 static WRITE16_HANDLER( term2_hack_w )
 {
 	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	if (offset == 1 && cpu_get_pc(space->cpu) == 0xffce6520)
+	if (offset == 1 && cpu_get_pc(&space->device()) == 0xffce6520)
 	{
 		state->t2_hack_mem[offset] = 0;
 		return;
@@ -204,7 +204,7 @@ static WRITE16_HANDLER( term2_hack_w )
 static WRITE16_HANDLER( term2la3_hack_w )
 {
 	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce5230)
+	if (offset == 0 && cpu_get_pc(&space->device()) == 0xffce5230)
 	{
 		state->t2_hack_mem[offset] = 0;
 		return;
@@ -215,7 +215,7 @@ static WRITE16_HANDLER( term2la3_hack_w )
 static WRITE16_HANDLER( term2la2_hack_w )
 {
 	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce4b80)
+	if (offset == 0 && cpu_get_pc(&space->device()) == 0xffce4b80)
 	{
 		state->t2_hack_mem[offset] = 0;
 		return;
@@ -226,7 +226,7 @@ static WRITE16_HANDLER( term2la2_hack_w )
 static WRITE16_HANDLER( term2la1_hack_w )
 {
 	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce33f0)
+	if (offset == 0 && cpu_get_pc(&space->device()) == 0xffce33f0)
 	{
 		state->t2_hack_mem[offset] = 0;
 		return;
@@ -603,7 +603,7 @@ WRITE16_HANDLER( midyunit_sound_w )
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", cpu_get_pc(space->cpu), data);
+		logerror("%08X:Unexpected write to sound (hi) = %04X\n", cpu_get_pc(&space->device()), data);
 		return;
 	}
 

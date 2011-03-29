@@ -161,7 +161,7 @@ static void log_protection( address_space *space, const char *warning )
 {
 	quizpun2_state *state = space->machine().driver_data<quizpun2_state>();
 	struct prot_t &prot = state->prot;
-	logerror("%04x: protection - %s (state %x, wait %x, param %02x, cmd %02x, addr %02x)\n", cpu_get_pc(space->cpu), warning,
+	logerror("%04x: protection - %s (state %x, wait %x, param %02x, cmd %02x, addr %02x)\n", cpu_get_pc(&space->device()), warning,
 		prot.state,
 		prot.wait_param,
 		prot.param,

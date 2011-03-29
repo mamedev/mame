@@ -493,11 +493,11 @@ void williams_cvsd_reset_w(int state)
 	{
 		cvsd_bank_select_w(space, 0, 0);
 		init_audio_state(space->machine());
-		device_set_input_line(space->cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(&space->device(), INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	/* going low resets and reactivates the CPU */
 	else
-		device_set_input_line(space->cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(&space->device(), INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 

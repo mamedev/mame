@@ -663,13 +663,13 @@ static READ16_HANDLER( hotrod3_ctrl_r )
 
 static READ16_HANDLER( iod_r )
 {
-	logerror("IO daughterboard read %02x (%x)\n", offset, cpu_get_pc(space->cpu));
+	logerror("IO daughterboard read %02x (%x)\n", offset, cpu_get_pc(&space->device()));
 	return 0xffff;
 }
 
 static WRITE16_HANDLER( iod_w )
 {
-	logerror("IO daughterboard write %02x, %04x & %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
+	logerror("IO daughterboard write %02x, %04x & %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(&space->device()));
 }
 
 
@@ -700,7 +700,7 @@ static void resetcontrol_w(address_space *space, UINT8 data)
 {
 	segas24_state *state = space->machine().driver_data<segas24_state>();
 	state->resetcontrol = data;
-	logerror("Reset control %02x ('%s':%x)\n", state->resetcontrol, space->cpu->tag(), cpu_get_pc(space->cpu));
+	logerror("Reset control %02x ('%s':%x)\n", state->resetcontrol, space->device().tag(), cpu_get_pc(&space->device()));
 	reset_reset(space->machine());
 }
 
@@ -759,7 +759,7 @@ static WRITE16_HANDLER( mlatch_w )
 		int i;
 		UINT8 mxor = 0;
 		if(!state->mlatch_table) {
-			logerror("Protection: magic latch accessed but no table loaded (%s:%x)\n", space->cpu->tag(), cpu_get_pc(space->cpu));
+			logerror("Protection: magic latch accessed but no table loaded (%s:%x)\n", space->device().tag(), cpu_get_pc(&space->device()));
 			return;
 		}
 
@@ -770,9 +770,9 @@ static WRITE16_HANDLER( mlatch_w )
 				if(state->mlatch & (1<<i))
 					mxor |= 1 << state->mlatch_table[i];
 			state->mlatch = data ^ mxor;
-			logerror("Magic latching %02x ^ %02x as %02x (%s:%x)\n", data & 0xff, mxor, state->mlatch, space->cpu->tag(), cpu_get_pc(space->cpu));
+			logerror("Magic latching %02x ^ %02x as %02x (%s:%x)\n", data & 0xff, mxor, state->mlatch, space->device().tag(), cpu_get_pc(&space->device()));
 		} else {
-			logerror("Magic latch reset (%s:%x)\n", space->cpu->tag(), cpu_get_pc(space->cpu));
+			logerror("Magic latch reset (%s:%x)\n", space->device().tag(), cpu_get_pc(&space->device()));
 			state->mlatch = 0x00;
 		}
 	}
@@ -877,7 +877,7 @@ static READ16_HANDLER(irq_r)
 	segas24_state *state = space->machine().driver_data<segas24_state>();
 	switch(offset) {
 	case 0: {
-		int pc = cpu_get_pc(space->cpu);
+		int pc = cpu_get_pc(&space->device());
 		if(pc == 0x84a4 || pc == 0x84a6)
 			return 0;
 		if(pc == 0x84aa || pc == 0x84ac) {

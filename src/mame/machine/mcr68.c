@@ -539,13 +539,13 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 		if (diffs & 0x02)
 			reload_count(state, counter);
 
-		LOG(("%06X:Counter %d control = %02X\n", cpu_get_previouspc(space->cpu), counter, data));
+		LOG(("%06X:Counter %d control = %02X\n", cpu_get_previouspc(&space->device()), counter, data));
 	}
 
 	/* offsets 2, 4, and 6 are MSB buffer registers */
 	else if ((offset & 1) == 0)
 	{
-		LOG(("%06X:MSB = %02X\n", cpu_get_previouspc(space->cpu), data));
+		LOG(("%06X:MSB = %02X\n", cpu_get_previouspc(&space->device()), data));
 		state->m6840_msb_buffer = data;
 	}
 
@@ -564,7 +564,7 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 		if (!(m6840->control & 0x10))
 			reload_count(state, counter);
 
-		LOG(("%06X:Counter %d latch = %04X\n", cpu_get_previouspc(space->cpu), counter, m6840->latch));
+		LOG(("%06X:Counter %d latch = %04X\n", cpu_get_previouspc(&space->device()), counter, m6840->latch));
 	}
 }
 
@@ -579,7 +579,7 @@ static READ16_HANDLER( mcr68_6840_r_common )
 	/* offset 1 is the status register */
 	else if (offset == 1)
 	{
-		LOG(("%06X:Status read = %04X\n", cpu_get_previouspc(space->cpu), state->m6840_status));
+		LOG(("%06X:Status read = %04X\n", cpu_get_previouspc(&space->device()), state->m6840_status));
 		state->m6840_status_read_since_int |= state->m6840_status & 0x07;
 		return state->m6840_status;
 	}
@@ -597,7 +597,7 @@ static READ16_HANDLER( mcr68_6840_r_common )
 
 		state->m6840_lsb_buffer = result & 0xff;
 
-		LOG(("%06X:Counter %d read = %04X\n", cpu_get_previouspc(space->cpu), counter, result));
+		LOG(("%06X:Counter %d read = %04X\n", cpu_get_previouspc(&space->device()), counter, result));
 		return result >> 8;
 	}
 

@@ -286,7 +286,7 @@ static void tmek_protection_w(address_space *space, offs_t offset, UINT16 data)
         Read ($38488)
 */
 
-	if (LOG_PROTECTION) logerror("%06X:Protection W@%06X = %04X\n", cpu_get_previouspc(space->cpu), offset, data);
+	if (LOG_PROTECTION) logerror("%06X:Protection W@%06X = %04X\n", cpu_get_previouspc(&space->device()), offset, data);
 
 	/* track accesses */
 	tmek_update_mode(state, offset);
@@ -302,7 +302,7 @@ static void tmek_protection_w(address_space *space, offs_t offset, UINT16 data)
 static void tmek_protection_r(address_space *space, offs_t offset, UINT16 *data)
 {
 	atarigt_state *state = space->machine().driver_data<atarigt_state>();
-	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", cpu_get_previouspc(space->cpu), offset);
+	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", cpu_get_previouspc(&space->device()), offset);
 
 	/* track accesses */
 	tmek_update_mode(state, offset);
@@ -371,7 +371,7 @@ static void primrage_protection_w(address_space *space, offs_t offset, UINT16 da
 	atarigt_state *state = space->machine().driver_data<atarigt_state>();
 	if (LOG_PROTECTION)
 	{
-	UINT32 pc = cpu_get_previouspc(space->cpu);
+	UINT32 pc = cpu_get_previouspc(&space->device());
 	switch (pc)
 	{
 		/* protection code from 20f90 - 21000 */
@@ -404,7 +404,7 @@ static void primrage_protection_w(address_space *space, offs_t offset, UINT16 da
 
 		/* catch anything else */
 		default:
-			logerror("%06X:Unknown protection W@%06X = %04X\n", cpu_get_previouspc(space->cpu), offset, data);
+			logerror("%06X:Unknown protection W@%06X = %04X\n", cpu_get_previouspc(&space->device()), offset, data);
 			break;
 	}
 	}
@@ -445,7 +445,7 @@ static void primrage_protection_r(address_space *space, offs_t offset, UINT16 *d
 
 if (LOG_PROTECTION)
 {
-	UINT32 pc = cpu_get_previouspc(space->cpu);
+	UINT32 pc = cpu_get_previouspc(&space->device());
 	UINT32 p1, p2, a6;
 	switch (pc)
 	{
@@ -465,7 +465,7 @@ if (LOG_PROTECTION)
 		case 0x275bc:
 			break;
 		case 0x275cc:
-			a6 = cpu_get_reg(space->cpu, M68K_A6);
+			a6 = cpu_get_reg(&space->device(), M68K_A6);
 			p1 = (space->read_word(a6+8) << 16) | space->read_word(a6+10);
 			p2 = (space->read_word(a6+12) << 16) | space->read_word(a6+14);
 			logerror("Known Protection @ 275BC(%08X, %08X): R@%06X ", p1, p2, offset);
@@ -483,7 +483,7 @@ if (LOG_PROTECTION)
 
 		/* protection code from 3d8dc - 3d95a */
 		case 0x3d8f4:
-			a6 = cpu_get_reg(space->cpu, M68K_A6);
+			a6 = cpu_get_reg(&space->device(), M68K_A6);
 			p1 = (space->read_word(a6+12) << 16) | space->read_word(a6+14);
 			logerror("Known Protection @ 3D8F4(%08X): R@%06X ", p1, offset);
 			break;
@@ -494,7 +494,7 @@ if (LOG_PROTECTION)
 
 		/* protection code from 437fa - 43860 */
 		case 0x43814:
-			a6 = cpu_get_reg(space->cpu, M68K_A6);
+			a6 = cpu_get_reg(&space->device(), M68K_A6);
 			p1 = space->read_dword(a6+14) & 0xffffff;
 			logerror("Known Protection @ 43814(%08X): R@%06X ", p1, offset);
 			break;
@@ -508,7 +508,7 @@ if (LOG_PROTECTION)
 
 		/* catch anything else */
 		default:
-			logerror("%06X:Unknown protection R@%06X\n", cpu_get_previouspc(space->cpu), offset);
+			logerror("%06X:Unknown protection R@%06X\n", cpu_get_previouspc(&space->device()), offset);
 			break;
 	}
 }
@@ -1250,19 +1250,19 @@ ROM_END
 
 static WRITE32_HANDLER( tmek_pf_w )
 {
-	offs_t pc = cpu_get_pc(space->cpu);
+	offs_t pc = cpu_get_pc(&space->device());
 
 	/* protected version */
 	if (pc == 0x2EB3C || pc == 0x2EB48)
 	{
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", cpu_get_pc(space->cpu), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(space->cpu, M68K_A4) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", cpu_get_pc(&space->device()), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(&space->device(), M68K_A4) - 2);
 		/* skip these writes to make more stuff visible */
 		return;
 	}
 
 	/* unprotected version */
 	if (pc == 0x25834 || pc == 0x25860)
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", cpu_get_pc(space->cpu), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(space->cpu, M68K_A3) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", cpu_get_pc(&space->device()), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(&space->device(), M68K_A3) - 2);
 
 	atarigen_playfield32_w(space, offset, data, mem_mask);
 }

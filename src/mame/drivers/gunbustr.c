@@ -131,7 +131,7 @@ popmessage(t);
 				coin_counter_w(space->machine(), 1, data & 0x04000000);
 				state->coin_word = (data >> 16) &0xffff;
 			}
-//logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(space->cpu),offset);
+//logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(&space->device()),offset);
 		}
 	}
 }
@@ -183,7 +183,7 @@ static READ32_HANDLER( gunbustr_gun_r )
 static WRITE32_HANDLER( gunbustr_gun_w )
 {
 	/* 10000 cycle delay is arbitrary */
-	space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(10000), FUNC(gunbustr_interrupt5));
+	space->machine().scheduler().timer_set(downcast<cpu_device *>(&space->device())->cycles_to_attotime(10000), FUNC(gunbustr_interrupt5));
 }
 
 
@@ -408,8 +408,8 @@ ROM_END
 static READ32_HANDLER( main_cycle_r )
 {
 	gunbustr_state *state = space->machine().driver_data<gunbustr_state>();
-	if (cpu_get_pc(space->cpu)==0x55a && (state->ram[0x3acc/4]&0xff000000)==0)
-		device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device())==0x55a && (state->ram[0x3acc/4]&0xff000000)==0)
+		device_spin_until_interrupt(&space->device());
 
 	return state->ram[0x3acc/4];
 }

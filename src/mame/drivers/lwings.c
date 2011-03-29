@@ -98,7 +98,7 @@ static INTERRUPT_GEN( lwings_interrupt )
 static WRITE8_HANDLER( avengers_protection_w )
 {
 	lwings_state *state = space->machine().driver_data<lwings_state>();
-	int pc = cpu_get_pc(space->cpu);
+	int pc = cpu_get_pc(&space->device());
 
 	if (pc == 0x2eeb)
 	{
@@ -232,7 +232,7 @@ static READ8_HANDLER( avengers_protection_r )
 	int x, y;
 	int dx, dy, dist, dir;
 
-	if (cpu_get_pc(space->cpu) == 0x7c7)
+	if (cpu_get_pc(&space->device()) == 0x7c7)
 	{
 		/* palette data */
 		return avengers_fetch_paldata(space->machine());

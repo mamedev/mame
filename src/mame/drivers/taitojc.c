@@ -386,7 +386,7 @@ static WRITE32_HANDLER( taitojc_palette_w )
 static READ32_HANDLER ( jc_control_r )
 {
 	UINT32 r = 0;
-//  mame_printf_debug("jc_control_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
+//  mame_printf_debug("jc_control_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space->device()));
 	switch(offset)
 	{
 		case 0x0:
@@ -495,7 +495,7 @@ static UINT8 mcu_comm_reg_r(address_space *space, int reg)
 		}
 		default:
 		{
-			//mame_printf_debug("hc11_reg_r: %02X at %08X\n", reg, cpu_get_pc(space->cpu));
+			//mame_printf_debug("hc11_reg_r: %02X at %08X\n", reg, cpu_get_pc(&space->device()));
 			break;
 		}
 	}
@@ -522,7 +522,7 @@ static void mcu_comm_reg_w(address_space *space, int reg, UINT8 data)
 		}
 		default:
 		{
-			//mame_printf_debug("hc11_reg_w: %02X, %02X at %08X\n", reg, data, cpu_get_pc(space->cpu));
+			//mame_printf_debug("hc11_reg_w: %02X, %02X at %08X\n", reg, data, cpu_get_pc(&space->device()));
 			break;
 		}
 	}
@@ -725,7 +725,7 @@ static WRITE32_HANDLER(dsp_shared_w)
 {
 	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
-	//mame_printf_debug("dsp_shared_ram: %08X, %04X at %08X\n", offset, data >> 16, cpu_get_pc(space->cpu));
+	//mame_printf_debug("dsp_shared_ram: %08X, %04X at %08X\n", offset, data >> 16, cpu_get_pc(&space->device()));
 	if (ACCESSING_BITS_24_31)
 	{
 		state->dsp_shared_ram[offset] &= 0x00ff;
@@ -879,7 +879,7 @@ static READ16_HANDLER( dsp_rom_r )
 	UINT16 *rom = (UINT16*)space->machine().region("gfx2")->base();
 	UINT16 data = rom[state->dsp_rom_pos++];
 
-	//mame_printf_debug("dsp_rom_r:  %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
+	//mame_printf_debug("dsp_rom_r:  %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space->device()));
 	return data;
 }
 
@@ -930,7 +930,7 @@ static WRITE16_HANDLER( dsp_texaddr_w )
 	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	state->dsp_tex_address = data;
-//  mame_printf_debug("texaddr = %08X at %08X\n", data, cpu_get_pc(space->cpu));
+//  mame_printf_debug("texaddr = %08X at %08X\n", data, cpu_get_pc(&space->device()));
 
 	state->texture_x = (((data >> 0) & 0x1f) << 1) | ((data >> 12) & 0x1);
 	state->texture_y = (((data >> 5) & 0x1f) << 1) | ((data >> 13) & 0x1);

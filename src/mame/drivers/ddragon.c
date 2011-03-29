@@ -226,7 +226,7 @@ static WRITE8_HANDLER( toffy_bankswitch_w )
 static READ8_HANDLER( darktowr_mcu_bank_r )
 {
 	ddragon_state *state = space->machine().driver_data<ddragon_state>();
-	// logerror("BankRead %05x %08x\n",cpu_get_pc(space->cpu),offset);
+	// logerror("BankRead %05x %08x\n",cpu_get_pc(&space->device()),offset);
 
 	/* Horrible hack - the alternate TStrike set is mismatched against the MCU,
    so just hack around the protection here.  (The hacks are 'right' as I have
@@ -235,9 +235,9 @@ static READ8_HANDLER( darktowr_mcu_bank_r )
 	if (!strcmp(space->machine().system().name, "tstrike"))
 	{
 		/* Static protection checks at boot-up */
-		if (cpu_get_pc(space->cpu) == 0x9ace)
+		if (cpu_get_pc(&space->device()) == 0x9ace)
 			return 0;
-		if (cpu_get_pc(space->cpu) == 0x9ae4)
+		if (cpu_get_pc(&space->device()) == 0x9ae4)
 			return 0x63;
 
 		/* Just return whatever the code is expecting */
@@ -255,7 +255,7 @@ static READ8_HANDLER( darktowr_mcu_bank_r )
 static WRITE8_HANDLER( darktowr_mcu_bank_w )
 {
 	ddragon_state *state = space->machine().driver_data<ddragon_state>();
-	logerror("BankWrite %05x %08x %08x\n", cpu_get_pc(space->cpu), offset, data);
+	logerror("BankWrite %05x %08x %08x\n", cpu_get_pc(&space->device()), offset, data);
 
 	if (offset == 0x1400 || offset == 0)
 	{
@@ -365,14 +365,14 @@ static CUSTOM_INPUT( sub_cpu_busy )
 static WRITE8_HANDLER( darktowr_mcu_w )
 {
 	ddragon_state *state = space->machine().driver_data<ddragon_state>();
-	logerror("McuWrite %05x %08x %08x\n",cpu_get_pc(space->cpu), offset, data);
+	logerror("McuWrite %05x %08x %08x\n",cpu_get_pc(&space->device()), offset, data);
 	state->darktowr_mcu_ports[offset] = data;
 }
 
 
 static READ8_HANDLER( ddragon_hd63701_internal_registers_r )
 {
-	logerror("%04x: read %d\n", cpu_get_pc(space->cpu), offset);
+	logerror("%04x: read %d\n", cpu_get_pc(&space->device()), offset);
 	return 0;
 }
 
@@ -408,7 +408,7 @@ static READ8_HANDLER( ddragon_spriteram_r )
 	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 
 	/* Double Dragon crash fix - see notes above */
-	if (offset == 0x49 && cpu_get_pc(space->cpu) == 0x6261 && state->spriteram[offset] == 0x1f)
+	if (offset == 0x49 && cpu_get_pc(&space->device()) == 0x6261 && state->spriteram[offset] == 0x1f)
 		return 0x1;
 
 	return state->spriteram[offset];
@@ -419,7 +419,7 @@ static WRITE8_HANDLER( ddragon_spriteram_w )
 {
 	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 
-	if (space->cpu == state->sub_cpu && offset == 0)
+	if (&space->device() == state->sub_cpu && offset == 0)
 		state->dd_sub_cpu_busy = 1;
 
 	state->spriteram[offset] = data;

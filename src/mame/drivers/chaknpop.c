@@ -28,7 +28,7 @@ static WRITE8_DEVICE_HANDLER ( unknown_port_2_w )
 
 static WRITE8_HANDLER ( coinlock_w )
 {
-	logerror("%04x: coin lock %sable\n", cpu_get_pc(space->cpu), data ? "dis" : "en");
+	logerror("%04x: coin lock %sable\n", cpu_get_pc(&space->device()), data ? "dis" : "en");
 }
 
 

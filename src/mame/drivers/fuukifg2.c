@@ -71,7 +71,7 @@ static WRITE16_HANDLER( fuuki16_sound_command_w )
 	{
 		soundlatch_w(space,0,data & 0xff);
 		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-//      device_spin_until_time(space->cpu, attotime::from_usec(50));   // Allow the other CPU to reply
+//      device_spin_until_time(&space->device(), attotime::from_usec(50));   // Allow the other CPU to reply
 		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
 	}
 }
@@ -108,7 +108,7 @@ static WRITE8_HANDLER( fuuki16_sound_rombank_w )
 	if (data <= 2)
 		memory_set_bank(space->machine(), "bank1", data);
 	else
-		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(space->cpu), data);
+		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(&space->device()), data);
 }
 
 static WRITE8_DEVICE_HANDLER( fuuki16_oki_banking_w )

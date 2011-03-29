@@ -430,7 +430,7 @@ static WRITE8_HANDLER(meritm_psd_a15_w)
 {
 	meritm_state *state = space->machine().driver_data<meritm_state>();
 	state->psd_a15 = data;
-	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, cpu_get_pc(space->cpu) );
+	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, cpu_get_pc(&space->device()) );
 	meritm_switch_banks(space->machine());
 };
 

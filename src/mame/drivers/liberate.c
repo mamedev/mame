@@ -43,13 +43,13 @@ static READ8_HANDLER( deco16_bank_r )
 		return state->spriteram[offset - 0x800];
 	if (offset < 0x2200)
 	{
-		logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(space->cpu), offset);
+		logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(&space->device()), offset);
 		return 0;
 	}
 	if (offset < 0x2800)
 		return state->scratchram[offset - 0x2200];
 
-	logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(space->cpu), offset);
+	logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(&space->device()), offset);
 	return 0;
 }
 
@@ -61,7 +61,7 @@ static READ8_HANDLER( deco16_io_r )
 	if (offset == 3) return input_port_read(space->machine(), "DSW1"); /* Dip 1 */
 	if (offset == 4) return input_port_read(space->machine(), "DSW2"); /* Dip 2 */
 
-	logerror("%04x:  Read input %d\n", cpu_get_pc(space->cpu), offset);
+	logerror("%04x:  Read input %d\n", cpu_get_pc(&space->device()), offset);
 	return 0xff;
 }
 
@@ -96,13 +96,13 @@ static READ8_HANDLER( prosoccr_bank_r )
 		return state->spriteram[offset - 0xc00];
 	if (offset < 0x2200)
 	{
-		logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(space->cpu), offset);
+		logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(&space->device()), offset);
 		return 0;
 	}
 	if (offset < 0x2800)
 		return state->scratchram[offset - 0x2200];
 
-	logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(space->cpu), offset);
+	logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(&space->device()), offset);
 	return 0;
 }
 

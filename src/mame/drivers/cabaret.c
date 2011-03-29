@@ -134,7 +134,7 @@ static WRITE8_HANDLER( cabaret_nmi_and_coins_w )
 	cabaret_state *state = space->machine().driver_data<cabaret_state>();
 	if ((state->nmi_enable ^ data) & (~0xdd))
 	{
-		logerror("PC %06X: nmi_and_coins = %02x\n",cpu_get_pc(space->cpu),data);
+		logerror("PC %06X: nmi_and_coins = %02x\n",cpu_get_pc(&space->device()),data);
 //      popmessage("%02x",data);
 	}
 

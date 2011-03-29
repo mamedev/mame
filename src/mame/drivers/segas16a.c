@@ -303,7 +303,7 @@ static READ16_HANDLER( standard_io_r )
 		case 0x2000/2:
 			return input_port_read(space->machine(), (offset & 1) ? "DSW2" : "DSW1");
 	}
-	logerror("%06X:standard_io_r - unknown read access to address %04X\n", cpu_get_pc(space->cpu), offset * 2);
+	logerror("%06X:standard_io_r - unknown read access to address %04X\n", cpu_get_pc(&space->device()), offset * 2);
 	return 0xffff;
 }
 
@@ -320,7 +320,7 @@ static WRITE16_HANDLER( standard_io_w )
 				space->machine().scheduler().synchronize(FUNC(delayed_ppi8255_w), ((offset & 3) << 8) | (data & 0xff));
 			return;
 	}
-	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(space->cpu), offset * 2, data, mem_mask);
+	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(&space->device()), offset * 2, data, mem_mask);
 }
 
 
@@ -914,7 +914,7 @@ static WRITE8_HANDLER( mcu_io_w )
 				maincpu_byte_w(space->machine(), 0xc40001 ^ (offset & 0x3fff), data);
 			else
 				logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
-						 cpu_get_pc(space->cpu), state->mcu_control, offset, data);
+						 cpu_get_pc(&space->device()), state->mcu_control, offset, data);
 			break;
 
 		case 1:
@@ -922,7 +922,7 @@ static WRITE8_HANDLER( mcu_io_w )
 				maincpu_byte_w(space->machine(), 0x410001 ^ (offset & 0xfff), data);
 			else
 				logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
-						 cpu_get_pc(space->cpu), state->mcu_control, offset, data);
+						 cpu_get_pc(&space->device()), state->mcu_control, offset, data);
 			break;
 
 		case 3:
@@ -936,7 +936,7 @@ static WRITE8_HANDLER( mcu_io_w )
 
 		default:
 			logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
-					 cpu_get_pc(space->cpu), state->mcu_control, offset, data);
+					 cpu_get_pc(&space->device()), state->mcu_control, offset, data);
 			break;
 	}
 }
@@ -956,14 +956,14 @@ static READ8_HANDLER( mcu_io_r )
 			else if (offset >= 0x8000 && offset < 0xc000)
 				return maincpu_byte_r(space->machine(), 0xc40001 ^ (offset & 0x3fff));
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",
-					 cpu_get_pc(space->cpu), state->mcu_control, offset);
+					 cpu_get_pc(&space->device()), state->mcu_control, offset);
 			return 0xff;
 
 		case 1:
 			if (offset >= 0x8000 && offset < 0x9000)
 				return maincpu_byte_r(space->machine(), 0x410001 ^ (offset & 0xfff));
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",
-					 cpu_get_pc(space->cpu), state->mcu_control, offset);
+					 cpu_get_pc(&space->device()), state->mcu_control, offset);
 			return 0xff;
 
 		case 3:
@@ -978,7 +978,7 @@ static READ8_HANDLER( mcu_io_r )
 
 		default:
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",
-					 cpu_get_pc(space->cpu), state->mcu_control, offset);
+					 cpu_get_pc(&space->device()), state->mcu_control, offset);
 			return 0xff;
 	}
 }

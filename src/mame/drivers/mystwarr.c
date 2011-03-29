@@ -246,7 +246,7 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 	mystwarr_state *state = space->machine().driver_data<mystwarr_state>();
 	if (offset & 0x0078)
 	{
-//      mame_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, cpu_get_pc(space->cpu));
+//      mame_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, cpu_get_pc(&space->device()));
 		COMBINE_DATA(state->spriteram+offset);
 	}
 	else

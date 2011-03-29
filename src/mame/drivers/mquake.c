@@ -107,7 +107,7 @@ static WRITE8_DEVICE_HANDLER( mquake_es5503_w )
 static WRITE16_HANDLER( output_w )
 {
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x:output_w(%x) = %02x\n", cpu_get_pc(space->cpu), offset, data);
+		logerror("%06x:output_w(%x) = %02x\n", cpu_get_pc(&space->device()), offset, data);
 }
 
 
@@ -115,13 +115,13 @@ static READ16_HANDLER( coin_chip_r )
 {
 	if (offset == 1)
 		return input_port_read(space->machine(), "COINCHIP");
-	logerror("%06x:coin_chip_r(%02x) & %04x\n", cpu_get_pc(space->cpu), offset, mem_mask);
+	logerror("%06x:coin_chip_r(%02x) & %04x\n", cpu_get_pc(&space->device()), offset, mem_mask);
 	return 0xffff;
 }
 
 static WRITE16_HANDLER( coin_chip_w )
 {
-	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 }
 
 // inputs at 282000, 282002 (full word)

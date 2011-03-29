@@ -82,7 +82,7 @@ static READ16_HANDLER ( sderby_input_r )
 			return 0xffff;			// to avoid game to reset (needs more work)
 	}
 
-	logerror("sderby_input_r : offset = %x - PC = %06x\n",offset*2,cpu_get_pc(space->cpu));
+	logerror("sderby_input_r : offset = %x - PC = %06x\n",offset*2,cpu_get_pc(&space->device()));
 
 	return 0xffff;
 }
@@ -126,7 +126,7 @@ static READ16_HANDLER( roulette_input_r )
 
 static READ16_HANDLER( rprot_r )
 {
-	logerror("rprot_r : offset = %02x\n",cpu_get_pc(space->cpu));
+	logerror("rprot_r : offset = %02x\n",cpu_get_pc(&space->device()));
 
 /* This is the only mask I found that allow a normal play.
    Using other values, the game hangs waiting for response,

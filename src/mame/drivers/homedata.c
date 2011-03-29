@@ -315,7 +315,7 @@ static WRITE8_HANDLER( mrokumei_sound_io_w )
 			dac_signed_data_w(state->dac, data);
 			break;
 		default:
-			logerror("%04x: I/O write to port %04x\n", cpu_get_pc(space->cpu), offset);
+			logerror("%04x: I/O write to port %04x\n", cpu_get_pc(&space->device()), offset);
 			break;
 	}
 }
@@ -362,7 +362,7 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
        1 \ ROM bank
        0 /
       */
-//  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n", cpu_get_pc(space->cpu), data, BIT(data, 2), BIT(data, 6));
+//  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n", cpu_get_pc(&space->device()), data, BIT(data, 2), BIT(data, 6));
 
 	memory_set_bank(space->machine(), "bank2", data & 0x03);
 
@@ -390,7 +390,7 @@ static READ8_HANDLER( reikaids_io_r )
 
 	state->vblank = 0;
 
-	//logerror("%04x: io_r %02x\n", cpu_get_pc(space->cpu), res);
+	//logerror("%04x: io_r %02x\n", cpu_get_pc(&space->device()), res);
 
 	return res;
 }
@@ -398,7 +398,7 @@ static READ8_HANDLER( reikaids_io_r )
 static READ8_HANDLER( reikaids_snd_command_r )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-	//logerror("%04x: sndmcd_r (%02x)\n", cpu_get_pc(space->cpu), state->snd_command);
+	//logerror("%04x: sndmcd_r (%02x)\n", cpu_get_pc(&space->device()), state->snd_command);
 	return state->snd_command;
 }
 
@@ -406,7 +406,7 @@ static WRITE8_HANDLER( reikaids_snd_command_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
 	state->snd_command = data;
-	//logerror("%04x: coprocessor_command_w %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: coprocessor_command_w %02x\n", cpu_get_pc(&space->device()), data);
 }
 
 
@@ -421,14 +421,14 @@ static WRITE8_HANDLER( reikaids_snd_command_w )
 static WRITE8_HANDLER( pteacher_snd_command_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-	//logerror("%04x: snd_command_w %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: snd_command_w %02x\n", cpu_get_pc(&space->device()), data);
 	state->from_cpu = data;
 }
 
 static READ8_HANDLER( pteacher_snd_r )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-	//logerror("%04x: pteacher_snd_r %02x\n",cpu_get_pc(space->cpu),to_cpu);
+	//logerror("%04x: pteacher_snd_r %02x\n",cpu_get_pc(&space->device()),to_cpu);
 	return state->to_cpu;
 }
 
@@ -456,7 +456,7 @@ static READ8_HANDLER( pteacher_keyboard_r )
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 	int dips = input_port_read(space->machine(), "DSW");
 
-	//  logerror("%04x: keyboard_r with port A = %02x\n",cpu_get_pc(space->cpu),upd7807_porta);
+	//  logerror("%04x: keyboard_r with port A = %02x\n",cpu_get_pc(&space->device()),upd7807_porta);
 
 	if (state->upd7807_porta & 0x80)
 	{
@@ -480,7 +480,7 @@ static READ8_HANDLER( pteacher_upd7807_porta_r )
 	if (!BIT(state->upd7807_portc, 6))
 		state->upd7807_porta = state->from_cpu;
 	else
-		logerror("%04x: read PA with PC *not* clear\n", cpu_get_pc(space->cpu));
+		logerror("%04x: read PA with PC *not* clear\n", cpu_get_pc(&space->device()));
 
 	return state->upd7807_porta;
 }
@@ -489,7 +489,7 @@ static WRITE8_HANDLER( pteacher_snd_answer_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
 	state->to_cpu = data;
-	//logerror("%04x: to_cpu = %02x\n", cpu_get_pc(space->cpu), state->to_cpu);
+	//logerror("%04x: to_cpu = %02x\n", cpu_get_pc(&space->device()), state->to_cpu);
 }
 
 static WRITE8_HANDLER( pteacher_upd7807_porta_w )
@@ -512,7 +512,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
        0 input (coin)
       */
 
-	//  logerror("%04x: port C wr %02x\n", cpu_get_pc(space->cpu), data);
+	//  logerror("%04x: port C wr %02x\n", cpu_get_pc(&space->device()), data);
 
 	memory_set_bank(space->machine(), "bank2", (data & 0x0c) >> 2);
 

@@ -553,7 +553,7 @@ static MACHINE_RESET( missile )
 INLINE int get_madsel(address_space *space)
 {
 	missile_state *state = space->machine().driver_data<missile_state>();
-	UINT16 pc = cpu_get_previouspc(space->cpu);
+	UINT16 pc = cpu_get_previouspc(&space->device());
 
 	/* if we're at a different instruction than last time, reset our delay counter */
 	if (pc != state->madsel_lastpc)
@@ -615,7 +615,7 @@ static void write_vram(address_space *space, offs_t address, UINT8 data)
 		videoram[vramaddr] = (videoram[vramaddr] & vrammask) | (vramdata & ~vrammask);
 
 		/* account for the extra clock cycle */
-		device_adjust_icount(space->cpu, -1);
+		device_adjust_icount(&space->device(), -1);
 	}
 }
 
@@ -651,7 +651,7 @@ static UINT8 read_vram(address_space *space, offs_t address)
 			result &= ~0x20;
 
 		/* account for the extra clock cycle */
-		device_adjust_icount(space->cpu, -1);
+		device_adjust_icount(&space->device(), -1);
 	}
 	return result;
 }
@@ -761,7 +761,7 @@ static WRITE8_HANDLER( missile_w )
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown write to %04X = %02X\n", cpu_get_pc(space->cpu), offset, data);
+		logerror("%04X:Unknown write to %04X = %02X\n", cpu_get_pc(&space->device()), offset, data);
 }
 
 
@@ -814,7 +814,7 @@ static READ8_HANDLER( missile_r )
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown read from %04X\n", cpu_get_pc(space->cpu), offset);
+		logerror("%04X:Unknown read from %04X\n", cpu_get_pc(&space->device()), offset);
 	return result;
 }
 

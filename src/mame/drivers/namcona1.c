@@ -797,7 +797,7 @@ static READ16_HANDLER( na1mcu_shared_r )
 #if 0
 	if (offset >= 0x70000/2)
 	{
-		logerror("MD: %04x @ %x PC %x\n", ((data>>8)&0xff) | ((data<<8)&0xff00), offset*2, cpu_get_pc(space->cpu));
+		logerror("MD: %04x @ %x PC %x\n", ((data>>8)&0xff) | ((data<<8)&0xff00), offset*2, cpu_get_pc(&space->device()));
 	}
 #endif
 
@@ -855,7 +855,7 @@ static WRITE8_HANDLER( port4_w )
 	namcona1_state *state = space->machine().driver_data<namcona1_state>();
 	if ((data & 0x08) && !(state->mcu_port4 & 0x08))
 	{
-		logerror("launching 68k, PC=%x\n", cpu_get_pc(space->cpu));
+		logerror("launching 68k, PC=%x\n", cpu_get_pc(&space->device()));
 
 		// reset and launch the 68k
 		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_RESET, CLEAR_LINE);

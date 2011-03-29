@@ -1401,7 +1401,7 @@ static WRITE16_HANDLER( timer_regs_w )
 			uPD71054->max[offset] = (uPD71054->max[offset]&0x00ff)+(data<<8);
 		}
 		if( uPD71054->max[offset] != 0 ) {
-			uPD71054_update_timer( space->machine(), space->cpu, offset );
+			uPD71054_update_timer( space->machine(), &space->device(), offset );
 		}
 		break;
 	  case 0x0003:
@@ -1652,7 +1652,7 @@ static READ16_HANDLER ( calibr50_ip_r )
 		case 0x16/2:	return (dir2 >> 8);			// upper 4 bits of p2 rotation
 		case 0x18/2:	return 0xffff;				// ? (value's read but not used)
 		default:
-			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(space->cpu), offset*2);
+			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(&space->device()), offset*2);
 			return 0;
 	}
 }
@@ -1663,7 +1663,7 @@ static WRITE16_HANDLER( calibr50_soundlatch_w )
 	{
 		soundlatch_word_w(space, 0, data, mem_mask);
 		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_NMI, PULSE_LINE);
-		device_spin_until_time(space->cpu, attotime::from_usec(50));	// Allow the other cpu to reply
+		device_spin_until_time(&space->device(), attotime::from_usec(50));	// Allow the other cpu to reply
 	}
 }
 
@@ -2425,7 +2425,7 @@ static READ16_HANDLER( krzybowl_input_r )
 		case 0xc/2:	return dir2y & 0xff;
 		case 0xe/2:	return dir2y >> 8;
 		default:
-			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(space->cpu), offset*2);
+			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(&space->device()), offset*2);
 			return 0;
 	}
 }
@@ -2588,7 +2588,7 @@ static READ16_HANDLER( kiwame_input_r )
 		case 0x08/2:	return 0xffff;
 
 		default:
-			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(space->cpu), offset*2);
+			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(&space->device()), offset*2);
 			return 0x0000;
 	}
 }
@@ -2613,12 +2613,12 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( thunderl_protection_r )
 {
-//  logerror("PC %06X - Protection Read\n", cpu_get_pc(space->cpu));
+//  logerror("PC %06X - Protection Read\n", cpu_get_pc(&space->device()));
 	return 0x00dd;
 }
 static WRITE16_HANDLER( thunderl_protection_w )
 {
-//  logerror("PC %06X - Protection Written: %04X <- %04X\n", cpu_get_pc(space->cpu), offset*2, data);
+//  logerror("PC %06X - Protection Written: %04X <- %04X\n", cpu_get_pc(&space->device()), offset*2, data);
 }
 
 /* Similar to downtown etc. */
@@ -2782,7 +2782,7 @@ static READ16_HANDLER( pairlove_prot_r )
 	int retdata;
 
 	retdata = state->pairslove_protram[offset];
-	//mame_printf_debug("pairs love protection? read %06x %04x %04x\n",cpu_get_pc(space->cpu), offset,retdata);
+	//mame_printf_debug("pairs love protection? read %06x %04x %04x\n",cpu_get_pc(&space->device()), offset,retdata);
 	state->pairslove_protram[offset] = state->pairslove_protram_old[offset];
 	return retdata;
 }
@@ -2790,7 +2790,7 @@ static READ16_HANDLER( pairlove_prot_r )
 static WRITE16_HANDLER( pairlove_prot_w )
 {
 	seta_state *state = space->machine().driver_data<seta_state>();
-	//mame_printf_debug("pairs love protection? write %06x %04x %04x\n",cpu_get_pc(space->cpu), offset,data);
+	//mame_printf_debug("pairs love protection? write %06x %04x %04x\n",cpu_get_pc(&space->device()), offset,data);
 	state->pairslove_protram_old[offset] = state->pairslove_protram[offset];
 	state->pairslove_protram[offset] = data;
 }
@@ -2866,7 +2866,7 @@ static READ16_HANDLER( inttoote_key_r )
 		case 0x80:	return input_port_read(space->machine(), "BET4");
 	}
 
-	logerror("%06X: unknown read, select = %04x\n",cpu_get_pc(space->cpu), *state->inttoote_key_select);
+	logerror("%06X: unknown read, select = %04x\n",cpu_get_pc(&space->device()), *state->inttoote_key_select);
 	return 0xffff;
 }
 
@@ -3094,7 +3094,7 @@ static MACHINE_RESET(calibr50)
 static WRITE8_HANDLER( calibr50_soundlatch2_w )
 {
 	soundlatch2_w(space,0,data);
-	device_spin_until_time(space->cpu, attotime::from_usec(50));	// Allow the other cpu to reply
+	device_spin_until_time(&space->device(), attotime::from_usec(50));	// Allow the other cpu to reply
 }
 
 static ADDRESS_MAP_START( calibr50_sub_map, AS_PROGRAM, 8 )
@@ -10040,12 +10040,12 @@ static READ16_HANDLER( twineagl_200100_r )
 	seta_state *state = space->machine().driver_data<seta_state>();
 
 	// protection check at boot
-	logerror("%04x: twineagl_200100_r %d\n",cpu_get_pc(space->cpu),offset);
+	logerror("%04x: twineagl_200100_r %d\n",cpu_get_pc(&space->device()),offset);
 	return state->twineagl_xram[offset];
 }
 static WRITE16_HANDLER( twineagl_200100_w )
 {
-	logerror("%04x: twineagl_200100_w %d = %02x\n",cpu_get_pc(space->cpu),offset,data);
+	logerror("%04x: twineagl_200100_w %d = %02x\n",cpu_get_pc(&space->device()),offset,data);
 
 	if (ACCESSING_BITS_0_7)
 	{

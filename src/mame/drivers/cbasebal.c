@@ -32,7 +32,7 @@ static WRITE8_HANDLER( cbasebal_bankswitch_w )
 	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 
 	/* bits 0-4 select ROM bank */
-	//logerror("%04x: bankswitch %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: bankswitch %02x\n", cpu_get_pc(&space->device()), data);
 	memory_set_bank(space->machine(), "bank1", data & 0x1f);
 
 	/* bit 5 used but unknown */

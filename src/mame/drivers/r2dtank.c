@@ -103,7 +103,7 @@ static READ8_HANDLER( audio_command_r )
 {
 	UINT8 ret = soundlatch_r(space, 0);
 
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", cpu_get_pc(space->cpu), ret);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", cpu_get_pc(&space->device()), ret);
 
 	return ret;
 }
@@ -114,14 +114,14 @@ static WRITE8_HANDLER( audio_command_w )
 	soundlatch_w(space, 0, ~data);
 	cputag_set_input_line(space->machine(), "audiocpu", M6800_IRQ_LINE, HOLD_LINE);
 
-if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", cpu_get_pc(space->cpu), data^0xff);
+if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", cpu_get_pc(&space->device()), data^0xff);
 }
 
 
 static READ8_HANDLER( audio_answer_r )
 {
 	UINT8 ret = soundlatch2_r(space, 0);
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", cpu_get_pc(space->cpu), ret);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", cpu_get_pc(&space->device()), ret);
 
 	return ret;
 }
@@ -130,13 +130,13 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", cpu_get_pc(
 static WRITE8_HANDLER( audio_answer_w )
 {
 	/* HACK - prevents lock-up, but causes game to end some in-between sreens prematurely */
-	if (cpu_get_pc(space->cpu) == 0xfb12)
+	if (cpu_get_pc(&space->device()) == 0xfb12)
 		data = 0x00;
 
 	soundlatch2_w(space, 0, data);
 	cputag_set_input_line(space->machine(), "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", cpu_get_pc(space->cpu), data);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", cpu_get_pc(&space->device()), data);
 }
 
 

@@ -197,7 +197,7 @@ static READ8_HANDLER( firetrap_8751_bootleg_r )
 	UINT8 coin = 0;
 	UINT8 port = input_port_read(space->machine(), "IN2") & 0x70;
 
-	if (cpu_get_pc(space->cpu) == 0x1188)
+	if (cpu_get_pc(&space->device()) == 0x1188)
 		return ~state->coin_command_pending;
 
 	if (port != 0x70)
@@ -218,7 +218,7 @@ static READ8_HANDLER( firetrap_8751_bootleg_r )
 static READ8_HANDLER( firetrap_8751_r )
 {
 	firetrap_state *state = space->machine().driver_data<firetrap_state>();
-	//logerror("PC:%04x read from 8751\n",cpu_get_pc(space->cpu));
+	//logerror("PC:%04x read from 8751\n",cpu_get_pc(&space->device()));
 	return state->i8751_return;
 }
 
@@ -298,7 +298,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	else
 	{
 		state->i8751_return = 0xff;
-		logerror("%04x: Unknown i8751 command %02x!\n",cpu_get_pc(space->cpu),data);
+		logerror("%04x: Unknown i8751 command %02x!\n",cpu_get_pc(&space->device()),data);
 	}
 
 	/* Signal main cpu task is complete */

@@ -340,7 +340,7 @@ READ8_HANDLER( snes_open_bus_r )
 		return 0xff;
 
 	recurse = 1;
-	result = space->read_byte(cpu_get_pc(space->cpu) - 1); //LAST opcode that's fetched on the bus
+	result = space->read_byte(cpu_get_pc(&space->device()) - 1); //LAST opcode that's fetched on the bus
 	recurse = 0;
 	return result;
 }
@@ -582,7 +582,7 @@ READ8_HANDLER( snes_r_io )
 //      case 0x420c: //PC: 9c7d - 8fab          //only nss_ssoc
 
 		default:
-			mame_printf_debug("snes_r: offset = %x pc = %x\n",offset,cpu_get_pc(space->cpu));
+			mame_printf_debug("snes_r: offset = %x pc = %x\n",offset,cpu_get_pc(&space->device()));
 #endif	/* MESS */
 
 	}
@@ -614,7 +614,7 @@ WRITE8_HANDLER( snes_w_io )
 	// APU is mirrored from 2140 to 217f
 	if (offset >= APU00 && offset < WMDATA)
 	{
-//      printf("816: %02x to APU @ %d (PC=%06x)\n", data, offset & 3,cpu_get_pc(space->cpu));
+//      printf("816: %02x to APU @ %d (PC=%06x)\n", data, offset & 3,cpu_get_pc(&space->device()));
 		spc_port_in(state->spc700, offset & 0x3, data);
 		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 		return;
@@ -990,7 +990,7 @@ READ8_HANDLER( snes_r_bank1 )
 		}
 		else
 		{
-			logerror("(PC=%06x) snes_r_bank1: Unmapped external chip read: %04x\n",cpu_get_pc(space->cpu),address);
+			logerror("(PC=%06x) snes_r_bank1: Unmapped external chip read: %04x\n",cpu_get_pc(&space->device()),address);
 			value = snes_open_bus_r(space, 0);								/* Reserved */
 		}
 	}
@@ -1005,7 +1005,7 @@ READ8_HANDLER( snes_r_bank1 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
+		device_adjust_icount(&space->device(), -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
 	#endif
 
 	return value;
@@ -1053,7 +1053,7 @@ READ8_HANDLER( snes_r_bank2 )
 		}
 		else
 		{
-			logerror( "(PC=%06x) snes_r_bank2: Unmapped external chip read: %04x\n",cpu_get_pc(space->cpu),address );
+			logerror( "(PC=%06x) snes_r_bank2: Unmapped external chip read: %04x\n",cpu_get_pc(&space->device()),address );
 			value = snes_open_bus_r(space, 0);
 		}
 	}
@@ -1071,7 +1071,7 @@ READ8_HANDLER( snes_r_bank2 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
+		device_adjust_icount(&space->device(), -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
 	#endif
 
 	return value;
@@ -1114,7 +1114,7 @@ READ8_HANDLER( snes_r_bank3 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -8);
+		device_adjust_icount(&space->device(), -8);
 	#endif
 
 	return value;
@@ -1154,7 +1154,7 @@ READ8_HANDLER( snes_r_bank4 )
 			value = (address >= 0x4000) ? dsp_get_sr() : dsp_get_dr();
 		else
 		{
-			logerror("(PC=%06x) snes_r_bank4: Unmapped external chip read: %04x\n",cpu_get_pc(space->cpu),address);
+			logerror("(PC=%06x) snes_r_bank4: Unmapped external chip read: %04x\n",cpu_get_pc(&space->device()),address);
 			value = snes_open_bus_r(space, 0);							/* Reserved */
 		}
 	}
@@ -1163,7 +1163,7 @@ READ8_HANDLER( snes_r_bank4 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -8);
+		device_adjust_icount(&space->device(), -8);
 	#endif
 
 	return value;
@@ -1192,7 +1192,7 @@ READ8_HANDLER( snes_r_bank5 )
 		}
 		else
 		{
-			logerror("(PC=%06x) snes_r_bank5: Unmapped external chip read: %04x\n",cpu_get_pc(space->cpu),address);
+			logerror("(PC=%06x) snes_r_bank5: Unmapped external chip read: %04x\n",cpu_get_pc(&space->device()),address);
 			value = snes_open_bus_r(space, 0);								/* Reserved */
 		}
 	}
@@ -1201,7 +1201,7 @@ READ8_HANDLER( snes_r_bank5 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -8);
+		device_adjust_icount(&space->device(), -8);
 	#endif
 
 	return value;
@@ -1233,7 +1233,7 @@ READ8_HANDLER( snes_r_bank6 )
 			}
 			else						/* Area 0x6000-0x8000 with offset < 0x300000 is reserved */
 			{
-				logerror("(PC=%06x) snes_r_bank6: Unmapped external chip read: %04x\n",cpu_get_pc(space->cpu),address);
+				logerror("(PC=%06x) snes_r_bank6: Unmapped external chip read: %04x\n",cpu_get_pc(&space->device()),address);
 				value = snes_open_bus_r(space, 0);
 			}
 		}
@@ -1251,7 +1251,7 @@ READ8_HANDLER( snes_r_bank6 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine(), offset));
+		device_adjust_icount(&space->device(), -snes_bank_0x80_0xbf_cycles(space->machine(), offset));
 	#endif
 
 	return value;
@@ -1315,7 +1315,7 @@ READ8_HANDLER( snes_r_bank7 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
+		device_adjust_icount(&space->device(), -((snes_ram[MEMSEL] & 1) ? 6 : 8));
 	#endif
 
 	return value;
@@ -1370,11 +1370,11 @@ WRITE8_HANDLER( snes_w_bank1 )
 		else
 			dsp_set_sr(data);
 	else
-		logerror( "(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset );
+		logerror( "(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(&space->device()),offset );
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
+		device_adjust_icount(&space->device(), -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
 	#endif
 }
 
@@ -1431,11 +1431,11 @@ WRITE8_HANDLER( snes_w_bank2 )
 		else
 			dsp_set_sr(data);
 	else
-		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x300000);
+		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(&space->device()),offset + 0x300000);
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
+		device_adjust_icount(&space->device(), -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
 	#endif
 }
 
@@ -1465,18 +1465,18 @@ WRITE8_HANDLER( snes_w_bank4 )
 	else if (state->cart[0].mode & 5)					/* Mode 20 & 22 */
 	{
 		if (address >= 0x8000)
-			logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x600000);
+			logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(&space->device()),offset + 0x600000);
 		else if (state->has_addon_chip == HAS_DSP1)
 			dsp_set_dr(data);
 		else
 			logerror("snes_w_bank4: Attempt to write to reserved address: %X = %02x\n", offset + 0x600000, data);
 	}
 	else if (state->cart[0].mode & 0x0a)
-		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x600000);
+		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(&space->device()),offset + 0x600000);
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -8);
+		device_adjust_icount(&space->device(), -8);
 	#endif
 }
 
@@ -1499,11 +1499,11 @@ WRITE8_HANDLER( snes_w_bank5 )
 			logerror("snes_w_bank5: Attempt to write to reserved address: %X = %02x\n", offset + 0x700000, data);
 	}
 	else if (state->cart[0].mode & 0x0a)
-		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x700000);
+		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(&space->device()),offset + 0x700000);
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -8);
+		device_adjust_icount(&space->device(), -8);
 	#endif
 }
 
@@ -1555,11 +1555,11 @@ WRITE8_HANDLER( snes_w_bank6 )
 		else
 			dsp_set_sr(data);
 	else
-		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x800000);
+		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(&space->device()),offset + 0x800000);
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine(), offset));
+		device_adjust_icount(&space->device(), -snes_bank_0x80_0xbf_cycles(space->machine(), offset));
 	#endif
 }
 
@@ -1578,7 +1578,7 @@ WRITE8_HANDLER( snes_w_bank7 )
 			snes_ram[0xe00000 + offset] = data;		// SFX RAM
 		}
 		else
-			logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0xc00000);
+			logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(&space->device()),offset + 0xc00000);
 	}
 	else if (state->has_addon_chip == HAS_ST010 || state->has_addon_chip == HAS_ST011)
 	{
@@ -1607,14 +1607,14 @@ WRITE8_HANDLER( snes_w_bank7 )
 				snes_w_bank4(space, offset - 0x200000, data);
 		}
 		else
-			logerror("(PC=%06x) snes_w_bank7: Attempt to write to ROM address: %X = %02x\n",cpu_get_pc(space->cpu),offset + 0xc00000, data);
+			logerror("(PC=%06x) snes_w_bank7: Attempt to write to ROM address: %X = %02x\n",cpu_get_pc(&space->device()),offset + 0xc00000, data);
 	}
 	else if (state->cart[0].mode & 0x0a)
-		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0xc00000);
+		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(&space->device()),offset + 0xc00000);
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		device_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
+		device_adjust_icount(&space->device(), -((snes_ram[MEMSEL] & 1) ? 6 : 8));
 	#endif
 }
 
@@ -2141,7 +2141,7 @@ INLINE void snes_dma_transfer( address_space *space, UINT8 dma, UINT32 abus, UIN
 
 	#if USE_CYCLE_STEAL
 	/* every byte transfer takes 8 master cycles */
-	device_adjust_icount(space->cpu,-8);
+	device_adjust_icount(&space->device(),-8);
 	#endif
 
 	if (state->dma_channel[dma].dmap & 0x80)	/* PPU->CPU */
@@ -2352,7 +2352,7 @@ static void snes_dma( address_space *space, UINT8 channels )
 
 	#if USE_CYCLE_STEAL
 	/* overhead steals 8 master cycles, correct? */
-	device_adjust_icount(space->cpu,-8);
+	device_adjust_icount(&space->device(),-8);
 	#endif
 
 	/* Assume priority of the 8 DMA channels is 0-7 */
@@ -2466,14 +2466,14 @@ static void snes_dma( address_space *space, UINT8 channels )
 
 			#if USE_CYCLE_STEAL
 			/* active channel takes 8 master cycles */
-			device_adjust_icount(space->cpu,-8);
+			device_adjust_icount(&space->device(),-8);
 			#endif
 		}
 	}
 
 	/* finally, take yet another 8 master cycles for the aforementioned overhead */
 	#if USE_CYCLE_STEAL
-	device_adjust_icount(space->cpu,-8);
+	device_adjust_icount(&space->device(),-8);
 	#endif
 }
 

@@ -1004,7 +1004,7 @@ READ64_HANDLER( pvr_ta_r )
 
 	#if DEBUG_PVRTA_REGS
 	if (reg != 0x43)
-		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f8000+reg*4, pvrta_regs[reg], offset, reg, mem_mask, cpu_get_pc(space->cpu));
+		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f8000+reg*4, pvrta_regs[reg], offset, reg, mem_mask, cpu_get_pc(&space->device()));
 	#endif
 	return (UINT64)pvrta_regs[reg] << shift;
 }

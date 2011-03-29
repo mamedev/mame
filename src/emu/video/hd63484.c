@@ -1467,8 +1467,8 @@ static void hd63484_command_w(device_t *device, UINT16 cmd)
 
 READ16_DEVICE_HANDLER( hd63484_status_r )
 {
-//  if (cpu_get_pc(space->cpu) != 0xfced6 && cpu_get_pc(space->cpu) != 0xfe1d6)
-//      logerror("%05x: HD63484 status read\n",cpu_get_pc(space->cpu));
+//  if (cpu_get_pc(&space->device()) != 0xfced6 && cpu_get_pc(&space->device()) != 0xfe1d6)
+//      logerror("%05x: HD63484 status read\n",cpu_get_pc(&space->device()));
 
 	return 0xff22 | (device->machine().rand() & 0x0004);	/* write FIFO ready + command end    +  (read FIFO ready or read FIFO not ready) */
 }
@@ -1495,7 +1495,7 @@ WRITE16_DEVICE_HANDLER( hd63484_data_w )
 		hd63484->regno += 2;	/* autoincrement */
 
 #if LOG_COMMANDS
-//  logerror("PC %05x: HD63484 register %02x write %04x\n", cpu_get_pc(space->cpu), hd63484->regno, hd63484->reg[hd63484->regno/2]);
+//  logerror("PC %05x: HD63484 register %02x write %04x\n", cpu_get_pc(&space->device()), hd63484->regno, hd63484->reg[hd63484->regno/2]);
 #endif
 
 	if (hd63484->regno == 0)	/* FIFO */
@@ -1512,14 +1512,14 @@ READ16_DEVICE_HANDLER( hd63484_data_r )
 	else if (hd63484->regno == 0)
 	{
 #if LOG_COMMANDS
-//      logerror("%05x: HD63484 read FIFO\n", cpu_get_pc(space->cpu));
+//      logerror("%05x: HD63484 read FIFO\n", cpu_get_pc(&space->device()));
 #endif
 		res = hd63484->readfifo;
 	}
 	else
 	{
 #if LOG_COMMANDS
-//      logerror("%05x: HD63484 read register %02x\n", cpu_get_pc(space->cpu), hd63484->regno);
+//      logerror("%05x: HD63484 read register %02x\n", cpu_get_pc(&space->device()), hd63484->regno);
 #endif
 		res = 0;
 	}

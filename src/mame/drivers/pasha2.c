@@ -463,8 +463,8 @@ static READ16_HANDLER( pasha2_speedup_r )
 {
 	pasha2_state *state = space->machine().driver_data<pasha2_state>();
 
-	if(cpu_get_pc(space->cpu) == 0x8302)
-		device_spin_until_interrupt(space->cpu);
+	if(cpu_get_pc(&space->device()) == 0x8302)
+		device_spin_until_interrupt(&space->device());
 
 	return state->wram[(0x95744 / 2) + offset];
 }

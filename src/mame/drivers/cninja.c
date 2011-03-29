@@ -94,7 +94,7 @@ static READ16_HANDLER( cninja_irq_r )
 		return 0;
 	}
 
-	logerror("%08x:  Unmapped IRQ read %d\n", cpu_get_pc(space->cpu), offset);
+	logerror("%08x:  Unmapped IRQ read %d\n", cpu_get_pc(&space->device()), offset);
 	return 0;
 }
 
@@ -110,7 +110,7 @@ static WRITE16_HANDLER( cninja_irq_w )
             0xc8:   Raster IRQ turned on (68k IRQ level 4)
             0xd8:   Raster IRQ turned on (68k IRQ level 3)
         */
-		logerror("%08x:  IRQ write %d %08x\n", cpu_get_pc(space->cpu), offset, data);
+		logerror("%08x:  IRQ write %d %08x\n", cpu_get_pc(&space->device()), offset, data);
 		state->irq_mask = data & 0xff;
 		return;
 
@@ -127,7 +127,7 @@ static WRITE16_HANDLER( cninja_irq_w )
 		return;
 	}
 
-	logerror("%08x:  Unmapped IRQ write %d %04x\n", cpu_get_pc(space->cpu), offset, data);
+	logerror("%08x:  Unmapped IRQ write %d %04x\n", cpu_get_pc(&space->device()), offset, data);
 }
 
 static READ16_HANDLER( robocop2_prot_r )
@@ -141,10 +141,10 @@ static READ16_HANDLER( robocop2_prot_r )
 		case 0x4e6: /* Dip switches */
 			return input_port_read(space->machine(), "DSW");
 		case 0x504: /* PC: 6b6.  b4, 2c, 36 written before read */
-			logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", cpu_get_pc(space->cpu), offset);
+			logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", cpu_get_pc(&space->device()), offset);
 			return 0x84;
 	}
-	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", cpu_get_pc(space->cpu), offset);
+	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", cpu_get_pc(&space->device()), offset);
 	return 0;
 }
 

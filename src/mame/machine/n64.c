@@ -47,7 +47,7 @@ READ32_HANDLER( n64_mi_reg_r )
 			return mi_intr_mask;
 
 		default:
-			logerror("mi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
+			logerror("mi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space->device()));
 			break;
 	}
 
@@ -129,7 +129,7 @@ WRITE32_HANDLER( n64_mi_reg_w )
 		}
 
 		default:
-			logerror("mi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+			logerror("mi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
 			break;
 	}
 }
@@ -268,7 +268,7 @@ READ32_HANDLER( n64_rdram_reg_r )
             return rdram_device_manuf;
 
         default:
-            logerror("rdram_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
+            logerror("rdram_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space->device()));
             break;
     }
     return 0;
@@ -319,7 +319,7 @@ WRITE32_HANDLER( n64_rdram_reg_w )
             break;
 
         default:
-            logerror("mi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+            logerror("mi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
             break;
     }
 }
@@ -912,7 +912,7 @@ READ32_HANDLER( n64_vi_reg_r )
             return n64_vi_yscale;
 
 		default:
-			logerror("vi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
+			logerror("vi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space->device()));
 			break;
 	}
 	return 0;
@@ -998,7 +998,7 @@ WRITE32_HANDLER( n64_vi_reg_w )
             break;
 
 		default:
-			logerror("vi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+			logerror("vi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
 			break;
 	}
 }
@@ -1167,7 +1167,7 @@ READ32_HANDLER( n64_ai_reg_r )
             return ai_status;
 
         default:
-            logerror("ai_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
+            logerror("ai_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space->device()));
             break;
     }
 
@@ -1181,18 +1181,18 @@ WRITE32_HANDLER( n64_ai_reg_w )
     switch (offset)
     {
         case 0x00/4:        // AI_DRAM_ADDR_REG
-//          mame_printf_debug("ai_dram_addr = %08X at %08X\n", data, cpu_get_pc(space->cpu));
+//          mame_printf_debug("ai_dram_addr = %08X at %08X\n", data, cpu_get_pc(&space->device()));
             ai_dram_addr = data & 0xffffff;
             break;
 
         case 0x04/4:        // AI_LEN_REG
-//          mame_printf_debug("ai_len = %08X at %08X\n", data, cpu_get_pc(space->cpu));
+//          mame_printf_debug("ai_len = %08X at %08X\n", data, cpu_get_pc(&space->device()));
             ai_len = data & 0x3ffff;        // Hardware v2.0 has 18 bits, v1.0 has 15 bits
             audio_fifo_push(space->machine(), ai_dram_addr, ai_len);
             break;
 
         case 0x08/4:        // AI_CONTROL_REG
-//          mame_printf_debug("ai_control = %08X at %08X\n", data, cpu_get_pc(space->cpu));
+//          mame_printf_debug("ai_control = %08X at %08X\n", data, cpu_get_pc(&space->device()));
             ai_control = data;
             break;
 
@@ -1213,7 +1213,7 @@ WRITE32_HANDLER( n64_ai_reg_w )
             break;
 
         default:
-            logerror("ai_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+            logerror("ai_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
             break;
     }
 }
@@ -1273,7 +1273,7 @@ READ32_HANDLER( n64_pi_reg_r )
             return pi_bsd_dom2_rls;
 
 		default:
-			logerror("pi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
+			logerror("pi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space->device()));
 			break;
 	}
 	return 0;
@@ -1406,7 +1406,7 @@ WRITE32_HANDLER( n64_pi_reg_w )
             break;
 
 		default:
-			logerror("pi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+			logerror("pi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
 			break;
 	}
 }
@@ -1451,7 +1451,7 @@ READ32_HANDLER( n64_ri_reg_r )
             return ri_werror;
 
 		default:
-			logerror("ri_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
+			logerror("ri_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space->device()));
 			break;
 	}
 
@@ -1496,7 +1496,7 @@ WRITE32_HANDLER( n64_ri_reg_w )
             break;
 
 		default:
-			logerror("ri_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+			logerror("ri_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
 			break;
 	}
 }

@@ -133,7 +133,7 @@ static READ16_HANDLER( drill_io_r )
 	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
 
 //  if (offset * 2 == 0x4)
-	/*popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x", cpu_get_pc(space->cpu), state->iodata[0/2], state->iodata[2/2], state->iodata[4/2], state->iodata[6/2],
+	/*popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x", cpu_get_pc(&space->device()), state->iodata[0/2], state->iodata[2/2], state->iodata[4/2], state->iodata[6/2],
                                         state->iodata[8/2], state->iodata[0xa/2], state->iodata[0xc/2], state->iodata[0xe/2]);*/
 
 	switch(offset)
@@ -142,7 +142,7 @@ static READ16_HANDLER( drill_io_r )
 		case 0x2/2:
 		{
 			int arm_pwr = input_port_read(space->machine(), "IN0");//throw
-			//popmessage("PC=%08x %02x",cpu_get_pc(space->cpu),arm_pwr);
+			//popmessage("PC=%08x %02x",cpu_get_pc(&space->device()),arm_pwr);
 
 			if(arm_pwr > 0xe0) return ~0x1800;
 			if(arm_pwr > 0xc0) return ~0x1400;
@@ -152,7 +152,7 @@ static READ16_HANDLER( drill_io_r )
 		}
 		case 0x4/2: return (state->defender_sensor) | (state->shutter_sensor);
 		case 0xe/2: return input_port_read(space->machine(), "IN2");//coins
-//      default:  printf("PC=%08x [%04x] -> %04x R\n", cpu_get_pc(space->cpu), offset * 2, state->iodata[offset]);
+//      default:  printf("PC=%08x [%04x] -> %04x R\n", cpu_get_pc(&space->device()), offset * 2, state->iodata[offset]);
 	}
 
 	return 0xffff;
@@ -174,7 +174,7 @@ static WRITE16_HANDLER( drill_io_w )
 	}
 
 //  if(data != 0 && offset != 8)
-//  printf("PC=%08x [%04x] <- %04x W\n", cpu_get_pc(space->cpu), offset * 2, data);
+//  printf("PC=%08x [%04x] <- %04x W\n", cpu_get_pc(&space->device()), offset * 2, data);
 }
 
 /*

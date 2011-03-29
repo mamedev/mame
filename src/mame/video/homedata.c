@@ -737,7 +737,7 @@ WRITE8_HANDLER( reikaids_videoram_w )
 WRITE8_HANDLER( reikaids_gfx_bank_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-//logerror( "%04x: [setbank %02x]\n",cpu_get_pc(space->cpu),data);
+//logerror( "%04x: [setbank %02x]\n",cpu_get_pc(&space->device()),data);
 
 	if (state->gfx_bank[state->reikaids_which] != data)
 	{
@@ -751,7 +751,7 @@ WRITE8_HANDLER( reikaids_gfx_bank_w )
 WRITE8_HANDLER( pteacher_gfx_bank_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-//  logerror("%04x: gfxbank:=%02x\n", cpu_get_pc(space->cpu), data);
+//  logerror("%04x: gfxbank:=%02x\n", cpu_get_pc(&space->device()), data);
 	if (state->gfx_bank[0] != data)
 	{
 		state->gfx_bank[0] = data;
@@ -762,7 +762,7 @@ WRITE8_HANDLER( pteacher_gfx_bank_w )
 WRITE8_HANDLER( homedata_blitter_param_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-//logerror("%04x: blitter_param_w %02x\n", cpu_get_pc(space->cpu), data);
+//logerror("%04x: blitter_param_w %02x\n", cpu_get_pc(&space->device()), data);
 	state->blitter_param[state->blitter_param_count] = data;
 	state->blitter_param_count++;
 	state->blitter_param_count &= 3;

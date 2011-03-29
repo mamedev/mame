@@ -123,7 +123,7 @@ static WRITE8_HANDLER(port60_w)
 {
 	if(data>9)
 	{
-		logerror("ROMBANK %x @ %x\n", data, cpu_get_pc(space->cpu));
+		logerror("ROMBANK %x @ %x\n", data, cpu_get_pc(&space->device()));
 		data=0;
 	}
 	port60=data;

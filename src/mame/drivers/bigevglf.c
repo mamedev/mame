@@ -83,7 +83,7 @@ static TIMER_CALLBACK( from_sound_latch_callback )
 }
 static WRITE8_HANDLER( beg_fromsound_w )	/* write to D800 sets bit 1 in status */
 {
-	space->machine().scheduler().synchronize(FUNC(from_sound_latch_callback), (cpu_get_pc(space->cpu) << 16) | data);
+	space->machine().scheduler().synchronize(FUNC(from_sound_latch_callback), (cpu_get_pc(&space->device()) << 16) | data);
 }
 
 static READ8_HANDLER( beg_fromsound_r )

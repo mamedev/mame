@@ -107,7 +107,7 @@ WRITE8_HANDLER( tagteam_mirrorcolorram_w )
 WRITE8_HANDLER( tagteam_control_w )
 {
 	tagteam_state *state = space->machine().driver_data<tagteam_state>();
-logerror("%04x: control = %02x\n",cpu_get_pc(space->cpu),data);
+logerror("%04x: control = %02x\n",cpu_get_pc(&space->device()),data);
 
 	/* bit 7 is the palette bank */
 	state->palettebank = (data & 0x80) >> 7;

@@ -152,7 +152,7 @@ WRITE8_HANDLER( pang_gfxctrl_w )
 {
 	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 
-logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(space->cpu),data);
+logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(&space->device()),data);
 {
 #if 0
 	char baf[40];
@@ -192,7 +192,7 @@ WRITE8_HANDLER( pangbl_gfxctrl_w )
 {
 	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 
-logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(space->cpu),data);
+logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(&space->device()),data);
 {
 #if 0
 	char baf[40];
@@ -230,7 +230,7 @@ WRITE8_HANDLER( mstworld_gfxctrl_w )
 {
 	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 
-logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(space->cpu),data);
+logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(&space->device()),data);
 {
 	char baf[40];
 	sprintf(baf,"%02x",data);

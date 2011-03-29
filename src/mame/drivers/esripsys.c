@@ -570,7 +570,7 @@ static WRITE8_HANDLER( tms5220_w )
 /* Not used in later revisions */
 static WRITE8_HANDLER( control_w )
 {
-	logerror("Sound control write: %.2x (PC:0x%.4x)\n", data, cpu_get_previouspc(space->cpu));
+	logerror("Sound control write: %.2x (PC:0x%.4x)\n", data, cpu_get_previouspc(&space->device()));
 }
 
 

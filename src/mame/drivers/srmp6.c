@@ -350,7 +350,7 @@ static WRITE16_HANDLER( video_regs_w )
 		case 0x56/2: // written 8,9,8,9 successively
 
 		default:
-			logerror("video_regs_w (PC=%06X): %04x = %04x & %04x\n", cpu_get_previouspc(space->cpu), offset*2, data, mem_mask);
+			logerror("video_regs_w (PC=%06X): %04x = %04x & %04x\n", cpu_get_previouspc(&space->device()), offset*2, data, mem_mask);
 			break;
 	}
 	COMBINE_DATA(&state->video_regs[offset]);
@@ -360,7 +360,7 @@ static READ16_HANDLER( video_regs_r )
 {
 	srmp6_state *state = space->machine().driver_data<srmp6_state>();
 
-	logerror("video_regs_r (PC=%06X): %04x\n", cpu_get_previouspc(space->cpu), offset*2);
+	logerror("video_regs_r (PC=%06X): %04x\n", cpu_get_previouspc(&space->device()), offset*2);
 	return state->video_regs[offset];
 }
 

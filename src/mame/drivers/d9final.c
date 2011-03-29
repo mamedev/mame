@@ -97,7 +97,7 @@ static WRITE8_HANDLER( d9final_bank_w )
 /* game checks this after three attract cycles, otherwise coin inputs stop to work. */
 static READ8_HANDLER( prot_latch_r )
 {
-//  printf("PC=%06x\n",cpu_get_pc(space->cpu));
+//  printf("PC=%06x\n",cpu_get_pc(&space->device()));
 
 	return 0x04;
 }

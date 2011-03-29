@@ -92,7 +92,7 @@ static WRITE8_DEVICE_HANDLER( friskyt_portB_w )
 {
 	seicross_state *state = device->machine().driver_data<seicross_state>();
 
-	//logerror("PC %04x: 8910 port B = %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("PC %04x: 8910 port B = %02x\n", cpu_get_pc(&space->device()), data);
 	/* bit 0 is IRQ enable */
 	cpu_interrupt_enable(device->machine().device("maincpu"), data & 1);
 

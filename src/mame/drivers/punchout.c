@@ -152,7 +152,7 @@ static WRITE8_HANDLER( punchout_2a03_reset_w )
 static READ8_HANDLER( spunchout_rp5c01_r )
 {
 	punchout_state *state = space->machine().driver_data<punchout_state>();
-	logerror("%04x: prot_r %x\n", cpu_get_previouspc(space->cpu), offset);
+	logerror("%04x: prot_r %x\n", cpu_get_previouspc(&space->device()), offset);
 
 	if (offset <= 0x0c)
 	{
@@ -265,7 +265,7 @@ static WRITE8_HANDLER( spunchout_rp5c01_w )
 	punchout_state *state = space->machine().driver_data<punchout_state>();
 	data &= 0x0f;
 
-	logerror("%04x: prot_w %x = %02x\n",cpu_get_previouspc(space->cpu),offset,data);
+	logerror("%04x: prot_w %x = %02x\n",cpu_get_previouspc(&space->device()),offset,data);
 
 	if (offset <= 0x0c)
 	{
@@ -300,7 +300,7 @@ static READ8_HANDLER( spunchout_exp_r )
 	/* PC = 0x0313 */
 	/* (ret or 0x10) -> (D7DF),(D7A0) - (D7DF),(D7A0) = 0d0h(ret nc) */
 
-	if (cpu_get_previouspc(space->cpu) == 0x0313)
+	if (cpu_get_previouspc(&space->device()) == 0x0313)
 		ret |= 0xc0;
 
 	return ret;

@@ -46,7 +46,7 @@ static WRITE16_HANDLER( eeprom_w )
 {
 	xmen_state *state = space->machine().driver_data<xmen_state>();
 
-	logerror("%06x: write %04x to 108000\n",cpu_get_pc(space->cpu),data);
+	logerror("%06x: write %04x to 108000\n",cpu_get_pc(&space->device()),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = coin counter */

@@ -601,7 +601,7 @@ static READ32_HANDLER( btc_trackball_r )
 {
 	konamigv_state *state = space->machine().driver_data<konamigv_state>();
 
-//  mame_printf_debug( "r %08x %08x %08x\n", cpu_get_pc(space->cpu), offset, mem_mask );
+//  mame_printf_debug( "r %08x %08x %08x\n", cpu_get_pc(&space->device()), offset, mem_mask );
 
 	if( offset == 1 && mem_mask == 0xffff0000 )
 	{
@@ -624,7 +624,7 @@ static READ32_HANDLER( btc_trackball_r )
 
 static WRITE32_HANDLER( btc_trackball_w )
 {
-//  mame_printf_debug( "w %08x %08x %08x %08x\n", cpu_get_pc(space->cpu), offset, data, mem_mask );
+//  mame_printf_debug( "w %08x %08x %08x %08x\n", cpu_get_pc(&space->device()), offset, data, mem_mask );
 }
 
 static DRIVER_INIT( btchamp )

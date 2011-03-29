@@ -170,7 +170,7 @@ static WRITE8_HANDLER( vsnes_coin_counter_w )
 	 //"bnglngby" and "cluclu"
 	if( data & 0xfe )
 	{
-		logerror("vsnes_coin_counter_w: pc = 0x%04x - data = 0x%02x\n", cpu_get_pc(space->cpu), data);
+		logerror("vsnes_coin_counter_w: pc = 0x%04x - data = 0x%02x\n", cpu_get_pc(&space->device()), data);
 	}
 }
 
@@ -187,7 +187,7 @@ static WRITE8_HANDLER( vsnes_coin_counter_1_w )
 	if( data & 0xfe ) //vsbball service mode
 	{
 	//do something?
-		logerror("vsnes_coin_counter_1_w: pc = 0x%04x - data = 0x%02x\n", cpu_get_pc(space->cpu), data);
+		logerror("vsnes_coin_counter_1_w: pc = 0x%04x - data = 0x%02x\n", cpu_get_pc(&space->device()), data);
 	}
 
 }

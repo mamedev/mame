@@ -189,10 +189,10 @@ static READ16_HANDLER( bmc_random_read )
 
 static READ16_HANDLER( bmc_protection_r )
 {
-	switch(cpu_get_previouspc(space->cpu))
+	switch(cpu_get_previouspc(&space->device()))
 	{
 		case 0xca68:
-			switch(cpu_get_reg(space->cpu, M68K_D2))
+			switch(cpu_get_reg(&space->device(), M68K_D2))
 			{
 				case 0: 		 return 0x37<<8;
 				case 0x1013: return 0;
@@ -200,7 +200,7 @@ static READ16_HANDLER( bmc_protection_r )
 			}
 			break;
 	}
-	logerror("Protection read @ %X\n",cpu_get_previouspc(space->cpu));
+	logerror("Protection read @ %X\n",cpu_get_previouspc(&space->device()));
 	return space->machine().rand();
 }
 

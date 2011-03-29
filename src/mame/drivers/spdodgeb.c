@@ -214,7 +214,7 @@ static void mcu63705_update_inputs(running_machine &machine)
 static READ8_HANDLER( mcu63701_r )
 {
 	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
-//  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",cpu_get_pc(space->cpu),offset);
+//  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",cpu_get_pc(&space->device()),offset);
 
 	if (state->mcu63701_command == 0) return 0x6a;
 	else switch (offset)
@@ -231,7 +231,7 @@ static READ8_HANDLER( mcu63701_r )
 static WRITE8_HANDLER( mcu63701_w )
 {
 	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
-//  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",cpu_get_pc(space->cpu),data);
+//  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",cpu_get_pc(&space->device()),data);
 	state->mcu63701_command = data;
 	mcu63705_update_inputs(space->machine());
 }

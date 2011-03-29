@@ -110,7 +110,7 @@ static READ8_HANDLER( astron_DISC_read )
 	if (state->nmi_enable)
 		state->ldv1000_input_latch = laserdisc_data_r(state->laserdisc);
 
-	logerror("DISC read   (0x%04x) @ 0x%04x [0x%x]\n", state->ldv1000_input_latch, offset, cpu_get_pc(space->cpu));
+	logerror("DISC read   (0x%04x) @ 0x%04x [0x%x]\n", state->ldv1000_input_latch, offset, cpu_get_pc(&space->device()));
 
 	return state->ldv1000_input_latch;
 }
@@ -119,7 +119,7 @@ static READ8_HANDLER( astron_OUT_read )
 {
 	segald_state *state = space->machine().driver_data<segald_state>();
 
-	logerror("OUT read   (0x%04x) @ 0x%04x [0x%x]\n", state->out_RAM[offset], offset, cpu_get_pc(space->cpu));
+	logerror("OUT read   (0x%04x) @ 0x%04x [0x%x]\n", state->out_RAM[offset], offset, cpu_get_pc(&space->device()));
 	return state->out_RAM[offset];
 }
 
@@ -127,7 +127,7 @@ static READ8_HANDLER( astron_OBJ_read )
 {
 	segald_state *state = space->machine().driver_data<segald_state>();
 
-	logerror("OBJ read   (0x%04x) @ 0x%04x [0x%x]\n", state->obj_RAM[offset], offset, cpu_get_pc(space->cpu));
+	logerror("OBJ read   (0x%04x) @ 0x%04x [0x%x]\n", state->obj_RAM[offset], offset, cpu_get_pc(&space->device()));
 	return state->obj_RAM[offset];
 }
 
@@ -135,7 +135,7 @@ static READ8_HANDLER( astron_COLOR_read )
 {
 	segald_state *state = space->machine().driver_data<segald_state>();
 
-	logerror("COLOR read   (0x%04x) @ 0x%04x [0x%x]\n", state->color_RAM[offset], offset, cpu_get_pc(space->cpu));
+	logerror("COLOR read   (0x%04x) @ 0x%04x [0x%x]\n", state->color_RAM[offset], offset, cpu_get_pc(&space->device()));
 	return state->color_RAM[offset];
 }
 
@@ -145,7 +145,7 @@ static WRITE8_HANDLER( astron_DISC_write )
 {
 	segald_state *state = space->machine().driver_data<segald_state>();
 
-	logerror("DISC write : 0x%04x @  0x%04x [0x%x]\n", data, offset, cpu_get_pc(space->cpu));
+	logerror("DISC write : 0x%04x @  0x%04x [0x%x]\n", data, offset, cpu_get_pc(&space->device()));
 
 	state->ldv1000_output_latch = data;
 
@@ -157,7 +157,7 @@ static WRITE8_HANDLER( astron_OUT_write )
 {
 	segald_state *state = space->machine().driver_data<segald_state>();
 
-	logerror("OUT write : 0x%04x @  0x%04x [0x%x]\n", data, offset, cpu_get_pc(space->cpu));
+	logerror("OUT write : 0x%04x @  0x%04x [0x%x]\n", data, offset, cpu_get_pc(&space->device()));
 
 	switch(offset)
 	{
@@ -196,7 +196,7 @@ static WRITE8_HANDLER( astron_OBJ_write )
 	segald_state *state = space->machine().driver_data<segald_state>();
 
 	state->obj_RAM[offset] = data;
-	logerror("OBJ write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, cpu_get_pc(space->cpu));
+	logerror("OBJ write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, cpu_get_pc(&space->device()));
 }
 
 static WRITE8_HANDLER( astron_COLOR_write )
@@ -220,7 +220,7 @@ static WRITE8_HANDLER( astron_COLOR_write )
 	a = (highBits & 0x80) ? 0 : 255;
 
 	palette_set_color(space->machine(), palIndex, MAKE_ARGB(a, r, g, b));
-	logerror("COLOR write : 0x%04x @   0x%04x [0x%x]\n", data, offset, cpu_get_pc(space->cpu));
+	logerror("COLOR write : 0x%04x @   0x%04x [0x%x]\n", data, offset, cpu_get_pc(&space->device()));
 }
 
 static WRITE8_HANDLER( astron_FIX_write )
@@ -228,7 +228,7 @@ static WRITE8_HANDLER( astron_FIX_write )
 	segald_state *state = space->machine().driver_data<segald_state>();
 
 	state->fix_RAM[offset] = data;
-	/* logerror("FIX write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, cpu_get_pc(space->cpu)); */
+	/* logerror("FIX write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, cpu_get_pc(&space->device())); */
 }
 
 static WRITE8_HANDLER( astron_io_bankswitch_w )

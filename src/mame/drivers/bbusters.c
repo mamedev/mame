@@ -284,9 +284,9 @@ static WRITE16_HANDLER( gun_select_w )
 {
 	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 
-	logerror("%08x: gun r\n",cpu_get_pc(space->cpu));
+	logerror("%08x: gun r\n",cpu_get_pc(&space->device()));
 
-	device_set_input_line(space->cpu, 2, HOLD_LINE);
+	device_set_input_line(&space->device(), 2, HOLD_LINE);
 
 	state->gun_select = data & 0xff;
 }

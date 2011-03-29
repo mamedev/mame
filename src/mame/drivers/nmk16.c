@@ -230,7 +230,7 @@ static WRITE8_HANDLER ( ssmissin_soundbank_w )
 
 static WRITE16_HANDLER( tharrier_mcu_control_w )
 {
-//  logerror("%04x: mcu_control_w %02x\n",cpu_get_pc(space->cpu),data);
+//  logerror("%04x: mcu_control_w %02x\n",cpu_get_pc(&space->device()),data);
 }
 
 static READ16_HANDLER( tharrier_mcu_r )
@@ -247,8 +247,8 @@ static READ16_HANDLER( tharrier_mcu_r )
 
 		int res;
 
-		if (cpu_get_pc(space->cpu)==0x8aa) res = (state->mainram[0x9064/2])|0x20; /* Task Force Harrier */
-		else if (cpu_get_pc(space->cpu)==0x8ce) res = (state->mainram[0x9064/2])|0x60; /* Task Force Harrier */
+		if (cpu_get_pc(&space->device())==0x8aa) res = (state->mainram[0x9064/2])|0x20; /* Task Force Harrier */
+		else if (cpu_get_pc(&space->device())==0x8ce) res = (state->mainram[0x9064/2])|0x60; /* Task Force Harrier */
 		else
 		{
 			res = to_main[state->prot_count++];
@@ -4688,7 +4688,7 @@ static WRITE16_HANDLER( twinactn_flipscreen_w )
 		flip_screen_set(space->machine(), data & 1);
 
 	if (data & (~1))
-		logerror("%06x: unknown flip screen bit written %04x\n", cpu_get_pc(space->cpu), data);
+		logerror("%06x: unknown flip screen bit written %04x\n", cpu_get_pc(&space->device()), data);
 }
 #endif
 
@@ -4735,7 +4735,7 @@ static WRITE8_DEVICE_HANDLER( twinactn_oki_bank_w )
 	if (data & (~3))
 		logerror("%s: invalid oki bank %02x\n", device->machine().describe_context(), data);
 
-//  logerror("%04x: oki bank %02x\n", cpu_get_pc(space->cpu), data);
+//  logerror("%04x: oki bank %02x\n", cpu_get_pc(&space->device()), data);
 }
 
 static ADDRESS_MAP_START( twinactn_sound_cpu, AS_PROGRAM, 8 )

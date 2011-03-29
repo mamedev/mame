@@ -181,11 +181,11 @@ static WRITE16_HANDLER( lastfght_hi_w )
 	lastfght_state *state = space->machine().driver_data<lastfght_state>();
 
 	if (ACCESSING_BITS_8_15)
-		logerror("%06x: 600000.b = %02x\n", cpu_get_pc(space->cpu), data >> 8);
+		logerror("%06x: 600000.b = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	if (ACCESSING_BITS_0_7)
 	{
 		state->hi = data << 8;
-		//logerror("%06x: lastfght_hi  = %02x\n", cpu_get_pc(space->cpu), data);
+		//logerror("%06x: lastfght_hi  = %02x\n", cpu_get_pc(&space->device()), data);
 	}
 }
 
@@ -195,11 +195,11 @@ static WRITE16_HANDLER( lastfght_x_w )
 	lastfght_state *state = space->machine().driver_data<lastfght_state>();
 
 	if (ACCESSING_BITS_8_15)
-		logerror("%06x: 800008.b = %02x\n", cpu_get_pc(space->cpu), data >> 8);
+		logerror("%06x: 800008.b = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	if (ACCESSING_BITS_0_7)
 	{
 		state->x = state->hi | data;
-		//logerror("%06x: lastfght_x   = %02x\n", cpu_get_pc(space->cpu),data);
+		//logerror("%06x: lastfght_x   = %02x\n", cpu_get_pc(&space->device()),data);
 	}
 }
 
@@ -211,12 +211,12 @@ static WRITE16_HANDLER( lastfght_yw_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		state->y = state->hi | (data >> 8);
-		//logerror("%06x: lastfght_y   = %02x\n", cpu_get_pc(space->cpu), data >> 8);
+		//logerror("%06x: lastfght_y   = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		state->w = state->hi | data;
-		//logerror("%06x: lastfght_w   = %02x\n", cpu_get_pc(space->cpu), data);
+		//logerror("%06x: lastfght_w   = %02x\n", cpu_get_pc(&space->device()), data);
 	}
 }
 
@@ -228,10 +228,10 @@ static WRITE16_HANDLER( lastfght_h_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		state->h = state->hi | (data >> 8);
-		//logerror("%06x: lastfght_h   = %02x\n", cpu_get_pc(space->cpu), data >> 8);
+		//logerror("%06x: lastfght_h   = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x: 80000d.b = %02x\n", cpu_get_pc(space->cpu), data);
+		logerror("%06x: 80000d.b = %02x\n", cpu_get_pc(&space->device()), data);
 }
 
 // source delta x << 6, source x << 6
@@ -242,12 +242,12 @@ static WRITE16_HANDLER( lastfght_sx_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		state->dsx = state->hi | (data >> 8);
-		//logerror("%06x: lastfght_dsx = %02x\n", cpu_get_pc(space->cpu), data >> 8);
+		//logerror("%06x: lastfght_dsx = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		state->sx = state->hi | data;
-		//logerror("%06x: lastfght_sx  = %02x\n", cpu_get_pc(space->cpu), data);
+		//logerror("%06x: lastfght_sx  = %02x\n", cpu_get_pc(&space->device()), data);
 	}
 }
 
@@ -259,12 +259,12 @@ static WRITE16_HANDLER( lastfght_sy_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		state->sy = state->hi | (data >> 8);
-		//logerror("%06x: lastfght_sy  = %02x\n", cpu_get_pc(space->cpu), data >> 8);
+		//logerror("%06x: lastfght_sy  = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		state->sy1 = state->hi | data;
-		//logerror("%06x: lastfght_sy1 = %02x\n", cpu_get_pc(space->cpu), data);
+		//logerror("%06x: lastfght_sy1 = %02x\n", cpu_get_pc(&space->device()), data);
 	}
 }
 
@@ -276,12 +276,12 @@ static WRITE16_HANDLER( lastfght_sr_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		state->sp = (state->hi >> 8) >> 4;
-		//logerror("%06x: lastfght_sp  = %02x\n", cpu_get_pc(space->cpu), data >> 8);
+		//logerror("%06x: lastfght_sp  = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		state->sr = data;
-		//logerror("%06x: lastfght_sr  = %02x\n", cpu_get_pc(space->cpu), data);
+		//logerror("%06x: lastfght_sr  = %02x\n", cpu_get_pc(&space->device()), data);
 	}
 }
 
@@ -293,12 +293,12 @@ static WRITE16_HANDLER( lastfght_sd_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		state->sx1 = state->hi | (data >> 8);
-		//logerror("%06x: lastfght_sx1 = %02x\n", cpu_get_pc(space->cpu), data >> 8);
+		//logerror("%06x: lastfght_sx1 = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		state->dsy = state->hi | data;
-		//logerror("%06x: lastfght_dsy = %02x\n", cpu_get_pc(space->cpu), data);
+		//logerror("%06x: lastfght_dsy = %02x\n", cpu_get_pc(&space->device()), data);
 	}
 }
 
@@ -314,7 +314,7 @@ static WRITE16_HANDLER( lastfght_blit_w )
 		bitmap_t *dest = state->bitmap[state->dest];
 
 #if 0
-		logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, sx %03x.%02x, sx1 %03x.%02x, dsx %03x.%02x, sy %03x.%02x, sy1 %03x.%02x, dsy %03x.%02x, sp %02x, sr %02x, data %02x\n", cpu_get_pc(space->cpu),
+		logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, sx %03x.%02x, sx1 %03x.%02x, dsx %03x.%02x, sy %03x.%02x, sy1 %03x.%02x, dsy %03x.%02x, sp %02x, sr %02x, data %02x\n", cpu_get_pc(&space->device()),
 				state->x, state->y, state->w + 1, state->h + 1,
 				state->sx >> 6, state->sx & 0x3f, state->sx1 >> 6, state->dsx & 0x3f, state->sx1 >> 6, state->sx1 & 0x3f,
 				state->sy >> 6, state->sy & 0x3f, state->sy1 >> 6, state->dsy & 0x3f, state->sy1 >> 6, state->sy1 & 0x3f,
@@ -338,7 +338,7 @@ static WRITE16_HANDLER( lastfght_blit_w )
 		}
 	}
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x: 600007.b = %02x\n", cpu_get_pc(space->cpu), data);
+		logerror("%06x: 600007.b = %02x\n", cpu_get_pc(&space->device()), data);
 }
 
 // toggle framebuffer
@@ -396,9 +396,9 @@ static READ16_HANDLER( lastfght_sound_r )
 static WRITE16_HANDLER( lastfght_sound_w )
 {
 	if (ACCESSING_BITS_8_15)
-		logerror("%06x: sound_w msb = %02x\n", cpu_get_pc(space->cpu), data >> 8);
+		logerror("%06x: sound_w msb = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x: sound_w lsb = %02x\n", cpu_get_pc(space->cpu), data);
+		logerror("%06x: sound_w lsb = %02x\n", cpu_get_pc(&space->device()), data);
 }
 
 /***************************************************************************

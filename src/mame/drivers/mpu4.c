@@ -2195,9 +2195,9 @@ static WRITE8_HANDLER( characteriser_w )
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	int x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(space->cpu),offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(&space->device()),offset,data));
 	if (!state->current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
 
 	if (offset == 0)
 	{
@@ -2260,7 +2260,7 @@ static READ8_HANDLER( characteriser_r )
 {
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	if (!state->current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
 
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	if (offset == 0)
@@ -2293,9 +2293,9 @@ static WRITE8_HANDLER( bwb_characteriser_w )
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	int x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", cpu_get_previouspc(space->cpu),offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", cpu_get_previouspc(&space->device()),offset,data));
 	if (!state->current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
 
 	if (offset == 0)//initialisation is always at 0x800
 	{
@@ -2337,7 +2337,7 @@ static READ8_HANDLER( bwb_characteriser_r )
 {
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	if (!state->current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
 
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 

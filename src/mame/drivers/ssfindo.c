@@ -339,18 +339,18 @@ ssfindo_speedup_func ssfindo_speedup;
 
 static void ssfindo_speedups(address_space* space)
 {
-	if (cpu_get_pc(space->cpu)==0x2d6c8) // ssfindo
-		device_spin_until_time(space->cpu, attotime::from_usec(20));
-	else if (cpu_get_pc(space->cpu)==0x2d6bc) // ssfindo
-		device_spin_until_time(space->cpu, attotime::from_usec(20));
+	if (cpu_get_pc(&space->device())==0x2d6c8) // ssfindo
+		device_spin_until_time(&space->device(), attotime::from_usec(20));
+	else if (cpu_get_pc(&space->device())==0x2d6bc) // ssfindo
+		device_spin_until_time(&space->device(), attotime::from_usec(20));
 }
 
 static void ppcar_speedups(address_space* space)
 {
-	if (cpu_get_pc(space->cpu)==0x000bc8) // ppcar
-		device_spin_until_time(space->cpu, attotime::from_usec(20));
-	else if (cpu_get_pc(space->cpu)==0x000bbc) // ppcar
-		device_spin_until_time(space->cpu, attotime::from_usec(20));
+	if (cpu_get_pc(&space->device())==0x000bc8) // ppcar
+		device_spin_until_time(&space->device(), attotime::from_usec(20));
+	else if (cpu_get_pc(&space->device())==0x000bbc) // ppcar
+		device_spin_until_time(&space->device(), attotime::from_usec(20));
 }
 
 
@@ -364,7 +364,7 @@ static READ32_HANDLER(PS7500_IO_r)
 
 		case IOLINES: //TODO: eeprom  24c01
 #if 0
-		mame_printf_debug("IOLINESR %i @%x\n", offset, cpu_get_pc(space->cpu));
+		mame_printf_debug("IOLINESR %i @%x\n", offset, cpu_get_pc(&space->device()));
 #endif
 
 		if(state->flashType == 1)
@@ -421,13 +421,13 @@ static WRITE32_HANDLER(PS7500_IO_w)
 				if(data&0xc0)
 					state->adrLatch=0;
 
-			if(cpu_get_pc(space->cpu) == 0xbac0 && state->flashType == 1)
+			if(cpu_get_pc(&space->device()) == 0xbac0 && state->flashType == 1)
 			{
 				state->flashN=data&1;
 			}
 
 #if 0
-				logerror("IOLINESW %i = %x  @%x\n",offset,data,cpu_get_pc(space->cpu));
+				logerror("IOLINESW %i = %x  @%x\n",offset,data,cpu_get_pc(&space->device()));
 #endif
 			break;
 
@@ -509,7 +509,7 @@ static WRITE32_HANDLER(io_w)
 	COMBINE_DATA(&temp);
 
 #if 0
-	logerror("[io_w] = %x @%x [latch=%x]\n",data,cpu_get_pc(space->cpu),state->adrLatch);
+	logerror("[io_w] = %x @%x [latch=%x]\n",data,cpu_get_pc(&space->device()),state->adrLatch);
 #endif
 
 	if(state->adrLatch==1)

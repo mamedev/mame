@@ -348,7 +348,7 @@ static WRITE32_HANDLER( znsecsel_w )
 		psx_sio_install_handler( space->machine(), 0, sio_dip_handler );
 		psx_sio_input( space->machine(), 0, PSX_SIO_IN_DSR, 0 );
 
-		state->dip_timer->adjust( downcast<cpu_device *>(space->cpu)->cycles_to_attotime( 100 ), 1 );
+		state->dip_timer->adjust( downcast<cpu_device *>(&space->device())->cycles_to_attotime( 100 ), 1 );
 	}
 
 	verboselog( space->machine(), 2, "znsecsel_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
@@ -1795,7 +1795,7 @@ static WRITE32_HANDLER( bam2_mcu_w )
 		else if (ACCESSING_BITS_16_31)
 		{
 			state->bam2_mcu_command = data>>16;
-			logerror("MCU command: %04x (PC %08x)\n", state->bam2_mcu_command, cpu_get_pc(space->cpu));
+			logerror("MCU command: %04x (PC %08x)\n", state->bam2_mcu_command, cpu_get_pc(&space->device()));
 		}
 	}
 }
@@ -1807,11 +1807,11 @@ static READ32_HANDLER( bam2_mcu_r )
 	switch (offset)
 	{
 		case 0:
-			logerror("MCU port 0 read @ PC %08x mask %08x\n", cpu_get_pc(space->cpu), mem_mask);
+			logerror("MCU port 0 read @ PC %08x mask %08x\n", cpu_get_pc(&space->device()), mem_mask);
 			break;
 
 		case 1:
-			logerror("MCU status read @ PC %08x mask %08x\n", cpu_get_pc(space->cpu), mem_mask);
+			logerror("MCU status read @ PC %08x mask %08x\n", cpu_get_pc(&space->device()), mem_mask);
 
 			switch (state->bam2_mcu_command)
 			{

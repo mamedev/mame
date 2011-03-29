@@ -185,7 +185,7 @@ static SOUND_START(mirax)
 static WRITE8_HANDLER(audio_w)
 {
 	mirax_state *state = space->machine().driver_data<mirax_state>();
-	if(cpu_get_previouspc(space->cpu)==0x2fd)
+	if(cpu_get_previouspc(&space->device())==0x2fd)
 	{
 		state->nAyCtrl=offset;
 		state->nAyData=data;

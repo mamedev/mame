@@ -20,12 +20,12 @@ static int eolith_scanline = 0;
 void eolith_speedup_read(address_space *space)
 {
 	/* for debug */
-  //if ((cpu_get_pc(space->cpu)!=eolith_speedup_address) && (eolith_vblank!=1) )
+  //if ((cpu_get_pc(&space->device())!=eolith_speedup_address) && (eolith_vblank!=1) )
   //    printf("%s:eolith speedup_read data %02x\n",space->machine().describe_context(), eolith_vblank);
 
-	if (cpu_get_pc(space->cpu)==eolith_speedup_address && eolith_vblank==0 && eolith_scanline < eolith_speedup_resume_scanline)
+	if (cpu_get_pc(&space->device())==eolith_speedup_address && eolith_vblank==0 && eolith_scanline < eolith_speedup_resume_scanline)
 	{
-		device_spin_until_trigger(space->cpu, 1000);
+		device_spin_until_trigger(&space->device(), 1000);
 	}
 
 }

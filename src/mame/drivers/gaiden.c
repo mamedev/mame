@@ -179,7 +179,7 @@ static WRITE16_HANDLER( wildfang_protection_w )
 
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n",cpu_get_pc(space->cpu),data);
+//      logerror("PC %06x: prot = %02x\n",cpu_get_pc(&space->device()),data);
 
 		switch (data & 0xf0)
 		{
@@ -218,7 +218,7 @@ static WRITE16_HANDLER( wildfang_protection_w )
 static READ16_HANDLER( wildfang_protection_r )
 {
 	gaiden_state *state = space->machine().driver_data<gaiden_state>();
-//  logerror("PC %06x: read prot %02x\n", cpu_get_pc(space->cpu), state->prot);
+//  logerror("PC %06x: read prot %02x\n", cpu_get_pc(&space->device()), state->prot);
 	return state->prot;
 }
 
@@ -342,7 +342,7 @@ static WRITE16_HANDLER( raiga_protection_w )
 	{
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n", cpu_get_pc(space->cpu), data);
+//      logerror("PC %06x: prot = %02x\n", cpu_get_pc(&space->device()), data);
 
 		switch (data & 0xf0)
 		{
@@ -389,7 +389,7 @@ static WRITE16_HANDLER( raiga_protection_w )
 static READ16_HANDLER( raiga_protection_r )
 {
 	gaiden_state *state = space->machine().driver_data<gaiden_state>();
-//  logerror("PC %06x: read prot %02x\n", cpu_get_pc(space->cpu), state->prot);
+//  logerror("PC %06x: read prot %02x\n", cpu_get_pc(&space->device()), state->prot);
 	return state->prot;
 }
 

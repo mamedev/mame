@@ -576,7 +576,7 @@ static WRITE16_HANDLER( galgames_eeprom_w )
 {
 	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	if (data & ~0x0003)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(space->cpu),data);
+		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(&space->device()),data);
 
 	if ( ACCESSING_BITS_0_7 )
 	{
@@ -671,7 +671,7 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 			default:
 				eeprom_set_cs_line(space->machine().device(galgames_eeprom_names[0]), CLEAR_LINE);
 				galgames_update_rombank(space->machine(), 0);
-				logerror("%06x: unknown cart sel = %04x\n", cpu_get_pc(space->cpu), data);
+				logerror("%06x: unknown cart sel = %04x\n", cpu_get_pc(&space->device()), data);
 				break;
 		}
 	}
@@ -694,13 +694,13 @@ static WRITE16_HANDLER( galgames_cart_clock_w )
 		{
 			memory_set_bank(space->machine(), GALGAMES_BANK_000000_R, GALGAMES_RAM);	// ram
 			galgames_update_rombank(space->machine(), state->galgames_cart);
-			logerror("%06x: romram bank = %04x\n", cpu_get_pc(space->cpu), data);
+			logerror("%06x: romram bank = %04x\n", cpu_get_pc(&space->device()), data);
 		}
 		else
 		{
 			memory_set_bank(space->machine(), GALGAMES_BANK_000000_R, GALGAMES_ROM0);	// rom
 			memory_set_bank(space->machine(), GALGAMES_BANK_200000_R, GALGAMES_RAM);	// ram
-			logerror("%06x: unknown romram bank = %04x\n", cpu_get_pc(space->cpu), data);
+			logerror("%06x: unknown romram bank = %04x\n", cpu_get_pc(&space->device()), data);
 		}
 	}
 }

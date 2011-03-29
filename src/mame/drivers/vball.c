@@ -198,14 +198,14 @@ static WRITE8_HANDLER( vb_scrollx_hi_w )
 	state->vb_scrollx_hi = (data & 0x02) << 7;
 	vb_bgprombank_w(space->machine(), (data >> 2) & 0x07);
 	vb_spprombank_w(space->machine(), (data >> 5) & 0x07);
-	//logerror("%04x: vb_scrollx_hi = %d\n", cpu_get_previouspc(space->cpu), state->vb_scrollx_hi);
+	//logerror("%04x: vb_scrollx_hi = %d\n", cpu_get_previouspc(&space->device()), state->vb_scrollx_hi);
 }
 
 static WRITE8_HANDLER(vb_scrollx_lo_w)
 {
 	vball_state *state = space->machine().driver_data<vball_state>();
 	state->vb_scrollx_lo = data;
-	//logerror("%04x: vb_scrollx_lo =%d\n", cpu_get_previouspc(space->cpu), state->vb_scrollx_lo);
+	//logerror("%04x: vb_scrollx_lo =%d\n", cpu_get_previouspc(&space->device()), state->vb_scrollx_lo);
 }
 
 

@@ -37,9 +37,9 @@ static UINT32 *namcoc7x_hostram;
 
 static READ16_HANDLER( speedup_r )
 {
-	if ((cpu_get_pc(space->cpu) == 0xc12d) && (!(su_82 & 0xff00)))
+	if ((cpu_get_pc(&space->device()) == 0xc12d) && (!(su_82 & 0xff00)))
 	{
-		device_spin_until_interrupt(space->cpu);
+		device_spin_until_interrupt(&space->device());
 	}
 
 	return su_82;

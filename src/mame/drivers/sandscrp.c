@@ -217,7 +217,7 @@ static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
 		state->latch1_full = 1;
 		soundlatch_w(space, 0, data & 0xff);
 		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-		device_spin_until_time(space->cpu, attotime::from_usec(100));	// Allow the other cpu to reply
+		device_spin_until_time(&space->device(), attotime::from_usec(100));	// Allow the other cpu to reply
 	}
 }
 
@@ -256,7 +256,7 @@ static WRITE8_HANDLER( sandscrp_bankswitch_w )
 	UINT8 *RAM = space->machine().region("maincpu")->base();
 	int bank = data & 0x07;
 
-	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
+	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(&space->device()),data);
 
 	if (bank < 3)	RAM = &RAM[0x4000 * bank];
 	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];

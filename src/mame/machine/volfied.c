@@ -346,7 +346,7 @@ WRITE16_HANDLER( volfied_cchip_ram_w )
 	state->cchip_ram[(state->current_bank * 0x400) + offset] = data;
 
 //  if (offset != 0x8)
-//      logerror("%08x:  volfied c write %04x %04x\n", cpu_get_pc(space->cpu), offset, data);
+//      logerror("%08x:  volfied c write %04x %04x\n", cpu_get_pc(&space->device()), offset, data);
 
 	if (state->current_bank == 0)
 	{
@@ -392,12 +392,12 @@ WRITE16_HANDLER( volfied_cchip_ram_w )
 			// Palette request cmd - verified to take around 122242 68000 cycles to complete
 			if (state->current_cmd >= 0x1 && state->current_cmd < 0x12)
 			{
-				space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(122242), FUNC(volfied_timer_callback));
+				space->machine().scheduler().timer_set(downcast<cpu_device *>(&space->device())->cycles_to_attotime(122242), FUNC(volfied_timer_callback));
 			}
 			// Unknown cmd - verified to take around 105500 68000 cycles to complete
 			else if (state->current_cmd >= 0x81 && state->current_cmd < 0x92)
 			{
-				space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(105500), FUNC(volfied_timer_callback));
+				space->machine().scheduler().timer_set(downcast<cpu_device *>(&space->device())->cycles_to_attotime(105500), FUNC(volfied_timer_callback));
 			}
 			else
 			{
@@ -447,8 +447,8 @@ READ16_HANDLER( volfied_cchip_ram_r )
 		}
 	}
 
-//  if (cpu_get_pc(space->cpu)!=0x15ca8 && cpu_get_pc(space->cpu)!=0x15cd8 && cpu_get_pc(space->cpu)!=0x15cde)
-//      logerror("%08x:  volfied c read %04x (bank %04x)\n", cpu_get_pc(space->cpu), offset, current_bank);
+//  if (cpu_get_pc(&space->device())!=0x15ca8 && cpu_get_pc(&space->device())!=0x15cd8 && cpu_get_pc(&space->device())!=0x15cde)
+//      logerror("%08x:  volfied c read %04x (bank %04x)\n", cpu_get_pc(&space->device()), offset, current_bank);
 
 	/* Unknown */
 	if (state->current_bank == 2 && offset == 0x005)

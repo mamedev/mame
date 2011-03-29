@@ -109,7 +109,7 @@ static WRITE16_HANDLER( cabal_sound_irq_trigger_word_w )
 	seibu_main_word_w(space,4,data,mem_mask);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
-	device_spin_until_time(space->cpu, attotime::from_usec(50));
+	device_spin_until_time(&space->device(), attotime::from_usec(50));
 }
 
 static WRITE16_HANDLER( cabalbl_sound_irq_trigger_word_w )

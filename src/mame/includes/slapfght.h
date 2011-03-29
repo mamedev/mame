@@ -60,9 +60,9 @@ public:
 /* due to code at 0x108d (GUARDIAN) or 0x1152 (GETSTARJ),
    register C is a unaltered copy of register A */
 
-#define GS_SAVE_REGS  state->gs_a = cpu_get_reg(space->cpu, Z80_BC) >> 0; \
-                       state->gs_d = cpu_get_reg(space->cpu, Z80_DE) >> 8; \
-                       state->gs_e = cpu_get_reg(space->cpu, Z80_DE) >> 0;
+#define GS_SAVE_REGS  state->gs_a = cpu_get_reg(&space->device(), Z80_BC) >> 0; \
+                       state->gs_d = cpu_get_reg(&space->device(), Z80_DE) >> 8; \
+                       state->gs_e = cpu_get_reg(&space->device(), Z80_DE) >> 0;
 
 #define GS_RESET_REGS state->gs_a = 0; \
                        state->gs_d = 0; \

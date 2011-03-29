@@ -148,7 +148,7 @@ MCU simulation TODO:
 			return 0x45;
 
 		default:
-			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", cpu_get_pc(space->cpu), state->mcu_val);
+			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", cpu_get_pc(&space->device()), state->mcu_val);
 			return state->mcu_val;
 	}
 #endif
@@ -170,7 +170,7 @@ static WRITE8_HANDLER( msisaac_mcu_w )
 #else
 	msisaac_state *state = space->machine().driver_data<msisaac_state>();
 	//if(data != 0x0a && data != 0x42 && data != 0x02)
-	//  popmessage("PC = %04x %02x", cpu_get_pc(space->cpu), data);
+	//  popmessage("PC = %04x %02x", cpu_get_pc(&space->device()), data);
 	state->mcu_val = data;
 #endif
 }

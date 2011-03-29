@@ -455,7 +455,7 @@ static WRITE8_HANDLER( zerotrgt_ctrl_w )
 {
 	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
 	/*TODO: check this.*/
-	logerror("CTRL: %04x: %04x: %04x\n", cpu_get_pc(space->cpu), offset, data);
+	logerror("CTRL: %04x: %04x: %04x\n", cpu_get_pc(&space->device()), offset, data);
 //  if (offset == 0) device_set_input_line(state->subcpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this

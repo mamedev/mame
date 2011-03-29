@@ -202,7 +202,7 @@ READ8_HANDLER( bublbobl_mcu_port1_r )
 {
 	bublbobl_state *state = space->machine().driver_data<bublbobl_state>();
 
-	//logerror("%04x: 6801U4 port 1 read\n", cpu_get_pc(space->cpu));
+	//logerror("%04x: 6801U4 port 1 read\n", cpu_get_pc(&space->device()));
 	state->port1_in = input_port_read(space->machine(), "IN0");
 	return (state->port1_out & state->ddr1) | (state->port1_in & ~state->ddr1);
 }
@@ -210,7 +210,7 @@ READ8_HANDLER( bublbobl_mcu_port1_r )
 WRITE8_HANDLER( bublbobl_mcu_port1_w )
 {
 	bublbobl_state *state = space->machine().driver_data<bublbobl_state>();
-	//logerror("%04x: 6801U4 port 1 write %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: 6801U4 port 1 write %02x\n", cpu_get_pc(&space->device()), data);
 
 	// bit 4: coin lockout
 	coin_lockout_global_w(space->machine(), ~data & 0x10);
@@ -235,14 +235,14 @@ READ8_HANDLER( bublbobl_mcu_port2_r )
 {
 	bublbobl_state *state = space->machine().driver_data<bublbobl_state>();
 
-	//logerror("%04x: 6801U4 port 2 read\n", cpu_get_pc(space->cpu));
+	//logerror("%04x: 6801U4 port 2 read\n", cpu_get_pc(&space->device()));
 	return (state->port2_out & state->ddr2) | (state->port2_in & ~state->ddr2);
 }
 
 WRITE8_HANDLER( bublbobl_mcu_port2_w )
 {
 	bublbobl_state *state = space->machine().driver_data<bublbobl_state>();
-	//logerror("%04x: 6801U4 port 2 write %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: 6801U4 port 2 write %02x\n", cpu_get_pc(&space->device()), data);
 	static const char *const portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
 
 	// bits 0-3: bits 8-11 of shared RAM address
@@ -277,28 +277,28 @@ WRITE8_HANDLER( bublbobl_mcu_port2_w )
 READ8_HANDLER( bublbobl_mcu_port3_r )
 {
 	bublbobl_state *state = space->machine().driver_data<bublbobl_state>();
-	//logerror("%04x: 6801U4 port 3 read\n", cpu_get_pc(space->cpu));
+	//logerror("%04x: 6801U4 port 3 read\n", cpu_get_pc(&space->device()));
 	return (state->port3_out & state->ddr3) | (state->port3_in & ~state->ddr3);
 }
 
 WRITE8_HANDLER( bublbobl_mcu_port3_w )
 {
 	bublbobl_state *state = space->machine().driver_data<bublbobl_state>();
-	//logerror("%04x: 6801U4 port 3 write %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: 6801U4 port 3 write %02x\n", cpu_get_pc(&space->device()), data);
 	state->port3_out = data;
 }
 
 READ8_HANDLER( bublbobl_mcu_port4_r )
 {
 	bublbobl_state *state = space->machine().driver_data<bublbobl_state>();
-	//logerror("%04x: 6801U4 port 4 read\n", cpu_get_pc(space->cpu));
+	//logerror("%04x: 6801U4 port 4 read\n", cpu_get_pc(&space->device()));
 	return (state->port4_out & state->ddr4) | (state->port4_in & ~state->ddr4);
 }
 
 WRITE8_HANDLER( bublbobl_mcu_port4_w )
 {
 	bublbobl_state *state = space->machine().driver_data<bublbobl_state>();
-	//logerror("%04x: 6801U4 port 4 write %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: 6801U4 port 4 write %02x\n", cpu_get_pc(&space->device()), data);
 
 	// bits 0-7 of shared RAM address
 
@@ -318,7 +318,7 @@ READ8_HANDLER( boblbobl_ic43_a_r )
 {
 	bublbobl_state *state = space->machine().driver_data<bublbobl_state>();
 	// if (offset >= 2)
-	//     logerror("%04x: ic43_a_r (offs %d) res = %02x\n", cpu_get_pc(space->cpu), offset, res);
+	//     logerror("%04x: ic43_a_r (offs %d) res = %02x\n", cpu_get_pc(&space->device()), offset, res);
 
 	if (offset == 0)
 		return state->ic43_a << 4;
@@ -370,14 +370,14 @@ WRITE8_HANDLER( boblbobl_ic43_b_w )
 	bublbobl_state *state = space->machine().driver_data<bublbobl_state>();
 	static const int xorval[4] = { 4, 1, 8, 2 };
 
-	//  logerror("%04x: ic43_b_w (offs %d) %02x\n", cpu_get_pc(space->cpu), offset, data);
+	//  logerror("%04x: ic43_b_w (offs %d) %02x\n", cpu_get_pc(&space->device()), offset, data);
 	state->ic43_b = (data >> 4) ^ xorval[offset];
 }
 
 READ8_HANDLER( boblbobl_ic43_b_r )
 {
 	bublbobl_state *state = space->machine().driver_data<bublbobl_state>();
-	//  logerror("%04x: ic43_b_r (offs %d)\n", cpu_get_pc(space->cpu), offset);
+	//  logerror("%04x: ic43_b_r (offs %d)\n", cpu_get_pc(&space->device()), offset);
 	if (offset == 0)
 		return state->ic43_b << 4;
 	else
@@ -411,14 +411,14 @@ INTERRUPT_GEN( bublbobl_m68705_interrupt )
 READ8_HANDLER( bublbobl_68705_port_a_r )
 {
 	bublbobl_state *state = space->machine().driver_data<bublbobl_state>();
-	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(space->cpu), state->port_a_in);
+	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(&space->device()), state->port_a_in);
 	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
 }
 
 WRITE8_HANDLER( bublbobl_68705_port_a_w )
 {
 	bublbobl_state *state = space->machine().driver_data<bublbobl_state>();
-	//logerror("%04x: 68705 port A write %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: 68705 port A write %02x\n", cpu_get_pc(&space->device()), data);
 	state->port_a_out = data;
 }
 
@@ -458,7 +458,7 @@ READ8_HANDLER( bublbobl_68705_port_b_r )
 WRITE8_HANDLER( bublbobl_68705_port_b_w )
 {
 	bublbobl_state *state = space->machine().driver_data<bublbobl_state>();
-	//logerror("%04x: 68705 port B write %02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: 68705 port B write %02x\n", cpu_get_pc(&space->device()), data);
 	static const char *const portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
 
 	if ((state->ddr_b & 0x01) && (~data & 0x01) && (state->port_b_out & 0x01))
@@ -468,7 +468,7 @@ WRITE8_HANDLER( bublbobl_68705_port_b_w )
 	if ((state->ddr_b & 0x02) && (data & 0x02) && (~state->port_b_out & 0x02)) /* positive edge trigger */
 	{
 		state->address = (state->address & 0xff00) | state->port_a_out;
-		//logerror("%04x: 68705 address %02x\n", cpu_get_pc(space->cpu), state->port_a_out);
+		//logerror("%04x: 68705 address %02x\n", cpu_get_pc(&space->device()), state->port_a_out);
 	}
 	if ((state->ddr_b & 0x04) && (data & 0x04) && (~state->port_b_out & 0x04)) /* positive edge trigger */
 	{
@@ -480,26 +480,26 @@ WRITE8_HANDLER( bublbobl_68705_port_b_w )
 		{
 			if ((state->address & 0x0800) == 0x0000)
 			{
-				//logerror("%04x: 68705 read input port %02x\n", cpu_get_pc(space->cpu), state->address);
+				//logerror("%04x: 68705 read input port %02x\n", cpu_get_pc(&space->device()), state->address);
 				state->latch = input_port_read(space->machine(), portnames[state->address & 3]);
 			}
 			else if ((state->address & 0x0c00) == 0x0c00)
 			{
-				//logerror("%04x: 68705 read %02x from address %04x\n", cpu_get_pc(space->cpu), state->mcu_sharedram[state->address], state->address);
+				//logerror("%04x: 68705 read %02x from address %04x\n", cpu_get_pc(&space->device()), state->mcu_sharedram[state->address], state->address);
 				state->latch = state->mcu_sharedram[state->address & 0x03ff];
 			}
 			else
-				logerror("%04x: 68705 unknown read address %04x\n", cpu_get_pc(space->cpu), state->address);
+				logerror("%04x: 68705 unknown read address %04x\n", cpu_get_pc(&space->device()), state->address);
 		}
 		else	/* write */
 		{
 			if ((state->address & 0x0c00) == 0x0c00)
 			{
-				//logerror("%04x: 68705 write %02x to address %04x\n", cpu_get_pc(space->cpu), state->port_a_out, state->address);
+				//logerror("%04x: 68705 write %02x to address %04x\n", cpu_get_pc(&space->device()), state->port_a_out, state->address);
 				state->mcu_sharedram[state->address & 0x03ff] = state->port_a_out;
 			}
 			else
-				logerror("%04x: 68705 unknown write to address %04x\n", cpu_get_pc(space->cpu), state->address);
+				logerror("%04x: 68705 unknown write to address %04x\n", cpu_get_pc(&space->device()), state->address);
 		}
 	}
 	if ((state->ddr_b & 0x20) && (~data & 0x20) && (state->port_b_out & 0x20))
@@ -512,11 +512,11 @@ WRITE8_HANDLER( bublbobl_68705_port_b_w )
 	}
 	if ((state->ddr_b & 0x40) && (~data & 0x40) && (state->port_b_out & 0x40))
 	{
-		logerror("%04x: 68705 unknown port B bit %02x\n", cpu_get_pc(space->cpu), data);
+		logerror("%04x: 68705 unknown port B bit %02x\n", cpu_get_pc(&space->device()), data);
 	}
 	if ((state->ddr_b & 0x80) && (~data & 0x80) && (state->port_b_out & 0x80))
 	{
-		logerror("%04x: 68705 unknown port B bit %02x\n", cpu_get_pc(space->cpu), data);
+		logerror("%04x: 68705 unknown port B bit %02x\n", cpu_get_pc(&space->device()), data);
 	}
 
 	state->port_b_out = data;

@@ -129,25 +129,25 @@ WRITE16_HANDLER( seta2_vregs_w )
 
 	COMBINE_DATA(&state->vregs[offset]);
 	if ( state->vregs[offset] != olddata )
-		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n",cpu_get_pc(space->cpu),offset*2,data);
+		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n",cpu_get_pc(&space->device()),offset*2,data);
 
 	switch( offset*2 )
 	{
 	case 0x1c:	// FLIP SCREEN (myangel)    <- this is actually zoom
 		flip_screen_set(space->machine(),  data & 1 );
-		if (data & ~1)	logerror("CPU #0 PC %06X: flip screen unknown bits %04X\n",cpu_get_pc(space->cpu),data);
+		if (data & ~1)	logerror("CPU #0 PC %06X: flip screen unknown bits %04X\n",cpu_get_pc(&space->device()),data);
 		break;
 	case 0x2a:	// FLIP X (pzlbowl)
 		flip_screen_x_set(space->machine(),  data & 1 );
-		if (data & ~1)	logerror("CPU #0 PC %06X: flipx unknown bits %04X\n",cpu_get_pc(space->cpu),data);
+		if (data & ~1)	logerror("CPU #0 PC %06X: flipx unknown bits %04X\n",cpu_get_pc(&space->device()),data);
 		break;
 	case 0x2c:	// FLIP Y (pzlbowl)
 		flip_screen_y_set(space->machine(),  data & 1 );
-		if (data & ~1)	logerror("CPU #0 PC %06X: flipy unknown bits %04X\n",cpu_get_pc(space->cpu),data);
+		if (data & ~1)	logerror("CPU #0 PC %06X: flipy unknown bits %04X\n",cpu_get_pc(&space->device()),data);
 		break;
 
 	case 0x30:	// BLANK SCREEN (pzlbowl, myangel)
-		if (data & ~1)	logerror("CPU #0 PC %06X: blank unknown bits %04X\n",cpu_get_pc(space->cpu),data);
+		if (data & ~1)	logerror("CPU #0 PC %06X: blank unknown bits %04X\n",cpu_get_pc(&space->device()),data);
 		break;
 	}
 }

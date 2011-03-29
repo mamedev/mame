@@ -462,7 +462,7 @@ READ8_DEVICE_HANDLER( namcoio_r )
 	namcoio_state *namcoio = get_safe_token(device);
 	offset &= 0x3f;
 
-//  LOG(("%04x: I/O read: mode %d, offset %d = %02x\n", cpu_get_pc(space->cpu), offset / 16, namcoio_ram[(offset & 0x30) + 8], offset & 0x0f, namcoio_ram[offset]&0x0f));
+//  LOG(("%04x: I/O read: mode %d, offset %d = %02x\n", cpu_get_pc(&space->device()), offset / 16, namcoio_ram[(offset & 0x30) + 8], offset & 0x0f, namcoio_ram[offset]&0x0f));
 
 	return 0xf0 | namcoio->ram[offset];
 }
@@ -473,7 +473,7 @@ WRITE8_DEVICE_HANDLER( namcoio_w )
 	offset &= 0x3f;
 	data &= 0x0f;	// RAM is 4-bit wide
 
-//  LOG(("%04x: I/O write %d: offset %d = %02x\n", cpu_get_pc(space->cpu), offset / 16, offset & 0x0f, data));
+//  LOG(("%04x: I/O write %d: offset %d = %02x\n", cpu_get_pc(&space->device()), offset / 16, offset & 0x0f, data));
 
 	namcoio->ram[offset] = data;
 }

@@ -63,7 +63,7 @@ static WRITE8_HANDLER( surpratk_videobank_w )
 {
 	surpratk_state *state = space->machine().driver_data<surpratk_state>();
 
-	logerror("%04x: videobank = %02x\n",cpu_get_pc(space->cpu),data);
+	logerror("%04x: videobank = %02x\n",cpu_get_pc(&space->device()),data);
 	/* bit 0 = select 053245 at 0000-07ff */
 	/* bit 1 = select palette at 0000-07ff */
 	/* bit 2 = select palette bank 0 or 1 */
@@ -75,7 +75,7 @@ static WRITE8_HANDLER( surpratk_5fc0_w )
 	surpratk_state *state = space->machine().driver_data<surpratk_state>();
 
 	if ((data & 0xf4) != 0x10)
-		logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(space->cpu),data);
+		logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(&space->device()),data);
 
 	/* bit 0/1 = coin counters */
 	coin_counter_w(space->machine(), 0, data & 0x01);

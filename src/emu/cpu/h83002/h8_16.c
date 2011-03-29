@@ -430,7 +430,7 @@ static CPU_SET_INFO( h8 )
 
 static READ16_HANDLER( h8_itu_r )
 {
-	h83xx_state *h8 = get_safe_token(space->cpu);
+	h83xx_state *h8 = get_safe_token(&space->device());
 
 	if (mem_mask == 0xffff)
 	{
@@ -451,7 +451,7 @@ static READ16_HANDLER( h8_itu_r )
 
 static WRITE16_HANDLER( h8_itu_w )
 {
-	h83xx_state *h8 = get_safe_token(space->cpu);
+	h83xx_state *h8 = get_safe_token(&space->device());
 
 	if (mem_mask == 0xffff)
 	{
@@ -471,7 +471,7 @@ static WRITE16_HANDLER( h8_itu_w )
 
 static READ16_HANDLER( h8_3007_itu_r )
 {
-	h83xx_state *h8 = get_safe_token(space->cpu);
+	h83xx_state *h8 = get_safe_token(&space->device());
 
 	if (mem_mask == 0xffff)
 	{
@@ -491,7 +491,7 @@ static READ16_HANDLER( h8_3007_itu_r )
 }
 static WRITE16_HANDLER( h8_3007_itu_w )
 {
-	h83xx_state *h8 = get_safe_token(space->cpu);
+	h83xx_state *h8 = get_safe_token(&space->device());
 
 	if (mem_mask == 0xffff)
 	{
@@ -511,7 +511,7 @@ static WRITE16_HANDLER( h8_3007_itu_w )
 
 static READ16_HANDLER( h8_3007_itu1_r )
 {
-	h83xx_state *h8 = get_safe_token(space->cpu);
+	h83xx_state *h8 = get_safe_token(&space->device());
 
 	if (mem_mask == 0xffff)
 	{
@@ -531,7 +531,7 @@ static READ16_HANDLER( h8_3007_itu1_r )
 }
 static WRITE16_HANDLER( h8_3007_itu1_w )
 {
-	h83xx_state *h8 = get_safe_token(space->cpu);
+	h83xx_state *h8 = get_safe_token(&space->device());
 
 	if (mem_mask == 0xffff)
 	{

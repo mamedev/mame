@@ -196,7 +196,7 @@ static WRITE16_HANDLER( ddragon3_io_w )
 			break;
 
 		default:
-			logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset, (unsigned)data, cpu_get_pc(space->cpu) );
+			logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset, (unsigned)data, cpu_get_pc(&space->device()) );
 			break;
 	}
 }

@@ -209,7 +209,7 @@ static WRITE8_HANDLER( mjsister_banksel1_w )
 		case 0xf: state->vrambank = 1 ; break;
 
 		default:
-			logerror("%04x p30_w:%02x\n", cpu_get_pc(space->cpu), data);
+			logerror("%04x p30_w:%02x\n", cpu_get_pc(&space->device()), data);
 	}
 
 	if (tmp != state->colorbank)
@@ -231,7 +231,7 @@ static WRITE8_HANDLER( mjsister_banksel2_w )
 		case 0xd: state->rombank1 = 1; break;
 
 		default:
-			logerror("%04x p31_w:%02x\n", cpu_get_pc(space->cpu), data);
+			logerror("%04x p31_w:%02x\n", cpu_get_pc(&space->device()), data);
 	}
 
 	memory_set_bank(space->machine(), "bank1", state->rombank0 * 2 + state->rombank1);

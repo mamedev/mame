@@ -235,7 +235,7 @@ WRITE8_HANDLER( galivan_gfxbank_w )
 	/* bit 7 selects one of two ROM banks for c000-dfff */
 	memory_set_bank(space->machine(), "bank1", (data & 0x80) >> 7);
 
-	/*  logerror("Address: %04X - port 40 = %02x\n", cpu_get_pc(space->cpu), data); */
+	/*  logerror("Address: %04X - port 40 = %02x\n", cpu_get_pc(&space->device()), data); */
 }
 
 WRITE8_HANDLER( ninjemak_gfxbank_w )
@@ -257,7 +257,7 @@ WRITE8_HANDLER( ninjemak_gfxbank_w )
 		/* This is a temporary condition specification. */
 		int offs;
 
-		logerror("%04x: write %02x to port 80\n", cpu_get_pc(space->cpu), data);
+		logerror("%04x: write %02x to port 80\n", cpu_get_pc(&space->device()), data);
 
 		for (offs = 0; offs < state->videoram_size; offs++)
 		{

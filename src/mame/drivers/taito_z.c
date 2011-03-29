@@ -919,7 +919,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 	}
 
 	if (state->dblaxle_vibration) output_set_value("Wheel_Vibration", (data & 0x04)>>2);
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(space->cpu), data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space->device()), data);
 }
 
 
@@ -1172,7 +1172,7 @@ static READ16_HANDLER( bshark_stick_r )
 			return input_port_read(space->machine(), "Y_ADJUST");
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", cpu_get_pc(space->cpu), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", cpu_get_pc(&space->device()), offset);
 
 	return 0xff;
 }
@@ -1195,7 +1195,7 @@ static READ16_HANDLER( nightstr_stick_r )
 			return input_port_read(space->machine(), "Y_ADJUST");
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", cpu_get_pc(space->cpu), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", cpu_get_pc(&space->device()), offset);
 
 	return 0xff;
 }
@@ -1208,7 +1208,7 @@ static WRITE16_HANDLER( bshark_stick_w )
        but we don't want CPUA to have an int6 before int4 is over (?)
     */
 
-	space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(10000), FUNC(taitoz_interrupt6));
+	space->machine().scheduler().timer_set(downcast<cpu_device *>(&space->device())->cycles_to_attotime(10000), FUNC(taitoz_interrupt6));
 }
 
 
@@ -1243,7 +1243,7 @@ static READ16_HANDLER( sci_steer_input_r )
 			return (steer & 0xff00) >> 8;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %06x\n", cpu_get_pc(space->cpu), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %06x\n", cpu_get_pc(&space->device()), offset);
 
 	return 0xff;
 }
@@ -1293,7 +1293,7 @@ static WRITE16_HANDLER( spacegun_lightgun_w )
        Four lightgun interrupts happen before the collected coords
        are moved to shared ram where CPUA can use them. */
 
-	space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(10000), FUNC(taitoz_cpub_interrupt5));
+	space->machine().scheduler().timer_set(downcast<cpu_device *>(&space->device())->cycles_to_attotime(10000), FUNC(taitoz_cpub_interrupt5));
 }
 
 static WRITE16_HANDLER( spacegun_gun_output_w )
@@ -1334,7 +1334,7 @@ static READ16_HANDLER( dblaxle_steer_input_r )
 			return steer & 0xff;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %02x\n", cpu_get_pc(space->cpu), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %02x\n", cpu_get_pc(&space->device()), offset);
 
 	return 0x00;
 }
@@ -1351,7 +1351,7 @@ static READ16_HANDLER( chasehq_motor_r )
 			return 0x55;	/* motor cpu status ? */
 
 		default:
-logerror("CPU #0 PC %06x: warning - read motor cpu %03x\n",cpu_get_pc(space->cpu),offset);
+logerror("CPU #0 PC %06x: warning - read motor cpu %03x\n",cpu_get_pc(&space->device()),offset);
 			return 0;
 	}
 }
@@ -1367,7 +1367,7 @@ static WRITE16_HANDLER( chasehq_motor_w )
 	/* outputs will go here, but driver is still broken */
 	break;
 	}
-logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",cpu_get_pc(space->cpu),data,offset);
+logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",cpu_get_pc(&space->device()),data,offset);
 
 }
 

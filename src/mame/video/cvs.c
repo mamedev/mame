@@ -88,7 +88,7 @@ WRITE8_HANDLER( cvs_video_fx_w )
 	cvs_state *state = space->machine().driver_data<cvs_state>();
 
 	if (data & 0xce)
-		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n",cpu_get_pc(space->cpu), data & 0xce);
+		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n",cpu_get_pc(&space->device()), data & 0xce);
 
 	state->stars_on = data & 0x01;
 

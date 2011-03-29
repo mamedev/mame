@@ -158,16 +158,16 @@ static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 		return seed00[state->prot_count] | seedxx;
 
 #if 0
-	if ( cpu_get_pc(space->cpu) == (0x26F2 + 0x03) )
+	if ( cpu_get_pc(&space->device()) == (0x26F2 + 0x03) )
 	{
 		popflame_prot_count = 0;
 		return 0x01;
 	} /* Must not carry when rotated left */
 
-	if ( cpu_get_pc(space->cpu) == (0x26F9 + 0x03) )
+	if ( cpu_get_pc(&space->device()) == (0x26F9 + 0x03) )
 		return 0x80; /* Must carry when rotated left */
 
-	if ( cpu_get_pc(space->cpu) == (0x270F + 0x03) )
+	if ( cpu_get_pc(&space->device()) == (0x270F + 0x03) )
 	{
 		switch( popflame_prot_count++ )
 		{
@@ -177,7 +177,7 @@ static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 			case 3: return 0x38; /* x011 1xxx, matches 0x07 at $2693, stored in $400D */
 		}
 	}
-	logerror("CPU #0 PC %06x: unmapped protection read\n", cpu_get_pc(space->cpu));
+	logerror("CPU #0 PC %06x: unmapped protection read\n", cpu_get_pc(&space->device()));
 	return 0x00;
 #endif
 }

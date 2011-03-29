@@ -124,7 +124,7 @@ static WRITE16_HANDLER( seta2_sound_bank_w )
 		int banks = (space->machine().region( "x1snd" )->bytes() - 0x100000) / 0x20000;
 		if (data >= banks)
 		{
-			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",cpu_get_pc(space->cpu),data);
+			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",cpu_get_pc(&space->device()),data);
 			data %= banks;
 		}
 		memcpy(ROM + offset * 0x20000, ROM + 0x100000 + data * 0x20000, 0x20000);
@@ -649,7 +649,7 @@ static READ8_HANDLER( funcube_coins_r )
 
 	if ( state->funcube_coin_start_cycles )
 	{
-		UINT64 elapsed = downcast<cpu_device *>(space->cpu)->total_cycles() - state->funcube_coin_start_cycles;
+		UINT64 elapsed = downcast<cpu_device *>(&space->device())->total_cycles() - state->funcube_coin_start_cycles;
 
 		if ( elapsed < coin_total_cycles/2 )
 			coin_bit0 = 0;
@@ -661,7 +661,7 @@ static READ8_HANDLER( funcube_coins_r )
 	else
 	{
 		if (!(ret & 1))
-			state->funcube_coin_start_cycles = downcast<cpu_device *>(space->cpu)->total_cycles();
+			state->funcube_coin_start_cycles = downcast<cpu_device *>(&space->device())->total_cycles();
 	}
 
 	return (ret & ~7) | (hopper_bit << 2) | (coin_bit1 << 1) | coin_bit0;

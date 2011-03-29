@@ -1671,7 +1671,7 @@ READ16_HANDLER( copdxbl_0_r )
 	{
 		default:
 		{
-			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", cpu_get_pc(space->cpu), retvalue, offset*2);
+			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", cpu_get_pc(&space->device()), retvalue, offset*2);
 			return retvalue;
 		}
 
@@ -1697,7 +1697,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 	{
 		default:
 		{
-			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", cpu_get_pc(space->cpu), data, offset*2);
+			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", cpu_get_pc(&space->device()), data, offset*2);
 			break;
 		}
 
@@ -1897,7 +1897,7 @@ static READ16_HANDLER( generic_cop_r )
 			return cop_angle;
 
 		default:
-			seibu_cop_log("%06x: COPX unhandled read returning %04x from offset %04x\n", cpu_get_pc(space->cpu), retvalue, offset*2);
+			seibu_cop_log("%06x: COPX unhandled read returning %04x from offset %04x\n", cpu_get_pc(&space->device()), retvalue, offset*2);
 			return retvalue;
 	}
 }
@@ -1915,7 +1915,7 @@ static WRITE16_HANDLER( generic_cop_w )
 	switch (offset)
 	{
 		default:
-			seibu_cop_log("%06x: COPX unhandled write data %04x at offset %04x\n", cpu_get_pc(space->cpu), data, offset*2);
+			seibu_cop_log("%06x: COPX unhandled write data %04x at offset %04x\n", cpu_get_pc(&space->device()), data, offset*2);
 			break;
 
 		/* Sprite DMA */
@@ -2003,28 +2003,28 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x078/2): /* DMA source address */
 		{
 			cop_dma_src[cop_dma_trigger] = data; // << 6 to get actual address
-			//seibu_cop_log("%06x: COPX set layer clear address to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
+			//seibu_cop_log("%06x: COPX set layer clear address to %04x (actual %08x)\n", cpu_get_pc(&space->device()), data, data<<6);
 			break;
 		}
 
 		case (0x07a/2): /* DMA length */
 		{
 			cop_dma_size[cop_dma_trigger] = data;
-			//seibu_cop_log("%06x: COPX set layer clear length to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<5);
+			//seibu_cop_log("%06x: COPX set layer clear length to %04x (actual %08x)\n", cpu_get_pc(&space->device()), data, data<<5);
 			break;
 		}
 
 		case (0x07c/2): /* DMA destination */
 		{
 			cop_dma_dst[cop_dma_trigger] = data;
-			//seibu_cop_log("%06x: COPX set layer clear value to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
+			//seibu_cop_log("%06x: COPX set layer clear value to %04x (actual %08x)\n", cpu_get_pc(&space->device()), data, data<<6);
 			break;
 		}
 
 		case (0x07e/2): /* DMA parameter */
 		{
 			cop_dma_trigger = data;
-			//seibu_cop_log("%06x: COPX set layer clear trigger? to %04x\n", cpu_get_pc(space->cpu), data);
+			//seibu_cop_log("%06x: COPX set layer clear trigger? to %04x\n", cpu_get_pc(&space->device()), data);
 			if (data>=0x1ff)
 			{
 				seibu_cop_log("invalid DMA trigger!, >0x1ff\n");
@@ -2077,7 +2077,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			int command;
 
 			#if LOG_CMDS
-			seibu_cop_log("%06x: COPX execute table macro command %04x %04x | regs %08x %08x %08x %08x %08x\n", cpu_get_pc(space->cpu), data, cop_mcu_ram[offset], cop_register[0], cop_register[1], cop_register[2], cop_register[3], cop_register[4]);
+			seibu_cop_log("%06x: COPX execute table macro command %04x %04x | regs %08x %08x %08x %08x %08x\n", cpu_get_pc(&space->device()), data, cop_mcu_ram[offset], cop_register[0], cop_register[1], cop_register[2], cop_register[3], cop_register[4]);
 			#endif
 
 			command = -1;
@@ -2505,7 +2505,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		/* DMA go register */
 		case (0x2fc/2):
 		{
-			//seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", cpu_get_pc(space->cpu), data);
+			//seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", cpu_get_pc(&space->device()), data);
 
 			if (cop_dma_trigger >= 0x80 && cop_dma_trigger <= 0x87)
 			{

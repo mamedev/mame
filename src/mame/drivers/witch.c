@@ -386,7 +386,7 @@ static WRITE8_HANDLER(write_a00x)
 		break;
 
 		case 0x08: //A008
-			device_set_input_line(space->cpu,0,CLEAR_LINE);
+			device_set_input_line(&space->device(),0,CLEAR_LINE);
 		break;
 	}
 }
@@ -403,7 +403,7 @@ static READ8_HANDLER(prot_read_700x)
     Otherwise later in game some I/O (controls) reads are skipped.
 */
 
-  switch(cpu_get_pc(space->cpu))
+  switch(cpu_get_pc(&space->device()))
   {
 	case 0x23f:
 	case 0x246:

@@ -414,7 +414,7 @@ WRITE16_HANDLER( opwolf_cchip_data_w )
 	state->cchip_ram[(state->current_bank * 0x400) + offset] = data & 0xff;
 
 //  if (offset != 0x64 && offset != 0x65 && offset != 0x66 && offset != 0x67 && offset != 0x68 && offset != 0x69)
-//      logerror("%08x:  opwolf c write %04x %04x\n", cpu_get_pc(space->cpu), offset, data);
+//      logerror("%08x:  opwolf c write %04x %04x\n", cpu_get_pc(&space->device()), offset, data);
 
 	if (state->current_bank == 0)
 	{
@@ -516,8 +516,8 @@ READ16_HANDLER( opwolf_cchip_data_r )
 {
 	opwolf_state *state = space->machine().driver_data<opwolf_state>();
 
-//  if (offset!=0x7f && offset!=0x1c && offset!=0x1d && offset!=0x1e && offset!=0x1f && offset!=0x20 && cpu_get_pc(space->cpu)!=0xc18 && cpu_get_pc(space->cpu)!=0xc2e && cpu_get_pc(space->cpu)!=0xc9e && offset!=0x50 && offset!=0x51 && offset!=0x52 && offset!=0x53 && offset!=0x5 && offset!=0x13 && offset!=0x79 && offset!=0x12 && offset!=0x34)
-//      logerror("%08x:  opwolf c read %04x (bank %04x)\n", cpu_get_pc(space->cpu), offset, state->current_bank);
+//  if (offset!=0x7f && offset!=0x1c && offset!=0x1d && offset!=0x1e && offset!=0x1f && offset!=0x20 && cpu_get_pc(&space->device())!=0xc18 && cpu_get_pc(&space->device())!=0xc2e && cpu_get_pc(&space->device())!=0xc9e && offset!=0x50 && offset!=0x51 && offset!=0x52 && offset!=0x53 && offset!=0x5 && offset!=0x13 && offset!=0x79 && offset!=0x12 && offset!=0x34)
+//      logerror("%08x:  opwolf c read %04x (bank %04x)\n", cpu_get_pc(&space->device()), offset, state->current_bank);
 
 	return state->cchip_ram[(state->current_bank * 0x400) + offset];
 }

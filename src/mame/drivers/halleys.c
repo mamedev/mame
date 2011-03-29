@@ -1002,7 +1002,7 @@ static WRITE8_HANDLER( bgtile_w )
 static READ8_HANDLER( blitter_status_r )
 {
 	halleys_state *state = space->machine().driver_data<halleys_state>();
-	if (state->game_id==GAME_HALLEYS && cpu_get_pc(space->cpu)==0x8017) return(0x55); // HACK: trick SRAM test on startup
+	if (state->game_id==GAME_HALLEYS && cpu_get_pc(&space->device())==0x8017) return(0x55); // HACK: trick SRAM test on startup
 
 	return(0);
 }
@@ -1045,7 +1045,7 @@ static WRITE8_HANDLER( blitter_w )
 		else
 		{
 			state->blitter_busy = 1;
-			state->blitter_reset_timer->adjust(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(100)); // free blitter if no updates in 100 cycles
+			state->blitter_reset_timer->adjust(downcast<cpu_device *>(&space->device())->cycles_to_attotime(100)); // free blitter if no updates in 100 cycles
 		}
 	}
 }
@@ -1076,7 +1076,7 @@ static READ8_HANDLER( collision_id_r )
     UPDATE: re-implemented pixel collision to accompany the hack method.
 */
 
-	if (state->game_id==GAME_HALLEYS && cpu_get_pc(space->cpu)==state->collision_detection) // HACK: collision detection bypass
+	if (state->game_id==GAME_HALLEYS && cpu_get_pc(&space->device())==state->collision_detection) // HACK: collision detection bypass
 	{
 		if (state->collision_count) { state->collision_count--; return(state->collision_list[state->collision_count]); }
 

@@ -503,7 +503,7 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 
 WRITE32_HANDLER( sh2_internal_w )
 {
-	sh2_state *sh2 = GET_SH2(space->cpu);
+	sh2_state *sh2 = GET_SH2(&space->device());
 	UINT32 old;
 
 #ifdef USE_SH2DRC
@@ -517,7 +517,7 @@ WRITE32_HANDLER( sh2_internal_w )
 	//      logerror("sh2_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfffffe00+offset*4, offset, data, mem_mask);
 
 //    if(offset != 0x20)
-//        printf("sh2_internal_w:  Write %08x (%x), %08x @ %08x (PC %x)\n", 0xfffffe00+offset*4, offset, data, mem_mask, cpu_get_pc(space->cpu));
+//        printf("sh2_internal_w:  Write %08x (%x), %08x @ %08x (PC %x)\n", 0xfffffe00+offset*4, offset, data, mem_mask, cpu_get_pc(&space->device()));
 
 	switch( offset )
 	{
@@ -681,7 +681,7 @@ WRITE32_HANDLER( sh2_internal_w )
 
 READ32_HANDLER( sh2_internal_r )
 {
-	sh2_state *sh2 = GET_SH2(space->cpu);
+	sh2_state *sh2 = GET_SH2(&space->device());
 
 #ifdef USE_SH2DRC
 	offset &= 0x7f;

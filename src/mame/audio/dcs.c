@@ -1445,7 +1445,7 @@ static WRITE16_HANDLER( denver_w )
 WRITE32_HANDLER( dsio_idma_addr_w )
 {
 	if (LOG_DCS_TRANSFERS)
-		logerror("%08X:IDMA_addr = %04X\n", cpu_get_pc(space->cpu), data);
+		logerror("%08X:IDMA_addr = %04X\n", cpu_get_pc(&space->device()), data);
 	downcast<adsp2181_device *>(dcs.cpu)->idma_addr_w(data);
 	if (data == 0)
 		dsio.start_on_next_write = 2;
@@ -1454,7 +1454,7 @@ WRITE32_HANDLER( dsio_idma_addr_w )
 
 WRITE32_HANDLER( dsio_idma_data_w )
 {
-	UINT32 pc = cpu_get_pc(space->cpu);
+	UINT32 pc = cpu_get_pc(&space->device());
 	if (ACCESSING_BITS_0_15)
 	{
 		if (LOG_DCS_TRANSFERS)
@@ -1480,7 +1480,7 @@ READ32_HANDLER( dsio_idma_data_r )
 	UINT32 result;
 	result = downcast<adsp2181_device *>(dcs.cpu)->idma_data_r();
 	if (LOG_DCS_TRANSFERS)
-		logerror("%08X:IDMA_data_r(%04X) = %04X\n", cpu_get_pc(space->cpu), downcast<adsp2181_device *>(dcs.cpu)->idma_addr_r(), result);
+		logerror("%08X:IDMA_data_r(%04X) = %04X\n", cpu_get_pc(&space->device()), downcast<adsp2181_device *>(dcs.cpu)->idma_addr_r(), result);
 	return result;
 }
 
@@ -1615,7 +1615,7 @@ static READ16_HANDLER( input_latch_r )
 	if (dcs.auto_ack)
 		input_latch_ack_w(space,0,0,0xffff);
 	if (LOG_DCS_IO)
-		logerror("%08X:input_latch_r(%04X)\n", cpu_get_pc(space->cpu), dcs.input_data);
+		logerror("%08X:input_latch_r(%04X)\n", cpu_get_pc(&space->device()), dcs.input_data);
 	return dcs.input_data;
 }
 
@@ -1637,7 +1637,7 @@ static TIMER_CALLBACK( latch_delayed_w )
 static WRITE16_HANDLER( output_latch_w )
 {
 	if (LOG_DCS_IO)
-		logerror("%08X:output_latch_w(%04X) (empty=%d)\n", cpu_get_pc(space->cpu), data, IS_OUTPUT_EMPTY());
+		logerror("%08X:output_latch_w(%04X) (empty=%d)\n", cpu_get_pc(&space->device()), data, IS_OUTPUT_EMPTY());
 	space->machine().scheduler().synchronize(FUNC(latch_delayed_w), data);
 }
 
@@ -1691,7 +1691,7 @@ static TIMER_CALLBACK( output_control_delayed_w )
 static WRITE16_HANDLER( output_control_w )
 {
 	if (LOG_DCS_IO)
-		logerror("%04X:output_control = %04X\n", cpu_get_pc(space->cpu), data);
+		logerror("%04X:output_control = %04X\n", cpu_get_pc(&space->device()), data);
 	space->machine().scheduler().synchronize(FUNC(output_control_delayed_w), data);
 }
 
@@ -1877,7 +1877,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			/* bit 9 forces a reset */
 			if (data & 0x0200)
 			{
-				logerror("%04X:Rebooting DCS due to SYSCONTROL write\n", cpu_get_pc(space->cpu));
+				logerror("%04X:Rebooting DCS due to SYSCONTROL write\n", cpu_get_pc(&space->device()));
 				device_set_input_line(dcs.cpu, INPUT_LINE_RESET, PULSE_LINE);
 				dcs_boot();
 				dcs.control_regs[SYSCONTROL_REG] = 0;
@@ -2073,7 +2073,7 @@ static void sound_tx_callback(adsp21xx_device &device, int port, INT32 data)
 static READ16_HANDLER( dcs_polling_r )
 {
 	if (dcs.polling_count++ > 5)
-		device_eat_cycles(space->cpu, 10000);
+		device_eat_cycles(&space->device(), 10000);
 	return *dcs_polling_base;
 }
 

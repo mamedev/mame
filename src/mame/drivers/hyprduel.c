@@ -122,7 +122,7 @@ static WRITE16_HANDLER( hyprduel_subcpu_control_w )
 				device_set_input_line(state->subcpu, INPUT_LINE_RESET, CLEAR_LINE);
 				state->subcpu_resetline = 0;
 			}
-			device_spin_until_interrupt(space->cpu);
+			device_spin_until_interrupt(&space->device());
 			break;
 
 		case 0x0c:
@@ -154,7 +154,7 @@ static WRITE16_HANDLER( hyprduel_cpusync_trigger1_w )
 	{
 		if (!state->cpu_trigger && !state->subcpu_resetline)
 		{
-			device_spin_until_trigger(space->cpu, 1001);
+			device_spin_until_trigger(&space->device(), 1001);
 			state->cpu_trigger = 1001;
 		}
 	}
@@ -182,7 +182,7 @@ static WRITE16_HANDLER( hyprduel_cpusync_trigger2_w )
 	{
 		if (!state->cpu_trigger && !state->subcpu_resetline)
 		{
-			device_spin_until_trigger(space->cpu, 1002);
+			device_spin_until_trigger(&space->device(), 1002);
 			state->cpu_trigger = 1002;
 		}
 	}
@@ -306,7 +306,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 		int shift = (dst_offs & 0x80) ? 0 : 8;
 		UINT16 mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
 
-//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", cpu_get_pc(space->cpu), tmap, src_offs, dst_offs);
+//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", cpu_get_pc(&space->device()), tmap, src_offs, dst_offs);
 
 		dst_offs >>= 7 + 1;
 		switch (tmap)
@@ -316,7 +316,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 			case 3:
 				break;
 			default:
-				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n", cpu_get_pc(space->cpu), tmap);
+				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n", cpu_get_pc(&space->device()), tmap);
 				return;
 		}
 
@@ -326,7 +326,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 
 			src_offs %= src_len;
 			b1 = blt_read(src, src_offs);
-//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n", cpu_get_pc(space->cpu), b1, src_offs);
+//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n", cpu_get_pc(&space->device()), b1, src_offs);
 			src_offs++;
 
 			count = ((~b1) & 0x3f) + 1;
@@ -410,7 +410,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 
 
 				default:
-					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n", cpu_get_pc(space->cpu), b1, src_offs - 1);
+					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n", cpu_get_pc(&space->device()), b1, src_offs - 1);
 					return;
 			}
 

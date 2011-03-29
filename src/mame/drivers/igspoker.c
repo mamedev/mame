@@ -220,7 +220,7 @@ static WRITE8_HANDLER( igs_nmi_and_coins_w )
 
 	state->nmi_enable = data & 0x80;     // nmi enable?
 #ifdef VERBOSE
-	logerror("PC %06X: NMI change %02x\n",cpu_get_pc(space->cpu),state->nmi_enable);
+	logerror("PC %06X: NMI change %02x\n",cpu_get_pc(&space->device()),state->nmi_enable);
 #endif
 
 	state->out[0] = data;
@@ -260,7 +260,7 @@ static READ8_HANDLER( custom_io_r )
 {
 	igspoker_state *state = space->machine().driver_data<igspoker_state>();
 #ifdef VERBOSE
-	logerror("PC %06X: Protection read %02x\n",cpu_get_pc(space->cpu), (int) state->protection_res);
+	logerror("PC %06X: Protection read %02x\n",cpu_get_pc(&space->device()), (int) state->protection_res);
 #endif
 	return state->protection_res;
 }
@@ -269,7 +269,7 @@ static WRITE8_HANDLER( custom_io_w )
 {
 	igspoker_state *state = space->machine().driver_data<igspoker_state>();
 #ifdef VERBOSE
-	logerror("PC %06X: Protection write %02x\n",cpu_get_pc(space->cpu),data);
+	logerror("PC %06X: Protection write %02x\n",cpu_get_pc(&space->device()),data);
 #endif
 
 	switch (data)

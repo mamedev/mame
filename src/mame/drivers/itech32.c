@@ -364,7 +364,7 @@ Notes:
 
 
 
-#define START_TMS_SPINNING(n)			do { device_spin_until_trigger(space->cpu, 7351 + n); space->machine().driver_data<itech32_state>()->tms_spinning[n] = 1; } while (0)
+#define START_TMS_SPINNING(n)			do { device_spin_until_trigger(&space->device(), 7351 + n); space->machine().driver_data<itech32_state>()->tms_spinning[n] = 1; } while (0)
 #define STOP_TMS_SPINNING(machine, n)	do { (machine).scheduler().trigger(7351 + n); (machine).driver_data<itech32_state>()->tms_spinning[n] = 0; } while (0)
 
 
@@ -850,7 +850,7 @@ static WRITE32_HANDLER( tms2_trigger_w )
 static READ32_HANDLER( drivedge_tms1_speedup_r )
 {
 	itech32_state *state = space->machine().driver_data<itech32_state>();
-	if (state->tms1_ram[0x382] == 0 && cpu_get_pc(space->cpu) == 0xee) START_TMS_SPINNING(0);
+	if (state->tms1_ram[0x382] == 0 && cpu_get_pc(&space->device()) == 0xee) START_TMS_SPINNING(0);
 	return state->tms1_ram[0x382];
 }
 
@@ -858,7 +858,7 @@ static READ32_HANDLER( drivedge_tms1_speedup_r )
 static READ32_HANDLER( drivedge_tms2_speedup_r )
 {
 	itech32_state *state = space->machine().driver_data<itech32_state>();
-	if (state->tms2_ram[0x382] == 0 && cpu_get_pc(space->cpu) == 0x809808) START_TMS_SPINNING(1);
+	if (state->tms2_ram[0x382] == 0 && cpu_get_pc(&space->device()) == 0x809808) START_TMS_SPINNING(1);
 	return state->tms2_ram[0x382];
 }
 
@@ -958,10 +958,10 @@ ADDRESS_MAP_END
 static READ32_HANDLER( test1_r )
 {
 	itech32_state *state = space->machine().driver_data<itech32_state>();
-	if (ACCESSING_BITS_24_31 && !state->written[0x100 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(space->cpu), 0x100 + offset*4+0);
-	if (ACCESSING_BITS_16_23 && !state->written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(space->cpu), 0x100 + offset*4+1);
-	if (ACCESSING_BITS_8_15 && !state->written[0x100 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(space->cpu), 0x100 + offset*4+2);
-	if (ACCESSING_BITS_0_7 && !state->written[0x100 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(space->cpu), 0x100 + offset*4+3);
+	if (ACCESSING_BITS_24_31 && !state->written[0x100 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0x100 + offset*4+0);
+	if (ACCESSING_BITS_16_23 && !state->written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0x100 + offset*4+1);
+	if (ACCESSING_BITS_8_15 && !state->written[0x100 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0x100 + offset*4+2);
+	if (ACCESSING_BITS_0_7 && !state->written[0x100 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0x100 + offset*4+3);
 	return ((UINT32 *)state->main_ram)[0x100/4 + offset];
 }
 
@@ -978,10 +978,10 @@ static WRITE32_HANDLER( test1_w )
 static READ32_HANDLER( test2_r )
 {
 	itech32_state *state = space->machine().driver_data<itech32_state>();
-	if (ACCESSING_BITS_24_31 && !state->written[0xc00 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(space->cpu), 0xc00 + offset*4+0);
-	if (ACCESSING_BITS_16_23 && !state->written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(space->cpu), 0xc00 + offset*4+1);
-	if (ACCESSING_BITS_8_15 && !state->written[0xc00 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(space->cpu), 0xc00 + offset*4+2);
-	if (ACCESSING_BITS_0_7 && !state->written[0xc00 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(space->cpu), 0xc00 + offset*4+3);
+	if (ACCESSING_BITS_24_31 && !state->written[0xc00 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0xc00 + offset*4+0);
+	if (ACCESSING_BITS_16_23 && !state->written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0xc00 + offset*4+1);
+	if (ACCESSING_BITS_8_15 && !state->written[0xc00 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0xc00 + offset*4+2);
+	if (ACCESSING_BITS_0_7 && !state->written[0xc00 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0xc00 + offset*4+3);
 	return ((UINT32 *)state->main_ram)[0xc00/4 + offset];
 }
 

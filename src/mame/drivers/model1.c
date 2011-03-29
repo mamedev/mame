@@ -785,7 +785,7 @@ static WRITE16_HANDLER(md1_w)
 	if(0 && offset)
 		return;
 	if(1 && state->dump)
-		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
+		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(&space->device()));
 }
 
 static WRITE16_HANDLER(md0_w)
@@ -795,7 +795,7 @@ static WRITE16_HANDLER(md0_w)
 	if(0 && offset)
 		return;
 	if(1 && state->dump)
-		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
+		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(&space->device()));
 }
 
 static WRITE16_HANDLER(p_w)
@@ -803,7 +803,7 @@ static WRITE16_HANDLER(p_w)
 	UINT16 old = space->machine().generic.paletteram.u16[offset];
 	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
 	if(0 && space->machine().generic.paletteram.u16[offset] != old)
-		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
+		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(&space->device()));
 }
 
 static WRITE16_HANDLER(mr_w)
@@ -811,7 +811,7 @@ static WRITE16_HANDLER(mr_w)
 	model1_state *state = space->machine().driver_data<model1_state>();
 	COMBINE_DATA(state->mr+offset);
 	if(0 && offset == 0x1138/2)
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, cpu_get_pc(space->cpu));
+		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, cpu_get_pc(&space->device()));
 }
 
 static WRITE16_HANDLER(mr2_w)
@@ -820,23 +820,23 @@ static WRITE16_HANDLER(mr2_w)
 	COMBINE_DATA(state->mr2+offset);
 #if 0
 	if(0 && offset == 0x6e8/2) {
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, cpu_get_pc(space->cpu));
+		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, cpu_get_pc(&space->device()));
 	}
 	if(offset/2 == 0x3680/4)
-		logerror("MW f80[r25], %04x%04x (%x)\n", state->mr2[0x3680/2+1], state->mr2[0x3680/2], cpu_get_pc(space->cpu));
+		logerror("MW f80[r25], %04x%04x (%x)\n", state->mr2[0x3680/2+1], state->mr2[0x3680/2], cpu_get_pc(&space->device()));
 	if(offset/2 == 0x06ca/4)
-		logerror("MW fca[r19], %04x%04x (%x)\n", state->mr2[0x06ca/2+1], state->mr2[0x06ca/2], cpu_get_pc(space->cpu));
+		logerror("MW fca[r19], %04x%04x (%x)\n", state->mr2[0x06ca/2+1], state->mr2[0x06ca/2], cpu_get_pc(&space->device()));
 	if(offset/2 == 0x1eca/4)
-		logerror("MW fca[r22], %04x%04x (%x)\n", state->mr2[0x1eca/2+1], state->mr2[0x1eca/2], cpu_get_pc(space->cpu));
+		logerror("MW fca[r22], %04x%04x (%x)\n", state->mr2[0x1eca/2+1], state->mr2[0x1eca/2], cpu_get_pc(&space->device()));
 #endif
 
 	// wingwar scene position, pc=e1ce -> d735
 	if(offset/2 == 0x1f08/4)
-		logerror("MW  8[r10], %f (%x)\n", *(float *)(state->mr2+0x1f08/2), cpu_get_pc(space->cpu));
+		logerror("MW  8[r10], %f (%x)\n", *(float *)(state->mr2+0x1f08/2), cpu_get_pc(&space->device()));
 	if(offset/2 == 0x1f0c/4)
-		logerror("MW  c[r10], %f (%x)\n", *(float *)(state->mr2+0x1f0c/2), cpu_get_pc(space->cpu));
+		logerror("MW  c[r10], %f (%x)\n", *(float *)(state->mr2+0x1f0c/2), cpu_get_pc(&space->device()));
 	if(offset/2 == 0x1f10/4)
-		logerror("MW 10[r10], %f (%x)\n", *(float *)(state->mr2+0x1f10/2), cpu_get_pc(space->cpu));
+		logerror("MW 10[r10], %f (%x)\n", *(float *)(state->mr2+0x1f10/2), cpu_get_pc(&space->device()));
 }
 
 static READ16_HANDLER( snd_68k_ready_r )
@@ -845,7 +845,7 @@ static READ16_HANDLER( snd_68k_ready_r )
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		device_spin_until_time(space->cpu, attotime::from_usec(40));
+		device_spin_until_time(&space->device(), attotime::from_usec(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
@@ -862,7 +862,7 @@ static WRITE16_HANDLER( snd_latch_to_68k_w )
 	// signal the 68000 that there's data waiting
 	cputag_set_input_line(space->machine(), "audiocpu", 2, HOLD_LINE);
 	// give the 68k time to reply
-	device_spin_until_time(space->cpu, attotime::from_usec(40));
+	device_spin_until_time(&space->device(), attotime::from_usec(40));
 }
 
 static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16 )

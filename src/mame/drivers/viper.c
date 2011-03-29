@@ -126,7 +126,7 @@ static READ32_HANDLER( epic_r )
 	reg = offset * 4;
 
 	#ifdef VIPER_DEBUG_LOG
-	printf("EPIC: read %08X, %08X at %08X\n", reg, mem_mask, cpu_get_pc(space->cpu));
+	printf("EPIC: read %08X, %08X at %08X\n", reg, mem_mask, cpu_get_pc(&space->device()));
 	#endif
 
 	switch (reg >> 16)
@@ -154,7 +154,7 @@ static WRITE32_HANDLER( epic_w )
 	reg = offset * 4;
 
 	#ifdef VIPER_DEBUG_LOG
-	printf("EPIC: write %08X, %08X, %08X at %08X\n", data, reg, mem_mask, cpu_get_pc(space->cpu));
+	printf("EPIC: write %08X, %08X, %08X at %08X\n", data, reg, mem_mask, cpu_get_pc(&space->device()));
 	#endif
 
 	switch (reg >> 16)
@@ -563,7 +563,7 @@ static READ64_HANDLER(voodoo3_io_r)
 }
 static WRITE64_HANDLER(voodoo3_io_w)
 {
-//  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(space->cpu));
+//  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(&space->device()));
 	write64be_with_32le_handler(banshee_io_0_w, space->machine(), offset, data, mem_mask);
 }
 
@@ -573,7 +573,7 @@ static READ64_HANDLER(voodoo3_r)
 }
 static WRITE64_HANDLER(voodoo3_w)
 {
-//  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(space->cpu));
+//  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(&space->device()));
 	write64be_with_32le_handler(banshee_0_w, space->machine(),  offset, data, mem_mask);
 }
 
@@ -583,7 +583,7 @@ static READ64_HANDLER(voodoo3_lfb_r)
 }
 static WRITE64_HANDLER(voodoo3_lfb_w)
 {
-//  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(space->cpu));
+//  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(&space->device()));
 	write64be_with_32le_handler(banshee_fb_0_w, space->machine(), offset, data, mem_mask);
 }
 #endif

@@ -146,7 +146,7 @@ popmessage(t);
 				coin_counter_w(space->machine(), 1, data & 0x04000000);
 				state->coin_word = (data >> 16) &0xffff;
 			}
-//logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(space->cpu),offset);
+//logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(&space->device()),offset);
 		}
 	}
 }
@@ -165,7 +165,7 @@ static READ32_HANDLER( galastrm_adstick_ctrl_r )
 
 static WRITE32_HANDLER( galastrm_adstick_ctrl_w )
 {
-	space->machine().scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(1000), FUNC(galastrm_interrupt6));
+	space->machine().scheduler().timer_set(downcast<cpu_device *>(&space->device())->cycles_to_attotime(1000), FUNC(galastrm_interrupt6));
 }
 
 /***********************************************************

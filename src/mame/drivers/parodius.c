@@ -81,7 +81,7 @@ static WRITE8_HANDLER( parodius_videobank_w )
 	parodius_state *state = space->machine().driver_data<parodius_state>();
 
 	if (state->videobank & 0xf8)
-		logerror("%04x: videobank = %02x\n",cpu_get_pc(space->cpu),data);
+		logerror("%04x: videobank = %02x\n",cpu_get_pc(&space->device()),data);
 
 	/* bit 0 = select palette or work RAM at 0000-07ff */
 	/* bit 1 = select 052109 or 053245 at 2000-27ff */
@@ -94,7 +94,7 @@ static WRITE8_HANDLER( parodius_3fc0_w )
 	parodius_state *state = space->machine().driver_data<parodius_state>();
 
 	if ((data & 0xf4) != 0x10)
-		logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(space->cpu),data);
+		logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(&space->device()),data);
 
 	/* bit 0/1 = coin counters */
 	coin_counter_w(space->machine(), 0, data & 0x01);

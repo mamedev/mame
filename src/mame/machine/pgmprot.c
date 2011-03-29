@@ -265,7 +265,7 @@ WRITE16_HANDLER( pstars_w )
 
 		default:
 			state->pstars_val = 0x890000;
-			logerror("PSTARS PC(%06x) UNKNOWN %4X %4X\n", cpu_get_pc(space->cpu), state->pstars_int[1], state->pstars_int[0]);
+			logerror("PSTARS PC(%06x) UNKNOWN %4X %4X\n", cpu_get_pc(&space->device()), state->pstars_int[1], state->pstars_int[0]);
 
 		}
 
@@ -460,7 +460,7 @@ READ16_HANDLER( asic28_r )
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 	UINT32 val = (state->asic28_regs[1] << 16) | (state->asic28_regs[0]);
 
-	//logerror("Asic28 Read PC = %06x Command = %02x ??\n", cpu_get_pc(space->cpu), state->asic28_regs[1]);
+	//logerror("Asic28 Read PC = %06x Command = %02x ??\n", cpu_get_pc(&space->device()), state->asic28_regs[1]);
 
 	switch (state->asic28_regs[1] & 0xff)
 	{

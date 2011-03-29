@@ -416,18 +416,18 @@ static READ32_HANDLER( bballoon_speedup_r )
 	UINT32 ret = s3c2410_lcd_r(s3c2410, offset+0x10/4, mem_mask);
 
 
-	int pc = cpu_get_pc(space->cpu);
+	int pc = cpu_get_pc(&space->device());
 
 	// these are vblank waits
 	if (pc == 0x3001c0e4 || pc == 0x3001c0d8)
 	{
 		// BnB Arcade
-		device_spin_until_time(space->cpu, attotime::from_usec(20));
+		device_spin_until_time(&space->device(), attotime::from_usec(20));
 	}
 	else if (pc == 0x3002b580 || pc == 0x3002b550)
 	{
 		// Happy Tour
-		device_spin_until_time(space->cpu, attotime::from_usec(20));
+		device_spin_until_time(&space->device(), attotime::from_usec(20));
 	}
 	//else
 	//  printf("speedup %08x %08x\n", pc, ret);

@@ -750,9 +750,9 @@ static READ16_HANDLER( c76_speedup_r )
 {
 	namcos11_state *state = space->machine().driver_data<namcos11_state>();
 
-	if ((cpu_get_pc(space->cpu) == 0xc153) && (!(state->su_83 & 0xff00)))
+	if ((cpu_get_pc(&space->device()) == 0xc153) && (!(state->su_83 & 0xff00)))
 	{
-		device_spin_until_interrupt(space->cpu);
+		device_spin_until_interrupt(&space->device());
 	}
 
 	return state->su_83;
@@ -767,7 +767,7 @@ static WRITE16_HANDLER( c76_speedup_w )
 
 static READ16_HANDLER( c76_inputs_r )
 {
-//  logerror("'c76' Read port %d @ %06X\n", offset, cpu_get_pc(space->cpu));
+//  logerror("'c76' Read port %d @ %06X\n", offset, cpu_get_pc(&space->device()));
 
 	switch (offset)
 	{

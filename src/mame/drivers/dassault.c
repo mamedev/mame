@@ -831,8 +831,8 @@ static READ16_HANDLER( dassault_main_skip )
 	dassault_state *state = space->machine().driver_data<dassault_state>();
 	int ret = state->ram[0];
 
-	if (cpu_get_previouspc(space->cpu) == 0x1170 && ret & 0x8000)
-		device_spin_until_interrupt(space->cpu);
+	if (cpu_get_previouspc(&space->device()) == 0x1170 && ret & 0x8000)
+		device_spin_until_interrupt(&space->device());
 
 	return ret;
 }
@@ -842,8 +842,8 @@ static READ16_HANDLER( thndzone_main_skip )
 	dassault_state *state = space->machine().driver_data<dassault_state>();
 	int ret = state->ram[0];
 
-	if (cpu_get_pc(space->cpu) == 0x114c && ret & 0x8000)
-		device_spin_until_interrupt(space->cpu);
+	if (cpu_get_pc(&space->device()) == 0x114c && ret & 0x8000)
+		device_spin_until_interrupt(&space->device());
 
 	return ret;
 }
