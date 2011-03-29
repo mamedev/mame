@@ -234,6 +234,7 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/hd61830.o		\
 	$(EMUVIDEO)/hd63484.o		\
 	$(EMUVIDEO)/mc6845.o		\
+	$(EMUVIDEO)/msm6255.o		\
 	$(EMUVIDEO)/pc_vga.o		\
 	$(EMUVIDEO)/pc_video.o		\
 	$(EMUVIDEO)/poly.o			\
