@@ -441,15 +441,20 @@ hash_collection &hash_collection::operator=(const hash_collection &src)
 bool hash_collection::operator==(const hash_collection &rhs) const
 {
 	// look for a mismatch in any hash; do not fail if one is missing
+	int matches = 0;
 	for (hash_base *hash = m_hashlist.first(); hash != NULL; hash = hash->next())
 	{
 		hash_base *rhs_hash = rhs.hash(hash->id());
-		if (hash != NULL && rhs_hash != NULL && *hash != *rhs_hash)
-			return false;
+		if (hash != NULL)
+		{
+			if (rhs_hash != NULL && *hash != *rhs_hash)
+				return false;
+			matches++;
+		}
 	}
 
 	// if all shared hashes match, return true
-	return true;
+	return (matches > 0);
 }
 
 
