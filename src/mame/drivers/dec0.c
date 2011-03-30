@@ -38,8 +38,15 @@ Original Service Manuals and Service Mode (when available).
 
 
 ToDo:
-  Hook up the 68705 in Midnight Resistance (bootleg)
-  (it might not be used, leftover from the Fighting Fantasy bootleg on the same PCB?)
+- Fix protection simulation in Birdie Try (that part needs a complete rewrite);
+- IPT_VBLANK doesn't work properly, that's particularly true for Birdie Try hang when you clear an hole (in any way it never clears out)
+  and for Boulder Dash fade in / fade out transitions (they are far too slow right now);
+- graphics are completely broken in Automat and Secret Agent (bootleg);
+- Fighting Fantasy (bootleg) doesn't boot at all;
+- Hook up the 68705 in Midnight Resistance (bootleg)
+   (it might not be used, leftover from the Fighting Fantasy bootleg on the same PCB?)
+- Get rid of ROM patches in Sly Spy and Hippodrome;
+- Finally, get a proper decap of the MCUs used by Bad Dudes and Birdie Try;
 
 
 PCB Layouts
@@ -282,19 +289,19 @@ static ADDRESS_MAP_START( dec0_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x242400, 0x2427ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 	AM_RANGE(0x242800, 0x243fff) AM_RAM														/* Robocop only */
 	AM_RANGE(0x244000, 0x245fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
-	
+
 	AM_RANGE(0x246000, 0x246007) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_0_w)									/* first tile layer */
 	AM_RANGE(0x246010, 0x246017) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_1_w)
 	AM_RANGE(0x248000, 0x24807f) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
 	AM_RANGE(0x248400, 0x2487ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 	AM_RANGE(0x24a000, 0x24a7ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
-	
+
 	AM_RANGE(0x24c000, 0x24c007) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_0_w)								/* second tile layer */
 	AM_RANGE(0x24c010, 0x24c017) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_1_w)
 	AM_RANGE(0x24c800, 0x24c87f) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
 	AM_RANGE(0x24cc00, 0x24cfff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 	AM_RANGE(0x24d000, 0x24d7ff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
-	
+
 	AM_RANGE(0x300000, 0x30001f) AM_READ(dec0_rotary_r)
 	AM_RANGE(0x30c000, 0x30c00b) AM_READ(dec0_controls_r)
 	AM_RANGE(0x30c010, 0x30c01f) AM_WRITE(dec0_control_w)									/* Priority, sound, etc. */
@@ -395,7 +402,7 @@ static WRITE16_HANDLER( unmapped_w )
 {
 	// fall through for unmapped protection areas
 	dec0_state *state = space->machine().driver_data<dec0_state>();
-	logerror("unmapped memory write to %04x = %04x in mode %d\n", 0x240000+offset*2, data, state->slyspy_state);		
+	logerror("unmapped memory write to %04x = %04x in mode %d\n", 0x240000+offset*2, data, state->slyspy_state);
 }
 
 void slyspy_set_protection_map(running_machine& machine, int type);
@@ -420,7 +427,7 @@ READ16_HANDLER( slyspy_state_r )
 void slyspy_set_protection_map(running_machine& machine, int type)
 {
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	
+
 	deco_bac06_device *tilegen1 = (deco_bac06_device*)space->machine().device<deco_bac06_device>("tilegen1");
 	deco_bac06_device *tilegen2 = (deco_bac06_device*)space->machine().device<deco_bac06_device>("tilegen2");
 
@@ -438,7 +445,7 @@ void slyspy_set_protection_map(running_machine& machine, int type)
 
 			space->install_legacy_write_handler( *tilegen2, 0x242000, 0x24207f, FUNC(deco_bac06_pf_colscroll_w));
 			space->install_legacy_write_handler( *tilegen2, 0x242400, 0x2427ff, FUNC(deco_bac06_pf_rowscroll_w));
-			
+
 			space->install_legacy_write_handler( *tilegen2, 0x246000, 0x247fff, FUNC(deco_bac06_pf_data_w));
 
 			space->install_legacy_write_handler( *tilegen1, 0x248000, 0x280007, FUNC(deco_bac06_pf_control_0_w));
@@ -450,7 +457,7 @@ void slyspy_set_protection_map(running_machine& machine, int type)
 			space->install_legacy_write_handler( *tilegen1, 0x24e000, 0x24ffff, FUNC(deco_bac06_pf_data_w));
 
 			break;
-	
+
 		case 1:
 			// 0x240000 - 0x241fff not mapped
 			// 0x242000 - 0x243fff not mapped
@@ -492,9 +499,9 @@ static ADDRESS_MAP_START( slyspy_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 
 	/* The location of p1 & pf2 can change in the 240000 - 24ffff region according to protection */
-	
+
 	/* Pf3 is unaffected by protection */
-	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_0_w)		
+	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_0_w)
 	AM_RANGE(0x300010, 0x300017) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_1_w)
 	AM_RANGE(0x300800, 0x30087f) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
 	AM_RANGE(0x300c00, 0x300fff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
@@ -519,20 +526,20 @@ static ADDRESS_MAP_START( midres_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x180008, 0x18000f) AM_WRITENOP /* ?? watchdog ?? */
 	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(midres_sound_w)
 
-	AM_RANGE(0x200000, 0x200007) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_0_w)				
+	AM_RANGE(0x200000, 0x200007) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_0_w)
 	AM_RANGE(0x200010, 0x200017) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_1_w)
 	AM_RANGE(0x220000, 0x2207ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 	AM_RANGE(0x220800, 0x220fff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)	/* mirror address used in end sequence */
 	AM_RANGE(0x240000, 0x24007f) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
 	AM_RANGE(0x240400, 0x2407ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 
-	AM_RANGE(0x280000, 0x280007) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_0_w)			
+	AM_RANGE(0x280000, 0x280007) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_0_w)
 	AM_RANGE(0x280010, 0x280017) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_1_w)
 	AM_RANGE(0x2a0000, 0x2a07ff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 	AM_RANGE(0x2c0000, 0x2c007f) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
 	AM_RANGE(0x2c0400, 0x2c07ff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 
-	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_0_w)			
+	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_0_w)
 	AM_RANGE(0x300010, 0x300017) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_1_w)
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 	AM_RANGE(0x340000, 0x34007f) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
@@ -575,18 +582,18 @@ static ADDRESS_MAP_START( midres_s_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-	
+
 
 
 static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_0_w)		
+	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_0_w)
 	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_1_w)
 	AM_RANGE(0x246000, 0x247fff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 //  AM_RANGE(0x240000, 0x24007f) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
 //  AM_RANGE(0x240400, 0x2407ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 
-//  AM_RANGE(0x200000, 0x300007) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_0_w)	
+//  AM_RANGE(0x200000, 0x300007) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_0_w)
 //  AM_RANGE(0x300010, 0x300017) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_1_w)
 	AM_RANGE(0x24e000, 0x24ffff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 //  AM_RANGE(0x340000, 0x34007f) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
@@ -595,7 +602,7 @@ static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x314008, 0x31400f) AM_READ(slyspy_controls_r)
 //  AM_RANGE(0x314000, 0x314003) AM_WRITE(slyspy_control_w)
 
-	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_0_w)	
+	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_0_w)
 	AM_RANGE(0x300010, 0x300017) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_1_w)
 	AM_RANGE(0x300800, 0x30087f) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
 	AM_RANGE(0x300c00, 0x300fff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
@@ -1373,7 +1380,7 @@ static MACHINE_CONFIG_DERIVED( automat, dec0_base )
 	MCFG_SCREEN_UPDATE(robocop)
 
 	MCFG_GFXDECODE(automat)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
