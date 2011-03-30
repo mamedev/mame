@@ -119,11 +119,4 @@ struct _copydata_id_string
 
 
 
-//============================================================
-//  FUNCTION PROTOTYPES
-//============================================================
-
-void winoutput_init(running_machine &machine);
-
-
 #endif /* __WINDOWS_OUTPUT_H__ */
