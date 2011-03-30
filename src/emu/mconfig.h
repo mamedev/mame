@@ -160,7 +160,6 @@ public:
 private:
 	const game_driver &		m_gamedrv;
 	emu_options &			m_options;
-	int						m_parse_level;				// nested parsing level
 };
 
 

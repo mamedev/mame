@@ -186,14 +186,9 @@ typedef struct _input_private input_private;
 typedef struct _input_port_private input_port_private;
 typedef struct _ui_input_private ui_input_private;
 typedef struct _debugcpu_private debugcpu_private;
-typedef struct _debugvw_private debugvw_private;
 typedef struct _generic_machine_private generic_machine_private;
 typedef struct _generic_video_private generic_video_private;
 typedef struct _generic_audio_private generic_audio_private;
-
-
-// template specializations
-typedef tagged_list<memory_region> region_list;
 
 
 // legacy callback functions
@@ -454,7 +449,7 @@ private:
 	osd_interface &			m_osd;					// reference to OSD system
 
 	// embedded managers and objects
-	region_list				m_regionlist;			// list of memory regions
+	tagged_list<memory_region> m_regionlist;		// list of memory regions
 	state_manager			m_state;				// state manager
 	device_scheduler		m_scheduler;			// scheduler object
 

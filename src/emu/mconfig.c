@@ -61,8 +61,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	  m_total_colors(0),
 	  m_default_layout(NULL),
 	  m_gamedrv(gamedrv),
-	  m_options(options),
-	  m_parse_level(0)
+	  m_options(options)
 {
 	// construct the config
 	(*gamedrv.machine_config)(*this, NULL);
