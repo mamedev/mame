@@ -417,24 +417,5 @@ DRIVER_INIT( hbarrel )
 DRIVER_INIT( birdtry )
 {
 	dec0_state *state = machine.driver_data<dec0_state>();
-	UINT8 *src, tmp;
-	int i, j, k;
-
 	state->GAME=3;
-
-	src = machine.region("gfx4")->base();
-
-	/* some parts of the graphic have bytes swapped */
-	for (k = 0;k < 0x70000;k += 0x20000)
-	{
-		for (i = 0x2000;i < 0x10000;i += 32)
-		{
-			for (j = 0;j < 16;j++)
-			{
-				tmp = src[k+i+j+16];
-				src[k+i+j+16] = src[k+i+j];
-				src[k+i+j] = tmp;
-			}
-		}
-	}
 }

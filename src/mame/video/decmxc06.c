@@ -32,8 +32,6 @@ todo:
     Implement sprite/tilemap orthogonality (not strictly needed as no
     games make deliberate use of it). (pdrawgfx, or rendering to bitmap for manual mixing)
 
-	fix multi-width support, used by birdie try
-
 */
 
 
@@ -94,7 +92,6 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_t *bitmap
 		/* multi width used only on the title screen? */
 
 	
-		code = spriteram[offs + 1] & 0x1fff;
 
 		sx = sx & 0x01ff;
 		sy = sy & 0x01ff;
@@ -103,15 +100,7 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_t *bitmap
 		sx = 240 - sx;
 		sy = 240 - sy;
 
-		code &= ~(h-1);
-		if (flipy)
-			incy = -1;
-		else
-		{
-			code += h-1;
-			incy = 1;
-		}
-
+	
 		if (flip_screen_get(machine))
 		{
 			sy = 240 - sy;
@@ -125,6 +114,19 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_t *bitmap
 
 		for (x = 0; x < w; x++)
 		{
+			// maybe, birdie try appears to specify the base code for each part..
+			code = spriteram[offs + 1] & 0x1fff;
+
+			code &= ~(h-1);
+		
+			if (flipy)
+				incy = -1;
+			else
+			{
+				code += h-1;
+				incy = 1;
+			}
+
 			for (y = 0; y < h; y++)
 			{
 				if (spriteram[offs] & 0x8000)
@@ -155,7 +157,7 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_t *bitmap
 					if (draw)
 					{
 						drawgfx_transpen(bitmap,cliprect,machine.gfx[m_gfxregion],
-							code - y * incy + h * x,
+							code - y * incy,
 							color & col_mask,
 							flipx,flipy,
 							sx + (mult * x),sy + (mult * y),0);
@@ -164,8 +166,8 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_t *bitmap
 			}
 
 			offs += 4;
-			if (offs >= 0x800 / 2 || spriteram[offs] & 0x8000)	// seems the expected behaviour on the title screen - WRONG for birdie try
-				 break;
+			if (offs >= 0x800 / 2)
+				 return;
 		}
 	}
 }
