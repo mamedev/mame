@@ -383,7 +383,7 @@ bool device_config::device_validity_check(emu_options &options, const game_drive
 //  rom region description for this device
 //-------------------------------------------------
 
-const rom_entry *device_config::rom_region() const
+const rom_entry *device_config::device_rom_region() const
 {
 	return NULL;
 }
@@ -395,7 +395,7 @@ const rom_entry *device_config::rom_region() const
 //  this device
 //-------------------------------------------------
 
-machine_config_constructor device_config::machine_config_additions() const
+machine_config_constructor device_config::device_mconfig_additions() const
 {
 	return NULL;
 }
@@ -407,7 +407,7 @@ machine_config_constructor device_config::machine_config_additions() const
 //  input ports description for this device
 //-------------------------------------------------
 
-const input_port_token *device_config::input_ports() const
+const input_port_token *device_config::device_input_ports() const
 {
 	return NULL;
 }

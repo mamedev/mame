@@ -1000,7 +1000,8 @@ time_t input_port_init(running_machine &machine, const input_port_token *tokens,
 
 	for (device_config *config = devicelist.first(); config != NULL; config = config->next())
 	{
-		if (config->input_ports()!=NULL) {
+		if (config->input_ports() != NULL)
+		{
 			input_port_list_init(machine.m_portlist, config->input_ports(), errorbuf, sizeof(errorbuf), TRUE, config);
 			if (errorbuf[0] != 0)
 				mame_printf_error("Input port errors:\n%s", errorbuf);

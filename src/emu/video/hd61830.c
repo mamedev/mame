@@ -124,7 +124,7 @@ const address_space_config *hd61830_device_config::memory_space_config(address_s
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *hd61830_device_config::rom_region() const
+const rom_entry *hd61830_device_config::device_rom_region() const
 {
 	return ROM_NAME(hd61830);
 }

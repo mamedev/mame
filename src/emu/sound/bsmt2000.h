@@ -88,11 +88,11 @@ public:
 	// inline configuration helpers
 	static void static_set_ready_callback(device_config *device, ready_callback callback);
 
-	// optional information overrides
-	virtual const rom_entry *rom_region() const;
-	virtual machine_config_constructor machine_config_additions() const;
-
 protected:
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+
 	// device_config overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 

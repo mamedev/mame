@@ -1053,9 +1053,8 @@ static void print_game_info(FILE *out, const game_driver *game, emu_options &opt
 	input_port_list_init(portlist, game->ipt, NULL, 0, FALSE, NULL);
 	for (device_config *cfg = config.m_devicelist.first(); cfg != NULL; cfg = cfg->next())
 	{
-		if (cfg->input_ports()!=NULL) {
+		if (cfg->input_ports() != NULL)
 			input_port_list_init(portlist, cfg->input_ports(), NULL, 0, FALSE, cfg);
-		}
 	}
 
 	/* print the header and the game name */

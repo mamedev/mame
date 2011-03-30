@@ -563,7 +563,7 @@ public:
 
 protected:
 	// optional information overrides
-	virtual const rom_entry *rom_region() const;
+	virtual const rom_entry *device_rom_region() const;
 
 	// internal state
 	const game_driver *		m_system;						// pointer to the game driver

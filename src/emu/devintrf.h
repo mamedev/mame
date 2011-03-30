@@ -292,7 +292,10 @@ public:
 	const char *tag() const { return m_tag; }
 	const void *static_config() const { return m_static_config; }
 	const machine_config &mconfig() const { return m_machine_config; }
-	const input_device_default *input_ports_defaults() const  { return m_input_defaults; }
+	const input_device_default *input_ports_defaults() const { return m_input_defaults; }
+	const rom_entry *rom_region() const { return device_rom_region(); }
+	machine_config_constructor machine_config_additions() const { return device_mconfig_additions(); }
+	const input_port_token *input_ports() const { return device_input_ports(); }
 
 	// methods that wrap both interface-level and device-level behavior
 	void config_complete();
@@ -313,15 +316,13 @@ protected:
 	virtual void device_config_complete();
 	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
 
-public:
 	// optional information overrides
-	virtual const rom_entry *rom_region() const;
-	virtual machine_config_constructor machine_config_additions() const;
-	virtual const input_port_token *input_ports() const;
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const input_port_token *device_input_ports() const;
 
 	//------------------- end derived class overrides
 
-protected:
 	// device relationships
 	device_config *			m_next;					// next device (of any type/class)
 	device_config *			m_owner;				// device that owns us, or NULL if nobody

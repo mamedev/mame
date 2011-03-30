@@ -977,7 +977,7 @@ void driver_device_config_base::static_set_palette_init(device_config *device, p
 //  regions specified for the current game
 //-------------------------------------------------
 
-const rom_entry *driver_device_config_base::rom_region() const
+const rom_entry *driver_device_config_base::device_rom_region() const
 {
 	return m_system->rom;
 }

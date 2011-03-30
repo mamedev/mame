@@ -436,10 +436,6 @@ protected:
 
 	// basic information getters
 public:
-	virtual const rom_entry *rom_region() const { return reinterpret_cast<const rom_entry *>(get_legacy_config_ptr(DEVINFO_PTR_ROM_REGION)); }
-	virtual machine_config_constructor machine_config_additions() const { return reinterpret_cast<machine_config_constructor>(get_legacy_config_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
-	virtual const input_port_token *input_ports() const { return reinterpret_cast<const input_port_token *>(get_legacy_config_ptr(DEVINFO_PTR_INPUT_PORTS)); }
-
 	// access to legacy inline configuartion
 	void *inline_config() const { return m_inline_config; }
 
@@ -451,6 +447,9 @@ public:
 protected:
 	// overrides
 	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
+	virtual const rom_entry *device_rom_region() const { return reinterpret_cast<const rom_entry *>(get_legacy_config_ptr(DEVINFO_PTR_ROM_REGION)); }
+	virtual machine_config_constructor device_mconfig_additions() const { return reinterpret_cast<machine_config_constructor>(get_legacy_config_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
+	virtual const input_port_token *device_input_ports() const { return reinterpret_cast<const input_port_token *>(get_legacy_config_ptr(DEVINFO_PTR_INPUT_PORTS)); }
 
 	// access to legacy configuration info
 	INT64 get_legacy_config_int(UINT32 state) const;

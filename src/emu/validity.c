@@ -962,7 +962,8 @@ static bool validate_inputs(const machine_config &config, int_map &defstr_map, i
 	}
 	for (device_config *cfg = config.m_devicelist.first(); cfg != NULL; cfg = cfg->next())
 	{
-		if (cfg->input_ports()!=NULL) {
+		if (cfg->input_ports() != NULL)
+		{
 			input_port_list_init(portlist, cfg->input_ports(), errorbuf, sizeof(errorbuf), FALSE, cfg);
 			if (errorbuf[0] != 0)
 			{
@@ -1106,7 +1107,7 @@ static bool validate_devices(const machine_config &config, const ioport_list &po
 				break;
 			}
 
-		if (devconfig->rom_region()!=NULL && (strcmp(devconfig->shortname(),"") == 0)) {
+		if (devconfig->rom_region() != NULL && (strcmp(devconfig->shortname(),"") == 0)) {
 			mame_printf_warning("Device %s does not have short name defined\n", devconfig->name());
 		}
 		/* check for device-specific validity check */

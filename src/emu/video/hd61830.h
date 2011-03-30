@@ -68,12 +68,12 @@ public:
     static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
     virtual device_t *alloc_device(running_machine &machine) const;
 
-	// optional information overrides
-	virtual const rom_entry *rom_region() const;
-
 protected:
 	// device_config overrides
 	virtual void device_config_complete();
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
 
 	// device_config_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
