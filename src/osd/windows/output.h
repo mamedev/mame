@@ -117,6 +117,7 @@ struct _copydata_id_string
 	char		string[1];			// string array containing the data
 };
 
+void winoutput_init(running_machine &machine);
 
 
 #endif /* __WINDOWS_OUTPUT_H__ */
