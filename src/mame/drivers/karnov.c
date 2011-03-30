@@ -23,6 +23,7 @@
     There is another Karnov rom set - a bootleg version of the Japanese roms with
     the Data East copyright removed - not supported because the original Japanese
     roms work fine.
+	^^ This should be added (DH, 30/03/11)
 
     One of the two color PROMs for chelnov and chelnoj is different; one is most
     likely a bad read, but I don't know which one.
@@ -81,7 +82,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
 #include "includes/karnov.h"
-
+#include "video/deckarn.h"
 
 /*************************************
  *
@@ -837,6 +838,9 @@ static MACHINE_CONFIG_START( karnov, karnov_state )
 	MCFG_GFXDECODE(karnov)
 	MCFG_PALETTE_LENGTH(1024)
 
+	MCFG_DEVICE_ADD("spritegen", deco_karnovsprites_, 0)
+	deco_karnovsprites_device_config::set_gfx_region(device, 2);
+
 	MCFG_PALETTE_INIT(karnov)
 	MCFG_VIDEO_START(karnov)
 
@@ -879,6 +883,9 @@ static MACHINE_CONFIG_START( wndrplnt, karnov_state )
 	MCFG_GFXDECODE(karnov)
 	MCFG_PALETTE_LENGTH(1024)
 
+	MCFG_DEVICE_ADD("spritegen", deco_karnovsprites_, 0)
+	deco_karnovsprites_device_config::set_gfx_region(device, 2);
+
 	MCFG_PALETTE_INIT(karnov)
 	MCFG_VIDEO_START(wndrplnt)
 
@@ -911,6 +918,9 @@ ROM_START( karnov )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "dn05-5",       0x8000, 0x8000, CRC(fa1a31a8) SHA1(5007a625be03c546d2a78444d72c28761b10cdb0) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 MCU */
+	ROM_LOAD( "karnov_i8751", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "dn00-",        0x00000, 0x08000, CRC(0ed77c6d) SHA1(4ec86ac56c01c158a580dc13dea3e5cbdf90d0e9) )	/* Characters */
@@ -948,6 +958,9 @@ ROM_START( karnovj )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "kar5",         0x8000, 0x8000, CRC(7c9158f1) SHA1(dfba7b3abd6b8d6991f0207cd252ee652a6050c2) )
 
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 MCU */
+	ROM_LOAD( "karnovj_i8751", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "dn00-",        0x00000, 0x08000, CRC(0ed77c6d) SHA1(4ec86ac56c01c158a580dc13dea3e5cbdf90d0e9) )	/* Characters */
 
@@ -983,6 +996,9 @@ ROM_START( wndrplnt )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 6502 Sound CPU */
 	ROM_LOAD( "ea05.bin",     0x8000, 0x8000, CRC(8dbb6231) SHA1(342faa020448ce916e820b3df18d44191983f7a6) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 MCU */
+	ROM_LOAD( "wndrplnt_i8751", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "ea00.bin",    0x00000, 0x08000, CRC(9f3cac4c) SHA1(af8a275ff531029dbada3c820c9f660fef383100) )	/* Characters */
@@ -1020,6 +1036,9 @@ ROM_START( chelnov )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 6502 Sound CPU */
 	ROM_LOAD( "ee05-.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
 
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 MCU */
+	ROM_LOAD( "chelnov_i8751", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "ee00-e.c5",    0x00000, 0x08000, CRC(e06e5c6b) SHA1(70166257da5be428cb8404d8e1063c59c7722365) )	/* Characters */
 
@@ -1053,6 +1072,9 @@ ROM_START( chelnovu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 6502 Sound CPU */
 	ROM_LOAD( "ee05-.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
 
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 MCU */
+	ROM_LOAD( "chelnovu_i8751", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "ee00-e.c5",    0x00000, 0x08000, CRC(e06e5c6b) SHA1(70166257da5be428cb8404d8e1063c59c7722365) )	/* Characters */
 
@@ -1085,6 +1107,9 @@ ROM_START( chelnovj )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 6502 Sound CPU */
 	ROM_LOAD( "ee05-.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 MCU */
+	ROM_LOAD( "chelnovj_i8751", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "a-c5.bin",     0x00000, 0x08000, CRC(1abf2c6d) SHA1(86d625ae94cd9ea69e4e613895410640efb175b3) )	/* Characters */

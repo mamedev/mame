@@ -45,6 +45,7 @@ sprites.
 #include "includes/dec8.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
+#include "video/deckarn.h"
 
 /***************************************************************************
 
@@ -220,70 +221,6 @@ WRITE8_HANDLER( gondo_scroll_w )
 
 /******************************************************************************/
 
-/* 'Karnov' sprites, used by Gondomania, Last Mission, Shackled, Ghostbusters */
-static void draw_sprites1( running_machine& machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
-{
-	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
-	int offs, x, y, sprite, sprite2, colour, extra, fx, fy;
-
-	for (offs = 0; offs < 0x800; offs += 8)
-	{
-		y = buffered_spriteram[offs + 1] + (buffered_spriteram[offs] << 8);
-		if ((y & 0x8000) == 0) continue;
-
-		fx = buffered_spriteram[offs + 3];
-
-		if ((fx & 0x1) == 0) continue;
-
-		extra = fx & 0x10;
-		fy = fx & 0x2;
-		fx = fx & 0x4;
-
-		x = buffered_spriteram[offs + 5] + (buffered_spriteram[offs + 4] << 8);
-		colour = buffered_spriteram[offs + 6] >> 4;
-		if (priority == 1 && (colour & 8)) continue;
-		if (priority == 2 && !(colour & 8)) continue;
-		sprite = buffered_spriteram[offs + 7] + (buffered_spriteram[offs + 6] << 8);
-		sprite &= 0x0fff;
-
-		if (extra) {y = y + 16; sprite &= 0xffe;}
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		x = (x + 16) % 0x200;
-		y = (y + 16) % 0x200;
-		x = 256 - x;
-		y = 256 - y;
-		if (flip_screen_get(machine))
-		{
-			y = 240 - y;
-			x = 240 - x;
-			if (fx) fx = 0; else fx = 1;
-			if (fy) fy = 0; else fy = 1;
-			if (extra) y = y - 16;
-		}
-
-		/* Y Flip determines order of multi-sprite */
-		if (extra && fy)
-		{
-			sprite2 = sprite;
-			sprite++;
-		}
-		else
-			sprite2 = sprite + 1;
-
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
-				sprite,
-				colour,fx,fy,x,y,0);
-
-    	/* 1 more sprite drawn underneath */
-    	if (extra)
-    		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
-				sprite2,
-				colour,fx,fy,x,y+16,0);
-	}
-}
-
 
 static void srdarwin_draw_sprites( running_machine& machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
@@ -385,7 +322,7 @@ SCREEN_UPDATE( ghostb )
 {
 	dec8_state *state = screen->machine().driver_data<dec8_state>();
 	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	draw_sprites1(screen->machine(), bitmap, cliprect, 0);
+	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram16, 0x400, 0);
 	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
 	return 0;
 }
@@ -464,7 +401,7 @@ SCREEN_UPDATE( lastmisn )
 	tilemap_set_scrolly(state->bg_tilemap, 0, ((state->scroll2[2] << 8)+ state->scroll2[3]));
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites1(screen->machine(), bitmap, cliprect, 0);
+	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram16, 0x400, 0);
 	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
 	return 0;
 }
@@ -478,7 +415,7 @@ SCREEN_UPDATE( shackled )
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1 | 0, 0);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1 | 1, 0);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0 | 0, 0);
-	draw_sprites1(screen->machine(), bitmap, cliprect, 0);
+	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram16, 0x400, 0);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0 | 1, 0);
 	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
 	return 0;
@@ -618,9 +555,9 @@ SCREEN_UPDATE( gondo )
 	tilemap_set_scrolly(state->bg_tilemap, 0, ((state->scroll2[2] << 8) + state->scroll2[3]));
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites1(screen->machine(), bitmap, cliprect, 2);
+	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram16, 0x400, 2);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	draw_sprites1(screen->machine(), bitmap, cliprect, 1);
+	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram16, 0x400, 1);
 	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
 	return 0;
 }
@@ -632,7 +569,7 @@ SCREEN_UPDATE( garyoret )
 	tilemap_set_scrolly(state->bg_tilemap, 0, ((state->scroll2[2] << 8) + state->scroll2[3]));
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites1(screen->machine(), bitmap, cliprect, 0);
+	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram16, 0x400, 0);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 1, 0);
 	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
 	return 0;

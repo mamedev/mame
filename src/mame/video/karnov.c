@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "includes/karnov.h"
+#include "video/deckarn.h"
 
 /***************************************************************************
 
@@ -120,76 +121,13 @@ static void draw_background( running_machine &machine, bitmap_t *bitmap, const r
 	copyscrollbitmap(bitmap, state->bitmap_f, 1, &scrollx, 1, &scrolly, cliprect);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
-{
-	karnov_state *state = machine.driver_data<karnov_state>();
-	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
-	int offs;
-
-	for (offs = 0; offs <0x800; offs += 4)
-	{
-		int x, y, sprite, sprite2, colour, fx, fy, extra;
-
-		y = buffered_spriteram16[offs];
-		if (!(y & 0x8000))
-			continue;
-
-		y = y & 0x1ff;
-		sprite = buffered_spriteram16[offs + 3];
-		colour = sprite >> 12;
-		sprite = sprite & 0xfff;
-		x = buffered_spriteram16[offs + 2] & 0x1ff;
-
-		fx = buffered_spriteram16[offs + 1];
-		extra = (fx & 0x10) ? 1 : 0;
-		fy = fx & 0x2;
-		fx = fx & 0x4;
-
-		if (extra)
-			y = y + 16;
-
-		/* Convert the co-ords..*/
-		x = (x + 16) % 0x200;
-		y = (y + 16) % 0x200;
-		x = 256 - x;
-		y = 256 - y;
-		if (state->flipscreen)
-		{
-			y = 240 - y;
-			x = 240 - x;
-			if (fx) fx = 0; else fx = 1;
-			if (fy) fy = 0; else fy = 1;
-			if (extra) y = y - 16;
-		}
-
-		/* Y Flip determines order of multi-sprite */
-		if (extra && fy)
-		{
-			sprite2 = sprite;
-			sprite++;
-		}
-		else
-			sprite2 = sprite + 1;
-
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
-				sprite,
-				colour,fx,fy,x,y,0);
-
-    	/* 1 more sprite drawn underneath */
-    	if (extra)
-    		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
-				sprite2,
-				colour,fx,fy,x,y+16,0);
-	}
-}
-
 /******************************************************************************/
 
 SCREEN_UPDATE( karnov )
 {
 	karnov_state *state = screen->machine().driver_data<karnov_state>();
 	draw_background(screen->machine(), bitmap, cliprect);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect,  screen->machine().generic.buffered_spriteram.u16, 0x800, 0);
 	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
 	return 0;
 }
