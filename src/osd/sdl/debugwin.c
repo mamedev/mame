@@ -213,7 +213,7 @@ static win_i *add_win_i(running_machine &machine, int win_type)
 	win_i *win = (win_i *) osd_malloc(sizeof(*win));
 	memset(win, 0, sizeof(*win));
 	win->cpu = NULL;
-	win->machine() = machine;
+	win->machine = &machine;
 	win->type = win_type;
 
 	win->next = win_list;
@@ -545,7 +545,7 @@ static void configuration_save(running_machine &machine, int config_type, xml_da
 void sdl_osd_interface::init_debugger()
 {
 	/* register callbacks */
-	config_register(&machine(), "debugger", configuration_load, configuration_save);
+	config_register(machine(), "debugger", configuration_load, configuration_save);
 }
 
 
@@ -562,7 +562,7 @@ void sdl_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 	{
 		// GTK init should probably be done earlier
 		gtk_init(0, 0);
-		debugmain_init(&machine());
+		debugmain_init(machine());
 
 		// Resize the main window
 		for (int i = 0; i < windowStateCount; i++)
@@ -582,9 +582,9 @@ void sdl_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 
 			switch (windowStateArray[i].type)
 			{
-				case WIN_TYPE_MEMORY: memorywin_new(&machine()); break;
-				case WIN_TYPE_DISASM: disasmwin_new(&machine()); break;
-				case WIN_TYPE_LOG:    logwin_new(&machine()); break;
+				case WIN_TYPE_MEMORY: memorywin_new(machine()); break;
+				case WIN_TYPE_DISASM: disasmwin_new(machine()); break;
+				case WIN_TYPE_LOG:    logwin_new(machine()); break;
 				default: break;
 			}
 
@@ -625,9 +625,9 @@ void debugwin_update_during_game(running_machine &machine)
 static void debugmain_process_string(win_i *win, const char *str)
 {
 	if(!str[0])
-		debug_cpu_get_visible_cpu(win->machine())->debug()->single_step();
+		debug_cpu_get_visible_cpu(*win->machine)->debug()->single_step();
 	else
-		debug_console_execute_command(win->machine(), str, 1);
+		debug_console_execute_command(*win->machine, str, 1);
 }
 
 
@@ -640,7 +640,7 @@ static void debugmain_destroy(GtkObject *obj, gpointer user_data)
 {
 	win_i *dmain = get_first_win_i(WIN_TYPE_MAIN);
 
-	dmain->machine().schedule_exit();
+	dmain->machine->schedule_exit();
 }
 
 
@@ -969,58 +969,58 @@ void on_comments_activate(GtkWidget *win)
 
 void on_new_mem_activate(GtkWidget *win)
 {
-	memorywin_new(get_running_machine(win));
+	memorywin_new(*get_running_machine(win));
 }
 
 void on_new_disasm_activate(GtkWidget *win)
 {
-	disasmwin_new(get_running_machine(win));
+	disasmwin_new(*get_running_machine(win));
 }
 
 void on_new_errorlog_activate(GtkWidget *win)
 {
-	logwin_new(get_running_machine(win));
+	logwin_new(*get_running_machine(win));
 }
 
 void on_run_activate(GtkWidget *win)
 {
-	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->go();
+	debug_cpu_get_visible_cpu(*get_running_machine(win))->debug()->go();
 }
 
 void on_run_h_activate(GtkWidget *win)
 {
 	debugwin_show(0);
-	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->go();
+	debug_cpu_get_visible_cpu(*get_running_machine(win))->debug()->go();
 }
 
 void on_run_cpu_activate(GtkWidget *win)
 {
-	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->go_next_device();
+	debug_cpu_get_visible_cpu(*get_running_machine(win))->debug()->go_next_device();
 }
 
 void on_run_irq_activate(GtkWidget *win)
 {
-	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->go_interrupt();
+	debug_cpu_get_visible_cpu(*get_running_machine(win))->debug()->go_interrupt();
 }
 
 void on_run_vbl_activate(GtkWidget *win)
 {
-	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->go_vblank();
+	debug_cpu_get_visible_cpu(*get_running_machine(win))->debug()->go_vblank();
 }
 
 void on_step_into_activate(GtkWidget *win)
 {
-	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->single_step();
+	debug_cpu_get_visible_cpu(*get_running_machine(win))->debug()->single_step();
 }
 
 void on_step_over_activate(GtkWidget *win)
 {
-	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->single_step_over();
+	debug_cpu_get_visible_cpu(*get_running_machine(win))->debug()->single_step_over();
 }
 
 void on_step_out_activate(GtkWidget *win)
 {
-	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->single_step_out();
+	debug_cpu_get_visible_cpu(*get_running_machine(win))->debug()->single_step_out();
 }
 
 void on_hard_reset_activate(GtkWidget *win)
@@ -1031,7 +1031,7 @@ void on_hard_reset_activate(GtkWidget *win)
 void on_soft_reset_activate(GtkWidget *win)
 {
 	get_running_machine(win)->schedule_soft_reset();
-	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->go();
+	debug_cpu_get_visible_cpu(*get_running_machine(win))->debug()->go();
 }
 
 void on_exit_activate(GtkWidget *win)
@@ -1123,11 +1123,11 @@ void on_run_to_cursor_activate(GtkWidget *win)
 
 	if (disasm->view->cursor_visible())
 	{
-		if (debug_cpu_get_visible_cpu(info->machine()) == disasm->view->source()->device())
+		if (debug_cpu_get_visible_cpu(*info->machine) == disasm->view->source()->device())
 		{
 			offs_t address = downcast<debug_view_disasm *>(disasm->view)->selected_address();
 			command.printf("go 0x%X", address);
-			debug_console_execute_command(info->machine(), command, 1);
+			debug_console_execute_command(*info->machine, command, 1);
 		}
 	}
 }
@@ -1141,7 +1141,7 @@ on_set_breakpoint_at_cursor_activate(GtkWidget *win)
 
 	if (disasm->view->cursor_visible())
 	{
-		if (debug_cpu_get_visible_cpu(info->machine()) == disasm->view->source()->device())
+		if (debug_cpu_get_visible_cpu(*info->machine) == disasm->view->source()->device())
 		{
 			offs_t address = downcast<debug_view_disasm *>(disasm->view)->selected_address();
 			device_debug *cpuinfo = disasm->view->source()->device()->debug();
@@ -1161,7 +1161,7 @@ on_set_breakpoint_at_cursor_activate(GtkWidget *win)
 				command.printf("bpset 0x%X", address);
 			else
 				command.printf("bpclear 0x%X", bpindex);
-			debug_console_execute_command(info->machine(), command, 1);
+			debug_console_execute_command(*info->machine, command, 1);
 		}
 	}
 }
