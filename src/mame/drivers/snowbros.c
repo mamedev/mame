@@ -64,6 +64,7 @@ out of the sprite list at that point.. (verify on real hw)
 
 #include "emu.h"
 #include "deprecat.h"
+#include "includes/snowbros.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
@@ -72,21 +73,6 @@ out of the sprite list at that point.. (verify on real hw)
 #include "video/kan_pand.h" // for the original pandora
 #include "video/kan_panb.h" // for bootlegs / non-original hw
 #include "cpu/mcs51/mcs51.h" // for semicom mcu
-
-
-class snowbros_state : public driver_device
-{
-public:
-	snowbros_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
-
-	UINT16 *hyperpac_ram;
-	int sb3_music_is_playing;
-	int sb3_music;
-	UINT8 semicom_prot_offset;
-	UINT8 *spriteram;
-	size_t spriteram_size;
-};
 
 
 static WRITE16_HANDLER( snowbros_flipscreen_w )
@@ -280,7 +266,7 @@ static ADDRESS_MAP_START( wintbob_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x600000, 0x6001ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, spriteram, spriteram_size)
+	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, bootleg_spriteram16, spriteram_size)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)	/* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)	/* IRQ 3 acknowledge */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)	/* IRQ 2 acknowledge */
@@ -301,7 +287,7 @@ static ADDRESS_MAP_START( honeydol_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x900002, 0x900003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x900004, 0x900005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xa00000, 0xa007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb00000, 0xb01fff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, spriteram, spriteram_size)
+	AM_RANGE(0xb00000, 0xb01fff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, bootleg_spriteram16, spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( honeydol_sound_map, AS_PROGRAM, 8 )
@@ -338,7 +324,7 @@ static ADDRESS_MAP_START( twinadv_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x600000, 0x6001ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, spriteram, spriteram_size)
+	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, bootleg_spriteram16, spriteram_size)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)	/* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)	/* IRQ 3 acknowledge */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)	/* IRQ 2 acknowledge */
@@ -513,7 +499,7 @@ static ADDRESS_MAP_START( snowbros3_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE( 0x500004, 0x500005) AM_READ_PORT("SYSTEM")
 	AM_RANGE( 0x600000, 0x6003ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC (paletteram)
-	AM_RANGE( 0x700000, 0x7021ff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, spriteram, spriteram_size)
+	AM_RANGE( 0x700000, 0x7021ff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, bootleg_spriteram16, spriteram_size)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)	/* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)	/* IRQ 3 acknowledge */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)	/* IRQ 2 acknowledge */

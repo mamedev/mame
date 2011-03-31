@@ -3166,6 +3166,7 @@ src/mame/includes/snk.h svneol=native#text/plain
 src/mame/includes/snk6502.h svneol=native#text/plain
 src/mame/includes/snk68.h svneol=native#text/plain
 src/mame/includes/snookr10.h svneol=native#text/plain
+src/mame/includes/snowbros.h svneol=native#text/plain
 src/mame/includes/solomon.h svneol=native#text/plain
 src/mame/includes/sonson.h svneol=native#text/plain
 src/mame/includes/spacefb.h svneol=native#text/plain
