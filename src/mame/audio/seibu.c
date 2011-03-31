@@ -176,6 +176,11 @@ static DEVICE_START( seibu_adpcm )
 	state->playing = 0;
 	state->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), state, seibu_adpcm_callback);
 	state->base = machine.region("adpcm")->base();
+
+	// because legacy device tokens are just allocated as a blob, the constructor for adpcm_state
+	// is not called, so use placement new to force it to set up; when this is converted to a
+	// modern device, we can remove this grossness
+	new(&state->adpcm) adpcm_state;
 	state->adpcm.reset();
 }
 
