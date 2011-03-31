@@ -10,6 +10,7 @@
     - Sonic Blast Man 2
     - Iron (bootleg of Iron Commando)
     - Ghost Chaser Densei
+    - Gundam Wing: Endless Duel
 
     Not dumped:
     - Final Fight 3
