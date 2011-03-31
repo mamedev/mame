@@ -117,6 +117,12 @@ struct _copydata_id_string
 	char		string[1];			// string array containing the data
 };
 
+
+
+//============================================================
+//  FUNCTION PROTOTYPES
+//============================================================
+
 void winoutput_init(running_machine &machine);
 
 

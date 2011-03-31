@@ -273,7 +273,7 @@ static DEVICE_IMAGE_LOAD( cassette )
 	{
 		/* creating an image */
 		create_opts = cassette->config->create_opts;
-		err = cassette_create(device->machine(), (void *) &image, &image_ioprocs, &wavfile_format, create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &cassette->cassette);
+		err = cassette_create((void *) &image, &image_ioprocs, &wavfile_format, create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &cassette->cassette);
 		if (err)
 			goto error;
 	}
@@ -285,7 +285,7 @@ static DEVICE_IMAGE_LOAD( cassette )
 			is_writable = image.is_writable();
 			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
 			extension = image.filetype();
-			err = cassette_open_choices(device->machine(),(void *) &image, &image_ioprocs, extension, formats, cassette_flags, &cassette->cassette);
+			err = cassette_open_choices((void *) &image, &image_ioprocs, extension, formats, cassette_flags, &cassette->cassette);
 
 			/* this is kind of a hack */
 			if (err && is_writable)
