@@ -179,8 +179,7 @@ device_config *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config 
 	astring tempstring; \
 	(void)device; \
 	(void)tag; \
-	assert(owner == NULL); \
-	owner = config.device_add(NULL, "root", &driver_device_config<_class>::static_alloc_device_config, 0); \
+	if (owner == NULL) owner = config.device_add(NULL, "root", &driver_device_config<_class>::static_alloc_device_config, 0); \
 
 #define MACHINE_CONFIG_FRAGMENT(_name) \
 device_config *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner) \
@@ -202,6 +201,17 @@ device_config *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config 
 	(void)tag; \
 	owner = MACHINE_CONFIG_NAME(_base)(config, owner); \
 	assert(owner != NULL); \
+
+#define MACHINE_CONFIG_DERIVED_CLASS(_name, _base, _class) \
+device_config *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner) \
+{ \
+	device_config *device = NULL; \
+	const char *tag; \
+	astring tempstring; \
+	(void)device; \
+	(void)tag; \
+	if (owner == NULL) owner = config.device_add(NULL, "root", &driver_device_config<_class>::static_alloc_device_config, 0); \
+	owner = MACHINE_CONFIG_NAME(_base)(config, owner); \
 
 #define MACHINE_CONFIG_END \
 	return owner; \
